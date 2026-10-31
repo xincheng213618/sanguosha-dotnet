@@ -4,7 +4,6 @@ internal sealed partial class CharacterYangFengOlEntries
 {
     internal bool AdvanceYangFengSubtree() => _resolve().AdvanceYangFengSubtree();
     internal void AnswerYangFeng(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerYangFeng(choice);
-    internal void AssertYangFeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertYangFeng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginYangFeng(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginYangFeng(supplied, op);
     internal global::CardGame.Core.PromptChoice ChooseYangFengAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseYangFengAi(p, f);
     internal bool ContinuePaidYangFeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidYangFeng(f);
@@ -14,7 +13,6 @@ internal sealed partial class CharacterYangFengOlEntries
     internal bool HasYangFengBeforeDamageObserver(long id) => _resolve().HasYangFengBeforeDamageObserver(id);
     internal bool HasYangFengDamageObserver(long id) => _resolve().HasYangFengDamageObserver(id);
     internal bool IsJiaweiOriginalProcessing(global::CardGame.Core.JiaweiRevealedEntity e) => _resolve().IsJiaweiOriginalProcessing(e);
-    internal bool IsYangFengDying() => _resolve().IsYangFengDying();
     internal bool IsYangFengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsYangFengMovement(f, e, p);
     internal bool IsYangFengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsYangFengRecoveryParent(f, recovery);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.YangFengMaterial> JiaweiDiscardCandidates(global::CardGame.Core.ProgramSkillFrame f, int target) => _resolve().JiaweiDiscardCandidates(f, target);

@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageEntries
 {
     internal global::CardGame.Core.ProgramAdjacentDiscardOriginEvent? AdjacentDiscardOrigin(global::CardGame.Core.CardMovementRecord move) => _resolve().AdjacentDiscardOrigin(move);
     internal void AssertAdjacentDiscardStorage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertAdjacentDiscardStorage(f);
-    internal void AssertPendingAdjacentDiscardOrigins() => _resolve().AssertPendingAdjacentDiscardOrigins();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAdjacentDiscardStorage(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.CardZoneKind zone) => _resolve().BeginAdjacentDiscardStorage(input, zone);
     internal void CaptureAdjacentDiscardOrigin(global::CardGame.Core.Card card, global::CardGame.Core.CardMovementRecord move, global::CardGame.Core.CardKind? frozenIdentity) => _resolve().CaptureAdjacentDiscardOrigin(card, move, frozenIdentity);
     internal global::CardGame.Core.CardKind? FreezeAdjacentDiscardPaymentIdentity(global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to, global::CardGame.Core.CardMoveReason reason) => _resolve().FreezeAdjacentDiscardPaymentIdentity(card, from, to, reason);

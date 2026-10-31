@@ -53,15 +53,6 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1530)]
     internal bool HasMouHuangYueyingBeforeDamageObserver(long id) => MouHuangYueyingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1360)]
-    internal bool IsMouHuangYueyingDying()
-    {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying)
-            return false;
-        if (MouHuangYueyingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id))
-            return true;
-        return _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.MouBingcai is not null && ValidMouBingcaiStarted(f) && IsMouBingcaiLegacyDyingParent(f)) || IsMouBingcaiLegacyDyingWindow();
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28960)]
     internal bool AdvanceMouHuangYueyingChildren()

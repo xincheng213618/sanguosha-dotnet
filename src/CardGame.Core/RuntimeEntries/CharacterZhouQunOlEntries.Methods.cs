@@ -5,7 +5,6 @@ internal sealed partial class CharacterZhouQunOlEntries
     internal bool AdvanceZhouQunChildren() => _resolve().AdvanceZhouQunChildren();
     internal void AnswerZhouQun(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerZhouQun(choice);
     internal void ApplyNingwuJudgment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ApplyNingwuJudgment(f);
-    internal void AssertZhouQun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhouQun(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhouQun(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginZhouQun(supplied, op);
     internal void BeginZhouQunMovement(ref global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ZhouQunStage stage) => _resolve().BeginZhouQunMovement(ref f, stage);
     internal bool CanBeginNingwuJudgment(global::CardGame.Core.ProgramSkillFrame f, int target, string reason, string bind, global::CardGame.Core.SkillProgramCardSetVisibility visibility) => _resolve().CanBeginNingwuJudgment(f, target, reason, bind, visibility);
@@ -21,10 +20,8 @@ internal sealed partial class CharacterZhouQunOlEntries
     internal void GrantTianhouWeather(global::CardGame.Core.ProgramSkillFrame f, int recipient) => _resolve().GrantTianhouWeather(f, recipient);
     internal bool HasZhouQunBeforeDamageObserver(long id) => _resolve().HasZhouQunBeforeDamageObserver(id);
     internal bool HasZhouQunDamageObserver(long id) => _resolve().HasZhouQunDamageObserver(id);
-    internal bool IsExactNingwuFinalizedChildSubtree(global::CardGame.Core.ProgramJudgmentTriggerWindowFrame frame, global::CardGame.Core.JudgmentFrame? judgment, int index) => _resolve().IsExactNingwuFinalizedChildSubtree(frame, judgment, index);
     internal bool IsNingwuJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsNingwuJudgment(j, f);
     internal bool IsNingwuUseIneffective(global::CardGame.Core.CardUseFrame use) => _resolve().IsNingwuUseIneffective(use);
-    internal bool IsZhouQunDying() => _resolve().IsZhouQunDying();
     internal bool IsZhouQunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhouQunMovement(f, effect, p);
     internal bool IsZhouQunRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZhouQunRecoveryParent(f, recovery);
     internal global::CardGame.Core.CardUseFrame? NingwuEligibleUse(int holder, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().NingwuEligibleUse(holder, context);

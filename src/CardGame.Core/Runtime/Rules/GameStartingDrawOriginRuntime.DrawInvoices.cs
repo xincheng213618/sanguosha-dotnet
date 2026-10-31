@@ -9,7 +9,7 @@ internal sealed partial class GameStartingDrawOriginRuntime(IProgramRuntimeFrame
     ICardMovementBatchQueue batches, IGameStartingMovementBatchOrigins batchOrigins,
     IProgramTurnQueries turn, IProgramPhaseQueries phase, ISelectionParticipantQueries participants,
     IGameStartingDrawNativeFacts facts, IGameStartingDrawNativeValidation nativeValidation,
-    IGameStartingDrawNativeReceipts receipts, IDingShangWanFrameProofs dingShangWan) : IGameStartingDrawOrigins, IGameStartingDrawOriginQueries
+    IGameStartingDrawNativeReceipts receipts) : IGameStartingDrawOrigins, IGameStartingDrawOriginQueries
 {
     private const string FudaoGiftReason = "skill-program.ding-shang-wan.fudao.give";
     private const string ZhiyiDrawReason = "skill-program.tang-tang.zhiyi.draw";

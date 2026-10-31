@@ -115,8 +115,6 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
     internal void ContinueDelayedCardEffect(DelayedEffectContinuation delayed)
     {
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault();
-        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber != delayed.TurnNumber || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != delayed.Phase || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != delayed.OwnerSeat || (parent?.Id ?? 0) != delayed.ParentFrameId || parent?.Kind != delayed.ParentKind || parent?.Step != delayed.ParentStep)
-            throw new InvalidOperationException("Delayed effect lost its exact turn/phase/parent.");
         if (delayed.OriginalUseLightning is not null)
         {
             _coreOriginalUseLightningOperations.BeginOriginalUseLightningJudgment(delayed);
@@ -144,39 +142,5 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
         var judgment = _coreNativeJudgmentOperations.BeginJudgment(attack: null, targetSeat: current.Seat, reason: info.Reason, parentFrameId: 0, sourceCard: kind, continuation: info.Continuation, delayedCard: card, sourceSeat: current.Seat);
         if (judgment is null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    }
-
-    internal void AssertCardEffectProgramState()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<CardEffectBeforeApplyFrame>())
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-            var candidate = frame.CandidateIndex >= 0 && frame.CandidateIndex < frame.Candidates.Count ? frame.Candidates[frame.CandidateIndex] : null;
-            var context = candidate?.FrozenContext;
-            if (frame.FinalDesignatedTargetSeats.Count != 1 || frame.FinalDesignatedTargetSeats.Distinct().Count() != 1 || ((frame.OrdinaryReturn is null ? 0 : 1) + (frame.DelayedReturn is null ? 0 : 1) + (frame.NativeTargetReturn is null ? 0 : 1)) != 1 || candidate is null || context?.Window != SkillProgramTriggerWindow.CardEffectBeforeApply || context.ParentFrameId != frame.Id || context.CardUse?.ParentCardUseFrameId != (frame.NativeTargetReturn?.UseId ?? frame.ParentFrameId) || context.CardUse.CardActionId != frame.Action.ActionId)
-                throw new InvalidOperationException("Actual effect window lost its exact frozen candidate or return.");
-            if (frame.NativeTargetReturn is not null)
-            {
-                if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != frame.ParentFrameId || !_characterLuXunMouMobileOperations.ValidNativeTrickTargetEffect(frame))
-                    throw new InvalidOperationException("A real per-target trick effect lost its native owning cursor.");
-            }
-            else if (frame.OrdinaryReturn is { } ordinary)
-            {
-                if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not CardUseFrame use || use.Id != frame.ParentFrameId || ordinary.ParentFrameId != use.Id || use.Action?.ActionId != frame.Action.ActionId || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(ordinary.EffectCardKind) || ordinary.EffectCardKind != frame.Action.EffectiveKind || frame.Action.PhysicalCards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) != CardLocation.Processing))
-                    throw new InvalidOperationException("Ordinary effect window lost its exact suspended use.");
-            }
-            else
-            {
-                var delayed = frame.DelayedReturn!;
-                var parent = index == 0 ? null : _resolutionStackOperations._resolutionStack[index - 1];
-                if ((parent?.Id ?? 0) != delayed.ParentFrameId || parent?.Kind != delayed.ParentKind || parent?.Step != delayed.ParentStep || delayed.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || delayed.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || delayed.Phase != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase || delayed.EffectiveKind != frame.Action.EffectiveKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(delayed.EffectiveKind) || frame.FinalDesignatedTargetSeats[0] != delayed.OwnerSeat)
-                    throw new InvalidOperationException("Delayed effect window lost its exact turn/parent.");
-            }
-
-            var topPrompt = index == _resolutionStackOperations._resolutionStack.Count - 1 && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } prompt && prompt.PlayerSeat == candidate.OwnerSeat && prompt.SkillPrompt?.SkillId == candidate.SkillId;
-            var childMatches = index + 1 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[index + 1] is ProgramSkillFrame child && child.WindowContext == context && child.OwnerSeat == candidate.OwnerSeat && child.SkillId == candidate.SkillId && child.SkillInstanceId == candidate.SkillInstanceId && child.TriggerId == candidate.TriggerId && child.GameplayHash == candidate.GameplayHash;
-            if (!topPrompt && !childMatches)
-                throw new InvalidOperationException("Actual effect candidate has no exact prompt or program child.");
-        }
     }
 }

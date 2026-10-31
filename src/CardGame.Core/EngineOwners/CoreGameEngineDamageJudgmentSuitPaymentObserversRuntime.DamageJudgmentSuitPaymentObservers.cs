@@ -99,25 +99,8 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentObserversRu
     internal bool HasDamageJudgmentSuitPaymentObserver(long id) => DamageJudgmentSuitPaymentRoot(id)is not null;
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 580)]
     internal bool IsDamageJudgmentSuitPaymentMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation movement) => effect?.Op == SkillProgramEffectOp.JudgeDamageTargetThenOfferSuitDiscard && movement.SubjectSeat == frame.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && frame.DamageJudgmentSuitPayment is { Stage: ProgramDamageJudgmentPaymentStage.PaymentChildren or ProgramDamageJudgmentPaymentStage.SourceDiscardChildren or ProgramDamageJudgmentPaymentStage.ClaimChildren or ProgramDamageJudgmentPaymentStage.CleanupChildren } && IsValidDamageJudgmentSuitPayment(frame);
-    internal bool HasDamageJudgmentSuitPaymentRide(long judgment) => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && DamageJudgmentSuitPaymentRoot(damage.Id)?.DamageJudgmentSuitPayment?.JudgmentFrameId == judgment;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 410, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 410)]
     internal bool IsDamageJudgmentSuitPaymentDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && DamageJudgmentSuitPaymentRoot(damage.Id)is not null;
-    internal bool IsExactDamageJudgmentSuitPaymentFinalizedSubtree(ProgramJudgmentTriggerWindowFrame window, JudgmentFrame? judgment, int index) => judgment is not null && window.Activated && index >= 1 && index + 1 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[index - 1] == judgment && judgment.Id == window.ParentFrameId && _resolutionStackOperations._resolutionStack[index + 1] is ProgramSkillFrame child && child.WindowContext is { Window: SkillProgramTriggerWindow.JudgmentFinalized } context && context.ParentFrameId == window.Id && context.Judgment == window.Judgment && HasDamageJudgmentSuitPaymentRide(judgment.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 590)]
-    internal void AssertDamageJudgmentSuitPayment(ProgramSkillFrame frame)
-    {
-        if (frame.DamageJudgmentSuitPayment is not { } draft)
-            return;
-        if (!IsValidDamageJudgmentSuitPayment(frame))
-            throw new InvalidOperationException("Invalid damage judgment payment owning receipt.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && draft.Stage is ProgramDamageJudgmentPaymentStage.ChoosingPayment or ProgramDamageJudgmentPaymentStage.ChoosingSourceDiscard)
-        {
-            var source = draft.Stage == ProgramDamageJudgmentPaymentStage.ChoosingSourceDiscard;
-            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != (source ? draft.SourceSeat : frame.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, _coreDamageJudgmentSuitPaymentsOperations.DamageJudgmentPaymentChoices(frame, source)))
-                throw new InvalidOperationException("Damage judgment payment changed its published exact choices.");
-        }
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.JudgeDamageTargetThenOfferSuitDiscard)]
     internal PromptChoice SelectAiDamageJudgmentSuitPayment(PendingDecision decision)

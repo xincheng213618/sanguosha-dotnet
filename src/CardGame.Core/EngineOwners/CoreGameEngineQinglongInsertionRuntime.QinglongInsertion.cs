@@ -80,28 +80,4 @@ internal sealed partial class CoreGameEngineQinglongInsertionRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
         return true;
     }
-
-    internal HashSet<int> QinglongAncestorProcessing(long attackId)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == attackId);
-        return _resolutionStackOperations._resolutionStack.Take(Math.Max(0, index)).OfType<CardUseFrame>().Where(use => use.Continuations.QinglongFollowup is { Active: true }).SelectMany(use => use.PhysicalCardIds ?? [use.CardId]).Where(id => id != 0).ToHashSet();
-    }
-
-    internal void AssertQinglongInsertions()
-    {
-        foreach (var original in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-        {
-            if (original.Continuations.QinglongFollowup is not { Active: true } suspension)
-                continue;
-            if (original.Step == ResolutionFrameStep.Completed || original.CardAttack is not { Active: false } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(original.CardKind) || suspension.NextAttackOwnerId != original.Id || attack.SuccessfulDodgeResponses != attack.RequiredDodgeResponses || suspension.Decision is not null || suspension.FollowupUseId is not { } childId)
-                throw new InvalidOperationException("A Qinglong insertion lost its unfinished dodged parent.");
-            var child = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == childId);
-            var paidSettlement = _characterLiuFengBoundaryOperations.HasBoundaryLiuFengQinglongSettlementRide(original, childId);
-            var matchingChild = suspension.ChildCompleted ? child is null && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == original.Id || paidSettlement) : child is null ? paidSettlement : child.Action is { } childAction && childAction.ParentActionId == original.Action?.ActionId && child.SourceSeat == original.SourceSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(child.CardKind) && childAction.TargetSeats.SequenceEqual([attack.TargetSeat]);
-            if (!matchingChild)
-                throw new InvalidOperationException("A Qinglong insertion returned through a different child use.");
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Any(fact => fact.ResolutionId == original.Id))
-                throw new InvalidOperationException("A suspended Qinglong parent finished before its inserted Slash.");
-        }
-    }
 }

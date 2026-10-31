@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineUnequalHandHpEndingEntries
 {
-    internal void AssertRegisteredUnequalHandHpReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredUnequalHandHpReceipt(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginUnequalHandHpEnding(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginUnequalHandHpEnding(supplied);
     internal bool CanContinueUnequalHandHp(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueUnequalHandHp(f);
     internal bool CanOfferUnequalHandHp(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context, int owner) => _resolve().CanOfferUnequalHandHp(trigger, context, owner);

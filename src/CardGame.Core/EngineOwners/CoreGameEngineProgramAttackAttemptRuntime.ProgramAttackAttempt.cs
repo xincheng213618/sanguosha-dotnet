@@ -75,7 +75,6 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
             throw new InvalidOperationException("Program damage lost its owner continuation.");
         var receipt = program.AttackReturn;
         _coreRecoveryDamageEdgesOperations.AssertRecoveryDamageOrigin(program);
-        _coreNativeDrawThresholdDyingOperations.AssertNativeDrawThresholdDyingOrigin(program);
         _coreSuitDamagePreventionBenefitsOperations.CaptureSuitPreventionDamageCompleted(program, attack.DamageWasApplied);
         program = _coreDynamicDiscardDamagePaymentsOperations.CaptureDynamicDiscardDamageCompleted(program);
         program = _characterZhaoZhongOlOperations.CaptureYintianProgramDamageCompleted(program, attack);
@@ -87,27 +86,5 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
             throw new InvalidOperationException("Program damage lost its parent damage occurrence.");
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
         _coreRuntimeOperations.AdvanceRuntimeProgram(id);
-    }
-
-    internal bool HasDamageTriggerForAttack(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Any(window => _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Any(damage => damage.Id == window.ParentFrameId && damage.ParentFrameId == attack.ResolutionId && damage.SourceSeat == attack.SourceSeat && damage.TargetSeat == attack.TargetSeat));
-    internal void AssertProgramAttackState()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-        {
-            if (frame.AttackAttempt is not { } state)
-            {
-                if (frame.AttackReturn is not null)
-                    throw new InvalidOperationException("A completed program damage retained its return receipt.");
-                continue;
-            }
-
-            if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(state.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(state.TargetSeat) || state.DamageAmount < 0 || frame.AttackReturn is null || state.ChainedTargetIndex < 0 || state.ChainedTargetIndex > (state.ChainedTargetSeats?.Count ?? 0) || (state.ChainedTargetSeats ?? []).Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat)))
-                throw new InvalidOperationException("A program damage attempt has invalid participants or chain cursor.");
-            if (frame.AttackReturn.ParentAttackOwnerFrameId is { } parent && !_resolutionStackOperations._resolutionStack.TakeWhile(item => item.Id != frame.Id).Any(item => item.Id == parent))
-                throw new InvalidOperationException("A program damage attempt lost its suspended parent owner.");
-            if (frame.AttackReturn.ParentDamageWindowFrameId is { } windowId && !_resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Any(window => window.Id == windowId))
-                throw new InvalidOperationException("A program damage attempt lost its suspended damage occurrence.");
-            _coreRecoveryDamageEdgesOperations.AssertRecoveryDamageOrigin(frame);
-        }
     }
 }

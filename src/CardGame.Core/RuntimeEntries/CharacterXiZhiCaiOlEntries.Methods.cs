@@ -21,15 +21,12 @@ internal sealed partial class CharacterXiZhiCaiOlEntries
     internal void FinishXianfuEcho(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishXianfuEcho(f);
     internal bool HasXiZhiCaiBeforeDamageObserver(long id) => _resolve().HasXiZhiCaiBeforeDamageObserver(id);
     internal bool HasXiZhiCaiDamageObserver(long id) => _resolve().HasXiZhiCaiDamageObserver(id);
-    internal bool IsExactChouceFinalizedChildSubtree(global::CardGame.Core.ProgramJudgmentTriggerWindowFrame frame, global::CardGame.Core.JudgmentFrame? judgmentFrame, int frameIndex) => _resolve().IsExactChouceFinalizedChildSubtree(frame, judgmentFrame, frameIndex);
-    internal bool IsXiZhiCaiDying() => _resolve().IsXiZhiCaiDying();
     internal bool IsXiZhiCaiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXiZhiCaiMovement(f, e, p);
     internal bool IsXianfuEchoTrigger(global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().IsXianfuEchoTrigger(trigger);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.XianfuRelationGrant> LiveXianfuRelations() => _resolve().LiveXianfuRelations();
     internal void ObserveXianfuDamageQualification(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveXianfuDamageQualification(payload);
     internal bool? ProveXianfuHealth(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ProveXianfuHealth(trigger, candidate, context);
     internal void PublishChouceDecision(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishChouceDecision(f);
-    internal void RequireIssuedXiZhiCai(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireIssuedXiZhiCai(f);
     internal void ResolveChouceChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveChouceChoice(choice);
     internal global::CardGame.Core.SkillProgramStepOutcome ResolveChouceFrozenJudgment(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().ResolveChouceFrozenJudgment(supplied, effect);
     internal bool ResumeChouce(long id) => _resolve().ResumeChouce(id);

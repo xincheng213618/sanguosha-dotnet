@@ -47,7 +47,6 @@ internal sealed partial class CharacterJiangWeiMouRuntime
     internal bool MouJiangWeiAnniversaryDamageWindow(long id) => MouJiangWeiAnniversaryRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35200)]
     internal bool MouJiangWeiAnniversaryBeforeDamage(long id) => MouJiangWeiAnniversaryRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 35200)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35200)]
     internal bool MouJiangWeiAnniversaryDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouJiangWeiAnniversaryRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35200)]

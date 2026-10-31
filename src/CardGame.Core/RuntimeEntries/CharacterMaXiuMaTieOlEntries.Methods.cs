@@ -6,9 +6,6 @@ internal sealed partial class CharacterMaXiuMaTieOlEntries
     internal global::CardGame.Core.PromptChoice AiKenshang(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiKenshang(p, f);
     internal void AnswerKenshangRequest(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerKenshangRequest(selected);
     internal void AnswerKenshangTarget(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerKenshangTarget(choice);
-    internal void AssertKenshang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertKenshang(f);
-    internal void AssertKenshangRequestState(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertKenshangRequestState(f);
-    internal void AssertKenshangRequests() => _resolve().AssertKenshangRequests();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginKenshang(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginKenshang(input, op);
     internal void BeginKenshangRequest(global::CardGame.Core.KenshangRequestReceipt r) => _resolve().BeginKenshangRequest(r);
     internal bool CanRunIssuedKenshangCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunIssuedKenshangCandidate(c, context);
@@ -26,7 +23,6 @@ internal sealed partial class CharacterMaXiuMaTieOlEntries
     internal bool HasKenshangTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasKenshangTargetTail(use);
     internal bool HasKenshangTargetTail2(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardActionContext action) => _resolve().HasKenshangTargetTail(use, action);
     internal bool IsIssuedKenshangCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedKenshangCandidate(c);
-    internal bool IsKenshangDying() => _resolve().IsKenshangDying();
     internal bool IsKenshangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsKenshangMovement(f, e, p);
     internal bool IsKenshangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsKenshangRecoveryParent(f, recovery);
     internal bool IsKenshangTargetsReplacedFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.SlashTargetsReplacedEvent fact) => _resolve().IsKenshangTargetsReplacedFact(use, fact);
@@ -35,10 +31,8 @@ internal sealed partial class CharacterMaXiuMaTieOlEntries
     internal int KenshangDamageTotal(global::CardGame.Core.CardUseFrame use) => _resolve().KenshangDamageTotal(use);
     internal bool KenshangFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().KenshangFirstChild(f, child);
     internal int[] KenshangLegalTargets(global::CardGame.Core.CardUseFrame use) => _resolve().KenshangLegalTargets(use);
-    internal global::CardGame.Core.PendingDecision? KenshangNativeOriginalDecision(long ownerId) => _resolve().KenshangNativeOriginalDecision(ownerId);
     internal global::CardGame.Core.ProgramSkillFrame? KenshangObserverRoot() => _resolve().KenshangObserverRoot();
     internal bool KenshangProgramActor(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffectOp op, int actor) => _resolve().KenshangProgramActor(f, op, actor);
-    internal global::CardGame.Core.PendingDecision KenshangProgramNativeDecision(global::CardGame.Core.PendingDecision p) => _resolve().KenshangProgramNativeDecision(p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> KenshangProgramSlashChoices(global::CardGame.Core.ProgramSkillFrame f, int actorSeat, global::System.Collections.Generic.IReadOnlyList<int> targets, string? resultBind = default) => _resolve().KenshangProgramSlashChoices(f, actorSeat, targets, resultBind);
     internal int[] KenshangProgramTargets(global::CardGame.Core.ProgramSkillFrame f, int actor, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().KenshangProgramTargets(f, actor, op);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> KenshangQinglongSlashChoices(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().KenshangQinglongSlashChoices(pending);

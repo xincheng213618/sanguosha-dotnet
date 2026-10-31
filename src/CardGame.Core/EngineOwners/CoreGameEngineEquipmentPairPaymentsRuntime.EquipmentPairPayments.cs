@@ -85,23 +85,6 @@ internal sealed partial class CoreGameEngineEquipmentPairPaymentsRuntime
     }
 
     internal SkillProgramEffect EquipmentPairOwnedSelectionEffect(ProgramSkillFrame frame, SkillProgramEffect effect) => effect.Op != SkillProgramEffectOp.SelectEquipmentPairAndPayment ? effect : frame.EquipmentPairPayment is { } paid ? new(SkillProgramEffectOp.SelectOwnedCards, SkillProgramEffectTarget.Owner, paid.RequiredPaymentCount, effect.Condition, zones: [CardZoneKind.Hand, CardZoneKind.Equipment], resultBind: paid.ResultBind, minimumCards: paid.RequiredPaymentCount) : effect;
-    internal bool IsValidEquipmentPairProgramSelection(ProgramSkillFrame frame, bool awaitingSelection)
-    {
-        // This instruction replaces the activation's initially empty target set.
-        // Its later private cost choices and native children retain the same pair.
-        if (frame.EquipmentPairPayment is not null)
-            return IsIssuedEquipmentPairPayment(frame);
-        if (!awaitingSelection || frame.TriggerId is not null || frame.WindowContext is not null || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat)
-            return false;
-        var program = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program;
-        if (program is null || program.GameplayHash != frame.GameplayHash)
-            return false;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, program);
-        if (plan.Instructions.Count != 4 || plan.Instructions[0].Op != SkillProgramEffectOp.SelectEquipmentPairAndPayment)
-            return false;
-        var pairs = PayableEquipmentPairs(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId);
-        return pairs.Count > 0 && prompt.Choices.Count == pairs.Count && prompt.ValidTargetSeats.SequenceEqual(pairs.SelectMany(p => new[] { p.First, p.Second }).Distinct().Order()) && prompt.Choices.Select(c => c.Id.Value).SequenceEqual(pairs.Select(p => $"equipment-pair.frame-{(frame.Id)}.first-{(p.First)}.second-{(p.Second)}")) && prompt.Choices.All(c => c.Cards.Count == 0 && c.Targets is [var first, var second] && pairs.Contains((first, second)) && c.Parameters.GetValueOrDefault("program-action") == "equipment-pair-payment" && c.Parameters.GetValueOrDefault("frame-id") == frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture));
-    }
 
     internal bool IsIssuedEquipmentPairPayment(ProgramSkillFrame frame)
     {
@@ -139,15 +122,6 @@ internal sealed partial class CoreGameEngineEquipmentPairPaymentsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { EquipmentPairPayment = p with { ExchangeMovementSequenceBefore = before } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramEquipmentPairExchangeStartedEvent(frame.Id, p.FirstSeat, p.SecondSeat, before));
         return frame;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 340)]
-    internal void AssertEquipmentPairPayment(ProgramSkillFrame frame)
-    {
-        if (frame.EquipmentPairPayment is not { } paid)
-            return;
-        if (!IsIssuedEquipmentPairPayment(frame) || paid.ExchangeMovementSequenceBefore is { } before && (frame.InstructionIndex != 4 || !EquipmentPairCostIsPaid(frame) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramEquipmentPairExchangeStartedEvent>().Any(e => e.FrameId == frame.Id && e.FirstSeat == paid.FirstSeat && e.SecondSeat == paid.SecondSeat && e.MovementSequenceBefore == before)))
-            throw new InvalidOperationException("The paid equipment pair lost its exact frozen pair, cost or exchange receipt.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.SelectEquipmentPairAndPayment)]

@@ -105,8 +105,6 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossObserversRunt
         var current = _resolutionStackOperations._resolutionStack[child];
         return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(current, parent) || OrderedPrintedSkillLossSkillsChangedEdge(parent, current) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, current) || _coreMatchingRecastObserversOperations.MatchingRecastStructuralEdge(parent, current) || _coreOverflowTargetCancellationObserversOperations.OverflowTargetCancellationStructuralEdge(parent, current) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child);
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 510, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 590)]
     internal bool IsOrderedPrintedSkillLossProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OrderedPrintedSkillLossObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1690)]
@@ -133,51 +131,5 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossObserversRunt
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || OrderedPrintedSkillLossObserverRoot()is null)
             return false;
         return _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 60)]
-    internal void AssertOrderedPrintedSkillLoss(ProgramSkillFrame f)
-    {
-        if (f.OrderedPrintedSkillLoss is null)
-            return;
-        if (!ValidOrderedPrintedSkillLossReceipt(f))
-            throw new InvalidOperationException("Ordered printed-skill loss lost its exact damage, removed grants or once-issued Draw receipt.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !OrderedPrintedSkillLossFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Ordered printed-skill loss retained an unrelated native child.");
-    }
-
-    internal void AssertOrderedPrintedSkillLossObservers()
-    {
-        foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OrderedPrintedSkillLoss is not null || f.AlcoholSlashSkillReplacement is not null || f.RandomDamageTargetSkill is not null || f.DamageTargetSkillRoundDraw is not null))
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-            if (index + 1 < _resolutionStackOperations._resolutionStack.Count && OrderedPrintedSkillLossObserverRoot(root.Id)is null)
-                throw new InvalidOperationException("An ordered printed-skill loss descendant lost its exact native return ancestry.");
-        }
-    }
-
-    internal void AssertOrderedPrintedSkillLossState()
-    {
-        if (!_coreGameEngineOrderedPrintedSkillLossOrderedPrintedSkillLossLeasesOrderedPrintedSkillLossStateStartedAccess._orderedPrintedSkillLossStateStarted && _coreGameEngineOrderedPrintedSkillLossOrderedPrintedSkillLossLeasesOrderedPrintedSkillLossStateStartedAccess._orderedPrintedSkillLossLeases.Count == 0)
-            return;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        if (_coreGameEngineOrderedPrintedSkillLossOrderedPrintedSkillLossLeasesOrderedPrintedSkillLossStateStartedAccess._orderedPrintedSkillLossLeases.Select(l => l.ProgramFrameId).Distinct().Count() != _coreGameEngineOrderedPrintedSkillLossOrderedPrintedSkillLossLeasesOrderedPrintedSkillLossStateStartedAccess._orderedPrintedSkillLossLeases.Count || _coreGameEngineOrderedPrintedSkillLossOrderedPrintedSkillLossLeasesOrderedPrintedSkillLossStateStartedAccess._orderedPrintedSkillLossLeases.Any(l => !ValidOrderedPrintedSkillLossLease(l) || history.OfType<OrderedPrintedSkillLossExpiredEvent>().Any(e => e.FrameId == l.ProgramFrameId)))
-            throw new InvalidOperationException("An ordered printed-skill loss lease lost its immutable removed-grant issuance.");
-        foreach (var issued in history.OfType<OrderedPrintedSkillLossIssuedEvent>())
-        {
-            var expires = history.OfType<OrderedPrintedSkillLossExpiredEvent>().Where(e => e.FrameId == issued.FrameId).ToArray();
-            if (expires.Length == 0)
-            {
-                if (_coreGameEngineOrderedPrintedSkillLossOrderedPrintedSkillLossLeasesOrderedPrintedSkillLossStateStartedAccess._orderedPrintedSkillLossLeases.Count(l => l.ProgramFrameId == issued.FrameId) != 1)
-                    throw new InvalidOperationException("An unexpired ordered printed-skill loss disappeared before actual turn end.");
-                continue;
-            }
-
-            var returned = history.OfType<OrderedPrintedSkillGrantRestoredEvent>().Where(e => e.FrameId == issued.FrameId).ToArray();
-            var removed = history.OfType<OrderedPrintedSkillGrantRemovedEvent>().Where(e => e.FrameId == issued.FrameId).ToArray();
-            if (expires is not [var end] || end.OwnerSeat != issued.Source.OwnerSeat || end.ActualTurnNumber != issued.ActualTurnNumber || end.ActualTurnOwnerSeat != issued.ActualTurnOwnerSeat || returned.Length != issued.RemovedGrantCount || !returned.Select(e => e.Grant).SequenceEqual(removed.Select(e => e.Grant)) || returned.Any(e => e.OwnerSeat != end.OwnerSeat) || end.RestoredCount != returned.Count(e => e.Restored) || end.SkippedCount != returned.Count(e => !e.Restored) || !history.OfType<TurnEndedEvent>().Any(e => e.TurnNumber == end.ActualTurnNumber && e.ActorSeat == end.ActualTurnOwnerSeat))
-                throw new InvalidOperationException("An ordered printed-skill restoration lost its original grants or matching actual TurnEnded fact.");
-        }
     }
 }

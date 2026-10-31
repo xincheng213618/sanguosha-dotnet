@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterYuanTanYuanShangOlEntries
 {
-    internal void AssertNeifaFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertNeifaFrame(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginNeifa(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginNeifa(supplied, effect);
     internal bool CanContinueNeifa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueNeifa(f);
     internal bool CanOfferNeifa(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferNeifa(c, t, w);
@@ -18,7 +17,6 @@ internal sealed partial class CharacterYuanTanYuanShangOlEntries
     internal bool HasNeifaBeforeDamageObserver(long id) => _resolve().HasNeifaBeforeDamageObserver(id);
     internal bool HasNeifaDamageObserver(long id) => _resolve().HasNeifaDamageObserver(id);
     internal bool HasNeifaTrickTargetCancellation(global::CardGame.Core.CardUseFrame use) => _resolve().HasNeifaTrickTargetCancellation(use);
-    internal bool IsNeifaDying() => _resolve().IsNeifaDying();
     internal bool IsNeifaMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsNeifaMovement(f, e, p);
     internal bool IsNeifaTargetsResolvedFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.NeifaTargetsResolvedEvent fact, global::System.Collections.Generic.IReadOnlyList<int> original) => _resolve().IsNeifaTargetsResolvedFact(use, fact, original);
     internal bool IsNeifaUseForbidden(int actor, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardActionType type) => _resolve().IsNeifaUseForbidden(actor, kind, type);

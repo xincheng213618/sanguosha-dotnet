@@ -14,11 +14,9 @@ internal sealed partial class CharacterRuanJiAnniversaryEntries
     internal bool DrainRuanJi(long id) => _resolve().DrainRuanJi(id);
     internal void FinishRuanJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishRuanJi(f);
     internal bool HasRuanJiShownRedUse(int owner, string instance, global::CardGame.Core.CardActionContext action) => _resolve().HasRuanJiShownRedUse(owner, instance, action);
-    internal bool IsExactRuanJiVirtualBasicDraft(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramVirtualBasicDraft draft) => _resolve().IsExactRuanJiVirtualBasicDraft(f, draft);
     internal bool KeepsAnniversaryRuanJiAlcohol(int seat) => _resolve().KeepsAnniversaryRuanJiAlcohol(seat);
     internal void PublishRuanJiDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishRuanJiDiscard(f);
     internal void RecordRuanJiConvertedName(global::CardGame.Core.IGameEvent payload) => _resolve().RecordRuanJiConvertedName(payload);
-    internal void RequireRuanJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireRuanJi(f);
     internal bool ResumeRuanJi(long id) => _resolve().ResumeRuanJi(id);
     internal void ReturnRuanJiDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnRuanJiDraw(supplied, draw);
     internal bool ReturnRuanJiMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnRuanJiMovement(f);

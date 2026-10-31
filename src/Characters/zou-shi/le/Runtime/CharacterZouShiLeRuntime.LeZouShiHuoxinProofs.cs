@@ -22,11 +22,4 @@ internal sealed partial class CharacterZouShiLeRuntime
             return r.BatchId == 0 && r.PaidSequence == 0 && paid.Length == 0 && f.PendingMovementContinuation is null;
         return r.MayObtain && r.BatchId > 0 && r.PaidSequence > r.Before && r.PaidSequence <= r.After && paid is [var p] && p == new HuoxinObtainPaidEvent(f.Id, r.BatchId, id, kind, CardLocation.Hand(r.TargetSeat), CardLocation.Hand(f.OwnerSeat), r.PaidSequence, r.Before, r.After) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.Sequence == p.MovementSequence && move.CardId == id && move.CardKind == kind && move.From == p.From && move.To == p.To && move.Reason.Value == HuoxinObtainReason) == 1 && (f.PendingMovementContinuation is null || IsHuoxinMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), f.PendingMovementContinuation));
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28951)]
-    internal void AssertHuoxin(ProgramSkillFrame f)
-    {
-        if (f.Huoxin is not null && !ValidHuoxin(f))
-            throw new InvalidOperationException("Huoxin lost its true-use origin, hidden slot draft, pre-mark suit/mark ticket or exact once-paid shown entity.");
-    }
 }

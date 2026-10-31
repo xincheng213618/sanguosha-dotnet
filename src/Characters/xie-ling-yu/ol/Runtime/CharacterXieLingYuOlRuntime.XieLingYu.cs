@@ -90,7 +90,6 @@ internal sealed partial class CharacterXieLingYuOlRuntime
 
     internal void PublishXieLingYu(ProgramSkillFrame f)
     {
-        AssertXieLingYu(f);
         var choices = XieLingYuChoices(f);
         if (choices.Count == 0)
         {
@@ -116,7 +115,6 @@ internal sealed partial class CharacterXieLingYuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XieLingYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !XieLingYuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xie Ling Yu requires her exact current private cost or remaining-name choice.");
-        AssertXieLingYu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -200,7 +198,6 @@ internal sealed partial class CharacterXieLingYuOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { XieLingYu: { } r } f && f.Id == id)
         {
-            AssertXieLingYu(f);
             if (r.Stage is XieLingYuStage.Cost or XieLingYuStage.RemoveName)
             {
                 if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))

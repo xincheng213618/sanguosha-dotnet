@@ -114,8 +114,6 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyWindowsRuntime
             {
                 _coreRuntimeOperations.PopResolutionFrame(w.Id, ResolutionFrameKind.SlashTargetPenaltyWindow);
                 var attack = _coreActiveNativeAttackQueriesOperations.ActiveCardAttack;
-                if (attack is null || attack.ResolutionId != w.ParentFrameId)
-                    throw new InvalidOperationException("The target penalty lost its exact Slash return.");
                 if (_coreMatchOutcomeWinnerAccess._winner != Winner.None)
                 {
                     _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);

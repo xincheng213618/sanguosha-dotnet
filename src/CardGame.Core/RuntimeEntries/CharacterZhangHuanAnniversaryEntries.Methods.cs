@@ -12,12 +12,10 @@ internal sealed partial class CharacterZhangHuanAnniversaryEntries
     internal bool DrainZhangHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainZhangHuan(f);
     internal void DrawZhangHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrawZhangHuan(f);
     internal void FinishZhangHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhangHuan(f);
-    internal bool HasAnniversaryZhangHuanPrompt() => _resolve().HasAnniversaryZhangHuanPrompt();
     internal bool IsAnniversaryZhangHuanExactCardQuery(global::CardGame.Core.CharacterState actor, int? selected) => _resolve().IsAnniversaryZhangHuanExactCardQuery(actor, selected);
     internal bool IsAnniversaryZhangHuanSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsAnniversaryZhangHuanSettlementBatch(f, b);
     internal bool IsZhangHuanNative(global::CardGame.Core.CardUseFrame use) => _resolve().IsZhangHuanNative(use);
     internal void PublishZhangHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishZhangHuan(f);
-    internal void RequireZhangHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireZhangHuan(f);
     internal bool RetainZhangHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainZhangHuan(f);
     internal bool ReturnZhangHuanAttack() => _resolve().ReturnZhangHuanAttack();
     internal void ReturnZhangHuanDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome d) => _resolve().ReturnZhangHuanDraw(supplied, d);

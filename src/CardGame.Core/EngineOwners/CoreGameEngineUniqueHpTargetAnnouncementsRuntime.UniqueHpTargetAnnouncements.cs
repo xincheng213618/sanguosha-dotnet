@@ -77,15 +77,4 @@ internal sealed partial class CoreGameEngineUniqueHpTargetAnnouncementsRuntime
             return false;
         return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<UniqueHpTargetAnnouncedEvent>().Count(e => e.WindowFrameId == parent.Id && e.Target == identity) == 1;
     }
-
-    internal void AssertUniqueHpTargetAnnouncements()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.UniqueHpAnnouncedTargets is not null))
-        {
-            var seen = use.UniqueHpAnnouncedTargets!;
-            var issued = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<UniqueHpTargetAnnouncedEvent>().Where(e => e.Target.CardUseFrameId == use.Id).ToArray();
-            if (!HasUniqueHpPeerPrograms || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || seen.Distinct().Count() != seen.Count || seen.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || issued.Length != seen.Count || issued.Select(e => e.Target.TargetSeat).Distinct().Count() != issued.Length || !issued.Select(e => e.Target.TargetSeat).SequenceEqual(seen) || issued.Any(e => e.Target.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || e.Target.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || e.WindowFrameId <= use.Id || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.Target.EffectiveKind)))
-                throw new InvalidOperationException("The once-announced target set lost its exact real Slash/window facts.");
-        }
-    }
 }

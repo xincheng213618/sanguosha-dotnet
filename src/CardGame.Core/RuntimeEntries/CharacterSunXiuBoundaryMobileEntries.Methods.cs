@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSunXiuBoundaryMobileEntries
 {
     internal void AnswerBoundaryXingxue(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerBoundaryXingxue(answer);
-    internal void AssertBoundaryXingxue(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryXingxue(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryXingxue(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryXingxue(supplied);
     internal void BeginBoundaryXingxueDraw(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginBoundaryXingxueDraw(frame);
     internal global::CardGame.Core.PromptChoice BoundaryXingxueAi(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryXingxueAi(pending, frame);

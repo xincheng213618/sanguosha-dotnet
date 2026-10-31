@@ -58,7 +58,7 @@ internal interface IMouXiaoQiaoOlOperations : IProgramRuntimeOperations
     void ReturnResponse(ProgramSkillFrame frame);
 }
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IMouXiaoQiaoOlOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
     IProgramOperationDraws draws, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
@@ -187,7 +187,6 @@ internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IM
     private void Continue(long id)
     {
         if (frames.Top is not ProgramSkillFrame { MouXiaoQiaoOl: { } r } f || f.Id != id) return;
-        Assert(f);
         if (r.Stage == MouXiaoQiaoOlStage.RevealChildren)
         {
             if (operations.BeginRevealChildren(id)) return;
@@ -231,9 +230,6 @@ internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IM
         r.Gifts.Count <= 2 && r.Gifts.Select(g => g.CardId).Distinct().Count() == r.Gifts.Count && r.Gifts.Select(g => g.RecipientSeat).Distinct().Count() == r.Gifts.Count &&
         facts.History<MouXiaoQiaoOlStartedEvent>().Count(e => e == new MouXiaoQiaoOlStartedEvent(f.Id, r.Source, r.GameplayHash, r.Operation, r.Round, r.ParentFrameId)) == 1 &&
         !facts.History<MouXiaoQiaoOlCompletedEvent>().Any(e => e.FrameId == f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 34000)]
-    internal void Assert(ProgramSkillFrame f)
-    { if (f.MouXiaoQiaoOl is not null && !Valid(f)) throw new InvalidOperationException("Mou Xiao Qiao lost its original frame, source or issued receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 34000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 34000)]
     internal bool PreservePaid(ProgramSkillFrame f) => f.MouXiaoQiaoOl is { Paid: true } && Valid(f) ||

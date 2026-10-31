@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineNativeDrawAttemptsEntries
 {
-    internal void AssertNativeDrawAttempts() => _resolve().AssertNativeDrawAttempts();
     internal global::CardGame.Core.ProgramSkillWindowContext AttachNativeDrawContext(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame window, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().AttachNativeDrawContext(window, context);
     internal void CompleteNativeDrawReplacement(global::CardGame.Core.ProgramSkillFrame frame, int sourceSeat, global::System.Collections.Generic.IReadOnlyList<int> gainedIds, global::CardGame.Core.CardMoveReason reason, long sequenceBefore) => _resolve().CompleteNativeDrawReplacement(frame, sourceSeat, gainedIds, reason, sequenceBefore);
     internal void ContinueNativeDrawAttempt(long id) => _resolve().ContinueNativeDrawAttempt(id);

@@ -5,7 +5,6 @@ internal sealed partial class CharacterZhenJiMouMobileEntries
     internal bool AdvanceMouZhenJiLuoshenChildren() => _resolve().AdvanceMouZhenJiLuoshenChildren();
     internal global::CardGame.Core.PromptChoice AiMouZhenJiLuoshen(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouZhenJiLuoshen(p, f);
     internal void AnswerMouZhenJiLuoshen(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouZhenJiLuoshen(selected);
-    internal void AssertMouZhenJiLuoshen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouZhenJiLuoshen(f);
     internal bool ContinueAcceptedMouZhenJiLuoshen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueAcceptedMouZhenJiLuoshen(f);
     internal void ContinueLuoshenAfterPublicReveal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueLuoshenAfterPublicReveal(f);
     internal void ContinueMouZhenJiLuoshen(long id) => _resolve().ContinueMouZhenJiLuoshen(id);

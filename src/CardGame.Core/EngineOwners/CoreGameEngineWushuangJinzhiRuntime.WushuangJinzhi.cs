@@ -148,8 +148,6 @@ internal sealed partial class CoreGameEngineWushuangJinzhiRuntime
 
         var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == card && m.Sequence <= paid.MovementBefore && m.From == cost.From && m.To == CardLocation.Processing);
         var finish = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.FirstOrDefault(m => m.CardId == card && m.Sequence > paid.MovementBefore && m.Reason.Value == WushuangJinzhiDiscardReason && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile);
-        if (entry is null || finish is null)
-            throw new InvalidOperationException("A Jinzhi response lost its exact entered and discarded materials.");
         movements = Array.AsReadOnly(new[] { entry, finish });
         return true;
     }

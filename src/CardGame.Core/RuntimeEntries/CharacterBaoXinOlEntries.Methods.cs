@@ -4,7 +4,6 @@ internal sealed partial class CharacterBaoXinOlEntries
 {
     internal bool AdvanceBaoXinChildren() => _resolve().AdvanceBaoXinChildren();
     internal void AnswerBaoXin(global::CardGame.Core.PromptChoice chosen) => _resolve().AnswerBaoXin(chosen);
-    internal void AssertBaoXin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBaoXin(f);
     internal global::CardGame.Core.PromptChoice BaoXinChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, int? card = default, int? target = default) => _resolve().BaoXinChoice(f, branch, label, card, target);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BaoXinChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BaoXinChoices(f);
     internal bool BaoXinFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().BaoXinFirstChild(f, child);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterBaoXinOlEntries
     internal void FinishBaoXin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishBaoXin(f);
     internal bool HasBaoXinBeforeDamageObserver(long id) => _resolve().HasBaoXinBeforeDamageObserver(id);
     internal bool HasBaoXinDamageObserver(long id) => _resolve().HasBaoXinDamageObserver(id);
-    internal bool IsBaoXinDying() => _resolve().IsBaoXinDying();
     internal bool IsBaoXinMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBaoXinMovement(f, effect, pending);
     internal bool IsIssuedBaoXinMutaoPile(global::CardGame.Core.PublicPersistentPileSource source) => _resolve().IsIssuedBaoXinMutaoPile(source);
     internal void MoveBaoXin(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.BaoXinEntity> entities, global::CardGame.Core.BaoXinStage stage, global::CardGame.Core.CardLocation destination, string reason) => _resolve().MoveBaoXin(f, entities, stage, destination, reason);

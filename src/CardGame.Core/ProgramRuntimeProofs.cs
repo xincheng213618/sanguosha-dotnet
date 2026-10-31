@@ -7,7 +7,7 @@ namespace CardGame.Core;
 // them separate preserves the checks before/after native debt and payment rules.
 internal enum ProgramObserverProofPhase { PaidDamage, NestedDamage, BeforeDamagePrelude, BeforeDamage }
 internal enum ProgramMovementProofPhase { NativeCost, BeforePrivatePayments, PrivatePayments, EffectPayments, BoundEquipment }
-internal enum ProgramDyingProofPhase { Invariant, Runtime }
+internal enum ProgramDyingProofPhase { Runtime =1}
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 internal sealed class ProgramObserverProofAttribute(ProgramObserverProofPhase phase, int order) : Attribute
@@ -111,24 +111,6 @@ internal sealed class ProgramRuntimeProofs(ProgramRuntimeProofCatalog catalog, F
     private readonly Dictionary<ProgramMovementProofPhase, Func<ProgramSkillFrame, SkillProgramEffect?, ProgramMovementContinuation, bool>[]> _movements = new();
     private readonly Dictionary<ProgramDyingProofPhase, Func<bool>[][]> _dying = new();
 
-    internal bool MatchesObserver(ProgramObserverProofPhase phase, long windowId)
-    {
-        if (!_observers.TryGetValue(phase, out var handlers))
-            _observers.Add(phase, handlers = catalog.Observers[phase].Select(row => (Func<long, bool>)bind(row)).ToArray());
-        foreach (var handler in handlers) if (handler(windowId)) return true;
-        return false;
-    }
-
-    internal bool MatchesMovement(ProgramMovementProofPhase phase, ProgramSkillFrame frame,
-        SkillProgramEffect? effect, ProgramMovementContinuation movement)
-    {
-        if (!_movements.TryGetValue(phase, out var handlers))
-            _movements.Add(phase, handlers = catalog.Movements[phase]
-                .Select(row => (Func<ProgramSkillFrame, SkillProgramEffect?, ProgramMovementContinuation, bool>)bind(row)).ToArray());
-        foreach (var handler in handlers) if (handler(frame, effect, movement)) return true;
-        return false;
-    }
-
     internal bool IsDying(ProgramDyingProofPhase phase)
     {
         if (!_dying.TryGetValue(phase, out var groups))
@@ -149,8 +131,5 @@ internal sealed class ProgramRuntimeProofs(ProgramRuntimeProofCatalog catalog, F
 internal sealed partial class ProgramRuntimeHooks
 {
     private readonly ProgramRuntimeProofs _proofs;
-    internal bool MatchesObserver(ProgramObserverProofPhase phase, long windowId) => _proofs.MatchesObserver(phase, windowId);
-    internal bool MatchesMovement(ProgramMovementProofPhase phase, ProgramSkillFrame frame,
-        SkillProgramEffect? effect, ProgramMovementContinuation movement) => _proofs.MatchesMovement(phase, frame, effect, movement);
     internal bool IsDying(ProgramDyingProofPhase phase) => _proofs.IsDying(phase);
 }

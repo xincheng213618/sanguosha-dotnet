@@ -24,7 +24,6 @@ internal sealed partial class CharacterYangFuOlRuntime
     bool global::CardGame.Core.IYangFuAdjacencyFacts.HasDesignatedExtraTargetTail(CardUseFrame use) => _coreDesignatedExtraTargetsOperations.HasDesignatedExtraTargetTail(use);
     bool global::CardGame.Core.IYangFuAdjacencyFacts.HasRecipientCategorySlashTargetTail(CardUseFrame use) => _coreRecipientCategorySlashTargetsOperations.HasRecipientCategorySlashTargetTail(use);
     bool global::CardGame.Core.IYangFuAdjacencyFacts.HasZhangYanLangdaoTargetTail(CardUseFrame use) => _characterZhangYanOlOperations.HasZhangYanLangdaoTargetTail(use);
-    bool global::CardGame.Core.IYangFuAdjacencyFacts.MountObserverCandidateMatches(ProgramSkillFrame frame, ProgramTriggerCandidate candidate) => global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate);
     DyingFrame? global::CardGame.Core.IYangFuAdjacencyFacts.ActiveDying => _coreDyingCursorRuntimeOperations.ActiveDying;
 
     bool global::CardGame.Core.IYangFuAdjacencyFacts.MovementObserverEdge(long childId) => _coreObserverSubtreesOperations.IsMovementObserverEdge(_resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == childId));

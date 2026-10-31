@@ -5,7 +5,6 @@ internal sealed partial class CharacterQinLangOlEntries
     internal bool AdvanceQinLangChildren() => _resolve().AdvanceQinLangChildren();
     internal global::CardGame.Core.PromptChoice AiQinLang(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiQinLang(p, f);
     internal void AnswerQinLang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerQinLang(choice);
-    internal void AssertQinLang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertQinLang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginQinLang(global::CardGame.Core.ProgramSkillFrame input, bool ending) => _resolve().BeginQinLang(input, ending);
     internal void BeginQinLangXianyingUse(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.QinLangXianyingUseOrigin origin, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().BeginQinLangXianyingUse(f, origin, targets);
     internal bool CollectQinLang(global::CardGame.Core.SkillProgramTrigger t) => _resolve().CollectQinLang(t);
@@ -22,10 +21,7 @@ internal sealed partial class CharacterQinLangOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> IncludeQinLangXianyingAfterTurnEndedItems(global::CardGame.Core.DeferredTurnEndFrame parent, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> ordinary) => _resolve().IncludeQinLangXianyingAfterTurnEndedItems(parent, ordinary);
     internal bool IsIssuedQinLangXianyingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedQinLangXianyingCandidate(c, context);
     internal bool IsQinLangDiscardMovement(global::CardGame.Core.QinLangXianyingReceipt r, global::CardGame.Core.CardMovementRecord m) => _resolve().IsQinLangDiscardMovement(r, m);
-    internal bool IsQinLangDying() => _resolve().IsQinLangDying();
     internal bool IsQinLangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsQinLangRecoveryParent(f, recovery);
-    internal bool IsQinLangXianyingAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsQinLangXianyingAttackConsistent(attack, processing);
-    internal bool IsQinLangXianyingBorrowedAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsQinLangXianyingBorrowedAttackConsistent(attack, processing);
     internal bool IsQinLangXianyingSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsQinLangXianyingSlashQuery(actor);
     internal bool IsQinLangXianyingUse(long id) => _resolve().IsQinLangXianyingUse(id);
     internal bool MatchesQinLangXianying(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.QinLangXianyingUseOrigin o) => _resolve().MatchesQinLangXianying(f, o);

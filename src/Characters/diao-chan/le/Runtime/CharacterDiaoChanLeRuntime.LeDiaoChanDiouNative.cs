@@ -250,14 +250,6 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         return true;
     }
 
-    internal bool IsDiouAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { DiouOrigin: { } o } use || !IsIssuedDiouUse(use) || attack.Card is not null || attack.PhysicalCards.Count != 0 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.CardKind is not (CardKind.Duel or CardKind.FireAttack or CardKind.BarbarianAssault or CardKind.ArrowBarrage) || attack.SourceSeat != use.SourceSeat || attack.EffectiveCardKind != use.CardKind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && attack.ProgramSkillCardUseFrameId != o.ProgramFrameId || attack.ProgramSkillCardUseFrameId is { } issuingProgram && issuingProgram != o.ProgramFrameId)
-            return false;
-        var ancestors = DiouNativeAncestorProcessing(use.Id);
-        return ancestors is not null && processing.Select(c => c.Id).Distinct().Order().SequenceEqual(ancestors.Order());
-    }
-
     [NativeUseValidation(29042)]
     internal void ValidateDiouNativeUse(CardUseFrame use)
     {

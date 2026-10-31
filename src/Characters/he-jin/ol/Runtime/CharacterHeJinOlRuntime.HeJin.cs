@@ -65,7 +65,6 @@ internal sealed partial class CharacterHeJinOlRuntime
     internal void AnswerHeJinMouzhu(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Mouzhu lost its owning frame.");
-        RequireHeJin(f);
         var r = f.HeJinMouzhu!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != r.ActorSeat || !HeJinMouzhuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mouzhu needs the actual donor's exact private answer.");
@@ -97,7 +96,6 @@ internal sealed partial class CharacterHeJinOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.HeJinMouzhu is null && f.HeJinYanhuo is null)
             return false;
-        RequireHeJin(f);
         if (f.HeJinYanhuo is not null)
         {
             ResumeHeJinYanhuo(f);

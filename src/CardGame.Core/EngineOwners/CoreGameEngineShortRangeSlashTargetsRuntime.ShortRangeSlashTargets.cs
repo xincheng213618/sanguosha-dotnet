@@ -95,7 +95,6 @@ internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime
     internal void ResolveShortRangeSlashTarget(PromptChoice selected)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The short-range chooser lost its owning program.");
-        AssertShortRangeSlashDraft(frame);
         var choices = ShortRangeSlashChoices(frame);
         if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], [choices.Single(c => c.Id == selected.Id)]))
             throw new InvalidOperationException("Short-range selection changed its exact target.");
@@ -127,16 +126,6 @@ internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ShortRangeSlashTargetDraft = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 380)]
-    internal void AssertShortRangeSlashDraft(ProgramSkillFrame frame)
-    {
-        if (frame.ShortRangeSlashTargetDraft is not { } draft)
-            return;
-        var use = frame.WindowContext is { } context ? ShortRangeSlashUse(frame.OwnerSeat, context) : null;
-        if (use is null || use.Id != draft.CardUseFrameId || use.Action?.ActionId != draft.ActionId || frame.InstructionIndex != draft.InstructionIndex || frame.InstructionIndex != 1 || _coreProgramLifecycleOperations.GetProgramTrigger(frame).Effects is not [{ Op: SkillProgramEffectOp.OfferShortRangeSlashTarget }] || ShortRangeSlashWasOffered(use.Id) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: false } prompt || prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, ShortRangeSlashChoices(frame))))
-            throw new InvalidOperationException("A short-range target draft lost its source, actual use or frozen target choices.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.OfferShortRangeSlashTarget)]

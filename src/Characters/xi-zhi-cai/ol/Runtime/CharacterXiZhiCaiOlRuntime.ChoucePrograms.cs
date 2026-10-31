@@ -48,7 +48,6 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     internal SkillProgramStepOutcome ResolveChouceFrozenJudgment(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        RequireIssuedXiZhiCai(f);
         if (f.Chouce is not { Stage: ChouceStage.Judgment, FrozenSuit: { } suit } p || p.Receipt.ResultBind != effect.SourceBind)
             throw new InvalidOperationException("Chouce requires its frozen real final judgment.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
@@ -100,7 +99,6 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     internal void ResolveChouceChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        RequireIssuedXiZhiCai(f);
         var p = f.Chouce!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ChouceChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Chouce lost its actual chooser authority.");
@@ -156,14 +154,12 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
             return false;
         if (pending.Stage == ChouceStage.Judgment && !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && pending.FrozenSuit is not null && f.InstructionIndex == pending.Receipt.StartInstructionIndex && f.CardSetBindings.Any(binding => binding.Name == pending.Receipt.ResultBind) && !_resolutionStackOperations._resolutionStack.Any(child => child.Id == pending.Receipt.JudgmentFrameId))
         {
-            RequireIssuedXiZhiCai(f);
             FinishChouce(f);
             return true;
         }
 
         if (pending.Stage != ChouceStage.NativeChildren)
             return false;
-        RequireIssuedXiZhiCai(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         FinishChouce(f);

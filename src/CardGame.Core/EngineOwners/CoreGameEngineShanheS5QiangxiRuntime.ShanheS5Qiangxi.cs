@@ -47,14 +47,6 @@ internal sealed partial class CoreGameEngineShanheS5QiangxiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 59100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 59100)]
     internal bool ContinuePaidShanheS5Qiangxi(ProgramSkillFrame f) => HasShanheS5QiangxiPayment(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 59100)]
-    internal void AssertShanheS5Qiangxi(ProgramSkillFrame f)
-    {
-        if (f.ShanheS5Qiangxi is not { } r)
-            return;
-        if (r.Source != new CardConversionSource(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.RoundNumber < 1 || r.TurnNumber < 1 || r.PhaseInstanceId <= 0 || r.ActivationCount < 1 || f.SelectedTargetSeats is not [var target] || r.TargetSeat != target || target == f.OwnerSeat || f.InstructionIndex is < 1 or > 3 || (r.WeaponCardId is null) != (f.ActivationId == "lose-hp") || r.Paid && (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5QiangxiPaidEvent>().SingleOrDefault(e => e.FrameId == f.Id)is not { } paid || paid.Source != r.Source || paid.GameplayHash != r.GameplayHash || paid.ActivationCount != r.ActivationCount || paid.Damage != r.ActivationCount + 1 || !HasShanheS5QiangxiPayment(f)))
-            throw new InvalidOperationException("S5 Qiangxi lost its exact owner, paid source, round count or target.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IShanheS5QiangxiHost.ResolveShanheS5Qiangxi(ProgramSkillFrame frame, string stage) => ResolveShanheS5Qiangxi(frame, stage);
 }

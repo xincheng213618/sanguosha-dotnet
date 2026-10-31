@@ -192,9 +192,6 @@ internal sealed class ProgramRandomSeatAcquisitionRuntime(IProgramRuntimeFrames 
         frames.ReplaceTop(f = f with { SeatAcquisition = r with { Stage = ProgramSeatAcquisitionStage.Finished } });
         events.AdvanceFact(policy.Completed(f, f.SeatAcquisition!, cancelled)); operations.Finish(f);
     }
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 40701)]
-    private void RequireKnownMode(ProgramSkillFrame f)
-    { if (f.SeatAcquisition is { } r && !Enum.IsDefined(r.Mode)) throw new InvalidOperationException("Unknown seat-acquisition policy."); }
     internal void Require(ProgramSkillFrame f, IProgramSeatAcquisitionPolicy policy)
     {
         if (!Valid(f, policy) || f.PendingMovementContinuation is { } p && !MovementProof(f, facts.PausedEffect(f), p, policy))

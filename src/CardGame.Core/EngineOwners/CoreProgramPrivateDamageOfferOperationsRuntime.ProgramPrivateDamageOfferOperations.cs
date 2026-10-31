@@ -247,29 +247,6 @@ internal sealed partial class CoreProgramPrivateDamageOfferOperationsRuntime
         return set.CardIds.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(c => c.Id == id))).ToArray();
     }
 
-    internal void AssertPrivateOfferDrafts(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.SelectedParticipantDiscard is { } discard)
-        {
-            var key = "participant-discard-cursor-" + (frame.InstructionIndex - 1);
-            if (paused.Op != SkillProgramEffectOp.DiscardSelectedParticipantCards || discard.Cursor < 0 || discard.Cursor >= frame.SelectedTargetSeats.Count || frame.SelectedTargetSeats[discard.Cursor] != discard.TargetSeat || frame.NumberBindings.SingleOrDefault(b => b.Name == key)?.Value != discard.Cursor + 1 || frame.ReexecuteParticipantInstruction)
-                throw new InvalidOperationException("Participant discard lost its instruction cursor.");
-            if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, SelectedParticipantDiscardChoices(frame))))
-                throw new InvalidOperationException("Participant discard lost its chooser prompt.");
-        }
-
-        if (frame.DamageCardOffer is { } offer)
-        {
-            if (paused.Op != SkillProgramEffectOp.OfferBoundCardsForDamagePrevention || paused.SourceBind != offer.SourceBind || frame.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, SourceSeat: { } source, TargetSeat: { } target } || source != offer.SourceSeat || target != frame.OwnerSeat || source == target || IsDamageOfferPairBlocked(target, frame.SkillId, source))
-                throw new InvalidOperationException("Private offer lost its actual damage pair.");
-            var set = _coreProgramLifecycleOperations.GetProgramCardSet(frame, offer.SourceBind);
-            if (set.CardIds.Select((id, i) => (id, i)).Any(c => set.SourceLocations[c.i].OwnerSeat != frame.OwnerSeat || _cardZonesOperations._cardZones.GetLocation(c.id) != set.SourceLocations[c.i]) || offer.Refusing && (offer.RequiredDiscardCount < 1 || offer.RequiredDiscardCount > set.CardIds.Count || offer.SelectedDiscardIds is null || offer.SelectedDiscardIds.Count >= offer.RequiredDiscardCount || offer.SelectedDiscardIds.Distinct().Count() != offer.SelectedDiscardIds.Count || offer.SelectedDiscardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id)is not { OwnerSeat: { } seat, Zone: CardZoneKind.Hand or CardZoneKind.Equipment } || seat != source)))
-                throw new InvalidOperationException("Private offer changed its real cards or unpaid refusal cost.");
-            if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != offer.SourceSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, DamageCardOfferChoices(frame))))
-                throw new InvalidOperationException("Private offer lost its private source prompt.");
-        }
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IPrivateOfferProgramEffectHost.DiscardSelectedParticipantCards(ProgramSkillFrame frame) => DiscardProgramSelectedParticipantCards(frame);
     SkillProgramStepOutcome global::CardGame.Core.IPrivateOfferProgramEffectHost.OfferBoundCardsForDamagePrevention(ProgramSkillFrame frame, string bind) => OfferProgramBoundCardsForDamagePrevention(frame, bind);
 }

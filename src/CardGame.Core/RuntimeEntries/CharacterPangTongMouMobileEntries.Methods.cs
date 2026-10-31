@@ -4,7 +4,6 @@ internal sealed partial class CharacterPangTongMouMobileEntries
 {
     internal bool AdvanceMouPtChildren() => _resolve().AdvanceMouPtChildren();
     internal global::CardGame.Core.ProgramCardTriggerWindowFrame AppendMouPtLateTargets(global::CardGame.Core.ProgramCardTriggerWindowFrame frame) => _resolve().AppendMouPtLateTargets(frame);
-    internal void AssertMouPt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouPt(f);
     internal bool CanOfferMouPt(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferMouPt(gate);
     internal void CaptureMouPtConversion(global::CardGame.Core.CardUseDeclaredEvent e) => _resolve().CaptureMouPtConversion(e);
     internal void CaptureMouPtLateTarget(global::CardGame.Core.ProgramCardUseTargetAddedEvent e) => _resolve().CaptureMouPtLateTarget(e);

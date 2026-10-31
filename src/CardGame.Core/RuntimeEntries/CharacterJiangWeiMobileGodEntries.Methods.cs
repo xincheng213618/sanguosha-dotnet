@@ -33,7 +33,6 @@ internal sealed partial class CharacterJiangWeiMobileGodEntries
     internal bool PayMobileJwReservedSlash(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards, int provider, global::CardGame.Core.CardLocation? source, global::CardGame.Core.CardMoveReason reason) => _resolve().PayMobileJwReservedSlash(cards, provider, source, reason);
     internal void PublishMobileJw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishMobileJw(f);
     internal void RecordMobileJwPayment(long id) => _resolve().RecordMobileJwPayment(id);
-    internal void RequireMobileJw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireMobileJw(f);
     internal bool ResumeMobileJw(long id) => _resolve().ResumeMobileJw(id);
     internal bool ReturnMobileJwAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnMobileJwAttack(completion);
     internal bool ReturnMobileJwMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMobileJwMovement(f);

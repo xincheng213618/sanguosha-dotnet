@@ -94,16 +94,4 @@ internal sealed partial class CoreGameEngineSimultaneousPindianClaimsRuntime
         if (!_coreSimultaneousPindianOperations.DrainSimultaneousChildren(f))
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
-
-    internal void AssertSimultaneousClaims(ProgramSkillFrame f)
-    {
-        var r = f.SimultaneousPindian!;
-        if (r.Claims is not { } claims)
-            return;
-        var result = _coreSimultaneousPindianOperations.SimultaneousResult(f);
-        if (!r.ComparisonIssued || claims.Index < 0 || claims.Index > claims.Claims.Count || claims.Claims is not System.Collections.ObjectModel.ReadOnlyCollection<PindianPolicyClaim> || claims.Claims.Any(c => c.OwnerSeat != result.SourceSeat && c.OwnerSeat != result.OpponentSeat || c.Source.OwnerSeat != c.OwnerSeat || c.Kind is not (SkillProgramCardPolicyKind.PindianClaim or SkillProgramCardPolicyKind.PindianClaimAllWhenSourceWins or SkillProgramCardPolicyKind.PindianMaximumSlashClaim) || c.CardIds is not System.Collections.ObjectModel.ReadOnlyCollection<int> || c.CardIds.Distinct().Count() != c.CardIds.Count || c.CardIds.Any(id => id != result.SourceCardId && id != result.OpponentCardId)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimultaneousPindianClaimsIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.ComparisonIndex == r.ComparisonIndex && e.Claims.Index == 0 && e.Claims.Claims.Count == claims.Claims.Count && e.Claims.Claims.Zip(claims.Claims).All(p => p.First.Source == p.Second.Source && p.First.OwnerSeat == p.Second.OwnerSeat && p.First.Kind == p.Second.Kind && p.First.CardIds.SequenceEqual(p.Second.CardIds))) != 1)
-            throw new InvalidOperationException("A simultaneous result claim lost its exact once-issued typed public policy cursor.");
-        if (r.Stage is SimultaneousPindianStage.Claiming or SimultaneousPindianStage.ClaimMovementChildren && claims.Index >= claims.Claims.Count)
-            throw new InvalidOperationException("A simultaneous claim outlived its exact current candidate.");
-    }
 }

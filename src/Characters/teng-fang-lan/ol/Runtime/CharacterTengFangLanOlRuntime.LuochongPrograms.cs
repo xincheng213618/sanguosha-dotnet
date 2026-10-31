@@ -146,8 +146,6 @@ internal sealed partial class CharacterTengFangLanOlRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
-
-    internal bool IsValidLuochongDyingContinuation(ProgramSkillFrame frame, SkillProgramEffect paused) => paused.Op == SkillProgramEffectOp.LuochongResolve && paused.Target == SkillProgramEffectTarget.Owner && frame.LuochongPending is { OptionId: "loseHp", RemainingDiscards: 0 } pending && _coreTableSeatQueriesOperations.IsValidPlayerSeat(pending.TargetSeat) && pending.DiscardedCardIds.Count == 0;
     internal void PresentLuochongDiscardPrompt(ProgramSkillFrame frame)
     {
         var pending = frame.LuochongPending ?? throw new InvalidOperationException("The Luochong discard lost its pending state.");

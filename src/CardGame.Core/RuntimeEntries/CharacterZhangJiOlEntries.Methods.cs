@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhangJiOlEntries
 {
-    internal void AssertZhangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhangJi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhangJiOperation(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginZhangJiOperation(supplied, op);
     internal void BindZhangJiNativeUse(long useId) => _resolve().BindZhangJiNativeUse(useId);
     internal bool CanActivateZhangJi(int owner, global::CardGame.Core.SkillProgramActivation a) => _resolve().CanActivateZhangJi(owner, a);
@@ -11,7 +10,6 @@ internal sealed partial class CharacterZhangJiOlEntries
     internal void FinishZhangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhangJi(f);
     internal bool HasZhangJiBeforeDamageObserver(long id) => _resolve().HasZhangJiBeforeDamageObserver(id);
     internal bool HasZhangJiDamageObserver(long id) => _resolve().HasZhangJiDamageObserver(id);
-    internal bool IsZhangJiDying() => _resolve().IsZhangJiDying();
     internal bool IsZhangJiJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsZhangJiJudgment(j, f);
     internal bool IsZhangJiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhangJiMovement(f, e, p);
     internal void IssueZhangJiEquipment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueZhangJiEquipment(f);

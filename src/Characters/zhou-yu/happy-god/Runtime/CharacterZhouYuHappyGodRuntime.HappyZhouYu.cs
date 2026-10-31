@@ -66,7 +66,6 @@ internal sealed partial class CharacterZhouYuHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyZhouYu: { Stage: HappyZyStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappyZyChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Happy Qinyin requires its exact original three-way choice.");
-        RequireHappyZy(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var mode = choice.Parameters["mode"];
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { Step = ResolutionFrameStep.ResolvingEffect, HappyZhouYu = r with { Mode = mode, Stage = HappyZyStage.Ready } });
@@ -113,7 +112,6 @@ internal sealed partial class CharacterZhouYuHappyGodRuntime
             return false;
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyZhouYu: { } r } f && f.Id == id)
         {
-            RequireHappyZy(f);
             if (r.Stage == HappyZyStage.Choosing)
             {
                 PublishHappyZy(f);

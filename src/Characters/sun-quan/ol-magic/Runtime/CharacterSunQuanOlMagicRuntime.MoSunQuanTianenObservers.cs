@@ -42,8 +42,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     internal bool HasMoSunQuanPaidDamageObserver(long id) => MoSunQuanPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1560)]
     internal bool HasMoSunQuanPaidBeforeDamageObserver(long id) => MoSunQuanPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1390)]
-    internal bool IsMoSunQuanPaidDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MoSunQuanPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 640)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 580)]
     internal bool IsMoSunQuanPaidRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

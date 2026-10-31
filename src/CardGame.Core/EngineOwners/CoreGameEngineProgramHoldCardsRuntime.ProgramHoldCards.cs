@@ -124,21 +124,6 @@ internal sealed partial class CoreGameEngineProgramHoldCardsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal void AssertProgramHoldCardSelection(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (paused.Op != SkillProgramEffectOp.HoldTargetCards)
-        {
-            if (frame.HoldCardSelection is not null)
-                throw new InvalidOperationException("A card-hold draft outlived its suspended instruction.");
-            return;
-        }
-
-        if (frame.HoldCardSelection is not { } draft)
-            throw new InvalidOperationException("A suspended card-hold lost its private draft.");
-        if (draft.ResultBind != paused.ResultBind || draft.RequiredCount <= 0 || draft.RequiredCount > draft.CandidateCardIds.Count || draft.SelectedCardIds.Count >= draft.RequiredCount || draft.MinimumCount != paused.MinimumCards || draft.MinimumCount > draft.RequiredCount || draft.CandidateCardIds.Count != draft.CandidateLocations.Count || draft.CandidateCardIds.Distinct().Count() != draft.CandidateCardIds.Count || draft.SelectedCardIds.Distinct().Count() != draft.SelectedCardIds.Count || draft.SelectedCardIds.Any(id => !draft.CandidateCardIds.Contains(id)) || draft.CandidateLocations.Any(location => location.OwnerSeat != draft.HolderSeat || !paused.Zones.Contains(location.Zone) || location.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || frame.CardSetBindings.Any(binding => binding.Name == draft.ResultBind) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != draft.ChooserSeat || decision.Choices.Count != (draft.SelectedCardIds.Count >= draft.RequiredCount ? 1 : draft.CandidateCardIds.Count - draft.SelectedCardIds.Count + (draft.SelectedCardIds.Count >= draft.MinimumCount ? 1 : 0)) || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("result-bind") != draft.ResultBind || (choice.Parameters.GetValueOrDefault("program-action") == "finish-owned-cards" ? draft.SelectedCardIds.Count < draft.MinimumCount || choice.Cards.Count != 0 : choice.Parameters.GetValueOrDefault("program-action") != "select-owned-cards" || choice.Cards.Count > 1 || (choice.Cards.Count == 1 ? !draft.CandidateCardIds.Contains(choice.Cards[0]) || draft.SelectedCardIds.Contains(choice.Cards[0]) : choice.Parameters.GetValueOrDefault("source-zone") != "Hand"))))
-            throw new InvalidOperationException("A private card-hold draft lost its exact instruction, sources or prompt.");
-    }
-
     internal void ReturnProgramPojunHoldsAtTurnEnd()
     {
         for (var seat = 0; seat < _coreMatchDefinitionPlayerCountAccess._playerCount; seat++)

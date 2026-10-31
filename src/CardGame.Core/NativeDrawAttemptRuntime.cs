@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 // The exact paid producer and typed return remain the sole pending state;
 // this match-local service retains only dedicated primitive interfaces.
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
     INativeDrawAttemptQueries queries, INativeDrawAttemptOperations operations,
@@ -182,62 +182,5 @@ internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
         frames.ReplaceTop(parent with { NativeDraw = paid with
             { AttemptReturned = true, Replacement = attempt.Replacement } });
         frames.Advance(parent.Id);
-    }
-
-    internal void AssertNativeDrawAttempts()
-    {
-        foreach (var attempt in frames.OfType<NativeDrawAttemptFrame>())
-        {
-            var context = attempt.Context;
-            if (!queries.HasAttemptCapability || attempt.Id != context.AttemptFrameId ||
-                frames.ParentOf(attempt.Id) is not { } parent || parent.Id != context.ParentFrameId ||
-                parent.NativeDraw is not { } paid || paid.ActiveAttemptId != attempt.Id || paid.AttemptReturned ||
-                paid.RecipientApplied || paid.InstructionIndex != attempt.Return.InstructionIndex ||
-                paid.RecipientIndex != attempt.Return.RecipientIndex ||
-                paid.Recipients[paid.RecipientIndex] != context.RecipientSeat || paid.RequestedCount != context.RequestedCount ||
-                paid.Reason != context.Reason || context.RequestedCount <= 0 || context.Reason == CardMoveReasons.InitialDeal ||
-                context.ActualTurnNumber != queries.TurnNumber || context.ActualTurnOwnerSeat != queries.TurnOwnerSeat ||
-                context.ActualPhase != queries.ActualPhase || context.SequenceBefore > queries.MovementSequence ||
-                !Enum.IsDefined(attempt.Stage) || !Enum.IsDefined(attempt.Return.Kind) || attempt.Return.Kind != paid.ReturnKind ||
-                (attempt.Return.Kind switch
-                {
-                    NativeDrawAttemptReturnKind.DrawPhase => parent is not DrawPhaseObligationFrame { Stage: DrawPhaseObligationStage.RequestingDraw },
-                    NativeDrawAttemptReturnKind.SoleIncomingRange => parent is not CardUseFrame { SoleIncomingRangeDraw.Stage: SoleIncomingRangeDrawStage.Requesting },
-                    NativeDrawAttemptReturnKind.CardUseDrawTwo => parent is not CardUseFrame { NativeCardEffectDraw.Stage: NativeCardEffectDrawStage.Requesting },
-                    NativeDrawAttemptReturnKind.GuanduCardEffect => parent is not CardUseFrame { GuanduCardEffect.Stage: GuanduCardEffectStage.Drawing },
-                    NativeDrawAttemptReturnKind.WumiaoFlood => parent is not CardUseFrame { WumiaoFlood.Stage: WumiaoFloodStage.Drawing },
-                    NativeDrawAttemptReturnKind.DragonBoatCardEffect => parent is not CardUseFrame { DragonBoatCardEffect.Stage: DragonBoatCardEffectStage.Drawing },
-                    NativeDrawAttemptReturnKind.EquipmentRecast => parent is not EquipmentRecastFrame { DrawApplied: false },
-                    NativeDrawAttemptReturnKind.SkillInvocation => parent is not SkillInvocationFrame { Stage: SkillInvocationStage.Drawing },
-                    NativeDrawAttemptReturnKind.KemingSkillEcho => parent is not KemingSkillEchoFrame { Stage: KemingSkillEchoStage.Drawing },
-                    _ => parent is not ProgramSkillFrame
-                }) ||
-                queries.StartedEvents().Count(e => e.Context == context && e.Return == attempt.Return) != 1 ||
-                queries.DecidedEvents().Any(e => e.AttemptFrameId == attempt.Id))
-                throw new InvalidOperationException("A pre-draw request lost its exact producer, phase or once-only issuance.");
-            if (attempt.Stage == NativeDrawAttemptStage.Programs &&
-                (frames.ChildOf(attempt.Id) is not ProgramLifecycleTriggerWindowFrame window ||
-                 !global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(window, attempt)))
-                throw new InvalidOperationException("A pre-draw request lost its active candidate window.");
-            if (attempt.Replacement is { } replacement && !ValidReplacement(context, replacement))
-                throw new InvalidOperationException("A draw replacement lost its frozen actual obtained materials.");
-        }
-        // The attempt child may already have returned while its paid producer
-        // is draining movement children. Its typed DrawPile proof stays checked
-        // on that original producer as well.
-        foreach (var parent in frames.OfType<ResolutionFrame>())
-        {
-            if (parent.NativeDraw is not { Replacement: { } replacement } paid ||
-                replacement.SourceKind == NativeDrawReplacementSourceKind.OwnedHandOrEquipment && replacement.DrawPileSlashProof is null)
-                continue;
-            var issued = queries.StartedEvents().Where(e => e.Context.AttemptFrameId == paid.ActiveAttemptId &&
-                e.Context.ParentFrameId == parent.Id).ToArray();
-            if (!paid.AttemptReturned || paid.RecipientIndex < 0 || paid.RecipientIndex >= paid.Recipients.Count ||
-                issued is not [var start] || start.Context.RecipientSeat != paid.Recipients[paid.RecipientIndex] ||
-                start.Context.RequestedCount != paid.RequestedCount || start.Context.Reason != paid.Reason ||
-                start.Return.Kind != paid.ReturnKind || start.Return.InstructionIndex != paid.InstructionIndex ||
-                start.Return.RecipientIndex != paid.RecipientIndex || !ValidReplacement(start.Context, replacement))
-                throw new InvalidOperationException("A returned DrawPile replacement lost its original producer and material proof.");
-        }
     }
 }

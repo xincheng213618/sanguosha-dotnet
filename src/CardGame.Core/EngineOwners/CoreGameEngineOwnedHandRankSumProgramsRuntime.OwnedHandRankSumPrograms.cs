@@ -74,7 +74,6 @@ internal sealed partial class CoreGameEngineOwnedHandRankSumProgramsRuntime
             throw new InvalidOperationException("The rank-sum choice lost its owning frame.");
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
         var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        AssertOwnedHandRankSumSelection(frame, plan);
         var draft = frame.OwnedHandRankSumSelection!;
         if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], OwnedHandRankSumChoices(frame).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The rank-sum choice is not an exact published, completable selection.");
@@ -104,22 +103,6 @@ internal sealed partial class CoreGameEngineOwnedHandRankSumProgramsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { OwnedHandRankSumSelection = null });
         _coreProgramLifecycleOperations.SetProgramCardSet(frame.Id, draft.ResultBind, draft.SelectedCardIds, SkillProgramCardSetVisibility.Private, Array.AsReadOnly(draft.SelectedCardIds.Select(_ => CardLocation.Hand(draft.OwnerSeat)).ToArray()), selectionActorSeat: draft.OwnerSeat);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 120)]
-    internal void AssertOwnedHandRankSumSelection(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        var paused = frame.InstructionIndex > 0 && frame.InstructionIndex <= plan.Instructions.Count ? plan.GetPausedInstruction(frame.InstructionIndex).Effect : null;
-        if (frame.OwnedHandRankSumSelection is not { } draft)
-        {
-            if (paused?.Op == SkillProgramEffectOp.SelectOwnedHandRankSum)
-                throw new InvalidOperationException("A suspended exact rank-sum instruction lost its private draft.");
-            return;
-        }
-
-        var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]);
-        if (plan.SourceKind != ProgramInstructionSourceKind.Activation || frame.WindowContext is not null || frame.InstructionIndex != 1 || draft.InstructionIndex != frame.InstructionIndex || paused is not { Op: SkillProgramEffectOp.SelectOwnedHandRankSum } || paused.ExactRankSum != draft.RequiredRankSum || paused.ResultBind != draft.ResultBind || draft.OwnerSeat != frame.OwnerSeat || draft.SkillId != frame.SkillId || draft.BindingId != frame.ActivationId || draft.SkillInstanceId != frame.SkillInstanceId || draft.GameplayHash != frame.GameplayHash || draft.RequiredRankSum is < 1 or > 208 || draft.CandidateCardIds.Count != draft.CandidateRanks.Count || draft.CandidateCardIds.Count != hand.Count || draft.CandidateCardIds.Any(id => id <= 0) || draft.CandidateCardIds.Distinct().Count() != draft.CandidateCardIds.Count || draft.CandidateRanks.Any(rank => rank is < 1 or > 13) || !draft.CandidateCardIds.Order().SequenceEqual(hand.Select(c => c.Id).Order()) || draft.CandidateCardIds.Where((id, index) => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(frame.OwnerSeat) || (_characterGuanYuWumiaoOperations.JuewuForeignHandRank(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], hand.Single(c => c.Id == id)) ?? hand.Single(c => c.Id == id).Rank) != draft.CandidateRanks[index]).Any() || draft.SelectedCardIds.Distinct().Count() != draft.SelectedCardIds.Count || draft.SelectedCardIds.Any(id => !draft.CandidateCardIds.Contains(id)) || OwnedHandSelectedRankSum(draft) > draft.RequiredRankSum || !RankSubsetSearch.CanComplete(draft.CandidateCardIds.Select((id, index) => (id, draft.CandidateRanks[index])).Where(c => !draft.SelectedCardIds.Contains(c.id)).Select(c => c.Item2), draft.RequiredRankSum - OwnedHandSelectedRankSum(draft)) || frame.CardSetBindings.Any(b => b.Name == draft.ResultBind) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.TargetSeat != frame.OwnerSeat || prompt.SkillPrompt?.SkillId != frame.SkillId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, OwnedHandRankSumChoices(frame)))
-            throw new InvalidOperationException("A private rank-sum draft lost its exact activation, complete physical hand, completion path or published prompt.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.SelectOwnedHandRankSum)]

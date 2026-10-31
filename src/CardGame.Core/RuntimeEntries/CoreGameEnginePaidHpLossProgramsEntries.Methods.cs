@@ -2,8 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePaidHpLossProgramsEntries
 {
-    internal void AssertPaidHpLossModifiers() => _resolve().AssertPaidHpLossModifiers();
-    internal void AssertPaidHpLossState(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().AssertPaidHpLossState(f, plan);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHpLossQuantity(global::CardGame.Core.ProgramSkillFrame frame, string bind) => _resolve().BeginHpLossQuantity(frame, bind);
     internal bool CanContinueIssuedHpLoss(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIssuedHpLoss(f);
     internal global::CardGame.Core.SkillProgramStepOutcome DrawProgramPaidHpLoss(global::CardGame.Core.ProgramSkillFrame f, string bind) => _resolve().DrawProgramPaidHpLoss(f, bind);

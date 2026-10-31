@@ -4,7 +4,6 @@ internal sealed partial class CharacterQuanCongBoundaryMobileEntries
 {
     internal bool AllowsBoundaryYaoming(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsBoundaryYaoming(gate);
     internal void AnswerBoundaryYaoming(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerBoundaryYaoming(answer);
-    internal void AssertBoundaryYaomingFrame(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryYaomingFrame(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryYaoming(supplied);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> BoundaryQuanCongPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().BoundaryQuanCongPublicStates(owner, skillId);
     internal global::CardGame.Core.PromptChoice BoundaryYaomingAi(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryYaomingAi(pending, frame);

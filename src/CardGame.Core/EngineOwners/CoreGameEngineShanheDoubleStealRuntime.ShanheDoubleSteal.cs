@@ -8,7 +8,6 @@ using CardGame.Core.Campaigns;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheDoubleStealRuntime
 {
-    internal static bool IsShanheNativeTrickRepeatSource(CardKind kind, string skillId) => skillId == ShanheSchoolEffects.TrickRepeatSkillId && global::CardGame.Core.EngineOwners.CoreGameEngineShanheSchoolTrickRuntime.IsShanheSchoolDamageTrick(kind) || skillId == ShanheDoubleStealPrograms.SkillId && kind == CardKind.Snatch;
     internal bool TryGetShanheDoubleStealUse(int owner, ProgramSkillWindowContext? context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
     {
         use = null !;

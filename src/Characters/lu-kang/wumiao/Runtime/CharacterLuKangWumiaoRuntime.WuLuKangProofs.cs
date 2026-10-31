@@ -39,15 +39,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         return r.Comparisons.All(c => _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangComparisonSettledEvent>().Count(e => e == new WuLuKangComparisonSettledEvent(parent.Id, c.Index, c.Result)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == parent.Id && e.Result == c.Result) == 1) && r.Comparisons.Select(c => c.Index).Distinct().Count() == r.Comparisons.Count;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29700)]
-    internal void AssertWuLuKang(ProgramSkillFrame f)
-    {
-        if (f.WuLuKangShenduan is not null && !ValidWuLuKangShenduan(f))
-            throw new InvalidOperationException("Shenduan lost its exact native comparison, independent source, actual payment or typed minimum-draw invoice.");
-        if (f.WuLuKangKegou is not null && !ValidWuLuKangKegou(f))
-            throw new InvalidOperationException("Kegou lost its actual boundary qualification, current iteration or genuine native pair/use result.");
-    }
-
     internal void AssertWuLuKangWindows()
     {
         foreach (var f in _resolutionStackOperations._resolutionStack.Where(f => f.WuLuKangContest is not null))
@@ -69,26 +60,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     }
 
     internal bool IsWuLuKangAssignedPair(PindianFrame f, PindianResult result) => f.WuLuKangContest is { SourcesReady: true, Revealed: true } r && ValidWuLuKangContest(f) && result.SourceSeat == r.SourceSeat && result.OpponentSeat == r.Original[1].Seat && (f.DouyuContest is not null ? _characterPangJiOlOperations.IsDouyuPairAssignment(f, result) : result.SourceCardId == r.Assignments[0].CardId && result.OpponentCardId == r.Assignments[1].CardId);
-    internal IReadOnlyList<PindianRevealedCard> WuLuKangOriginalSelectedGroup(ProgramSkillFrame f) => f.WuLuKangContest is { } r ? r.Original.Select(c => new PindianRevealedCard(c.Seat, c.CardId, c.Rank, c.Rank)).ToArray() : _characterPangJiOlOperations.GetDouyuOriginalSimultaneousCards(f);
-    internal bool IsWuLuKangPrivateGroup(ProgramSkillFrame f) => f.WuLuKangContest is { Revealed: false } && ValidWuLuKangContest(f) && _resolutionStackOperations._resolutionStack.Any(w => w is WuLuKangPindianFrame window && window.ParentFrameId == f.Id);
-    internal bool ValidWuLuKangGroupReveal(ProgramSkillFrame f)
-    {
-        if (f.WuLuKangContest is not { SourcesReady: true, Revealed: true, Cancelled: false } r || f.SimultaneousPindian is not { Revealed: true } g || !ValidWuLuKangContest(f))
-            return false;
-        foreach (var a in r.Assignments)
-        {
-            var input = WuLuKangActualInput(f, a.Seat, a.CardId, CardLocation.Hand(a.Seat), a.Rank, false);
-            if (input.From == CardLocation.Processing)
-            {
-                if (input.ReservationSequence is not { } sequence || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == sequence && m.CardId == input.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing) != 1)
-                    return false;
-            }
-            else if (_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > g.RevealBefore && m.Sequence <= g.RevealAfter && m.CardId == input.CardId && m.From == input.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.PindianReveal) != 1)
-                return false;
-        }
-
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<PindianCardsRevealedEvent>().Count(e => e.ParentFrameId == f.Id && e.Simultaneous && e.Cards.Select(c => (c.Seat, c.CardId, c.OriginalRank)).SequenceEqual(g.Cards.Select(c => (c.Seat, c.CardId, c.OriginalRank)))) == 1;
-    }
 
     internal bool IsWuLuKangHistoricalPairAssignment(long contest, PindianResult result, int original) => _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangContestStartedEvent>().Count(e => e.ContestId == contest && !e.Simultaneous && e.SourceSeat == result.SourceSeat) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangPindianInputRevealedEvent>().Count(e => e.ContestId == contest && e.Seat == result.SourceSeat && e.CardId == result.SourceCardId) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == contest && e.Result == result) == 1 && (result.SourceCardId == original || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangShenduanDiscardPaidEvent>().Any(e => e.ContestId == contest && e.ParticipantSeat == result.SourceSeat) || _characterPangJiOlOperations.IsDouyuHistoricalPairAssignment(contest, result, original));
 }

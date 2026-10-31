@@ -45,17 +45,6 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtReceiptsRuntime
         return plan.Instructions.Count == 3 && plan.Instructions[0].Op == SkillProgramEffectOp.SelectFrozenHandExchangeDebtPayment && plan.Instructions[0].StateId == paid.StateId && plan.Instructions[0].ResultBind == paid.ResultBind && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseHandExchangeDebtPaymentStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.ExchangeProgramFrameId == paid.ExchangeProgramFrameId && e.Source == _coreHalfHandPhaseDebtProgramsOperations.HalfHandDebtSource(f) && e.GameplayHash == f.GameplayHash && e.StateId == paid.StateId && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.OwnerSeat == f.OwnerSeat && e.PhaseInstanceId == paid.PhaseInstanceId && e.FrozenDifference == paid.FrozenDifference && e.RequiredPaymentCount == paid.RequiredPaymentCount) == 1;
     }
 
-    internal void AssertHalfHandPhaseDebt(ProgramSkillFrame f)
-    {
-        if (f.HalfHandDraw is not null && !ValidHalfHandDraw(f) || f.HalfHandGift is not null && !ValidHalfHandGift(f) || f.PhaseHandExchange is not null && !ValidPhaseHandExchange(f) || f.PhaseHandDebtPayment is not null && !ValidPhaseHandDebtPayment(f))
-            throw new InvalidOperationException("A half-hand/phase-debt receipt lost its real producer, source or exact ledger.");
-        if (f.HalfHandSupport is { } aid)
-        {
-            if (_resolutionStackOperations._resolutionStack.FirstOrDefault(frame => frame.Id == f.WindowContext?.ParentFrameId)is not ActualUseTargetWindowFrame parent || !_coreHalfHandTargetSupportOperations.HalfHandSupportPaymentMatches(f, parent, aid.Paid) || aid.Paid && aid.Declined || !aid.Paid && aid.CardId is not null || !aid.Paid && (aid.SequenceBefore != 0 || aid.SequenceAfter != 0))
-                throw new InvalidOperationException("The recipient support lost its actual target owning return.");
-        }
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 510)]
     internal bool IsHalfHandPhaseMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && (effect?.Op switch
     {

@@ -19,7 +19,6 @@ internal interface IQuHuangFacts : IProgramSelectionQuery
     long CardActionSequence { get; }
     Card Card(int cardId);
     SkillProgramTrigger Trigger(ProgramSkillFrame frame);
-    SkillProgramEffect? PausedEffect(ProgramSkillFrame frame);
     bool HasRuntimeSkill(int seat, string skillId);
     SkillProgramTriggerFacts MovementFacts(int ownerSeat, CardMovementSourceCount count, CardMovementTiming? timing);
     bool IsActiveSourceEquipment(int ownerSeat, string skillId, string instance, Card card);

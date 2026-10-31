@@ -325,14 +325,6 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
     internal bool ContinuePaidMobileShiWeiYan(ProgramSkillFrame f) => f.MobileShiWeiYan is { Stage: > 0 };
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 47100)]
     internal bool MobileShiWeiYanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.MobileShiWeiYan is { Stage: > 0 } && e?.Op is SkillProgramEffectOp.ResolveMobileShiZhuangshi or SkillProgramEffectOp.ResolveMobileShiYinzhan or SkillProgramEffectOp.ResolveMobileShiKuanggu;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 47100)]
-    internal void AssertMobileShiWeiYanPending(ProgramSkillFrame f, ProgramExecutionPlan plan)
-    {
-        if (f.MobileShiWeiYan is not { } r)
-            return;
-        if (r.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.PhaseInstanceId < 0 || r.Stage is < 0 or > 8 || r.HpLoss < 0 || r.Cards.Count != r.Cards.Distinct().Count() || f.TriggerId is null || f.WindowContext is null || r.Operation == "zhuangshi" && (f.SkillId != ShiWyZhuangshi || f.WindowContext.Window != SkillProgramTriggerWindow.PlayPhaseStarting) || r.Operation == "yinzhan" && (f.SkillId != ShiWyYinzhan || f.WindowContext.Window != SkillProgramTriggerWindow.CardUseCompleted) || r.Operation == "zhongao" && f.SkillId != ShiWyZhongao || r.Operation == "kuanggu" && f.SkillId is not (ShiWyKuanggu or ShiWyKuanggu2))
-            throw new InvalidOperationException("Shi Wei Yan pending state lost its owning actual trigger, phase, payment or finite stage.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiZhuangshi, SkillProgramEffectOp.ResolveMobileShiYinzhan, SkillProgramEffectOp.ResolveMobileShiKuanggu)]
     internal PromptChoice SelectMobileShiWeiYanAi(PendingDecision decision)

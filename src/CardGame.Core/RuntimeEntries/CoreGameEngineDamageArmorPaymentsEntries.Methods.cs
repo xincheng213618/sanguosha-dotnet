@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDamageArmorPaymentsEntries
 {
-    internal void AssertDamageArmorPayments() => _resolve().AssertDamageArmorPayments();
     internal global::CardGame.Core.GameEngine.IDamageAttempt? DamageArmorPaymentOwner(global::CardGame.Core.DamageFrame damage) => _resolve().DamageArmorPaymentOwner(damage);
     internal bool IsExactArmorDamageRequest(global::CardGame.Core.DamageFrame damage, global::CardGame.Core.GameEngine.IDamageAttempt attack, bool requireUnpaid = false) => _resolve().IsExactArmorDamageRequest(damage, attack, requireUnpaid);
     internal bool IsIssuedDamageArmorPayment(global::CardGame.Core.DamageFrame damage) => _resolve().IsIssuedDamageArmorPayment(damage);

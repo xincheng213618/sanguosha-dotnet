@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheMobilizationEntries
 {
-    internal void AssertShanheMobilization(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShanheMobilization(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheMobilization(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheMobilization(supplied);
     internal bool CanCompleteShanheMobilization(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanCompleteShanheMobilization(frame);
     internal void ContinueShanheMobilization(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ContinueShanheMobilization(supplied);

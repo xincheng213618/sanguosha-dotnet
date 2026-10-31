@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreHellMengpoProgramsEntries
 {
-    internal void AssertHellWanghun(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertHellWanghun(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHellWanghun(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHellWanghun(supplied);
     internal bool CanContinueHellWanghun(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueHellWanghun(frame);
     internal void CompleteHellShiyouDiscardTransfers(global::CardGame.Core.HellShiyouTransferPlan plan, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> movements) => _resolve().CompleteHellShiyouDiscardTransfers(plan, movements);

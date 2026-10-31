@@ -6,7 +6,6 @@ internal sealed partial class CharacterDongBaiMobileEntries
     internal bool AdmitIssuedMobileLianzhu(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().AdmitIssuedMobileLianzhu(c, context);
     internal bool AdvanceMobileLianzhuSubtree() => _resolve().AdvanceMobileLianzhuSubtree();
     internal void AnswerMobileLianzhuRelay(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMobileLianzhuRelay(choice);
-    internal void AssertMobileLianzhuReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileLianzhuReceipt(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileLianzhuRelay(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMobileLianzhuRelay(f);
     internal global::CardGame.Core.PromptChoice ChooseMobileLianzhuRelay(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseMobileLianzhuRelay(f);
     internal void CollectMobileLianzhuGains(global::CardGame.Core.CardMovementBatchContext batch, global::System.Collections.Generic.List<global::CardGame.Core.ProgramTriggerCandidate> candidates) => _resolve().CollectMobileLianzhuGains(batch, candidates);
@@ -22,7 +21,6 @@ internal sealed partial class CharacterDongBaiMobileEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileLianzhuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileLianzhuChoices(f);
     internal bool MobileLianzhuDamageObserver(long id) => _resolve().MobileLianzhuDamageObserver(id);
     internal bool MobileLianzhuDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().MobileLianzhuDistance(q);
-    internal bool MobileLianzhuDying() => _resolve().MobileLianzhuDying();
     internal bool MobileLianzhuFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().MobileLianzhuFirstChild(root, child);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileLianzhuGiftCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileLianzhuGiftCards(f);
     internal bool MobileLianzhuGiftMoved(global::CardGame.Core.MobileLianzhuIssuedEvent e) => _resolve().MobileLianzhuGiftMoved(e);

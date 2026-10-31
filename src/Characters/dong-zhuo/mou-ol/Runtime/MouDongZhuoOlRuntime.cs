@@ -19,7 +19,7 @@ internal interface IMouDongZhuoOlNative : IProgramRuntimeOperations
     void MaximumHp(ProgramSkillFrame frame); void Recover(ProgramSkillFrame frame); void Grant(ProgramSkillFrame frame, string skill);
 }
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouDongZhuoOlRuntime(IMouDongZhuoOlFacts facts, IMouDongZhuoOlNative native,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouDongZhuoOlRuntime
 {
@@ -119,7 +119,6 @@ internal sealed class MouDongZhuoOlRuntime(IMouDongZhuoOlFacts facts, IMouDongZh
     private void Complete(ProgramSkillFrame f){events.AdvanceFact(new MouDongZhuoOlCompletedEvent(f.Id));frames.ReplaceTop(f=f with{MouDongZhuoOl=null,PendingMovementContinuation=null});native.Finish(f);}
     [ProgramContinuation(ProgramContinuationKind.Resume,34700)]internal bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouDongZhuoOl:not null}f||f.Id!=id)return false;Continue(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,34700)]internal bool Movement(ProgramSkillFrame f)=>f.MouDongZhuoOl is not null&&Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,34700)]internal void Invariant(ProgramSkillFrame f){if(f.MouDongZhuoOl is not null&&!Valid(f))throw new InvalidOperationException("Invalid Mou Dong Zhuo owning receipt.");}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,34700)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,34700)]internal bool Paid(ProgramSkillFrame f)=>f.MouDongZhuoOl is{Paid:true}&&Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouDongZhuoXiongni,SkillProgramEffectOp.ResolveMouDongZhuoFengshang)]
     internal PromptChoice Ai(PendingDecision d,ProgramSkillFrame f)

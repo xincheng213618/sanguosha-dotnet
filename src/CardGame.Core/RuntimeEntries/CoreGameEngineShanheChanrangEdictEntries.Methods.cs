@@ -5,7 +5,6 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictEntries
     internal void AdvanceShanheChanrangRecipient(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AdvanceShanheChanrangRecipient(frame);
     internal global::CardGame.Core.PromptChoice AiShanheChanrang(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AiShanheChanrang(decision, frame);
     internal void AnswerShanheChanrang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShanheChanrang(choice);
-    internal void AssertShanheChanrang(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShanheChanrang(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheChanrang(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheChanrang(supplied);
     internal void CaptureShanheChanrangFirstGains(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureShanheChanrangFirstGains(batch);
     internal void CollectShanheChanrangCandidates(global::CardGame.Core.CardMovementBatchContext batch, global::System.Collections.Generic.List<global::CardGame.Core.ProgramTriggerCandidate> candidates) => _resolve().CollectShanheChanrangCandidates(batch, candidates);

@@ -30,7 +30,6 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 56900)]
     internal bool ProgramAttackRangeAidBeforeDamage(long id) => ProgramAttackRangeAidRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == id && child is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 56900)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 56900)]
     internal bool ProgramAttackRangeAidDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ProgramAttackRangeAidRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 56900)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 56900)]

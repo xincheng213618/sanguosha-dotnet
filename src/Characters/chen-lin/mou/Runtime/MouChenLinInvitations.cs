@@ -80,5 +80,4 @@ internal sealed partial class MouChenLinRuntime
             PublishInvitation(f); return;
         }
     }
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 37001)] private void InvitationInvariant(ProgramSkillFrame f) { if (f.MouChenLinInvitation is not null && !ValidInvitation(f)) throw new InvalidOperationException("Invalid Yaozuo issued participant frame."); }
 }

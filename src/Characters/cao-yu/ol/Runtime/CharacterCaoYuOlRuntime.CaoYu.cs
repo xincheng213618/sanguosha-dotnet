@@ -162,7 +162,6 @@ internal sealed partial class CharacterCaoYuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == CaoYuStage.GongjieTake ? r.Targets[r.Index] : f.OwnerSeat) || !CaoYuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("CaoYu requires its actual chooser and exact current opaque slot or private material set.");
-        AssertCaoYu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -335,7 +334,6 @@ internal sealed partial class CharacterCaoYuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoYu: { } r } f || f.Id != id)
             return;
-        AssertCaoYu(f);
         if (r.Stage is CaoYuStage.GongjieTargets or CaoYuStage.GongjieTake or CaoYuStage.XiangxuChoice or CaoYuStage.XiangxuDiscardChoice or CaoYuStage.XiangzuRecipient or CaoYuStage.XiangzuCards)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -404,7 +402,6 @@ internal sealed partial class CharacterCaoYuOlRuntime
     {
         if (f.CaoYu is not { } r || !r.Paid && !(r.Op == SkillProgramEffectOp.ResolveXiangxuIssuedTurnEndAdjustment && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive))
             return false;
-        AssertCaoYu(f);
         return true;
     }
 

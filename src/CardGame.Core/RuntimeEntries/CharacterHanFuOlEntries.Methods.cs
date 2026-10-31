@@ -5,7 +5,6 @@ internal sealed partial class CharacterHanFuOlEntries
     internal bool AdvanceHanFuSubtree() => _resolve().AdvanceHanFuSubtree();
     internal global::CardGame.Core.PromptChoice AiHanFu(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiHanFu(p, f);
     internal void AnswerHanFu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHanFu(choice);
-    internal void AssertHanFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHanFu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHanFu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginHanFu(supplied, op);
     internal void ContinueHanFu(long id) => _resolve().ContinueHanFu(id);
     internal bool ContinuePaidHanFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidHanFu(f);
@@ -20,8 +19,6 @@ internal sealed partial class CharacterHanFuOlEntries
     internal global::CardGame.Core.ProgramSkillFrame? HanFuObserverRoot() => _resolve().HanFuObserverRoot();
     internal bool HasHanFuBeforeDamageObserver(long id) => _resolve().HasHanFuBeforeDamageObserver(id);
     internal bool HasHanFuDamageObserver(long id) => _resolve().HasHanFuDamageObserver(id);
-    internal bool HasPaidShuziInitialSelection(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPaidShuziInitialSelection(f);
-    internal bool IsHanFuDying() => _resolve().IsHanFuDying();
     internal bool IsHanFuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsHanFuMovement(f, e, p);
     internal bool IsHanFuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsHanFuRecoveryParent(f, recovery);
     internal int[] KuangshouDamagedSeats(int cutoff) => _resolve().KuangshouDamagedSeats(cutoff);

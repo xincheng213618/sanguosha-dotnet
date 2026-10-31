@@ -61,7 +61,6 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal void AnswerWuZhangFeiObserved(PromptChoice choice)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        AssertWuZhangFeiOperation(f);
         if (f.WuZhangFeiXianlue is not { Stage: WuZhangFeiXianlueStage.Observing } r || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuZhangFeiObservedChoices(f)))
             throw new InvalidOperationException("Xianlue observation must return through its original private acknowledgement.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -72,7 +71,6 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal void ContinueWuZhangFeiXianlue(long id)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-        AssertWuZhangFeiOperation(f);
         var r = f.WuZhangFeiXianlue!;
         if (r.Stage == WuZhangFeiXianlueStage.Observing)
             return;

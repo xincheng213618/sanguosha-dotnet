@@ -77,13 +77,4 @@ internal sealed partial class CoreGameEngineShanheSourceShennuRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(damage.Id, owner.Seat, PlayerMarkerKind.ShanheSourceNu, -count, 0, owner.Seat, "skill-program.shanhe-source-shennu-14214.after-damage"));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheShennuClearedEvent(damage.Id, receipt.AttackResolutionId, owner.Seat, count));
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62048)]
-    internal void AssertShanheShennuReceived(ProgramSkillFrame frame)
-    {
-        if (frame.ShanheShennuReceived is not { } receipt)
-            return;
-        if (!IsShanheSourceShennuMode || frame.SkillId != ShanheSourceShennuSkill || receipt.InstructionIndex != frame.InstructionIndex || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DamageAppliedBeforeDying } context || receipt.DamageWindowId != context.ParentFrameId || receipt.DamageFrameId != context.DamageFrameId || receipt.SourceSeat != context.SourceSeat || context.TargetSeat != frame.OwnerSeat || receipt.DamageAmount != context.Amount || receipt.SourceHp < 0 || receipt.NuBefore < 0 || receipt.NuAfter != checked(receipt.NuBefore + 1) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheShennuReceivedEvent>().Count(fact => fact.ProgramFrameId == frame.Id && fact.Receipt == receipt && fact.Source == new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId)) != 1)
-            throw new InvalidOperationException("Source Shennu lost its frozen source HP and one-Nu applied-damage receipt.");
-    }
 }

@@ -10,9 +10,7 @@ internal sealed partial class CharacterPangJiOlEntries
     internal global::CardGame.Core.PindianResult ApplyDouyuPairResult(global::CardGame.Core.PindianFrame frame, global::CardGame.Core.PindianResult native) => _resolve().ApplyDouyuPairResult(frame, native);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PindianRevealedCard> ApplyDouyuSimultaneousCards(global::CardGame.Core.ProgramSkillFrame frame, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PindianRevealedCard> original) => _resolve().ApplyDouyuSimultaneousCards(frame, original);
     internal void AssertDouyuPairSubtreeProcessing(global::CardGame.Core.PindianFrame pair) => _resolve().AssertDouyuPairSubtreeProcessing(pair);
-    internal void AssertDouyuProgram(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertDouyuProgram(f);
     internal void AssertDouyuWindows() => _resolve().AssertDouyuWindows();
-    internal void AssertPangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertPangJi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDouyuWinDraw(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginDouyuWinDraw(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPangJi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginPangJi(supplied, op);
     internal bool BiguoCardUseForbidden(global::CardGame.Core.ProgramCardUseQuery query) => _resolve().BiguoCardUseForbidden(query);
@@ -53,7 +51,6 @@ internal sealed partial class CharacterPangJiOlEntries
     internal void FinalizeDouyuAssignments(global::CardGame.Core.DouyuWindowFrame window) => _resolve().FinalizeDouyuAssignments(window);
     internal void FinishPangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishPangJi(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PindianRevealedCard> GetDouyuOriginalSimultaneousCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GetDouyuOriginalSimultaneousCards(f);
-    internal bool HasBiguoPindianContinuation() => _resolve().HasBiguoPindianContinuation();
     internal bool HasDouyuBeforeDamageObserver(long id) => _resolve().HasDouyuBeforeDamageObserver(id);
     internal bool HasDouyuDamageObserver(long id) => _resolve().HasDouyuDamageObserver(id);
     internal bool HasPangJiBeforeDamageObserver(long id) => _resolve().HasPangJiBeforeDamageObserver(id);
@@ -63,7 +60,6 @@ internal sealed partial class CharacterPangJiOlEntries
     internal bool IsBiguoPindianFrame(global::CardGame.Core.PindianFrame child) => _resolve().IsBiguoPindianFrame(child);
     internal bool IsBiguoPindianSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsBiguoPindianSettlementBatch(f, batch);
     internal bool IsBiguoPindianSettlementReturn(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardsMovedTriggerWindowFrame moved) => _resolve().IsBiguoPindianSettlementReturn(f, moved);
-    internal bool IsDouyuDying() => _resolve().IsDouyuDying();
     internal bool IsDouyuHistoricalPairAssignment(long contestId, global::CardGame.Core.PindianResult result, int originalSourceCardId) => _resolve().IsDouyuHistoricalPairAssignment(contestId, result, originalSourceCardId);
     internal bool IsDouyuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsDouyuMovement(f, effect, pending);
     internal bool IsDouyuPairAssignment(global::CardGame.Core.PindianFrame pair, global::CardGame.Core.PindianResult result) => _resolve().IsDouyuPairAssignment(pair, result);
@@ -71,7 +67,6 @@ internal sealed partial class CharacterPangJiOlEntries
     internal bool IsDouyuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDouyuRecoveryParent(f, recovery);
     internal bool IsIssuedBiguoCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedBiguoCandidate(c, context);
     internal bool IsIssuedDouyuCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedDouyuCandidate(candidate, context);
-    internal bool IsPangJiDying() => _resolve().IsPangJiDying();
     internal bool IsPangJiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsPangJiMovement(f, e, p);
     internal bool IsPangJiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().IsPangJiRecoveryParent(f, child);
     internal void ObtainBiguoCategories(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ObtainBiguoCategories(f);
@@ -81,7 +76,6 @@ internal sealed partial class CharacterPangJiOlEntries
     internal global::CardGame.Core.ProgramSkillFrame? PangJiObserverRoot() => _resolve().PangJiObserverRoot();
     internal bool PangJiObserverSuffix(int index) => _resolve().PangJiObserverSuffix(index);
     internal bool PangJiPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().PangJiPaidMovement(f, m);
-    internal bool PangJiWindowMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PangJiWindowMatches(f);
     internal bool PermitIssuedPangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PermitIssuedPangJi(f);
     internal void PublishDouyu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishDouyu(f);
     internal void PublishPangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishPangJi(f);

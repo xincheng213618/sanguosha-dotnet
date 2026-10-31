@@ -110,7 +110,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoTianen: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertMoTianen(f);
         if (r.Stage == MoTianenStage.QuanyuChild)
             return;
         if (r.Stage is MoTianenStage.DiscardChildren or MoTianenStage.ObtainChildren)

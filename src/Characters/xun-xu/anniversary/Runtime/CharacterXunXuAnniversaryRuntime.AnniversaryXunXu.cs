@@ -115,7 +115,6 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryXunXu: { } r } f || !XunXuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xun Xu rejects a stale participant or private card choice.");
-        RequireXunXu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage == "target")
@@ -163,7 +162,6 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
             return false;
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryXunXu: { } r } f && f.Id == id)
         {
-            RequireXunXu(f);
             if (r.Stage == "native-children")
             {
                 if (_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id))

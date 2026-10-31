@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSkillProgramsEntries
 {
-    internal void AssertProgramSkillState() => _resolve().AssertProgramSkillState();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginProgramSkillDamage(global::CardGame.Core.ProgramSkillFrame frame, int targetSeat, int amount, global::CardGame.Core.ProgramParticipantReference? sourceReference = default, global::CardGame.Core.DamageNature? nature = default, bool sourceLess = false, int? explicitSourceSeat = default) => _resolve().BeginProgramSkillDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat);
     internal void BeginProgramSkillDying(long parentFrameId, global::CardGame.Core.CharacterState victim) => _resolve().BeginProgramSkillDying(parentFrameId, victim);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginProgramSkillPindian(global::CardGame.Core.ProgramSkillFrame frame, int targetSeat) => _resolve().BeginProgramSkillPindian(frame, targetSeat);
@@ -29,7 +28,6 @@ internal sealed partial class CoreGameEngineSkillProgramsEntries
     internal global::CardGame.Core.SkillProgram GetEnabledSkillProgram(global::CardGame.Core.CharacterState player, string skillId) => _resolve().GetEnabledSkillProgram(player, skillId);
     internal int GetProgramActivationMinimumCards(int ownerSeat, string skillId, global::CardGame.Core.SkillProgramActivation activation) => _resolve().GetProgramActivationMinimumCards(ownerSeat, skillId, activation);
     internal bool HasFreeEquipmentSlotForOwnedHandEquipment(global::CardGame.Core.CharacterState owner, global::CardGame.Core.CharacterState target) => _resolve().HasFreeEquipmentSlotForOwnedHandEquipment(owner, target);
-    internal bool IsBoundEquipmentAwaitedMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBoundEquipmentAwaitedMovement(frame, effect, pending);
     internal void PendProgramExtraTurn(global::CardGame.Core.ProgramSkillFrame frame, int? targetSeat) => _resolve().PendProgramExtraTurn(frame, targetSeat);
     internal global::CardGame.Core.Suit ProgramSameSuitInputSuit(global::CardGame.Core.CharacterState owner, int cardId, bool useEffectiveSuit) => _resolve().ProgramSameSuitInputSuit(owner, cardId, useEffectiveSuit);
     internal void ResetProgramContributionUsesForPlayPhase(int providerSeat) => _resolve().ResetProgramContributionUsesForPlayPhase(providerSeat);

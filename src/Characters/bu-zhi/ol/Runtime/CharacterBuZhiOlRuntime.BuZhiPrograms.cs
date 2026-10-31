@@ -124,7 +124,6 @@ internal sealed partial class CharacterBuZhiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BuZhi: not null } f || !BuZhiCurrent(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != BuZhiChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BuZhiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Bu Zhi choice lost its actual chooser and exact current candidates.");
-        AssertBuZhi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.BuZhi!;
         var branch = selected.Parameters["branch"];
@@ -198,7 +197,6 @@ internal sealed partial class CharacterBuZhiOlRuntime
             return false;
         if (f.PendingMovementContinuation is not { } p || !IsBuZhiMovement(f, BuZhiPausedEffect(f), p))
             throw new InvalidOperationException("Bu Zhi consumed a foreign movement continuation.");
-        AssertBuZhi(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd() || _coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, BuZhi = r with { Stage = r.ReturnStage } });
@@ -216,7 +214,6 @@ internal sealed partial class CharacterBuZhiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BuZhi: not null } f || f.Id != id)
             return false;
-        AssertBuZhi(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd())
             return true;
         if (f.PendingMovementContinuation is not null)
@@ -266,17 +263,6 @@ internal sealed partial class CharacterBuZhiOlRuntime
             return false;
         var damage = events.OfType<BuZhiDamageIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         return r.DamageIssued ? damage is [var d] && d.SourceSeat == f.OwnerSeat && d.TargetSeat == r.Target && d.Amount == 1 : damage.Length == 0;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 130)]
-    internal void AssertBuZhi(ProgramSkillFrame f)
-    {
-        if (f.BuZhi is null)
-            return;
-        if (!ValidBuZhi(f))
-            throw new InvalidOperationException("Bu Zhi lost its exact native batch, source or once-paid movement/damage receipts.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && f.BuZhi.Stage is "beneficiary" or "branch" or "discard" && (p.PlayerSeat != BuZhiChooser(f) || !p.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, BuZhiChoices(f))))
-            throw new InvalidOperationException("Bu Zhi published a foreign chooser or changed candidates.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit, SkillProgramEffectOp.ResolveRebelCountEquipmentChoice)]

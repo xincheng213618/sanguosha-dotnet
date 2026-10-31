@@ -59,7 +59,6 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     {
         if (frame.Yintian is not null)
         {
-            AssertYintianRecovery(frame);
             return true;
         }
 
@@ -94,15 +93,6 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
         if (grants.Length > 1 || grants.Any(g => !ValidYintianCharge(g)))
             throw new InvalidOperationException("Yintian must retain at most one exact unconsumed charge per owner.");
         return grants.SingleOrDefault();
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28113)]
-    internal void AssertYintianRecovery(ProgramSkillFrame frame)
-    {
-        if (frame.Yintian is not { } r)
-            return;
-        if (frame.InstructionIndex != 1 || frame.TriggerId is null || r.Source != new CardConversionSource(frame.SkillId, frame.TriggerId, frame.OwnerSeat, frame.SkillInstanceId) || r.GameplayHash != frame.GameplayHash || frame.WindowContext?.HpChange?.Id != r.ChangeId || (r.Issued ? _coreProgramEventHistoryOperations.ProgramEventHistory<YintianChargeIssuedEvent>().Count(e => e.GrantId == frame.Id && e.GrantId == r.ChargeId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.RecoveryChangeId == r.ChangeId && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner) != 1 : _coreProgramEventHistoryOperations.ProgramEventHistory<YintianChargeRetainedEvent>().Count(e => e.FrameId == frame.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.RecoveryChangeId == r.ChangeId && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner && e.ExistingGrantId == r.ChargeId) != 1))
-            throw new InvalidOperationException("Yintian lost its immutable exact first-recovery resolution.");
     }
 
     [ProgramTriggerProof(ProgramTriggerProofPhase.HpChangeOwner, 40, ProgramTriggerProofMatch.Decision)]

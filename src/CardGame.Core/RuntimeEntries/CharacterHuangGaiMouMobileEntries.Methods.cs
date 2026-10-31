@@ -4,7 +4,6 @@ internal sealed partial class CharacterHuangGaiMouMobileEntries
 {
     internal bool AdvanceMouKurouObserverChildren() => _resolve().AdvanceMouKurouObserverChildren();
     internal void AnswerMouKurouGift(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouKurouGift(selected);
-    internal void AssertMouKurou(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertMouKurou(frame);
     internal void AssertMouZhaJiangAdmissions() => _resolve().AssertMouZhaJiangAdmissions();
     internal bool AwaitMouKurouChildren(long id) => _resolve().AwaitMouKurouChildren(id);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouKurouGift(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginMouKurouGift(input);

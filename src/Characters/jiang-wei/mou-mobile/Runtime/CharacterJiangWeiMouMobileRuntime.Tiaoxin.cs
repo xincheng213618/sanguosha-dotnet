@@ -52,9 +52,6 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
 
             return SkillProgramStepOutcome.Continue;
         }
-
-        if (f.MouJiangWei is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
-            throw new InvalidOperationException("Jiang Wei lost its original zero-input binding.");
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
         var wake = op == SkillProgramEffectOp.ResolveMouJiangWeiZhiji;
         if (wake ? f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SourceSeat: var seat } || seat != f.OwnerSeat || phase is not { Kind: ActualDiscardRecoveryPhaseKind.Preparation } || phase.ActorSeat != f.OwnerSeat || MouJwSelectedCount(f.OwnerSeat) < 4 && !_characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(f.OwnerSeat, f.SkillId, f.TriggerId) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(e => e.OwnerSeat == f.OwnerSeat) : op != SkillProgramEffectOp.ResolveMouJiangWeiTiaoxin || f.ActivationId != "taunt" || phase is not { Kind: ActualDiscardRecoveryPhaseKind.Play } || phase.ActorSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatAccess._currentSeat != f.OwnerSeat)

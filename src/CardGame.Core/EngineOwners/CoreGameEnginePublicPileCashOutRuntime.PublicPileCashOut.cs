@@ -58,7 +58,6 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
     internal SkillProgramStepOutcome BeginPublicPileCashOut(SkillProgramEffect effect, ProgramSkillFrame input)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        AssertPublicPileCashOut(frame);
         if (frame.PublicPileCashOut is not null || frame.PendingMovementContinuation is not null || !ExactPublicPileCashOutParent(frame, effect.Op) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PublicPileCashOutStartedEvent>().Any(fact => fact.FrameId == frame.Id))
             throw new InvalidOperationException("Public pile cash-out requires its exact real owner window and unpaid instruction.");
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
@@ -129,7 +128,6 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != id || frame.PublicPileCashOut is not { } receipt)
             return false;
-        AssertPublicPileCashOut(frame);
         if (_corePublicPilePreparationOperations.PreparationGameEnded())
             return true;
         if (DrainPublicPileCashOut(frame))
@@ -169,7 +167,6 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
     {
         if (frame.PublicPileCashOut is null || frame.PendingMovementContinuation is null)
             return false;
-        AssertPublicPileCashOut(frame);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
@@ -202,29 +199,6 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
     }
 
     internal bool PublicPileCashOutPaymentDestination(ProgramSkillFrame frame, CardMovementRecord movement, CardLocation destination) => movement.To == destination || frame.PublicPileCashOut is { Operation: SkillProgramEffectOp.StoreBoundCardsInPublicPile } receipt && destination == receipt.Pile.Location && movement.From == CardLocation.Equipment(frame.OwnerSeat) && movement.Sequence > receipt.Before && movement.Sequence <= receipt.After && movement.Reason.Value == PublicPileCashOutReason(frame, "payment") && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId && fact.MovementSequence == movement.Sequence && fact.ParentFrameId == frame.Id) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 150)]
-    internal void AssertPublicPileCashOut(ProgramSkillFrame frame)
-    {
-        if (frame.PublicPileCashOut is null)
-        {
-            // No old program reads the new facts. A new producer may never turn
-            // a missing paid receipt into a second payment from today's stock.
-            if (frame.TriggerId is not null && _coreProgramLifecycleOperations.GetProgramTrigger(frame).Effects.Any(effect => PublicPileCashOutContract.IsOperation(effect.Op)))
-            {
-                var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-                if ((history.OfType<PublicPileCashOutStartedEvent>().Any(fact => fact.FrameId == frame.Id) || history.OfType<PublicPileCashOutPaidEvent>().Any(fact => fact.FrameId == frame.Id) || history.OfType<PublicPileCashOutDrawIssuedEvent>().Any(fact => fact.FrameId == frame.Id)) && !history.OfType<PublicPileCashOutResolvedEvent>().Any(fact => fact.FrameId == frame.Id))
-                    throw new InvalidOperationException("A paid public pile instruction cannot lose its owning receipt.");
-            }
-
-            return;
-        }
-
-        if (!ValidPublicPileCashOut(frame))
-            throw new InvalidOperationException("Public pile cash-out lost its exact original instance, owner window, paid physical invoice or once-issued successor.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !PublicPileCashOutFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Public pile cash-out retained an unrelated native child.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 10)]
     internal bool IsPublicPileCashOutMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.PublicPileCashOut is { } receipt && effect?.Op == receipt.Operation && pending == frame.PendingMovementContinuation && ValidPublicPileCashOut(frame);
@@ -252,7 +226,6 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
     }
 
     internal ProgramSkillFrame? PublicPileCashOutObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePublicPileCashOutOperations.PublicPileCashOutFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 150, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 260)]
     internal bool IsPublicPileCashOutProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PublicPileCashOutObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1920)]

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsEntries
 {
-    internal void AssertBudgetGiftDraft(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertBudgetGiftDraft(f, paused);
     internal int[] AvailableFactionGiftCosts(global::CardGame.Core.CardActionContext a) => _resolve().AvailableFactionGiftCosts(a);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCompletedFactionGift(global::CardGame.Core.ProgramSkillFrame f, string faction) => _resolve().BeginCompletedFactionGift(f, faction);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDiscardBudget(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginDiscardBudget(f);

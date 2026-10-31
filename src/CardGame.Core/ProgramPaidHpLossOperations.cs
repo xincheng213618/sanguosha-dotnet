@@ -13,15 +13,6 @@ public sealed record ProgramHpLossModifierOrigin(long ProducerFrameId,int Produc
 
 internal static class PaidHpLossProgram
 {
-    internal static bool IsValidModifierOrigin(TurnRuleModifier m) => m.PaidHpLossOrigin is{ } p &&
-        p.ProducerFrameId==m.ParentFrameId && p.ProducerFrameId>0 && p.ProducerInstructionIndex==1 && !string.IsNullOrWhiteSpace(p.ResultBind) &&
-        p.OwnerSeat==m.Source.OwnerSeat && p.SkillId==m.Source.SkillId && p.BindingId==m.Source.BindingId && p.SkillInstanceId==m.Source.SkillInstanceId &&
-        !string.IsNullOrWhiteSpace(p.SkillId) && !string.IsNullOrWhiteSpace(p.BindingId) && !string.IsNullOrWhiteSpace(p.SkillInstanceId) && !string.IsNullOrWhiteSpace(p.GameplayHash) && !string.IsNullOrWhiteSpace(p.UsageGroup) &&
-        p.TurnNumber==m.TurnNumber && p.TurnNumber>0 && p.TurnOwnerSeat==m.TurnSeat && p.OwnerSeat==p.TurnOwnerSeat &&
-        p.HpBefore>0 && p.Requested>0 && p.Requested<=p.HpBefore && p.HpAfter==p.HpBefore-p.Requested && p.ActualLost==p.HpBefore-p.HpAfter &&
-        m.Operation==SkillRuleOperation.Add && m.AffectedSeat is null && (m.CardKinds?.Count??0)==0 &&
-        (m.Query==SkillRuleQuery.OutgoingDistance && m.EffectIndex==2 && m.Amount==-p.ActualLost ||
-         m.Query==SkillRuleQuery.SlashLimit && m.EffectIndex==3 && m.Amount==p.ActualLost);
     internal static bool IsOperation(SkillProgramEffect effect) => effect.Op is
         SkillProgramEffectOp.ChooseOwnerHpLoss or SkillProgramEffectOp.DrawPaidHpLoss or
         SkillProgramEffectOp.GrantPaidHpLossDistance or SkillProgramEffectOp.GrantPaidHpLossSlashLimit;

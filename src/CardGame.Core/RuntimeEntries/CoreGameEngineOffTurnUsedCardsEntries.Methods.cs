@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOffTurnUsedCardsEntries
 {
-    internal void AssertOffTurnUsedCardGift(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertOffTurnUsedCardGift(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginOffTurnUsedCardGift(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginOffTurnUsedCardGift(f);
     internal bool CanOfferOffTurnUsedCards(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferOffTurnUsedCards(c, context);
     internal void CaptureMovementBatchFactsCaptureOffTurnUsedCards(global::CardGame.Core.CardMovementBatchBuilder batch, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> movements) => _resolve().CaptureMovementBatchFactsCaptureOffTurnUsedCards(batch, movements);

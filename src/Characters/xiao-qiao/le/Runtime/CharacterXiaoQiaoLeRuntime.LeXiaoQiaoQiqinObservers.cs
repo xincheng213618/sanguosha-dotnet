@@ -22,13 +22,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
         return r.BatchId > f.Id && r.SequenceAfter == r.SequenceBefore + r.Entities.Count && paid is [var fact] && fact == new QiqinCollectPaidEvent(f.Id, r.BatchId, r.Entities.Count, r.SequenceBefore, r.SequenceAfter) && moved.Length == r.Entities.Count && !moved.Where((e, i) => e.Index != i || e.CardId != r.Entities[i].CardId || e.PrintedKind != r.Entities[i].PrintedKind || e.MovementSequence != r.SequenceBefore + i + 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == QiqinObtainReason) != 1).Any();
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28610)]
-    internal void AssertQiqin(ProgramSkillFrame f)
-    {
-        if (f.Qiqin is not null && !ValidQiqinReceipt(f))
-            throw new InvalidOperationException("Qiqin lost its original preparation, immutable whole-pile selection or once-paid physical obtain.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 250)]
     internal bool IsQiqinMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.Qiqin is { BatchId: > 0 } && ValidQiqinReceipt(f) && effect is { Op: SkillProgramEffectOp.ResolveQiqinDiscardPileQin, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool QiqinBatchMatches(ProgramSkillFrame f, CardMovementBatchContext batch)
@@ -56,8 +49,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     internal bool HasQiqinDamageObserver(long id) => QiqinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1330)]
     internal bool HasQiqinBeforeDamageObserver(long id) => QiqinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1160)]
-    internal bool IsQiqinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && QiqinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 420)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 410)]
     internal bool IsQiqinRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

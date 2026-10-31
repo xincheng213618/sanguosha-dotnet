@@ -4,7 +4,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodEntries
 {
     internal void AnswerShenDa(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShenDa(choice);
     internal int ApplyShenDengAiFengtianRecovery(long id, int actor, int target, int amount) => _resolve().ApplyShenDengAiFengtianRecovery(id, actor, target, amount);
-    internal void AssertShenDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShenDa(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShenDa(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShenDa(supplied, op);
     internal void BindShenDaCuixin(global::CardGame.Core.CardUseDeclaredEvent e) => _resolve().BindShenDaCuixin(e);
     internal bool CanOfferShenDengAi(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanOfferShenDengAi(g);
@@ -18,12 +17,10 @@ internal sealed partial class CharacterDengAiAnniversaryGodEntries
     internal void DrawShenDaXianjin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrawShenDaXianjin(f);
     internal void FinishShenDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShenDa(f);
     internal bool FinishShenDaCuixinAttack(global::CardGame.Core.NativeOwners.CardAttackHandle a, scoped out bool paused) => _resolve().FinishShenDaCuixinAttack(a, out paused);
-    internal bool HasShenDaSuspendedCompletedParent(global::CardGame.Core.ProgramCardTriggerWindowFrame w) => _resolve().HasShenDaSuspendedCompletedParent(w);
     internal bool IsShenDaCarrier(int id) => _resolve().IsShenDaCarrier(id);
     internal bool IsShenDaCarrierDestroyedMaterial(global::CardGame.Core.CardMovementRecord m) => _resolve().IsShenDaCarrierDestroyedMaterial(m);
     internal bool IsShenDaCarrierDestroyedMaterial2(int id, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to) => _resolve().IsShenDaCarrierDestroyedMaterial(id, from, to);
     internal bool IsShenDaCarrierDestroyedMaterial3(long use, int id) => _resolve().IsShenDaCarrierDestroyedMaterial(use, id);
-    internal bool IsShenDaCuixinAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle a, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsShenDaCuixinAttackConsistent(a, processing);
     internal bool IsShenDaCuixinSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsShenDaCuixinSettlementBatch(f, b);
     internal bool IsShenDaCuixinTrick(long id) => _resolve().IsShenDaCuixinTrick(id);
     internal bool IsShenDaCuixinUse(long id) => _resolve().IsShenDaCuixinUse(id);
@@ -46,7 +43,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodEntries
     internal bool ShenDaAwakened(int owner) => _resolve().ShenDaAwakened(owner);
     internal bool ShenDaCardDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().ShenDaCardDistance(q);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShenDaChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShenDaChoices(f);
-    internal global::System.Collections.Generic.IReadOnlyList<int>? ShenDaCuixinAncestorProcessing(long id) => _resolve().ShenDaCuixinAncestorProcessing(id);
     internal global::CardGame.Core.CardUseFrame? ShenDaCuixinOriginal(global::CardGame.Core.ProgramSkillWindowContext w, int owner, string skillId) => _resolve().ShenDaCuixinOriginal(w, owner, skillId);
     internal int ShenDaDamageCount(int owner) => _resolve().ShenDaDamageCount(owner);
     internal global::CardGame.Core.ShenDengAiDomain[] ShenDaDeveloped(int owner) => _resolve().ShenDaDeveloped(owner);

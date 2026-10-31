@@ -13,7 +13,6 @@ internal sealed partial class CoreGameEngineWushuangRuntime
 
     internal bool IsWushuangSkillGrantQualified(SkillGrant grant) => !_coreWushuangModeProjectionOperations.IsWushuangMode || _contentRegistryOperations._contentRegistry.Skills.TryGetValue(grant.SkillId, out var skill) && WushuangCatalogue.IsSkillAllowed(skill);
     internal WushuangIntermissionFrame? ActiveWushuangWindow(int seat) => WushuangFeature?.ActiveWushuangWindow(seat);
-    internal bool HasWushuangIntermissionBoundary() => WushuangFeature?.HasWushuangIntermissionBoundary() ?? false;
     internal bool CanUseWushuangShop(int seat) => WushuangFeature?.CanUseWushuangShop(seat) ?? false;
     internal void AdvanceWushuangShopSeat(WushuangIntermissionFrame frame) => RequireWushuangFeature.AdvanceWushuangShopSeat(frame);
     internal void ChangeWushuangTokens(int seat, int delta, string reason) => RequireWushuangFeature.ChangeWushuangTokens(seat, delta, reason);

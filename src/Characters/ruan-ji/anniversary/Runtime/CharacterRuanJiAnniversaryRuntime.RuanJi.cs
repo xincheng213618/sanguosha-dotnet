@@ -64,7 +64,6 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
     [PublicHandRevealReturn(RuanJiRevealReturn)]
     internal void CompleteRuanJiReveal(ProgramSkillFrame f)
     {
-        RequireRuanJi(f);
         var r = f.RuanJi!;
         if (r.Stage != RuanJiStage.Revealing)
             throw new InvalidOperationException("Zhaowen's native public reveal returned twice.");
@@ -77,10 +76,7 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
     internal void ReturnRuanJiDraw(ProgramSkillFrame supplied, NativeDrawOutcome draw)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        RequireRuanJi(f);
         var r = f.RuanJi!;
-        if (r.Stage != RuanJiStage.Drawing || r.Draw is not null || f.NativeDraw is not null || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != 1)
-            throw new InvalidOperationException("Ruan Ji lost his exact original native Draw1 return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RuanJi = r with { Stage = RuanJiStage.DrawChildren, Draw = draw } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RuanJiDrawReturnedEvent(f.Id, draw.AttemptFrameId, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter));
         ContinueRuanJi(f.Id);
@@ -114,7 +110,6 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanJi.Stage: RuanJiStage.DiscardChoice } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanJiDiscardChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Jiudun requires its owner's exact private current hand payment.");
-        RequireRuanJi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.RuanJi!;
         var cardId = selected.Cards.Single();
@@ -136,7 +131,6 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanJi: { } r } f || f.Id != id)
             return;
-        RequireRuanJi(f);
         if (r.Stage is RuanJiStage.Revealing or RuanJiStage.Drawing)
             return;
         if (r.Stage == RuanJiStage.DiscardChoice)

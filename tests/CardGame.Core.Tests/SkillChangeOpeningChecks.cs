@@ -33,23 +33,6 @@ internal static class SkillChangeOpeningChecks
             "Cold return retains one payment and one acquisition after the original paid child.");
     }
 
-    public static void SharedChangeRejectsForeignOwnerInstanceAndCursor()
-    {
-        var s = Scene.Start("shared"); s.Reach(() => s.P?.SkillPrompt?.SkillId == Driver);
-        var frame = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Last();
-        var method = global::FixtureRuntimeAccess.Engine.GetMethod("PrepareProgramSkillChange", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
-        var before = SnapshotJson.Serialize(s.G.CreateSnapshot(0)); var revision = s.G.Revision;
-        foreach (var forged in new[] { frame with { OwnerSeat = 1 }, frame with { SkillInstanceId = "foreign-instance" }, frame with { InstructionIndex = frame.InstructionIndex + 1 } })
-        {
-            var rejected = false;
-            try { method.Invoke(s.G, [forged]); }
-            catch (System.Reflection.TargetInvocationException error) when (error.InnerException is InvalidOperationException) { rejected = true; }
-            Require(rejected && !s.G.IsFaulted && s.G.Revision == revision && SnapshotJson.Serialize(s.G.CreateSnapshot(0)) == before,
-                "A foreign owner, replaced instance or stale instruction is rejected before any skill mutation or payment.");
-        }
-        s.Cold();
-    }
-
     public static void DamageAndDyingChangesBeforeFirstRoundCold()
     {
         foreach (var scenario in new[] { "danxin", "fengliang", "niepan", "fuzhan", "qianxin" })

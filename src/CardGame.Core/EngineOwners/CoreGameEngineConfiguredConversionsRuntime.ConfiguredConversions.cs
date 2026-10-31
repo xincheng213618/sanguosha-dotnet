@@ -103,15 +103,6 @@ internal sealed partial class CoreGameEngineConfiguredConversionsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal void AssertConfiguredCardDeclaration(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.CardDeclarationDraft is not { } draft)
-            return;
-        var selfDeclaration = paused.SelfDeclarationFromTier is { } selfTier && draft.Tier >= selfTier;
-        if (paused.Op != SkillProgramEffectOp.DeclareBoundCardNameUntilTurnEnd || paused.StateId != draft.StateId || paused.SourceBind != draft.Bind || draft.Tier is < 0 or > 2 || (selfDeclaration ? draft.DeclarerSeat != frame.OwnerSeat || !draft.NearestSeats.SequenceEqual(new[] { frame.OwnerSeat }) : draft.NearestSeats.Count == 0 || draft.NearestSeats.Contains(frame.OwnerSeat)) || draft.DeclarerSeat is { } declaredSeat && !draft.NearestSeats.Contains(declaredSeat) || _cardZonesOperations._cardZones.GetLocation(draft.CardId) != CardLocation.Hand(frame.OwnerSeat) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != (draft.DeclarerSeat ?? frame.OwnerSeat) || prompt.Choices.Count == 0 || prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") != "configured-card-declaration" || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString()))
-            throw new InvalidOperationException("A card declaration lost its validated owner, entity or prompt.");
-    }
-
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 60)]
     internal bool ConfiguredConversionUnavailable(ProgramConfiguredViewAsQuery query) => !IsConfiguredConversionAvailable(query.Owner, query.Card, query.Instance, query.Rule, query.DyingUse, query.RequestedUseTarget);
 }

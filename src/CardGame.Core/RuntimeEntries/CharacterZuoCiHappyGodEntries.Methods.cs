@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZuoCiHappyGodEntries
 {
     internal void AnswerHappyZc(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHappyZc(choice);
-    internal void AssertHappyZc(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHappyZc(f);
     internal void BeginHappyZcDraw(global::CardGame.Core.ProgramSkillFrame supplied, int amount) => _resolve().BeginHappyZcDraw(supplied, amount);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyZuoCi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginHappyZuoCi(supplied, operation);
     internal bool CanHuanjingHappyZc(global::CardGame.Core.CharacterState owner) => _resolve().CanHuanjingHappyZc(owner);
@@ -39,7 +38,6 @@ internal sealed partial class CharacterZuoCiHappyGodEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> HappyZcTemplates(global::CardGame.Core.CharacterState owner, int phantomId) => _resolve().HappyZcTemplates(owner, phantomId);
     internal int HappyZcTransformCount(int owner) => _resolve().HappyZcTransformCount(owner);
     internal string? HappyZuoCiPhantomCardLabel(int cardId) => _resolve().HappyZuoCiPhantomCardLabel(cardId);
-    internal bool HasHappyZuoCiPrompt() => _resolve().HasHappyZuoCiPrompt();
     internal bool IsHappyZcActualRoundStart(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsHappyZcActualRoundStart(candidate, context);
     internal bool IsHappyZuoCiDestroyedMaterial(global::CardGame.Core.CardMovementRecord m) => _resolve().IsHappyZuoCiDestroyedMaterial(m);
     internal bool IsHappyZuoCiDestroyedMaterial2(int cardId, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to) => _resolve().IsHappyZuoCiDestroyedMaterial(cardId, from, to);

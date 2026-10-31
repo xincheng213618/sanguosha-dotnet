@@ -5,9 +5,6 @@ internal sealed partial class CharacterZhaoZhongOlEntries
     internal bool AdvanceZhaoZhongChildren() => _resolve().AdvanceZhaoZhongChildren();
     internal void AnswerZhaoZhong(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerZhaoZhong(choice);
     internal void ApplyYintianChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ApplyYintianChainedDamageBonus(attack);
-    internal void AssertYintianDamageStates() => _resolve().AssertYintianDamageStates();
-    internal void AssertYintianRecovery(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertYintianRecovery(frame);
-    internal void AssertZhaoZhong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhaoZhong(f);
     internal global::CardGame.Core.YintianChargeIssuedEvent? AvailableYintianCharge(int owner) => _resolve().AvailableYintianCharge(owner);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhaoZhong(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginZhaoZhong(supplied, op);
     internal bool CanActivateDici(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateDici(c);
@@ -46,7 +43,6 @@ internal sealed partial class CharacterZhaoZhongOlEntries
     internal bool IsIssuedDiciChainTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsIssuedDiciChainTrigger(t);
     internal bool IsIssuedYintianRecoveryCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedYintianRecoveryCandidate(candidate, context);
     internal bool IsPengbiTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsPengbiTrigger(t);
-    internal bool IsZhaoZhongDying() => _resolve().IsZhaoZhongDying();
     internal bool IsZhaoZhongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhaoZhongMovement(f, e, p);
     internal bool IsZhaoZhongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().IsZhaoZhongRecoveryParent(f, child);
     internal void ObserveDiciEntry(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveDiciEntry(payload);
@@ -78,7 +74,6 @@ internal sealed partial class CharacterZhaoZhongOlEntries
     internal global::CardGame.Core.ProgramSkillFrame? ZhaoZhongObserverRoot() => _resolve().ZhaoZhongObserverRoot();
     internal bool ZhaoZhongObserverSuffix(int i) => _resolve().ZhaoZhongObserverSuffix(i);
     internal bool ZhaoZhongPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().ZhaoZhongPaidMovement(f, m);
-    internal bool ZhaoZhongWindowMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhaoZhongWindowMatches(f);
     internal bool HasYintianCapability { get => _resolve().HasYintianCapability; }
     internal bool HasZhaoZhongCapability { get => _resolve().HasZhaoZhongCapability; }
     internal bool YintianActualTurnOpen { get => _resolve().YintianActualTurnOpen; }

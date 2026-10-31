@@ -88,8 +88,6 @@ internal sealed partial class CoreParticipantHandDamageRidesRuntime
             return false;
         return _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(frame, parent) || ParticipantHandRescueCardWindowRide(frame, parent, rescue);
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 360, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 380)]
     internal bool IsPaidHandRepaymentProgramDying()
     {

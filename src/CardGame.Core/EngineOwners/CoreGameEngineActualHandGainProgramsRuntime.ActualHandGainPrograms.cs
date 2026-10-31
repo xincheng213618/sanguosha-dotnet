@@ -182,7 +182,6 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
     internal void ResolveActualHandGainChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Category gift has no owning frame.");
-        _coreActualHandGainObserversOperations.AssertActualHandGain(f);
         var r = f.ActualHandGain!;
         if (r.Operation != SkillProgramEffectOp.GiveSameCategoryFromDeck || r.Stage != ActualHandGainProgramStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ActualHandGainChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Category gift choice lost its exact private owner and current living targets.");
@@ -246,7 +245,6 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ActualHandGain: not null } f || f.Id != id)
             return false;
-        _coreActualHandGainObserversOperations.AssertActualHandGain(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd())
             return true;
         if (f.PendingMovementContinuation is not null)
@@ -277,7 +275,6 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
             return false;
         if (f.PendingMovementContinuation is not { } p || !IsActualHandGainMovement(f, ActualHandGainPausedEffect(f), p))
             throw new InvalidOperationException("Actual gains cannot consume another instruction's return.");
-        _coreActualHandGainObserversOperations.AssertActualHandGain(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd() || _coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });

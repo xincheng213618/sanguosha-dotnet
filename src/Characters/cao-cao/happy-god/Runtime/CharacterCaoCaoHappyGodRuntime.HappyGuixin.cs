@@ -36,7 +36,6 @@ internal sealed partial class CharacterCaoCaoHappyGodRuntime
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
             var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            RequireHappyGuixin(f);
             var r = f.HappyGuixin!;
             if (r.Stage is HappyGuixinStage.MovementChildren or HappyGuixinStage.TurnoverChildren)
             {

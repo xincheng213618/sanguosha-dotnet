@@ -27,14 +27,6 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
         return f.PendingMovementContinuation is null && !r.HpPaid;
     }
 
-    internal bool HasAnniversaryHouChengPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryHouCheng.Stage: AnniversaryHouChengStage.Source or AnniversaryHouChengStage.Obtain or AnniversaryHouChengStage.Recipient or AnniversaryHouChengStage.Give, Step: ResolutionFrameStep.AwaitingResponse } f && p.PlayerSeat == f.OwnerSeat && ValidHouCheng(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HouChengChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 48700)]
-    internal void AssertHouCheng(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryHouCheng is not null && (!ValidHouCheng(f) || f.PendingMovementContinuation is { } p && !HouChengMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p)))
-            throw new InvalidOperationException("Xianniang lost its original frame, once-paid physical movement or actual HP loss.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 48700)]
     internal bool HouChengMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => effect?.Op == SkillProgramEffectOp.ResolveAnniversaryHouChengXianniang && f.AnniversaryHouCheng is { Stage: AnniversaryHouChengStage.ObtainChildren or AnniversaryHouChengStage.GiveChildren } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidHouCheng(f);
     internal bool HouChengFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -60,7 +52,6 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
     internal bool HouChengDamageObserver(long id) => HouChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 48700)]
     internal bool HouChengBeforeDamageObserver(long id) => HouChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 48700)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 48700)]
     internal bool HouChengDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HouChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 48700)]

@@ -49,45 +49,6 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
             return r.Stage == HappyGuardStage.Declined || _coreMatchParticipantsPlayersAccess._players[r.GuardedSeat].MarkerSourceCounts.GetValueOrDefault((PlayerMarkerKind.HappyGuard, f.OwnerSeat)) == 1;
         return (r.Stage != HappyGuardStage.Transferred || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyGuardTransferredEvent>().Count(e => e == new HappyGuardTransferredEvent(f.Id, r.AttackId, r.GuardedSeat, window.RedirectedTargetSeat ?? r.GuardedSeat, r.Amount)) == 1) && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyGuardPaidEvent>().Count(e => e == new HappyGuardPaidEvent(f.Id, r.Source, r.GameplayHash, r.ParentId, r.AttackId, r.GuardedSeat, r.DamageSource, r.Amount, r.Nature)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerMarkerChangedEvent>().Count(e => e.ResolutionId == f.Id && e.PlayerSeat == r.GuardedSeat && e.SkillOwnerSeat == f.OwnerSeat && e.Marker == PlayerMarkerKind.HappyGuard && e.Delta == -1 && e.Count == 0 && e.Reason == "skill-program.happy:shenwei.guard") == 1;
     }
-
-    internal bool HasExactHappyDianWeiElaiSelection(ProgramSkillFrame f) => f.HappyGuard is { Stage: HappyGuardStage.ElaiCommitted } && ValidHappyGuardFrame(f);
-    internal bool TryAssertHappyDianWeiDeathRemoval(DeathFrame death)
-    {
-        if (death.HappyGuardRemovals is not { } removed)
-            return false;
-        if (!death.HappyGuardMarkerCleanupCompleted || !death.OwnerDiedProgramsResolved || !death.KillerProgramsResolved || _coreMatchParticipantsPlayersAccess._players[death.VictimSeat].IsAlive || removed.Count is < 1 || removed.Count > _coreMatchDefinitionPlayerCountAccess._playerCount || death.HappyGuardRemovalIndex < 0 || death.HappyGuardRemovalIndex > removed.Count || removed.Select(r => r.RemovedSeat).Distinct().Count() != removed.Count || removed.Where((r, i) => r.Ordinal != i || r.GuardOwner != death.VictimSeat || r.ResolutionId != death.Id || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.RemovedSeat)).Any())
-            throw new InvalidOperationException("Guard-removal death stage lost its original completed cleanup or frozen queue.");
-        if (death.HappyGuardRemovalIndex == removed.Count)
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == death.Id);
-        var entry = removed[death.HappyGuardRemovalIndex];
-        if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramLifecycleTriggerWindowFrame { HappyGuardRemoval: { } ret } window || ret != new HappyGuardRemovalReturn(death.Id, entry.RemovedSeat, entry.GuardOwner, entry.ResolutionId, true) || !HappyDianWeiStructuralEdge(window, death) || window.OwnerSeat != entry.RemovedSeat || window.CandidateIndex < 0 || window.CandidateIndex > window.Candidates.Count)
-            throw new InvalidOperationException("Guard-removal death stage requires its exact adjacent typed lifecycle return.");
-        if (index + 2 == _resolutionStackOperations._resolutionStack.Count)
-        {
-            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
-                throw new InvalidOperationException("An unstarted guard-removal lifecycle window cannot own a skill prompt.");
-            return true;
-        }
-
-        if (_resolutionStackOperations._resolutionStack[index + 2] is not ProgramSkillFrame { HappyGuard: { } r } elai || !HappyDianWeiStructuralEdge(elai, window))
-            throw new InvalidOperationException("Guard-removal death stage lost its actual Elai binding.");
-        for (var child = index + 3; child < _resolutionStackOperations._resolutionStack.Count; child++)
-        {
-            if (!_coreObserverSubtreesOperations.IsMovementObserverEdge(child) && !global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[child], _resolutionStackOperations._resolutionStack[child - 1]))
-                throw new InvalidOperationException("Guard-removal death stage has an unproved native child return.");
-            if (_resolutionStackOperations._resolutionStack[child] is DyingFrame dying && child + 1 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsPaidRescueObserverSuffix(child, dying))
-                break;
-        }
-
-        if (index + 3 == _resolutionStackOperations._resolutionStack.Count && r.Stage == HappyGuardStage.ElaiChoice && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != elai.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, HappyGuardChoices(elai))))
-            throw new InvalidOperationException("Guard-removal Elai lost its exact native chooser menu.");
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.AttackAttempt is not null))
-            _coreProgramAttackAttemptOperations.AssertProgramAttackState();
-        return true;
-    }
-
-    internal bool HasHappyDianWeiGuardPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyGuard: { Stage: HappyGuardStage.GuardChoice } r } f && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == r.GuardedSeat && p.SkillPrompt?.SkillId == HappyDianWeiComposition.Shenwei && ValidHappyGuardFrame(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HappyGuardChoices(f));
     internal bool IsOriginalDyingSuspendedByHappyGuardElai(DyingFrame dying)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id);
@@ -103,12 +64,6 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
     }
 
     internal bool HappyDianWeiStructuralEdge(ResolutionFrame child, ResolutionFrame parent) => child is ProgramSkillFrame { HappyGuard: { } r } f && r.ParentId == parent.Id && ValidHappyGuardFrame(f) && (parent is BeforeDamageProgramWindowFrame && f.SkillId == HappyDianWeiComposition.Shenwei && f.TriggerId == "guard-damage" || parent is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.HappyGuardRemoved } && f.SkillId == HappyDianWeiComposition.Elai) || child is ProgramLifecycleTriggerWindowFrame { HappyGuardRemoval: { } ret } w && ret.ParentId == parent.Id && w.Window == SkillProgramTriggerWindow.HappyGuardRemoved && w.Continuation == ProgramLifecycleContinuation.HappyGuardRemoved && w.ResumeProgramFrameId == parent.Id && HappyGuardRemovalIsPaid(ret) && (ret.DeathParent ? parent is DeathFrame : parent is ProgramSkillFrame { HappyGuard: { Stage: HappyGuardStage.RemovedChildren } });
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 41980)]
-    internal void AssertHappyDianWei(ProgramSkillFrame f)
-    {
-        if (f.HappyGuard is not null && !ValidHappyGuardFrame(f))
-            throw new InvalidOperationException("Happy Dian Wei lost its original native window, exact source, issued guard payment or Elai participant proof.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41980)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 41980)]

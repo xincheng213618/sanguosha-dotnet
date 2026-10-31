@@ -85,7 +85,6 @@ internal sealed class MobileSimaRenjieRuntime(IProgramRuntimeFrames frames, IPro
             facts.UseUnrespondable(use.Id) || facts.YingboUnrespondable(use.Id)) return false;
         var key = $"qizheng:{use.Id}:{q.NullificationId}:{q.TargetIndex}:{q.EffectOrdinal}";
         if (facts.History<MobileSimaRenjieStartedEvent>().Any(e => e.OccurrenceKey == key)) return false;
-        if (frames.Top?.Id != use.Id) throw new InvalidOperationException("Qizheng's unanswered response lost its original owner.");
         prompts.Clear();
         return BeginMobileSimaRenjie(use, use.Id, q.Target, MobileSimaRenjieReturnKind.Qizheng, key);
     }

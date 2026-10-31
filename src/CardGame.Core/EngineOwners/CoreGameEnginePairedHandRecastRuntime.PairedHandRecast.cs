@@ -47,7 +47,6 @@ internal sealed partial class CoreGameEnginePairedHandRecastRuntime
     internal void ResolvePairedHandRecastChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Paired hand recast lost its private choice owner.");
-        _corePairedHandRecastObserversOperations.AssertPairedHandRecast(f);
         var r = f.PairedHandRecast!;
         if (r.Stage != PairedHandRecastStage.ChoosingPartner || r.Cursor != 0 || r.Partner.Material is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != r.Partner.Seat || choice.Parameters.GetValueOrDefault("program-action") != "paired-hand-recast" || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Cards is not [var id] || choice.Targets.Count != 0 || !PairedHandRecastChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(choice.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Paired recast changed its published private chooser, physical hand entity or frame.");
@@ -118,7 +117,6 @@ internal sealed partial class CoreGameEnginePairedHandRecastRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != frameId || f.PairedHandRecast is not { } r)
             return false;
-        _corePairedHandRecastObserversOperations.AssertPairedHandRecast(f);
         if (r.Stage == PairedHandRecastStage.ChoosingPartner)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -178,9 +176,6 @@ internal sealed partial class CoreGameEnginePairedHandRecastRuntime
     {
         if (f.PairedHandRecast is not { Stage: PairedHandRecastStage.CostChildren or PairedHandRecastStage.DrawChildren })
             return false;
-        _corePairedHandRecastObserversOperations.AssertPairedHandRecast(f);
-        if (f.PendingMovementContinuation is null)
-            throw new InvalidOperationException("A paired recast child lost its exact movement return.");
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

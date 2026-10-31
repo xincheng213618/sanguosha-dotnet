@@ -93,12 +93,6 @@ internal sealed partial class CharacterLiDianMobileRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 71010)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 71010)]
     internal bool ProveMobileLiDianWangxiRecovery(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.MobileLiDianWangxi is { AwaitingMovement: true, Draw.Replacement: not null } && ValidMobileLiDianWangxi(f) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 71010)]
-    internal void AssertMobileLiDianWangxi(ProgramSkillFrame f)
-    {
-        if (f.MobileLiDianWangxi is not null && !ValidMobileLiDianWangxi(f))
-            throw new InvalidOperationException("Mobile Wangxi changed its original participant pair, seating order or damage occurrence.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 71010)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 71010)]

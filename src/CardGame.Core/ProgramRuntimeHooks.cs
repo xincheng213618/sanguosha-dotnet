@@ -4,8 +4,8 @@ using System.Reflection;
 namespace CardGame.Core;
 
 // These phases are positions in the existing scheduler, not interchangeable
-// priorities. In particular, paid response-health cursors stay between the two
-// subtree phases, and selection validation stays between the invariant phases.
+// priorities. Paid response-health cursors stay between the two
+// subtree phases.
 public enum ProgramRuntimePhase
 {
     BeforeDeclaration,
@@ -19,8 +19,6 @@ public enum ProgramRuntimePhase
     PaidInitialSelection
 }
 
-internal enum ProgramFrameInvariantPhase { BeforeSelectionState, AfterSelectionState }
-
 // Recovery and damage cursors have distinct admission sets. Keep each original
 // proof and its short-circuit order on the capability that owns the receipt.
 internal enum ProgramRecoveryParentPhase { RecoveryCursor, DamageCursor }
@@ -29,13 +27,6 @@ internal enum ProgramRecoveryParentPhase { RecoveryCursor, DamageCursor }
 internal sealed class ProgramRuntimeHookAttribute(ProgramRuntimePhase phase, int order) : Attribute
 {
     internal ProgramRuntimePhase Phase { get; } = phase;
-    internal int Order { get; } = order;
-}
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-internal sealed class ProgramFrameInvariantAttribute(ProgramFrameInvariantPhase phase, int order) : Attribute
-{
-    internal ProgramFrameInvariantPhase Phase { get; } = phase;
     internal int Order { get; } = order;
 }
 
@@ -53,18 +44,13 @@ internal sealed record ProgramRuntimeRegistration(MethodInfo Method, Type Delega
 internal sealed class ProgramRuntimeHookCatalog
 {
     internal IReadOnlyDictionary<ProgramRuntimePhase, IReadOnlyList<ProgramRuntimeRegistration>> Hooks { get; }
-    internal IReadOnlyDictionary<ProgramFrameInvariantPhase, IReadOnlyList<ProgramRuntimeRegistration>> Invariants { get; }
     internal IReadOnlyDictionary<ProgramRecoveryParentPhase, IReadOnlyList<ProgramRuntimeRegistration>> RecoveryParents { get; }
     internal ProgramRuntimeProofCatalog Proofs { get; }
 
     private ProgramRuntimeHookCatalog(
-        Dictionary<ProgramRuntimePhase, SortedDictionary<int, ProgramRuntimeRegistration>> hooks,
-        Dictionary<ProgramFrameInvariantPhase, SortedDictionary<int, ProgramRuntimeRegistration>> invariants,
-        Dictionary<ProgramRecoveryParentPhase, SortedDictionary<int, ProgramRuntimeRegistration>> recoveryParents,
-        ProgramRuntimeProofCatalog proofs)
+        Dictionary<ProgramRuntimePhase, SortedDictionary<int, ProgramRuntimeRegistration>> hooks,        Dictionary<ProgramRecoveryParentPhase, SortedDictionary<int, ProgramRuntimeRegistration>> recoveryParents,        ProgramRuntimeProofCatalog proofs)
     {
         Hooks = Freeze(hooks);
-        Invariants = Freeze(invariants);
         RecoveryParents = Freeze(recoveryParents);
         Proofs = proofs;
     }
@@ -73,8 +59,6 @@ internal sealed class ProgramRuntimeHookCatalog
     {
         var methodArray = methods.ToArray();
         var hooks = Enum.GetValues<ProgramRuntimePhase>().ToDictionary(p => p,
-            _ => new SortedDictionary<int, ProgramRuntimeRegistration>());
-        var invariants = Enum.GetValues<ProgramFrameInvariantPhase>().ToDictionary(p => p,
             _ => new SortedDictionary<int, ProgramRuntimeRegistration>());
         var recoveryParents = Enum.GetValues<ProgramRecoveryParentPhase>().ToDictionary(p => p,
             _ => new SortedDictionary<int, ProgramRuntimeRegistration>());
@@ -94,20 +78,6 @@ internal sealed class ProgramRuntimeHookCatalog
                 if (!hooks[attribute.Phase].TryAdd(attribute.Order, registration))
                     throw new InvalidOperationException($"Duplicate runtime hook order '{attribute.Phase}:{attribute.Order}'.");
             }
-            foreach (var attribute in method.GetCustomAttributes<ProgramFrameInvariantAttribute>())
-            {
-                if (!Enum.IsDefined(attribute.Phase) || attribute.Order <= 0)
-                    throw new InvalidOperationException($"Frame invariant '{method.Name}' requires a valid phase and positive order.");
-                var withPlan = method.GetParameters().Length == 2;
-                var parameterTypes = withPlan
-                    ? new[] { typeof(ProgramSkillFrame), typeof(ProgramExecutionPlan) }
-                    : new[] { typeof(ProgramSkillFrame) };
-                if (!ValidSignature(method, typeof(void), parameterTypes)) throw Invalid(method);
-                var registration = new ProgramRuntimeRegistration(method, withPlan
-                    ? typeof(Action<ProgramSkillFrame, ProgramExecutionPlan>) : typeof(Action<ProgramSkillFrame>), attribute.Order);
-                if (!invariants[attribute.Phase].TryAdd(attribute.Order, registration))
-                    throw new InvalidOperationException($"Duplicate frame invariant order '{attribute.Phase}:{attribute.Order}'.");
-            }
             foreach (var attribute in method.GetCustomAttributes<ProgramRecoveryParentAttribute>())
             {
                 if (!Enum.IsDefined(attribute.Phase) || attribute.Order <= 0)
@@ -122,9 +92,7 @@ internal sealed class ProgramRuntimeHookCatalog
         }
         foreach (var pair in hooks)
             if (pair.Value.Count == 0 && pair.Key != ProgramRuntimePhase.PaidInitialSelection) throw new InvalidOperationException($"Runtime hook phase '{pair.Key}' has no registrations.");
-        foreach (var pair in invariants)
-            if (pair.Value.Count == 0) throw new InvalidOperationException($"Frame invariant phase '{pair.Key}' has no registrations.");
-        return new(hooks, invariants, recoveryParents, ProgramRuntimeProofCatalog.Discover(methodArray));
+        return new(hooks,recoveryParents,ProgramRuntimeProofCatalog.Discover(methodArray));
     }
 
     internal static bool IsPermission(ProgramRuntimePhase phase) =>
@@ -157,7 +125,6 @@ internal sealed class ProgramRuntimeHookCatalog
 internal sealed partial class ProgramRuntimeHooks
 {
     private readonly Dictionary<ProgramRuntimePhase, Delegate[]> _hooks;
-    private readonly Dictionary<ProgramFrameInvariantPhase, Action<ProgramSkillFrame, ProgramExecutionPlan>[]> _invariants;
     private readonly Dictionary<ProgramRecoveryParentPhase, Func<ProgramSkillFrame, RecoveryReplacementFrame, bool>[]> _recoveryParents;
 
     internal ProgramRuntimeHooks(ProgramRuntimeHookCatalog catalog, Func<MethodInfo, Type, Delegate> bind,
@@ -179,12 +146,6 @@ internal sealed partial class ProgramRuntimeHooks
                 .Concat(external.Select(registration => (registration.Order, registration.Callback)))
                 .OrderBy(item => item.Order).Select(item => item.Callback).ToArray();
         });
-        _invariants = catalog.Invariants.ToDictionary(p => p.Key, p => p.Value.Select(registration =>
-        {
-            var callback = Bind(registration);
-            return callback is Action<ProgramSkillFrame, ProgramExecutionPlan> withPlan
-                ? withPlan : Adapt((Action<ProgramSkillFrame>)callback);
-        }).ToArray());
         _recoveryParents = catalog.RecoveryParents.ToDictionary(p => p.Key, p => p.Value
             .Select(registration => (Func<ProgramSkillFrame, RecoveryReplacementFrame, bool>)Bind(registration)).ToArray());
         _proofs = new(catalog.Proofs, Bind);
@@ -204,20 +165,12 @@ internal sealed partial class ProgramRuntimeHooks
         return false;
     }
 
-    internal void AssertFrame(ProgramFrameInvariantPhase phase, ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        foreach (var callback in _invariants[phase]) callback(frame, plan);
-    }
-
     internal bool IsRecoveryParent(ProgramRecoveryParentPhase phase, ProgramSkillFrame frame, RecoveryReplacementFrame recovery)
     {
         foreach (var callback in _recoveryParents[phase])
             if (callback(frame, recovery)) return true;
         return false;
     }
-
-    private static Action<ProgramSkillFrame, ProgramExecutionPlan> Adapt(Action<ProgramSkillFrame> callback) =>
-        (frame, _) => callback(frame);
 }
 
 public sealed partial class GameEngine

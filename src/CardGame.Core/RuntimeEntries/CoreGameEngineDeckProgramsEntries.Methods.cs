@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDeckProgramsEntries
 {
     internal bool AllowsUseDeckSlashesThenShuffleTrigger(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsUseDeckSlashesThenShuffleTrigger(gate);
-    internal void AssertDeckProgramDrafts(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertDeckProgramDrafts(frame, paused);
     internal void AwaitDeckProgramMovement(long id) => _resolve().AwaitDeckProgramMovement(id);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.LegalAction> BuildDeckEndExchangeActions(global::CardGame.Core.CharacterState provider) => _resolve().BuildDeckEndExchangeActions(provider);
     internal void CleanupDeckSlashSequence(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CleanupDeckSlashSequence(frame);

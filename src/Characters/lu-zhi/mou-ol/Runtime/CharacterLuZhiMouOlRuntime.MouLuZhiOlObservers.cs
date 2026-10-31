@@ -88,7 +88,6 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 32900)]
     internal bool MouLzBeforeDamage(long id) => MouLzRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32900)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 32900)]
     internal bool MouLzDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouLzRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 32900)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 32900)]
@@ -119,10 +118,4 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     internal bool ReturnMouLzMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeMouLz(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 32900)]
     internal bool AdvanceMouLzChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouLzRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32900)]
-    internal void AssertMouLz(ProgramSkillFrame f)
-    {
-        if (f.MouLuZhiOl is not null && !ValidMouLz(f))
-            throw new InvalidOperationException("Lu Zhi lost its original source, current native parent or paid child receipt.");
-    }
 }

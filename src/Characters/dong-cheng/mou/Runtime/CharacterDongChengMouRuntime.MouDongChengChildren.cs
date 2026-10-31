@@ -32,7 +32,6 @@ internal sealed partial class CharacterDongChengMouRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 37400)]
     internal bool MouDcDamageObserver(long id) => MouDcRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 37400)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 37400)]
     internal bool MouDcDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouDcRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 37400)]
     internal bool AdvanceMouDcChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouDcRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);

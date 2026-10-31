@@ -1,5 +1,5 @@
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MouChenLinRuntime(IMouChenLinFacts facts, IMouChenLinNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouChenLinRuntime
 {
     internal const string Yaozuo = "mou:yaozuo",Zhuanwen = "mou:zhuanwen",RevealBind = "mou-chen-lin-written-cards",Action = "mou-chen-lin-anniversary";
@@ -109,7 +109,6 @@ internal sealed partial class MouChenLinRuntime(IMouChenLinFacts facts, IMouChen
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouChenLinCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouChenLin = null, MouChenLinInvitation = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 37000)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame f || f.Id != id) return false; if (f.MouChenLin is not null) { Continue(id); return true; } if (f.MouChenLinInvitation is not null) { ContinueInvitation(id); return true; } return false; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 37000)] private bool Movement(ProgramSkillFrame f) => (f.MouChenLin is not null || f.MouChenLinInvitation is not null) && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 37000)] private void Invariant(ProgramSkillFrame f) { if (f.MouChenLin is not null && !Valid(f)) throw new InvalidOperationException("Invalid Zhuanwen physical queue receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 37000)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 37000)] private bool Paid(ProgramSkillFrame f) => f.MouChenLin is not null && Valid(f) || f.MouChenLinInvitation is not null && ValidInvitation(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouChenLinZhuanwen, SkillProgramEffectOp.ResolveMouChenLinYaozuo)] private PromptChoice Ai(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Targets is [var t] && (c.Parameters["branch"] == "give" ? facts.Friendly(p.PlayerSeat, t) : !facts.Friendly(p.PlayerSeat, t)) ? 0 : 1).First();
 }

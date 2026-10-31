@@ -53,23 +53,6 @@ internal sealed partial class CharacterZhangWenAnniversaryRuntime
             throw new InvalidOperationException("Sibian lost its original draw parent, public top-four entities, extrema or once-paid movement return.");
     }
 
-    internal bool HasAnniversaryZhangWenPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ZhangWenSibian: { Stage: ZhangWenSibianStage.Recipient } } f && f.Step == ResolutionFrameStep.AwaitingResponse && p.PlayerSeat == f.OwnerSeat && ValidZhangWenSibian(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhangWenSibianChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 45100)]
-    internal void AssertZhangWen(ProgramSkillFrame f)
-    {
-        if (f.ZhangWenSibian is not null)
-        {
-            RequireZhangWenSibian(f);
-            if (f.PendingMovementContinuation is { } pending && !ZhangWenMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-                throw new InvalidOperationException("Sibian lost its exact movement cursor.");
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && f.ZhangWenSibian.Stage == ZhangWenSibianStage.Recipient && (p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhangWenSibianChoices(f))))
-                throw new InvalidOperationException("Sibian's real minimum-hand recipient menu changed.");
-        }
-
-        if (f.ZhangWenSongshu is { } r && (r.Source != ZhangWenSource(f) || r.Hash != f.GameplayHash || f.SkillId != AnniversaryZhangWenComposition.Songshu || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangWenSongshuAcceptedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Hash == r.Hash && e.Turn == r.Turn && e.PlayPhase == r.PlayPhase && e.UsageGroup == r.UsageGroup && e.TurnUses == r.TurnUses && e.PhaseUses == r.PhaseUses) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangWenSongshuRefundedEvent>().Count(e => e.FrameId == f.Id) != (r.Refunded ? 1 : 0)))
-            throw new InvalidOperationException("Songshu lost its accepted original Play debit.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 45100)]
     internal bool ZhangWenMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ZhangWenSibian is { Stage: ZhangWenSibianStage.RevealChildren or ZhangWenSibianStage.GainChildren or ZhangWenSibianStage.FinishChildren } && ValidZhangWenSibian(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryZhangWenSibian && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool ZhangWenFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -88,8 +71,6 @@ internal sealed partial class CharacterZhangWenAnniversaryRuntime
     internal bool ZhangWenDamageObserver(long id) => ZhangWenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 45100)]
     internal bool ZhangWenBeforeDamageObserver(long id) => ZhangWenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 45100)]
-    internal bool ZhangWenDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ZhangWenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 45100)]
     internal bool AdvanceZhangWenSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangWenObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

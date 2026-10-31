@@ -4,7 +4,6 @@ internal sealed partial class CharacterKongShuOlEntries
 {
     internal bool AdvanceKongShuChildren() => _resolve().AdvanceKongShuChildren();
     internal void AnswerKongShu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerKongShu(choice);
-    internal void AssertKongShu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertKongShu(f);
     internal void AssertLeiluanPayments(global::CardGame.Core.CardUseFrame use) => _resolve().AssertLeiluanPayments(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginKongShu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginKongShu(supplied, op);
     internal void BindLeiluanNativeUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().BindLeiluanNativeUse(supplied);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterKongShuOlEntries
     internal bool HasKongShuBeforeDamageObserver(long id) => _resolve().HasKongShuBeforeDamageObserver(id);
     internal bool HasKongShuDamageObserver(long id) => _resolve().HasKongShuDamageObserver(id);
     internal bool IsIssuedLeiluanCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLeiluanCandidate(candidate, context);
-    internal bool IsKongShuDying() => _resolve().IsKongShuDying();
     internal bool IsKongShuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsKongShuMovement(f, e, p);
     internal bool IsKongShuPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsKongShuPaidMovement(f, m);
     internal bool IsKongShuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsKongShuRecoveryParent(f, recovery);

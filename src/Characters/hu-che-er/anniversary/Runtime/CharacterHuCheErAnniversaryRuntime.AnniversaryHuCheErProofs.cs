@@ -27,14 +27,6 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
         return _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHuCheErWeaponClaimedEvent>().Any(e => e.UseId == useId && e.ActionId == a.ActionId && e.Count > 0 && e.Before >= 0 && e.After >= e.Before && e.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHuCheErStartedEvent>().Count(s => s.FrameId == e.FrameId && s.UseId == useId && s.ActionId == a.ActionId && s.Actor == a.ActorSeat && s.Source.OwnerSeat == e.Recipient && s.Source.SkillId == AnniversaryHuCheErComposition.Daoji && s.Source.BindingId == "first-foreign-weapon" && _contentRegistryOperations._contentRegistry.GetSkill(s.Source.SkillId).Program?.GameplayHash == s.Hash) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == cardId && m.From == CardLocation.Processing && (m.To == CardLocation.Hand(e.Recipient) || m.To == CardLocation.OutsideGame && _coreAdvancedLifecycleOperations.GetAdvancedCard(cardId).IsGeneralWeapon || _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(m, CardLocation.Hand(e.Recipient))) && m.Reason.Value == HuCheErClaimReason && m.Sequence > e.Before && m.Sequence <= e.After) == 1);
     }
 
-    internal bool HasAnniversaryHuCheErPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryHuCheEr.Stage: AnniversaryHuCheErStage.Choice, Step: ResolutionFrameStep.AwaitingResponse } f && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && ValidHuCheEr(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HuCheErChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 49500)]
-    internal void AssertHuCheEr(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryHuCheEr is not null && !ValidHuCheEr(f))
-            throw new InvalidOperationException("Daoji lost its original first Weapon Use, private choice or once-paid entity gain.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49500)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49500)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49500)]
@@ -63,7 +55,6 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
     internal bool HuCheErDamageObserver(long id) => HuCheErObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49500)]
     internal bool HuCheErBeforeDamageObserver(long id) => HuCheErObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 49500)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49500)]
     internal bool HuCheErDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HuCheErObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49500)]

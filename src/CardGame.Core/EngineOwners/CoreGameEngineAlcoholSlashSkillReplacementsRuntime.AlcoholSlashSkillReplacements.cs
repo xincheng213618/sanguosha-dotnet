@@ -120,8 +120,6 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var lossIndex = Array.FindIndex(history, e => ReferenceEquals(e, originalLoss));
-        if (lossIndex < 0)
-            throw new InvalidOperationException("Permanent grant restoration validation lost its original issued loss fact.");
         return history.Skip(lossIndex + 1).OfType<ProgramAlcoholSlashSkillsReplacedEvent>().Any(e => e.Receipt.Source.OwnerSeat == ownerSeat && e.Receipt.RevokedGrants.Any(revoked => SamePermanentGrantIdentity(grant, revoked))) || history.Skip(lossIndex + 1).OfType<PrepPoisonGrantRevokedEvent>().Any(e => e.OwnerSeat == ownerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime.SameRoundSkillIdentity(grant, e.Grant)) || history.Skip(lossIndex + 1).OfType<ShenHuaTuoSkillRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId) || history.Skip(lossIndex + 1).OfType<MobileWulingGrantRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId) || history.Skip(lossIndex + 1).OfType<MobileLuBuWushuangRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId);
     }
 
@@ -130,7 +128,6 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.AlcoholSlashSkillReplacement is null)
             return false;
-        AssertAlcoholSlashSkillReplacement(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAlcoholSlashSkillReplacementCompletedEvent(id));
@@ -141,28 +138,6 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 3902)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 3902)]
     internal bool CanContinueAlcoholSlashSkillReplacement(ProgramSkillFrame f) => f.AlcoholSlashSkillReplacement is not null && ValidAlcoholSlashSkillReplacementReceipt(f);
-    internal ProgramSkillFrame? AlcoholSlashReplacementDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId)
-    {
-        dyingId = null;
-        var windowIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == window.Id);
-        if (windowIndex < 0 || windowIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[windowIndex + 1] is not ProgramSkillFrame { AlcoholSlashSkillReplacement: { } receipt } root || receipt.DamageWindowId != window.Id || root.WindowContext?.ParentFrameId != window.Id || !_coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(root, window) || !ValidAlcoholSlashSkillReplacementReceipt(root))
-            return null;
-        var rootIndex = windowIndex + 1;
-        if (rootIndex == _resolutionStackOperations._resolutionStack.Count - 1)
-            return root;
-        if (_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossObserverRoot(root.Id)?.Id != root.Id)
-            return null;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > rootIndex)
-            dyingId = dying.Id;
-        return root;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 3902)]
-    internal void AssertAlcoholSlashSkillReplacement(ProgramSkillFrame f)
-    {
-        if (f.AlcoholSlashSkillReplacement is not null && !ValidAlcoholSlashSkillReplacementReceipt(f))
-            throw new InvalidOperationException("Permanent Alcohol Slash replacement lost its exact paid damage, original use or issued grant receipt.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IAlcoholSlashSkillReplacementProgramHost.ReplaceOwnSkillsAfterAlcoholSlashDamage(ProgramSkillFrame frame) => ReplaceOwnSkillsAfterAlcoholSlashDamage(frame);
 }

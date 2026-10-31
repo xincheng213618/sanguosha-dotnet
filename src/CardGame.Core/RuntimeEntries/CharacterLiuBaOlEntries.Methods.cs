@@ -6,7 +6,6 @@ internal sealed partial class CharacterLiuBaOlEntries
     internal bool AllowsLiuBaRecast(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().AllowsLiuBaRecast(c);
     internal void AnswerLiuBa(global::CardGame.Core.PromptChoice supplied) => _resolve().AnswerLiuBa(supplied);
     internal void AppendLiuBaCoinEndingItems(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendLiuBaCoinEndingItems(items);
-    internal void AssertLiuBa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLiuBa(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLiuBa(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginLiuBa(supplied, op);
     internal bool CanOfferLiuBa(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferLiuBa(c, t, context);
     internal global::CardGame.Core.PromptChoice ChooseLiuBa(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseLiuBa(p, f);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterLiuBaOlEntries
     internal bool HasLiuBaDamageObserver(long id) => _resolve().HasLiuBaDamageObserver(id);
     internal bool IsIssuedLiuBaCoinEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLiuBaCoinEndingCandidate(c, context);
     internal bool IsIssuedTongduCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedTongduCandidate(c, context);
-    internal bool IsLiuBaDying() => _resolve().IsLiuBaDying();
     internal bool IsLiuBaMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiuBaMovement(f, e, p);
     internal bool IsLiuBaRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiuBaRecoveryParent(f, recovery);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedTongduPlayEndingCandidates(global::CardGame.Core.CharacterState owner) => _resolve().IssuedTongduPlayEndingCandidates(owner);

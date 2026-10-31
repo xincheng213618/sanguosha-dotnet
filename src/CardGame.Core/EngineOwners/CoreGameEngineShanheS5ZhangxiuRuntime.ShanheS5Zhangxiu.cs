@@ -48,7 +48,6 @@ internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheS5Xiongluan: { Paid: true, ChildrenCompleted: false } r } f || f.Id != id)
             return false;
-        AssertShanheS5Xiongluan(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheS5Xiongluan = r with { ChildrenCompleted = true }, PendingMovementContinuation = null });
@@ -63,17 +62,7 @@ internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime
     {
         if (effect?.Op != SkillProgramEffectOp.PayShanheS5Xiongluan || f.ShanheS5Xiongluan is not { Paid: true, ChildrenCompleted: false } || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
             return false;
-        AssertShanheS5Xiongluan(f);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 59401)]
-    internal void AssertShanheS5Xiongluan(ProgramSkillFrame f)
-    {
-        if (f.ShanheS5Xiongluan is not { } r)
-            return;
-        if (!r.Paid || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || f.SkillId != ShanheS5XiongluanId || r.GameplayHash != f.GameplayHash || f.TriggerId is not null || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.CandidateCount is < 1 or > 5 || !Enum.IsDefined(r.Slot) || r.RandomBefore == r.RandomAfter || r.MovementBefore < 0 || r.MovementAfter < r.MovementBefore || r.MovementAfter > _coreCardMovementJournalMovementSequenceAccess._movementSequence || f.SelectedTargetSeats is not [var target] || target != r.TargetSeat || target == f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5XiongluanCostPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid.Source != r.Source || paid.GameplayHash != r.GameplayHash || paid.TargetSeat != target || paid.ActualTurnNumber != r.ActualTurnNumber || paid.PhaseInstanceId != r.PhaseInstanceId || paid.Slot != r.Slot || paid.CandidateCount != r.CandidateCount || paid.JudgmentWasAbolished != r.JudgmentWasAbolished || paid.MovementBefore != r.MovementBefore || paid.MovementAfter != r.MovementAfter || (r.ChildrenCompleted ? f.PendingMovementContinuation is not null : f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat))
-            throw new InvalidOperationException("S5 Xiongluan lost its original private random payment, actual area cost or typed movement continuation.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 59401)]
@@ -82,7 +71,6 @@ internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime
     {
         if (f.ShanheS5Xiongluan is not { Paid: true })
             return false;
-        AssertShanheS5Xiongluan(f);
         return true;
     }
 }

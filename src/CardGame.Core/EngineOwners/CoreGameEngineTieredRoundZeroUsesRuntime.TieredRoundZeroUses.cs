@@ -372,11 +372,4 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
 
         return true;
     }
-
-    internal void AssertTieredRoundConversionUses()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.TieredRoundConversionUse is not null))
-            if (!IsIssuedTieredRoundUse(use) || use.TieredRoundConversionUse!.FrozenTier == 2 && use.CardId != 0)
-                throw new InvalidOperationException("A tiered conversion lost its accepted material count, source tuple or issued allowance.");
-    }
 }

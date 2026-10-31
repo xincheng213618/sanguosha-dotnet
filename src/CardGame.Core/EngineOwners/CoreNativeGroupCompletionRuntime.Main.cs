@@ -35,7 +35,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             {
                 _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished);
             }
-            else if (!global::CardGame.Core.EngineOwners.CoreNativeCoreInvariantsRuntime.IsResolvedGroupPhysicalCardDestinationAllowed(cardLocation, group.DamageClaimedPhysicalCardIds.Contains(physicalCard.Id), group.TargetSeats))
+            else if (!global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsResolvedGroupPhysicalCardDestinationAllowed(cardLocation, group.DamageClaimedPhysicalCardIds.Contains(physicalCard.Id), group.TargetSeats))
             {
                 throw new InvalidOperationException($"A resolved {(group.Card.Kind)} left Processing through an unsupported destination: {(cardLocation)}.");
             }

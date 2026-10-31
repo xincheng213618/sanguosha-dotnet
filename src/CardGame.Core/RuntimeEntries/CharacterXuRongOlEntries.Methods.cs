@@ -17,7 +17,6 @@ internal sealed partial class CharacterXuRongOlEntries
     internal bool HasXuRongDyingQualification(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasXuRongDyingQualification(candidate, context);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeXuRong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().InitializeXuRong(f);
     internal bool IsXuRongCausalEntityClaim(long nativeOwnerId, int cardId) => _resolve().IsXuRongCausalEntityClaim(nativeOwnerId, cardId);
-    internal bool IsXuRongDying() => _resolve().IsXuRongDying();
     internal bool IsXuRongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXuRongMovement(f, e, p);
     internal bool IsXuRongSlashTargetForbidden(int actor, int target, global::CardGame.Core.CardKind kind) => _resolve().IsXuRongSlashTargetForbidden(actor, target, kind);
     internal void IssueXuRongMove(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> ids, string reason) => _resolve().IssueXuRongMove(f, ids, reason);
@@ -25,7 +24,6 @@ internal sealed partial class CharacterXuRongOlEntries
     internal void ObserveXuRongDyingQualification(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveXuRongDyingQualification(payload);
     internal void ObserveXuRongTurnExpiry(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveXuRongTurnExpiry(payload);
     internal void RemoveXuRongTargetMarkers(global::CardGame.Core.ProgramSkillFrame f, int subject, int source, int count) => _resolve().RemoveXuRongTargetMarkers(f, subject, source, count);
-    internal void RequireIssuedXuRong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireIssuedXuRong(f);
     internal bool ResumeXuRong(long id) => _resolve().ResumeXuRong(id);
     internal bool ReturnXuRongMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnXuRongMovement(f);
     internal global::CardGame.Core.SkillProgramStepOutcome SettleXuRong(global::CardGame.Core.ProgramSkillFrame input) => _resolve().SettleXuRong(input);

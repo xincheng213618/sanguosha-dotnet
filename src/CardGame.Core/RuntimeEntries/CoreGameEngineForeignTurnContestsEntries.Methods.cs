@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineForeignTurnContestsEntries
     internal void CommitForeignTurnContestSlash(global::CardGame.Core.ForeignTurnContestSlashIssue issue) => _resolve().CommitForeignTurnContestSlash(issue);
     internal void CompleteForeignActualTurnStartBinding(global::CardGame.Core.ProgramSkillFrame child) => _resolve().CompleteForeignActualTurnStartBinding(child);
     internal global::CardGame.Core.ForeignTurnPindianOrigin? FreezeForeignTurnPindianOrigin(global::CardGame.Core.ProgramSkillFrame program, global::CardGame.Core.PindianFrame pindian) => _resolve().FreezeForeignTurnPindianOrigin(program, pindian);
-    internal bool HasForeignActualTurnStartBoundary() => _resolve().HasForeignActualTurnStartBoundary();
     internal bool IsForeignActualTurnPindian(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsForeignActualTurnPindian(frame);
     internal bool ReturnRegisteredCompleteForeignTurnContestSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnRegisteredCompleteForeignTurnContestSlash(completion);
     internal bool TryBeginForeignActualTurnStart(global::CardGame.Core.CharacterState turnOwner) => _resolve().TryBeginForeignActualTurnStart(turnOwner);

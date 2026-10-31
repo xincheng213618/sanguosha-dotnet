@@ -99,12 +99,4 @@ internal sealed partial class CoreGameEngineFinalTargetGiftsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
-
-    internal void AssertFinalTargetGift(ProgramSkillFrame frame, SkillProgramEffect effect)
-    {
-        if (frame.FinalTargetGift is not { } draft)
-            return;
-        if (effect.Op != SkillProgramEffectOp.GiveOwnedCardToOtherFinalTargetAndDraw || draft.ActionId != FinalTargetGiftUse(frame).Action!.ActionId || draft.Stage is not ("choice" or "gift-movement" or "reward-movement") || draft.Stage != "choice" && (draft.RecipientSeat is not { } recipient || recipient == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || draft.CardId is null || draft.Reward is < 1 or > 2))
-            throw new InvalidOperationException("Final gift lost instruction-owned receipt/reward cursor.");
-    }
 }

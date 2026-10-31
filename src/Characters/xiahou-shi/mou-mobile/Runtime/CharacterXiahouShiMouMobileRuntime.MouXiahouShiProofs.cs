@@ -65,5 +65,4 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
     internal bool MouXiahouShiDrawSigned(ProgramSkillFrame f, NativeDrawOutcome d, int recipient, int requested) => d.RecipientSeat == recipient && d.RequestedCount == requested && _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiDrawReturnedEvent>().Count(e => e == new MouXiahouShiDrawReturnedEvent(f.Id, recipient, requested, d.ActualDrawIds.Count, d.ReplacementGainedIds.Count, d.SequenceBefore, d.SequenceAfter, d.AttemptFrameId)) == 1;
     internal bool ValidMouXiahouShi(ProgramSkillFrame f) => f.MouXiahouShiYanyu is not null ? ValidMouXiahouShiYanyu(f) : f.MouXiahouShiQiaoshi is not null && ValidMouXiahouShiQiaoshi(f);
     internal bool PermitIssuedMouXiahouShi(ProgramSkillFrame f) => ValidMouXiahouShi(f) && (f.MouXiahouShiYanyu is { Payment: not null } or { TargetSeat: not null } || f.MouXiahouShiQiaoshi is { Branch: "recover-and-draw" });
-    internal bool HasPaidMouXiahouShiSelection(ProgramSkillFrame f) => f.MouXiahouShiYanyu is { Support: false, Payment: not null } && ValidMouXiahouShiYanyu(f);
 }

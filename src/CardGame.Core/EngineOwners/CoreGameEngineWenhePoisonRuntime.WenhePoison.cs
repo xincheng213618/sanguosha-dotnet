@@ -80,7 +80,6 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
     }
 
     internal bool IsWenhePoisonFireAttackMovement(CardUseFrame parent, CardsMovedTriggerWindowFrame child) => parent.WenhePoisonFireAttackPayment is { } payment && child.WenhePoisonFireAttackReturn is { } returned && returned.ParentFrameId == parent.Id && returned.CostCardId == payment.CostCardId && returned.BatchId == child.Batch.Id && child.Id == child.Batch.Id && payment.ActiveChildId == child.Id && payment.BatchCursor < payment.BatchIds.Count && payment.BatchIds[payment.BatchCursor] == child.Batch.Id && child.Batch.ParentFrameId == parent.Id && child.Batch.Movements.Count > 0 && child.Batch.Movements.All(move => move.CardId == payment.CostCardId && move.Sequence > payment.SequenceBefore && move.Sequence <= payment.SequenceAfter) && child.ResumeProgramFrameId is null;
-    internal bool HasWenhePoisonFireAttackPrompt() => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.WenhePoisonFireAttackPayment is { ActiveChildId: { } id } && _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Any(child => child.Id == id && IsWenhePoisonFireAttackMovement(use, child)));
     internal void AssertWenhePoisonFireAttackPayment(CardUseFrame use)
     {
         var p = use.WenhePoisonFireAttackPayment!;
@@ -136,31 +135,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.LeadingTail, 20)]
     internal bool HasWenhePoisonUsePaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => continuation.Kind is RecoveryPaidCardUseKind.Trick or RecoveryPaidCardUseKind.Simple or RecoveryPaidCardUseKind.EquipmentUse && use.PaymentMovementReceipt is { } receipt && receipt.OwnerFrameId == use.Id && IsWenhePoisonUsePaymentBatch(use, receipt.Batch) && global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, receipt.Batch);
     internal bool IsPendingWenhePoisonWindow(CardsMovedTriggerWindowFrame frame) => HasWenhePoisonDepartures(frame.Batch) && frame.CandidateIndex == 0 && (frame.WenhePoisonLoss is null || frame.WenhePoisonLoss is { Stage: not WenhePoisonLossStage.Completed } receipt && receipt.Cursor >= 0 && receipt.Cursor < frame.Batch.WenhePoisonDepartures!.Count);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 240)]
     internal bool IsCurrentWenhePoisonDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id)is var index && index > 0 && IsWenhePoisonDyingChild(_resolutionStackOperations._resolutionStack[index - 1], dying);
-    internal bool HasExactWenhePoisonResponseContinuation()
-    {
-        if (_coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying)
-            return false;
-        var dyingIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id);
-        if (dyingIndex < 1 || _resolutionStackOperations._resolutionStack[dyingIndex - 1] is not CardsMovedTriggerWindowFrame movement || !IsWenhePoisonDyingChild(movement, dying))
-            return false;
-        AssertWenhePoisonMovementWindow(movement);
-        var receipt = movement.WenhePoisonLoss!;
-        if (receipt.HpBefore != 1 || receipt.HpAfter != 0 || receipt.Cursor >= movement.Batch.WenhePoisonDepartures!.Count)
-            return false;
-        var ownerIndex = dyingIndex - 2;
-        if (ownerIndex < 0)
-            return movement.Batch.ParentFrameId is null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == movement.Batch.ParentFrameId);
-        var owner = _resolutionStackOperations._resolutionStack[ownerIndex];
-        if (owner is ProgramSkillFrame program)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(program, movement);
-        if (owner is CardUseFrame use)
-            return _coreCardUsePaymentsOperations.IsPaidCardUseMovementReturn(use, movement) || IsWenhePoisonFireAttackMovement(use, movement) || IsWenhePoisonColorFireAttackMovement(use, movement);
-        return _coreResponseCompletionOperations.ResponseCompletionStructuralEdge(owner, movement) || _coreCardSupplyCompletionOperations.CardSupplyCompletionStructuralEdge(owner, movement);
-    }
-
-    internal bool IsWenhePoisonColorFireAttackMovement(CardUseFrame use, CardsMovedTriggerWindowFrame movement) => use.CardKind == CardKind.FireAttack && use.ColorFireAttack is { PaidCardId: { } cost, PaidFrom: { } from } p && use.Action?.ActionId == p.ActionId && p.Source.OwnerSeat == use.SourceSeat && from == CardLocation.Hand(use.SourceSeat) && p.PaidIsRed is not null && p.PaidIsRed == p.RevealedIsRed && p.PaymentEndSequence > p.PaymentStartSequence && movement.ResumeColorFireAttackFrameId == use.Id && movement.Batch.ParentFrameId == use.Id && movement.ResumeProgramFrameId is null && movement.Batch.AwaitingProgramFrameId is null && movement.Batch.Movements.Count == 1 && movement.Batch.Movements[0] is { } move && move.CardId == cost && move.From == from && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.FireAttackDiscard && move.Disclosure == CardMovementDisclosure.FaceUp && move.Sequence > p.PaymentStartSequence && move.Sequence <= p.PaymentEndSequence && movement.Batch.WenhePoisonDepartures?.Any(d => d.CardId == cost && d.MovementSequence == move.Sequence) == true;
     internal bool IsOriginalDyingSuspendedByWenhePoison(DyingFrame original)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == original.Id);

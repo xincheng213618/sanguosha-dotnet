@@ -86,8 +86,6 @@ internal sealed partial class CharacterSuFeiOlRuntime
     internal bool HasSuFeiDamageObserver(long id) => SuFeiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 380)]
     internal bool HasSuFeiBeforeDamageObserver(long id) => SuFeiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 150)]
-    internal bool IsSuFeiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && SuFeiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 290)]
     internal bool TryAdvanceSuFeiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SuFeiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

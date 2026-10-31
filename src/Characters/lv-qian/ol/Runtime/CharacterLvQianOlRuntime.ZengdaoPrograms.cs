@@ -30,7 +30,6 @@ internal sealed partial class CharacterLvQianOlRuntime
     internal void ResolveZengdaoDamageChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        AssertLvQian(f);
         if (f.LvQian is not { Stage: LvQianStage.DamageChoice } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZengdaoDamageChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zengdao payment lost its real recipient chooser.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

@@ -35,8 +35,6 @@ internal sealed partial class CharacterLiuYanOlRuntime
 
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(id, card, o.ActorSeat, [o.ActorSeat], LegalActionKind.Indulgence, playedCardKind: CardKind.Indulgence);
     }
-
-    internal bool HasPaidLiuYanInitialSelection(ProgramSkillFrame f) => f.LiuYan is { Operation: SkillProgramEffectOp.UseLimuSelfIndulgenceAndRecover, PaymentSequence: not null, Use: { } o } && f.SelectedCardIds.SequenceEqual([o.CardId]) && ValidLiuYan(f);
     internal bool IsLiuYanLimuUse(long id)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { LiuYanLimu: { } o, CardKind: CardKind.Indulgence, Action: { Type: CardActionType.Use } a } use || use.CardId != o.CardId || id != o.CardUseFrameId || a.ActionId != o.ActionId || a.EffectiveKind != CardKind.Indulgence || use.PhysicalCardIds is not [var paid] || paid != o.CardId || a.PhysicalCards is not [var cost] || cost.CardId != o.CardId || cost.CardKind != o.PrintedKind || cost.From != o.From || a.EffectiveSuit != Suit.Diamond || a.EffectiveRank != o.Rank || a.EffectiveIsRed != true || !a.ConversionChain.SequenceEqual([o.Source]) || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || a.ResponderSeat is not null || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) || !a.TargetSeats.SequenceEqual(use.TargetSeats))

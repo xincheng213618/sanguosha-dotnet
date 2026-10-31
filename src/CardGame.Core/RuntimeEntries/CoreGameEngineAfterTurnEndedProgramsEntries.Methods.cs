@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineAfterTurnEndedProgramsEntries
     internal bool CompleteAfterTurnEndedBinding(global::CardGame.Core.DeferredTurnEndFrame parent, global::CardGame.Core.ProgramSkillFrame child, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CompleteAfterTurnEndedBinding(parent, child, context);
     internal bool ContinueAfterTurnEndedPrograms(global::CardGame.Core.DeferredTurnEndFrame parent) => _resolve().ContinueAfterTurnEndedPrograms(parent);
     internal global::CardGame.Core.ProgramSkillWindowContext CreateAfterTurnEndedContext(global::CardGame.Core.DeferredTurnEndFrame parent, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().CreateAfterTurnEndedContext(parent, candidate);
-    internal bool HasAfterTurnEndedBoundaryFrame(global::CardGame.Core.DeferredTurnEndFrame parent) => _resolve().HasAfterTurnEndedBoundaryFrame(parent);
     internal bool IsActualAfterTurnEndedParent(global::CardGame.Core.DeferredTurnEndFrame parent) => _resolve().IsActualAfterTurnEndedParent(parent);
     internal bool MatchesAfterTurnEndedChild(global::CardGame.Core.DeferredTurnEndFrame parent, global::CardGame.Core.ProgramSkillFrame child, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().MatchesAfterTurnEndedChild(parent, child, context);
     internal bool HasAfterTurnEndedPrograms { get => _resolve().HasAfterTurnEndedPrograms; }

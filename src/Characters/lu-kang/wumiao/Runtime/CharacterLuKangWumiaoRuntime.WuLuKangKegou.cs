@@ -186,7 +186,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuKangKegou: { } r } f || f.Id != id)
             return;
-        AssertWuLuKang(f);
         if (r.PindianCancelled || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {
             FinishWuLuKangKegou(f);

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineBoundCardsRecastsEntries
 {
-    internal void AssertBoundCardsRecast(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().AssertBoundCardsRecast(frame, plan);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundCardsRecast(global::CardGame.Core.ProgramSkillFrame supplied, string sourceBind) => _resolve().BeginBoundCardsRecast(supplied, sourceBind);
     internal bool CanKeepPaidBoundCardsRecast(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanKeepPaidBoundCardsRecast(frame);
     internal void CompleteBoundCardsRecastDraw(global::CardGame.Core.ProgramSkillFrame frame, int actual, long before, long after) => _resolve().CompleteBoundCardsRecastDraw(frame, actual, before, after);

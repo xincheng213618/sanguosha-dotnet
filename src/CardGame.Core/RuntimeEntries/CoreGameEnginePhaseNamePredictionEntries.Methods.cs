@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionEntries
 {
     internal bool AllowsSettlePhaseNamePredictionTrigger(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsSettlePhaseNamePredictionTrigger(gate);
     internal void AppendPhaseNamePredictionCandidates(global::System.Collections.Generic.List<global::CardGame.Core.ProgramTriggerCandidate> candidates) => _resolve().AppendPhaseNamePredictionCandidates(candidates);
-    internal void AssertPhaseNamePrediction(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertPhaseNamePrediction(f);
     internal global::CardGame.Core.ProgramSkillWindowContext AttachPhaseNamePredictionContext(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().AttachPhaseNamePredictionContext(c, context);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPhaseNamePrediction(global::CardGame.Core.ProgramSkillFrame supplied, string stateId) => _resolve().BeginPhaseNamePrediction(supplied, stateId);
     internal bool CanContinuePhaseNamePrediction(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinuePhaseNamePrediction(f);

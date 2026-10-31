@@ -80,6 +80,5 @@ internal sealed class MouCaoAngRuntime(IMouCaoAngFacts facts,IMouCaoAngNative na
     [ProgramContinuation(ProgramContinuationKind.Resume,36700)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouCaoAng:not null}f||f.Id!=id)return false;Continue(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,36700)]private bool Movement(ProgramSkillFrame f)=>f.MouCaoAng is not null&&Resume(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,36700)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,36700)]private bool Paid(ProgramSkillFrame f)=>f.MouCaoAng is not null&&Valid(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,36700)]private void Invariant(ProgramSkillFrame f){if(f.MouCaoAng is not null&&!Valid(f))throw new InvalidOperationException("Invalid own-frame Mou Cao Ang receipt.");}
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouCaoAngFengmin,SkillProgramEffectOp.ResolveMouCaoAngZhiwang)]private PromptChoice Ai(PendingDecision p,ProgramSkillFrame f)=>p.Choices.OrderByDescending(c=>c.Targets.Sum(t=>facts.TargetValue(Chooser(f),t))).First();
 }

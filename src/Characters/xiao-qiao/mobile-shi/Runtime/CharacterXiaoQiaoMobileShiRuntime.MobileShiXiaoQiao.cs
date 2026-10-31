@@ -149,7 +149,6 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiXiaoQiao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiXqChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Shi Xiao Qiao lost its exact current common-skill target, lost skill or public current donor skill.");
-        RequireShiXq(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage is ShiXqStage.Target or ShiXqStage.CopyTarget)
@@ -198,7 +197,6 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiXiaoQiao: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || r.Stage == ShiXqStage.Drawing)
             return;
-        RequireShiXq(f);
         if (r.Stage is ShiXqStage.LossChildren or ShiXqStage.RevokeChildren or ShiXqStage.GrantChildren or ShiXqStage.DrawChildren)
         {
             if (DrainShiXq(id))
@@ -244,8 +242,6 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         var r = f.ShiXiaoQiao!;
-        if (r.Stage != ShiXqStage.Drawing || r.Draw is not null || !r.Paid || outcome.RecipientSeat != r.Target || outcome.RequestedCount != 2)
-            throw new InvalidOperationException("Heyun lost its once-paid skill loss or original two-card native draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiXiaoQiao = r with { Stage = ShiXqStage.DrawChildren, Draw = outcome, Before = checked((int)outcome.SequenceBefore), After = checked((int)outcome.SequenceAfter) }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiXqDrawPaidEvent(f.Id, r.Target, outcome.AttemptFrameId, outcome.ActualDrawIds.Count, outcome.Replacement is not null, outcome.SequenceBefore, outcome.SequenceAfter));
         ContinueShiXq(f.Id);

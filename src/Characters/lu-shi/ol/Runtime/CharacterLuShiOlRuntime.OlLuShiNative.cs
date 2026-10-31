@@ -49,17 +49,6 @@ internal sealed partial class CharacterLuShiOlRuntime
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat);
     }
 
-    internal bool IsOlLuShiLeijieAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle a, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { OlLuShiLeijie: { } o } use || !IsOlLuShiLeijieNativeSlash(use) || a.Card is not null || a.PhysicalCards.Count != 0 || processing.Count != 0 || a.EffectiveCardKind != CardKind.ThunderSlash || a.ProgramSkillCardUseFrameId != o.FrameId || a.ProgramSkillFrameId is not null || a.SourceSeat != use.SourceSeat || a.CardUserSeat != use.SourceSeat || a.IsSourceLess)
-            return false;
-        if (!a.IsChainPropagation)
-            return use.TargetSeats.Contains(a.TargetSeat) || a.DamageRedirected;
-        // Chain propagation is the same native attack's frozen recipient cursor;
-        // do not create a program-damage parent or a second virtual-card origin.
-        return a.ChainedTargetIndex > 0 && a.ChainedTargetIndex <= a.ChainedTargetSeats.Count && a.ChainedTargetSeats[a.ChainedTargetIndex - 1] == a.TargetSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<ChainedDamagePropagatedEvent>().Any(e => e.ResolutionId == use.Id && e.SourceSeat == use.SourceSeat && e.TargetSeat == a.TargetSeat && e.Nature == DamageNature.Thunder);
-    }
-
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 42701)]
     internal bool CompleteOlLuShiLeijieAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
     {

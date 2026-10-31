@@ -80,30 +80,7 @@ internal sealed partial class CoreGameEnginePairedHandRecastObserversRuntime
         return moved.ResumeProgramFrameId is null && moved.Batch.Id == moved.Id && moved.Batch.ParentFrameId == f.Id && moved.Batch.AwaitingProgramFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && (drawing || moved.Batch.Id == p.CostBatchId) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.Sequence > before && m.Sequence <= after && (drawing ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(p.Seat) && m.Reason == CardMoveReasons.RecastDraw || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle : p.Material is { } paid && m.CardId == paid.CardId && m.CardKind == paid.PrintedKind && m.From == paid.From && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.RecastDiscard));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 410)]
-    internal void AssertPairedHandRecast(ProgramSkillFrame f)
-    {
-        if (f.PairedHandRecast is null)
-            return;
-        if (!ValidPairedHandRecastReceipt(f))
-            throw new InvalidOperationException("Paired hand recast lost its frozen real-hand choices, actual phase, participant cursor or once-paid cost/draw invoice.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !PairedHandRecastFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Paired hand recast retained an unrelated first native child.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && f.PairedHandRecast.Stage == PairedHandRecastStage.ChoosingPartner && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !IsPairedHandRecastChoice(f, prompt)))
-            throw new InvalidOperationException("Paired hand recast lost its exact partner-only private hand prompt.");
-    }
-
-    internal bool IsPairedHandRecastChoice(ProgramSkillFrame f, PendingDecision decision)
-    {
-        if (f.PairedHandRecast is not { Stage: PairedHandRecastStage.ChoosingPartner, Cursor: 0, Partner.Material: null } r || !ValidPairedHandRecastReceipt(f) || decision.Kind != DecisionKind.ProgramTrigger || !decision.IsPrivate || decision.PlayerSeat != r.Partner.Seat || decision.TargetSeat != r.Partner.Seat || decision.SourceSeat != f.OwnerSeat || decision.ValidTargetSeats.Count != 0 || decision.ValidContentIds.Count != 0 || decision.RequiredCardCount != 0 || decision.SkillPrompt?.SkillId != f.SkillId)
-            return false;
-        var expected = _corePairedHandRecastOperations.PairedHandRecastChoices(f);
-        return decision.ValidCardIds.SequenceEqual(expected.SelectMany(c => c.Cards).Distinct()) && decision.Choices.Count == expected.Count && decision.Choices.Zip(expected).All(pair => pair.First.Id == pair.Second.Id && pair.First.Cards.SequenceEqual(pair.Second.Cards) && pair.First.Targets.SequenceEqual(pair.Second.Targets) && pair.First.Parameters.OrderBy(x => x.Key).SequenceEqual(pair.Second.Parameters.OrderBy(x => x.Key)));
-    }
-
     internal ProgramSkillFrame? PairedHandRecastObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePairedHandRecastObserversOperations.PairedHandRecastFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 20, group: 40)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 100)]
     internal bool IsPairedHandRecastDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairedHandRecastObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1880)]

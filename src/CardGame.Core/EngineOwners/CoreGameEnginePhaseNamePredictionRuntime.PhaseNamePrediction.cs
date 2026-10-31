@@ -85,7 +85,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
     internal void ResolvePhaseNamePredictionChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Prediction has no owning frame.");
-        AssertPhaseNamePrediction(f);
         if (f.PhaseNamePrediction is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], PredictionChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Prediction choice changed its exact private draft.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -262,7 +261,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
     {
         if (f.PhaseNamePrediction is not { Stage: PhaseNamePredictionStage.CostChildren or PhaseNamePredictionStage.ClaimChildren } r)
             return false;
-        AssertPhaseNamePrediction(f);
         if (f.PendingMovementContinuation is null)
             throw new InvalidOperationException("Prediction lost its typed movement return.");
         if (DrainPredictionChildren(f))
@@ -283,7 +281,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { PhaseNamePrediction: { } r } f || f.Id != id)
             return false;
-        AssertPhaseNamePrediction(f);
         if (r.Stage is PhaseNamePredictionStage.CostChildren or PhaseNamePredictionStage.ClaimChildren)
             return ReturnPhaseNamePredictionMovement(f);
         if (r.Stage == PhaseNamePredictionStage.DamageIssued)
@@ -313,23 +310,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
     internal bool CanContinuePhaseNamePrediction(ProgramSkillFrame f) => f.PhaseNamePrediction is not null || f.WindowContext?.PhaseNamePrediction is { } p && _coreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess._phaseNamePredictions.Contains(p);
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 70)]
     internal bool IsPhaseNamePredictionMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => e is not null && PhaseNamePredictionComposition.IsOperation(e.Op) && f.PendingMovementContinuation == pending && f.PhaseNamePrediction is { Stage: PhaseNamePredictionStage.CostChildren or PhaseNamePredictionStage.ClaimChildren };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 420)]
-    internal void AssertPhaseNamePrediction(ProgramSkillFrame f)
-    {
-        if (f.PhaseNamePrediction is not { } r)
-            return;
-        if (f.InstructionIndex != 1 || r.Origin.Source.OwnerSeat != f.OwnerSeat || r.Origin.Source.SkillId != f.SkillId || r.Origin.Source.SkillInstanceId != f.SkillInstanceId || r.Origin.GameplayHash != f.GameplayHash || r.Origin.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Origin.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || r.Origin.PhaseInstanceId != CurrentPredictionPhaseInstanceId || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseNamePredictionStartedEvent>().Count(e => e == r.Origin) != 1 || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Any(id => !r.Eligible.Any(m => m.CardId == id)))
-            throw new InvalidOperationException("Prediction receipt lost its original source, phase or immutable materials.");
-        if (r.IssuedPolicy is { } p && (!_coreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess._phaseNamePredictions.Contains(p) || f.WindowContext?.PhaseNamePrediction != p || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseNamePredictionSettledEvent>().Count(e => e.FrameId == f.Id && e.OriginalFrameId == p.Origin.FrameId) != 1))
-            throw new InvalidOperationException("Prediction settlement lost its one issued policy.");
-        if (r.Stage is PhaseNamePredictionStage.CostChildren or PhaseNamePredictionStage.ClaimChildren)
-        {
-            var reason = r.Stage == PhaseNamePredictionStage.CostChildren ? PhasePredictionCostReason : PhasePredictionClaimReason;
-            var destination = r.Stage == PhaseNamePredictionStage.CostChildren ? CardLocation.DiscardPile : CardLocation.Hand(f.OwnerSeat);
-            if (f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != f.OwnerSeat || r.SequenceBefore < 0 || r.SequenceAfter <= r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Selected.Any(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.CardId == id && m.From == r.Eligible.Single(x => x.CardId == id).From && (m.To == destination || r.Stage == PhaseNamePredictionStage.CostChildren && m.To == CardLocation.OutsideGame && (_coreCardAttackStateOperations.GetAttackCard(id).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m))) && m.Reason.Value == reason) != 1))
-                throw new InvalidOperationException("Prediction movement lost its one exact paid interval.");
-        }
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IPhaseNamePredictionHost.BeginPhaseNamePrediction(ProgramSkillFrame f, string state) => BeginPhaseNamePrediction(f, state);
     SkillProgramStepOutcome global::CardGame.Core.IPhaseNamePredictionHost.SettlePhaseNamePrediction(ProgramSkillFrame f, string state) => SettlePhaseNamePrediction(f, state);

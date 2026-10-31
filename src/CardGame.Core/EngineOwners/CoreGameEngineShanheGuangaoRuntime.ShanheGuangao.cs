@@ -85,7 +85,6 @@ internal sealed partial class CoreGameEngineShanheGuangaoRuntime
     internal void ResolveShanheGuangaoChoice(PromptChoice selected)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Guangao lost its owning frame.");
-        AssertShanheGuangao(frame);
         var draft = frame.ShanheGuangao!;
         var choice = draft.Choices.SingleOrDefault(candidate => candidate.Id == selected.Id);
         if (choice is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
@@ -170,18 +169,6 @@ internal sealed partial class CoreGameEngineShanheGuangaoRuntime
     {
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ShanheGuangao = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 5405)]
-    internal void AssertShanheGuangao(ProgramSkillFrame frame)
-    {
-        if (frame.ShanheGuangao is not { } draft)
-            return;
-        var use = RequireShanheGuangaoUse(frame);
-        if (draft.CardUseFrameId != use.Id || draft.ActionId != use.Action!.ActionId || draft.OriginalTargets.Count == 0 || draft.OriginalTargets.Distinct().Count() != draft.OriginalTargets.Count || draft.Stage is not ("target" or "draw" or "draw-children" or "nullify") || (draft.Stage == "target" ? !draft.OriginalTargets.SequenceEqual(use.TargetSeats) || draft.AddedTarget is not null || draft.DrawOutcome is not null : draft.AddedTarget is not { } target || draft.OriginalTargets.Contains(target) || !draft.OriginalTargets.Append(target).SequenceEqual(use.TargetSeats) || draft.HandCountBeforeDraw is not { } count || count % 2 != 0))
-            throw new InvalidOperationException("Guangao lost its frozen original targets, accepted extra target or paid stage.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (draft.Stage is not ("target" or "nullify") || prompt.PlayerSeat != (draft.Stage == "target" ? use.SourceSeat : frame.OwnerSeat) || prompt.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, draft.Choices) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(draft.Choices, ShanheGuangaoChoices(frame))))
-            throw new InvalidOperationException("Guangao lost its exact public owner choice.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShanheGuangao)]

@@ -66,14 +66,6 @@ internal sealed partial class CharacterChengYuMouOlRuntime
     }
 
     internal bool MouDanchiSuspensionMatches(ProgramSkillFrame f) => f.MouDanchi?.Suspension is not { } s || _coreCardUseLifecycleOperations.LifecycleCardUse(s.UseId)is { Action: { } a } use && a.ActionId == s.ActionId && use.CardKind == s.Kind && use.SourceSeat == s.SourceSeat && use.TargetIndex == s.TargetIndex && (!s.AttackActive || use.CardAttack is { Active: false }) && (!s.DuelActive || use.Continuations.Duel is { Active: false }) && (!s.GroupActive || use.Continuations.GroupCard is { Active: false }) && (use.FireAttackSelection is not null) == s.HasFireSelection && use.FireAttackSelection?.RevealedCardId == s.FireRevealedCardId && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDanchiCursorSuspendedEvent>().Count(e => e.FrameId == f.Id && e.Suspension == s) == 1;
-    internal bool HasMouDanchiSuspendedCompletedParent(ProgramCardTriggerWindowFrame window)
-    {
-        var at = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == window.Id);
-        if (window.Continuation != ProgramCardContinuation.CompletedSlash || window.CompletedResponseReturn is not null || window.Action.Type != CardActionType.Use || window.AttackOwnerFrameId != window.ParentFrameId || at < 1 || _resolutionStackOperations._resolutionStack[at - 1] is not CardUseFrame { Step: ResolutionFrameStep.Completed, Action: { } action } original || original.Id != window.ParentFrameId || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(action, window.Action) || at + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[at + 1] is not ProgramSkillFrame { MouDanchi: { Suspension: { AttackActive: true } suspension } receipt } child || child.SkillId != MouChengYuComposition.Danchi || child.TriggerId != "source-next-use" || child.WindowContext?.ParentFrameId != window.Id || receipt.WindowId != window.Id || receipt.NextActionId != action.ActionId || suspension.UseId != original.Id || suspension.ActionId != action.ActionId || !MouDanchi.Valid(child) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == original.Id) != 1 || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
-            return false;
-        var candidate = window.Candidates[window.CandidateIndex];
-        return candidate.OwnerSeat == child.OwnerSeat && candidate.SkillId == child.SkillId && candidate.SkillInstanceId == child.SkillInstanceId && candidate.TriggerId == child.TriggerId && candidate.GameplayHash == child.GameplayHash;
-    }
 
     internal CardActionContext PrepareMouDanchiAction(CardActionContext action)
     {
@@ -109,15 +101,6 @@ internal sealed partial class CharacterChengYuMouOlRuntime
         return new(0, appearance.Kind, Suit.None, 0);
     }
 
-    internal IReadOnlyList<int>? MouDanchiAncestorProcessing(long id)
-    {
-        if (!IsMouDanchiUse(id))
-            return null;
-        var origin = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.MouDanchiOrigin!;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == origin.FrameId);
-        return Array.AsReadOnly(_resolutionStackOperations._resolutionStack.Take(index).OfType<CardUseFrame>().SelectMany(u => u.PhysicalCardIds ?? []).Where(card => card > 0 && _cardZonesOperations._cardZones.GetLocation(card) == CardLocation.Processing).Distinct().ToArray());
-    }
-
     internal bool IsMouDanchiSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.MouDanchi is { Stage: MouDanchiStage.Children, Returned: true } r && MouDanchi.Valid(f) && r.Batches.Contains(batch.Id) && batch.ParentFrameId == r.UseId && batch.AwaitingProgramFrameId is null && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.OriginOwnerSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDanchiNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == batch.Id) == 1 && batch.Movements.Count > 0 && batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m));
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 34101)]
     internal bool FinishMouDanchiSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
@@ -138,8 +121,6 @@ internal sealed partial class CharacterChengYuMouOlRuntime
 
         return true;
     }
-
-    internal bool IsMouDanchiAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MouDanchiOrigin: { } o } use && IsMouDanchiUse(use.Id) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && attack.Card is null && attack.PhysicalCards.Count == 0 && attack.ProgramSkillCardUseFrameId == o.FrameId && attack.EffectiveCardKind == use.CardKind && attack.SourceSeat == use.SourceSeat && processing.Select(c => c.Id).Order().SequenceEqual((MouDanchiAncestorProcessing(use.Id) ?? []).Order());
     [NativeUseValidation(34101)]
     internal void ValidateMouDanchiNativeUse(CardUseFrame use)
     {

@@ -38,8 +38,6 @@ internal sealed partial class CharacterZhouYuLeRuntime
     internal bool HasGuYinDamageObserver(long id) => GuYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1340)]
     internal bool HasGuYinBeforeDamageObserver(long id) => GuYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1170)]
-    internal bool IsGuYinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && GuYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 430)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 420)]
     internal bool IsGuYinRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

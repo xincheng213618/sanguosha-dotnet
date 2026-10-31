@@ -118,14 +118,4 @@ internal sealed partial class CoreGameEngineAfterTurnEndedProgramsRuntime
         _coreDeferredHandAlignmentsOperations.ContinueDeferredTurnEnd();
         return true;
     }
-
-    internal bool HasAfterTurnEndedBoundaryFrame(DeferredTurnEndFrame parent)
-    {
-        var candidate = AfterTurnEndedCandidate(parent);
-        if (_resolutionStackOperations._resolutionStack.Count == 1 && parent.Step == ResolutionFrameStep.AwaitingResponse && parent.AfterTurnEnded!.CurrentChild is null && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Optional && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } decision && decision.PlayerSeat == candidate.OwnerSeat && decision.SourceSeat == parent.OwnerSeat && decision.TargetSeat == parent.OwnerSeat && decision.Choices.Count == 2 && decision.Choices.All(choice => choice.Parameters.GetValueOrDefault("skill-id") == candidate.SkillId && choice.Parameters.GetValueOrDefault("binding-id") == candidate.BindingId && choice.Parameters.GetValueOrDefault("skill-instance-id") == candidate.SkillInstanceId) && decision.Choices.Select(choice => choice.Parameters.GetValueOrDefault("program-action")).Order(StringComparer.Ordinal).SequenceEqual(["activate", "skip"]))
-            return true;
-        if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[1] is not ProgramSkillFrame child || child.WindowContext is not { } context || !MatchesAfterTurnEndedChild(parent, child, context))
-            throw new InvalidOperationException("An after-turn-ended boundary lost its exact prompt or owning child.");
-        return true;
-    }
 }

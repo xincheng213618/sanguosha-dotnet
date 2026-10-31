@@ -5,7 +5,6 @@ internal sealed partial class CharacterHuoJunOlEntries
     internal bool AdvanceHuoJunFenruiSubtree() => _resolve().AdvanceHuoJunFenruiSubtree();
     internal global::CardGame.Core.PromptChoice AiHuoJunFenrui(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiHuoJunFenrui(p, f);
     internal void AnswerHuoJunFenrui(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHuoJunFenrui(choice);
-    internal void AssertHuoJunFenrui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHuoJunFenrui(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHuoJunFenrui(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHuoJunFenrui(supplied);
     internal bool CanContinuePaidHuoJunFenrui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinuePaidHuoJunFenrui(f);
     internal bool CanOfferHuoJunFenrui(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferHuoJunFenrui(c, t, context);
@@ -22,7 +21,6 @@ internal sealed partial class CharacterHuoJunOlEntries
     internal bool HuoJunHasAbolishedSlot(int seat) => _resolve().HuoJunHasAbolishedSlot(seat);
     internal bool HuoJunHasDiscard(int seat) => _resolve().HuoJunHasDiscard(seat);
     internal global::CardGame.Core.CardConversionSource HuoJunSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuoJunSource(f);
-    internal bool IsHuoJunFenruiDying() => _resolve().IsHuoJunFenruiDying();
     internal bool IsHuoJunFenruiNativeEquipment(global::CardGame.Core.ResolutionFrame ride, global::CardGame.Core.ResolutionFrame beneath) => _resolve().IsHuoJunFenruiNativeEquipment(ride, beneath);
     internal bool IsHuoJunFenruiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsHuoJunFenruiRecoveryParent(f, recovery);
     internal void IssueHuoJunRandomEquipment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueHuoJunRandomEquipment(f);

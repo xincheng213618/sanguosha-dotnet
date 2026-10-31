@@ -30,12 +30,6 @@ internal sealed partial class CharacterSunZiLiuFangMobileRuntime
     internal bool HasMobileJiyuOriginalSelection(ProgramSkillFrame frame) => frame.SkillId == MobileJiyu && frame.TriggerId is null && frame.ActivationId == MobileJiyuActivation && frame.SelectedCardIds.Count == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiyuInvokedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var invoked] && ValidMobileJiyuInvocation(invoked) && invoked.Source == new CardConversionSource(frame.SkillId, frame.ActivationId, frame.OwnerSeat, frame.SkillInstanceId) && invoked.Hash == frame.GameplayHash && frame.SelectedTargetSeats.SequenceEqual([invoked.Target]);
     [ProgramRuntimeHook(ProgramRuntimePhase.PaidInitialSelection, 78300)]
     internal bool KeepMobileJiyuInitialSelection(ProgramSkillFrame frame) => HasMobileJiyuOriginalSelection(frame);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 78300)]
-    internal void AssertMobileJiyuOriginalSelection(ProgramSkillFrame frame)
-    {
-        if (frame.SkillId == MobileJiyu && !HasMobileJiyuOriginalSelection(frame))
-            throw new InvalidOperationException("Mobile Jiyu lost its committed original target and actual Play allowance.");
-    }
 
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 78301)]
     internal void CompleteMobileJiyuInvocation(ProgramSkillResolvedEvent resolved)

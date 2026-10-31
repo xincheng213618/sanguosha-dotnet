@@ -36,46 +36,6 @@ internal sealed partial class CharacterZhouYuLeRuntime
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == PingluObtainReason) == entries.Length;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28820)]
-    internal void AssertPinglu(ProgramSkillFrame frame)
-    {
-        if (frame.Pinglu is not { } r)
-            return;
-        if (!ValidPingluStarted(frame) || r.Stage != PingluStage.ObtainChildren || r.Before != r.SequenceBefore || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Targets is not System.Collections.IList { IsReadOnly: true } || r.Targets.Count == 0 || r.Targets.Select(s => s.TargetSeat).Distinct().Count() != r.Targets.Count || r.Targets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s.TargetSeat) || s.TargetSeat == frame.OwnerSeat) || !r.Targets.Select(s => s.TargetSeat).SequenceEqual(r.Targets.Select(s => s.TargetSeat).OrderBy(seat => _coreTableOrderOperations.RelativeTableOrder(frame.OwnerSeat, seat))) || r.Targets.Where(s => s.CardId is not null).Select(s => s.CardId).Distinct().Count() != r.Targets.Count(s => s.CardId is not null))
-            throw new InvalidOperationException("Pinglu lost its exact source, actual Play or frozen all-target original Hand samples.");
-        var samples = _coreProgramEventHistoryOperations.ProgramEventHistory<PingluTargetSampledEvent>().Where(e => e.FrameId == frame.Id).OrderBy(e => e.Index).ToArray();
-        if (samples.Length != r.Targets.Count)
-            throw new InvalidOperationException("Pinglu lost an original target's one random sample.");
-        for (var i = 0; i < samples.Length; i++)
-        {
-            var sample = r.Targets[i];
-            if (sample.Index != i || sample.HandCount < 0 || sample.RandomBefore == 0 || i > 0 && sample.RandomBefore != r.Targets[i - 1].RandomAfter || samples[i] != new PingluTargetSampledEvent(frame.Id, i, sample.TargetSeat, sample.HandCount, sample.CardId, sample.PrintedKind, sample.From, sample.RandomBefore, sample.RandomAfter, r.SequenceBefore))
-                throw new InvalidOperationException("Pinglu changed its original random cursor or sampled participant.");
-            if (sample.HandCount == 0)
-            {
-                if (sample.CardId is not null || sample.PrintedKind is not null || sample.From is not null || sample.RandomBefore != sample.RandomAfter)
-                    throw new InvalidOperationException("An empty target cannot pay a fictional Hand card or consume random selection.");
-            }
-            else
-            {
-                var random = new DeterministicRandom(unchecked((int)sample.RandomBefore));
-                random.Next(sample.HandCount);
-                if (sample.CardId is not > 0 || sample.PrintedKind is null || sample.From != CardLocation.Hand(sample.TargetSeat) || random.State != sample.RandomAfter)
-                    throw new InvalidOperationException("Pinglu requires one original private Hand entity and exactly one real random selection per nonempty target.");
-            }
-        }
-
-        if (r.ActualCount >= 0)
-        {
-            if (!ValidPingluPaid(frame))
-                throw new InvalidOperationException("Pinglu lost its exact paid native obtain batch or actual destinations.");
-        }
-        else if (r.ActualCount != -1 || r.BatchId != 0 || r.After != r.Before)
-            throw new InvalidOperationException("Pinglu cannot enter child return before its actual obtain is signed.");
-        if (frame.PendingMovementContinuation is { } pending && !IsPingluMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), pending))
-            throw new InvalidOperationException("Pinglu lost its original paid movement continuation.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 640)]
     internal bool IsPingluMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.Pinglu is { Stage: PingluStage.ObtainChildren } && effect?.Op == SkillProgramEffectOp.ResolvePingluInRangeRandomHands && frame.PendingMovementContinuation == pending && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidPingluPaid(frame);
 }

@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 // The actual phase producer remains the sole owner of pending progress. This
 // runtime owns issuance, exact typed returns and final continuation selection.
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class ActualPhaseEndRuntime(IProgramRuntimeFrames frames, INativeFrameRoutingFacts nativeFrames,
     IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramEventJournalQueries history,
     IMatchParticipantStateAccess participants, IProgramContentQueries content, IProgramTurnQueries turn,
@@ -169,39 +169,6 @@ internal sealed class ActualPhaseEndRuntime(IProgramRuntimeFrames frames, INativ
                 frames.Advance(draw.Id); break;
             default: throw new InvalidOperationException("Unknown actual phase continuation.");
         }
-    }
-
-    internal bool HasActualPhaseEndBoundaryFrame()
-    {
-        if (nativeFrames.FrameCount == 0 || nativeFrames.FrameAt(0) is not (ActualPhaseEndFrame or DrawPhaseObligationFrame)) return false;
-        var found = false;
-        foreach (var frame in frames.OfType<ActualPhaseEndFrame>())
-        {
-            found = true;
-            var index = FindFrameIndex(frame.Id);
-            if (!Tracks || !actualPhases.IsRecorded(frame.Phase) ||
-                frame.Phase.TurnNumber != turn.TurnNumber || frame.Phase.ActualTurnOwnerSeat != turn.TurnOwnerSeat ||
-                frame.Items is not System.Collections.IList { IsReadOnly: true } ||
-                frame.InheritedMovementBatchIds is not System.Collections.IList { IsReadOnly: true } ||
-                frame.Items.Select(i => i.EntitlementId).Distinct().Count() != frame.Items.Count ||
-                frame.ItemIndex < 0 || frame.ItemIndex > frame.Items.Count ||
-                !frame.ItemsCaptured && (frame.Items.Count != 0 || frame.ItemIndex != 0 || frame.ActiveWindowFrameId is not null) ||
-                frame.ItemsCaptured && history.Complete().OfType<ActualPhaseEndingEvent>().Count(e => e.BoundaryFrameId == frame.Id && e.Phase == frame.Phase) != 1 ||
-                (frame.Continuation == ActualPhaseEndContinuation.OwnedDraw) != (frame.ParentFrameId is not null) ||
-                (frame.ParentFrameId is null ? index != 0 : index < 1 || nativeFrames.FrameAt(index - 1) is not DrawPhaseObligationFrame draw ||
-                    draw.Id != frame.ParentFrameId || draw.Stage != DrawPhaseObligationStage.ConsumeMarker || draw.DiscardRecoveryPhase != frame.Phase))
-                throw new InvalidOperationException("An actual phase end lost its exact phase, frozen items or native parent.");
-            if (frame.ActiveWindowFrameId is { } id && (frame.ItemIndex >= frame.Items.Count || index + 1 >= nativeFrames.FrameCount ||
-                nativeFrames.FrameAt(index + 1) is not ProgramLifecycleTriggerWindowFrame child || child.Id != id ||
-                child.ActualPhaseEnd != new ActualPhaseEndContext(frame.Phase, frame.Items[frame.ItemIndex].EntitlementId, frame.Id)))
-                throw new InvalidOperationException("An actual phase end lost its exact current lifecycle child.");
-            if (frame.ActiveWindowFrameId is null && index + 1 < nativeFrames.FrameCount &&
-                (frame.ItemsCaptured || nativeFrames.FrameAt(index + 1) is not CardsMovedTriggerWindowFrame movement ||
-                 movement.ResumeActualPhaseEndFrameId != frame.Id || !frame.InheritedMovementBatchIds.Contains(movement.Batch.Id) ||
-                 movement.Batch.AwaitingProgramFrameId is not null))
-                throw new InvalidOperationException("An actual phase end retained an unissued native child.");
-        }
-        return found;
     }
 
     private ActualPhaseEndFrame AppendNishouLatePhaseItems(ActualPhaseEndFrame frame)

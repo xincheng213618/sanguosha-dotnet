@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSharedPhaseSkillsEntries
 {
     internal void AnswerRandomPhaseSkillOffer(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerRandomPhaseSkillOffer(choice);
-    internal void AssertSharedPhaseSkillFrame(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertSharedPhaseSkillFrame(frame);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.LegalAction> BuildSharedProgramActivations(global::CardGame.Core.CharacterState actor) => _resolve().BuildSharedProgramActivations(actor);
     internal bool IsLiveRandomPhaseSkillRecipient(global::CardGame.Core.ProgramSkillFrame frame, int recipientSeat, global::CardGame.Core.SkillGrantPhaseExpiry phase) => _resolve().IsLiveRandomPhaseSkillRecipient(frame, recipientSeat, phase);
     internal global::CardGame.Core.SkillProgramStepOutcome OfferRandomPhaseSkill(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect, int recipientSeat) => _resolve().OfferRandomPhaseSkill(supplied, effect, recipientSeat);

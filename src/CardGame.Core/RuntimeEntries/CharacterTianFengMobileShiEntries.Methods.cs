@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterTianFengMobileShiEntries
 {
     internal void AnswerMobileShiTianFeng(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMobileShiTianFeng(selected);
-    internal void AssertShiTf(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiTf(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileShiTianFeng(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginMobileShiTianFeng(input);
     internal bool CanOfferMobileShiTianFeng(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMobileShiTianFeng(candidate, trigger, context);
     internal global::CardGame.Core.PromptChoice ChooseShiTf(global::CardGame.Core.PendingDecision prompt) => _resolve().ChooseShiTf(prompt);

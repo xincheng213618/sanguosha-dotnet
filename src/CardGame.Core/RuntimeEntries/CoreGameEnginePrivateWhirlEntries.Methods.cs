@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePrivateWhirlEntries
 {
-    internal void AssertRegisteredPrivateWhirl(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredPrivateWhirl(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPrivateWhirl(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginPrivateWhirl(supplied, effect);
     internal bool CanContinuePrivateWhirl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinuePrivateWhirl(f);
     internal bool CanOfferPrivateWhirl(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferPrivateWhirl(candidate, trigger, context);

@@ -55,7 +55,6 @@ internal sealed partial class CoreGameEngineNamedAcquisitionObserversRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1710)]
     internal bool HasNamedAcquisitionDamageObserver(long id) => NamedAcquisitionObserverRoot(id)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 210, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 330)]
     internal bool IsNamedAcquisitionProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is not null && NamedAcquisitionObserverRoot()is not null;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 40)]

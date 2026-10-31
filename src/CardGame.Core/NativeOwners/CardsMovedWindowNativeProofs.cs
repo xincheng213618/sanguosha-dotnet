@@ -8,5 +8,4 @@ internal sealed class CardsMovedWindowNativeProofs(global::System.Func<global::C
     public bool IsSkillInvocationMovementBatch(SkillInvocationFrame f, CardMovementBatchContext batch) => getCharacterHuaTuoAnniversaryGodRuntime().IsSkillInvocationMovementBatch(f, batch);
     public bool IsRoundEndingMovement(RoundEndingBoundaryFrame parent, CardMovementBatchContext batch) => getCoreGameEngineRoundEndingRuntime().IsRoundEndingMovement(parent, batch);
     public bool IsNianRevivalMovementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => getCoreGameEngineNianRevivalRuntime().IsNianRevivalMovementBatch(f, batch);
-    public bool IsPendingWenhePoisonWindow(CardsMovedTriggerWindowFrame frame) => getCoreGameEngineWenhePoisonRuntime().IsPendingWenhePoisonWindow(frame);
 }

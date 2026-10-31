@@ -57,8 +57,6 @@ internal sealed partial class CoreGameEngineSequentialDiscardObserversRuntime
 
         return true;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 430, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 510)]
     internal bool IsSequentialDiscardProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && (SequentialDiscardPaymentObserverRoot() ?? SequentialDiscardTopPaymentObserverRoot())is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     internal ProgramSkillFrame? SequentialDiscardTopPaymentObserverRoot()

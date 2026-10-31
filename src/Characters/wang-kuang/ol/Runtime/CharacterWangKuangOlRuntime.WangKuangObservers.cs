@@ -28,8 +28,6 @@ internal sealed partial class CharacterWangKuangOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 660)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 690)]
     internal bool HasWangKuangDamageObserver(long id) => WangKuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 510)]
-    internal bool IsWangKuangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WangKuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26910)]
     internal bool AdvanceWangKuangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WangKuangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

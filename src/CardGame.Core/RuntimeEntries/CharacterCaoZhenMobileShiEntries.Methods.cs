@@ -22,7 +22,6 @@ internal sealed partial class CharacterCaoZhenMobileShiEntries
     internal bool ObservesShiCaoZResponseUse(global::CardGame.Core.CardActionContext action) => _resolve().ObservesShiCaoZResponseUse(action);
     internal void PublishShiCaoZ(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiCaoZ(f);
     internal bool QualifyShiCaoZ(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().QualifyShiCaoZ(c, trigger, context);
-    internal void RequireShiCaoZ(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShiCaoZ(f);
     internal bool ResumeShiCaoZ(long id) => _resolve().ResumeShiCaoZ(id);
     internal bool ReturnShiCaoZMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiCaoZMovement(f);
     internal void SetShiCaoZAfter(long id) => _resolve().SetShiCaoZAfter(id);

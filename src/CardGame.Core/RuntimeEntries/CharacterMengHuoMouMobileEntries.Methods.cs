@@ -5,7 +5,6 @@ internal sealed partial class CharacterMengHuoMouMobileEntries
     internal bool AdvanceMouMhChildren() => _resolve().AdvanceMouMhChildren();
     internal global::CardGame.Core.PromptChoice AiMouMh(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouMh(p, f);
     internal void AnswerMouMh(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouMh(selected);
-    internal void AssertMouMh(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouMh(f);
     internal bool CanOfferMouMh(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanOfferMouMh(g);
     internal void CaptureMouMhUse(global::CardGame.Core.CardUseDeclaredEvent e) => _resolve().CaptureMouMhUse(e);
     internal void ChangeMouMhCharge(global::CardGame.Core.ProgramSkillFrame f, int delta) => _resolve().ChangeMouMhCharge(f, delta);

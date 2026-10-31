@@ -24,8 +24,6 @@ internal sealed partial class CharacterZhaoYunOlGod2016Runtime
             throw new InvalidOperationException("A HP-scaled conversion must revalidate its live material count before creating its original program frame.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HpScaledProgramSelectionEvent(f.Id, new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, owner.Hp, f.SelectedCardIds.Count));
     }
-
-    internal bool HpScaledProgramSelectionIsExact(ProgramSkillFrame f) => _coreProgramEventHistoryOperations.ProgramEventHistory<HpScaledProgramSelectionEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var e] && e.Source == new CardConversionSource(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId) && e.GameplayHash == f.GameplayHash && e.MaterialCount == f.SelectedCardIds.Count && e.MaterialCount == Math.Max(1, e.OwnerHp) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(s => s.FrameId == f.Id && s.OwnerSeat == f.OwnerSeat && s.SkillId == f.SkillId && s.ActivationId == f.ActivationId) == 1;
     internal CardActionContext CaptureHpScaledCardUseAction(CardActionContext action)
     {
         foreach (var source in action.ConversionChain)

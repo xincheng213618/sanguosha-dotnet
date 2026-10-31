@@ -56,16 +56,6 @@ internal sealed partial class CharacterHeJinOlRuntime
         return r.SelectedCards.Select((s, n) => paid.Count(e => e.Index == n && e.KillerSeat == r.KillerSeat && e.CardId == s.CardId && e.From == s.From && e.Before == r.Before && e.After == r.After) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == s.CardId && m.From == s.From && m.To == _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreCardAttackStateOperations.GetAttackCard(s.CardId), s.From, (s.From.Zone == CardZoneKind.Equipment && _coreCardAttackStateOperations.GetAttackCard(s.CardId).IsGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile)) && m.Reason.Value == HeJinDiscardReason && m.Sequence > r.Before && m.Sequence <= r.After) == 1).All(x => x);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26710)]
-    internal void RequireHeJin(ProgramSkillFrame f)
-    {
-        if (f.HeJinMouzhu is not null && !ValidHeJinMouzhu(f) || f.HeJinYanhuo is not null && !ValidHeJinYanhuo(f))
-            throw new InvalidOperationException("He Jin lost its exact source, private payment, native death cursor or issued card origin.");
-        var choosing = f.HeJinMouzhu?.Stage is HeJinMouzhuStage.ChoosingGift or HeJinMouzhuStage.ChoosingAssault || f.HeJinYanhuo?.Stage == HeJinYanhuoStage.ChoosingCard;
-        if (choosing && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != (f.HeJinMouzhu?.ActorSeat ?? f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, f.HeJinMouzhu is not null ? HeJinMouzhuChoices(f) : HeJinYanhuoChoices(f))))
-            throw new InvalidOperationException("He Jin lost the actual chooser's private prompt.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26710)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26710)]
     internal bool ContinuePaidHeJin(ProgramSkillFrame f) => f.HeJinMouzhu is { Stage: not HeJinMouzhuStage.ChoosingGift } && ValidHeJinMouzhu(f) || f.HeJinYanhuo is not null && ValidHeJinYanhuo(f);

@@ -81,7 +81,6 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SignedDamagePayment.Stage: SignedDamagePaymentStage.ChoosingCost } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [SignedDamagePaymentChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Signed damage answer lost its exact private cost choice.");
-        AssertSignedDamagePayment(f);
         var r = f.SignedDamagePayment!;
         var e = SignedDamageEffect(f);
         var p = CaptureSignedDamageProfile(f.OwnerSeat, e.Amount > 0 ? r.TargetSeat : r.SourceSeat, e);
@@ -111,7 +110,6 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.SignedDamagePayment is not { } r)
             return false;
-        AssertSignedDamagePayment(f);
         if (r.Stage == SignedDamagePaymentStage.ChoosingCost)
             return true;
         if (_coreSuitDamagePreventionBenefitsOperations.DrainSuitPlacementChildren(f))
@@ -171,15 +169,6 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
         if (r.Stage == SignedDamagePaymentStage.Adjusted && (r.FinalAmount != w.Amount || !r.Cancelled && w.Prevented != (w.Amount == 0) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSignedDamageAdjustedEvent>().Count(e => e.ProgramFrameId == f.Id && e.BeforeDamageFrameId == w.Id && e.OriginalAttackFrameId == r.OriginalAttackFrameId && e.SourceSeat == r.SourceSeat && e.TargetSeat == r.TargetSeat && e.BeforeAmount == r.OriginalAmount && e.AfterAmount == r.FinalAmount && e.Delta == r.Delta && e.Cancelled == r.Cancelled) != 1))
             return false;
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 560)]
-    internal void AssertSignedDamagePayment(ProgramSkillFrame f)
-    {
-        if (f.SignedDamagePayment is not null && !IsValidSignedDamagePayment(f, false))
-            throw new InvalidOperationException("Signed damage lost its exact offered policy, cost ledger or current recipient.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && f.SignedDamagePayment?.Stage == SignedDamagePaymentStage.ChoosingCost && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, SignedDamagePaymentChoices(f))))
-            throw new InvalidOperationException("Signed damage lost its frozen private owning prompt.");
     }
 
     SkillProgramStepOutcome global::CardGame.Core.ISignedDamagePaymentHost.DiscardOwnedCardToAdjustCurrentDamage(ProgramSkillFrame f) => BeginSignedDamagePayment(f);

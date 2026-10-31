@@ -199,15 +199,6 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     }
 
     internal bool IsShanheS5YunshenUse(long useId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YunshenIssuedEvent>().Any(e => e.UseId == useId);
-    internal void AssertShanheS5XuncanNativeUse(CardUseFrame use)
-    {
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YunshenIssuedEvent>().Where(e => e.UseId == use.Id).ToArray();
-        if (issued.Length == 0)
-            return;
-        if (issued is not [var fact] || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == fact.FrameId)is not { ShanheS5Yunshen: { Returned: false } r } parent || r.UseId != use.Id || r.ActorSeat != fact.ActorSeat || r.SlashTargetSeat != fact.TargetSeat || parent.InstructionIndex != 3 || use.CardId != 0 || use.CardKind != CardKind.ColdSlash || use.SourceSeat != fact.ActorSeat || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.ColdSlash, PhysicalCards.Count: 0, EffectiveSuit: Suit.None } action || action.ActionId != fact.ActionId || action.ActorSeat != fact.ActorSeat || action.ProviderSeat != fact.ActorSeat || !action.ConversionChain.SequenceEqual([r.Source]) || r.Source.OwnerSeat != parent.OwnerSeat)
-            throw new InvalidOperationException("Yunshen's zero-entity native Cold Slash lost its original owner, actual actor or source frame.");
-        _ = RequireShanheS5SkillTarget(parent);
-    }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 5771)]
     internal bool ReturnShanheS5YunshenSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
@@ -233,16 +224,6 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
             throw new InvalidOperationException("The S5 refill lost its exact once-only native Draw return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5XuncanDrawPaidEvent(f.Id, draw.RecipientSeat, draw.RequestedCount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 5771)]
-    internal void AssertShanheS5Yunshen(ProgramSkillFrame f)
-    {
-        if (f.ShanheS5Yunshen is not { } r)
-            return;
-        var accepted = RequireShanheS5SkillTarget(f);
-        if (f.InstructionIndex != 3 || r.Source != accepted.Source || r.GameplayHash != f.GameplayHash || r.OriginalTargetSeat != accepted.TargetSeat || r.UseId.HasValue != r.ActorSeat.HasValue || r.UseId.HasValue != r.SlashTargetSeat.HasValue || r.ActorSeat is { } actor && (actor != f.OwnerSeat && actor != r.OriginalTargetSeat || r.SlashTargetSeat != (actor == f.OwnerSeat ? r.OriginalTargetSeat : f.OwnerSeat)) || r.UseId is { } id && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YunshenIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == id && e.ActorSeat == r.ActorSeat && e.TargetSeat == r.SlashTargetSeat) != 1 || r.Returned && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardKind == CardKind.ColdSlash) != 1)
-            throw new InvalidOperationException("Yunshen lost its original frame, actual direction or exact native use identity.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5771)]

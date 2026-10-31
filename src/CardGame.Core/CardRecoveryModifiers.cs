@@ -96,10 +96,4 @@ internal sealed partial class TurnCardUseEffectStore
         _handLimitKindExemptions.RemoveAll(item => expired.Contains(item.GrantSequence));
         return ids;
     }
-
-    private bool RecoveryModifiersAreInvalid() => _recoveryModifiers.Any(item =>
-        item.Amount is <= 0 or > 20 || item.CardKinds.Count == 0 ||
-        item.CardKinds.Distinct().Count() != item.CardKinds.Count ||
-        item.CardKinds.Any(kind => kind is not (CardKind.Peach or CardKind.Alcohol)) ||
-        !Enum.IsDefined(item.Expiration) || item.TurnNumber <= 0 || item.Source.OwnerSeat < 0);
 }

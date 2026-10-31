@@ -2,8 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOrderedSelectedActorDuelsEntries
 {
-    internal void AssertOrderedSelectedActorDuelPayment(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertOrderedSelectedActorDuelPayment(frame);
-    internal void AssertOrderedSelectedActorDuelUse(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSkillFrame parent, global::CardGame.Core.ProgramSelectedActorDuelOrigin origin) => _resolve().AssertOrderedSelectedActorDuelUse(use, parent, origin);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginOrderedSelectedActorDuel(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginOrderedSelectedActorDuel(frame);
     internal bool CanContinuePaidOrderedSelectedActorDuel(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinuePaidOrderedSelectedActorDuel(frame);
     internal void CompleteOrderedSelectedActorDuel(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramSelectedActorDuelOrigin origin, long useId) => _resolve().CompleteOrderedSelectedActorDuel(frame, origin, useId);

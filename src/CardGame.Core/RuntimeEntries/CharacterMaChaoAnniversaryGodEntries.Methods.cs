@@ -18,7 +18,6 @@ internal sealed partial class CharacterMaChaoAnniversaryGodEntries
     internal bool IsShouliFieldMaterial(global::CardGame.Core.CharacterState actor, global::CardGame.Core.Card card, scoped out global::CardGame.Core.CardLocation location) => _resolve().IsShouliFieldMaterial(actor, card, out location);
     internal bool IsShouliStartingEquipmentRide(global::CardGame.Core.ResolutionFrame child, global::CardGame.Core.ResolutionFrame parent) => _resolve().IsShouliStartingEquipmentRide(child, parent);
     internal void IssueShouliBorrowedMountDebt(global::CardGame.Core.CardActionContext action) => _resolve().IssueShouliBorrowedMountDebt(action);
-    internal void RequireShenMaChao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShenMaChao(f);
     internal bool ResumeShenMc(long id) => _resolve().ResumeShenMc(id);
     internal void ReturnHengwuDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome o) => _resolve().ReturnHengwuDraw(supplied, o);
     internal bool ReturnShenMcMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShenMcMovement(f);

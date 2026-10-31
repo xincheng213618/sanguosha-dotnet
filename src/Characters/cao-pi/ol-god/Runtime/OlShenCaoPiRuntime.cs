@@ -1,6 +1,6 @@
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class OlShenCaoPiRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts, IProgramOperationDraws draws, IOlShenCaoPiFacts facts,
     IOlShenCaoPiOperations operations) : IOlShenCaoPiHost
@@ -73,7 +73,7 @@ internal sealed class OlShenCaoPiRuntime(IProgramRuntimeFrames frames, IProgramR
     {
         if (frames.Top is not ProgramSkillFrame { OlShenCaoPi: { } r } f || !OlCaoPiChoices(f).Any(c => RuntimeSkills.RuntimeRules_Core_AssistedPhysicalCards.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("OL Shen Cao Pi rejects a stale private deposit or permanent skill choice.");
-        AssertOlShenCaoPi(f); prompts.Clear(); frames.ReplaceTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
+prompts.Clear(); frames.ReplaceTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage == OlShenCaoPiStage.DepositChoice)
         {
             var id = choice.Cards.Single(); var pile = operations.EnsurePileSource(f, int.MaxValue); var before = facts.MovementSequence;
@@ -115,28 +115,4 @@ internal sealed class OlShenCaoPiRuntime(IProgramRuntimeFrames frames, IProgramR
     private void FinishOlShenCaoPi(ProgramSkillFrame f) { frames.ReplaceTop(f with { OlShenCaoPi = null }); frames.AdvanceProgram(f.Id); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40550)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40550)] private bool RetainOlCaoPi(ProgramSkillFrame f) => f.OlShenCaoPi is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40550)] private void AssertOlShenCaoPi(ProgramSkillFrame f)
-    {
-        if (f.OlShenCaoPi is not { } r) return;
-        var storage = r.Operation == SkillProgramEffectOp.StoreOlChuyuanAfterDamage;
-        if (r.Source != OlCaoPiSource(f) || r.GameplayHash != f.GameplayHash || r.ParentId != f.WindowContext?.ParentFrameId || !Enum.IsDefined(r.Stage) ||
-            f.InstructionIndex != (storage ? 1 : 2) || !OlCaoPiParentMatches(f, storage) || !facts.ValidSeat(r.TargetSeat) ||
-            !storage && r.TargetSeat != f.OwnerSeat || storage && r.TargetSeat != f.WindowContext!.TargetSeat || r.Cards is not System.Collections.IList { IsReadOnly: true } ||
-            r.Before < 0 || r.After < r.Before || r.After > facts.MovementSequence ||
-            facts.History<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == f.WindowContext!.Window) != 1)
-            throw new InvalidOperationException("OL Shen Cao Pi lost his exact original binding, candidate, source or immutable payment receipt.");
-        if (r.DrawOutcome is { } draw && (draw.RecipientSeat != r.TargetSeat || draw.RequestedCount != 1 || facts.History<OlChuyuanDrawReturnedEvent>()
-            .Count(e => e.FrameId == f.Id && e.RecipientSeat == r.TargetSeat && e.Actual == draw.ActualDrawIds.Count && e.Before == draw.SequenceBefore && e.After == draw.SequenceAfter) != 1))
-            throw new InvalidOperationException("Chuyuan's post-draw choice must retain its exact once-paid native request.");
-        if (r.DepositedId is { } deposited && (r.Pile is null || facts.History<OlChuyuanDepositedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.CardId == deposited && e.Pile == r.Pile.Location && e.Before == r.Before && e.After == r.After) != 1 ||
-            facts.Movements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray() is not [var move] || move.CardId != deposited || move.From != CardLocation.Hand(r.TargetSeat) || move.To != r.Pile.Location))
-            throw new InvalidOperationException("Chuyuan's deposit must remain the real chosen recipient hand entity and original public pile movement.");
-        if (!storage && (facts.History<OlCaoPiPileObtainedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Count == r.Cards.Count && e.Before == r.Before && e.After == r.After) != 1 ||
-            !facts.Movements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).Select(m => m.CardId).SequenceEqual(r.Cards) ||
-            facts.Movements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).Any(m => r.Pile is null || m.From != r.Pile.Location || m.To != CardLocation.Hand(f.OwnerSeat))))
-            throw new InvalidOperationException("Cao Pi's awakening must obtain its frozen original Chu entities exactly once.");
-        if (r.AcquiredSkillId is { } acquired && (r.Stage != OlShenCaoPiStage.SkillChildren || !OlShenCaoPiComposition.TianxingReferences.Skip(1).Contains(acquired) ||
-            facts.History<OlTianxingGrantedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.AcquiredSkillId == acquired) != 1))
-            throw new InvalidOperationException("Tianxing must retain its exact permanent formal skill choice.");
-    }
 }

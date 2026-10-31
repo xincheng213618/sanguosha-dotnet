@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramRevealsEntries
 {
-    internal void AssertProgramRevealCardSelection(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertProgramRevealCardSelection(frame, paused);
     internal void CommitProgramHandReveal(long frameId, int holderSeat, string resultBind, global::System.Collections.Generic.IReadOnlyList<int> cardIds) => _resolve().CommitProgramHandReveal(frameId, holderSeat, resultBind, cardIds);
     internal void PublishProgramRevealCardSelection(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishProgramRevealCardSelection(frame);
     internal void ResolveProgramRevealCardSelection(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveProgramRevealCardSelection(selected);

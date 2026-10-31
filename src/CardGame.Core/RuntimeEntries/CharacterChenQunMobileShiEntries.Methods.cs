@@ -3,12 +3,10 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterChenQunMobileShiEntries
 {
     internal void AnswerMobileShiChenQun(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMobileShiChenQun(choice);
-    internal void AssertMobileShiChenQunFrame(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertMobileShiChenQunFrame(frame);
     internal void BindMobileShiChenQunEffect(global::CardGame.Core.ProgramSkillFrame frame, string effect) => _resolve().BindMobileShiChenQunEffect(frame, effect);
     internal bool CanOfferMobileShiChenQun(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMobileShiChenQun(candidate, trigger, context);
     internal global::CardGame.Core.PromptChoice ChooseMobileShiChenQunAi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ChooseMobileShiChenQunAi(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome ClaimMobileShiChenQunFaenDebt(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ClaimMobileShiChenQunFaenDebt(supplied);
-    internal bool IsMobileShiChenQunFaenChoiceResult(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramChoiceResultBinding binding) => _resolve().IsMobileShiChenQunFaenChoiceResult(frame, binding);
     internal void IssueMobileShiChenQunFaenDebt(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().IssueMobileShiChenQunFaenDebt(supplied);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileShiChenQunChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().MobileShiChenQunChoices(frame);
     internal (global::CardGame.Core.ProgramCardTriggerWindowFrame Window, global::CardGame.Core.MobileShiChenQunUseRecordedEvent Use)? MobileShiChenQunCurrentUse(global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().MobileShiChenQunCurrentUse(context);

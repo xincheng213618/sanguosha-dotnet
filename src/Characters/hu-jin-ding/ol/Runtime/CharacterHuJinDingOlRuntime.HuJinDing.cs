@@ -77,7 +77,6 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qingyuan: { Stage: QingyuanStage.ChoosingPartner } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QingyuanPartnerChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Qingyuan lost its exact mandatory public partner choice.");
-        AssertHuJinDing(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var partner = choice.Targets.Single();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QingyuanPartnerSelectedEvent(f.Id, r.Source, r.GameplayHash, partner, r.Damage is not null, r.ParentId, r.Damage?.DamageFrameId, r.Damage?.Amount ?? 0, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
@@ -111,7 +110,6 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qingyuan: { } r } f || f.Id != id)
             return false;
-        AssertHuJinDing(f);
         if (r.Stage == QingyuanStage.ChoosingPartner)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

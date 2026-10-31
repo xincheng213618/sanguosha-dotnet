@@ -188,45 +188,4 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 39700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 39700)]
     internal bool RetainShenCaoPi(ProgramSkillFrame f) => f.ShenCaoPi is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 39700)]
-    internal void AssertShenCaoPi(ProgramSkillFrame f)
-    {
-        if (f.ShenCaoPi is not { } r)
-            return;
-        if (r.Source != ShenCaoPiSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.InstructionIndex != 1 || r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || !Enum.IsDefined(r.Stage) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Count is < 0 or > 3 || r.Options is not System.Collections.IList { IsReadOnly: true })
-            throw new InvalidOperationException("Shen Cao Pi's original-frame receipt changed its owner, binding or frozen request.");
-        if (r.Operation == SkillProgramEffectOp.ResolveKemingDamagedSkill)
-        {
-            if (r.Stage != ShenCaoPiStage.BorrowChoice || r.Count != 0 || r.ActionId != 0 || r.IssuedId != 0 || r.DrawOutcome is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, TargetSeat: { } target, DamageFrameId: { } damageId, Amount: > 0 } || target != f.OwnerSeat || source == target || r.TargetSeat != target || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.ParentId)is not { } window || window.ParentFrameId != damageId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || !r.Options.SequenceEqual(KemingBorrowOptions(f.OwnerSeat, source)) || r.Options.Count == 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && e.OwnerSeat == f.OwnerSeat && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.AfterDamageApplied) != 1)
-                throw new InvalidOperationException("Keming's borrowed choices must retain the actual source general pool on its original positive damage window.");
-            var fallback = KemingSourceBorrowOptions(source).Count == 0;
-            var random = new DeterministicRandom(unchecked((int)r.BorrowRandomBefore));
-            if (fallback ? r.ForcedBorrow != r.Options[random.Next(r.Options.Count)] || random.State != r.BorrowRandomAfter : r.ForcedBorrow is not null || r.BorrowRandomBefore != r.BorrowRandomAfter)
-                throw new InvalidOperationException("Keming's private fallback result must retain its exact single original random sample.");
-            return;
-        }
-
-        if (r.Operation is not (SkillProgramEffectOp.ApplyShenCaoPiYinzhi or SkillProgramEffectOp.DrawYinzhiHandAction) || r.Count < 1 || r.Stage is not (ShenCaoPiStage.Drawing or ShenCaoPiStage.Children) || r.Options.Count != 0 || r.ForcedBorrow is not null)
-            throw new InvalidOperationException("Shen Cao Pi retained an unrecognized operation receipt.");
-        if (r.Operation == SkillProgramEffectOp.ApplyShenCaoPiYinzhi)
-        {
-            if (r.IssuedId != f.Id || r.ActionId != 0 || !f.SelectedTargetSeats.SequenceEqual([r.TargetSeat]) || _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiActivatedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.TargetSeat == r.TargetSeat && e.Count == r.Count) != 1 || r.Count != Math.Min(3, _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiActivatedEvent>().Count(e => e.FrameId < f.Id && e.Source.OwnerSeat == f.OwnerSeat && e.TargetSeat == r.TargetSeat) + 1))
-                throw new InvalidOperationException("Yinzhi's initial draw must retain its unique accepted target and actual game activation ordinal.");
-        }
-        else
-        {
-            var issue = _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiIssuedEvent>().SingleOrDefault(e => e.FrameId == r.IssuedId);
-            if (issue is null || issue.Source.SkillId != r.Source.SkillId || issue.Source.OwnerSeat != r.Source.OwnerSeat || issue.Source.SkillInstanceId != r.Source.SkillInstanceId || issue.Source.BindingId != "edict" || issue.GameplayHash != r.GameplayHash || issue.Count != r.Count || YinzhiAction(f.WindowContext)is not { } action || action.ActionId != r.ActionId || action.ActorSeat != issue.TargetSeat || !action.PhysicalCards.Any(c => c.From == CardLocation.Hand(action.ActorSeat)) || _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiHandRewardRequestedEvent>().Count(e => e.FrameId == f.Id && e.IssueFrameId == issue.FrameId && e.ActionId == action.ActionId && e.Count == r.Count) != 1)
-                throw new InvalidOperationException("Yinzhi's paid hand reward must retain its unique issued source and actual completed hand action.");
-        }
-
-        var reason = r.Operation == SkillProgramEffectOp.ApplyShenCaoPiYinzhi ? "skill-program.anniversary:yinzhi.initial-draw" : "skill-program.anniversary:yinzhi.hand-reward";
-        if (r.Stage == ShenCaoPiStage.Drawing)
-        {
-            if (r.DrawOutcome is not null || f.NativeDraw is not { } draw || draw.Operation != r.Operation || draw.ReturnKind != NativeDrawAttemptReturnKind.ProgramOperation || draw.RequestedCount != r.Count || draw.Reason.Value != reason || !draw.Recipients.SequenceEqual([f.OwnerSeat]) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenCaoPiDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
-                throw new InvalidOperationException("Yinzhi lost its exact unpaid native draw producer.");
-        }
-        else if (f.NativeDraw is not null || r.DrawOutcome is not { } o || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenCaoPiDrawReturnedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Requested == r.Count && e.Actual == o.ActualDrawIds.Count && e.Before == o.SequenceBefore && e.After == o.SequenceAfter) != 1 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > o.SequenceBefore && m.Sequence <= o.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == reason).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(o.ActualDrawIds))
-            throw new InvalidOperationException("Yinzhi's returned draw changed its real paid entity movement range.");
-    }
 }

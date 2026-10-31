@@ -59,13 +59,6 @@ internal sealed partial class CharacterHuaTuoBoundaryMobileRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 60910)]
-    internal void AssertBoundaryHuaTuoFrame(ProgramSkillFrame f)
-    {
-        if (f.BoundaryHuaTuoQingnang is not null && !ValidBoundaryHuaTuoFrame(f))
-            throw new InvalidOperationException("Qingnang lost its frozen original hand payment, target or phase.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 60910)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 60910)]
     internal bool KeepPaidBoundaryHuaTuo(ProgramSkillFrame f) => f.BoundaryHuaTuoQingnang is { MovementSequence: > 0 } && ValidBoundaryHuaTuoFrame(f);

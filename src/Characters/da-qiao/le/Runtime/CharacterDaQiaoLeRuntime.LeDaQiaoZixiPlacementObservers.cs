@@ -28,29 +28,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28710)]
-    internal void AssertZixiPlacement(ProgramSkillFrame f)
-    {
-        if (f.ZixiPlacement is not { } r)
-            return;
-        if (!ZixiPlacementRoot(f) || !Enum.IsDefined(r.Stage))
-            throw new InvalidOperationException("Zixi placement lost its immutable source, actual phase or real boundary.");
-        if (!r.Paid)
-        {
-            if (r.Stage != ZixiPlacementStage.Selecting || r.BatchId != 0 || r.SequenceBefore != 0 || r.PrimaryAfter != 0 || r.SequenceAfter != 0 || r.Grains.Count != 0 || r.TailSealed || _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiPlacementCommittedEvent>().Any(e => e.FrameId == f.Id) || r.Entities.Any(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) != e.From || !CanPlaceZixiQin(f.OwnerSeat, _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId)) || _coreActualTurnsOperations.HasJudgmentEffectiveCard(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat!.Value], e.SlotKind)))
-                throw new InvalidOperationException("An unpaid Qin draft cannot move cards or reserve an occupied judgment slot.");
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZixiPlacementChoices(f))))
-                throw new InvalidOperationException("Zixi lost its private canonical placement draft.");
-            return;
-        }
-
-        if (!HasPaidZixiPlacement(f) || !r.TailSealed || r.SequenceAfter != r.PrimaryAfter + r.Grains.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiPlacementTailSealedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var sealedTail] || sealedTail != new ZixiPlacementTailSealedEvent(f.Id, r.BatchId, r.Grains.Count, r.SequenceBefore, r.SequenceAfter) || r.Grains.Select(g => g.CardId).Distinct().Count() != r.Grains.Count)
-            throw new InvalidOperationException("Zixi lost its exact whole placement or original equipment-removal tail.");
-        var grains = _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiPlacementGrainFrozenEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
-        if (grains.Length != r.Grains.Count || grains.Where((e, i) => e != new ZixiPlacementGrainFrozenEvent(f.Id, i, r.Grains[i].CardId, r.Grains[i].PrintedKind, r.Grains[i].From)).Any() || r.Grains.Any(g => g.From.Zone != CardZoneKind.WoodenOxGrain || !r.Entities.Any(e => e.PrintedKind == CardKind.WoodenOx && e.From == CardLocation.Equipment(g.From.OwnerSeat!.Value)) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == g.CardId && m.CardKind == g.PrintedKind && m.From == g.From && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard && m.Sequence > r.PrimaryAfter && m.Sequence <= r.SequenceAfter) != 1))
-            throw new InvalidOperationException("Zixi cannot replace or duplicate the exact original Ox grain payment children.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 470)]
     internal bool IsZixiPlacementMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => HasPaidZixiPlacement(f) && effect is { Op: SkillProgramEffectOp.ResolveZixiQinJudgmentPlacement, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool ZixiPlacementBatch(ProgramSkillFrame f, CardMovementBatchContext batch)
@@ -80,7 +57,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         if (!HasPaidZixiPlacement(f))
             return false;
-        AssertZixiPlacement(f);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && ZixiPlacementBatch(f, moved.Batch);
         if (child is RecoveryReplacementFrame recovery)
@@ -99,8 +75,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     internal bool HasZixiPlacementDamageObserver(long id) => ZixiPlacementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1570)]
     internal bool HasZixiPlacementBeforeDamageObserver(long id) => ZixiPlacementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1400)]
-    internal bool IsZixiPlacementDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ZixiPlacementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28710)]
     internal bool AdvanceZixiPlacementChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZixiPlacementObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

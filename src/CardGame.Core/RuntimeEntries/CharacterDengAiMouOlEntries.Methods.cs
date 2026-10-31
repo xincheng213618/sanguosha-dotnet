@@ -5,7 +5,6 @@ internal sealed partial class CharacterDengAiMouOlEntries
     internal bool AdvanceMouDengAiChildren() => _resolve().AdvanceMouDengAiChildren();
     internal global::CardGame.Core.PromptChoice AiMouDengAiOl(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouDengAiOl(decision, f);
     internal void AnswerMouDengAiOl(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouDengAiOl(choice);
-    internal void AssertMouDengAiOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouDengAiOl(f);
     internal bool CanOfferMouDengAiOl(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferMouDengAiOl(c);
     internal void CaptureMouDengAiUsedDiscard(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureMouDengAiUsedDiscard(batch);
     internal void ConfirmMouDengAiExchange(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ConfirmMouDengAiExchange(f);

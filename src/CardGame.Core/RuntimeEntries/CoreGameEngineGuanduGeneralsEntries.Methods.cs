@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineGuanduGeneralsEntries
 {
-    internal void AssertGuanduGeneral(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertGuanduGeneral(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGuanduGeneral(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginGuanduGeneral(supplied, operation);
     internal void CaptureGuanduDiscardBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureGuanduDiscardBatch(batch);
     internal global::CardGame.Core.CardMovementBatchContext CompleteMovementBatchCaptureGuanduDiscardBatch(global::CardGame.Core.CardMovementBatchBuilder batch, global::CardGame.Core.CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureGuanduDiscardBatch(batch, completed);

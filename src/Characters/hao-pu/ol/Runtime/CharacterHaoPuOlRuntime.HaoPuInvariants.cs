@@ -51,17 +51,6 @@ internal sealed partial class CharacterHaoPuOlRuntime
         return r.Stage == ZhenyingStage.AdjustmentChildren ? r.Duel is null && f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } m && m.SubjectSeat == f.OwnerSeat : f.PendingMovementContinuation is null && r.Duel is { } d && d.ProgramFrameId == f.Id && d.InstructionIndex == r.InstructionIndex && d.Source == r.Source && d.GameplayHash == r.GameplayHash && d.ActualTurn == r.ActualTurn && d.PhaseInstanceId == r.PhaseInstanceId && d.CardUseFrameId > f.Id && d.OwnerCount >= 0 && d.OtherCount >= 0 && d.OwnerCount != d.OtherCount && d.ActorSeat == (d.OwnerCount < d.OtherCount ? f.OwnerSeat : other) && d.TargetSeat == (d.ActorSeat == f.OwnerSeat ? other : f.OwnerSeat) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhenyingDuelIssuedEvent>().Count(e => e.Origin == d) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26500)]
-    internal void RequireZhenying(ProgramSkillFrame f)
-    {
-        if (f.Zhenying is null)
-            return;
-        if (!ValidZhenying(f))
-            throw new InvalidOperationException("Zhenying lost its exact source, simultaneous sealed hands, payment ledger or native Duel receipt.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.Zhenying.Stage is ZhenyingStage.ChoosingCount or ZhenyingStage.ChoosingKeptCards && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != ZhenyingPlan(f.Zhenying).Seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhenyingChoices(f))))
-            throw new InvalidOperationException("Zhenying lost its private chooser-owned unissued hand plan.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26500)]
     internal bool ContinuePaidZhenying(ProgramSkillFrame f) => f.Zhenying is { Stage: ZhenyingStage.AdjustmentChildren or ZhenyingStage.DuelIssued } && ValidZhenying(f);

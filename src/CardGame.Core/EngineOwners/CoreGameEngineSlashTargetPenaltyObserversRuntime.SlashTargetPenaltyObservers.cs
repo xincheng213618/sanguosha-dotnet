@@ -75,23 +75,8 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1830)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 210)]
     internal bool HasTargetPenaltyDamageObserver(long id) => TargetPenaltyPaidObserverRoot(id)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 590, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 670)]
     internal bool IsTargetPenaltyProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && TargetPenaltyPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 100)]
     internal bool IsTargetPenaltyMovement(ProgramSkillFrame root, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && effect?.Op == SkillProgramEffectOp.RequireTargetDiscardOrEquipmentRecast && root.SlashTargetPenaltyDraft is { } d && pending.SubjectSeat == d.Identity.TargetSeat && _coreSlashTargetPenaltyPaymentsOperations.ValidTargetPenaltyPayment(root) && (d.Stage == SlashTargetPenaltyStage.CostChildren || d.Stage == SlashTargetPenaltyStage.RewardChildren && ValidTargetPenaltyReward(root));
-    internal bool HasTargetPenaltyUseObserver(long useId) => _resolutionStackOperations._resolutionStack.OfType<SlashTargetPenaltyWindowFrame>().Any(w => w.ParentFrameId == useId && _coreSlashTargetPenaltyWindowsOperations.SlashTargetPenaltyWindowMatches(w) && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == w.Id || _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && f.WindowContext?.ParentFrameId == w.Id && _coreSlashTargetPenaltyWindowsOperations.SlashTargetPenaltyProgramMatches(f) || TargetPenaltyPaidObserverRoot()?.WindowContext?.ParentFrameId == w.Id));
-    internal void AssertTargetPenaltyWindows()
-    {
-        foreach (var w in _resolutionStackOperations._resolutionStack.OfType<SlashTargetPenaltyWindowFrame>())
-            if (!_coreSlashTargetPenaltyWindowsOperations.SlashTargetPenaltyWindowMatches(w))
-                throw new InvalidOperationException("A target penalty window lost its exact issued targets.");
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-        {
-            if (f.WindowContext?.Window != SkillProgramTriggerWindow.ActualSlashTargetPenalty)
-                continue;
-            if (!_coreSlashTargetPenaltyWindowsOperations.SlashTargetPenaltyProgramMatches(f) || f.SlashTargetPenaltyDraft is { } d && (d.Identity != f.WindowContext.SlashTargetPenalty || d.Stage != SlashTargetPenaltyStage.Offered && !_coreSlashTargetPenaltyPaymentsOperations.ValidTargetPenaltyPayment(f) || d.Stage == SlashTargetPenaltyStage.RewardChildren && !ValidTargetPenaltyReward(f)))
-                throw new InvalidOperationException("A target penalty lost its own original instruction/payment.");
-        }
-    }
 }

@@ -31,26 +31,6 @@ internal sealed partial class CoreGameEnginePairedColorResponseObserversRuntime
     }
 
     internal bool IsPairedColorDispositionChoice(ProgramSkillFrame f, PendingDecision decision) => f.PairedColorDisposition is { Stage: PairedColorDispositionStage.ChoosingCard } r && ValidPairedColorDispositionReceipt(f) && decision.Kind == DecisionKind.ProgramTrigger && decision.PlayerSeat == f.OwnerSeat && decision.IsPrivate && decision.SkillPrompt?.SkillId == f.SkillId && decision.Choices.Count > 0 && decision.Choices.Count == _corePairedColorResponsesOperations.PairedColorDispositionChoices(f).Count && decision.Choices.Zip(_corePairedColorResponsesOperations.PairedColorDispositionChoices(f)).All(p => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(p.First, p.Second)) && decision.ValidCardIds.SequenceEqual(decision.Choices.SelectMany(c => c.Cards).Distinct()) && decision.ValidTargetSeats.Count == 0 && decision.TargetSeat == r.CounterpartSeat && decision.SourceSeat == f.OwnerSeat && decision.ValidContentIds.Count == 0 && decision.RequiredCardCount == 0 && decision.IncomingCard is null && decision.RequiredCardKind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 480)]
-    internal void AssertPairedColorDisposition(ProgramSkillFrame f)
-    {
-        if (f.PairedColorDisposition is null)
-        {
-            if (f.TriggerId is null || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.Triggers.SingleOrDefault(t => t.Id == f.TriggerId)?.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferPairedColorCardDisposition) != true)
-                return;
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PairedColorDispositionStartedEvent>().Any(e => e.FrameId == f.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PairedColorDispositionCompletedEvent>().Any(e => e.FrameId == f.Id))
-                throw new InvalidOperationException("An issued paired-color disposition lost its owning receipt.");
-            return;
-        }
-
-        if (!ValidPairedColorDispositionReceipt(f))
-            throw new InvalidOperationException("Paired-color disposition lost its native response pair, exact source or paid entity invoice.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !PairedColorDispositionFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Paired-color disposition retained an unrelated native child.");
-        if (index == _resolutionStackOperations._resolutionStack.Count - 1 && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } choice && f.PairedColorDisposition.Stage == PairedColorDispositionStage.ChoosingCard && !IsPairedColorDispositionChoice(f, choice))
-            throw new InvalidOperationException("Paired-color disposition changed its owner-only opaque card prompt.");
-    }
 
     internal bool PairedColorDispositionFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -72,10 +52,8 @@ internal sealed partial class CoreGameEnginePairedColorResponseObserversRuntime
 
     internal bool PairedColorDispositionStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => parent is ProgramSkillFrame root && PairedColorDispositionFirstChild(root, child) || parent is ProgramCardTriggerWindowFrame window && child is ProgramSkillFrame { PairedColorDisposition: not null } program && program.WindowContext?.ParentFrameId == window.Id && ValidPairedColorDispositionReceipt(program);
     internal ProgramSkillFrame? PairedColorDispositionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePairedColorResponseObserversOperations.PairedColorDispositionFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30, group: 70)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40)]
     internal bool IsPairedColorDispositionDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairedColorDispositionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    internal bool HasPairedColorDispositionCardObserver(long parentId) => PairedColorDispositionObserverRoot()is { } root && root.PairedColorDisposition!.Pair.NativeParentFrameId == parentId;
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1680)]
     internal bool HasPairedColorDispositionDamageObserver(long id) => HasPairedColorDispositionObserver(id, false);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 220)]

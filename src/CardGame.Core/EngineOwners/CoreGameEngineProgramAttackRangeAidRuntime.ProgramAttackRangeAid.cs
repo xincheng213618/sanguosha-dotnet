@@ -130,31 +130,4 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
         _coreNativeAiDecisionsOperations.AddThought(thought);
         return choice;
     }
-
-    internal void AssertProgramAttackRangeAid(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (paused.Op != SkillProgramEffectOp.RequestAttackRangeAid)
-        {
-            if (frame.AttackRangeAid is not null)
-                throw new InvalidOperationException("An attack-range aid response outlived its suspended instruction.");
-            return;
-        }
-
-        if (frame.AttackRangeAid is not { } aid)
-            throw new InvalidOperationException("A suspended attack-range aid response lost its frozen progress.");
-        if (!_characterHanDangBoundaryMobileOperations.ValidProgramAttackRangeAid(frame))
-            throw new InvalidOperationException("The attack-range aid lost its frozen original responders or paid native return.");
-        if (aid.Payment is not null)
-            return;
-        var responderSeat = aid.ResponderSeats[aid.ResponderIndex];
-        var weapons = _characterHanDangBoundaryMobileOperations.ProgramAttackRangeAidWeapons(responderSeat);
-        var expectedReason = $"skill-program.{(frame.SkillId)}.{(paused.Op)}";
-        if (frame.SelectedTargetSeats.Count != 1 || frame.SelectedTargetSeats.Single() != aid.TargetSeat || aid.ResponderSeats.Count == 0 || aid.ResponderSeats.Distinct().Count() != aid.ResponderSeats.Count || aid.ResponderSeats.Contains(aid.TargetSeat) || !aid.ResponderSeats.Contains(responderSeat) || !_coreMatchParticipantsPlayersAccess._players[responderSeat].IsAlive || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != responderSeat || decision.TargetSeat != aid.TargetSeat || decision.Choices.Count != weapons.Length + 1 || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("responder-index") != aid.ResponderIndex.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("target-seat") != aid.TargetSeat.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("move-reason") != expectedReason || choice.Parameters.GetValueOrDefault("program-action") switch
-        {
-            "attack-range-aid-discard-weapon" => choice.Cards.Count != 1 || choice.Targets.Count != 0 || weapons.All(card => card.Id != choice.Cards.Single()),
-            "attack-range-aid-draw" => choice.Cards.Count != 0 || !choice.Targets.SequenceEqual([aid.TargetSeat]),
-            _ => true
-        }))
-            throw new InvalidOperationException("An attack-range aid response lost its exact frozen prompt.");
-    }
 }

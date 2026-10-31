@@ -78,13 +78,4 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuObserversRunt
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 62060)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 62060)]
     internal bool KeepPaidSourceHuanfu(ProgramSkillFrame f) => ValidPaidSourceHuanfuFrame(f) || f.TriggerId == "settle-wager" && f.WindowContext is { } context && ExactIssuedSourceHuanfu(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), context)is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 62060)]
-    internal void AssertSourceHuanfuFrame(ProgramSkillFrame f)
-    {
-        if (f.SourceExecutionerHuanfu is not { } r)
-            return;
-        var use = _coreSourceExecutionerHuanfuOperations.ExactSourceHuanfuParent(f);
-        if (r.UseId != use.Id || r.ActionId != use.Action!.ActionId || !Enum.IsDefined(r.Stage) || r.Cards.Distinct().Count() != r.Cards.Count || r.Stage == SourceExecutionerHuanfuStage.Cards && (f.TriggerId == "settle-wager" || r.Cards.Count > r.Limit) || r.Stage != SourceExecutionerHuanfuStage.Cards && !ValidPaidSourceHuanfuFrame(f))
-            throw new InvalidOperationException("Huanfu lost its owning payment/draw stage or original Slash parent.");
-    }
 }

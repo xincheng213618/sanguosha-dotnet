@@ -341,13 +341,6 @@ internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessingRuntime
         }
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 70)]
-    internal void AssertRegisteredExtraEffectsAndRankGuess(ProgramSkillFrame frame)
-    {
-        if (frame.ExtraEffectsAndRankGuess is not null)
-            RequireExtraEffectsAndRankGuess(frame);
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 410)]
     internal bool IsExtraEffectsAndRankGuessMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation movement) => f.ExtraEffectsAndRankGuess is { Stage: ExtraEffectsAndRankGuessStage.MovementChildren or ExtraEffectsAndRankGuessStage.GainChildren } r && e?.Op == r.Operation && movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 400)]

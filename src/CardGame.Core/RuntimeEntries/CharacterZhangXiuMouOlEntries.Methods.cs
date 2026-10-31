@@ -5,7 +5,6 @@ internal sealed partial class CharacterZhangXiuMouOlEntries
     internal bool AdvanceMouZhangXiuOlChildren() => _resolve().AdvanceMouZhangXiuOlChildren();
     internal global::CardGame.Core.PromptChoice AiMouZhangXiuOl(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouZhangXiuOl(p, f);
     internal void AnswerMouZhangXiuOl(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouZhangXiuOl(choice);
-    internal void AssertMouZhangXiuOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouZhangXiuOl(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouZhangXiuOlDefense(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouZhangXiuOlDefense(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouZhangXiuOlQiulie(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginMouZhangXiuOlQiulie(supplied, operation);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouZhangXiuOlZhuijiao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginMouZhangXiuOlZhuijiao(supplied, operation);

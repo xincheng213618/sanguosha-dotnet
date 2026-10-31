@@ -127,21 +127,4 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     }
 
     internal bool ValidYintianDamageReceipt(YintianDamageReceipt r) => r.InvoiceId > 0 && r.AttackId > 0 && r.InheritedAmount > 0 && r.ChainCursor >= -1 && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<YintianDamageIssuedEvent>().Count(e => e.InvoiceId == r.InvoiceId && e.GrantId == r.GrantId && e.AttackId == r.AttackId && e.SourceSeat == r.SourceSeat && e.TargetSeat == r.TargetSeat && e.ChainCursor == r.ChainCursor && e.InheritedAmount == r.InheritedAmount) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<YintianChargeIssuedEvent>().Where(g => g.GrantId == r.GrantId).ToArray()is [var grant] && grant.Source.OwnerSeat == r.SourceSeat && ValidYintianCharge(grant) && (r.TransferredTargetSeat is { } target ? _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && target != r.TargetSeat && r.TransferWindowId is { } id && _coreProgramEventHistoryOperations.ProgramEventHistory<YintianDamageTransferredEvent>().Count(e => e.InvoiceId == r.InvoiceId && e.AttackId == r.AttackId && e.GrantId == r.GrantId && e.SourceSeat == r.SourceSeat && e.OriginalTargetSeat == r.TargetSeat && e.TargetSeat == target && e.ChainCursor == r.ChainCursor && e.WindowId == id) == 1 : r.TransferWindowId is null);
-    internal void AssertYintianDamageStates()
-    {
-        if (!HasYintianCapability)
-            return;
-        foreach (var first in _coreProgramEventHistoryOperations.ProgramEventHistory<YintianFirstRecoveryEvent>())
-            if (first.Amount <= 0 || first.HpAfter - first.HpBefore != first.Amount || _coreProgramEventHistoryOperations.ProgramEventHistory<YintianFirstRecoveryEvent>().Count(e => e.ActualTurn == first.ActualTurn && e.TurnOwner == first.TurnOwner) != 1)
-                throw new InvalidOperationException("Yintian's global first recovery must be one actual positive event per turn.");
-        foreach (var owner in _coreProgramEventHistoryOperations.ProgramEventHistory<YintianChargeIssuedEvent>().Select(e => e.Source.OwnerSeat).Distinct())
-            _ = AvailableYintianCharge(owner);
-        foreach (var frame in _resolutionStackOperations._resolutionStack)
-        {
-            if (YintianDamageState(frame.Id)is not { } r)
-                continue;
-            if (r.AttackId != frame.Id || !ValidYintianDamageReceipt(r) || _coreProgramEventHistoryOperations.ProgramEventHistory<YintianChargeConsumedEvent>().Count(e => e.GrantId == r.GrantId) > 1)
-                throw new InvalidOperationException("Yintian lost its native damage-owner receipt or consumed a charge twice.");
-        }
-    }
 }

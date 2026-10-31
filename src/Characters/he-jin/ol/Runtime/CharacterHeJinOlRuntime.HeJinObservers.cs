@@ -32,8 +32,6 @@ internal sealed partial class CharacterHeJinOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 620)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 650)]
     internal bool HasHeJinDamageObserver(long id) => HeJinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 480)]
-    internal bool IsHeJinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HeJinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26710)]
     internal bool AdvanceHeJinSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HeJinObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

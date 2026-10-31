@@ -5,7 +5,6 @@ internal sealed partial class CharacterYanRouOlEntries
     internal bool AdvanceYanRouSubtree() => _resolve().AdvanceYanRouSubtree();
     internal global::CardGame.Core.PromptChoice AiYanRou(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiYanRou(p, f);
     internal void AnswerYanRou(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerYanRou(choice);
-    internal void AssertYanRou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertYanRou(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginYanRou(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginYanRou(supplied, op);
     internal bool CanOfferYanRou(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferYanRou(c, t, context);
     internal bool ContinuePaidYanRou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidYanRou(f);
@@ -14,7 +13,6 @@ internal sealed partial class CharacterYanRouOlEntries
     internal void FinishYanRou(global::CardGame.Core.ProgramSkillFrame f, bool applied) => _resolve().FinishYanRou(f, applied);
     internal bool HasYanRouDamageObserver(long id) => _resolve().HasYanRouDamageObserver(id);
     internal bool IsYanRouAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsYanRouAwaitedMovement(f, e, p);
-    internal bool IsYanRouDying() => _resolve().IsYanRouDying();
     internal bool IsYanRouIssuedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsYanRouIssuedMovement(f, m);
     internal bool IsYanRouRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsYanRouRecoveryParent(f, recovery);
     internal void PublishYanRou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishYanRou(f);

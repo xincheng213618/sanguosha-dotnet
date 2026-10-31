@@ -77,13 +77,6 @@ internal sealed partial class CoreGameEngineShanheS5ZhulingRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 5716)]
-    internal void AssertShanheS5JixianFrozen(ProgramSkillFrame f)
-    {
-        if (f.NumberBindings.Any(n => n.Name == ShanheS5JixianX))
-            _ = RequireShanheS5JixianFrozen(f);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5716)]
     internal bool CanContinueIssuedShanheS5Jixian(ProgramSkillFrame f)
     {

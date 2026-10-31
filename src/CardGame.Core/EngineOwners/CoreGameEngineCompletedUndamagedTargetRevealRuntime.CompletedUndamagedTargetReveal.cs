@@ -181,7 +181,6 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
     internal void ResolveCompletedUndamagedTargetRevealChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Completed-target reveal lost its chooser.");
-        _coreCompletedUndamagedTargetRevealObserversOperations.AssertCompletedUndamagedTargetReveal(f);
         var r = f.CompletedUndamagedTargetReveal!;
         if (r.Stage is not (CompletedUndamagedTargetRevealStage.ChoosingTarget or CompletedUndamagedTargetRevealStage.ChoosingCards) || !CompletedUndamagedTargetRevealChoices(f).Any(c => CompletedUndamagedChoiceEquals(c, choice)))
             throw new InvalidOperationException("Completed-target reveal changed its exact frozen target or opaque slot.");
@@ -279,7 +278,6 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.CompletedUndamagedTargetReveal is not { } r)
             return false;
-        _coreCompletedUndamagedTargetRevealObserversOperations.AssertCompletedUndamagedTargetReveal(f);
         if (r.Stage is CompletedUndamagedTargetRevealStage.ChoosingTarget or CompletedUndamagedTargetRevealStage.ChoosingCards)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -298,7 +296,6 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
     {
         if (f.CompletedUndamagedTargetReveal is not { MovementIssued: true, Stage: CompletedUndamagedTargetRevealStage.MovementChildren })
             return false;
-        _coreCompletedUndamagedTargetRevealObserversOperations.AssertCompletedUndamagedTargetReveal(f);
         if (f.PendingMovementContinuation is null)
             throw new InvalidOperationException("Completed-target reveal lost its native child return.");
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

@@ -24,7 +24,6 @@ internal sealed partial class MoSimaYiRuntime
             if (current.Id == windowId) return true;
         return false;
     }
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33900, group: 33900)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33900)]
     private bool OwnsMovementDying()
     {

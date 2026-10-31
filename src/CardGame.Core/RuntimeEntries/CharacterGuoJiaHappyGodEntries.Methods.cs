@@ -4,7 +4,6 @@ internal sealed partial class CharacterGuoJiaHappyGodEntries
 {
     internal bool AdvanceHappyGjSubtree() => _resolve().AdvanceHappyGjSubtree();
     internal void AnswerHappyGuoJia(global::CardGame.Core.PromptChoice c) => _resolve().AnswerHappyGuoJia(c);
-    internal void AssertHappyGuoJia(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHappyGuoJia(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyGuoJia(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginHappyGuoJia(supplied, op);
     internal bool CanAwakenHappyGj(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanAwakenHappyGj(g);
     internal bool CanHappyGjGift(global::CardGame.Core.CharacterState owner) => _resolve().CanHappyGjGift(owner);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterGuoJiaHappyGodEntries
     internal global::CardGame.Core.PromptChoice HappyGjChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, global::System.Collections.Generic.IReadOnlyList<int>? targets = default, string? value = default) => _resolve().HappyGjChoice(f, branch, label, targets, value);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyGjChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyGjChoices(f);
     internal bool HappyGjDamageObserver(long id) => _resolve().HappyGjDamageObserver(id);
-    internal bool HappyGjDying() => _resolve().HappyGjDying();
     internal bool HappyGjFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HappyGjFirstChild(f, child);
     internal bool HappyGjGiftTarget(global::CardGame.Core.CharacterState owner, int seat) => _resolve().HappyGjGiftTarget(owner, seat);
     internal int HappyGjMaximumAfterPayment(int seat, int before, int amount) => _resolve().HappyGjMaximumAfterPayment(seat, before, amount);

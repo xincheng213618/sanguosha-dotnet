@@ -296,14 +296,4 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
             _coreNativeTrickUseOperations.CompleteAlcoholUse(actor, card, id);
         return true;
     }
-
-    internal void AssertMouZhijueProgram(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.MouZhijue is not { } draft)
-            return;
-        if (paused.Op != SkillProgramEffectOp.MouZhijueUse || draft.Stage is not ("yang" or "color" or "copy" or "use" or "returned" or "done") || draft.Stage == "use" != (draft.UseId is not null && _coreCardUseLifecycleOperations.LifecycleCardUse(draft.UseId.Value)is not null) || draft.PaidCardIds.Distinct().Count() != draft.PaidCardIds.Count)
-            throw new InvalidOperationException("Zhijue lost its exact staged payment/use draft.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id && frame.PendingMovementContinuation is null && draft.Stage is "yang" or "color" or "copy" && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, MouZhijueChoices(frame))))
-            throw new InvalidOperationException("Zhijue lost its exact private choice.");
-    }
 }

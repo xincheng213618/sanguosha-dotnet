@@ -60,7 +60,6 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarkContinuationsRu
 
     internal bool IsOriginalDyingSuspendedByRecipientCategoryMark(DyingFrame dying) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.RecipientCategoryMark is { Consumed: true, RecoveryIssued: true, Stage: not RecipientCategoryMarkStage.Complete } r && r.DyingFrameId == dying.Id && RecipientCategoryPureDyingPrefix(f));
     internal ProgramSkillFrame? RecipientCategoryMarkObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreRecipientCategoryMarkObserversOperations.RecipientCategoryMarkFirstChild(root, child), (index) => _coreRecipientCategoryMarkContinuationsOperations.RecipientCategoryObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 530, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 610)]
     internal bool IsRecipientCategoryMarkProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RecipientCategoryMarkObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1840)]

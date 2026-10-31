@@ -122,17 +122,4 @@ internal sealed partial class CoreGameEngineHulaoCardsRuntime
         // in Processing until every surviving target has resolved or nullified.
         _coreNativeCardUseCompletionOperations.FinishCardUse(useId, card, CardKind.AllianceFeast);
     }
-
-    internal void AssertHulaoCardState()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.AllianceFeastChoice is not null))
-        {
-            var choice = use.AllianceFeastChoice!;
-            if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.AllianceFeast || use.Action?.ActionId != choice.ActionId || use.TargetIndex != choice.TargetIndex || use.TargetIndex < 0 || use.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != choice.TargetSeat || !HasHulaoAllianceFeastPrompt() || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != use.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision!.Choices.Count != 2 || _corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices.Any(option => option.Parameters.GetValueOrDefault("program-action") != "hulao-alliance-feast"))
-                throw new InvalidOperationException("Alliance feast lost its exact native target choice.");
-        }
-
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.IncomingCard == CardKind.AllianceFeast && _corePendingDecisionPolicyPipelineOperations._pendingDecision.Kind == DecisionKind.ProgramTrigger && !HasHulaoAllianceFeastPrompt())
-            throw new InvalidOperationException("Alliance feast has a choice without its owning card use.");
-    }
 }

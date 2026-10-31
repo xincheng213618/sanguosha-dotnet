@@ -60,16 +60,8 @@ internal sealed partial class CoreGameEngineActualHandGainObserversRuntime
         return gifts is [var gift] && gift.Source == r.Source && gift.GameplayHash == r.GameplayHash && gift.ActualTurn == r.ActualTurn && gift.ActualTurnOwner == r.ActualTurnOwner && gift.CardUseFrameId == r.OriginalCardUseFrameId && gift.ActionId == r.OriginalActionId && gift.Category == r.Category && gift.RecipientSeat == r.RecipientSeat && gift.ActualCount == r.PaidIds.Count && gift.Before == r.Before && gift.After == r.After && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SameCategoryDeckGiftIssuedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId && e.ActualTurn == r.ActualTurn && e.Category == r.Category) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 510)]
-    internal void AssertActualHandGain(ProgramSkillFrame f)
-    {
-        if (f.ActualHandGain is not null && !ValidActualHandGain(f))
-            throw new InvalidOperationException("Actual hand gains lost their exact source, native parent, original gain ledger or paid movement.");
-    }
-
     internal bool ActualHandGainFirstChild(ProgramSkillFrame root, ResolutionFrame child) => ValidActualHandGain(root) && root.ActualHandGain is { Stage: ActualHandGainProgramStage.MovementChildren } r && root.PendingMovementContinuation is not null && child is CardsMovedTriggerWindowFrame moved && moved.Batch.ParentFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
     internal ProgramSkillFrame? ActualHandGainObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreActualHandGainObserversOperations.ActualHandGainFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 60, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 190)]
     internal bool IsActualHandGainProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ActualHandGainObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1720)]

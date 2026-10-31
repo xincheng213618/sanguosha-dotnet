@@ -98,7 +98,6 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
     internal void ResolveAdjacentRedTargetChoice(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Adjacent red choice lost its owner.");
-        AssertAdjacentRedTargetDraft(f);
         var draft = f.AdjacentRedTarget!;
         if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], draft.Choices.Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Adjacent red choice must retain its whole published BorrowedSword pair.");
@@ -140,16 +139,6 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardUseTargetAddedEvent(f.Id, f.SkillId, f.OwnerSeat, use.Id, f.OwnerSeat));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AdjacentRedTargetAddedEvent(f.Id, use.Id, action.ActionId, action.ActorSeat, _coreDamageZoneAcquisitionOperations.DamageAcquisitionSource(f), f.GameplayHash, original, added, targets));
         _coreCurrentUseTargetCandidateRefreshOperations.RefreshCurrentUseAddedTargetCandidates(updated, [f.OwnerSeat]);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 470)]
-    internal void AssertAdjacentRedTargetDraft(ProgramSkillFrame f)
-    {
-        if (f.AdjacentRedTarget is not { } d)
-            return;
-        var use = RequireAdjacentRedParent(f, out _);
-        if (use.CardKind != CardKind.BorrowedSword || d.CardUseFrameId != use.Id || d.ActionId != use.Action!.ActionId || d.Source != _coreDamageZoneAcquisitionOperations.DamageAcquisitionSource(f) || d.GameplayHash != f.GameplayHash || !d.OriginalTargets.SequenceEqual(use.TargetSeats) || !AdjacentRedTargetEligible(use, f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(d.Choices, AdjacentBorrowedSwordChoices(f, use)) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: false } p || p.PlayerSeat != f.OwnerSeat || p.SourceSeat != f.OwnerSeat || p.TargetSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, d.Choices))
-            throw new InvalidOperationException("Adjacent red targeting lost its mandatory native pair choice.");
     }
 
     internal bool IsAdjacentRedTargetFact(CardUseFrame use, AdjacentRedTargetAddedEvent fact, IReadOnlyList<int> original, int? currentProofActor = null)

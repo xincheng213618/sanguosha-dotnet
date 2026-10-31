@@ -120,9 +120,7 @@ descriptor 的 `FactRequirements` 按 `Triggered`、`Activated` 分别声明逻�
 
 `AfterOwnerDeath` 和 `AfterSkillLoss` 分别判断所属帧能否继续，方法接收 `ProgramSkillFrame` 并返回 `bool`。两种权限独立注册；已支付代价、来源身份、原生完成凭据等原条件仍由所属机制核对，不能统一放行，也不能让恢复后的子帧重复支付。
 
-帧断言使用 `[ProgramFrameInvariant(phase, order)]`，接收原帧，必要时再接收本轮已经解析的 `ProgramExecutionPlan`。`BeforeSelectionState` 和 `AfterSelectionState` 分处通用选择状态检查两侧，保留通用游标、选择域和已支付状态检查的位置。机制原有条件放在自身包装方法中；无实例状态的断言可以保持静态。
-
-这些注册只保存不可变方法元数据，实际委托按对局绑定到引擎兼容入口或独立 Runtime 实例，禁止跨对局保存绑定实例。注册表校验阶段、顺序与签名，不新增可序列化状态或另一套 pending 对象。新增机制只在自身模块声明入口，无需向通用调度、死亡与失技权限、帧断言方法追加人物名称。
+这些注册只保存不可变方法元数据，实际委托按对局绑定到引擎兼容入口或独立 Runtime 实例，禁止跨对局保存绑定实例。注册表校验阶段、顺序与签名，不新增可序列化状态或另一套 pending 对象。新增机制只在自身模块声明入口，无需向通用调度、死亡与失技权限追加人物名称。
 
 ## Runtime 独立类型迁移评估
 

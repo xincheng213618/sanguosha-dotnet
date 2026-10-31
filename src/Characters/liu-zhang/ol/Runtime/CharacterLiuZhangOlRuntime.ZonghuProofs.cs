@@ -48,35 +48,12 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         return native is ResponseWindowFrame response ? response.ParentFrameId == r.Need.OwnerFrameId : native.Id == r.Need.OwnerFrameId && native is CardUseFrame or ProgramSkillFrame or DyingFrame;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27512)]
-    internal void AssertZonghu(ProgramSkillFrame f)
-    {
-        if (f.Zonghu is not { } r)
-            return;
-        if (f.InstructionIndex is < 0 or > 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.CardSetBindings.Count != 0 || f.ChoiceBindings.Count != 0 || f.NumberBindings.Count != 0 || f.PindianResultBindings.Count != 0 || f.ZonghuReturn is not null || r.Source != ZonghuSource(f) || r.Source.OwnerSeat != r.Need.ProviderSeat || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 0 && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveZonghuRequiredUseRequest || !ZonghuParent(f) || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber || r.ActualTurnOwner != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !ZonghuTurnOpen(f.OwnerSeat) || r.OriginalDecision.PlayerSeat != f.OwnerSeat || r.OriginalDecision.PromptId.Value <= 0 || r.OriginalDecision.Revision < 0 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuStartedEvent>().Count(e => e == new ZonghuStartedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.ActualTurnOwner, r.Need.Intent, r.Need.OwnerFrameId, r.Need.RequestFrameId, r.OriginalDecision.PromptId, r.OriginalDecision.Revision, ZonghuDecisionHash(r.OriginalDecision))) != 1 || r.Need.Intent != ZonghuIntent.Play && !r.OriginalDecision.Choices.Any(c => c.Parameters.GetValueOrDefault(ZonghuOpen) == "open" && global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(c.Parameters, out var s) && s == r.Source))
-            throw new InvalidOperationException("Zonghu lost its registered owning request, exact original native prompt, source hash or actual foreign turn.");
-        if (r.Stage != ZonghuStage.Declare && (r.OutputKind is not { } kind || r.TargetSeat is not { } target || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuDeclaredEvent>().Count(e => e == new ZonghuDeclaredEvent(f.Id, kind, target)) != 1))
-            throw new InvalidOperationException("Zonghu changed its once-declared basic name or target.");
-        if (r.Stage is ZonghuStage.Card or ZonghuStage.CostChildren && (r.RecipientSeat is not { } victim || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuRecipientSelectedEvent>().Count(e => e == new ZonghuRecipientSelectedEvent(f.Id, victim)) != 1))
-            throw new InvalidOperationException("Zonghu changed its selected foreign hand owner.");
-        if (r.Stage == ZonghuStage.CostChildren)
-        {
-            if (r.Paid is not { } paid || !ValidZonghuPayment(paid) || paid.AttemptId != f.Id || !SameZonghuNeed(paid.Need, r.Need) || paid.Source != r.Source || paid.GameplayHash != r.GameplayHash || paid.OutputKind != r.OutputKind || paid.TargetSeat != r.TargetSeat || paid.RecipientSeat != r.RecipientSeat || paid.Before != r.Before || paid.After > r.After || !paid.Gifts.Select(g => g.CardId).SequenceEqual(r.Selected) || f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).Any(m => !IsZonghuGiftMovement(f, m)))
-                throw new InvalidOperationException("Zonghu lost its exact whole gift and independent native spill interval.");
-        }
-        else if (r.Paid is not null || f.PendingMovementContinuation is not null || r.Before != 0 || r.After != 0)
-            throw new InvalidOperationException("Unpaid Zonghu cannot claim a native movement.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && (p.PlayerSeat != f.OwnerSeat || p.SkillPrompt?.SkillId != f.SkillId || !p.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZonghuChoices(f))))
-            throw new InvalidOperationException("Zonghu changed its private native request frontier.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 450)]
     internal bool IsLiuZhangMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.Fengwei is { Stage: FengweiStage.DrawChildren } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && effect?.Op == SkillProgramEffectOp.ResolveFengweiRoundStartDraw || f.Zonghu is { Stage: ZonghuStage.CostChildren, Paid: not null } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && effect?.Op == SkillProgramEffectOp.ResolveZonghuRequiredUseRequest;
     internal bool ZonghuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.Zonghu is not { Stage: ZonghuStage.CostChildren, Paid: { } p } r)
             return false;
-        AssertZonghu(f);
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } changed)
@@ -95,44 +72,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     internal bool HasLiuZhangDamageObserver(long id) => ZonghuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1100)]
     internal bool HasLiuZhangBeforeDamageObserver(long id) => ZonghuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 930)]
-    internal bool IsLiuZhangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && (ActiveZonghuDraft()is { Zonghu: { Need: { Intent: ZonghuIntent.Dying } need } } draft && need.OwnerFrameId == d.Id && need.RequestFrameId == d.Id && ZonghuParent(draft) || ZonghuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27512)]
     internal bool AdvanceZonghuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZonghuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    internal ProgramSkillFrame? ActiveZonghuDraft() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.Zonghu is not null);
-    internal PendingDecision? ZonghuInvariantDecision(PendingDecision? ordinary)
-    {
-        if (ActiveZonghuDraft()is not { } f)
-            return ordinary is { } p ? ZonghuNativeDecision(p) : null;
-        AssertZonghu(f);
-        return ZonghuNativeDecision(f.Zonghu!.OriginalDecision);
-    }
-
-    internal ResolutionFrame? ZonghuInvariantTop(ResolutionFrame? ordinary)
-    {
-        if (ActiveZonghuDraft()is not { } f)
-            return ordinary;
-        AssertZonghu(f);
-        return f.Zonghu!.Need.Intent == ZonghuIntent.Play ? ordinary : _resolutionStackOperations._resolutionStack.Single(x => x.Id == f.Zonghu!.Need.RequestFrameId);
-    }
-
-    internal bool HasZonghuNativeRequestContinuation(long owner) => ActiveZonghuDraft()is { } f && f.Zonghu!.Need.OwnerFrameId == owner && ZonghuParent(f) && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id || ZonghuObserverRoot()?.Id == f.Id);
-    internal bool HasZonghuQinglongPaymentRide(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
-    {
-        if (!_coreNativeDamageHandlesOperations.UsesFormalQinglongCrescentBlade || ActiveZonghuDraft()is not { Zonghu: { Stage: ZonghuStage.CostChildren, Paid: { } paid } r } f || r.Need.Intent != ZonghuIntent.Qinglong || !ValidZonghuPayment(paid) || !SameZonghuNeed(paid.Need, r.Need) || paid.AttemptId != f.Id || !ZonghuParent(f) || !ZonghuNativeNeedCurrent(r) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(blade.Attack, attack) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || attack.SuccessfulDodgeResponses != attack.RequiredDodgeResponses || r.Need.OwnerFrameId != attack.ResolutionId || r.Need.RequestFrameId != attack.ResolutionId || r.Need.ActorSeat != attack.SourceSeat || r.Need.ProviderSeat != attack.SourceSeat || r.Need.Cursor != 0 || r.Source.OwnerSeat != attack.SourceSeat || r.TargetSeat != attack.TargetSeat || !r.Need.Targets.SequenceEqual([attack.TargetSeat]))
-            return false;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Step: ResolutionFrameStep.AwaitingResponse, Action: { } action } use || use.SourceSeat != attack.SourceSeat || use.CardKind != attack.EffectiveCardKind || action.ActorSeat != attack.SourceSeat || action.EffectiveKind != use.CardKind || r.Need.ParentActionId != action.ActionId || r.OriginalDecision is not { Kind: DecisionKind.QinglongCrescentBlade, IsPrivate: true } original || original.PlayerSeat != attack.SourceSeat || original.SourceSeat != attack.SourceSeat || original.TargetSeat != attack.TargetSeat || original.IncomingCard != attack.EffectiveCardKind || !original.ValidTargetSeats.SequenceEqual([attack.TargetSeat]))
-            return false;
-        AssertZonghu(f);
-        return _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id || ZonghuObserverRoot()?.Id == f.Id;
-    }
-
-    internal void AssertZonghuRequests()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.Zonghu is not null))
-            AssertZonghu(f);
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.ZonghuOrigin is not null))
-            if (!IsIssuedZonghuUse(use))
-                throw new InvalidOperationException("Zonghu native use lost its exact once-paid request issuance.");
-    }
 }

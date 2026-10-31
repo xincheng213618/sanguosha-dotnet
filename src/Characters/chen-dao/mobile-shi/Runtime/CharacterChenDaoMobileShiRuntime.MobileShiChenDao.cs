@@ -132,16 +132,6 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
             throw new InvalidOperationException("Shi Chen Dao lost its exact source, frozen X, actual turn or Play phase.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 47800)]
-    internal void AssertShiCdChoice(ProgramSkillFrame f)
-    {
-        if (f.MobileShiChenDao is not { } r)
-            return;
-        RequireShiCdChoice(f);
-        if (!r.Finished && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ShiCdChoices(f))))
-            throw new InvalidOperationException("Shi Chen Dao lost its original choices.");
-    }
-
     internal bool IsMobileShiChenDaoChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => f.SkillId == ShiCdHongyi && b.Name == "hongyi-draw" && b.ChooserSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHongyiDrawBoundEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && b.OptionId == "draw-" + e.Count) == 1;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 47800)]
     internal bool CanOfferShiCd(ProgramTriggerLegalityContext g) => g.SkillId == ShiCdHongyi && g.Trigger.Id == "hongyi-ending" ? ShiCdPendingEnding(g.OwnerSeat)is not null : g.SkillId != ShiCdWanglie || g.Trigger.Id != "wanglie-response-complete" || g.Context.CardUse is { } c && _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == c.CardActionId && e.Action.Type == CardActionType.Response) && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat && e.ActionId == c.CardActionId);

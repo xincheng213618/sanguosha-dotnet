@@ -20,9 +20,6 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     [ProgramAiChoice(SkillProgramEffectOp.SelectAndMoveOwnedCard)]
     internal PromptChoice SelectAiCoverageAwareOwnedCard(PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) => ProgramAiChoiceSelector.SelectByCoverage(decision, effect, cardId => _coreProgramCardPaymentsOperations.WouldEquipmentRemovalReduceCoverage(_coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, effect.CardOwnerRef!), cardId));
     internal SkillProgramStepOutcome StartProgramPindian(ProgramSkillFrame frame, ProgramParticipantReference opponentReference, string resultBind, SkillProgramCardSetVisibility visibility) => _programPindianOperations.Get().Start(frame, opponentReference, resultBind, visibility);
-    internal bool HasProgramLifecycleBoundaryFrame() => _programBoundaryInvariantOperations.Get().HasProgramLifecycleBoundaryFrame();
-    internal bool HasTurnEndingBoundaryFrame() => _programBoundaryInvariantOperations.Get().HasTurnEndingBoundaryFrame();
-    internal bool HasPlayPhaseStartingBoundaryFrame() => _programBoundaryInvariantOperations.Get().HasPlayPhaseStartingBoundaryFrame();
     internal void BeginNormalTurnStartAfterProgramBindings(CharacterState current)
     {
         _coreActualTurnsOperations.BeginTurnStartAfterProgramLifecycle(current);
@@ -138,21 +135,6 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     }
 
     internal bool HasPendingProgramBoundCards => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SelectMany(frame => frame.CardSetBindings).SelectMany(binding => binding.CardIds).Distinct().Any(cardId => _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Processing);
-
-    internal bool IsProgramProcessingConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        var boundIds = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SelectMany(frame => frame.CardSetBindings).SelectMany(binding => binding.CardIds).Distinct().Where(cardId => _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Processing).ToHashSet();
-        if (boundIds.Count == 0 || boundIds.Any(cardId => processing.All(card => card.Id != cardId)))
-            return false;
-        var allowedParentIds = attack.PhysicalCards.Select(card => card.Id).ToHashSet();
-        if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment is { } currentJudgment && _coreNativeDamageHandlesOperations.GetJudgmentAttack(currentJudgment)is { } judgmentAttack)
-            allowedParentIds.UnionWith(judgmentAttack.PhysicalCards.Select(card => card.Id));
-        if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { } borrowedSword)
-            allowedParentIds.Add(borrowedSword.Card.Id);
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault()is { } programFrame)
-            allowedParentIds.UnionWith(programFrame.Action.PhysicalCards.Select(cost => cost.CardId));
-        return processing.Where(card => !boundIds.Contains(card.Id)).All(card => allowedParentIds.Contains(card.Id));
-    }
 
     internal IReadOnlyList<ProgramTriggerCandidate> CollectProgramTriggerCandidates(CharacterState owner, SkillProgramTriggerWindow window, int occurrenceIndex = 0) => _programTriggerOperations.Get().CollectProgramTriggerCandidates(_kernelCoreProgramTriggerRuntimeQueriesOperations.CreateProgramTriggerQueries(), owner, window, occurrenceIndex);
     internal SkillProgramTrigger GetProgramTrigger(ProgramTriggerCandidate candidate) => _programTriggerOperations.Get().GetProgramTrigger(_kernelCoreProgramTriggerRuntimeQueriesOperations.CreateProgramTriggerQueries(), candidate);

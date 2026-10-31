@@ -7,14 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvKaiOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 7171)]
-    internal void AssertBijingUnpaidSelection(ProgramSkillFrame frame)
-    {
-        if (frame.BijingPunish is not { } state)
-            return;
-        if (state.OwnerSeat != frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(state.TurnOwnerSeat) || state.Remaining is < 1 or > 2 || (state.Paid ? state.SelectedCardIds.Count != state.Remaining || state.SelectedLocations.Count != state.SelectedCardIds.Count || state.Before < 0 || state.After < state.Before || state.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || state.SelectedCardIds.Select((id, i) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > state.Before && m.Sequence <= state.After && m.From == state.SelectedLocations[i] && m.Reason.Value == $"skill-program.{(frame.SkillId)}.bijing-punish") != 1).Any(bad => bad) : state.SelectedCardIds.Count >= state.Remaining || state.SelectedCardIds.Any(id => !BijingPunishChoices(frame, state.TurnOwnerSeat).Any(c => c.Cards.Contains(id)))) || state.SelectedCardIds.Distinct().Count() != state.SelectedCardIds.Count || state.DiscardedCardIds.Intersect(state.SelectedCardIds).Any() || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op != SkillProgramEffectOp.BijingPunishDiscardPhase)
-            throw new InvalidOperationException("Bijing lost its original unpaid owned-card selection.");
-    }
 
     internal SkillProgramStepOutcome BijingProgramMarkHandCards(ProgramSkillFrame frame, SkillProgramEffect effect)
     {

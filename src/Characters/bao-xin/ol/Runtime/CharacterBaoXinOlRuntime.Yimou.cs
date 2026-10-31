@@ -64,7 +64,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BaoXin: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == BaoXinStage.Mode ? f.OwnerSeat : r.Holder) || !BaoXinChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Yimou requires its exact current private chooser and original choice.");
-        AssertBaoXin(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = chosen.Parameters["branch"];

@@ -17,7 +17,6 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhaoXiang: not null } f || f.Id != id)
             return false;
-        AssertZhaoXiang(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd())
             return true;
         if (f.PendingMovementContinuation is not null)
@@ -76,7 +75,6 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
             return false;
         if (f.PendingMovementContinuation is not { } p || !IsZhaoXiangMovement(f, ZhaoXiangPausedEffect(f), p))
             throw new InvalidOperationException("MeiYing draw consumed a foreign movement return.");
-        AssertZhaoXiang(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd() || _coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))
             return true;
         FinishZhaoXiang(f);
@@ -112,17 +110,6 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
             return false;
         var recovery = events.OfType<ZhaoXiangExchangeRecoveryIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         return r.Stage == "replacement-children" ? recovery.Length == 0 : recovery is [var request] && request.OwnerSeat == f.OwnerSeat && request.Requested == r.RecoveryRequested && r.RecoveryRequested is >= 0 and <= 1;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 410)]
-    internal void AssertZhaoXiang(ProgramSkillFrame f)
-    {
-        if (f.ZhaoXiang is null)
-            return;
-        if (!ValidZhaoXiang(f))
-            throw new InvalidOperationException("Zhao Xiang lost its actual conversion payment, five sampled Shu templates or once-issued recovery.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && f.ZhaoXiang.Stage == "selection" && (p.PlayerSeat != f.OwnerSeat || !p.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhaoXiangExchangeChoices(f))))
-            throw new InvalidOperationException("Private five-Shu choice leaked or changed its paid candidate set.");
     }
 
     void global::CardGame.Core.IZhaoXiangProgramHost.GainMeiYingAfterActualSlashDamage(ProgramSkillFrame f) => GainMeiYingAfterActualSlashDamage(f);

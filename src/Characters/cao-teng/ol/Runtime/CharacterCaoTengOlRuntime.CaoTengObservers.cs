@@ -38,13 +38,6 @@ internal sealed partial class CharacterCaoTengOlRuntime
         return r.Stage == CaoTengStage.JianxiongDrawChildren ? _coreProgramEventHistoryOperations.ProgramEventHistory<CaoTengJianxiongClaimIssuedEvent>().All(e => e.FrameId != f.Id) : _coreProgramEventHistoryOperations.ProgramEventHistory<CaoTengJianxiongClaimIssuedEvent>().Count(e => e.FrameId == f.Id && e.Before == r.Before) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<CaoTengJianxiongClaimedEvent>().Where(e => e.FrameId == f.Id).All(e => r.Materials.Any(m => m.CardId == e.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == e.Sequence && m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == e.CardId && m.From == CardLocation.Processing && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == CaoTengJianxiongClaimReason) == 1);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27300)]
-    internal void AssertCaoTeng(ProgramSkillFrame f)
-    {
-        if (f.CaoTeng is not null && !ValidCaoTeng(f))
-            throw new InvalidOperationException("Cao Teng lost his exact native parent, private chooser order, original cause or once-issued benefit.");
-    }
-
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 100)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 90)]
     internal bool IsCaoTengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.CaoTeng is { Stage: CaoTengStage.YongzuChildren, Option: "recover", RecoveryRequested: > 0 } r && ValidCaoTeng(f) && recovery.ParentFrameId == f.Id && recovery.Return == new RecoveryReplacementReturn(PostEventContinuation.Program, f.Id) && recovery.Attempt.SourceSeat == f.OwnerSeat && recovery.Attempt.TargetSeat == CaoTengChooser(f) && recovery.Attempt.Amount == r.RecoveryRequested && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.Program && recovery.Attempt.Completion.InstructionIndex == 1;
@@ -76,8 +69,6 @@ internal sealed partial class CharacterCaoTengOlRuntime
     internal bool HasCaoTengDamageObserver(long id) => CaoTengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 900)]
     internal bool HasCaoTengBeforeDamageObserver(long id) => HasCaoTengDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 730)]
-    internal bool IsCaoTengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CaoTengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27300)]
     internal bool AdvanceCaoTengChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoTengObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -50,7 +50,6 @@ internal sealed partial class CoreGameEnginePaidColorConversionsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.PaidColorConversion is null && f.ActualTurnDamageClaim is null)
             return false;
-        _corePaidColorDamageClaimObserversOperations.AssertPaidColorDamageClaimFrame(f);
         if (AwaitPaidColorDamageClaimMovements(id) != SkillProgramStepOutcome.Continue)
             return true;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -107,17 +106,6 @@ internal sealed partial class CoreGameEnginePaidColorConversionsRuntime
 
     internal bool IsPaidColorEquipmentDuelAction(CharacterState owner, LegalAction action, Card card) => action.Kind == LegalActionKind.Duel && action.PlayedCardKind == CardKind.Duel && action.ConversionSource is { } source && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Equipment(owner.Seat) && GetPaidColorTurnDuelConversions(owner, card, CardKind.Duel, false, CardZoneKind.Equipment).Contains(source);
     internal bool TracksPaidColorUseAppearance(int actorSeat, CardKind kind, IReadOnlyList<CardConversionSource> chain) => kind == CardKind.Duel && _turnCardUseEffectsOperations._turnCardUseEffects.Conversions.Any(g => g.PaidColorOrigin is not null && g.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && g.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && g.Source.OwnerSeat == actorSeat && chain.Any(source => source.OwnerSeat == actorSeat && source.SkillId == g.Source.SkillId && source.SkillInstanceId == g.Source.SkillInstanceId && source.BindingId == $"{(g.Source.BindingId)}.turn-{(g.EffectIndex)}"));
-    internal void AssertPaidColorTurnConversions()
-    {
-        foreach (var g in _turnCardUseEffectsOperations._turnCardUseEffects.Conversions.Where(g => g.PaidColorOrigin is not null))
-        {
-            var p = g.PaidColorOrigin!;
-            var program = _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program;
-            var trigger = program?.Triggers.SingleOrDefault(t => t.Id == g.Source.BindingId);
-            if (program?.GameplayHash != p.GameplayHash || trigger is null || trigger.Window != SkillProgramTriggerWindow.DrawPhaseEnded || g.EffectIndex != 1 || trigger.Effects.Count != 2 || !PaidColorDuelOperation.IsPayment(trigger.Effects[1].Op) || trigger.Effects[1].SourceBind != g.SourceBind || p.ActualTurnNumber != g.TurnNumber || p.TurnOwnerSeat != g.TurnSeat || g.Source.OwnerSeat != g.TurnSeat || g.BoundCardIsRed != global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(p.EffectiveSuit) || !HasActualRedOrBlackSuit(p.EffectiveSuit) || g.OutputKind != CardKind.Duel || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(g.Source.OwnerSeat) || !IsActualPaidColorMovement(g.Source.OwnerSeat, p) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramPaidColorConversionPaidEvent>().Count(e => e.ProgramFrameId == g.ParentFrameId && e.EffectIndex == g.EffectIndex && e.Origin == p && e.Source == new CardConversionSource(g.Source.SkillId, g.Source.BindingId, g.Source.OwnerSeat, g.Source.SkillInstanceId)) != 1)
-                throw new InvalidOperationException("A real-discard conversion lost its original paid entity, color, actual turn or exact source producer.");
-        }
-    }
 
     internal bool IsActualPaidColorMovement(int owner, ProgramPaidColorConversionOrigin p) => p.From.OwnerSeat == owner && p.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence == p.MovementSequence && m.CardId == p.CardId && m.From == p.From && m.CardKind == p.CardKind && m.Reason.Value == PaidColorDiscardReason && (m.To == CardLocation.DiscardPile && !p.GeneratedMaterial || p.GeneratedMaterial && p.From.Zone == CardZoneKind.Equipment && m.To == CardLocation.OutsideGame)) == 1 && p.SequenceAfter >= p.MovementSequence && _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > p.MovementSequence && m.Sequence <= p.SequenceAfter).All(m => p.CardKind == CardKind.WoodenOx && p.From == CardLocation.Equipment(owner) && m.From == CardLocation.WoodenOxGrain(owner) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard);
     SkillProgramStepOutcome global::CardGame.Core.IPaidColorDamageClaimProgramHost.DiscardBoundCardForOppositeTurnDuel(ProgramSkillFrame f, string bind) => BeginPaidColorConversion(f, bind);

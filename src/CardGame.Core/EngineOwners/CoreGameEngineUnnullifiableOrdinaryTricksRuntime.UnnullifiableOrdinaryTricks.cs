@@ -17,8 +17,6 @@ internal sealed partial class CoreGameEngineUnnullifiableOrdinaryTricksRuntime
         var binding = _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], SkillProgramCardPolicyKind.CannotNullifyOwnOrdinaryTrick, action.EffectiveKind).FirstOrDefault();
         if (binding.Source is null)
             return;
-        if (use.OrdinaryTrickCannotNullify is not null || use.SourceSeat != action.ActorSeat || use.CardKind != action.EffectiveKind || declared.SourceSeat != action.ActorSeat || declared.CardKind != action.EffectiveKind)
-            throw new InvalidOperationException("Cannot-nullify policy lost its real original trick declaration.");
         var receipt = new OrdinaryTrickCannotNullifyReceipt(new(binding.Source.SkillId, binding.Policy.Id, action.ActorSeat, binding.Source.SkillInstanceId), use.Id, action.ActionId, action.ActorSeat, action.EffectiveKind);
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { OrdinaryTrickCannotNullify = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OrdinaryTrickCannotNullifyIssuedEvent(receipt));

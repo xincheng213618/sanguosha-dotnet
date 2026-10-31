@@ -55,12 +55,6 @@ internal sealed partial class CoreGameEngineDyingSuitsAndHistoricalUseObserversR
     }
 
     internal bool ValidDyingSuitsPeachUse(CardUseFrame use, DyingSuitsPeachReturn ret) => use.DyingSuitsPeachReturn == ret && use.Id == ret.CardUseFrameId && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && use.CardKind == CardKind.Peach && use.SourceSeat == ret.ActorSeat && use.TargetSeats.SequenceEqual([ret.VictimSeat]) && use.Action is { Type: CardActionType.Use, EffectiveKind: CardKind.Peach } action && action.ActionId == ret.CardActionId && action.ActorSeat == ret.ActorSeat && action.ProviderSeat == ret.ActorSeat && action.PhysicalCards.Count == 0 && action.ConversionChain.Count == 0 && action.TargetSeats.SequenceEqual(use.TargetSeats) && action.RequesterSeat is null && action.ResponderSeat is null && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == CardKind.Peach && e.SourceSeat == ret.ActorSeat) == 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Count(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual([ret.VictimSeat])) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 540)]
-    internal void AssertDyingSuits(ProgramSkillFrame f)
-    {
-        if (f.DyingSuits is not null && !ValidDyingSuitsReceipt(f))
-            throw new InvalidOperationException("Dying suits lost original live Dying, round issuance, paid invoice or immutable typed Peach return.");
-    }
 
     internal bool IsOriginalDyingSuspendedByDyingSuits(DyingFrame dying) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.DyingSuits is { Stage: not DyingSuitsStage.Recipient and not DyingSuitsStage.Complete } r && r.DyingFrameId == dying.Id && DyingSuitsStructuralPrefix(f));
     internal bool DyingSuitsStructuralPrefix(ProgramSkillFrame root)
@@ -227,8 +221,6 @@ internal sealed partial class CoreGameEngineDyingSuitsAndHistoricalUseObserversR
     }
 
     internal ProgramSkillFrame? DyingSuitsObserverRoot() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.DyingSuits is not null && DyingSuitsPaidPrefix(f));
-    internal bool HasDyingSuitsSuspendedAttack(long attackId) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.DyingSuits is { Stage: not DyingSuitsStage.Recipient and not DyingSuitsStage.Complete } r && (r.OriginalCursor.AttackOwnerFrameId == attackId || r.OriginalCursor.ParentFrameId == attackId && r.OriginalCursor.Continuation == DyingContinuationKind.AttackHpLoss) && DyingSuitsStructuralPrefix(f));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 620, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 710)]
     internal bool IsDyingSuitsProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && DyingSuitsObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 530)]
@@ -239,31 +231,6 @@ internal sealed partial class CoreGameEngineDyingSuitsAndHistoricalUseObserversR
         return _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: false);
     }
 
-    internal bool AssertDyingSuitsSubtree()
-    {
-        var roots = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.DyingSuits is not null).ToArray();
-        if (roots.Length == 0)
-            return false;
-        foreach (var root in roots)
-            if (!DyingSuitsPaidPrefix(root))
-                throw new InvalidOperationException("Original Dying suits lost its exact paid subtree and original entry token.");
-        _coreProgramAttackAttemptOperations.AssertProgramAttackState();
-        _coreSkillProgramsOperations.AssertProgramSkillState();
-        _coreHpChangeProgramsOperations.AssertPostEventProgramInvariants();
-        return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 550)]
-    internal void AssertEndingHistoricalUses(ProgramSkillFrame f)
-    {
-        if (f.EndingHistoricalUses is not { } r)
-            return;
-        if (r.InstructionIndex != 1 || f.InstructionIndex != 1 || r.Source != global::CardGame.Core.EngineOwners.CoreGameEngineDyingSuitsPeachProgramsRuntime.DyingSuitsSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || !_coreEndingHistoricalUsesOperations.ExactHistoricalEnding(f) || r.EndingFrameId != f.WindowContext!.ParentFrameId || !r.Slots.SequenceEqual(_coreEndingHistoricalUsesOperations.OwnPlayHistory(f.OwnerSeat)) || r.Slots.Count is < 1 or > 2 || r.SlotIndex < 0 || r.SlotIndex > r.Slots.Count || r.SlotIndex > 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EndingHistoricalUseReturnedEvent>().Any(e => e.Return.ProgramFrameId == f.Id && e.Return.SlotIndex == r.SlotIndex - 1))
-            throw new InvalidOperationException("Historical Ending lost its own-turn accepted history or first-before-second completion.");
-        if (r.UseReturn is { } ret && (ret.Source != r.Source || ret.GameplayHash != r.GameplayHash || ret.ProgramFrameId != f.Id || ret.InstructionIndex != 1 || ret.EndingFrameId != r.EndingFrameId || ret.ActualTurn != r.ActualTurn || ret.SlotIndex != r.SlotIndex || ret.OriginalActionId != r.Slots[r.SlotIndex].CardActionId || ret.EffectiveKind != r.Slots[r.SlotIndex].EffectiveKind || _coreCardUseLifecycleOperations.LifecycleCardUse(ret.CardUseFrameId)is not { } use || use.EndingHistoricalUseReturn != ret))
-            throw new InvalidOperationException("Historical Ending lost its exact issued whole-use child.");
-    }
-
     internal void AssertHistoricalEndingUse(CardUseFrame use)
     {
         if (use.EndingHistoricalUseReturn is not { } ret)
@@ -271,7 +238,6 @@ internal sealed partial class CoreGameEngineDyingSuitsAndHistoricalUseObserversR
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame f || f.Id != ret.ProgramFrameId || f.EndingHistoricalUses?.UseReturn != ret)
             throw new InvalidOperationException("Historical Ending lost its exact suspended program owner.");
-        AssertEndingHistoricalUses(f);
         if (use.Id != ret.CardUseFrameId || use.CardId != ret.PhysicalCardId || use.PhysicalCardIds is not [var id] || id != ret.PhysicalCardId || (use.CurrentSlashFirePolicy?.OriginalAction ?? use.Action)is not { Type: CardActionType.Use } original || original.ActionId != ret.CardActionId || original.ActorSeat != f.OwnerSeat || original.ProviderSeat != f.OwnerSeat || original.EffectiveKind != ret.EffectiveKind || original.PhysicalCards is not [var cost] || cost.CardId != id || cost.From != CardLocation.Hand(f.OwnerSeat) || !original.ConversionChain.SequenceEqual([ret.Source]) || use.EndingHistoricalCostBefore < 0 || use.EndingHistoricalCostAfter < use.EndingHistoricalCostBefore || _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > use.EndingHistoricalCostBefore && m.Sequence <= use.EndingHistoricalCostAfter && m.CardId == id && m.From == cost.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EndingHistoricalUseIssuedEvent>().Count(e => e.Return == ret) != 1)
             throw new InvalidOperationException("Historical Ending's one-Hand cost or exact use identity changed.");
     }

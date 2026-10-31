@@ -10,7 +10,6 @@ internal sealed partial class CoreGameEngineForeignTurnContestsRuntime
     internal bool TryBeginForeignActualTurnStart(CharacterState turnOwner) => _foreignActualTurnWindowOperations.Get().TryBegin(turnOwner.Seat);
     internal void AdvanceForeignActualTurnStartCandidate(ForeignActualTurnStartWindowFrame parent, bool activated, bool completed) => _foreignActualTurnWindowOperations.Get().AdvanceCandidate(parent, activated, completed);
     internal void CompleteForeignActualTurnStartBinding(ProgramSkillFrame child) => _foreignActualTurnWindowOperations.Get().CompleteBinding(child);
-    internal bool HasForeignActualTurnStartBoundary() => _foreignActualTurnWindowOperations.Get().HasBoundary();
     internal bool IsForeignActualTurnPindian(ProgramSkillFrame frame) => _closedProgramPhaseFrameQueriesSource.Get().IsForeignActualTurnPindian(frame);
     internal ForeignTurnPindianOrigin? FreezeForeignTurnPindianOrigin(ProgramSkillFrame program, PindianFrame pindian) => _foreignTurnContestOperations.Get().FreezeOrigin(program, pindian);
     internal void AssertForeignTurnContest(ProgramSkillFrame frame) => _foreignTurnContestOperations.Get().Assert(frame);

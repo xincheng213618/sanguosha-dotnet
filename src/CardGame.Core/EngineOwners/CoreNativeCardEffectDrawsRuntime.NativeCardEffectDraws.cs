@@ -70,20 +70,6 @@ internal sealed partial class CoreNativeCardEffectDrawsRuntime
 
     internal bool IsNativeCardEffectDrawMovement(CardUseFrame use, CardMovementBatchContext batch) => use.NativeCardEffectDraw is { Stage: NativeCardEffectDrawStage.DrawingChildren, Outcome: { } outcome } receipt && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == receipt.AwaitingProgramFrameId && batch.Movements.Count > 0 && batch.Movements.All(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && (m.From == CardLocation.DrawPile && m.Reason == CardMoveReasons.Draw && (outcome.ActualDrawIds.Contains(m.CardId) && m.To == CardLocation.Hand(outcome.RecipientSeat) || _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(m, CardLocation.Hand(outcome.RecipientSeat))) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle));
     internal bool IsNativeCardEffectDrawMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame frame) => frame.ResumeNativeCardEffectDrawFrameId == use.Id && frame.Id == frame.Batch.Id && frame.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(frame with { ResumeNativeCardEffectDrawFrameId = null }) && IsNativeCardEffectDrawMovement(use, frame.Batch);
-    internal bool IsNativeCardEffectDrawStateReturn(CardUseFrame use, ProgramLifecycleTriggerWindowFrame frame) => use.NativeCardEffectDraw is { Stage: NativeCardEffectDrawStage.DrawingChildren } && frame.ResumeProgramFrameId == use.Id && frame.CharacterStateContinuation == CharacterStateContinuation.NativeCardEffectDraw && frame.ResumeCardId is null && frame.ResumeCardKind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.Id == frame.Id && e.Change.ParentFrameId == use.Id) == 1;
-    internal bool HasNativeCardEffectDrawProcessing(IReadOnlyList<Card> processing)
-    {
-        var uses = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray();
-        var draws = uses.Where(use => use.NativeCardEffectDraw is not null).ToArray();
-        if (draws.Length == 0)
-            return false;
-        foreach (var use in draws)
-            AssertNativeCardEffectDraw(use);
-        // A pre-draw optional offer can be open before it creates a ProgramSkillFrame.
-        // The original card and any real ancestor use still own their Processing entities.
-        var materials = uses.SelectMany(use => use.PhysicalCardIds ?? [use.CardId]).ToHashSet();
-        return processing.All(card => materials.Contains(card.Id));
-    }
 
     internal void AssertNativeCardEffectDraw(CardUseFrame use)
     {

@@ -81,7 +81,6 @@ internal sealed partial class CharacterTianChouOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TianChouShandao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !TianChouChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shandao requires the owner's exact currently published target or private card slot.");
-        AssertTianChou(f);
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Tops.Count == 0 && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("An unpaid Shandao choice lost its living source.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -126,7 +125,6 @@ internal sealed partial class CharacterTianChouOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { TianChouShandao: { } r } f && f.Id == id)
         {
-            AssertTianChou(f);
             if (r.Stage is TianChouShandaoStage.TopChildren or TianChouShandaoStage.NativeChildren)
             {
                 if (DrainTianChou(id))

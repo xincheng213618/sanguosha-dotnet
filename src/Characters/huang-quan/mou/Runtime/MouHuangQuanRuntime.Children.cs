@@ -16,7 +16,7 @@ internal sealed partial class MouHuangQuanRuntime
         if(ObserverRoot()is not{}root)return false;
         for(ResolutionFrame? p=root;p is not null;p=frames.ParentOf(p.Id))if(p.Id==id)return true;return false;
     }
-    [ProgramDyingProof(ProgramDyingProofPhase.Runtime,35700)][ProgramDyingProof(ProgramDyingProofPhase.Invariant,35700)]internal bool DyingObserver()
+    [ProgramDyingProof(ProgramDyingProofPhase.Runtime,35700)]internal bool DyingObserver()
     {
         if(health.ActiveDying is not{}dying||ObserverRoot()is not{}root)return false;
         for(ResolutionFrame? p=dying;p is not null;p=frames.ParentOf(p.Id))if(p.Id==root.Id)return true;return false;

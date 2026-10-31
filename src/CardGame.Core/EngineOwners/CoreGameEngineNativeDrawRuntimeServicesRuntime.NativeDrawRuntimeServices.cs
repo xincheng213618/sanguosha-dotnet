@@ -25,7 +25,6 @@ internal sealed partial class CoreGameEngineNativeDrawRuntimeServicesRuntime
 
     ProgramExecutionPlan global::CardGame.Core.INativeDrawProducerQueries.ResolvePlan(ProgramSkillFrame frame) => ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
     bool global::CardGame.Core.INativeDrawProducerQueries.HasOperationReturn(SkillProgramEffectOp operation) => global::CardGame.Core.EngineOwners.CoreProgramNativeDrawReturnsDefinitions.ProgramNativeDrawReturns.Value.ContainsKey(operation);
-    IEnumerable<NativeDrawAttemptDecidedEvent> global::CardGame.Core.INativeDrawProducerQueries.DecidedEvents() => _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptDecidedEvent>();
     int? global::CardGame.Core.INativeDrawProducerOperations.ResolveDrawCount(ProgramSkillFrame frame, int targetSeat, int amount, SkillProgramNumberExpression? expression) => _coreProgramLifecycleOperations.ResolveProgramDrawCount(frame, targetSeat, amount, expression);
     void global::CardGame.Core.INativeDrawProducerOperations.DrawSelectedTargets(long id, int count, CardMoveReason reason) => _coreProgramLifecycleOperations.DrawProgramSelectedTargets(id, count, reason);
     void global::CardGame.Core.INativeDrawProducerOperations.DrawProgramCards(long id, int seat, int count, string? resultBind, SkillProgramCardSetVisibility visibility, CardMoveReason reason) => _coreProgramLifecycleOperations.DrawProgramCards(id, seat, count, null, resultBind, visibility, reason);
@@ -64,8 +63,6 @@ internal sealed partial class CoreGameEngineNativeDrawRuntimeServicesRuntime
     }
 
     bool global::CardGame.Core.INativeDrawAttemptQueries.IsRedirectedGain(CardMovementRecord movement, CardLocation expectedTo) => _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(movement, expectedTo);
-    IEnumerable<NativeDrawAttemptStartedEvent> global::CardGame.Core.INativeDrawAttemptQueries.StartedEvents() => _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptStartedEvent>();
-    IEnumerable<NativeDrawAttemptDecidedEvent> global::CardGame.Core.INativeDrawAttemptQueries.DecidedEvents() => _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptDecidedEvent>();
     NativeDrawPileSlashProof? global::CardGame.Core.INativeDrawAttemptQueries.DrawPileSlashReplacementProof(ProgramSkillFrame frame, NativeDrawAttemptContext context) => _characterZhangFeiOlMagicOperations.NativeDrawPileSlashReplacementProof(frame, context);
     bool global::CardGame.Core.INativeDrawAttemptQueries.IsIssuedDrawPileSlashReplacement(NativeDrawAttemptContext context, NativeDrawReplacementResult replacement) => _characterZhangFeiOlMagicOperations.IsIssuedNativeDrawPileSlashReplacement(context, replacement);
     void global::CardGame.Core.INativeDrawAttemptOperations.CompleteLingkongReplacement(ProgramSkillFrame frame, NativeDrawAttemptFrame attempt, NativeDrawReplacementResult replacement) => _characterZhouFeiLeOperations.CompleteLingkongNativeDrawReplacement(frame, attempt, replacement);

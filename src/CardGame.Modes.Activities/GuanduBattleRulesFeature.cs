@@ -207,7 +207,6 @@ internal sealed class GuanduBattleRulesFeature : IGuanduBattleRulesFeature, IMat
     }
     public SkillProgramStepOutcome ExecuteEvent(long frameId, int ownerSeat, SkillProgramEffectOp operation)
     {
-        if (!Active) throw new InvalidOperationException("A Guandu event lost its exact once-issued program.");
         if (operation == SkillProgramEffectOp.ResolveGuanduRepeat) { _flow.IssueRepeat(frameId); return SkillProgramStepOutcome.Continue; }
         var rewarding = operation == SkillProgramEffectOp.RewardGuanduDamage;
         var useId = rewarding ? _flow.DamageRewardUse(frameId) : null;

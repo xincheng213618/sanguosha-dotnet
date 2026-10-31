@@ -20,7 +20,6 @@ internal sealed partial class CharacterLuShiOlEntries
     internal bool ContinueOlLuShi(long id) => _resolve().ContinueOlLuShi(id);
     internal bool DrainOlLuShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainOlLuShi(f);
     internal bool HasOlLuShiJudgmentProof(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasOlLuShiJudgmentProof(f);
-    internal bool IsOlLuShiLeijieAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle a, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsOlLuShiLeijieAttackConsistent(a, processing);
     internal bool IsOlLuShiLeijieNativeSlash(global::CardGame.Core.CardUseFrame use) => _resolve().IsOlLuShiLeijieNativeSlash(use);
     internal void IssueOlLuShiLeijieSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueOlLuShiLeijieSlash(f);
     internal bool OlLuShiBeforeDamage(long id) => _resolve().OlLuShiBeforeDamage(id);
@@ -36,7 +35,6 @@ internal sealed partial class CharacterLuShiOlEntries
     internal bool OlLuShiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().OlLuShiRecoveryParent(f, recovery);
     internal bool OlLuShiUnused(int owner, int target, string item) => _resolve().OlLuShiUnused(owner, target, item);
     internal void PublishOlLuShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishOlLuShi(f);
-    internal void RequireOlLuShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireOlLuShi(f);
     internal bool RetainOlLuShiIssued(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainOlLuShiIssued(f);
     internal void ReturnOlLuShiDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnOlLuShiDraw(f, outcome);
     internal bool ReturnOlLuShiLeijieAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnOlLuShiLeijieAttack(completion);

@@ -60,13 +60,6 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 42180)]
     internal bool HappyPtMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.HappyPangTong is { } r && effect?.Op == r.Operation && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && r.Stage is HappyPangTongStage.GainChildren or HappyPangTongStage.LowerDrawChildren or HappyPangTongStage.LowerRecoveryChildren or HappyPangTongStage.RewardChildren or HappyPangTongStage.GrowthMaximumChildren or HappyPangTongStage.GrowthHpChildren && ValidHappyPt(f);
     internal bool HappyPangTongStructuralEdge(ResolutionFrame child, ResolutionFrame parent) => child is ProgramLifecycleTriggerWindowFrame { HappyPlanReturn: { } ret } window && ret.RootId == parent.Id && parent is ProgramSkillFrame { HappyPangTong: { Stage: HappyPangTongStage.Settling } } && HappyPtSettlementPaid(window) || child is ProgramSkillFrame { HappyPangTong: { } r } program && r.ParentId == parent.Id && parent is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.HappyPlanSettled } && ValidHappyPt(program) || child is CardUseFrame use && parent is ProgramSkillFrame root && HappyPtUpperRidesOn(use, root);
-    internal bool HasHappyPangTongPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyPangTong: { } r } f && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == f.OwnerSeat && ValidHappyPt(f) && r.Stage is HappyPangTongStage.Grant or HappyPangTongStage.MiddleCard or HappyPangTongStage.UpperTarget or HappyPangTongStage.UpperCard or HappyPangTongStage.LowerChoice && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HappyPtChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 42180)]
-    internal void AssertHappyPt(ProgramSkillFrame f)
-    {
-        if (f.HappyPangTong is not null && !ValidHappyPt(f))
-            throw new InvalidOperationException("Happy Pang Tong lost its original independent plan, exact real boundary, paid movement or native return.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 42180)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 42180)]

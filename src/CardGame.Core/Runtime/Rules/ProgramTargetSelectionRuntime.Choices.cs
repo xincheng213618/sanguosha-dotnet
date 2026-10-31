@@ -19,8 +19,6 @@ internal sealed partial class ProgramTargetSelectionRuntime
             return protocols.SelectNamedBoundTargets(frame, paused);
         if (paused.ReplaceSelection == true)
         {
-            if (frame.SelectedTargetSeats.Count != 1)
-                throw new InvalidOperationException("A chained replacement selection lost its original single target.");
             frames.ReplaceTop(frame = frame with { SelectedTargetSeats = Array.AsReadOnly(Array.Empty<int>()) });
         }
         var targetSeats = GetProgramTargetSeats(ownerSeat, targetKind, frame.WindowContext);

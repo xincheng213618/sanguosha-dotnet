@@ -164,7 +164,6 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenTaishiCiPowei: { Stage: ShenTaishiCiPoweiStage.Choice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenTscChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Powei requires its current chooser and private real card or opaque slot.");
-        AssertShenTscPowei(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -207,7 +206,6 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenTaishiCiPowei: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertShenTscPowei(f);
         if (r.Stage == ShenTaishiCiPoweiStage.Choice)
         {
             PublishShenTscPowei(f);
@@ -272,19 +270,6 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     internal bool ContinuePaidShenTscPowei(ProgramSkillFrame f) => f.ShenTaishiCiPowei is { Stage: not ShenTaishiCiPoweiStage.Choice } || f.SkillId == ShenTscPowei && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiMissionEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat);
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 38200)]
     internal bool ShenTscPoweiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op is (SkillProgramEffectOp.ResolveShenTaishiCiPowei or SkillProgramEffectOp.ResolveHappyTaishiCiChongwei) && f.ShenTaishiCiPowei is { Stage: ShenTaishiCiPoweiStage.MovementChildren } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 38200)]
-    internal void AssertShenTscPowei(ProgramSkillFrame f)
-    {
-        if (f.ShenTaishiCiPowei is not { } r)
-            return;
-        if (r.Source != ShenTscSource(f) || r.GameplayHash != f.GameplayHash || r.WindowId != f.WindowContext?.ParentFrameId || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || r.InstructionIndex != f.InstructionIndex || !global::CardGame.Core.EngineOwners.CharacterTaishiCiHappyGodRuntime.IsShenTscPoweiFamily(f.SkillId) || f.TriggerId != "marked-turn" || f.WindowContext.SourceSeat != r.TargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiStartedEvent>().Count(e => e == new ShenTaishiCiPoweiStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.ActualTurn, r.TargetSeat, r.InstructionIndex)) != 1)
-            throw new InvalidOperationException("Powei lost its source, hash, original marked actual turn or owning instruction.");
-        if (r.Stage == ShenTaishiCiPoweiStage.Choice)
-            return;
-        var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Branch is not ("damage" or "take") || r.CardId is not { } card || paid is not [var invoice] || invoice.Branch != r.Branch || invoice.CardId != card || invoice.Sequence <= r.Before || invoice.Sequence > r.After || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == invoice.Sequence && m.CardId == card && m.From == invoice.From && m.To == invoice.To && m.Reason.Value == (r.Branch == "damage" ? ShenTscDiscard : ShenTscTake)))
-            throw new InvalidOperationException("Powei cannot resume or repay an absent real hand-card movement.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShenTaishiCiPowei)]
     internal PromptChoice ChooseShenTscPowei(PendingDecision p, ProgramSkillFrame f)

@@ -6,7 +6,6 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamEntries
     internal bool AllowsShanheTeamHealth(global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().AllowsShanheTeamHealth(candidate);
     internal void ApplyShanheAlliedHealth(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ApplyShanheAlliedHealth(supplied);
     internal void ApplyShanheAllyHealth(global::CardGame.Core.ProgramSkillFrame frame, int seat, int amount) => _resolve().ApplyShanheAllyHealth(frame, seat, amount);
-    internal void AssertShanheTeamRankApplication(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShanheTeamRankApplication(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheSchoolTeamRank(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheSchoolTeamRank(supplied);
     internal void ContinueShanheSchoolTeamRank(long id) => _resolve().ContinueShanheSchoolTeamRank(id);
     internal bool IsActualShanheAlly(int seat) => _resolve().IsActualShanheAlly(seat);

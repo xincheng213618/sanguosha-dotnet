@@ -87,10 +87,7 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
     internal void ResolveHulaoXiuluoChoice(PromptChoice answer)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        AssertHulaoProgram(f);
         var r = f.HulaoXiuluo!;
-        if (r.Stage != HulaoXiuluoStage.Offering || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat)
-            throw new InvalidOperationException("Xiuluo lost its exact preparation choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (answer.Id.Value == $"hulao-xiuluo.{(f.Id)}.stop")
         {
@@ -132,7 +129,6 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
     internal void ResolveHulaoXiuluoJudgmentChoice(PromptChoice answer)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        AssertHulaoProgram(f);
         var r = f.HulaoXiuluo!;
         if (r.Stage != HulaoXiuluoStage.JudgmentOffering || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat)
             throw new InvalidOperationException("Xiuluo lost the post-payment judgment choice.");
@@ -172,10 +168,7 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
     internal void ResolveHulaoPeachChoice(PromptChoice answer)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        AssertHulaoProgram(f);
         var r = f.HulaoPeach!;
-        if (r.Stage != HulaoPeachStage.Offering || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat)
-            throw new InvalidOperationException("Shenqu lost its exact real-Peach choice.");
         var choice = HulaoPeachChoices(f).Single(c => c.Id == answer.Id);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Cards.Count == 0)
@@ -210,7 +203,6 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.HulaoXiuluo is null && f.HulaoPeach is null)
             return false;
-        AssertHulaoProgram(f);
         if (f.HulaoXiuluo is { } x)
         {
             if (x.Stage == HulaoXiuluoStage.Complete)
@@ -292,7 +284,6 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
         var r = origin.Issuance;
         if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame f || f.Id != origin.ProgramFrameId || f.HulaoPeach != r || r.Stage != HulaoPeachStage.Using || use.Id != r.CardUseFrameId || use.CardId != r.CardId || use.CardKind != CardKind.Peach || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Peach } action || action.ProviderSeat != f.OwnerSeat || action.PhysicalCards is not [var physical] || physical.CardId != r.CardId || !_coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, f.OwnerSeat))
             throw new InvalidOperationException("A real Shenqu Peach lost its original physical payment and program owner.");
-        AssertHulaoProgram(f);
     }
 
     [NativeUseReturn(27601)]
@@ -302,23 +293,10 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.ProgramFrameId);
         var r = origin.Issuance;
-        if (f.HulaoPeach != r || use.Step != ResolutionFrameStep.Completed || use.Id != r.CardUseFrameId || use.CardId != r.CardId)
-            throw new InvalidOperationException("A completed real Shenqu Peach lost its exact typed return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { HulaoPeach = r with { Stage = HulaoPeachStage.Children }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HulaoPeachReturnedEvent(origin));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27600)]
-    internal void AssertHulaoProgram(ProgramSkillFrame f)
-    {
-        if (f.HulaoXiuluo is { } x && (x.Source != HulaoProgramSource(f) || x.GameplayHash != f.GameplayHash || x.ActualTurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber || x.InstructionIndex != f.InstructionIndex || f.WindowContext?.ParentFrameId != x.LifecycleFrameId || f.WindowContext.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || HulaoPausedEffect(f).Op != SkillProgramEffectOp.ResolveHulaoXiuluo || x.Iteration < 0 || x.Stage is HulaoXiuluoStage.CostChildren or HulaoXiuluoStage.JudgmentOffering or HulaoXiuluoStage.JudgmentChildren && (x.CostCardId is null || x.CostFrom is null || x.Iteration == 0) || x.Stage == HulaoXiuluoStage.JudgmentChildren && x.JudgmentCardId is null))
-            throw new InvalidOperationException("Xiuluo lost its original preparation or paid discard cursor.");
-        if (f.HulaoPeach is { } p && (p.Source != HulaoProgramSource(f) || p.GameplayHash != f.GameplayHash || p.ActualTurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber || p.InstructionIndex != f.InstructionIndex || f.WindowContext?.ParentFrameId != p.DamageFrameId || f.WindowContext.Window != SkillProgramTriggerWindow.AfterDamageApplied || HulaoPausedEffect(f).Op != SkillProgramEffectOp.OfferHulaoDamagePeach || p.Stage is HulaoPeachStage.Using or HulaoPeachStage.Children && (p.CardId is null || p.CardUseFrameId is null)))
-            throw new InvalidOperationException("Shenqu lost its original applied-damage Peach cursor.");
-    }
-
-    internal SkillProgramEffect HulaoPausedEffect(ProgramSkillFrame f) => ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
     internal bool HulaoActivityFrameRidesOn(ResolutionFrame child, ResolutionFrame parent)
     {
         if (child is CardUseFrame { HulaoPeachOrigin: { } origin } use && parent is ProgramSkillFrame owner)

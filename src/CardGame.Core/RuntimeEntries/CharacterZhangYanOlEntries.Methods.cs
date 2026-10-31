@@ -6,7 +6,6 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal global::CardGame.Core.PromptChoice AiZhangYan(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiZhangYan(p, f);
     internal void AnswerZhangYan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerZhangYan(choice);
     internal void AppendZhangYanSujiDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.DamageTriggerCandidate> candidates) => _resolve().AppendZhangYanSujiDamageCandidates(attack, window, candidates);
-    internal void AssertZhangYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhangYan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhangYan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginZhangYan(supplied, op);
     internal void BindZhangYanSujiUse(long id) => _resolve().BindZhangYanSujiUse(id);
     internal bool CanOfferZhangYan(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferZhangYan(candidate, trigger, c);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal bool HasIssuedZhangYanSujiRewardCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedZhangYanSujiRewardCandidate(c, context);
     internal bool HasZhangYanDamageObserver(long id) => _resolve().HasZhangYanDamageObserver(id);
     internal bool HasZhangYanLangdaoTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasZhangYanLangdaoTargetTail(use);
-    internal bool IsZhangYanDying() => _resolve().IsZhangYanDying();
     internal bool IsZhangYanLangdaoIssued(global::CardGame.Core.CardUseFrame use) => _resolve().IsZhangYanLangdaoIssued(use);
     internal bool IsZhangYanLangdaoUnrespondable(long id) => _resolve().IsZhangYanLangdaoUnrespondable(id);
     internal bool IsZhangYanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhangYanMovement(f, e, p);

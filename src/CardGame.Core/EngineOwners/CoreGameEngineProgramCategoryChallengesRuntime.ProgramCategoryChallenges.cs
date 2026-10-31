@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramCategoryChallengesRuntime
 {
-    internal static void AssertFrozenSelectedCardSuits(ProgramSkillFrame frame, ProgramExecutionPlan plan) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCategoryChallenges.AssertFrozenSelectedCardSuits(frame, plan);
     internal bool AreProgramBoundCardsSameColor(ProgramSkillFrame frame, string sourceBind)
     {
         var binding = _coreProgramLifecycleOperations.GetProgramCardSet(frame, sourceBind);

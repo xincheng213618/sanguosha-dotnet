@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSunHaoMobileEntries
 {
-    internal void AssertMobileSunHaoDraw(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertMobileSunHaoDraw(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileSunHaoDraw(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginMobileSunHaoDraw(frame);
     internal void ContinueMobileSunHaoDraw(long id) => _resolve().ContinueMobileSunHaoDraw(id);
     internal bool HasQualifiedMobileGuiming(global::CardGame.Core.CharacterState owner) => _resolve().HasQualifiedMobileGuiming(owner);

@@ -13,8 +13,6 @@ internal sealed partial class CharacterGuanYuRuntimeRuntime
     {
         var context = frame.WindowContext?.CardUse ?? throw new InvalidOperationException("Guan rule requires its actual card-action context.");
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == frame.WindowContext!.ParentFrameId);
-        if (parent is null || parent.Action.ActionId != context.CardActionId || parent.Action.ActorSeat != context.ActorSeat)
-            throw new InvalidOperationException("Guan rule lost its exact card-action parent.");
         return parent.Action;
     }
 

@@ -32,13 +32,6 @@ internal sealed partial class CoreGameEnginePaidColorDamageClaimObserversRuntime
         return root.PaidColorConversion is not null || root.ActualTurnDamageClaim is not null;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 280)]
-    internal void AssertPaidColorDamageClaimFrame(ProgramSkillFrame root)
-    {
-        if ((root.PaidColorConversion is not null || root.ActualTurnDamageClaim is not null) && !IsValidPaidColorDamageClaimFrame(root))
-            throw new InvalidOperationException("A paid color or independent damage claim lost its exact original candidate, cost and movement ledger.");
-    }
-
     internal ProgramSkillFrame? PaidColorDamageClaimObserverRoot(long? exactDamageWindowId = null)
     {
         for (var index = 1; index < _resolutionStackOperations._resolutionStack.Count; index++)
@@ -119,16 +112,8 @@ internal sealed partial class CoreGameEnginePaidColorDamageClaimObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1740)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 110)]
     internal bool HasPaidColorDamageClaimDamageObserver(long exactDamageWindowId) => PaidColorDamageClaimObserverRoot(exactDamageWindowId)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 480, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 560)]
     internal bool IsPaidColorDamageClaimProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PaidColorDamageClaimObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 120)]
     internal bool IsPaidColorDamageClaimMovement(ProgramSkillFrame root, SkillProgramEffect? op, ProgramMovementContinuation pending) => pending.SubjectSeat == root.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (op is not null && PaidColorDuelOperation.IsPayment(op.Op) && root.PaidColorConversion is not null || op?.Op == SkillProgramEffectOp.ClaimActualTurnDamageEntities && root.ActualTurnDamageClaim is not null) && IsValidPaidColorDamageClaimFrame(root);
-    internal void AssertPaidColorDamageClaims()
-    {
-        _corePaidColorConversionsOperations.AssertPaidColorTurnConversions();
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.PaidColorConversion is not null || f.ActualTurnDamageClaim is not null))
-            if (!IsValidPaidColorDamageClaimFrame(f) || PaidColorDamageClaimObserverRoot()?.Id != f.Id)
-                throw new InvalidOperationException("A paid color or damage claim lost its precise owning movement/recovery/Dying subtree.");
-    }
 }

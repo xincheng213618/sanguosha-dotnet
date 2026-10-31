@@ -153,7 +153,6 @@ internal sealed partial class CharacterMaYuanYiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaYuanYi: { Stage: MaYuanYiStage.TargetChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MaYuanYiTargets(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [supplied])))
             throw new InvalidOperationException("Binghuo requires its published actual target choice.");
-        AssertMaYuanYi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = supplied.Targets.Single();
         var judgment = _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1;
@@ -167,7 +166,6 @@ internal sealed partial class CharacterMaYuanYiOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MaYuanYi: { } r } f && f.Id == id)
         {
-            AssertMaYuanYi(f);
             if (r.Stage == MaYuanYiStage.TargetChoice)
             {
                 if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -235,7 +233,6 @@ internal sealed partial class CharacterMaYuanYiOlRuntime
     {
         if (f.MaYuanYi is null)
             return false;
-        AssertMaYuanYi(f);
         return true;
     }
 

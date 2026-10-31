@@ -99,20 +99,4 @@ internal sealed partial class CoreGameEngineSuitPreventionBenefitObserversRuntim
     internal bool HasSuitPreventionBenefitObserver(long beforeDamageId) => SuitPlacementObserverRoot(beforeDamageId)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 530)]
     internal bool IsSuitPlacementProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SuitPlacementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 450, group: 10)]
-    internal bool IsSuitPreventionInsideDamageProgramDying()
-    {
-        if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } window || !IsSuitPlacementProgramDying())
-            return false;
-        foreach (var original in _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>())
-        {
-            if (SuitPlacementObserverRoot(original.Id)is not { } root)
-                continue;
-            var i = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.SuitPreventionBenefit!.OriginalAttackFrameId);
-            if (i > 0 && _resolutionStackOperations._resolutionStack[i] is ProgramSkillFrame { AttackAttempt: not null, AttackReturn: { } returned } attack && returned.ParentDamageWindowFrameId == window.Id && _resolutionStackOperations._resolutionStack[i - 1] is DamageTriggerWindowFrame parent && parent.Id == window.Id && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(attack, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()))
-                return true;
-        }
-
-        return false;
-    }
 }

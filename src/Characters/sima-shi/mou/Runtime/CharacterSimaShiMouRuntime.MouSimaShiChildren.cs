@@ -37,7 +37,6 @@ internal sealed partial class CharacterSimaShiMouRuntime
     internal bool MouSimaShiDamageWindow(long id) => MouSimaShiRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 36400)]
     internal bool MouSimaShiBeforeDamage(long id) => MouSimaShiRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 36400)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36400)]
     internal bool MouSimaShiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouSimaShiRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36400)]

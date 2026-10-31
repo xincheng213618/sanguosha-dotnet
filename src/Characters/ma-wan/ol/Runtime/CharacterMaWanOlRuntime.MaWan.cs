@@ -69,7 +69,6 @@ internal sealed partial class CharacterMaWanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaWanHunjiang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MaWanChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MaWanChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Hunjiang lost its exact independent chooser or legal extra-target commitment.");
-        AssertMaWan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -131,7 +130,6 @@ internal sealed partial class CharacterMaWanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaWanHunjiang: { } r } f || f.Id != id)
             return;
-        AssertMaWan(f);
         if (DrainMaWan(id))
             return;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineZhaoguMirrorEntries
 {
-    internal void AssertZhaoguMirror(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? paused) => _resolve().AssertZhaoguMirror(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhaoguMirror(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginZhaoguMirror(input);
     internal bool CanOfferZhaoguMirror(global::CardGame.Core.ProgramTriggerLegalityContext context) => _resolve().CanOfferZhaoguMirror(context);
     internal void CancelZhaogu(global::CardGame.Core.PromptChoice selected) => _resolve().CancelZhaogu(selected);

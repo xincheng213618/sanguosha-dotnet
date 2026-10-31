@@ -26,7 +26,6 @@ internal sealed partial class CharacterQuHuangOlRuntime
 
     Card global::CardGame.Core.IQuHuangFacts.Card(int id) => _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
     SkillProgramTrigger global::CardGame.Core.IQuHuangFacts.Trigger(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.GetProgramTrigger(frame);
-    SkillProgramEffect? global::CardGame.Core.IQuHuangFacts.PausedEffect(ProgramSkillFrame frame) => _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame);
     bool global::CardGame.Core.IQuHuangFacts.HasRuntimeSkill(int seat, string skill) => _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[seat], skill);
     SkillProgramTriggerFacts global::CardGame.Core.IQuHuangFacts.MovementFacts(int owner, CardMovementSourceCount count, CardMovementTiming? timing) => _coreCardMovementProgramsOperations.CaptureCardsMovedTriggerFacts(_coreMatchParticipantsPlayersAccess._players[owner], 1, count, SkillProgramTriggerWindow.CardsMoved, timing);
     bool global::CardGame.Core.IQuHuangFacts.IsActiveSourceEquipment(int owner, string skill, string instance, Card card) => _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, skill, instance, card);

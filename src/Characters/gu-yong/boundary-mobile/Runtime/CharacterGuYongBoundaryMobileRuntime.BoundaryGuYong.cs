@@ -17,8 +17,6 @@ internal sealed partial class CharacterGuYongBoundaryMobileRuntime
         var colors = frame.SelectedCardIds.Select(id =>
         {
             var location = _cardZonesOperations._cardZones.GetLocation(id);
-            if (location.OwnerSeat != frame.OwnerSeat || location.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
-                throw new InvalidOperationException("Mobile Shenxing lost an original owned hand/equipment payment entity.");
             var card = _cardZonesOperations._cardZones.CardsAt(location).Single(card => card.Id == id);
             return BoundaryGuYongColor(_coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card));
         }).Distinct().ToArray();
@@ -27,8 +25,6 @@ internal sealed partial class CharacterGuYongBoundaryMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryGuYongColorsFrozenEvent(frame.Id, frame.OwnerSeat, frame.SkillInstanceId, frame.GameplayHash, effect.ResultBind!, outcome));
         return SkillProgramStepOutcome.Continue;
     }
-
-    internal bool IsBoundaryGuYongChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding) => frame.SkillId == "boundary:shenxing-mobile" && binding.ChooserSeat == frame.OwnerSeat && binding.OptionId is "same" or "different" && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryGuYongColorsFrozenEvent>().Count(fact => fact.FrameId == frame.Id && fact.OwnerSeat == frame.OwnerSeat && fact.SkillInstanceId == frame.SkillInstanceId && fact.GameplayHash == frame.GameplayHash && fact.ResultBind == binding.Name && fact.Outcome == binding.OptionId) == 1 && ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Instructions.Take(frame.InstructionIndex).Count(effect => effect.Op == SkillProgramEffectOp.PrepareBoundaryGuYongShenxing && effect.ResultBind == binding.Name) == 1;
     internal SkillProgramStepOutcome PrepareBoundaryGuYongBingyi(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

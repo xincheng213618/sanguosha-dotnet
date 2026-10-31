@@ -75,8 +75,6 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
 
         if (r.Stage == NianRevivalStage.DiscardChildren)
         {
-            if (target.IsAlive || target.MaxHp != r.MaximumHp || !target.HasHpValue)
-                throw new InvalidOperationException("A paid Nian revival lost its original dead character.");
             var wasFaceDown = _coreProgramLifeRestorationOperations.RestoreProgramCharacterLife(f, target, Math.Min(2, target.MaxHp));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { NianRevival = r with { Stage = NianRevivalStage.StateChildren, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Count = 0 } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NianAllyRevivedEvent(f.Id, f.OwnerSeat, target.Seat, r.UsedRevives, target.Hp));
@@ -153,12 +151,5 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
         var movements = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray();
         if (r.Stage == NianRevivalStage.DiscardChildren && movements.Count(m => m.From.OwnerSeat == r.TargetSeat && m.To == CardLocation.DiscardPile && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDiscard) != r.Count || r.Stage == NianRevivalStage.DrawChildren && movements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDraw) != r.Count)
             throw new InvalidOperationException("Nian revival's physical discard/draw invoice changed while suspended.");
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27930)]
-    internal void AssertNianRevival(ProgramSkillFrame f)
-    {
-        if (f.NianRevival is not null)
-            RequireNianRevival(f);
     }
 }

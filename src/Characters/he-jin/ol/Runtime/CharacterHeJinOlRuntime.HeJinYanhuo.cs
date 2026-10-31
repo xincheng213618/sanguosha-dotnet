@@ -50,8 +50,6 @@ internal sealed partial class CharacterHeJinOlRuntime
         if (death.ReturnKind == DeathReturnKind.Dying && dying is null || death.ReturnKind is null || death.ReturnKind == DeathReturnKind.ProgramSkill && (i < 3 || _resolutionStackOperations._resolutionStack[i - 3] is not ProgramSkillFrame p || p.Id != death.ParentFrameId))
             throw new InvalidOperationException("Yanhuo's original native death lost its typed parent.");
         var damage = dying?.Continuation == DyingContinuationKind.Damage ? _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(x => x.Id == dying.ParentFrameId) : null;
-        if (dying?.Continuation == DyingContinuationKind.Damage && damage is null)
-            throw new InvalidOperationException("Yanhuo lost the original damage parent.");
         var r = new HeJinYanhuoReceipt(HeJinSource(f), f.GameplayHash, f.InstructionIndex, w.Id, w.CandidateIndex, w.Step, w.Candidates[w.CandidateIndex], new(death.Id, death.ParentFrameId, death.VictimSeat, death.KillerSeat, death.ReturnKind, death.Step, death.OwnerDiedProgramsResolved, death.KillerProgramsResolved, death.CleanedUpCardIds), dying is null ? null : new(dying.Id, dying.ParentFrameId, dying.VictimSeat, dying.KillerSeat, dying.Continuation, dying.Step, dying.ResponderIndex, dying.ResponderSeats, dying.AttemptedSelfDyingBindings), damage is null ? null : new(damage.Id, damage.ParentFrameId, damage.SourceSeat, damage.TargetSeat, damage.Amount, damage.Nature, damage.Step), _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, killer, HeJinDeathOwnedCardCount(death));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HeJinYanhuo = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HeJinYanhuoStartedEvent(f.Id, r.Source, r.GameplayHash, death.Id, killer, r.Limit, HeJinDeathReturnHash(r)));
@@ -75,7 +73,6 @@ internal sealed partial class CharacterHeJinOlRuntime
     internal void AnswerHeJinYanhuo(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Yanhuo lost its owner.");
-        RequireHeJin(f);
         var r = f.HeJinYanhuo!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !HeJinYanhuoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Yanhuo needs its deceased owner's exact opaque card choice.");

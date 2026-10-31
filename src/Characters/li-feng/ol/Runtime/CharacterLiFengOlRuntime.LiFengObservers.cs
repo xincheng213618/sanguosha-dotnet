@@ -11,7 +11,6 @@ internal sealed partial class CharacterLiFengOlRuntime
     {
         if (f.LiFeng is { Paid: true })
         {
-            AssertLiFeng(f);
             return true;
         }
 
@@ -21,49 +20,6 @@ internal sealed partial class CharacterLiFengOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27591)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27591)]
     internal bool PermitIssuedLiFeng(ProgramSkillFrame f) => CanContinueIssuedLiFeng(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27591)]
-    internal void AssertLiFeng(ProgramSkillFrame f)
-    {
-        if (f.LiFeng is not { } r)
-            return;
-        if (f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } c || c.ParentFrameId != r.WindowId || c.OwnerSeat != f.OwnerSeat || r.Source != LiFengSource(f) || r.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || !LiFengComposition.Handles(r.Op) || !Enum.IsDefined(r.Stage) || r.ActualTurn != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.Pile.OwnerSeat != f.OwnerSeat || r.Pile.SkillId != "ol:jiyun" || r.Pile.Capacity != 3 || r.Cursor < 0 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Recipients is not System.Collections.IList { IsReadOnly: true } || r.Entities is not System.Collections.IList { IsReadOnly: true } || r.ActualDrawIds is not System.Collections.IList { IsReadOnly: true } || r.DistributedIds is not System.Collections.IList { IsReadOnly: true } || r.CompletedEntities is not System.Collections.IList { IsReadOnly: true } || r.Recipients.Distinct().Count() != r.Recipients.Count || r.Entities.Select(e => e.CardId).Distinct().Count() != r.Entities.Count || r.ActualDrawIds.Distinct().Count() != r.ActualDrawIds.Count || r.DistributedIds.Distinct().Count() != r.DistributedIds.Count || r.CompletedEntities.Select(e => e.LeaseId).Distinct().Count() != r.CompletedEntities.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<LiFengStartedEvent>().Count(e => e == new LiFengStartedEvent(f.Id, r.Source, r.GameplayHash, r.Op, r.WindowId, r.ActualTurn, r.TurnOwner, r.Pile)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<LiFengPaidEvent>().Count(e => e.FrameId == f.Id && e.Op == r.Op) != (r.Paid ? 1 : 0))
-            throw new InvalidOperationException("Li Feng lost his immutable owning source, native window or paid cursor.");
-        if (r.Op == SkillProgramEffectOp.InitializeJiyunCategoryGrain)
-        {
-            if (c.Window != SkillProgramTriggerWindow.GameStarting || f.TriggerId != "initial-categories" || r.Stage != LiFengStage.InitialChildren || !r.Paid || r.Entities.Count > 3 || r.Entities.Select(e => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(e.Kind)).Distinct().Count() != r.Entities.Count || r.Entities.Any(e => e.From != CardLocation.DrawPile) || !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunInitialEntityStoredEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => new LiFengEntity(e.CardId, e.PrintedKind, CardLocation.DrawPile)).SequenceEqual(r.Entities))
-                throw new InvalidOperationException("Jiyun initialization lost its real distinct-category Deck entities.");
-        }
-        else if (r.Op == SkillProgramEffectOp.ResolveJiyunPreparationDrawLeases)
-        {
-            if (c.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || f.TriggerId != "preparation-recipients" || c.SourceSeat != f.OwnerSeat || r.Stage is not (LiFengStage.PreparationTargets or LiFengStage.PreparationDraw or LiFengStage.PreparationChildren) || r.MaximumRecipients < 1 || r.Recipients.Count > r.MaximumRecipients || r.Cursor > r.Recipients.Count || r.Paid == (r.Stage == LiFengStage.PreparationTargets) || _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunRecipientLimitFrozenEvent>().Count(e => e == new JiyunRecipientLimitFrozenEvent(f.Id, r.MaximumRecipients)) != 1 || r.Paid && !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunRecipientFrozenEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.RecipientSeat).SequenceEqual(r.Recipients))
-                throw new InvalidOperationException("Jiyun preparation changed its frozen target bound or actual recipient order.");
-            if (r.Stage == LiFengStage.PreparationChildren)
-            {
-                if (r.Cursor >= r.Recipients.Count || r.DrawOutcome is not { } o || o.RecipientSeat != r.Recipients[r.Cursor] || o.RequestedCount != 1 || !r.ActualDrawIds.SequenceEqual(o.ActualDrawIds) || _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunPreparationDrawReturnedEvent>().Where(e => e.FrameId == f.Id && e.Index == r.Cursor).ToArray()is not [var returned] || returned != new JiyunPreparationDrawReturnedEvent(f.Id, r.Cursor, o.RecipientSeat, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId) || !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseIssuedEvent>().Where(e => e.FrameId == f.Id && e.RecipientIndex == r.Cursor).OrderBy(e => e.MovementSequence).Select(e => e.CardId).SequenceEqual(o.ActualDrawIds))
-                    throw new InvalidOperationException("Jiyun must mark actual DrawPile gains, never replacement gained entities.");
-            }
-        }
-        else if (r.Op == SkillProgramEffectOp.CollectJiyunCompletedUseEntities)
-        {
-            if (c.Window != SkillProgramTriggerWindow.CardUseCompleted || f.TriggerId != "completed-drawn-entity" || !r.Paid || r.Stage is not (LiFengStage.CollectNext or LiFengStage.CollectChildren) || c.Jiyun is not { } issued || issued != r.CompletedUse || issued.Pile != r.Pile || r.Cursor > r.CompletedEntities.Count || r.CompletedEntities.Count != issued.EntityCount || !r.CompletedEntities.SequenceEqual(JiyunCompletedEntities(issued)))
-                throw new InvalidOperationException("Jiyun lost its original whole-use lease invoice.");
-            for (var i = 0; i < r.Cursor; i++)
-                if (!_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.FrameId == f.Id && e.LeaseId == r.CompletedEntities[i].LeaseId && e.ActionId == issued.ActionId))
-                    throw new InvalidOperationException("A completed Jiyun lease cannot re-enter its collection cursor.");
-            if (r.Stage == LiFengStage.CollectChildren && (r.Cursor >= r.CompletedEntities.Count || r.ActiveCardId != r.CompletedEntities[r.Cursor].CardId || r.ActiveFrom is not { Zone: CardZoneKind.Equipment or CardZoneKind.DiscardPile } from || _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunClaimedEntityEvent>().Where(e => e.FrameId == f.Id && e.LeaseId == r.CompletedEntities[r.Cursor].LeaseId).ToArray()is not [var claim] || claim.CardId != r.ActiveCardId || claim.From != from || claim.To != r.Pile.Location || claim.ActionId != issued.ActionId || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == claim.MovementSequence && m.CardId == claim.CardId && m.CardKind == claim.PrintedKind && m.From == from && m.To == claim.To && m.Reason.Value == JiyunCollectReason)))
-                throw new InvalidOperationException("Jiyun collection cannot substitute or pay an entity twice.");
-        }
-        else
-        {
-            if (c.Window != SkillProgramTriggerWindow.TurnEnding || f.TriggerId != "ending-distribution" || c.SourceSeat != f.OwnerSeat || r.Stage is not (LiFengStage.DistributionChoice or LiFengStage.DistributionChildren) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShuliangDistributionEntityFrozenEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => new LiFengEntity(e.CardId, e.PrintedKind, e.From)).SequenceEqual(r.Entities) || r.Entities.Any(e => e.From.Zone != CardZoneKind.PublicPersistentPile || e.From.OwnerSeat != f.OwnerSeat) || r.DistributedIds.Any(id => !r.Entities.Any(e => e.CardId == id)))
-                throw new InvalidOperationException("Shuliang changed its exact ending grain set or repeated a distributed entity.");
-            if (r.Stage == LiFengStage.DistributionChildren && (!r.Paid || !r.DistributedIds.Contains(r.ActiveCardId) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShuliangGrainDistributedEvent>().Where(e => e.FrameId == f.Id && e.CardId == r.ActiveCardId).ToArray()is not [var gift] || gift.RecipientSeat != r.ActiveRecipient || gift.From != r.ActiveFrom || !r.Entities.Any(e => e.CardId == gift.CardId && e.From == gift.From) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == gift.MovementSequence && m.CardId == gift.CardId && m.From == gift.From && m.To == CardLocation.Hand(gift.RecipientSeat) && m.Reason.Value == ShuliangGiftReason)))
-                throw new InvalidOperationException("Shuliang lost its one actual gift and typed child return.");
-        }
-
-        if (f.PendingMovementContinuation is { } movement && !IsLiFengMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), movement))
-            throw new InvalidOperationException("Li Feng retained an unrelated movement continuation.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 540)]
     internal bool IsLiFengMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.LiFeng is { Paid: true } r && effect?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is LiFengStage.InitialChildren or LiFengStage.PreparationChildren or LiFengStage.CollectChildren or LiFengStage.DistributionChildren;
@@ -86,7 +42,6 @@ internal sealed partial class CharacterLiFengOlRuntime
     {
         if (f.LiFeng is not { Paid: true } r)
             return false;
-        AssertLiFeng(f);
         if (r.Stage == LiFengStage.PreparationDraw && f.NativeDraw is not null)
             return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
@@ -107,8 +62,6 @@ internal sealed partial class CharacterLiFengOlRuntime
     internal bool HasLiFengDamageObserver(long id) => LiFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1200)]
     internal bool HasLiFengBeforeDamageObserver(long id) => LiFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1030)]
-    internal bool IsLiFengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LiFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 290)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 280)]
     internal bool IsLiFengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

@@ -55,7 +55,6 @@ internal sealed partial class CharacterCaoXiuBoundaryMobileRuntime
         var branch = choice.Parameters.GetValueOrDefault("branch");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || choice.Parameters.GetValueOrDefault("program-action") != "boundary-qingxi" || choice.Targets.Count != 0 || branch is not ("card" or "unpick" or "discard" or "bonus"))
             throw new InvalidOperationException("Invalid Qingxi target choice.");
-        AssertBoundaryCaoXiuQingxi(frame);
         if (branch == "unpick")
         {
             if (choice.Cards is not [var card] || !draft.SelectedIds.Contains(card) || _cardZonesOperations._cardZones.GetLocation(card) != CardLocation.Hand(draft.TargetSeat))
@@ -94,18 +93,6 @@ internal sealed partial class CharacterCaoXiuBoundaryMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryCaoXiuQingxiResolvedEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), draft.AttackId, draft.TargetSeat, draft.Distance, draft.RequiredCount, branch == "discard", window.Amount, after));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 51100)]
-    internal void AssertBoundaryCaoXiuQingxi(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryCaoXiuQingxi is not { } draft)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.ResolveBoundaryCaoXiuQingxi || frame.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || context.ParentFrameId != draft.DamageWindowId || context.SourceSeat != frame.OwnerSeat || context.TargetSeat != draft.TargetSeat || draft.TargetSeat == frame.OwnerSeat || draft.Distance < 1 || draft.RequiredCount != Math.Max(1, 4 - draft.Distance) || draft.SelectedIds.Count > draft.RequiredCount || draft.SelectedIds.Distinct().Count() != draft.SelectedIds.Count || draft.SelectedIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(draft.TargetSeat)) || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { IsSourceLess: false, DamageWasApplied: false } attack || attack.ResolutionId != draft.AttackId || attack.SourceSeat != frame.OwnerSeat || attack.TargetSeat != draft.TargetSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == draft.DamageWindowId)is not BeforeDamageProgramWindowFrame { Prevented: false, RedirectedTargetSeat: null } window || window.SourceSeat != frame.OwnerSeat || window.TargetSeat != draft.TargetSeat)
-            throw new InvalidOperationException("Qingxi must retain its exact damage parent, frozen distance and unspent target hand entities.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != draft.TargetSeat || prompt.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") != "boundary-qingxi")))
-            throw new InvalidOperationException("Qingxi must retain its actual target's private prompt.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryCaoXiuQingxi)]

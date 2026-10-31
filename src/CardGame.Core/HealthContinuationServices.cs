@@ -34,7 +34,6 @@ internal interface IHealthContinuationProtocols : IProgramRuntimeOperations
     bool IsWenhePoisonDyingChild(ResolutionFrame? parent, DyingFrame child);
     bool TypedDamagePostEventEdge(ResolutionFrame parent, ResolutionFrame child);
     bool TypedDamageObserverCandidateMatches(ProgramSkillFrame observer, ProgramTriggerCandidate candidate);
-    void AssertEquipmentPlacementAndHpPair(ProgramSkillFrame producer, ProgramExecutionPlan plan);
     int SupportedRecoveryAmount(RecoveryReplacementFrame recovery, int baseAmount);
     int SupportedRecoveryHpBefore(RecoveryReplacementFrame recovery, int fallback);
     bool IsRecoveryParent(ProgramRecoveryParentPhase phase, ProgramSkillFrame parent, RecoveryReplacementFrame child);

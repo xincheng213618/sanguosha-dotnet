@@ -4,8 +4,6 @@ internal sealed partial class CharacterZhouYuLeEntries
 {
     internal bool AdvanceGuYinChildren() => _resolve().AdvanceGuYinChildren();
     internal int ApplyGuYinInitialHandSize(global::CardGame.Core.CharacterState player, int ordinaryCount) => _resolve().ApplyGuYinInitialHandSize(player, ordinaryCount);
-    internal void AssertGuYin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertGuYin(f);
-    internal void AssertPinglu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertPinglu(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGuYinDraw(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginGuYinDraw(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPinglu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginPinglu(supplied);
     internal bool CanActivatePinglu(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().CanActivatePinglu(gate);
@@ -36,7 +34,6 @@ internal sealed partial class CharacterZhouYuLeEntries
     internal bool HasGuYinDamageObserver(long id) => _resolve().HasGuYinDamageObserver(id);
     internal bool HasPingluCustody(int owner, global::CardGame.Core.ActualDiscardRecoveryPhaseKey phase) => _resolve().HasPingluCustody(owner, phase);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeGuYin(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeGuYin(supplied);
-    internal bool IsGuYinDying() => _resolve().IsGuYinDying();
     internal bool IsGuYinMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsGuYinMovement(f, effect, p);
     internal bool IsGuYinRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsGuYinRecoveryParent(f, recovery);
     internal bool IsIssuedGuYinCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedGuYinCandidate(c, context);

@@ -5,7 +5,6 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsEntries
     internal bool AllowsDragonBoatGeneralTrigger(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsDragonBoatGeneralTrigger(gate);
     internal bool AllowsDragonBoatJianji(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsDragonBoatJianji(gate);
     internal void AnswerDragonBoatGeneral(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerDragonBoatGeneral(choice);
-    internal void AssertDragonBoatGeneral(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertDragonBoatGeneral(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDragonBoatGeneral(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation, int targetSeat) => _resolve().BeginDragonBoatGeneral(supplied, operation, targetSeat);
     internal void CaptureDragonBoatFinalizedUse(long useId, global::CardGame.Core.CardActionContext action) => _resolve().CaptureDragonBoatFinalizedUse(useId, action);
     internal global::CardGame.Core.PromptChoice ChooseDragonBoatGeneral(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ChooseDragonBoatGeneral(frame);

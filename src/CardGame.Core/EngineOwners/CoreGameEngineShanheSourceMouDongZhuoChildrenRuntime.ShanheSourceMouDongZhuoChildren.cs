@@ -32,7 +32,6 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoChildrenRunti
     internal bool SourceMouDamageWindow(long id) => SourceMouRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 62053)]
     internal bool SourceMouBeforeDamage(long id) => SourceMouRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 62053)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 62053)]
     internal bool SourceMouDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SourceMouRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 62053)]

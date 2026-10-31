@@ -151,7 +151,6 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
     internal void AnswerBoundaryDanshou(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Danshou lost its original cost frame.");
-        AssertBoundaryDanshou(f);
         var r = f.BoundaryDanshou!;
         if (r.Stage != BoundaryDanshouStage.Selecting || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !BoundaryDanshouChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets)))
             throw new InvalidOperationException("Danshou rejects a stale or unrelated owned cost entity.");

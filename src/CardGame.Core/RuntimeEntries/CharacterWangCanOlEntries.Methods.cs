@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterWangCanOlEntries
 {
     internal void AssertDenglouNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertDenglouNativeUse(use);
-    internal void AssertRegisteredIssuedWangCan(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredIssuedWangCan(frame);
     internal void BeginDenglouLease(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginDenglouLease(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> BuildDenglouNativeBasicUseOptions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BuildDenglouNativeBasicUseOptions(f);
     internal bool CanContinueIssuedWangCan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIssuedWangCan(f);
@@ -27,7 +26,6 @@ internal sealed partial class CharacterWangCanOlEntries
     internal bool HasWangCanBeforeDamageObserver(long id) => _resolve().HasWangCanBeforeDamageObserver(id);
     internal bool HasWangCanDamageObserver(long id) => _resolve().HasWangCanDamageObserver(id);
     internal bool IsDenglouNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsDenglouNativeUse(use);
-    internal bool IsWangCanDying() => _resolve().IsWangCanDying();
     internal bool IsWangCanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWangCanMovement(f, effect, p);
     internal void IssueDenglouNativeUse(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.LegalAction action) => _resolve().IssueDenglouNativeUse(f, action);
     internal void IssueWangCanSegment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueWangCanSegment(f);

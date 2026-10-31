@@ -2,9 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineQinglongInsertionEntries
 {
-    internal void AssertQinglongInsertions() => _resolve().AssertQinglongInsertions();
     internal void BindQinglongInsertedUse(global::CardGame.Core.CardUseFrame child) => _resolve().BindQinglongInsertedUse(child);
-    internal global::System.Collections.Generic.HashSet<int> QinglongAncestorProcessing(long attackId) => _resolve().QinglongAncestorProcessing(attackId);
     internal bool RestoreContinuationAfterQinglongFollowup(long completedOwnerId) => _resolve().RestoreContinuationAfterQinglongFollowup(completedOwnerId);
     internal void RestoreFactionRequestAfterQinglongChoice(long ownerId) => _resolve().RestoreFactionRequestAfterQinglongChoice(ownerId);
     internal void SuspendContinuationForQinglongFollowup(long outerResolutionId, global::CardGame.Core.NativeOwners.FactionCardRequestHandle? followupRequest = default) => _resolve().SuspendContinuationForQinglongFollowup(outerResolutionId, followupRequest);

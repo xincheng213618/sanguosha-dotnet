@@ -121,22 +121,4 @@ internal sealed partial class CoreGameEngineHpLossSlashMaterialsRuntime
             throw new InvalidOperationException("The finished multi-material Slash lost its original payment/producer.");
         return use.HpLossMaterialSlashReturn.ParentProgramFrameId is not null;
     }
-
-    internal bool IsExactHpLossMaterialSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { HpLossMaterialSlashReturn: not null } use || !MatchesHpLossMaterialSlash(use) || !attack.PhysicalCards.Select(c => c.Id).SequenceEqual(use.PhysicalCardIds!))
-            return false;
-        var retained = use.PhysicalCardIds!.Where(id => !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(use.Id, id)).ToHashSet();
-        return processing.All(c => retained.Contains(c.Id)) && retained.All(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile);
-    }
-
-    internal void AssertHpLossMaterialSlashes()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.HpLossMaterialSlashReturn is not null))
-            if (!MatchesHpLossMaterialSlash(use))
-                throw new InvalidOperationException("The HP-based multi-material use lost its immutable issuance or real costs.");
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.HpLossSlashSelection is not null))
-            if (!HasExactHpLossSlashSelection(f, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!)))
-                throw new InvalidOperationException("The HP-based selected producer lost its exact target selection.");
-    }
 }

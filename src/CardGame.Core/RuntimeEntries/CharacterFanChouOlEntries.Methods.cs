@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterFanChouOlEntries
 {
-    internal void AssertRegisteredFanChou(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredFanChou(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginFanChou(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginFanChou(supplied, effect);
     internal bool CanContinueFanChou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueFanChou(f);
     internal bool CanOfferFanChou(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferFanChou(c, t, w);
@@ -19,7 +18,6 @@ internal sealed partial class CharacterFanChouOlEntries
     internal void FinishFanChou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishFanChou(f);
     internal bool HasFanChouBeforeDamageObserver(long id) => _resolve().HasFanChouBeforeDamageObserver(id);
     internal bool HasFanChouDamageObserver(long id) => _resolve().HasFanChouDamageObserver(id);
-    internal bool IsFanChouDying() => _resolve().IsFanChouDying();
     internal bool IsFanChouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsFanChouMovement(f, e, p);
     internal void IssueFanChouPaid(long id, global::CardGame.Core.FanChouReceipt r, int subject) => _resolve().IssueFanChouPaid(id, r, subject);
     internal void PayFanChouDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayFanChouDraw(f);

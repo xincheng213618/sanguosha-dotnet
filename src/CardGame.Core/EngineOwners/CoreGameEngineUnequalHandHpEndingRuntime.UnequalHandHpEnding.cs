@@ -276,13 +276,6 @@ internal sealed partial class CoreGameEngineUnequalHandHpEndingRuntime
         }
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 50)]
-    internal void AssertRegisteredUnequalHandHpReceipt(ProgramSkillFrame frame)
-    {
-        if (frame.UnequalHandHp is not null)
-            RequireUnequalHandHpReceipt(frame);
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 10)]
     internal bool IsUnequalHandHpMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.UnequalHandHp is { Payments.Count: > 0 } r && effect?.Op == SkillProgramEffectOp.ResolveUnequalHandHpEnding && pending.SubjectSeat == r.Payments[^1].SubjectSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 470)]

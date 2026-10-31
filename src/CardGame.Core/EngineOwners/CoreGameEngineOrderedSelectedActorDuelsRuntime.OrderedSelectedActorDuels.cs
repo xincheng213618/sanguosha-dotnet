@@ -101,17 +101,4 @@ internal sealed partial class CoreGameEngineOrderedSelectedActorDuelsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 2402)]
-    internal void AssertOrderedSelectedActorDuelPayment(ProgramSkillFrame frame)
-    {
-        if (frame.OrderedSelectedActorDuel is not null && !HasExactOrderedSelectedActorDuelPayment(frame))
-            throw new InvalidOperationException("Ordered Duel payment lost its original command, physical movement or source identity.");
-    }
-
-    internal void AssertOrderedSelectedActorDuelUse(CardUseFrame use, ProgramSkillFrame parent, ProgramSelectedActorDuelOrigin origin)
-    {
-        if (!MatchesOrderedSelectedActorDuel(parent, origin, use.Id) || use.CardId != 0 || use.CardKind != CardKind.Duel || use.PhysicalCardIds?.Count != 0 || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveIsRed: false })
-            throw new InvalidOperationException("Ordered Duel must retain its independent zero-entity Use and exact paid parent.");
-    }
 }

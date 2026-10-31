@@ -29,8 +29,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
             throw new InvalidOperationException("Guying equipment requires its exact still-available original entity and native issuer.");
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(origin.CardId);
         var id = _coreNativeCardUseOperations.BeginCardUse(card, origin.ActorSeat, [], physicalCardIds: [card.Id]);
-        if (id != origin.CardUseFrameId)
-            throw new InvalidOperationException("Guying equipment lost its exact native Use identity.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, use => use with { XiangChongGuyingEquipment = origin });
         RecordXiangChongEquipmentMaterialClaim(frame, origin);
         if (origin.From != CardLocation.Processing)

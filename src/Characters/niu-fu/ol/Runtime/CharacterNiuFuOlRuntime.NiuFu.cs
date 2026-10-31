@@ -122,7 +122,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { NiuFu: { } r } f || !NiuFuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage is NiuFuStage.SourceChoice or NiuFuStage.SourceGiftChoice ? r.DamageSourceSeat : f.OwnerSeat))
             throw new InvalidOperationException("NiuFu requires its exact chooser's published physical card, opaque slot or source branch.");
-        AssertNiuFu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (branch == "give-equipment")
@@ -182,7 +181,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { NiuFu: { } r } f && f.Id == id)
         {
-            AssertNiuFu(f);
             if (r.Stage is NiuFuStage.RecastChoice or NiuFuStage.SourceChoice or NiuFuStage.SourceGiftChoice or NiuFuStage.ZoneChoice)
             {
                 if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

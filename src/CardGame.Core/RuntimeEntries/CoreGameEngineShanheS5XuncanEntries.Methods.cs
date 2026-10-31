@@ -3,8 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheS5XuncanEntries
 {
     internal void AnswerShanheS5Yunshen(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShanheS5Yunshen(choice);
-    internal void AssertShanheS5XuncanNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertShanheS5XuncanNativeUse(use);
-    internal void AssertShanheS5Yunshen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShanheS5Yunshen(f);
     internal void BeginShanheS5YunshenSlash(global::CardGame.Core.ProgramSkillFrame f, int actorSeat, int targetSeat) => _resolve().BeginShanheS5YunshenSlash(f, actorSeat, targetSeat);
     internal bool CanOfferShanheS5Xuncan(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferShanheS5Xuncan(c);
     internal void CaptureShanheS5SkillTarget(global::CardGame.Core.ProgramSkillFrame f, int targetSeat) => _resolve().CaptureShanheS5SkillTarget(f, targetSeat);

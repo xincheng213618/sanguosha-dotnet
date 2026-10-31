@@ -5,7 +5,6 @@ internal sealed partial class CharacterCaoTengOlEntries
     internal bool AdvanceCaoTengChildren() => _resolve().AdvanceCaoTengChildren();
     internal void AnswerCaoTeng(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerCaoTeng(choice);
     internal void ApplyCaoTengFaction(global::CardGame.Core.ProgramSkillFrame f, string faction, bool setup) => _resolve().ApplyCaoTengFaction(f, faction, setup);
-    internal void AssertCaoTeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertCaoTeng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCaoTeng(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginCaoTeng(supplied, op);
     internal bool CanOfferCaoTeng(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferCaoTeng(c, t, context);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CaoTengChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CaoTengChoices(f);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterCaoTengOlEntries
     internal void GrantCaoTengSkill(global::CardGame.Core.ProgramSkillFrame f, int recipient) => _resolve().GrantCaoTengSkill(f, recipient);
     internal bool HasCaoTengBeforeDamageObserver(long id) => _resolve().HasCaoTengBeforeDamageObserver(id);
     internal bool HasCaoTengDamageObserver(long id) => _resolve().HasCaoTengDamageObserver(id);
-    internal bool IsCaoTengDying() => _resolve().IsCaoTengDying();
     internal bool IsCaoTengFactionChange(global::CardGame.Core.ProgramSkillFrame f, string faction) => _resolve().IsCaoTengFactionChange(f, faction);
     internal bool IsCaoTengQingliuDyingExitContext(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsCaoTengQingliuDyingExitContext(candidate, context);
     internal bool IsCaoTengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsCaoTengRecoveryParent(f, recovery);

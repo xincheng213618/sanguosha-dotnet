@@ -134,7 +134,6 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
     internal void ResolveFixedDistanceDebtChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Distance debt has no owning program.");
-        AssertFixedDistanceDebtPayment(f);
         // CardLocation is a non-nullable struct, so the owned-selection check runs
         // against a lifted nullable instead of an impossible negated pattern.
         var debtCardId = choice.Cards is [var selected] ? selected : default(int? );
@@ -168,7 +167,6 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FixedDistanceDebtPayment: not null } f || f.Id != id)
             return false;
-        AssertFixedDistanceDebtPayment(f);
         if (f.PendingMovementContinuation is not null)
         {
             if (!DrainFixedDistanceDebtChildren(f))
@@ -215,27 +213,9 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
         return paid is [var fact] && fact.Grant == r.Grant && fact.CardId == r.CardId && fact.From == from && fact.SequenceBefore == r.SequenceBefore && fact.SequenceAfter == r.SequenceAfter && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.CardId == r.CardId && m.From == from && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && (_coreCardAttackStateOperations.GetAttackCard(m.CardId).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m))) && m.Reason.Value == FixedDistanceDebtReason) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 390)]
-    internal void AssertFixedDistanceDebtPayment(ProgramSkillFrame f)
-    {
-        if (f.FixedDistanceDebtPayment is not null && !ValidFixedDistanceDebtPayment(f))
-            throw new InvalidOperationException("An issued distance debt lost its exact source, item or paid interval.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 240)]
     internal bool IsFixedDistanceDebtMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => e?.Op == SkillProgramEffectOp.SettleFixedDistanceOneEndingDebt && pending == f.PendingMovementContinuation && ValidFixedDistanceDebtPayment(f);
     internal bool DrainFixedDistanceDebtChildren(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id);
-    internal void AssertFixedDistanceOnePolicies()
-    {
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.GrantFixedDistanceOneTurnPolicy))
-            return;
-        var grants = _coreProgramEventHistoryOperations.ProgramEventHistory<FixedDistanceOneTurnGrantedEvent>();
-        var consumed = _coreProgramEventHistoryOperations.ProgramEventHistory<FixedDistanceOneDebtConsumedEvent>();
-        if (grants.Count == 0 && consumed.Count == 0)
-            return;
-        if (grants.Any(e => !ValidFixedDistanceOneGrant(e.Grant)) || consumed.GroupBy(e => e.Grant.ProgramFrameId).Any(g => g.Count() != 1))
-            throw new InvalidOperationException("A fixed-distance issuance or Ending consumption duplicated its original identity.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.SettleFixedDistanceOneEndingDebt)]
     internal PromptChoice SelectAiFixedDistanceDebt(PendingDecision d)

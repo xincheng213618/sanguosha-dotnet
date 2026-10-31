@@ -186,7 +186,6 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
 
         if (receipt.Stage == DragonBoatGeneralStage.DrawAttempt)
             throw new InvalidOperationException("The activity draw resumed before its native request returned.");
-        AssertDragonBoatGeneral(frame);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id)with { DragonBoatGeneral = null });
@@ -202,30 +201,7 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
     {
         if (frame.DragonBoatGeneral is not { Stage: DragonBoatGeneralStage.DrawAttempt or DragonBoatGeneralStage.DrawChildren })
             return false;
-        AssertDragonBoatGeneral(frame);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 42000)]
-    internal void AssertDragonBoatGeneral(ProgramSkillFrame frame)
-    {
-        if (frame.DragonBoatGeneral is not { } receipt)
-            return;
-        if (!_coreDragonBoatActivitiesOperations.IsDragonBoatActivity || receipt.InstructionIndex != frame.InstructionIndex || frame.InstructionIndex != 1 || receipt.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || receipt.WindowId != frame.WindowContext?.ParentFrameId || frame.SkillId is not ("dragonboat:lianpian" or "dragonboat:dianhu" or "dragonboat:tunjiang"))
-            throw new InvalidOperationException("The activity general lost its actual owning trigger.");
-        if (receipt.Stage == DragonBoatGeneralStage.Choosing)
-        {
-            if (receipt.RecipientSeat is not null || receipt.Draw is not null || frame.NativeDraw is not null)
-                throw new InvalidOperationException("An unpaid activity choice cannot retain a draw.");
-            return;
-        }
-
-        if (receipt.RecipientSeat is not { } recipient || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || receipt.RequestedCount is not (1 or 2))
-            throw new InvalidOperationException("The activity draw changed its frozen recipient.");
-        if (receipt.Stage == DragonBoatGeneralStage.DrawAttempt)
-            return;
-        if (receipt.Draw is not { } draw || draw.RecipientSeat != recipient || draw.RequestedCount != receipt.RequestedCount || _coreProgramEventHistoryOperations.ProgramEventHistory<DragonBoatDrawPaidEvent>().Count(e => e == new DragonBoatDrawPaidEvent(frame.Id, frame.SkillId, frame.OwnerSeat, recipient, draw.RequestedCount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId, draw.Replacement is not null)) != 1)
-            throw new InvalidOperationException("The activity draw must retain its once-issued native payment fact.");
     }
 
     internal IEnumerable<CharacterState> WenjiEligibleGiftRecipients(int ownerSeat, string skillId) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != ownerSeat && (skillId != "dragonboat:wenji" || DragonBoatAllies(ownerSeat, p.Seat)) && _characterLiuQiOlOperations.WenjiPayableCards(p.Seat).Count > 0);

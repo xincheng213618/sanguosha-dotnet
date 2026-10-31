@@ -68,7 +68,6 @@ internal sealed partial class CoreGameEngineCapturedEquipmentDrawsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.CapturedEquipmentDraw is not { } r)
             return false;
-        AssertCapturedEquipmentAndDraw(f);
         if (_coreActualDiscardRecoveriesOperations.DrainCapturedEquipmentOrDiscardChildren(f))
             return true;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -94,35 +93,5 @@ internal sealed partial class CoreGameEngineCapturedEquipmentDrawsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { CapturedEquipmentDraw = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(id);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 530)]
-    internal void AssertCapturedEquipmentAndDraw(ProgramSkillFrame f)
-    {
-        if (f.CapturedEquipmentDraw is not { } r)
-            return;
-        var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
-        var op = plan.GetPausedInstruction(f.InstructionIndex).Effect;
-        var set = _coreProgramLifecycleOperations.GetProgramCardSet(f, r.SourceBind);
-        if (op.Op != SkillProgramEffectOp.PlaceCapturedEquipmentAndDraw || op.SourceBind != r.SourceBind || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || f.TriggerId is not null || r.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || f.SelectedTargetSeats is not [var target] || target != r.RecipientSeat || target == f.OwnerSeat || !set.CardIds.SequenceEqual([r.CardId]) || !set.SourceLocations.SequenceEqual([r.OriginalFrom]) || !f.SelectedCardIds.SequenceEqual(set.CardIds) || r.OriginalFrom.OwnerSeat != f.OwnerSeat || r.OriginalFrom.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId).IsGeneralWeapon || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId).Kind) || _coreEquipmentContentOperations.EquipmentRules.Get(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId).Kind).Slot != r.Slot || !Enum.IsDefined(r.Stage) || r.SequenceAfter <= r.SequenceBefore || r.SequenceBefore < 0 || r.Stage == CapturedEquipmentDrawStage.Placed && (r.DrawSequenceBefore != 0 || r.DrawSequenceAfter != 0 || r.ActualDrawCount != 0) || r.EntryMovementSequence <= r.SequenceBefore || r.EntryMovementSequence > r.SequenceAfter || _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence == r.EntryMovementSequence && m.CardId == r.CardId && m.From == r.OriginalFrom && m.To == CardLocation.Equipment(target) && m.Reason == CardMoveReasons.EquipmentEnter) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CapturedEquipmentPlacedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.RecipientSeat == target && e.CardId == r.CardId && e.OriginalFrom == r.OriginalFrom && e.Slot == r.Slot && e.ReplacedCardId == r.ReplacedCardId && e.ReplacedGeneralWeapon == r.ReplacedGeneralWeapon && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter && e.EntryMovementSequence == r.EntryMovementSequence) != 1)
-            throw new InvalidOperationException("Captured equipment placement lost its exact actual cost/entry and frozen original recipient.");
-        var replacements = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.From == CardLocation.Equipment(target) && m.Reason == CardMoveReasons.EquipmentReplace).ToArray();
-        if (r.ReplacedCardId is { } replaced)
-        {
-            if (replacements is not [var movement] || movement.CardId != replaced || replaced == r.CardId || _coreAdvancedLifecycleOperations.GetAdvancedCard(replaced).IsGeneralWeapon != r.ReplacedGeneralWeapon || movement.To != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.ReplacedCardId!.Value), CardLocation.Equipment(target), (r.ReplacedGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile)) || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(movement.CardKind) || _coreEquipmentContentOperations.EquipmentRules.Get(movement.CardKind).Slot != r.Slot)
-                throw new InvalidOperationException("Captured equipment placement lost its first replaced physical/generated identity.");
-        }
-        else if (replacements.Length > 0 || r.ReplacedGeneralWeapon)
-            throw new InvalidOperationException("An unoccupied original slot cannot carry a replacement receipt.");
-        var payment = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter).ToArray();
-        var movedOx = _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId).Kind == CardKind.WoodenOx && r.OriginalFrom == CardLocation.Equipment(f.OwnerSeat);
-        var replacedOx = r.ReplacedCardId is { } oldOx && _coreAdvancedLifecycleOperations.GetAdvancedCard(oldOx).Kind == CardKind.WoodenOx;
-        if (payment.Any(m => !(m.Sequence == r.EntryMovementSequence && m.CardId == r.CardId && m.From == r.OriginalFrom && m.To == CardLocation.Equipment(target) && m.Reason == CardMoveReasons.EquipmentEnter) && !(m.CardId == r.ReplacedCardId && m.From == CardLocation.Equipment(target) && m.To == _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.ReplacedCardId!.Value), CardLocation.Equipment(target), (r.ReplacedGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile)) && m.Reason == CardMoveReasons.EquipmentReplace) && !(movedOx && m.From == CardLocation.WoodenOxGrain(f.OwnerSeat) && m.To == CardLocation.WoodenOxGrain(target) && m.Reason == CardMoveReasons.WoodenOxTransfer) && !(replacedOx && m.From == CardLocation.WoodenOxGrain(target) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard)))
-            throw new InvalidOperationException("Captured equipment placement contains a movement outside its exact equipment/WoodenOx payment.");
-        if (r.Stage == CapturedEquipmentDrawStage.Drawn)
-        {
-            if (r.ActualDrawCount < 0 || r.ActualDrawCount > op.Amount || r.DrawSequenceBefore < r.SequenceAfter || r.DrawSequenceAfter < r.DrawSequenceBefore || _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.DrawSequenceBefore && m.Sequence <= r.DrawSequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == $"skill-program.{(f.SkillId)}.captured-equipment-reward") != r.ActualDrawCount || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CapturedEquipmentRewardDrawnEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Requested == op.Amount && e.Actual == r.ActualDrawCount && e.SequenceBefore == r.DrawSequenceBefore && e.SequenceAfter == r.DrawSequenceAfter) != 1 || _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence > r.DrawSequenceBefore && m.Sequence <= r.DrawSequenceAfter && !(m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == $"skill-program.{(f.SkillId)}.captured-equipment-reward") && !(m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle)))
-                throw new InvalidOperationException("Captured equipment placement lost its one-time real draw tail.");
-        }
     }
 }

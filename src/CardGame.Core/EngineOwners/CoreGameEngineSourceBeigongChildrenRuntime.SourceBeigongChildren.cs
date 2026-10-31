@@ -62,7 +62,6 @@ internal sealed partial class CoreGameEngineSourceBeigongChildrenRuntime
     internal bool SourceBeigongDamageWindow(long id) => SourceBeigongRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 24510)]
     internal bool SourceBeigongBeforeDamage(long id) => SourceBeigongRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 24510)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 24510)]
     internal bool SourceBeigongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && SourceBeigongRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 24510)]

@@ -5,7 +5,6 @@ internal sealed partial class CharacterLiYiOlEntries
     internal void AddLiYiAttackRangeBaseTerms(global::CardGame.Core.ProgramAttackRangeQuery query, global::System.Collections.Generic.List<global::CardGame.Core.RuleQueryBaseTerm> terms) => _resolve().AddLiYiAttackRangeBaseTerms(query, terms);
     internal bool AdvanceLiYiChildren() => _resolve().AdvanceLiYiChildren();
     internal void AnswerChanshuang(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerChanshuang(selected);
-    internal void AssertLiYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLiYi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginChanshuang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginChanshuang(supplied, op);
     internal void BeginChanshuangFactionRequest(global::CardGame.Core.ProgramSkillFrame f, int actor, int target) => _resolve().BeginChanshuangFactionRequest(f, actor, target);
     internal void BindChanshuangSlashUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().BindChanshuangSlashUse(supplied);
@@ -36,7 +35,6 @@ internal sealed partial class CharacterLiYiOlEntries
     internal bool IsChanshuangSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsChanshuangSlashQuery(actor);
     internal bool IsChanshuangSlashRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsChanshuangSlashRequest(f);
     internal bool IsIssuedChanshuangUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedChanshuangUse(use);
-    internal bool IsLiYiDying() => _resolve().IsLiYiDying();
     internal bool IsLiYiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLiYiMovement(f, effect, pending);
     internal bool IsLiYiPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsLiYiPaidMovement(f, m);
     internal bool IsLiYiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiYiRecoveryParent(f, recovery);

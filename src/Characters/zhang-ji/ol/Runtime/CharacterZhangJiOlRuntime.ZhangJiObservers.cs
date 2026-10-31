@@ -53,17 +53,6 @@ internal sealed partial class CharacterZhangJiOlRuntime
         return gains.Length == 0 && (r.Stage != "damage" || r.FinalRank == r.ChosenRank && events.OfType<ZhangJiDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == f.OwnerSeat && e.Target == target && e.Amount == 2) == 1);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 250)]
-    internal void AssertZhangJi(ProgramSkillFrame f)
-    {
-        if (f.ZhangJi is null)
-            return;
-        if (!ValidZhangJi(f))
-            throw new InvalidOperationException("Zhang Ji lost its original binding, rank, native judge result, movement or distinct equipment invoices.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && f.ZhangJi.Stage == "rank" && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && (p.PlayerSeat != f.ZhangJi.Target || !p.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhangJiChoices(f))))
-            throw new InvalidOperationException("Lueming cannot expose the rank choice to a different actor.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 210)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 210)]
     internal bool CanContinueZhangJi(ProgramSkillFrame f) => ValidZhangJi(f);
@@ -83,8 +72,6 @@ internal sealed partial class CharacterZhangJiOlRuntime
     }
 
     internal ProgramSkillFrame? ZhangJiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangJiOlOperations.ZhangJiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 140)]
-    internal bool IsZhangJiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ZhangJiObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 170)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 280)]
     internal bool HasZhangJiDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(x => x.Id == id && x is DamageTriggerWindowFrame) && ZhangJiObserverRoot()is not null;

@@ -76,6 +76,4 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureObserversRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1900)]
     internal bool HasPhaseHandSeizureDamageObserver(long windowId) => PhaseHandSeizureObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == windowId && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 160, group: 10)]
-    internal bool IsPhaseHandSeizureProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PhaseHandSeizureObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

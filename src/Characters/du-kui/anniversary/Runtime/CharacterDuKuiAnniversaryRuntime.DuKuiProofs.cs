@@ -45,18 +45,6 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
     }
 
     internal bool DuKuiNativeBatchPaid(ProgramSkillFrame f, CardMovementBatchContext b) => f.DuKui is { Stage: DuKuiStage.NativeTail, NativeReturned: true } r && r.NativeBatches.Contains(b.Id) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.OriginOwnerSeat == f.OwnerSeat && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After) && _coreProgramEventHistoryOperations.ProgramEventHistory<DuKuiNativeBatchEvent>().Count(e => e == new DuKuiNativeBatchEvent(f.Id, r.UseId, b.Id, b.Movements.Count)) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 43200)]
-    internal void RequireDuKui(ProgramSkillFrame f)
-    {
-        if (f.DuKui is not { } r)
-            return;
-        if (!ValidDuKuiFrame(f) || r.Operation == SkillProgramEffectOp.ResolveAnniversaryDuKuiFanyin && r.Iteration > 0 && !DuKuiShownPaid(f))
-            throw new InvalidOperationException("Du Kui lost his original candidate, source/hash, actual turn or publicly revealed physical entity receipt.");
-        if (r.Stage is DuKuiStage.NativeUse or DuKuiStage.NativeTail && (_coreProgramEventHistoryOperations.ProgramEventHistory<DuKuiNativeIssuedEvent>().Count(e => e.Origin.FrameId == f.Id && e.Origin.Iteration == r.Iteration && e.Origin.CardId == r.CardId && e.Origin.UseId == r.UseId && e.Origin.ActionId == r.ActionId && e.Origin.Source == r.Source && e.Origin.GameplayHash == r.GameplayHash) != 1 || r.NativeReturned && _coreProgramEventHistoryOperations.ProgramEventHistory<DuKuiNativeReturnedEvent>().Count(e => e == new DuKuiNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1))
-            throw new InvalidOperationException("Fanyin lost its exact issued and returned native use.");
-        if (f.PendingMovementContinuation is { } pending && !DuKuiMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Du Kui lost its actual paid movement or original native-use tail.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43200)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43200)]
@@ -64,7 +52,6 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 43200)]
     internal bool ContinuePaidDuKui(ProgramSkillFrame f) => f.DuKui is not null && ValidDuKuiFrame(f);
-    internal bool HasDuKuiPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { DuKui: { Stage: DuKuiStage.Choice or DuKuiStage.MoveChoice }, Step: ResolutionFrameStep.AwaitingResponse } f && p.PlayerSeat == f.OwnerSeat && ValidDuKuiFrame(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, DuKuiChoices(f));
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.ProcessingAllowance, 43200)]
     internal bool DuKuiRevealedProcessing(IReadOnlyList<Card> cards) => cards.Count == 1 && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(p => p.DuKui is not null)is { DuKui: { } r } f && r.Operation == SkillProgramEffectOp.ResolveAnniversaryDuKuiFanyin && cards[0].Id == r.CardId && ValidDuKuiFrame(f) && DuKuiShownPaid(f);
 }

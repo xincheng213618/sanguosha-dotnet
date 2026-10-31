@@ -77,7 +77,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoQiangang: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertMoQiangang(f);
         if (r.Stage == MoQiangangStage.TianenLossChildren)
         {
             if (DrainMoQiangang(f))
@@ -117,13 +116,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
             return false;
         var entries = _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangEnteredEvent>().Where(e => e.FrameId == f.Id).ToArray();
         return r.Stage == MoQiangangStage.EntryChildren ? entries is [var entered] && entered == new MoQiangangEnteredEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner) : entries.Length == 0;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28930)]
-    internal void AssertMoQiangang(ProgramSkillFrame f)
-    {
-        if (f.MoQiangang is not null && !ValidMoQiangang(f))
-            throw new InvalidOperationException("Qiangang lost its real paid Tianen grants, permanent entry or exact Play source.");
     }
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 28930)]

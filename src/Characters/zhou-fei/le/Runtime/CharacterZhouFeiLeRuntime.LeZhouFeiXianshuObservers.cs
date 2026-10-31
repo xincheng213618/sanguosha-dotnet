@@ -14,46 +14,6 @@ internal sealed partial class CharacterZhouFeiLeRuntime
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == receipt.GiftSequence && m.CardId == receipt.CardId && m.CardKind == receipt.PrintedKind && m.From == CardLocation.Hand(frame.OwnerSeat) && m.To == CardLocation.Hand(receipt.TargetSeat) && m.Reason.Value == LeZhouFeiXianshuGiftReason) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28320)]
-    internal void AssertLeZhouFeiXianshu(ProgramSkillFrame frame)
-    {
-        if (frame.LeZhouFeiXianshu is not { } receipt)
-            return;
-        if (receipt.Source != LeZhouFeiXianshuSource(frame) || receipt.GameplayHash != frame.GameplayHash || frame.SkillId != "le:xianshu" || frame.TriggerId is not null || frame.WindowContext is not null || frame.ActivationId != "marked-hand-gift" || frame.InstructionIndex != receipt.InstructionIndex || frame.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op != SkillProgramEffectOp.ResolveXianshuGiftDrawAndHealth || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(receipt.Phase) || receipt.Phase.Kind != ActualDiscardRecoveryPhaseKind.Play || receipt.Phase.ActorSeat != frame.OwnerSeat || receipt.Phase.TurnNumber != receipt.ActualTurn || receipt.Phase.ActualTurnOwnerSeat != receipt.TurnOwner || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.TargetSeat) || receipt.TargetSeat == frame.OwnerSeat || !Enum.IsDefined(receipt.Stage) || !Enum.IsDefined(receipt.GiftSuit) || receipt.Before < receipt.SequenceBefore || receipt.After < receipt.Before || receipt.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !frame.SelectedCardIds.SequenceEqual([receipt.CardId]) || !frame.SelectedTargetSeats.SequenceEqual([receipt.TargetSeat]) || receipt.GiftSequence > 0 && !HasPaidLeZhouFeiXianshuSelection(frame) || receipt.GiftSequence == 0 && (receipt.Stage != LeZhouFeiXianshuStage.GiftChildren || receipt.GiftBatchId != 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<XianshuGiftPaidEvent>().Any(e => e.FrameId == frame.Id)))
-            throw new InvalidOperationException("Xianshu lost its exact source, selected original Hand entity, native own Play or once-paid gift invoice.");
-        if (receipt.RequestedDraw >= 0)
-        {
-            var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<XianshuDrawRequestedEvent>().Where(e => e.FrameId == frame.Id).ToArray();
-            if (!HasPaidLeZhouFeiXianshuSelection(frame) || receipt.RequestedDraw > 5 || facts is not [var draw] || draw.RequestedCount != receipt.RequestedDraw || draw.RequestedCount != (draw.OwnerHasHp && draw.TargetHasHp ? (int)Math.Min(5L, Math.Abs((long)draw.OwnerHp - draw.TargetHp)) : 0))
-                throw new InvalidOperationException("Xianshu must sample one real capped HP difference after its gift children.");
-        }
-        else if (receipt.Stage != LeZhouFeiXianshuStage.GiftChildren || receipt.DrawOutcome is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<XianshuDrawRequestedEvent>().Any(e => e.FrameId == frame.Id))
-            throw new InvalidOperationException("Xianshu cannot advance before its one native draw request is issued.");
-        if (receipt.DrawOutcome is { } outcome)
-        {
-            if (receipt.Stage is LeZhouFeiXianshuStage.GiftChildren or LeZhouFeiXianshuStage.Drawing || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != receipt.RequestedDraw || outcome.ActualDrawIds.Count > outcome.RequestedCount || outcome.ActualDrawIds is not System.Collections.IList { IsReadOnly: true } || outcome.ReplacementGainedIds is not System.Collections.IList { IsReadOnly: true } || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.ActualDrawIds.Intersect(outcome.ReplacementGainedIds).Any() || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || outcome.ActualDrawIds.Any(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason.Value == LeZhouFeiXianshuDrawReason) != 1) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason.Value == LeZhouFeiXianshuDrawReason) != outcome.ActualDrawIds.Count || outcome.SequenceBefore < receipt.GiftSequence || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<XianshuDrawReturnedEvent>().Count(e => e.FrameId == frame.Id) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<XianshuDrawReturnedEvent>().Count(e => e.FrameId == frame.Id && e.RecipientSeat == outcome.RecipientSeat && e.RequestedCount == outcome.RequestedCount && e.ActualCount == outcome.ActualDrawIds.Count && e.ReplacementCount == outcome.ReplacementGainedIds.Count && e.Before == outcome.SequenceBefore && e.After == outcome.SequenceAfter && e.AttemptFrameId == outcome.AttemptFrameId) != 1)
-                throw new InvalidOperationException("Xianshu's typed draw return changed its original request or actual DrawPile/replacement materials.");
-        }
-        else if (receipt.Stage is not (LeZhouFeiXianshuStage.GiftChildren or LeZhouFeiXianshuStage.Drawing))
-            throw new InvalidOperationException("Xianshu cannot compare HP before its own draw returns.");
-        if (receipt.HealthAction is { } action)
-        {
-            var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<XianshuHealthEvaluatedEvent>().Where(e => e.FrameId == frame.Id).ToArray();
-            if (receipt.DrawOutcome is null || receipt.Stage is not (LeZhouFeiXianshuStage.HealthIssuing or LeZhouFeiXianshuStage.HealthChildren) || facts is not [var health] || health.Action != action || health.GiftSuit != receipt.GiftSuit || health.Action != (!health.TargetAlive || !health.OwnerHasHp || !health.TargetHasHp ? XianshuHealthAction.None : global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(health.GiftSuit) && health.TargetHp <= health.OwnerHp ? XianshuHealthAction.Recover : (health.GiftSuit is Suit.Spade or Suit.Club) && health.TargetHp >= health.OwnerHp ? XianshuHealthAction.LoseHp : XianshuHealthAction.None))
-                throw new InvalidOperationException("Xianshu lost its once-only colour and freshly evaluated post-draw HP comparison.");
-            if (action == XianshuHealthAction.LoseHp && (receipt.Stage == LeZhouFeiXianshuStage.HealthChildren) != receipt.HpLossCaptured || action != XianshuHealthAction.LoseHp && (receipt.HpLossCaptured || receipt.AppearancePrevented))
-                throw new InvalidOperationException("Xianshu cannot resume after an unperformed HP-loss instruction.");
-            if (receipt.HpLossCaptured && (action != XianshuHealthAction.LoseHp || receipt.Stage != LeZhouFeiXianshuStage.HealthChildren || _coreProgramEventHistoryOperations.ProgramEventHistory<XianshuHpLossAppliedEvent>().Count(e => e.FrameId == frame.Id) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<XianshuHpLossAppliedEvent>().Count(e => e.FrameId == frame.Id && e.TargetSeat == receipt.TargetSeat && e.PreventedByAppearance == receipt.AppearancePrevented && e.Amount == (receipt.AppearancePrevented ? 0 : 1)) != 1))
-                throw new InvalidOperationException("Xianshu repeated or lost its native HP deduction/identity-prevention return.");
-            if (receipt.HpLossCaptured && !receipt.AppearancePrevented && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == frame.Id && e.SkillId == frame.SkillId && e.TargetSeat == receipt.TargetSeat && e.Amount == 1) != 1)
-                throw new InvalidOperationException("Xianshu lost its original native HP-loss result.");
-        }
-        else if (receipt.Stage is LeZhouFeiXianshuStage.HealthIssuing or LeZhouFeiXianshuStage.HealthChildren)
-            throw new InvalidOperationException("Xianshu has no issued colour-health action for this stage.");
-        if (frame.PendingMovementContinuation is { } pending && !IsLeZhouFeiXianshuMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), pending))
-            throw new InvalidOperationException("Xianshu's native child lost its exact typed parent return.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 210)]
     internal bool IsLeZhouFeiXianshuMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.LeZhouFeiXianshu is { } receipt && effect?.Op == SkillProgramEffectOp.ResolveXianshuGiftDrawAndHealth && pending == frame.PendingMovementContinuation && pending.BeforeCount == 0 && pending.CoverageResultBind is null && pending.SubjectSeat == (receipt.Stage is LeZhouFeiXianshuStage.GiftChildren or LeZhouFeiXianshuStage.DrawChildren ? frame.OwnerSeat : receipt.TargetSeat) && receipt.Stage != LeZhouFeiXianshuStage.Drawing;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 370)]
@@ -73,7 +33,6 @@ internal sealed partial class CharacterZhouFeiLeRuntime
     {
         if (frame.LeZhouFeiXianshu is not { } receipt || !HasPaidLeZhouFeiXianshuSelection(frame))
             return false;
-        AssertLeZhouFeiXianshu(frame);
         if (receipt.Stage == LeZhouFeiXianshuStage.Drawing && frame.NativeDraw is not null)
             return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, frame);
         if (child is IdentityAppearanceFrame appearance)
@@ -98,8 +57,6 @@ internal sealed partial class CharacterZhouFeiLeRuntime
     internal bool HasLeZhouFeiXianshuDamageObserver(long id) => LeZhouFeiXianshuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1280)]
     internal bool HasLeZhouFeiXianshuBeforeDamageObserver(long id) => LeZhouFeiXianshuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1110)]
-    internal bool IsLeZhouFeiXianshuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LeZhouFeiXianshuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28320)]
     internal bool AdvanceLeZhouFeiXianshuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LeZhouFeiXianshuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

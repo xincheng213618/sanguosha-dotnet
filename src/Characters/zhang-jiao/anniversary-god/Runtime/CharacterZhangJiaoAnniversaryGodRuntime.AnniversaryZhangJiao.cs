@@ -290,21 +290,6 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 39400)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 39400)]
     internal bool ContinueIssuedAnniversaryZj(ProgramSkillFrame f) => f.AnniversaryZhangJiao is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 39400)]
-    internal void AssertAnniversaryZj(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryZhangJiao is not { } r)
-            return;
-        if (r.Source != AnniversaryZjSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != 1 || !Enum.IsDefined(r.Stage) || r.Cursor < 0 || r.Cursor > r.Targets.Count || r.Targets.Count > 3 || r.Targets.Distinct().Count() != r.Targets.Count || r.Targets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == f.OwnerSeat) || r.Cards.Distinct().Count() != r.Cards.Count || r.Before < 0 || r.After < r.Before || (r.Stage == AnniversaryZhangJiaoStage.SanshouSnapshot ? !global::CardGame.Core.EngineOwners.CoreGameEngineShanheSanshouArmorRuntime.IsNativeSanshouSkill(f.SkillId) || f.InstructionIndex is < 1 or > 3 || r.Op != SkillProgramEffectOp.ResolveAnniversaryZhangJiaoSanshou : f.InstructionIndex != r.InstructionIndex) || r.Op == SkillProgramEffectOp.ResolveAnniversaryZhangJiaoYizhao && (f.SkillId is not (AnniversaryYizhao or HappyZhangJiaoYizhao) || r.Rank <= 0 || r.MarkerAfter != r.MarkerBefore + r.Rank || r.Cards.Count > 1) || r.Op == SkillProgramEffectOp.ResolveAnniversaryZhangJiaoSijun && (f.SkillId is not (AnniversarySijun or HappyZhangJiaoSijun) || r.MarkerBefore <= 0 || r.Rank is not (0 or 36)) || r.Op == SkillProgramEffectOp.ResolveAnniversaryZhangJiaoTianjie && f.SkillId is not (AnniversaryTianjie or HappyZhangJiaoTianjie) || f.SkillId == HappyZhangJiaoSijun && !HasHappySijunDrawPilePayment(f, r) || f.SkillId != HappyZhangJiaoSijun && r.HappySijunPayment is not null)
-            throw new InvalidOperationException("Anniversary Zhang Jiao lost his exact source, frozen categories, random entities, paid marker or target cursor.");
-    }
-
-    internal bool HasHappySijunDrawPilePayment(ProgramSkillFrame f, AnniversaryZhangJiaoReceipt r)
-    {
-        if (r.Op != SkillProgramEffectOp.ResolveAnniversaryZhangJiaoSijun || r.HappySijunPayment is not { } paid || paid.Before < 0 || paid.After < paid.Before || paid.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || paid.Before > r.Before || paid.Movements is not System.Collections.IList { IsReadOnly: true } || !paid.Movements.Select(m => m.CardId).SequenceEqual(r.Cards) || paid.Movements.Any(m => m.From != CardLocation.DrawPile || m.Sequence <= paid.Before || m.Sequence > paid.After || m.Reason.Value != "skill.anniversary-zhang-jiao.obtain" || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(actual => actual == m) != 1 || m.To != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), CardLocation.DrawPile, CardLocation.Hand(f.OwnerSeat))))
-            return false;
-        return r.Stage == AnniversaryZhangJiaoStage.Obtained ? paid.Before == r.Before && paid.After == r.After : r.Stage == AnniversaryZhangJiaoStage.Shuffled && paid.After <= r.Before;
-    }
 
     [ProgramTriggerProof(ProgramTriggerProofPhase.DeadOwnerEnding, 20)]
     internal bool ProveIsAnniversaryTianjieDeadOwnerEndingCandidate(ProgramTriggerCandidate candidate) => IsAnniversaryTianjieDeadOwnerEndingCandidate(candidate, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);

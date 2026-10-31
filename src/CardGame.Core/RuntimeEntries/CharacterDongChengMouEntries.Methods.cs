@@ -9,7 +9,6 @@ internal sealed partial class CharacterDongChengMouEntries
     internal bool ContinueMouDcSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().ContinueMouDcSlash(attack);
     internal bool FinishMouDcZeroAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouDcZeroAttack(attack, out paused);
     internal bool IsMouDcClaimedEntity(long useId, int card) => _resolve().IsMouDcClaimedEntity(useId, card);
-    internal bool IsMouDcZeroAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouDcZeroAttackConsistent(attack, processing);
     internal bool IsMouDcZeroUse(long id) => _resolve().IsMouDcZeroUse(id);
     internal void IssueMouDcUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouDcUse(f);
     internal bool MatchesMouDcNativeAction(long id, global::CardGame.Core.CardActionContext a, int card) => _resolve().MatchesMouDcNativeAction(id, a, card);

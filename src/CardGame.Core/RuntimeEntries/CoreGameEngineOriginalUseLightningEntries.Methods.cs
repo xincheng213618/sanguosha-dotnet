@@ -15,10 +15,8 @@ internal sealed partial class CoreGameEngineOriginalUseLightningEntries
     internal bool ExactOriginalUseLightning(global::CardGame.Core.OriginalUseLightningAttachment a) => _resolve().ExactOriginalUseLightning(a);
     internal bool FinishOriginalUseLightningAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().FinishOriginalUseLightningAttack(attack);
     internal bool HasHeldOriginalUseLightning(global::CardGame.Core.CharacterState player) => _resolve().HasHeldOriginalUseLightning(player);
-    internal bool HasNativeDelayedAttackChild(long judgmentId) => _resolve().HasNativeDelayedAttackChild(judgmentId);
     internal global::CardGame.Core.OriginalUseLightningAttachment? HeldOriginalUseLightning(long id) => _resolve().HeldOriginalUseLightning(id);
     internal bool IsOriginalUseLightning(long id) => _resolve().IsOriginalUseLightning(id);
-    internal bool IsOriginalUseLightningAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsOriginalUseLightningAttackConsistent(attack, processing);
     internal bool IsOriginalUseLightningFinalizedWindow(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().IsOriginalUseLightningFinalizedWindow(window);
     internal bool IsOriginalUseLightningJudgment(global::CardGame.Core.JudgmentFrame j) => _resolve().IsOriginalUseLightningJudgment(j);
     internal bool MatchesOriginalUseLightningAction(long id, global::CardGame.Core.CardActionContext action, int cardId) => _resolve().MatchesOriginalUseLightningAction(id, action, cardId);

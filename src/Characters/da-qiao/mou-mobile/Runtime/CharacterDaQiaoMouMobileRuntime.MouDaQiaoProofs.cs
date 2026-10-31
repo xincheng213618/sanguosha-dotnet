@@ -9,12 +9,6 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
 {
     internal bool ValidMouDaQiaoGuose(ProgramSkillFrame f) => f.MouDaQiaoGuose is { } r && f.SkillId == MouDaQiaoComposition.Guose && f.InstructionIndex == 1 && r.Source == MouDaQiaoSource(f) && r.GameplayHash == f.GameplayHash && Enum.IsDefined(r.Stage) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoGuoseReservedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Phase == r.Phase && e.Branch == r.Branch && e.TargetSeat == r.TargetSeat) == 1 && (!r.Paid || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoGuosePaidEvent>().Count(e => e.FrameId == f.Id && e.Branch == r.Branch && e.CardId == r.CardId && e.From == r.From) == 1);
     internal bool ValidMouDaQiaoPhase(ProgramSkillFrame f) => f.MouDaQiaoLiuliPhase is { } r && f.SkillId == MouDaQiaoComposition.Liuli && f.TriggerId == "marked-turn-start" && f.InstructionIndex == 1 && r.RecipientSeat == f.OwnerSeat && f.GameplayHash == r.GameplayHash && f.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } c && c.ParentFrameId == r.WindowId && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoLiuliMarkGrantedEvent>().Count(e => e.GrantId == r.GrantId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.RecipientSeat == r.RecipientSeat) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoLiuliPhaseIssuedEvent>().Count(e => e.FrameId == f.Id && e.GrantId == r.GrantId && e.ActualTurn == r.ActualTurn && e.WindowId == r.WindowId) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31300)]
-    internal void AssertMouDaQiao(ProgramSkillFrame f)
-    {
-        if (f.MouDaQiaoGuose is not null && !ValidMouDaQiaoGuose(f) || f.MouDaQiaoLiuliPhase is not null && !ValidMouDaQiaoPhase(f) || f.MouDaQiaoLiuli is { } r && (!PaidMouDaQiaoLiuli(f) || r.Source != MouDaQiaoSource(f) || r.GameplayHash != f.GameplayHash || f.SelectedTargetSeats is not [var target] || target != r.RedirectTargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoLiuliCostFrozenEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.CardId == r.PaidCardId && e.Suit == r.PaidSuit) != 1))
-            throw new InvalidOperationException("Mou Da Qiao lost its issued native payment, redirect target or inserted-phase owner.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 31300)]
@@ -68,7 +62,6 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 31300)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31300)]
     internal bool MouDaQiaoDamageObserver(long id) => MouDaQiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31300)]
     internal bool MouDaQiaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouDaQiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31300)]

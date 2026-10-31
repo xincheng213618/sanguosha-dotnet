@@ -46,7 +46,6 @@ internal sealed partial class CharacterLuSuMobileGodRuntime
     internal void AnswerShenLs(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Shen Lu Su lost his active choice parent.");
-        RequireShenLs(f);
         var r = f.ShenLuSu ?? throw new InvalidOperationException("Shen Lu Su lost his issued choice.");
         var current = ShenLsChoices(f).SingleOrDefault(c => c.Id == chosen.Id && c.Cards.SequenceEqual(chosen.Cards) && c.Targets.SequenceEqual(chosen.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(chosen.Parameters.OrderBy(x => x.Key))) ?? throw new InvalidOperationException("Shen Lu Su requires the exact current private entity or public participant.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

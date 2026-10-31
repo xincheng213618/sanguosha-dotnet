@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDrawAdviceProgramsEntries
 {
-    internal void AssertDrawAdviceReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertDrawAdviceReceipt(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDrawAdvice(global::CardGame.Core.ProgramSkillFrame input, int recipient) => _resolve().BeginDrawAdvice(input, recipient);
     internal bool CanContinueIssuedDrawAdvice(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueIssuedDrawAdvice(frame);
     internal bool DrainDrawAdviceChildren(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DrainDrawAdviceChildren(frame);

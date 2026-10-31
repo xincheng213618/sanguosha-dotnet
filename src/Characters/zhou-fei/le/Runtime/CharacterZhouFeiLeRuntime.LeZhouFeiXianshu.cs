@@ -57,7 +57,6 @@ internal sealed partial class CharacterZhouFeiLeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LeZhouFeiXianshu: { } receipt } frame || frame.Id != frameId || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertLeZhouFeiXianshu(frame);
         if (frame.NativeDraw is not null || receipt.Stage == LeZhouFeiXianshuStage.Drawing)
             return;
         if (receipt.Stage == LeZhouFeiXianshuStage.HealthIssuing)

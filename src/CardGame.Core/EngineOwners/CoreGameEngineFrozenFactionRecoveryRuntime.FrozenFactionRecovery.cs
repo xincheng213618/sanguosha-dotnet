@@ -36,15 +36,4 @@ internal sealed partial class CoreGameEngineFrozenFactionRecoveryRuntime
         if (count > 0)
             _coreProgramLifecycleOperations.DrawProgramCards(f.Id, f.OwnerSeat, count, null, null, SkillProgramCardSetVisibility.Private, new("program.frozen-faction-recovery.draw"));
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 250)]
-    internal void AssertFrozenFactionRecovery(ProgramSkillFrame f)
-    {
-        if (f.FrozenFactionRecovery is not { } r)
-            return;
-        var factions = _coreProgramExpressionsOperations.ReadProgramExpressionNumber(f, FrozenFactionRecoveryComposition.FactionNumber);
-        var damage = _coreProgramExpressionsOperations.ReadProgramExpressionNumber(f, FrozenFactionRecoveryComposition.DamageNumber);
-        if (r.InstructionIndex != 1 || factions is not { } factionCount || factionCount < 1 || factionCount > _coreMatchParticipantsPlayersAccess._players.Count || damage is not { } damagePoints || damagePoints < 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != r.DyingFrameId || f.InstructionIndex is < 1 or > 3 || r.DrawIssued != (f.InstructionIndex >= 2) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FrozenFactionRecoveryCapturedEvent>().Any(e => e.FrameId == f.Id && e.Source == new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && e.DyingFrameId == r.DyingFrameId && e.FactionCount == factionCount && e.GameDamagePoints == damagePoints))
-            throw new InvalidOperationException("A frozen faction recovery lost its exact immutable amount/history receipt.");
-    }
 }

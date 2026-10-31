@@ -11,7 +11,6 @@ internal sealed partial class CoreGameEngineForcedPhaseAlcoholEntries
     internal void CommitPhaseAlcoholPayment(long id) => _resolve().CommitPhaseAlcoholPayment(id);
     internal bool HasExactPhaseAlcoholReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasExactPhaseAlcoholReceipt(f);
     internal bool HasPhaseAlcoholChain(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasPhaseAlcoholChain(frame);
-    internal bool IsExactPhaseAlcoholVirtualDraft(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramVirtualBasicDraft draft) => _resolve().IsExactPhaseAlcoholVirtualDraft(f, draft);
     internal bool PreparePhaseAlcoholPayment(global::CardGame.Core.ProgramSkillFrame f, string bind, global::CardGame.Core.CardMoveReason reason) => _resolve().PreparePhaseAlcoholPayment(f, bind, reason);
     internal bool ResumePhaseAlcohol(long id) => _resolve().ResumePhaseAlcohol(id);
 }

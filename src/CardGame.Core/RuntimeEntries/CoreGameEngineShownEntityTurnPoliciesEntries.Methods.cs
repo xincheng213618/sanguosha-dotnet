@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShownEntityTurnPoliciesEntries
 {
     internal void AssertShownEntityPolicyOrigin(global::CardGame.Core.ShownEntityTurnPolicy p) => _resolve().AssertShownEntityPolicyOrigin(p);
-    internal void AssertShownEntityTurnPrograms() => _resolve().AssertShownEntityTurnPrograms();
     internal void AssertShownEntityUseBenefits(global::CardGame.Core.CardUseFrame use) => _resolve().AssertShownEntityUseBenefits(use);
     internal bool CanOfferShownEntityTurnPolicy(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShownEntityTurnPolicy(candidate, trigger, context);
     internal global::System.Collections.Generic.IEnumerable<(global::CardGame.Core.CardUseEffectSource Source, int Amount)> GetShownEntityUseDamageBenefits(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().GetShownEntityUseDamageBenefits(attack);

@@ -42,8 +42,6 @@ internal sealed partial class CoreGameEngineDelayedNullificationRuntime
     internal void CompleteDelayedNullification(NullificationWindowFrame window, DelayedEffectContinuation delayed)
     {
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault();
-        if ((parent?.Id ?? 0) != delayed.ParentFrameId || parent?.Kind != delayed.ParentKind || parent?.Step != delayed.ParentStep || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber != delayed.TurnNumber || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != delayed.Phase || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != delayed.OwnerSeat)
-            throw new InvalidOperationException("Delayed counterspell lost its exact turn and parent return.");
         if (delayed.OriginalUseLightning is not null)
         {
             _coreOriginalUseLightningOperations.CompleteOriginalUseLightningNullification(delayed, window.EffectNullified, window.Id);

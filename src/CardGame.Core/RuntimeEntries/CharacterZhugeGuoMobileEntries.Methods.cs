@@ -4,7 +4,6 @@ internal sealed partial class CharacterZhugeGuoMobileEntries
 {
     internal bool AdvanceMobileQirangObserver() => _resolve().AdvanceMobileQirangObserver();
     internal void AssertMobileQirangGain(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileQirangGain(f);
-    internal void AssertMobileZhugeGuo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileZhugeGuo(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileZhugeGuo(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMobileZhugeGuo(supplied, op);
     internal bool CanOfferMobileZhugeGuo(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanOfferMobileZhugeGuo(g);
     internal void CaptureMobileQirangUse(global::CardGame.Core.IGameEvent payload) => _resolve().CaptureMobileQirangUse(payload);

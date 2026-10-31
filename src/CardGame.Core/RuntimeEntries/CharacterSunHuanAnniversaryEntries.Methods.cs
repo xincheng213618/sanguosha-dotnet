@@ -12,13 +12,11 @@ internal sealed partial class CharacterSunHuanAnniversaryEntries
     internal void DiscardSunHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DiscardSunHuan(f);
     internal bool DrainSunHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainSunHuan(f);
     internal void FinishSunHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSunHuan(f);
-    internal bool HasAnniversarySunHuanPrompt() => _resolve().HasAnniversarySunHuanPrompt();
     internal bool IsAnniversarySunHuanExactCardQuery(global::CardGame.Core.CharacterState actor, int? selectedPhysicalCardId) => _resolve().IsAnniversarySunHuanExactCardQuery(actor, selectedPhysicalCardId);
     internal bool IsSunHuanDeclarationQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsSunHuanDeclarationQuery(actor, id);
     internal bool IsSunHuanNative(global::CardGame.Core.CardUseFrame use) => _resolve().IsSunHuanNative(use);
     internal bool MatchesSunHuanDeclaration(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.CardDeclarationFrame d) => _resolve().MatchesSunHuanDeclaration(root, d);
     internal void PublishSunHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishSunHuan(f);
-    internal void RequireSunHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireSunHuan(f);
     internal bool RetainSunHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainSunHuan(f);
     internal bool ReturnSunHuanAttack() => _resolve().ReturnSunHuanAttack();
     internal void ReturnSunHuanDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome d) => _resolve().ReturnSunHuanDraw(supplied, d);

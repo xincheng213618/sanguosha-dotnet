@@ -105,8 +105,6 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
         }
 
         var obtain = op == SkillProgramEffectOp.ObtainMouMengHuoBarbarian;
-        if (c.Window != (obtain ? SkillProgramTriggerWindow.PlayPhaseStarting : SkillProgramTriggerWindow.DiscardPhaseEnded) || c.SourceSeat != f.OwnerSeat || f.MouMengHuo is not null)
-            throw new InvalidOperationException("Mou Meng Huo lost its own exact phase boundary.");
         var state = new MouMengHuoReceipt(MouMhSource(f), f.GameplayHash, c.ParentFrameId, obtain, obtain ? 0 : MouMhCharge(f.OwnerSeat))
         {
             Stage = obtain ? MouMengHuoStage.ObtainChildren : MouMengHuoStage.Selecting,

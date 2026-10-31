@@ -42,16 +42,5 @@ internal sealed partial class CoreGameEngineRecordedSuitSlashRuntime
                 _coreProgramPersistentStateOperations.SetProgramBooleanState(receipt.ActorSeat, receipt.SkillId, receipt.SkillInstanceId, ProgramRecordedSuitSlash.StateId(receipt.StatePrefix, suit), false);
     }
 
-    internal void AssertRecordedSuitSlashReceipts()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-            foreach (var receipt in use.RecordedSuitSlashReceipts ?? [])
-            {
-                var trigger = _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(receipt.SkillId)?.Program?.Triggers.SingleOrDefault(t => t.Id == receipt.TriggerId);
-                if (use.Action is not { } action || action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || receipt.CardUseFrameId != use.Id || receipt.ActionId != action.ActionId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.TargetSeat) || receipt.SuitMask is < 0 or > 15 || receipt.DamageBonus < 0 || receipt.DamageBonus > Math.Max(0, System.Numerics.BitOperations.PopCount((uint)receipt.SuitMask) - 1) || receipt.ProducerFrameId <= 0 || string.IsNullOrEmpty(receipt.SkillInstanceId) || _contentRegistryOperations._contentRegistry.GetSkill(receipt.SkillId).Program!.GameplayHash != receipt.GameplayHash || trigger is null || receipt.EffectIndex < 0 || receipt.EffectIndex >= trigger.Effects.Count || trigger.Effects[receipt.EffectIndex].Op != SkillProgramEffectOp.RevealRecordedSuitSlash || trigger.Effects[receipt.EffectIndex].StateId != receipt.StatePrefix)
-                    throw new InvalidOperationException("Recorded-suit Slash receipt lost its owning action or producer.");
-            }
-    }
-
     void global::CardGame.Core.IRecordedSuitSlashProgramHost.RevealRecordedSuitSlash(ProgramSkillFrame frame, SkillProgramEffect effect) => RevealRecordedSuitSlash(frame, effect);
 }

@@ -20,10 +20,8 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageObserversRuntime
 
     internal bool JoinedTrickDamageRewardStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => parent is ProgramSkillFrame root && JoinedTrickDamageRewardFirstChild(root, child) || parent is ProgramCardTriggerWindowFrame window && child is ProgramSkillFrame { JoinedTrickDamageRewardReceipt: not null } reward && reward.WindowContext?.ParentFrameId == window.Id && _coreJoinedTrickDamageRewardsOperations.ValidJoinedTrickDamageReward(reward);
     internal ProgramSkillFrame? JoinedTrickDamageRewardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreJoinedTrickDamageObserversOperations.JoinedTrickDamageRewardFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 20, group: 70)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30)]
     internal bool IsJoinedTrickDamageRewardDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && JoinedTrickDamageRewardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    internal bool HasJoinedTrickDamageRewardCardObserver(long useId) => JoinedTrickDamageRewardObserverRoot()is { } root && root.JoinedTrickDamageRewardReceipt!.Benefit.CardUseFrameId == useId;
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1670)]
     internal bool HasJoinedTrickDamageRewardDamageObserver(long id) => HasJoinedTrickDamageRewardObserver(id, false);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 230)]

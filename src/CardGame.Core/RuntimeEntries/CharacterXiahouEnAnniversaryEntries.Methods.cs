@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXiahouEnAnniversaryEntries
 {
     internal bool AdvanceXiahouEnObserver() => _resolve().AdvanceXiahouEnObserver();
-    internal void AssertXiahouEnShiwuDuelUse(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSelectedActorDuelOrigin origin) => _resolve().AssertXiahouEnShiwuDuelUse(use, origin);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAnniversaryXiahouEn(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginAnniversaryXiahouEn(supplied, operation);
     internal bool CanOfferAnniversaryXiahouEn(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferAnniversaryXiahouEn(candidate, trigger, context);
     internal void ContinueAnniversaryXiahouEn(long id) => _resolve().ContinueAnniversaryXiahouEn(id);
@@ -11,7 +10,6 @@ internal sealed partial class CharacterXiahouEnAnniversaryEntries
     internal bool HasXiahouEnPaidDamageObserver(long id) => _resolve().HasXiahouEnPaidDamageObserver(id);
     internal bool IsAnniversaryXiahouEnPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsAnniversaryXiahouEnPaidMovement(f, effect, pending);
     internal bool KeepIssuedAnniversaryXiahouEn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepIssuedAnniversaryXiahouEn(f);
-    internal void RequireAnniversaryXiahouEn(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().RequireAnniversaryXiahouEn(frame);
     internal void RestoreXiahouEnSwordAtActualTurnEnd(global::CardGame.Core.TurnEndedEvent ended) => _resolve().RestoreXiahouEnSwordAtActualTurnEnd(ended);
     internal bool ResumeAnniversaryXiahouEn(long id) => _resolve().ResumeAnniversaryXiahouEn(id);
     internal bool ReturnAnniversaryXiahouEnMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnAnniversaryXiahouEnMovement(f);

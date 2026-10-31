@@ -191,8 +191,6 @@ internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
-
-    internal bool IsOriginalUseLightningAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => attack.IsDelayedJudgmentDamage && attack.IsSourceLess && attack.Card is null && attack.PhysicalCards.Count == 0 && processing.Count == 0 && attack.EffectiveCardKind == CardKind.Lightning && _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == attack.ResolutionId)is { OriginalUseLightning: { } a } judgment && IsOriginalUseLightningJudgment(judgment) && attack.SourceSeat == a.Holder && attack.DelayedJudgmentSeat == a.Holder;
     internal bool FinishOriginalUseLightningAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
     {
         if (_resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == attack.ResolutionId)is not { OriginalUseLightning: { } a } judgment)
@@ -276,12 +274,6 @@ internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
         {
             NativeDelayedAttackReturn = new(judgmentId, child.Id)
         };
-    }
-
-    internal bool HasNativeDelayedAttackChild(long judgmentId)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == judgmentId);
-        return index >= 0 && index + 1 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[index] is JudgmentFrame { NativeDelayedAttackCompletion: { } completion } judgment && completion.ResolutionId == judgmentId && completion.DelayedTurn && completion.ProgramFrameId is null && completion.DelayedTurnSeat == judgment.TargetSeat && judgment.CardAttack is not null && _resolutionStackOperations._resolutionStack[index + 1] is ProgramSkillFrame { NativeDelayedAttackReturn: { } parentReturn } child && parentReturn.JudgmentId == judgmentId && parentReturn.ChildFrameId == child.Id;
     }
 
     internal void ResumeNativeDelayedAttackCompletion(long judgmentId)

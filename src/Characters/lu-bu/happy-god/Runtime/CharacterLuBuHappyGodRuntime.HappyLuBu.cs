@@ -128,7 +128,6 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyLuBu: { } r } f || f.Id != id)
             return false;
-        AssertHappyLuBu(f);
         if (r.Stage == HappyLuBuStage.BasicChildren)
         {
             if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id))
@@ -165,7 +164,6 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
     internal void AnswerHappyLuBuTarget(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Wuqian lost its target parent.");
-        AssertHappyLuBu(f);
         if (!HappyLuBuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Wuqian requires its exact published target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

@@ -4,7 +4,6 @@ internal sealed partial class CharacterTangTangOlEntries
 {
     internal bool AdvanceTangTangChildren() => _resolve().AdvanceTangTangChildren();
     internal void AnswerTangTang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerTangTang(choice);
-    internal void AssertTangTang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertTangTang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginTangTang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginTangTang(supplied, op);
     internal bool CanActivateZexing(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateZexing(c);
     internal void CaptureMovementBatchStartTangTangOwnedOrigins(global::CardGame.Core.CardMovementBatchBuilder batch) => _resolve().CaptureMovementBatchStartTangTangOwnedOrigins(batch);
@@ -24,7 +23,6 @@ internal sealed partial class CharacterTangTangOlEntries
     internal void FinishTangTang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishTangTang(f);
     internal bool HasTangTangBeforeDamageObserver(long id) => _resolve().HasTangTangBeforeDamageObserver(id);
     internal bool HasTangTangDamageObserver(long id) => _resolve().HasTangTangDamageObserver(id);
-    internal bool IsTangTangDying() => _resolve().IsTangTangDying();
     internal bool IsTangTangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsTangTangMovement(f, e, p);
     internal bool IsTangTangPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsTangTangPaidMovement(f, m);
     internal bool IsTangTangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsTangTangRecoveryParent(f, recovery);

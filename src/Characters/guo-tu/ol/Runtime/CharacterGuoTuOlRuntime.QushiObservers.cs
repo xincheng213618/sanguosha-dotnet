@@ -40,13 +40,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27460)]
-    internal void AssertQushi(ProgramSkillFrame f)
-    {
-        if (f.Qushi is not null && !ValidQushi(f))
-            throw new InvalidOperationException("Qushi lost its original source, typed holder Ending, physical seal or once-paid native movement interval.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 410)]
     internal bool IsQushiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.Qushi is { Paid: true } r && GuoTuQushiComposition.Handles(r.Op) && e?.Op == r.Op && p == f.PendingMovementContinuation && p.BeforeCount == 0 && p.CoverageResultBind is null && p.SubjectSeat == (r.Stage is QushiStage.DrawChildren or QushiStage.RewardChildren ? f.OwnerSeat : r.HolderSeat);
     internal bool QushiMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
@@ -76,8 +69,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
     internal bool HasQushiDamageObserver(long id) => QushiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1060)]
     internal bool HasQushiBeforeDamageObserver(long id) => HasQushiDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 890)]
-    internal bool IsQushiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && QushiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27460)]
     internal bool AdvanceQushiChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && QushiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

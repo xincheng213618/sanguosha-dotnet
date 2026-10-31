@@ -4,7 +4,6 @@ internal sealed partial class CharacterKeBiNengOlEntries
 {
     internal bool AdvanceKeBiNengSubtree() => _resolve().AdvanceKeBiNengSubtree();
     internal void AnswerKeBiNeng(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerKeBiNeng(choice);
-    internal void AssertKeBiNeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertKeBiNeng(f);
     internal void AssertKeBiNengNativeCompletion(global::CardGame.Core.CardUseFrame use) => _resolve().AssertKeBiNengNativeCompletion(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginKeBiNeng(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginKeBiNeng(input);
     internal void BeginKeBiNengPingduanBasicUse(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.LegalAction selected) => _resolve().BeginKeBiNengPingduanBasicUse(frame, selected);
@@ -19,7 +18,6 @@ internal sealed partial class CharacterKeBiNengOlEntries
     internal bool HasIssuedKeBiNengPingduanUse(long id, int actor) => _resolve().HasIssuedKeBiNengPingduanUse(id, actor);
     internal bool HasKeBiNengBeforeDamageObserver(long id) => _resolve().HasKeBiNengBeforeDamageObserver(id);
     internal bool HasKeBiNengDamageObserver(long id) => _resolve().HasKeBiNengDamageObserver(id);
-    internal bool IsKeBiNengDying() => _resolve().IsKeBiNengDying();
     internal bool IsKeBiNengPingduanBasicQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsKeBiNengPingduanBasicQuery(actor);
     internal bool IsKeBiNengPingduanPaymentFrame(global::CardGame.Core.ChainedStateBasicFrame paid) => _resolve().IsKeBiNengPingduanPaymentFrame(paid);
     internal bool IsKeBiNengPingduanPaymentFrame2(global::CardGame.Core.DrawFundedDistinctBasicFrame paid) => _resolve().IsKeBiNengPingduanPaymentFrame(paid);

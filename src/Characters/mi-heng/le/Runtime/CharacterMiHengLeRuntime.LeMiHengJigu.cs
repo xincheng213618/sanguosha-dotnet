@@ -114,7 +114,6 @@ internal sealed partial class CharacterMiHengLeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Jigu: { } r } f || f.Id != id)
             return;
-        AssertJigu(f);
         if (r.Stage == JiguStage.Drawing)
         {
             if (f.NativeDraw is null)

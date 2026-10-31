@@ -15,7 +15,6 @@ internal sealed partial class CharacterSimaYiMobileGodRuntime
     internal bool TryBeginMobileSimaRenjieBorrowedSword(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => _mobileSimaRenjieOperations.Get().TryBeginMobileSimaRenjieBorrowedSword(ProjectMobileSimaSword(pending));
     internal bool TryBeginMobileSimaRenjieQizheng(CardUseFrame use) => _mobileSimaRenjieOperations.Get().TryBeginMobileSimaRenjieQizheng(use);
     internal bool MobileSimaRenjieStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _mobileSimaRenjieOperations.Get().MobileSimaRenjieStructuralEdge(parent, child);
-    internal bool HasMobileSimaRenjieNativeSubtree(long useId) => _mobileSimaRenjieOperations.Get().HasMobileSimaRenjieNativeSubtree(useId);
     bool global::CardGame.Core.IMobileSimaRenjieOperations.BeginInvocation(long frameId, int owner, string skillId, string occurrence, string instance) => _characterHuaTuoAnniversaryGodOperations.TryBeginSkillInvocation(frameId, owner, skillId, occurrence, instance);
     void global::CardGame.Core.IMobileSimaRenjieOperations.SetMarkerSourceCount(int owner, PlayerMarkerKind marker, int source, int count) => _coreMatchParticipantsPlayersAccess._players[owner].MarkerSourceCounts[(marker, source)] = count;
     void global::CardGame.Core.IMobileSimaRenjieOperations.SetMarkerCount(int owner, PlayerMarkerKind marker, int count) => _coreMatchParticipantsPlayersAccess._players[owner].Markers[marker] = count;

@@ -34,12 +34,6 @@ internal interface IDamageAdjacencyProtocols : IProgramRuntimeOperations
     bool IsWenyiDamageHealthReturn(DamageFrame damage, HpChangedTriggerWindowFrame health);
     bool IsHappyQiaoDamageHealthReturn(DamageFrame damage, HpChangedTriggerWindowFrame health);
     bool IsAmountSupportHealthChild(ResolutionFrame parent, HpChangedTriggerWindowFrame health);
-    TypedRecoveryDamageCursorProjection ProjectTypedRecoveryDamageCursor(long windowId);
-    ProgramSkillFrame? MouLixianDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId);
-    ProgramSkillFrame? AlcoholSlashReplacementDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId);
-    ProgramSkillFrame? RandomDamageTargetSkillDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId);
-    ProgramSkillFrame? DamageTargetSkillRoundDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId);
-    bool MatchesObserver(ProgramObserverProofPhase phase, long windowId);
     bool HasPaidFactionRequestCostRecovery(PaidFactionRequestCostRecovery receipt);
 }
 

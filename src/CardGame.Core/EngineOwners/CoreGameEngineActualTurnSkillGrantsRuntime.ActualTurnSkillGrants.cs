@@ -49,8 +49,6 @@ internal sealed partial class CoreGameEngineActualTurnSkillGrantsRuntime
         if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramCardTriggerWindowFrame parent || frame.WindowContext is not { CardUse: { } use } context || parent.Id != context.ParentFrameId || context.OwnerSeat != frame.OwnerSeat || context.Window != global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) || use.ParentCardUseFrameId != parent.ParentFrameId || use.CardActionId != parent.Action.ActionId || use.ActorSeat != parent.Action.ActorSeat || use.EffectiveKind != parent.Action.EffectiveKind || targetSeat != use.ActorSeat || context.SourceSeat != use.ActorSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count)
             throw new InvalidOperationException("A turn skill beneficiary requires its exact suspended card-action parent.");
         var candidate = parent.Candidates[parent.CandidateIndex];
-        if (candidate.OwnerSeat != frame.OwnerSeat || candidate.SkillId != frame.SkillId || candidate.SkillInstanceId != frame.SkillInstanceId || candidate.TriggerId != frame.TriggerId || candidate.GameplayHash != frame.GameplayHash)
-            throw new InvalidOperationException("A turn skill beneficiary lost its exact card-action candidate.");
     }
 
     // The caller runs this only after queuing the matching actual TurnEnded fact,

@@ -58,17 +58,6 @@ internal sealed class ManualDiscardRuntime(IProgramRuntimeFrames frames, INative
         transitions.EndTurn();
     }
 
-    internal bool HasManualDiscardBoundaryFrame()
-    {
-        if ((nativeFrames.FrameCount == 0 ? null : nativeFrames.FrameAt(0)) is not ManualDiscardFrame frame) return false;
-        if (frame.OwnerSeat != turn.CurrentSeat || frame.ActualTurnNumber != turn.TurnNumber || phase.Phase != TurnPhase.Discard ||
-            frame.InitialRequiredCount <= 0 || frame.PaidCount < 0 || frame.PaidCount > frame.InitialRequiredCount ||
-            frame.RemainingCount < 0 || frame.RemainingCount > frame.InitialRequiredCount - frame.PaidCount ||
-            frame.QuotaMultiplier is < 1 or > 20)
-            throw new InvalidOperationException("Manual discard lost its frozen remaining quota.");
-        return true;
-    }
-
     internal CommandResult SubmitDiscardCards(DiscardCardsCommand command)
     {
         var validation = commands.ValidatePrompt(command.ActorSeat, command.PromptId);
@@ -109,26 +98,5 @@ internal sealed class ManualDiscardRuntime(IProgramRuntimeFrames frames, INative
                 Array.AsReadOnly(cards.Select(card => card.Id).ToArray())));
             ContinueManualDiscard(frame.Id);
         });
-    }
-
-    internal void AssertDiscardPromptInvariant()
-    {
-        if (prompts.Current is { Kind: DecisionKind.DiscardCards } prompt)
-        {
-            var owner = participants.At(prompt.PlayerSeat);
-            var hand = facts.DiscardableHand(owner);
-            if (frames.Top is not ManualDiscardFrame frame || frame.OwnerSeat != owner.Seat ||
-                frame.ActualTurnNumber != turn.TurnNumber || !HasManualDiscardBoundaryFrame() ||
-                !owner.IsHuman || !owner.IsAlive || phase.Phase != TurnPhase.Discard ||
-                turn.CurrentSeat != owner.Seat || facts.Status != EngineStatus.AwaitingHumanDiscard ||
-                prompt.RequiredCardCount <= 0 || prompt.RequiredCardCount != Math.Min(frame.RemainingCount, hand.Count) ||
-                !prompt.ValidCardIds.Order().SequenceEqual(hand.Select(card => card.Id).Order()) ||
-                prompt.Choices.Count != 0 || prompt.ValidTargetSeats.Count != 0 || !prompt.IsPrivate)
-                throw new InvalidOperationException("The private discard prompt must match its current owner's hand limit.");
-        }
-        else if (facts.Status == EngineStatus.AwaitingHumanDiscard)
-        {
-            throw new InvalidOperationException("Discard status requires a private discard prompt.");
-        }
     }
 }

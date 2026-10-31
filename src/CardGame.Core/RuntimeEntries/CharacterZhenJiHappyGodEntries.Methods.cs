@@ -24,10 +24,8 @@ internal sealed partial class CharacterZhenJiHappyGodEntries
     internal global::CardGame.Core.ProgramSkillFrame? HappyZjObserverRoot() => _resolve().HappyZjObserverRoot();
     internal global::CardGame.Core.HappyZjEntity[] HappyZjPileEntities(int owner) => _resolve().HappyZjPileEntities(owner);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.PublicPersistentPileSource> HappyZjPiles(int owner) => _resolve().HappyZjPiles(owner);
-    internal bool IsHappyFeifuClaimedResponseEntity(global::CardGame.Core.CardActionContext action, int cardId) => _resolve().IsHappyFeifuClaimedResponseEntity(action, cardId);
     internal void MoveHappyZjEntities(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardLocation to) => _resolve().MoveHappyZjEntities(f, to);
     internal void PublishHappyZj(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishHappyZj(f);
-    internal void RequireHappyZj(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireHappyZj(f);
     internal bool ResumeHappyZj(long id) => _resolve().ResumeHappyZj(id);
     internal bool RetainHappyZjPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainHappyZjPaid(f);
     internal void ReturnHappyZjDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnHappyZjDraw(f, outcome);

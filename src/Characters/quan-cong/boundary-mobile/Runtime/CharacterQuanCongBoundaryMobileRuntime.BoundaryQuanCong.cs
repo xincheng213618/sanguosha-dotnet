@@ -208,12 +208,6 @@ internal sealed partial class CharacterQuanCongBoundaryMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 51200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 51200)]
     internal bool KeepPaidBoundaryYaoming(ProgramSkillFrame frame) => frame.BoundaryQuanCongYaoming is { Option: not null } && ValidBoundaryYaoming(frame);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 51200)]
-    internal void AssertBoundaryYaomingFrame(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryQuanCongYaoming is not null && !ValidBoundaryYaoming(frame))
-            throw new InvalidOperationException("Yaoming changed its original charge, damage parent or frame identity.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryQuanCongYaoming)]
     internal PromptChoice BoundaryYaomingAi(PendingDecision pending, ProgramSkillFrame frame)

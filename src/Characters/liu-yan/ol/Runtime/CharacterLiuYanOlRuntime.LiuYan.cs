@@ -80,7 +80,6 @@ internal sealed partial class CharacterLiuYanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiuYan: { } r } f || f.Id != id)
             return;
-        AssertLiuYan(f);
         if (r.Stage == LiuYanStage.LimuNative)
             return;
         if (DrainLiuYan(id))

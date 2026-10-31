@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhangLiaoMobileGodEntries
 {
     internal void AnswerMobileShenZhangLiao(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMobileShenZhangLiao(choice);
-    internal void AssertMobileShenZhangLiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileShenZhangLiao(f);
     internal void AssertMobileZhitiContest(global::CardGame.Core.ResolutionFrame parent) => _resolve().AssertMobileZhitiContest(parent);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileShenZhangLiao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMobileShenZhangLiao(supplied, op);
     internal bool BeginMobileZhitiContest(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.PindianResult result, global::CardGame.Core.MobileZhitiContestKind kind) => _resolve().BeginMobileZhitiContest(parent, result, kind);
@@ -12,8 +11,6 @@ internal sealed partial class CharacterZhangLiaoMobileGodEntries
     internal bool DrainMobileShenZhangLiao(long id) => _resolve().DrainMobileShenZhangLiao(id);
     internal void ExpireMobileDuorui(global::CardGame.Core.IGameEvent fact) => _resolve().ExpireMobileDuorui(fact);
     internal void FinishMobileShenZhangLiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMobileShenZhangLiao(f);
-    internal bool HasMobileZhitiContestPrompt() => _resolve().HasMobileZhitiContestPrompt();
-    internal bool HasMobileZhitiDuelContinuation(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().HasMobileZhitiDuelContinuation(attack);
     internal bool IsMobileDuoruiGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsMobileDuoruiGrantQualified(owner, grant);
     internal bool IsMobileZhitiContestSubtree(global::CardGame.Core.ResolutionFrame parent) => _resolve().IsMobileZhitiContestSubtree(parent);
     internal bool MobileDuoruiActive(global::CardGame.Core.MobileDuoruiIssuedEvent e) => _resolve().MobileDuoruiActive(e);

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShenwuExpandedPoliciesEntries
 {
     internal long CaptureShenwuFengdongStamp() => _resolve().CaptureShenwuFengdongStamp();
-    internal bool HasExactShenwuYanyuParticipant(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasExactShenwuYanyuParticipant(frame);
     internal bool IsShenwuHonglianHandExempt(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card) => _resolve().IsShenwuHonglianHandExempt(owner, card);
     internal bool ShenwuFengdongQualifiesGrant(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().ShenwuFengdongQualifiesGrant(owner, grant);
     internal bool ShenwuJuyuanExtraTarget(global::CardGame.Core.CharacterState player, global::CardGame.Core.CardKind kind) => _resolve().ShenwuJuyuanExtraTarget(player, kind);

@@ -66,8 +66,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
             return;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ZixiEffectRounds = r with { Grants = r.Grants.Select(g => g.CurrentTargetSeat == e.PreviousTargetSeat ? g with { CurrentTargetSeat = e.NewTargetSeat } : g).ToArray() } });
     }
-
-    internal bool IsZixiExtraEffectTargetSubset(CardUseFrame use, IReadOnlyList<int> targets) => use is { ZixiEffectRounds: { Active: true, Started: > 0 } r, Action: { } a } && r.ActionId == a.ActionId && r.ActiveTargetIndex >= 0 && r.ActiveTargetIndex < use.TargetSeats.Count && use.TargetSeats[r.ActiveTargetIndex] == r.ActiveTargetSeat && targets.SequenceEqual(use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(r.ActiveTargetIndex).Take(2) : [r.ActiveTargetSeat]) && _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiExtraEffectRoundStartedEvent>().Count(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.FrameId == r.Grants[r.Started - 1].FrameId && e.Round == r.Started && e.TargetSeat == r.ActiveTargetSeat) == 1;
     internal void CaptureZixiExtraEffectAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ZixiEffectRounds: { Started: 0 } rounds, CardAttack: { } original } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || rounds.Native.OriginalAttacks.Any(s => s.TargetIndex == use.TargetIndex))
@@ -148,48 +146,5 @@ internal sealed partial class CharacterDaQiaoLeRuntime
         }
 
         throw new InvalidOperationException("Zixi lost the original native card effect continuation.");
-    }
-
-    internal bool ValidZixiGrantTarget(CardUseFrame use, ZixiExtraEffectGrant grant)
-    {
-        var current = grant.TargetSeat;
-        var issued = false;
-        foreach (var fact in _coreAlternatingBenefitsOperations.CompleteProgramEventHistory())
-        {
-            if (fact is ZixiExtraEffectIssuedEvent started && started.FrameId == grant.FrameId)
-            {
-                issued = true;
-                continue;
-            }
-
-            if (!issued)
-                continue;
-            if (fact is ZixiExtraEffectRedirectedEvent redirected && redirected.FrameId == grant.FrameId)
-            {
-                if (redirected.UseId != use.Id || redirected.ActionId != use.Action!.ActionId || redirected.PreviousSeat != current || redirected.Source.OwnerSeat != current || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(redirected.TargetSeat) || _contentRegistryOperations._contentRegistry.GetSkill(redirected.Source.SkillId).Program is not { } p || p.GameplayHash != redirected.GameplayHash || !p.Triggers.Any(t => t.Id == redirected.Source.BindingId && t.Window == SkillProgramTriggerWindow.SlashTargetRedirecting && t.Effects.Any(e => e.Op == SkillProgramEffectOp.RedirectCurrentAttack)) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == redirected.RedirectFrameId && e.SkillId == redirected.Source.SkillId && e.SkillInstanceId == redirected.Source.SkillInstanceId && e.BindingId == redirected.Source.BindingId && e.OwnerSeat == current && e.Window == SkillProgramTriggerWindow.SlashTargetRedirecting) != 1)
-                    return false;
-                current = redirected.TargetSeat;
-            }
-            else if (fact is SoleTargetReplacedEvent replaced && replaced.CardUseFrameId == use.Id && replaced.PreviousTargetSeat == current)
-            {
-                if (!_coreSoleTargetQuarantineOperations.IsSoleTargetReplacementFact(use, replaced, replaced.BeforeTargets))
-                    return false;
-                current = replaced.NewTargetSeat;
-            }
-        }
-
-        return issued && current == grant.CurrentTargetSeat;
-    }
-
-    internal void AssertZixiExtraEffectRounds()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.ZixiEffectRounds is not null))
-        {
-            var r = use.ZixiEffectRounds!;
-            var starts = _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiExtraEffectRoundStartedEvent>().Where(e => e.UseId == use.Id && e.ActionId == r.ActionId).ToArray();
-            var completions = _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiExtraEffectRoundCompletedEvent>().Where(e => e.UseId == use.Id && e.ActionId == r.ActionId).ToArray();
-            if (use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || !ZixiEffectsKind(use.CardKind) || r.Started < 0 || r.Started > r.Grants.Count || r.Grants.Count == 0 || r.Grants.Select(g => g.FrameId).Distinct().Count() != r.Grants.Count || r.Grants.Select(g => g.Source.OwnerSeat).Distinct().Count() != r.Grants.Count || r.Native.ActionId != r.ActionId || r.Native.WholeGroupRepeated != (r.Started > 0) || r.Started == 0 && (r.Active || r.ActiveTargetIndex != -1 || r.ActiveTargetSeat != -1) || r.Started > 0 && (starts.Length != r.Started || r.ActiveTargetSeat != starts[^1].TargetSeat || r.ActiveTargetIndex != Array.IndexOf(use.TargetSeats.ToArray(), r.ActiveTargetSeat) || r.ActiveTargetSeat != r.Grants[r.Started - 1].CurrentTargetSeat) || r.Active && (r.Started == 0 || r.ActiveTargetIndex < 0 || r.ActiveTargetIndex >= use.TargetSeats.Count || use.TargetSeats[r.ActiveTargetIndex] != r.ActiveTargetSeat || !IsZixiExtraEffectTargetSubset(use, use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(r.ActiveTargetIndex).Take(2).ToArray() : [r.ActiveTargetSeat])) || r.Native.OriginalAttacks.Select(s => s.TargetIndex).Distinct().Count() != r.Native.OriginalAttacks.Count || r.Native.OriginalAttacks.Any(s => s.TargetIndex < 0 || s.TargetIndex >= use.TargetSeats.Count) || r.Grants.Any(g => g.JudgmentCount != 1 || !ValidZixiGrantTarget(use, g) || g.Source.SkillId != "le:zixi" || g.Source.BindingId != "unique-target-judgment-effects" || _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program?.GameplayHash != g.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiEffectsStartedEvent>().Count(e => e.FrameId == g.FrameId && e.Source == g.Source && e.GameplayHash == g.GameplayHash && e.UseId == use.Id && e.ActionId == a.ActionId && e.WindowId == g.WindowId && e.TargetSeat == g.TargetSeat && e.JudgmentCount == 1 && e.CardKind == use.CardKind) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiExtraEffectIssuedEvent>().Count(e => e.FrameId == g.FrameId && e.Source == g.Source && e.GameplayHash == g.GameplayHash && e.UseId == use.Id && e.ActionId == a.ActionId && e.TargetSeat == g.TargetSeat && e.JudgmentCount == 1) != 1) || !Enumerable.Range(1, r.Started).SequenceEqual(starts.Select(e => e.Round)) || starts.Any(e => e.Round < 1 || e.Round > r.Grants.Count || e.FrameId != r.Grants[e.Round - 1].FrameId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(e.TargetSeat)) || !Enumerable.Range(1, r.Started - (r.Active ? 1 : 0)).SequenceEqual(completions.Select(e => e.Round)) || completions.Any(e => !starts.Any(s => e == new ZixiExtraEffectRoundCompletedEvent(s.UseId, s.ActionId, s.FrameId, s.Round, s.TargetSeat))))
-                throw new InvalidOperationException("Zixi lost its accepted original Use, once-issued judgment-count grant or ordered native repeated effect.");
-        }
     }
 }

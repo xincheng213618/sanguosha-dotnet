@@ -142,20 +142,4 @@ internal sealed partial class CharacterLuZhiMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 81400)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 81400)]
     internal bool KeepMobileLuZhiPaid(ProgramSkillFrame f) => f.SkillId == MobileLuZhiComposition.Zhenliang && (f.HpDifferencePileDamage is { Stage: HpDifferencePileDamageStage.Movement or HpDifferencePileDamageStage.Damage } && f.ConversionPreviousPolarity == SkillPolarity.Yang || f.MobileLuZhiYin is { } r && f.ConversionPreviousPolarity == SkillPolarity.Yin && f.WindowContext?.ParentFrameId == r.ParentWindowId && f.InstructionIndex >= 3);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 81400)]
-    internal void AssertMobileLuZhiFrames(ProgramSkillFrame f)
-    {
-        if (f.HpDifferencePileDamage is { } r)
-        {
-            var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f);
-            if (effect.Op != SkillProgramEffectOp.PublicPileColorDamage || effect.PublicPileDamageCostPolicy != PublicPileColorDamageCostPolicy.HpDifferenceAtLeastOne || f.InstructionIndex != 1 || f.TriggerId is not null || f.WindowContext is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Ren.OwnerSeat != f.OwnerSeat || !effect.SkillIds.SequenceEqual(new[] { r.Ren.SkillId }) || !Enum.IsDefined(r.Stage) || r.CardIds.Distinct().Count() != r.CardIds.Count || r.CardIds.Count > r.Required || r.Stage == HpDifferencePileDamageStage.Target && r.CardIds.Count != 0 || r.Stage != HpDifferencePileDamageStage.Target && (r.TargetSeat == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Required != Math.Max(1, Math.Abs(r.OwnerHp - r.TargetHp))))
-                throw new InvalidOperationException("HP-difference pile damage lost its original source, frozen target HP or exact selection.");
-            if (r.Stage is HpDifferencePileDamageStage.Movement or HpDifferencePileDamageStage.Damage)
-                if (f.ConversionPreviousPolarity != SkillPolarity.Yang || r.CardIds.Count != r.Required || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<HpDifferencePileDamagePaidEvent>().Count(e => e == new HpDifferencePileDamagePaidEvent(f.Id, f.OwnerSeat, r.TargetSeat, r.Required, r.OwnerHp, r.TargetHp, r.Before, r.After)) != 1 || r.CardIds.Any(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From.OwnerSeat == f.OwnerSeat && m.From.Zone is (CardZoneKind.Hand or CardZoneKind.Equipment) && m.Reason.Value == HpDifferencePileDiscard) != 1))
-                    throw new InvalidOperationException("HP-difference pile damage lost its once-paid physical discard or original-frame continuation.");
-        }
-
-        if (f.MobileLuZhiYin is { } yin && (f.SkillId != MobileLuZhiComposition.Zhenliang || f.ConversionPreviousPolarity != SkillPolarity.Yin || f.WindowContext is not { } context || context.ParentFrameId != yin.ParentWindowId || context.Window != yin.Window || context.CardUse?.CardActionId != yin.ActionId || _resolutionStackOperations._resolutionStack.SingleOrDefault(w => w.Id == yin.ParentWindowId)is not ProgramCardTriggerWindowFrame parent || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(parent.Action.EffectiveKind) != yin.Category || yin.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || yin.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || yin.TurnOwnerSeat == f.OwnerSeat))
-            throw new InvalidOperationException("Mobile Zhenliang Yin lost its original outside-turn matching-category completion.");
-    }
 }

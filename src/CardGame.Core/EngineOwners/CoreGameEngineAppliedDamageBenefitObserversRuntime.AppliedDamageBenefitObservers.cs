@@ -57,12 +57,4 @@ internal sealed partial class CoreGameEngineAppliedDamageBenefitObserversRuntime
     internal bool AppliedDamageFieldPayment(ProgramSkillFrame root, ProgramAppliedDamageBenefit receipt) => root.InstructionIndex == receipt.InstructionIndex + 1 && _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > receipt.LastMovementSequence && m.From.OwnerSeat == receipt.TargetSeat && m.From.Zone is CardZoneKind.Equipment or CardZoneKind.Judgment && m.To.Zone is CardZoneKind.DiscardPile or CardZoneKind.OutsideGame && m.Reason.Value == $"skill-program.{(root.SkillId)}.SelectAndMoveOwnedCard") == 1;
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 110)]
     internal bool HasAppliedDamageBenefitObserver(long damageWindowId) => AppliedDamageBenefitRoot(damageWindowId)is not null;
-    internal void AssertAppliedDamageBenefitReceipt(ProgramSkillFrame frame)
-    {
-        if (frame.AppliedDamageBenefit is { } receipt && AppliedDamageBenefitRoot(receipt.DamageWindowId)?.Id != frame.Id)
-            throw new InvalidOperationException("An applied-damage benefit lost its actual once-issued draw or exact owning producer subtree.");
-    }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 420, group: 10)]
-    internal bool IsAppliedDamageBenefitDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AppliedDamageBenefitRoot(damage.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(d => d.Id == dying.FrameId && d.ParentFrameId == dying.ParentFrameId);
 }

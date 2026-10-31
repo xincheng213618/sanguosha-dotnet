@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouZhangXiuAnniversaryRuntime(IMouZhangXiuAnniversaryFacts facts, IMouZhangXiuAnniversaryNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouZhangXiuAnniversaryRuntime
 {
     internal const string Fuxi = "mou:fuxi",Haoyi = "mou:haoyi",Action = "mou-zhang-xiu-anniversary";
@@ -129,7 +129,6 @@ internal sealed class MouZhangXiuAnniversaryRuntime(IMouZhangXiuAnniversaryFacts
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouZhangXiuAnniversaryCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouZhangXiuAnniversary = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 36600)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouZhangXiuAnniversary: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 36600)] private bool Movement(ProgramSkillFrame f) => f.MouZhangXiuAnniversary is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 36600)] private void Invariant(ProgramSkillFrame f) { if (f.MouZhangXiuAnniversary is not null && !Valid(f)) throw new InvalidOperationException("Invalid Mou Zhang Xiu native receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 36600)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 36600)] private bool Paid(ProgramSkillFrame f) => f.MouZhangXiuAnniversary is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouZhangXiuFuxi, SkillProgramEffectOp.ResolveMouZhangXiuHaoyi)] private PromptChoice Ai(PendingDecision p, ProgramSkillFrame f)
     {

@@ -10,17 +10,6 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29200)]
     internal bool KeepPaidMouLuMeng(ProgramSkillFrame f) => f.MouLuMengKeji is not null && ValidMouKeji(f) || f.MouLuMengDujiang is not null && ValidMouDujiang(f) || f.MouLuMengDuojing is { Stage: MouLuMengDuojingStage.Taking or MouLuMengDuojingStage.MovementChildren or MouLuMengDuojingStage.Complete } && ValidMouDuojing(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29200)]
-    internal void AssertMouLuMeng(ProgramSkillFrame f)
-    {
-        if (f.MouLuMengKeji is not null && !ValidMouKeji(f) || f.MouLuMengDujiang is not null && !ValidMouDujiang(f) || f.MouLuMengDuojing is not null && !ValidMouDuojing(f))
-            throw new InvalidOperationException("Mobile Lu Meng lost its exact native cost, actual awakening, finalized Slash or once-paid target receipt.");
-        if (f.MouLuMengDuojing is not { } r || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || r.Stage is not (MouLuMengDuojingStage.Choosing or MouLuMengDuojingStage.Taking))
-            return;
-        var choices = r.Stage == MouLuMengDuojingStage.Choosing ? MouDuojingChoices(f) : MouDuojingTakeChoices(f);
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || p.TargetSeat != r.Targets[r.TargetIndex] || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, choices))
-            throw new InvalidOperationException("Duojing's current target must retain its canonical payment or concealed native Hand choice.");
-    }
 
     internal bool MouLuMengObserverOrigin(ProgramSkillFrame f) => f.MouLuMengKeji is not null && ValidMouKeji(f) || f.MouLuMengDujiang is not null && ValidMouDujiang(f) || f.MouLuMengDuojing is { Stage: MouLuMengDuojingStage.MovementChildren } && ValidMouDuojing(f);
     internal bool MouLuMengFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -49,7 +38,6 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
     internal bool HasMouLuMengDamageObserver(long id) => MouLuMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1420)]
     internal bool HasMouLuMengBeforeDamageObserver(long id) => MouLuMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1250)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 810)]
     internal bool IsMouLuMengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouLuMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 580)]

@@ -45,15 +45,6 @@ internal sealed partial class CharacterCaoCaoHappyGodRuntime
         return r.FaceDownBefore is null && r.FaceDownAfter is null && r.Stage != HappyGuixinStage.TurnoverChildren && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyGuixinTurnoverIssuedEvent>().Any(e => e.FrameId == f.Id);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 41400)]
-    internal void RequireHappyGuixin(ProgramSkillFrame f)
-    {
-        if (f.HappyGuixin is null)
-            return;
-        if (!ValidHappyGuixin(f) || f.PendingMovementContinuation is { } pending && !HappyGuixinMovementProof(f, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect, pending))
-            throw new InvalidOperationException("Happy Guixin lost its original damage point, private random selection, actual paid gain or conditional turnover.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 41400)]
     internal bool HappyGuixinMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveHappyShenCaoCaoGuixin && f.HappyGuixin is { Stage: HappyGuixinStage.MovementChildren } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidHappyGuixin(f);
 }

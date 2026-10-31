@@ -131,7 +131,6 @@ internal sealed partial class CharacterLvQianOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvQian: { } r } f || f.Id != id || r.Stage == LvQianStage.DamageChoice)
             return false;
-        AssertLvQian(f);
         if (DrainLvQian(f))
             return true;
         if (r.Stage is LvQianStage.LoseHpChildren or LvQianStage.RecoveryChildren)

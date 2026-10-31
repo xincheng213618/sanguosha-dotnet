@@ -90,8 +90,6 @@ internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
             return false;
         return index + 2 == _resolutionStackOperations._resolutionStack.Count || RecipientContestPaidPrefix(index + 1, _resolutionStackOperations._resolutionStack.Count - 1);
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 260, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 370)]
     internal bool IsRecipientContestProgramDying() => _coreRecipientConsequencesObserversOperations.IsRecipientConsequencesProgramDying() || _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RecipientContestPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1860)]

@@ -6,7 +6,6 @@ internal sealed partial class CharacterGongsunZanMouOlEntries
     internal void AddMouGszBaojingRange(global::CardGame.Core.CharacterState player, global::System.Collections.Generic.List<global::CardGame.Core.RuleQueryContribution> contributions) => _resolve().AddMouGszBaojingRange(player, contributions);
     internal bool AdvanceMouGszChildren() => _resolve().AdvanceMouGszChildren();
     internal void AnswerMouGsz(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouGsz(choice);
-    internal void AssertMouGsz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouGsz(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouGszBaojing(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouGszBaojing(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouGszJiaodi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouGszJiaodi(supplied);
     internal bool CanOfferMouGszJiaodi(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferMouGszJiaodi(gate);

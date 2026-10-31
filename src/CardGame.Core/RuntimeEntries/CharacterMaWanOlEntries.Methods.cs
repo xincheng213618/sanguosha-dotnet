@@ -5,7 +5,6 @@ internal sealed partial class CharacterMaWanOlEntries
     internal bool AdvanceMaWanSubtree() => _resolve().AdvanceMaWanSubtree();
     internal global::CardGame.Core.PromptChoice AiMaWan(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMaWan(p, f);
     internal void AnswerMaWan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMaWan(choice);
-    internal void AssertMaWan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMaWan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMaWanTargets(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMaWanTargets(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMaWanVotes(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMaWanVotes(supplied);
     internal bool CanOfferMaWan(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMaWan(candidate, trigger, context);
@@ -18,7 +17,6 @@ internal sealed partial class CharacterMaWanOlEntries
     internal bool HasIssuedMaWanHunjiangCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedMaWanHunjiangCandidate(candidate, context);
     internal bool HasMaWanDamageObserver(long id) => _resolve().HasMaWanDamageObserver(id);
     internal bool HasMaWanHunjiangTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasMaWanHunjiangTargetTail(use);
-    internal bool IsMaWanDying() => _resolve().IsMaWanDying();
     internal void IssueMaWanHunjiangUse(long id, global::CardGame.Core.CardActionContext? action) => _resolve().IssueMaWanHunjiangUse(id, action);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MaWanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MaWanChoices(f);
     internal int MaWanChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MaWanChooser(f);

@@ -45,14 +45,6 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
         return r.Draw is null && r.Discard is null && (r.Stage == XingDaoRongXuHeStage.Next || r.Stage == XingDaoRongXuHeStage.Card && r.Mode == "discard" || r.Stage == XingDaoRongXuHeStage.Drawing && r.Mode == "draw");
     }
 
-    internal bool HasAnniversaryXingDaoRongPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { XingDaoRongXuHe: { Stage: XingDaoRongXuHeStage.Mode or XingDaoRongXuHeStage.Card }, Step: ResolutionFrameStep.AwaitingResponse } f && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == f.OwnerSeat && ValidXingDaoRong(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, XingDaoRongChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 45700)]
-    internal void AssertXingDaoRong(ProgramSkillFrame f)
-    {
-        if (f.XingDaoRongXuHe is not null && !ValidXingDaoRong(f))
-            throw new InvalidOperationException("Xuhe lost original source, paid maximum HP, frozen group or once-paid native result.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 45700)]
     internal bool XingDaoRongMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.XingDaoRongXuHe is { Stage: XingDaoRongXuHeStage.DiscardChildren or XingDaoRongXuHeStage.DrawChildren } && ValidXingDaoRong(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryXingDaoRongXuHe && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool XingDaoRongFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -85,8 +77,6 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
     internal bool XingDaoRongDamageObserver(long id) => XingDaoRongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 45700)]
     internal bool XingDaoRongBeforeDamageObserver(long id) => XingDaoRongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 45700)]
-    internal bool XingDaoRongDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && XingDaoRongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 45700)]
     internal bool AdvanceXingDaoRongObserver() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XingDaoRongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

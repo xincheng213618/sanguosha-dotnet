@@ -10,7 +10,6 @@ internal interface IOlShenZhenJiFacts : IProgramSelectionQuery
     Winner Winner { get; }
     IReadOnlyList<OlShenfuPlayer> Players { get; }
     OlShenfuPlayer Player(int seat);
-    bool ValidSeat(int seat);
     IReadOnlyList<Card> Hand(int seat);
     bool HasSkillInstance(int seat, string skillId, string instance);
     int RelativeOrder(int from, int target);

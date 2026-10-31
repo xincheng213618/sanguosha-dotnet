@@ -47,9 +47,6 @@ internal sealed partial class CharacterLuShiOlRuntime
             ContinueOlLuShi(f.Id);
             return SkillProgramStepOutcome.AwaitChild;
         }
-
-        if (op == SkillProgramEffectOp.ResolveOlLuShiZhuyan ? f.SkillId != "ol:zhuyan" || f.InstructionIndex != 1 || f.WindowContext?.Window != SkillProgramTriggerWindow.DiscardPhaseEnded : f.SkillId != "ol:leijie" || f.InstructionIndex != 3 || f.ActivationId != "judge-target" || f.SelectedTargetSeats.Count != 1)
-            throw new InvalidOperationException("Lu Shi lost her original adjustment or finalized judgment instruction.");
         var r = new OlLuShiReceipt(OlLuShiSource(f), f.GameplayHash, op, f.InstructionIndex, f.WindowContext?.ParentFrameId ?? 0, op == SkillProgramEffectOp.ResolveOlLuShiZhuyan ? OlLuShiStage.Choice : OlLuShiStage.Ready);
         if (op == SkillProgramEffectOp.ResolveOlLuShiLeijie)
         {
@@ -121,7 +118,6 @@ internal sealed partial class CharacterLuShiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OlLuShi: { } r } f || !OlLuShiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Lu Shi rejects a stale participant, spent lifetime option, pool or private discard material.");
-        RequireOlLuShi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage == OlLuShiStage.Choice)
@@ -197,7 +193,6 @@ internal sealed partial class CharacterLuShiOlRuntime
             return false;
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { OlLuShi: { } r } f && f.Id == id)
         {
-            RequireOlLuShi(f);
             if (f.ReexecuteParticipantInstruction)
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ReexecuteParticipantInstruction = false });
             if (r.Stage is OlLuShiStage.Choice or OlLuShiStage.Pool or OlLuShiStage.Discard)

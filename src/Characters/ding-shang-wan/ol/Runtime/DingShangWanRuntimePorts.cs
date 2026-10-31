@@ -1,13 +1,6 @@
 namespace CardGame.Core;
 
-// Startup draw origins consume only this read-only receipt proof. Keeping its
-// owner separate from the draw producer avoids constructing an invoice cycle.
-internal interface IDingShangWanFrameProofs : IProgramSelectionQuery
-{
-    void AssertDingShangWan(ProgramSkillFrame frame);
-}
-
-internal interface IDingShangWanRuntimeQueries : IDingShangWanFrameProofs
+internal interface IDingShangWanRuntimeQueries : IProgramSelectionQuery
 {
     CardConversionSource DingShangWanSource(ProgramSkillFrame frame);
     bool CanOfferDingShangWan(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context);
@@ -27,7 +20,6 @@ internal interface IDingShangWanNativeFacts : IProgramSelectionQuery
     bool ValidSeat(int seat);
     bool HasSkillInstance(int seat, string skill, string instance);
     SkillProgramTrigger Trigger(ProgramSkillFrame frame);
-    SkillProgramEffect? PausedEffect(ProgramSkillFrame frame);
     bool IsActualAfterTurnEndedParent(DeferredTurnEndFrame frame);
     ProgramTriggerCandidate AfterTurnEndedCandidate(DeferredTurnEndFrame frame);
     bool ValidResponseCompletionWindow(ProgramCardTriggerWindowFrame frame);

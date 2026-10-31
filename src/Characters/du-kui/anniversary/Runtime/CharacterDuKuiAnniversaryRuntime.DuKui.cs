@@ -83,7 +83,6 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuKui: { } r } f || f.Id != id)
             return false;
-        RequireDuKui(f);
         if (r.Stage is DuKuiStage.NativeIssuing or DuKuiStage.NativeUse)
             return true;
         if (r.Stage is DuKuiStage.RevealMovement or DuKuiStage.DeclineMovement or DuKuiStage.MoveChildren or DuKuiStage.NativeTail)
@@ -201,7 +200,6 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuKui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuKuiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Du Kui lost the original published entity and currently legal targets.");
-        RequireDuKui(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         switch (choice.Parameters["verb"])

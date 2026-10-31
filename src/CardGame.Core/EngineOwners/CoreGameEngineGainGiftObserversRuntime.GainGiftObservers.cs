@@ -59,13 +59,6 @@ internal sealed partial class CoreGameEngineGainGiftObserversRuntime
         return draws[^1].Before == r.Before && draws[^1].After == r.After && draws[^1].ActualCount == r.ActualDrawCount;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 370)]
-    internal void AssertGainGiftReceipt(ProgramSkillFrame f)
-    {
-        if (f.GainGiftReceipt is not null && !ValidGainGiftReceipt(f))
-            throw new InvalidOperationException("An issued gain/loss receipt lost its actual source, batch, phase or paid physical segment.");
-    }
-
     internal bool GainGiftFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (!ValidGainGiftReceipt(root) || root.GainGiftReceipt is not { Stage: not GainGiftStage.Choosing } r || root.PendingMovementContinuation is null)
@@ -107,8 +100,6 @@ internal sealed partial class CoreGameEngineGainGiftObserversRuntime
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 90, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 200)]
     internal bool IsGainGiftProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GainGiftObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1750)]

@@ -215,13 +215,6 @@ internal sealed partial class CharacterCaoYingOlRuntime
             throw new InvalidOperationException("Cao Ying receipt lost its frozen instruction, action or private category decision.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 110)]
-    internal void AssertRegisteredCaoYing(ProgramSkillFrame frame)
-    {
-        if (frame.CaoYing is not null)
-            RequireCaoYing(frame);
-    }
-
     internal bool CaoYingFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (!CanContinueCaoYing(root) || root.CaoYing is not { } r)
@@ -237,8 +230,6 @@ internal sealed partial class CharacterCaoYingOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 30)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 140)]
     internal bool HasCaoYingDamageObserver(long id) => CaoYingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 180)]
-    internal bool IsCaoYingDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CaoYingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 110)]
     internal bool TryAdvanceCaoYingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoYingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     SkillProgramStepOutcome global::CardGame.Core.ICaoYingProgramHost.BeginCaoYing(ProgramSkillFrame f, SkillProgramEffect e) => BeginCaoYing(f, e);

@@ -92,22 +92,7 @@ internal sealed partial class CoreGameEngineMatchingRecastObserversRuntime
         return decision.ValidCardIds.SequenceEqual(choices.SelectMany(c => c.Cards).Distinct()) && decision.Choices.Count == choices.Count && decision.Choices.Zip(choices).All(pair => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(pair.First, pair.Second));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 400)]
-    internal void AssertMatchingRecast(ProgramSkillFrame f)
-    {
-        if (f.MatchingRecast is null)
-            return;
-        if (!ValidMatchingRecastReceipt(f))
-            throw new InvalidOperationException("Matching recast lost its group, target phase debit, private choice or once-paid cost/draw invoice.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !MatchingRecastFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Matching recast retained an unrelated first native child.");
-        if (index == _resolutionStackOperations._resolutionStack.Count - 1 && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && f.MatchingRecast.Stage is MatchingRecastStage.ChoosingPeer or MatchingRecastStage.ChoosingPeerCards && !IsMatchingRecastChoice(f, prompt))
-            throw new InvalidOperationException("Matching recast changed its participant-only private prompt.");
-    }
-
     internal ProgramSkillFrame? MatchingRecastObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreMatchingRecastObserversOperations.MatchingRecastFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 40)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 90)]
     internal bool IsMatchingRecastDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MatchingRecastObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1870)]

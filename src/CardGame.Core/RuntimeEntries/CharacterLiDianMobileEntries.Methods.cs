@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiDianMobileEntries
 {
-    internal void AssertMobileLiDianWangxi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileLiDianWangxi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileLiDianWangxi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMobileLiDianWangxi(supplied);
     internal void ContinueMobileLiDianWangxi(long id) => _resolve().ContinueMobileLiDianWangxi(id);
     internal bool ExactMobileLiDianDamage(global::CardGame.Core.ProgramSkillFrame f, scoped out global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().ExactMobileLiDianDamage(f, out c);

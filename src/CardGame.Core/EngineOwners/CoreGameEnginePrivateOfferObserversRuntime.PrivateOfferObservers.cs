@@ -73,17 +73,8 @@ internal sealed partial class CoreGameEnginePrivateOfferObserversRuntime
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 180, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 300)]
     internal bool IsPrivateOfferProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PrivateOfferObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1980)]
     internal bool HasPrivateOfferDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) && PrivateOfferObserverRoot()is not null;
-    internal void AssertPrivateOfferPrograms()
-    {
-        _corePrivateOfferReturnsOperations.AssertPrivateOfferFrames();
-        foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-            if (root.GameTargetHandHp is not null && !_coreGameTargetHandHpChoicesOperations.ValidGameHandHpReceipt(root))
-                throw new InvalidOperationException("A game-target invoice lost its real issuance/payment.");
-    }
 }

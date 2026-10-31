@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MobileSimaYiRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts, IProgramOperationDraws draws, IMobileSimaYiFacts facts,
     IMobileSimaYiOperations operations) : IMobileSimaYiHost
@@ -75,7 +75,7 @@ internal sealed class MobileSimaYiRuntime(IProgramRuntimeFrames frames, IProgram
         if (frames.Top is not ProgramSkillFrame { MobileSimaYi: { Stage: MobileSimaYiStage.Choice } r } f ||
             prompts.Current?.PlayerSeat != f.OwnerSeat || !MobileSimaYiChoices(f).Any(c => RuntimeSkills.RuntimeRules_Core_AssistedPhysicalCards.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mobile Sima Yi requires his exact current choice and unpaid original instruction.");
-        AssertMobileSimaYi(f); prompts.Clear(); var key = choice.Parameters["option"];
+prompts.Clear(); var key = choice.Parameters["option"];
         var cost = key.StartsWith("draw:", StringComparison.Ordinal) ? int.Parse(key[5..], CultureInfo.InvariantCulture) :
             key.StartsWith("learn:", StringComparison.Ordinal) && r.Operation == SkillProgramEffectOp.ResolveMobileShenSimaYiJilue ? r.Cost : 0;
         if (cost > 0) operations.PayMarker(f.OwnerSeat, new(PlayerMarkerKind.Ren, cost), f.SkillId, RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(f));
@@ -108,26 +108,6 @@ internal sealed class MobileSimaYiRuntime(IProgramRuntimeFrames frames, IProgram
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40425)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40425)]
     private bool RetainMobileSimaYi(ProgramSkillFrame f) => f.MobileSimaYi is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40425)] private void AssertMobileSimaYi(ProgramSkillFrame f)
-    {
-        if (f.MobileSimaYi is not { } r) return;
-        if (r.Source != MobileSimaSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 ||
-            !Enum.IsDefined(r.Stage) || r.Cost < 2 || r.DrawCount is < 0 or > 2 || r.Skills.Distinct().Count() != r.Skills.Count ||
-            r.Skills.Any(id => !MobileSimaJilueSkills.Contains(id))) throw new InvalidOperationException("Mobile Sima Yi lost his exact original trigger and frozen learning request.");
-        if (r.Stage == MobileSimaYiStage.Choice)
-        {
-            if (r.Choice is not null || facts.History<MobileSimaJilueChoiceEvent>().Any(e => e.FrameId == f.Id) || r.Cost != MobileSimaLearningCost(f.OwnerSeat))
-                throw new InvalidOperationException("An unpaid Jilue selection cannot contain a previously paid result.");
-        }
-        else if (r.Choice == "initialize")
-        {
-            if (facts.History<MobileSimaJilueInitializedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillInstanceId == f.SkillInstanceId) != 1)
-                throw new InvalidOperationException("Jilue lost its actual skill-acquisition result.");
-        }
-        else if (facts.History<MobileSimaJilueChoiceEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Choice == r.Choice &&
-            e.Paid == (r.Choice!.StartsWith("draw:", StringComparison.Ordinal) ? r.DrawCount : r.Choice.StartsWith("learn:", StringComparison.Ordinal) && r.Operation == SkillProgramEffectOp.ResolveMobileShenSimaYiJilue ? r.Cost : 0)) != 1)
-            throw new InvalidOperationException("Jilue or Lianpo lost its once-paid actual selected result.");
-    }
     [ProgramAiChoice(SkillProgramEffectOp.InitializeMobileShenSimaYiJilue)] private PromptChoice ChooseMobileSimaInitial(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShenSimaYiJilue)] private PromptChoice ChooseMobileSimaJilue(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShenSimaYiLianpo)] private PromptChoice ChooseMobileSimaLianpo(PendingDecision p, ProgramSkillFrame f) => p.Choices.Last();

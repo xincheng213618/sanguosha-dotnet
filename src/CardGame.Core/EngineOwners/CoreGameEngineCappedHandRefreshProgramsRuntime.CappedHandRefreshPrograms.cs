@@ -154,14 +154,4 @@ internal sealed partial class CoreGameEngineCappedHandRefreshProgramsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCappedHandRefreshCompletedEvent(frame.Id, frame.OwnerSeat, draft.TargetSeat, draft.Maximum, draft.Stage == ProgramCappedHandRefreshStage.Discarding ? draft.DiscardCount : 0, completed));
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    internal void AssertCappedHandRefresh(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.CappedHandRefresh is not { } draft)
-            return;
-        if (paused.Op != SkillProgramEffectOp.DrawThenDiscardHandToMaximumHp || frame.SelectedTargetSeats is not [var target] || target != draft.TargetSeat || draft.Maximum < 0 || draft.Maximum > paused.Amount || draft.DiscardCount < 0 || !Enum.IsDefined(draft.Stage) || draft.CandidateCardIds.Distinct().Count() != draft.CandidateCardIds.Count || draft.SelectedCardIds.Distinct().Count() != draft.SelectedCardIds.Count || draft.SelectedCardIds.Any(id => !draft.CandidateCardIds.Contains(id)) || draft.SelectedCardIds.Count > draft.DiscardCount || draft.CandidateCardIds is not System.Collections.IList { IsReadOnly: true } || draft.SelectedCardIds is not System.Collections.IList { IsReadOnly: true })
-            throw new InvalidOperationException("Capped hand refresh changed its frozen threshold or private owning draft.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && draft.Stage == ProgramCappedHandRefreshStage.Selecting && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != target || draft.DiscardCount <= draft.SelectedCardIds.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, CappedHandRefreshChoices(frame))))
-            throw new InvalidOperationException("Capped hand refresh lost its target-owned private discard prompt.");
-    }
 }

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineFriendTrioEntries
 {
-    internal void AssertFriendTrio(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertFriendTrio(f);
     internal void BeginFriendXuanjianUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginFriendXuanjianUse(f);
     internal bool CanOfferFriendTrio(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferFriendTrio(candidate, trigger, context);
     internal void ContinueFriendTrio(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueFriendTrio(f);

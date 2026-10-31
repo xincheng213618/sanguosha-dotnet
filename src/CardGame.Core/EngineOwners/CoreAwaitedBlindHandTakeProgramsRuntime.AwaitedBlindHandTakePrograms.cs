@@ -41,7 +41,6 @@ internal sealed partial class CoreAwaitedBlindHandTakeProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != frameId || frame.BlindHandTake is not { } receipt)
             return false;
-        AssertAwaitedBlindHandTake(frame);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { BlindHandTake = null });
@@ -52,15 +51,5 @@ internal sealed partial class CoreAwaitedBlindHandTakeProgramsRuntime
         }
 
         return false;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 20)]
-    internal void AssertAwaitedBlindHandTake(ProgramSkillFrame frame)
-    {
-        if (frame.BlindHandTake is not { } receipt)
-            return;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        if (receipt.InstructionIndex != frame.InstructionIndex || receipt.InstructionIndex < 1 || receipt.InstructionIndex > plan.Instructions.Count || plan.Instructions[receipt.InstructionIndex - 1] is not { Op: SkillProgramEffectOp.TakeRandomHandCardFromSelectedTargets, AwaitMovementTriggers: true } || receipt.TargetSeats.Count != receipt.CardIds.Count || receipt.CardIds.Count != receipt.SourceLocations.Count || receipt.CardIds.Count > 2 || receipt.CardIds.Distinct().Count() != receipt.CardIds.Count || receipt.TargetSeats.Distinct().Count() != receipt.TargetSeats.Count || receipt.SourceLocations.Where((from, i) => from != CardLocation.Hand(receipt.TargetSeats[i])).Any())
-            throw new InvalidOperationException("An awaited blind hand take lost its frozen exact instruction or source batch.");
     }
 }

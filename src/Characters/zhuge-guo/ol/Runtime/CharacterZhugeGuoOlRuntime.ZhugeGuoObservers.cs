@@ -60,8 +60,6 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
     internal bool HasZhugeGuoDamageObserver(long id) => ZhugeGuoObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 310)]
     internal bool HasZhugeGuoBeforeDamageObserver(long id) => ZhugeGuoObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 70)]
-    internal bool IsZhugeGuoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ZhugeGuoObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 200)]
     internal bool TryAdvanceZhugeGuoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhugeGuoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramPipelineHook(ProgramPipelinePhase.ObserveCommittedMovement, 200)]

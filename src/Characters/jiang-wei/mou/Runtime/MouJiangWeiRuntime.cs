@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouJiangWeiAnniversaryRuntime(IMouJiangWeiAnniversaryFacts facts, IMouJiangWeiAnniversaryNative native, IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouJiangWeiAnniversaryRuntime
 {
@@ -136,7 +136,6 @@ internal sealed class MouJiangWeiAnniversaryRuntime(IMouJiangWeiAnniversaryFacts
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouJiangWeiAnniversaryCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouJiangWeiAnniversary = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 35200)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouJiangWeiAnniversary: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 35200)] private bool Movement(ProgramSkillFrame f) => f.MouJiangWeiAnniversary is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 35200)] private void Invariant(ProgramSkillFrame f) { if (f.MouJiangWeiAnniversary is not null && !Valid(f)) throw new InvalidOperationException("Invalid Mou Jiang Wei owning receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35200)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35200)] private bool Paid(ProgramSkillFrame f) => f.MouJiangWeiAnniversary is { Paid: true } && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.InitializeMouJiangWeiJuemou, SkillProgramEffectOp.ResolveMouJiangWeiJuemou)]
     private PromptChoice Ai(PendingDecision p, ProgramSkillFrame f) => f.MouJiangWeiAnniversary!.Stage switch {

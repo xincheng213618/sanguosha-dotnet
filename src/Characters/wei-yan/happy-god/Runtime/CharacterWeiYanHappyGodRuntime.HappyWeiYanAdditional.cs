@@ -101,7 +101,6 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
             var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            RequireHappyWeiYan(frame);
             var receipt = frame.HappyWeiYan!;
             if (receipt.Stage == HappyWeiYanStage.Drawing)
                 return true;

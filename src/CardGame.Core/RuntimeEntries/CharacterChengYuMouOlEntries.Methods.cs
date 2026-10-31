@@ -8,11 +8,9 @@ internal sealed partial class CharacterChengYuMouOlEntries
     internal void CollectMouChengYuIssued(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.ProgramCardTriggerCandidate> result) => _resolve().CollectMouChengYuIssued(action, window, result);
     internal void ConsumeMouLidanCounterspell(global::CardGame.Core.CardActionContext action) => _resolve().ConsumeMouLidanCounterspell(action);
     internal bool FinishMouDanchiSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouDanchiSlash(attack, out paused);
-    internal bool HasMouDanchiSuspendedCompletedParent(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().HasMouDanchiSuspendedCompletedParent(window);
     internal bool HasMouLidanTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasMouLidanTargetTail(use);
     internal bool IsIssuedMouChengYu(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedMouChengYu(c, context);
     internal bool IsMouChengYuTrueUse(global::CardGame.Core.CardActionContext action) => _resolve().IsMouChengYuTrueUse(action);
-    internal bool IsMouDanchiAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouDanchiAttackConsistent(attack, processing);
     internal bool IsMouDanchiDrawTwo(long id) => _resolve().IsMouDanchiDrawTwo(id);
     internal bool IsMouDanchiSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsMouDanchiSettlementBatch(f, batch);
     internal bool IsMouDanchiUse(long id) => _resolve().IsMouDanchiUse(id);
@@ -24,7 +22,6 @@ internal sealed partial class CharacterChengYuMouOlEntries
     internal bool MouChengYuDrawTwoTargets(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().MouChengYuDrawTwoTargets(query);
     internal bool MouChengYuFinalizedTrick(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().MouChengYuFinalizedTrick(query);
     internal bool MouChengYuParentMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouChengYuParentMatches(f);
-    internal global::System.Collections.Generic.IReadOnlyList<int>? MouDanchiAncestorProcessing(long id) => _resolve().MouDanchiAncestorProcessing(id);
     internal bool MouDanchiSuspensionMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouDanchiSuspensionMatches(f);
     internal bool ObserveMouChengYuResponse(global::CardGame.Core.CardActionContext action) => _resolve().ObserveMouChengYuResponse(action);
     internal void ObserveMouChengYuUse(global::CardGame.Core.IGameEvent fact) => _resolve().ObserveMouChengYuUse(fact);

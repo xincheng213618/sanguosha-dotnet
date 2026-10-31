@@ -23,7 +23,6 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodEntries
     internal bool DrainAnnZl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainAnnZl(f);
     internal void FinishAnnZl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishAnnZl(f);
     internal void ObserveAnnZlLeases(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveAnnZlLeases(payload);
-    internal void RequireAnnZl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireAnnZl(f);
     internal bool ResumeAnnZl(long id) => _resolve().ResumeAnnZl(id);
     internal bool RetainAnnZlPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainAnnZlPaid(f);
     internal void ReturnAnnZlDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnAnnZlDraw(f, outcome);

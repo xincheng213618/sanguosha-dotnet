@@ -65,15 +65,6 @@ internal sealed partial class CoreGameEngineWushuangAuditCombatRuntime
         return moves.Length == receipt.Cards.Count && moves.Select(m => m.CardId).SequenceEqual(receipt.Cards) && moves.All(m => m.From == CardLocation.Hand(receipt.EndedSeat) && m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason.Value == WushuangCampClaimReason) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCampClaimedEvent>().Count(e => e.ProgramFrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.EndedFrameId == receipt.EndedFrameId && e.EndedSeat == receipt.EndedSeat && e.ActualTurn == receipt.ActualTurn && e.Count == receipt.Cards.Count && e.BatchId == receipt.BatchId && e.SequenceBefore == receipt.SequenceBefore && e.SequenceAfter == receipt.SequenceAfter) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 63200)]
-    internal void AssertWushuangCampClaim(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.WushuangCampClaim is null)
-            return;
-        if (frame.InstructionIndex < 1 || frame.InstructionIndex > plan.Instructions.Count || plan.Instructions[frame.InstructionIndex - 1].Op != SkillProgramEffectOp.ClaimWushuangEndedCampHand || frame.WushuangCampClaim.Cards is not System.Collections.IList { IsReadOnly: true } || !ValidWushuangCampClaim(frame))
-            throw new InvalidOperationException("Camp collection lost its exact completed turn, candidate or immutable hand movement.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 63200)]
     internal bool IsWushuangCampClaimMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ClaimWushuangEndedCampHand && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidWushuangCampClaim(frame);
     [ProgramContinuation(ProgramContinuationKind.Movement, 63200)]

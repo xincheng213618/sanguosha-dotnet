@@ -5,7 +5,6 @@ internal sealed partial class CharacterGanNingMouMobileEntries
     internal bool AdvanceMouGnChildren() => _resolve().AdvanceMouGnChildren();
     internal void AnswerMouGn(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouGn(choice);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? AppendMouGanNingWei(int seat, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? ordinary) => _resolve().AppendMouGanNingWei(seat, ordinary);
-    internal void AssertMouGn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouGn(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouGn(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouGn(supplied, op);
     internal bool CanOfferMouGnWei(int owner, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferMouGnWei(owner, c);
     internal global::CardGame.Core.PromptChoice ChooseMouGnAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseMouGnAi(p, f);

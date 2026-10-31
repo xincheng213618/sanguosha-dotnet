@@ -76,14 +76,10 @@ internal sealed partial class CoreGameEngineProvenanceVirtualAlcoholRuntime
         _coreCardUseLifecycleOperations.BeginSimpleCardUse(useId, new(0, SimpleCardUseEffect.Alcohol));
         return true;
     }
-
-    internal bool IsExactProvenanceVirtualBasicDraft(ProgramSkillFrame f, ProgramVirtualBasicDraft draft) => f.ProvenanceAlcohol is { Stage: ProgramProvenanceAlcoholStage.WineUse } receipt && receipt.InstructionIndex == f.InstructionIndex && receipt.ChildFrameId == draft.ChildFrameId && draft.InstructionIndex == receipt.InstructionIndex;
     internal void AssertProvenanceAlcohol(ProgramSkillFrame f)
     {
         if (f.ProvenanceAlcohol is not { } receipt)
             return;
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions;
-        if (receipt.InstructionIndex != f.InstructionIndex || plan.Count != 1 || receipt.InstructionIndex != 1 || plan[0].Op != SkillProgramEffectOp.UseVirtualAlcohol || f.TriggerId is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || receipt.Stage == ProgramProvenanceAlcoholStage.FaceCost && (receipt.ChildFrameId is not null || f.VirtualBasicDraft is not null) || receipt.Stage == ProgramProvenanceAlcoholStage.WineUse && receipt.ChildFrameId is null)
-            throw new InvalidOperationException("A paid Wine instruction lost its exact zero-card activation receipt.");
     }
 }

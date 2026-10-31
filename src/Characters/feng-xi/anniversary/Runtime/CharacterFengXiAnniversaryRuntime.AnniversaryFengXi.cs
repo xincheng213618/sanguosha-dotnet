@@ -95,7 +95,6 @@ internal sealed partial class CharacterFengXiAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryFengXi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == AnniversaryFengXiStage.DiscardChoice ? r.Target : f.OwnerSeat) || !FengXiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Feng Xi rejects a stale branch or another participant's private discard.");
-        RequireFengXi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -154,7 +153,6 @@ internal sealed partial class CharacterFengXiAnniversaryRuntime
             return false;
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryFengXi: { } r } f && f.Id == id)
         {
-            RequireFengXi(f);
             if (r.Stage is AnniversaryFengXiStage.Choice or AnniversaryFengXiStage.DiscardChoice)
             {
                 PublishFengXi(f);

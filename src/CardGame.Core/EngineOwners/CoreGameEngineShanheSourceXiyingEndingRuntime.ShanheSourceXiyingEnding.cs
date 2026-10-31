@@ -101,25 +101,4 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 62063)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 62063)]
     internal bool KeepPaidSourceXiying(ProgramSkillFrame f) => f.SkillId == ShanheSourceXiyingContract.Skill && (f.ShanheSourceXiying is { CostCardId: > 0 } && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().Any(e => e.FrameId == f.Id && ValidSourceXiyingPaid(e)) || f.TriggerId == ShanheSourceXiyingContract.Ending && f.WindowContext is { } c && ExactSourceXiyingEnding(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), c)is not null);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 62063)]
-    internal void AssertSourceXiyingFrame(ProgramSkillFrame f)
-    {
-        if (f.ShanheSourceXiying is not { } r)
-            return;
-        if (f.SkillId != ShanheSourceXiyingContract.Skill || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { } c || r.ParentId != c.ParentFrameId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || !Enum.IsDefined(r.Stage) || r.PlayPhaseInstance < 1 || r.Seats.Distinct().Count() != r.Seats.Count || r.Seats.Contains(f.OwnerSeat) || r.Index < 0 || r.Index > r.Seats.Count)
-            throw new InvalidOperationException("Source1180 lost its immutable owner, native frame or actual-Play cursor.");
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
-        if (r.Stage == ShanheSourceXiyingStage.RewardChildren)
-        {
-            var paid = ExactSourceXiyingEnding(candidate, c);
-            if (paid is null || r.PaidFrameId != paid.FrameId || r.RewardCardId is null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingRewardEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var reward] || reward.PaidFrameId != paid.FrameId || reward.CardId != r.RewardCardId || reward.Before != r.TargetBefore || reward.After != r.TargetAfter || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == reward.After && m.CardId == reward.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "skill-program.source-xiying-1180.reward"))
-                throw new InvalidOperationException("Source1180 reward lost its one original deck entity or original paid Ending invoice.");
-            return;
-        }
-
-        if (!_coreShanheSourceXiyingOperations.SourceXiyingPlayParent(f.OwnerSeat, candidate, c) || r.PlayPhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Stage != ShanheSourceXiyingStage.Cost && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().Any(e => e.FrameId == f.Id && e.Source == global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceXiyingRuntime.SourceXiyingSource(f) && e.CardId == r.CostCardId && e.Before == r.CostBefore && e.After == r.CostAfter && ValidSourceXiyingPaid(e)))
-            throw new InvalidOperationException("Source1180 lost its exact once-paid non-basic hand cost or Play parent.");
-        if (r.Stage == ShanheSourceXiyingStage.TargetChildren && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingTargetPaidEvent>().Any(e => e.FrameId == f.Id && e.TargetSeat == r.TargetSeat && e.CardId == r.TargetCardId && e.Before == r.TargetBefore && e.After == r.TargetAfter))
-            throw new InvalidOperationException("Source1180 lost an actual other-character discard invoice.");
-    }
 }

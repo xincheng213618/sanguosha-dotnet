@@ -155,7 +155,6 @@ internal sealed partial class CharacterHanFuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HanFu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == HanFuStage.ReturnChoice ? r.TargetSeat : f.OwnerSeat) || !HanFuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("HanFu requires the original chooser's exact published private physical-card or benefit choice.");
-        AssertHanFu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (branch == "skip")
@@ -214,7 +213,6 @@ internal sealed partial class CharacterHanFuOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HanFu: { } r } f && f.Id == id)
         {
-            AssertHanFu(f);
             if (r.Stage == HanFuStage.DamageIssued)
             {
                 if (f.AttackAttempt is not null)

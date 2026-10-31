@@ -30,7 +30,6 @@ internal interface ICardsMovedWindowNativeProofs : IProgramSelectionQuery
     bool IsSkillInvocationMovementBatch(SkillInvocationFrame f, CardMovementBatchContext batch);
     bool IsRoundEndingMovement(RoundEndingBoundaryFrame parent, CardMovementBatchContext batch);
     bool IsNianRevivalMovementBatch(ProgramSkillFrame f, CardMovementBatchContext batch);
-    bool IsPendingWenhePoisonWindow(CardsMovedTriggerWindowFrame frame);
 }
 
 internal interface ICardsMovedWindowCardUseProofs : IProgramSelectionQuery

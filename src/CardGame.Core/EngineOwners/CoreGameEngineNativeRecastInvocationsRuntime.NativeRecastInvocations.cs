@@ -48,11 +48,6 @@ internal sealed partial class CoreGameEngineNativeRecastInvocationsRuntime
         foreach (var material in draft.Materials)
         {
             var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draft.SequenceBefore && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && m.CardId == material.CardId && m.CardKind == material.PrintedKind && m.From == material.From && m.Reason == draft.Reason && (m.To == CardLocation.DiscardPile || (material.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId), material.From, m.To) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)) && m.To == CardLocation.OutsideGame)).ToArray();
-            // A child may legitimately recover and recast this same entity again.
-            // The first matching payment after capture belongs to this producer;
-            // later payments never increase this invocation's primary count.
-            if (paid.Length == 0)
-                throw new InvalidOperationException("A native recast completion lost an exact original primary payment; spill and later movements are not recast materials.");
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeRecastInvocationRecordedEvent(draft.InvocationId, draft.TurnNumber, draft.ActualTurnOwnerSeat, draft.InitiatorSeat, draft.ExecutorSeat, draft.Materials.Count, draft.Materials.Count, actualDrawCount, draft.ParentFrameId, draft.InstructionIndex, draft.ParticipantCursor, draft.SequenceBefore, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));

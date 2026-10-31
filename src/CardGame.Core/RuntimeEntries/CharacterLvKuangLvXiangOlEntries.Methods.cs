@@ -4,7 +4,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlEntries
 {
     internal void AddQigongNativeAdapterChoices(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.List<global::CardGame.Core.PromptChoice> choices) => _resolve().AddQigongNativeAdapterChoices(f, choices);
     internal void AnswerLvKuangLvXiang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerLvKuangLvXiang(choice);
-    internal void AssertLvKuangLvXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLvKuangLvXiang(f);
     internal void AssertQigongNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertQigongNativeUse(use);
     internal void BeginQigongDeclaration(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PromptChoice choice) => _resolve().BeginQigongDeclaration(f, choice);
     internal void BindQigongNativeUse(long id) => _resolve().BindQigongNativeUse(id);
@@ -20,11 +19,8 @@ internal sealed partial class CharacterLvKuangLvXiangOlEntries
     internal void FinishLvKuangLvXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLvKuangLvXiang(f);
     internal bool FinishQigongFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => _resolve().FinishQigongFactionDeclined(id, pending);
     internal bool HasLvKuangLvXiangBeforeDamageObserver(long id) => _resolve().HasLvKuangLvXiangBeforeDamageObserver(id);
-    internal bool HasLvKuangLvXiangCardObserver(long originalUseId) => _resolve().HasLvKuangLvXiangCardObserver(originalUseId);
     internal bool HasLvKuangLvXiangDamageObserver(long id) => _resolve().HasLvKuangLvXiangDamageObserver(id);
-    internal bool IsLvKuangLvXiangDying() => _resolve().IsLvKuangLvXiangDying();
     internal bool IsLvKuangLvXiangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLvKuangLvXiangMovement(f, e, p);
-    internal bool IsQigongCompletedAttackProcessing(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsQigongCompletedAttackProcessing(attack, processing);
     internal bool IsQigongDeclarationChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().IsQigongDeclarationChild(f, child);
     internal bool IsQigongDeclarationQuery(global::CardGame.Core.CharacterState actor, int? selectedId) => _resolve().IsQigongDeclarationQuery(actor, selectedId);
     internal bool IsQigongIssuedDistance(long? id, int actor) => _resolve().IsQigongIssuedDistance(id, actor);
@@ -38,7 +34,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlEntries
     internal global::CardGame.Core.PromptChoice LvKuangLvXiangAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().LvKuangLvXiangAi(p, f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> LvKuangLvXiangChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LvKuangLvXiangChoices(f);
     internal bool LvKuangLvXiangCurrent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LvKuangLvXiangCurrent(f);
-    internal bool LvKuangLvXiangDecisionMatches(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision prompt) => _resolve().LvKuangLvXiangDecisionMatches(f, prompt);
     internal bool LvKuangLvXiangFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().LvKuangLvXiangFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? LvKuangLvXiangObserverRoot() => _resolve().LvKuangLvXiangObserverRoot();
     internal bool LvKuangLvXiangObserverSuffix(int index) => _resolve().LvKuangLvXiangObserverSuffix(index);

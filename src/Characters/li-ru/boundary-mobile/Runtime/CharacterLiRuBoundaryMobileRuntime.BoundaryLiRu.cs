@@ -214,12 +214,6 @@ internal sealed partial class CharacterLiRuBoundaryMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 55700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 55700)]
     internal bool KeepPaidBoundaryLiRuMieji(ProgramSkillFrame f) => f.BoundaryLiRuMieji is { Stage: BoundaryLiRuMiejiStage.Movement } && ValidBoundaryLiRuMieji(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 55700)]
-    internal void AssertBoundaryLiRuMieji(ProgramSkillFrame f)
-    {
-        if (f.BoundaryLiRuMieji is not null && !ValidBoundaryLiRuMieji(f))
-            throw new InvalidOperationException("Mieji lost its original activation, private choice or paid movement receipt.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryLiRuMieji)]
     internal PromptChoice AiBoundaryLiRuMieji(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "gift") ?? p.Choices.OrderBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(card => card.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).First();

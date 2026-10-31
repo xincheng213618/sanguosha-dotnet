@@ -7,7 +7,6 @@ internal sealed partial class CharacterHuaXiongMouOlEntries
     internal void AfterMouHxYangweiChain(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().AfterMouHxYangweiChain(attack);
     internal void AnswerMouHxBojue(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouHxBojue(choice);
     internal int ApplyMouHxYangwei(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ApplyMouHxYangwei(attack);
-    internal void AssertMouHxBojue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouHxBojue(f);
     internal void BeforeMouHxYangweiChain(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().BeforeMouHxYangweiChain(attack);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouHxBojue(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouHxBojue(supplied);
     internal void BindMouHxBojueSlash(global::CardGame.Core.IGameEvent fact) => _resolve().BindMouHxBojueSlash(fact);

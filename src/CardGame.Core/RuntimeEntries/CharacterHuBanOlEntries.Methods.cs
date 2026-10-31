@@ -4,7 +4,6 @@ internal sealed partial class CharacterHuBanOlEntries
 {
     internal bool AdvanceHuBanSubtree() => _resolve().AdvanceHuBanSubtree();
     internal void AnswerHuiyun(global::CardGame.Core.PromptChoice supplied) => _resolve().AnswerHuiyun(supplied);
-    internal void AssertHuiyun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHuiyun(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHuiyun(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHuiyun(supplied);
     internal void BindHuiyunFollowupUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindHuiyunFollowupUse(use);
     internal bool CanRunIssuedHuiyunCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunIssuedHuiyunCandidate(c, context);
@@ -22,7 +21,6 @@ internal sealed partial class CharacterHuBanOlEntries
     internal void FinishHuiyunOpportunity(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuiyunOpportunity(f);
     internal bool HasHuBanBeforeDamageObserver(long id) => _resolve().HasHuBanBeforeDamageObserver(id);
     internal bool HasHuBanDamageObserver(long id) => _resolve().HasHuBanDamageObserver(id);
-    internal bool HasHuiyunCompletedUseObserver(long useId) => _resolve().HasHuiyunCompletedUseObserver(useId);
     internal bool HasHuiyunOption(int seat, int round) => _resolve().HasHuiyunOption(seat, round);
     internal bool HasHuiyunTrickPaymentProcessing(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().HasHuiyunTrickPaymentProcessing(processing);
     internal bool HasHuiyunTrickPaymentTail(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation) => _resolve().HasHuiyunTrickPaymentTail(use, continuation);
@@ -44,7 +42,6 @@ internal sealed partial class CharacterHuBanOlEntries
     internal bool HuiyunPaymentProof(long use, long action, int card, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to, global::CardGame.Core.CardMoveReason reason, long before, bool followup) => _resolve().HuiyunPaymentProof(use, action, card, from, to, reason, before, followup);
     internal bool HuiyunSlashQuotaBeforeLimit(global::CardGame.Core.ProgramSlashQuotaQuery query) => _resolve().HuiyunSlashQuotaBeforeLimit(query);
     internal bool HuiyunUseProof(global::CardGame.Core.CardUseFrame u) => _resolve().HuiyunUseProof(u);
-    internal bool IsHuBanDying() => _resolve().IsHuBanDying();
     internal bool IsHuBanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsHuBanMovement(f, e, p);
     internal bool IsHuiyunExactHandQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsHuiyunExactHandQuery(actor, id);
     internal bool IsHuiyunNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsHuiyunNativeSettlementBatch(f, batch);

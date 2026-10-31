@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 // Runs only the paid threshold occurrence on its existing movement/program frames.
 // Random selection, the public fact and damage entry retain their original order.
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class NativeDrawThresholdRuntime(IProgramRuntimeFrames frames,
     INativeFrameRoutingFacts nativeFrames, IProgramRuntimeEvents events,
     IProgramContentQueries content, IProgramEventHistoryQueries history,
@@ -69,22 +69,6 @@ internal sealed class NativeDrawThresholdRuntime(IProgramRuntimeFrames frames,
         events.AdvanceFact(new NativeDrawThresholdTargetChosenEvent(active.Id, batch.NativeDrawInvocation!.InvocationId,
             context.OccurrenceIndex, progress.Source, target));
         return operations.BeginDamage(active, target, amount);
-    }
-
-    internal bool HasExactNativeDrawThresholdSelection(ProgramSkillFrame frame)
-    {
-        if (frame.TriggerId is null || frame.InstructionIndex != 1 || frame.SelectedTargetSeats is not [var target] ||
-            frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained,
-                MovementBatch: { NativeDrawInvocation: { } proof } batch } context ||
-            !UsesNativeDrawThreshold(windows.GetProgramTrigger(frame)) ||
-            frames.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(item => item.Id == context.ParentFrameId) is not { } movement ||
-            movement.Batch != batch || movement.CandidateIndex < 0 || movement.CandidateIndex >= movement.Candidates.Count ||
-            !RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, movement.Candidates[movement.CandidateIndex]) ||
-            MatchingNativeDrawThresholdProgress(batch, movement.Candidates[movement.CandidateIndex]) is not { } progress)
-            return false;
-        return history.Read<NativeDrawThresholdTargetChosenEvent>().Where(item => item.ProgramFrameId == frame.Id).ToArray()
-            is [var chosen] && chosen.InvocationId == proof.InvocationId && chosen.OccurrenceIndex == context.OccurrenceIndex &&
-            chosen.Source == progress.Source && chosen.TargetSeat == target;
     }
 
     private bool NativeDrawThresholdProgramProducerMatches(ProgramSkillFrame producer,
@@ -186,15 +170,5 @@ internal sealed class NativeDrawThresholdRuntime(IProgramRuntimeFrames frames,
                 described == paid) return true;
         }
         return false;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 62022)]
-    internal void AssertNativeDrawThresholdDyingOrigin(ProgramSkillFrame frame)
-    {
-        if (frame.AttackReturn?.NativeDrawDyingOrigin is not { } paid) return;
-        if (frame.AttackAttempt is not { SourceLess: false } attack || attack.SourceSeat != frame.OwnerSeat ||
-            !TryDescribeNativeDrawThresholdDyingDamage(frame, paid.TargetSeat, paid.Amount, null, null, false, null, out var described) ||
-            described != paid)
-            throw new InvalidOperationException("Draw-threshold damage lost its exact self-dying producer, native invoice or original dying token.");
     }
 }

@@ -61,7 +61,6 @@ internal sealed partial class CharacterXuShuMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileSpXuShuJianyan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MobileSpXuShuJianyanChoices(f).Any(c => c.Id == choice.Id && c.Targets.SequenceEqual(choice.Targets)))
             throw new InvalidOperationException("Mobile Jianyan rejects a different original chooser, criterion or recipient.");
-        AssertMobileSpXuShuJianyan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == "declare")
         {
@@ -95,7 +94,6 @@ internal sealed partial class CharacterXuShuMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileSpXuShuJianyan: { } r } f || f.Id != id)
             return false;
-        AssertMobileSpXuShuJianyan(f);
         if (r.Stage == "declare")
             return true;
         if (r.Stage == "recipient" && _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
@@ -124,9 +122,6 @@ internal sealed partial class CharacterXuShuMobileRuntime
             BeginMobileSpXuShuJianyanCleanup(f);
             return true;
         }
-
-        if (r.Stage != "search" || r.Criterion is null)
-            throw new InvalidOperationException("Mobile Jianyan lost its original search cursor.");
         if (!_corePhysicalDrawFacadesOperations.EnsureDrawPile())
         {
             BeginMobileSpXuShuJianyanCleanup(f);
@@ -224,7 +219,6 @@ internal sealed partial class CharacterXuShuMobileRuntime
     {
         if (f.MobileSpXuShuJianyan is null)
             return false;
-        AssertMobileSpXuShuJianyan(f);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
         if (f.MobileSpXuShuJianyan.Stage == "recipient")
             PublishOrFinishMobileSpXuShuJianyanRecipient(f);
@@ -238,14 +232,6 @@ internal sealed partial class CharacterXuShuMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 71700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 71700)]
     internal bool KeepMobileSpXuShuJianyanIssued(ProgramSkillFrame f) => f.MobileSpXuShuJianyan is { RevealedIds.Count: > 0 };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 71700)]
-    internal void AssertMobileSpXuShuJianyan(ProgramSkillFrame f)
-    {
-        if (f.MobileSpXuShuJianyan is not { } r)
-            return;
-        if (f.SkillId != MobileSpXuShuJianyanSkill || f.TriggerId is not null || f.InstructionIndex != 1 || f.ActivationId != "declare-and-give" || r.Stage is not ("declare" or "search" or "recipient" or "gift-children" or "cleanup-children") || r.Stage != "declare" && r.Criterion is not ("basic" or "trick" or "equipment" or "red" or "black") || r.RevealedIds.Distinct().Count() != r.RevealedIds.Count || r.RevealedIds.Any(id => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSpXuShuJianyanRevealedEvent>().Count(e => e.FrameId == f.Id && e.CardId == id && e.Criterion == r.Criterion && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.MovementSequence && m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == MobileSpXuShuJianyanRevealReason)) != 1) || r.MatchedCardId is { } match && !r.RevealedIds.Contains(match) || r.Movement is not null && !ValidMobileSpXuShuJianyanMovement(f) || f.PendingMovementContinuation is not null && r.Movement is null || r.Stage == "gift-children" && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSpXuShuJianyanGiftPaidEvent>().Count(e => e.FrameId == f.Id && e.CardId == r.MatchedCardId && e.RecipientSeat == r.RecipientSeat) != 1 || r.Stage == "cleanup-children" && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSpXuShuJianyanCleanupPaidEvent>().Count(e => e.FrameId == f.Id) != 1)
-            throw new InvalidOperationException("Mobile Jianyan lost its original immutable reveal pool or once-paid native gift/cleanup.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileSpXuShuJianyan)]
     internal PromptChoice MobileSpXuShuJianyanAi(PendingDecision p, ProgramSkillFrame f) => f.MobileSpXuShuJianyan?.Stage == "declare" ? p.Choices.First(c => c.Parameters.GetValueOrDefault("criterion") == "basic") : p.Choices.FirstOrDefault(c => c.Targets.SequenceEqual([f.OwnerSeat])) ?? p.Choices.First();

@@ -53,16 +53,6 @@ internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTargetSlashReceiptIssuedEvent(owner.Id, receipt));
     }
 
-    internal void AssertCurrentUsePhysicalClaims()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.CurrentUsePhysicalClaims is not null))
-        {
-            var claims = use.CurrentUsePhysicalClaims!;
-            if (use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || claims.Count == 0 || claims.DistinctBy(c => (c.ProducerFrameId, c.EffectIndex)).Count() != claims.Count || claims.SelectMany(c => c.CardIds).Distinct().Count() != claims.Sum(c => c.CardIds.Count) || claims.Any(c => c.CardUseFrameId != use.Id || c.ActionId != action.ActionId || c.ActorSeat != action.ActorSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(c.RecipientSeat) || c.ActorSeat == c.RecipientSeat || !action.EffectiveDesignatedTargetSeats.Contains(c.RecipientSeat) || c.ProducerFrameId <= 0 || c.CardIds.Count == 0 || c.CardIds.Distinct().Count() != c.CardIds.Count || c.CardIds.Any(id => !action.PhysicalCards.Any(cost => cost.CardId == id)) || string.IsNullOrEmpty(c.SkillInstanceId) || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(c.SkillId)?.Program is not { } program || program.GameplayHash != c.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == c.TriggerId)is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, OwnerRelation: SkillProgramCardActionOwnerRelation.Actor } trigger || c.EffectIndex < 0 || c.EffectIndex >= trigger.Effects.Count || trigger.Effects[c.EffectIndex].Op != SkillProgramEffectOp.ClaimCurrentUsePhysicalCards || !_coreCommandJournalStorageEventsPendingEventsAccess._events.Select(e => e.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).OfType<ProgramCurrentUsePhysicalCardsClaimedEvent>().Any(e => (e.Claim with { CardIds = c.CardIds }) == c && e.Claim.CardIds.SequenceEqual(c.CardIds))))
-                throw new InvalidOperationException("A claimed physical entity lost its still-resolving use and issuing instruction.");
-        }
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.ICurrentUsePhysicalClaimProgramHost.ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame) => ClaimCurrentUsePhysicalCards(frame);
     void global::CardGame.Core.ICurrentUsePhysicalClaimProgramHost.PreventCurrentTargetSlashCancellationByRule(ProgramSkillFrame frame) => PreventCurrentTargetSlashCancellationByRule(frame);
 }

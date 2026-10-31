@@ -78,8 +78,6 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamageObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1990)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 90)]
     internal bool HasDynamicDiscardDamageObserver(long window) => DynamicDiscardDamageObserverRoot(window)is not null;
-    internal bool HasDynamicDiscardDamageAttackObserver(global::CardGame.Core.GameEngine.IDamageAttempt attack) => DynamicDiscardDamageObserverRoot()is { } root && root.Id == attack.ResolutionId && root.AttackAttempt is { } actual && actual.SourceSeat == attack.SourceSeat && actual.TargetSeat == attack.TargetSeat;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 220, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 340)]
     internal bool IsDynamicDiscardDamageProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DynamicDiscardDamageObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 560)]

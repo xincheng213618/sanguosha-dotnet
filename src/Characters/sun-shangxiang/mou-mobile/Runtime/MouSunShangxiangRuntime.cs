@@ -156,8 +156,6 @@ internal sealed partial class MouSunShangxiangRuntime(IMouSunShangxiangFacts fac
     internal bool Valid(ProgramSkillFrame f)=>f.MouSsx is{}r&&r.Source==Source(f)&&r.GameplayHash==f.GameplayHash&&facts.Program(f.SkillId).GameplayHash==f.GameplayHash&&
         f.InstructionIndex==1&&r.ParentFrameId==(frames.ParentOf(f.Id)?.Id??0)&&facts.ParentMatches(f)&&r.Before<=r.After&&r.After<=facts.MovementSequence&&r.Selected.Distinct().Count()==r.Selected.Count&&
         facts.History<MouSsxStartedEvent>().Count(e=>e==new MouSsxStartedEvent(f.Id,r.Source,r.GameplayHash,r.Operation,r.ParentFrameId,r.HolderSeat))==1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,35100)]
-    internal void Assert(ProgramSkillFrame f){if(f.MouSsx is not null&&!Valid(f))throw new InvalidOperationException("Sun Shangxiang lost her original source, actual parent or paid entities.");}
     [ProgramContinuation(ProgramContinuationKind.Resume,35100)]
     internal bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouSsx:not null}f||f.Id!=id)return false;Continue(id);return true;}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,35100)]

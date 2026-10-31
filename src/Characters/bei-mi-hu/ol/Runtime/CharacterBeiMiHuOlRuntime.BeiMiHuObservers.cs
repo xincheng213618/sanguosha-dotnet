@@ -30,13 +30,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
             throw new InvalidOperationException("Bei Mi Hu lost its actual lifecycle/damage invoice or exact paid target mutation.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 210)]
-    internal void AssertRegisteredBeiMiHu(ProgramSkillFrame frame)
-    {
-        if (frame.BeiMiHu is not null)
-            AssertBeiMiHu(frame);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 170)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 170)]
     internal bool CanContinueBeiMiHu(ProgramSkillFrame f) => f.BeiMiHu is { } r && r.Stage is not ("round-choice" or "before-turn-choice" or "append-choice") && ValidBeiMiHu(f);
@@ -56,8 +49,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     }
 
     internal ProgramSkillFrame? BeiMiHuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterBeiMiHuOlOperations.BeiMiHuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 100)]
-    internal bool IsBeiMiHuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BeiMiHuObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 130)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 240)]
     internal bool HasBeiMiHuDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && BeiMiHuObserverRoot()is not null;

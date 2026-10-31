@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsEntries
 {
     internal void AssertJoinedTrickDamageBenefits(global::CardGame.Core.CardUseFrame use) => _resolve().AssertJoinedTrickDamageBenefits(use);
-    internal void AssertJoinedTrickDamageReward(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertJoinedTrickDamageReward(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginJoinedTrickDamageReward(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginJoinedTrickDamageReward(supplied);
     internal bool CanContinueIssuedJoinedTrickDamageReward(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueIssuedJoinedTrickDamageReward(frame);
     internal bool CanOfferJoinedTrickDamageReward(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferJoinedTrickDamageReward(candidate, trigger, context);

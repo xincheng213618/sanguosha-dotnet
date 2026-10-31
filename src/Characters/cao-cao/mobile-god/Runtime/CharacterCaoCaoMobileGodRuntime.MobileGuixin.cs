@@ -37,7 +37,6 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
             var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            RequireMobileGuixin(f);
             var r = f.MobileGuixin!;
             if (r.Stage is MobileGuixinStage.MovementChildren or MobileGuixinStage.TurnoverChildren)
             {
@@ -106,7 +105,6 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
     internal void AnswerMobileGuixin(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Mobile Guixin lost its active original frame.");
-        RequireMobileGuixin(f);
         var r = f.MobileGuixin!;
         var exact = MobileGuixinChoices(f).SingleOrDefault(c => c.Id == chosen.Id && c.Cards.SequenceEqual(chosen.Cards) && c.Targets.SequenceEqual(chosen.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(chosen.Parameters.OrderBy(p => p.Key))) ?? throw new InvalidOperationException("Mobile Guixin requires its exact current public card or opaque hand slot.");
         var target = r.OtherSeats[r.Cursor];

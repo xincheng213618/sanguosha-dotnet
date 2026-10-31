@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRecipientConsequencesObserversEntries
 {
-    internal void AssertRecipientConsequencesSubtrees() => _resolve().AssertRecipientConsequencesSubtrees();
     internal bool HasRecipientConsequencesDamageObserver(long id) => _resolve().HasRecipientConsequencesDamageObserver(id);
     internal bool IsRecipientConsequencesProgramDying() => _resolve().IsRecipientConsequencesProgramDying();
     internal bool RecipientConsequencesFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().RecipientConsequencesFirstChild(f, child);

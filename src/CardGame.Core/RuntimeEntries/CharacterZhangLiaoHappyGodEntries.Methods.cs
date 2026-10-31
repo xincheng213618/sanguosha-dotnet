@@ -29,7 +29,6 @@ internal sealed partial class CharacterZhangLiaoHappyGodEntries
     internal bool HasHappyZlSourceRestoration(int source, int target) => _resolve().HasHappyZlSourceRestoration(source, target);
     internal void ObserveHappyZlCounterspell(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveHappyZlCounterspell(payload);
     internal void ObserveHappyZlSlots(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveHappyZlSlots(payload);
-    internal void RequireHappyZl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireHappyZl(f);
     internal bool ResumeHappyZl(long id) => _resolve().ResumeHappyZl(id);
     internal bool RetainHappyZlPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainHappyZlPaid(f);
     internal void ReturnHappyZlDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnHappyZlDraw(f, outcome);

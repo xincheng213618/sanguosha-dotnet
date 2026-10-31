@@ -14,64 +14,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == r.CostSequence && m.CardId == r.CardId && m.CardKind == r.PrintedKind && m.From == r.CostFrom && m.To == r.CostTo && m.Reason.Value == WeiwanCostReason) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28620)]
-    internal void AssertWeiwan(ProgramSkillFrame f)
-    {
-        if (f.Weiwan is not { } r)
-            return;
-        if (f.SkillId != "le:weiwan" || f.ActivationId != "discard-qin-obtain-suits" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != WeiwanSource(f) || r.GameplayHash != f.GameplayHash || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Play || r.Phase.ActorSeat != f.OwnerSeat || r.Phase.TurnNumber != r.ActualTurn || r.Phase.ActualTurnOwnerSeat != r.TurnOwner || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || !Enum.IsDefined(r.Stage) || !Enum.IsDefined(r.CostSuit) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.TargetSeat == f.OwnerSeat || !f.SelectedCardIds.SequenceEqual([r.CardId]) || !f.SelectedTargetSeats.SequenceEqual([r.TargetSeat]) || r.Before < r.SequenceBefore || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Samples is not System.Collections.IList { IsReadOnly: true } || r.CostSequence > 0 && !HasPaidWeiwanSelection(f) || r.CostSequence == 0 && (r.Stage != WeiwanStage.CostChildren || r.CostBatchId != 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<WeiwanCostPaidEvent>().Any(e => e.FrameId == f.Id)))
-            throw new InvalidOperationException("Weiwan lost its exact original Qin cost, source, selected target or native phase.");
-        var sampled = _coreProgramEventHistoryOperations.ProgramEventHistory<WeiwanSuitSampledEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Stage == WeiwanStage.CostChildren)
-        {
-            if (r.Samples.Count != 0 || sampled.Length != 0 || r.ActualCount != -1 || r.ObtainBatchId != 0 || r.Branch is not null)
-                throw new InvalidOperationException("Weiwan cannot sample its target before the cost children finish.");
-            return;
-        }
-
-        if (!HasPaidWeiwanSelection(f) || r.Before < r.CostSequence || r.Samples.Count > 4 || r.Samples.Select(s => s.Suit).Distinct().Count() != r.Samples.Count || sampled.Length != r.Samples.Count || r.Samples.Where(s => s.CardId is not null).Select(s => s.CardId).Distinct().Count() != r.Samples.Count(s => s.CardId is not null))
-            throw new InvalidOperationException("Weiwan lost its once-only original random suit group.");
-        for (var i = 0; i < r.Samples.Count; i++)
-        {
-            var s = r.Samples[i];
-            if (s.Index != i || !global::CardGame.Core.EngineOwners.CharacterXiaoQiaoLeDefinitions.WeiwanSuits.Contains(s.Suit) || s.Suit == r.CostSuit || s.CandidateCount < 0 || (s.CardId is null) != (s.CandidateCount == 0) || (s.CardId is null) != (s.PrintedKind is null) || (s.CardId is null) != (s.From is null) || s.From is { } from && (from.OwnerSeat != r.TargetSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)) || sampled[i] != new WeiwanSuitSampledEvent(f.Id, s.Index, s.Suit, s.CardId, s.PrintedKind, s.From, s.CandidateCount, s.RandomBefore, s.RandomAfter, r.Before))
-                throw new InvalidOperationException("Weiwan's private random sample changed its suit, original area or scalar invoice.");
-            var random = new DeterministicRandom(unchecked((int)s.RandomBefore));
-            if (s.CandidateCount > 0)
-                _ = random.Next(s.CandidateCount);
-            if (random.State != s.RandomAfter || i > 0 && s.RandomBefore != r.Samples[i - 1].RandomAfter)
-                throw new InvalidOperationException("Weiwan cannot redraw or replace its original deterministic choice.");
-        }
-
-        var moves = _coreProgramEventHistoryOperations.ProgramEventHistory<WeiwanEntityObtainedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        var selected = r.Samples.Where(s => s.CardId is not null).ToArray();
-        if (r.ActualCount == -1)
-        {
-            if (r.Stage != WeiwanStage.ObtainChildren || moves.Length != 0 || r.ObtainBatchId != 0 || r.Branch is not null)
-                throw new InvalidOperationException("Weiwan cannot finish before the actual original entity obtain batch.");
-            return;
-        }
-
-        if (moves.Length != selected.Length || r.ActualCount != moves.Count(m => m.To == CardLocation.Hand(f.OwnerSeat)) || _coreProgramEventHistoryOperations.ProgramEventHistory<WeiwanObtainPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paidObtain] || paidObtain != new WeiwanObtainPaidEvent(f.Id, r.ObtainBatchId, selected.Length, r.ActualCount, r.Before, r.After) || selected.Length == 0 && (r.ObtainBatchId != 0 || r.Before != r.After))
-            throw new InvalidOperationException("Weiwan's count must be actual primary entities entering its owner's Hand, excluding destruction or spill.");
-        for (var i = 0; i < selected.Length; i++)
-        {
-            var s = selected[i];
-            var m = moves[i];
-            if (m.Index != s.Index || m.CardId != s.CardId || m.PrintedKind != s.PrintedKind || m.From != s.From || m.BatchId != r.ObtainBatchId || m.MovementSequence <= r.Before || m.MovementSequence > r.After || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(x => x.Sequence == m.MovementSequence && x.CardId == m.CardId && x.CardKind == m.PrintedKind && x.From == m.From && x.To == m.To && x.Reason.Value == WeiwanObtainReason) != 1)
-                throw new InvalidOperationException("Weiwan lost the real destination or single payment of a sampled entity.");
-        }
-
-        if (r.Branch is { } branch && branch != (r.ActualCount switch
-        {
-            1 => WeiwanBranch.LoseHp,
-            2 => WeiwanBranch.UnlimitedUse,
-            3 => WeiwanBranch.ForbidUse,
-            _ => WeiwanBranch.None
-        }) || r.Stage is WeiwanStage.HealthIssuing or WeiwanStage.HealthChildren && r.Branch is null || r.HpLossCaptured && (r.Branch != WeiwanBranch.LoseHp || r.Stage != WeiwanStage.HealthChildren || _coreProgramEventHistoryOperations.ProgramEventHistory<WeiwanHealthAppliedEvent>().Count(e => e.FrameId == f.Id && e.TargetSeat == r.TargetSeat && e.Amount == (r.AppearancePrevented ? 0 : 1) && e.PreventedByAppearance == r.AppearancePrevented) != 1))
-            throw new InvalidOperationException("Weiwan repeated or changed the branch of its exact actual obtained count.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 220)]
     internal bool IsWeiwanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.Weiwan is { } r && HasPaidWeiwanSelection(f) && effect?.Op == SkillProgramEffectOp.ResolveWeiwanQinDiscardAndSuitObtain && pending == f.PendingMovementContinuation && pending.BeforeCount == 0 && pending.CoverageResultBind is null && pending.SubjectSeat == (r.Stage is WeiwanStage.CostChildren or WeiwanStage.ObtainChildren ? f.OwnerSeat : r.TargetSeat);
     internal bool WeiwanPrimaryMovement(ProgramSkillFrame f, CardMovementRecord m)

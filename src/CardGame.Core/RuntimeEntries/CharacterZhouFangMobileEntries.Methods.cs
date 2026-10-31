@@ -4,7 +4,6 @@ internal sealed partial class CharacterZhouFangMobileEntries
 {
     internal bool AdvanceMobileDuanfaObserver() => _resolve().AdvanceMobileDuanfaObserver();
     internal void AnswerMobileDuanfa(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMobileDuanfa(selected);
-    internal void AssertMobileDuanfa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileDuanfa(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileDuanfa(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMobileDuanfa(supplied);
     internal bool CanActivateMobileDuanfa(global::CardGame.Core.ProgramActivationLegalityContext g) => _resolve().CanActivateMobileDuanfa(g);
     internal void ContinueMobileDuanfa(long id) => _resolve().ContinueMobileDuanfa(id);

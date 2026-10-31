@@ -27,13 +27,6 @@ internal sealed partial class CharacterZhangHengAnniversaryRuntime
         return r.Cards.Count > 0 && f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } p && p.SubjectSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryZhangHengMovedEvent>().Count(e => e == new AnniversaryZhangHengMovedEvent(f.Id, r.Donor, r.Cards.Count, r.Before, r.After)) == 1 && r.Cards.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == CardLocation.Judgment(r.Donor) && m.To == CardLocation.Judgment(f.OwnerSeat) && m.Reason == ZhangHengMoveReason) == 1);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 49600)]
-    internal void AssertZhangHeng(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryZhangHeng is not null && !ValidZhangHeng(f))
-            throw new InvalidOperationException("Dangzai lost its original Play boundary, legal physical subset or once-paid native transfer.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49600)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49600)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49600)]
@@ -62,7 +55,6 @@ internal sealed partial class CharacterZhangHengAnniversaryRuntime
     internal bool ZhangHengDamageObserver(long id) => ZhangHengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49600)]
     internal bool ZhangHengBeforeDamageObserver(long id) => ZhangHengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 49600)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49600)]
     internal bool ZhangHengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ZhangHengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49600)]

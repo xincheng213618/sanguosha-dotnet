@@ -97,7 +97,6 @@ internal sealed partial class CoreGameEngineHpDamageShieldsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != frameId || frame.HpDamageShieldReceipt is not { Granted: false } receipt)
             return false;
-        AssertHpDamageShieldState(frame);
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchOutcomeStatusWinnerAccess._status == EngineStatus.Completed)
         {
             // The completed match cannot acquire new rule effects. Consume only
@@ -155,19 +154,6 @@ internal sealed partial class CoreGameEngineHpDamageShieldsRuntime
     }
 
     internal int IndependentMarkerCount(CharacterState target, PlayerMarkerKind marker, int source) => target.OneUseDamageShields.Count(s => s.Marker == marker && s.OwnerSeat == source);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 500)]
-    internal void AssertHpDamageShieldState(ProgramSkillFrame frame)
-    {
-        if (frame.HpDamageShieldDraft is null && frame.HpDamageShieldReceipt is null)
-            return;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } || frame.InstructionIndex != 1 || plan.Instructions.Count != 1 || plan.Instructions[0].Op != SkillProgramEffectOp.PayHpToGrantOneUseDamageShield)
-            throw new InvalidOperationException("HP-paid shields lost their standalone owning turn-ending instruction.");
-        if (frame.HpDamageShieldDraft is { } draft && (frame.HpDamageShieldReceipt is not null || draft.InstructionIndex != frame.InstructionIndex || draft.Marker != plan.Instructions[0].Marker || draft.HpBefore <= 0 || draft.Maximum <= 0 || draft.CandidateSeats is not System.Collections.ObjectModel.ReadOnlyCollection<int> || draft.Maximum != Math.Min(draft.HpBefore, draft.CandidateSeats.Count) || draft.CandidateSeats.Distinct().Count() != draft.CandidateSeats.Count || draft.CandidateSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == frame.OwnerSeat) || draft.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || draft.TurnOwnerSeat != frame.OwnerSeat || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(decision.Choices, HpDamageShieldChoices(frame))))
-            throw new InvalidOperationException("HP-paid shield selection lost its exact frozen prompt.");
-        if (frame.HpDamageShieldReceipt is { } receipt && (receipt.InstructionIndex != frame.InstructionIndex || receipt.Marker != plan.Instructions[0].Marker || receipt.OwnerSeat != frame.OwnerSeat || receipt.SkillId != frame.SkillId || receipt.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || receipt.SkillInstanceId != frame.SkillInstanceId || receipt.GameplayHash != frame.GameplayHash || receipt.HpBefore <= 0 || receipt.HpAfter < 0 || receipt.ActualLost <= 0 || receipt.ActualLost != receipt.HpBefore - receipt.HpAfter || receipt.TargetSeats is not System.Collections.ObjectModel.ReadOnlyCollection<int> || receipt.TargetSeats.Count != receipt.ActualLost || receipt.TargetSeats.Distinct().Count() != receipt.TargetSeats.Count || receipt.TargetSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == frame.OwnerSeat) || receipt.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || receipt.TurnOwnerSeat != frame.OwnerSeat))
-            throw new InvalidOperationException("HP-paid shield receipt lost its exact once-paid source or target quantity.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 650)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 790)]
@@ -175,7 +161,6 @@ internal sealed partial class CoreGameEngineHpDamageShieldsRuntime
     {
         if (frame.HpDamageShieldReceipt is null)
             return false;
-        AssertHpDamageShieldState(frame);
         return true;
     }
 

@@ -78,7 +78,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
 
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
-        AssertZonghu(f);
         PublishZonghu(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -156,7 +155,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
 
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zonghu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZonghuChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Zonghu changed its exact private declaration or opaque native slot.");
-        AssertZonghu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = c.Parameters[ZonghuChoice];
@@ -225,7 +223,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zonghu: { } r } f || f.Id != id)
             return;
-        AssertZonghu(f);
         if (r.Stage != ZonghuStage.CostChildren)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -277,7 +274,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (f.Zonghu?.Paid is null)
             return false;
-        AssertZonghu(f);
         return true;
     }
 

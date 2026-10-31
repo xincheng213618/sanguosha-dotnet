@@ -7,7 +7,6 @@ internal sealed partial class CharacterFuRongOlEntries
     internal void AnswerFuRongPair(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerFuRongPair(selected);
     internal void AnswerFuRongUse(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PromptChoice selected) => _resolve().AnswerFuRongUse(f, selected);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> AppendFuRongDiscardCards(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> held) => _resolve().AppendFuRongDiscardCards(actor, held);
-    internal void AssertFuRongPair(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertFuRongPair(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginFuRongPair(global::CardGame.Core.ProgramSkillFrame supplied, int target) => _resolve().BeginFuRongPair(supplied, target);
     internal void BindFuRongNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindFuRongNativeUse(use);
     internal bool ContinuePaidFuRongPair(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidFuRongPair(f);
@@ -37,7 +36,6 @@ internal sealed partial class CharacterFuRongOlEntries
     internal bool HasIssuedFuRongUnlimitedUse(long id, int seat) => _resolve().HasIssuedFuRongUnlimitedUse(id, seat);
     internal bool IsFuRongAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFuRongAwaitedMovement(f, e, pending);
     internal bool IsFuRongDiscardQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsFuRongDiscardQuery(actor, id);
-    internal bool IsFuRongDying() => _resolve().IsFuRongDying();
     internal bool IsFuRongSelectedDiscard(int seat, int id) => _resolve().IsFuRongSelectedDiscard(seat, id);
     internal void PublishFuRongPayment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishFuRongPayment(f);
     internal void PublishFuRongUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishFuRongUse(f);

@@ -91,13 +91,5 @@ internal sealed partial class CoreGameEngineProgramDodgeResponsesRuntime
         }
     }
 
-    internal bool HasProgramDodgeResponseContinuation(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
-    {
-        if (_coreDamageObserverCursorQueriesOperations.DamageCursorEffectiveTop(includeNestedObservers: true)is not ProgramSkillFrame { ResponseDecision: { Kind: DecisionKind.RespondDodge } decision } frame || frame.OwnerSeat != decision.PlayerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(frame.OwnerSeat) || (frame.OwnerSeat != attack.TargetSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat != frame.OwnerSeat))
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.IndexOf(frame);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ResponseWindowFrame response && response.ParentFrameId == attack.ResolutionId && response.ResponderSeat == attack.TargetSeat && response.SourceSeat == attack.SourceSeat && decision.IncomingCard == response.IncomingCard && _coreSkillProgramsOperations.GetEnabledSkillProgram(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId).Activations.Any(activation => activation.Id == frame.ActivationId && activation.Effects is [{ Op: SkillProgramEffectOp.DrawTurnOwnerThenDiscardMaximumHandForDodge }]) && decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("response") == "program-dodge" && choice.Parameters.GetValueOrDefault("skill") == frame.SkillId && choice.Parameters.GetValueOrDefault("activation") == frame.ActivationId);
-    }
-
     internal bool IsWithinAttackRange(int actorSeat, int targetSeat) => _characterTaishiCiMobileGodOperations.HasShenTaishiCiPoweiRange(actorSeat, targetSeat) || _characterSunYuanOlOperations.HasSayingRoundRange(actorSeat, targetSeat) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(actorSeat, targetSeat) || _coreNativeRuleQueriesOperations.GetCombatDistance(actorSeat, targetSeat) <= _coreNativeRuleQueriesOperations.GetAttackRange(actorSeat);
 }

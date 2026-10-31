@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineWushuangSkillsBEntries
 {
     internal void AnswerWushuangB(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerWushuangB(selected);
-    internal void AssertWushuangBFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWushuangBFrame(f);
     internal global::CardGame.Core.PromptChoice BChoice(global::CardGame.Core.ProgramSkillFrame f, string step, string key, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().BChoice(f, step, key, label, cards, targets);
     internal global::System.Collections.Generic.IEnumerable<int> BDinganDrawTargets(int owner, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().BDinganDrawTargets(owner, targets);
     internal bool BDyingThisTurn() => _resolve().BDyingThisTurn();

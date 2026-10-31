@@ -164,24 +164,6 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
         return decision.Choices.Single(choice => choice.Parameters["accept"] == (accept ? "true" : "false"));
     }
 
-    internal void ValidateFactionRecoveryDraft(ProgramSkillFrame frame)
-    {
-        if (frame.FactionRecoveryDraft is not { } draft)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (draft.SettlingDebts)
-        {
-            if (frame.FactionRecoveryDebtReturn is not { } continuation || continuation.DyingFrameId != draft.DyingFrameId || effect.Op != SkillProgramEffectOp.RequestFactionRecovery || draft.ResponderSeats.Count == 0 || draft.ResponderSeats.Distinct().Count() != draft.ResponderSeats.Count || draft.ResponderSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || seat == frame.OwnerSeat) || draft.ResponderIndex < 0 || draft.ResponderIndex > draft.ResponderSeats.Count || !draft.AcceptedSeats.SequenceEqual(draft.ResponderSeats))
-                throw new InvalidOperationException("Invalid faction damage debt continuation.");
-            return;
-        }
-
-        if (effect.Op != SkillProgramEffectOp.RequestFactionRecovery || draft.DyingFrameId != _coreDyingCursorRuntimeOperations.ActiveDying?.FrameId || _coreDyingCursorRuntimeOperations.ActiveDying?.VictimSeat != frame.OwnerSeat || draft.ResponderSeats.Count == 0 || draft.ResponderSeats.Distinct().Count() != draft.ResponderSeats.Count || draft.ResponderSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || seat == frame.OwnerSeat || _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[seat]) != effect.ProviderFactionId) || draft.ResponderIndex < 0 || draft.ResponderIndex >= draft.ResponderSeats.Count || draft.AcceptedSeats.Distinct().Count() != draft.AcceptedSeats.Count || draft.AcceptedSeats.Any(seat => !draft.ResponderSeats.Take(draft.ResponderIndex).Contains(seat)))
-            throw new InvalidOperationException("Invalid faction recovery draft.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != draft.ResponderSeats[draft.ResponderIndex] || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") != "faction-recovery")))
-            throw new InvalidOperationException("Faction recovery must preserve its private responder prompt.");
-    }
-
     internal SkillProgramStepOutcome BeginProgramWeaponDamageChoice(ProgramSkillFrame frame, int amount)
     {
         var context = frame.WindowContext ?? throw new InvalidOperationException("Weapon damage choice has no damage context.");
@@ -257,16 +239,5 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramWeaponDamageChoiceEvent(frame.Id, frame.SkillId, frame.OwnerSeat, draft.TargetSeat, draft.WeaponCardId, branch == "finish", branch == "finish" ? draft.SelectedIds : [], window.Amount, after));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-    }
-
-    internal void ValidateWeaponDamageDraft(ProgramSkillFrame frame)
-    {
-        if (frame.WeaponDamageDraft is not { } draft)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.WeaponDiscardOrDamageBonus || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(draft.TargetSeat) || draft.RequiredCount < 0 || draft.SelectedIds.Count > draft.RequiredCount || draft.SelectedIds.Distinct().Count() != draft.SelectedIds.Count || draft.SelectedIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(draft.TargetSeat)) || _cardZonesOperations._cardZones.GetLocation(draft.WeaponCardId) != CardLocation.Equipment(frame.OwnerSeat))
-            throw new InvalidOperationException("Invalid weapon damage draft.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != draft.TargetSeat || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") != "weapon-damage")))
-            throw new InvalidOperationException("Weapon damage must preserve its private victim prompt.");
     }
 }

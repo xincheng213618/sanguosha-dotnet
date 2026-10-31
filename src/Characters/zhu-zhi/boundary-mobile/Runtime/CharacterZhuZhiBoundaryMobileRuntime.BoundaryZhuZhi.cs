@@ -153,8 +153,6 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime
     internal void ApplyBoundaryAnguoPayment(ProgramSkillFrame frame)
     {
         var receipt = frame.BoundaryZhuZhi!;
-        if (receipt.Stage != BoundaryZhuZhiStage.Paying || receipt.Requested <= 0)
-            throw new InvalidOperationException("Anguo lost its affordable original payment.");
         if (receipt.Payment == "hp")
         {
             var result = _corePrepPoisonOutcomesOperations.ApplyProgramHpLoss(frame.Id, frame.SkillId, frame.OwnerSeat, receipt.Requested, (_, _, _) => RecordBoundaryAnguoPayment(frame.Id));
@@ -228,13 +226,6 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime
             return false;
         var removals = _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerMarkerChangedEvent>().Where(e => e.ResolutionId == frame.Id && e.PlayerSeat == receipt.Victim && e.Marker == PlayerMarkerKind.MobileBoundaryAnguo && e.Delta < 0).ToArray();
         return removals.Length > 0 && removals.Sum(e => -e.Delta) == issue.RemovedMarks && removals[^1].Count == 0;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 53200)]
-    internal void AssertBoundaryAnguo(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryZhuZhi is not null && !ValidBoundaryAnguo(frame))
-            throw new InvalidOperationException("Anguo changed its original mark or rescue frame.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 53200)]

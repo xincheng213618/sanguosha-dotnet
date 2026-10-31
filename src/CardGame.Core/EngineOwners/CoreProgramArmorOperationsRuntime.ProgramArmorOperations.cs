@@ -12,8 +12,6 @@ internal sealed partial class CoreProgramArmorOperationsRuntime
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var program = _contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Program!;
         var effect = ProgramInstructionResolver.Default.Resolve(active, program).GetPausedInstruction(active.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.GrantArmor || effect.Amount is < 1 or > 20 || effect.Condition.Kind != SkillProgramConditionKind.Always)
-            throw new InvalidOperationException("An armor grant lost its exact configured instruction.");
         var index = active.InstructionIndex - 1;
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<ArmorGrantedEvent>().Any(grant => grant.ProgramFrameId == active.Id && grant.InstructionIndex == index))
             throw new InvalidOperationException("An armor grant instruction cannot be paid twice.");

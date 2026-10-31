@@ -4,7 +4,6 @@ internal sealed partial class CharacterJianYongBoundaryMobileEntries
 {
     internal bool AdvanceBoundaryZongshiChild() => _resolve().AdvanceBoundaryZongshiChild();
     internal void AnswerBoundaryZongshi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryZongshi(choice);
-    internal void AssertBoundaryZongshi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryZongshi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryJianYongZongshiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginBoundaryJianYongZongshiChoice(f);
     internal bool BoundaryJianYongAdjustmentConsumes(global::CardGame.Core.NextActualUseTargetAdjustmentGrantedEvent grant, global::CardGame.Core.CardKind kind) => _resolve().BoundaryJianYongAdjustmentConsumes(grant, kind);
     internal bool BoundaryJianYongPhaseCurrent(global::CardGame.Core.BoundaryJianYongPhaseEvent e) => _resolve().BoundaryJianYongPhaseCurrent(e);

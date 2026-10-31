@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineKunlunMirrorEntries
 {
-    internal void AssertKunlunMirrorReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertKunlunMirrorReceipt(frame);
     internal bool CanOfferKunlunMirror(global::CardGame.Core.ProgramTriggerLegalityContext context) => _resolve().CanOfferKunlunMirror(context);
     internal bool HasEffectiveKunlunMirror(int owner, string instance) => _resolve().HasEffectiveKunlunMirror(owner, instance);
     internal bool KnowsKunlunMirrorName(int owner, string name) => _resolve().KnowsKunlunMirrorName(owner, name);

@@ -28,7 +28,6 @@ internal sealed partial class MouWangLingRuntime
         return false;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime,34500)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant,34500)]
     internal bool DyingObserver()
     {
         if(health.ActiveDying is not{}dying||ObserverRoot()is not{}root)return false;

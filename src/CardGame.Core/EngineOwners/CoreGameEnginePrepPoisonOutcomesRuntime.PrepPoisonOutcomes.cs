@@ -133,13 +133,6 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
             throw new InvalidOperationException("Preparation poison lost its single genuine native HP-loss payment.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 1248)]
-    internal void AssertPrepPoisonOutcome(ProgramSkillFrame f)
-    {
-        if (f.PrepPoisonOutcome is not null)
-            RequirePrepPoisonOutcome(f);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1248)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1248)]
     internal bool ContinuePaidPrepPoison(ProgramSkillFrame f)

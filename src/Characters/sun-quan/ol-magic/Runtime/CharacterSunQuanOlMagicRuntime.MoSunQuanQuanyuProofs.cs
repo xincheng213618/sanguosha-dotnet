@@ -42,17 +42,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         return r.DrawOutcome is { } o && o.RecipientSeat == f.OwnerSeat && o.RequestedCount == r.DrawCount && r.DrawCount > 0 && o.SequenceBefore >= 0 && o.SequenceAfter >= o.SequenceBefore && o.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && requests.Length == 1 && returns is [var returned] && returned == new MoQuanyuDrawReturnedEvent(f.Id, r.DrawCount, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId) && f.NativeDraw is null && f.PendingMovementContinuation is { } pending && IsMoQuanyuMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28910)]
-    internal void AssertMoQuanyu(ProgramSkillFrame f)
-    {
-        if (f.MoQuanyu is null)
-            return;
-        if (!ValidMoQuanyuReceipt(f))
-            throw new InvalidOperationException("Quanyu lost its exact round or paid Tianen root, frozen private choices, permanent history or native draw return.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.Step == ResolutionFrameStep.AwaitingResponse && f.MoQuanyu.Stage == MoQuanyuStage.Choosing && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || f.MoQuanyu.Votes.Count >= f.MoQuanyu.Participants.Count || prompt.PlayerSeat != f.MoQuanyu.Participants[f.MoQuanyu.Votes.Count].Seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, MoQuanyuChoices(f))))
-            throw new InvalidOperationException("Quanyu's private chooser cannot receive another participant's choice or a stale option set.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28910)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28910)]
     internal bool CanContinueIssuedMoQuanyu(ProgramSkillFrame f) => f.MoQuanyu is not null && ValidMoQuanyuReceipt(f);

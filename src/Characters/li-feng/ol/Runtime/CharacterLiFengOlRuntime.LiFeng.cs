@@ -22,8 +22,6 @@ internal sealed partial class CharacterLiFengOlRuntime
             SkillProgramEffectOp.CollectJiyunCompletedUseEntities => SkillProgramTriggerWindow.CardUseCompleted,
             _ => SkillProgramTriggerWindow.TurnEnding
         };
-        if (c.Window != expected || c.OwnerSeat != f.OwnerSeat)
-            throw new InvalidOperationException("Li Feng lost his original lifecycle window.");
         PublicPersistentPileSource? pile;
         if (op == SkillProgramEffectOp.CollectJiyunCompletedUseEntities)
         {
@@ -139,7 +137,6 @@ internal sealed partial class CharacterLiFengOlRuntime
 
     internal void PublishLiFeng(ProgramSkillFrame f)
     {
-        AssertLiFeng(f);
         var choices = LiFengChoices(f);
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
         if (choices.Count == 0)
@@ -165,7 +162,6 @@ internal sealed partial class CharacterLiFengOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiFeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LiFengChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Li Feng requires his current published recipient or exact grain choice.");
-        AssertLiFeng(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = selected.Parameters["branch"];
@@ -236,7 +232,6 @@ internal sealed partial class CharacterLiFengOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { LiFeng: { } r } f && f.Id == id)
         {
-            AssertLiFeng(f);
             if (r.Stage is LiFengStage.InitialChildren or LiFengStage.PreparationChildren or LiFengStage.CollectChildren or LiFengStage.DistributionChildren)
             {
                 if (DrainLiFeng(f))

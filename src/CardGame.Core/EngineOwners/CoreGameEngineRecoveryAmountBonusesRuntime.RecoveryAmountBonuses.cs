@@ -86,16 +86,5 @@ internal sealed partial class CoreGameEngineRecoveryAmountBonusesRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualTurnRecoveryRecordedEvent(recovery.Id, recovery.ParentFrameId, recovery.SourceSeat, recovery.TargetSeat, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, ordinal.Value, recovery.Amount, actual, recovery.HpBefore, applied.RemainingHp));
     }
 
-    internal void AssertRecoveryAmountBonusReceipts()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<RecoveryReplacementFrame>())
-            if (frame.AmountBonus is { } bonus)
-            {
-                if (frame.Stage == RecoveryReplacementStage.Choosing)
-                    throw new InvalidOperationException("A recovery amount receipt must already own its atomic application.");
-                RequireRecoveryAmountBonus(frame, bonus);
-            }
-    }
-
     internal static bool RecoveryAmountBonusEquals(RecoveryAmountBonusReceipt a, RecoveryAmountBonusReceipt b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecoveryAmountBonuses.RecoveryAmountBonusEquals(a, b);
 }

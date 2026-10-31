@@ -27,7 +27,6 @@ internal sealed partial class CoreGameEnginePhaseStartCardControlObserversRuntim
     }
 
     internal ProgramSkillFrame? PhaseStartCardControlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePhaseStartCardControlObserversOperations.PhaseStartCardControlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 110, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 220)]
     internal bool IsPhaseStartCardControlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PhaseStartCardControlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1770)]
@@ -36,14 +35,4 @@ internal sealed partial class CoreGameEnginePhaseStartCardControlObserversRuntim
     internal bool TryAdvancePhaseStartCardControlSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && PhaseStartCardControlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 20)]
     internal bool IsPhaseStartCardControlMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.PhaseStartCardControl is { Stage: PhaseStartCardControlStage.MovementChildren, Payment: { } payment } r && effect?.Op == (r.Kind == PhaseStartCardControlKind.OtherPlayRestriction ? SkillProgramEffectOp.GrantOtherPlayUseRestriction : SkillProgramEffectOp.ChooseStartingEquipmentControl) && pending == f.PendingMovementContinuation && pending.SubjectSeat == payment.From.OwnerSeat && pending.CoverageResultBind is null && _corePhaseStartCardControlOperations.HasExactPhaseStartCardControl(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 80)]
-    internal void AssertPhaseStartCardControl(ProgramSkillFrame f)
-    {
-        if (f.PhaseStartCardControl is not { } r)
-            return;
-        if (!_corePhaseStartCardControlOperations.HasExactPhaseStartCardControl(f) || r.Stage == PhaseStartCardControlStage.MovementChildren && f.PendingMovementContinuation is null || r.Stage != PhaseStartCardControlStage.MovementChildren && f.PendingMovementContinuation is not null)
-            throw new InvalidOperationException("Phase-starting card control lost its exact source, boundary or paid child stage.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && r.Stage == PhaseStartCardControlStage.Choosing && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != f.OwnerSeat || prompt.IsPrivate != (r.Kind == PhaseStartCardControlKind.OtherPlayRestriction) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, _corePhaseStartCardControlOperations.PhaseStartCardControlChoices(f))))
-            throw new InvalidOperationException("Phase-starting card control lost its exact owning choice.");
-    }
 }

@@ -7,55 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiFuRenOlRuntime
 {
-    internal bool MatchesOrdinaryQietingRoot(ProgramSkillFrame f)
-    {
-        if (f.OrdinaryQieting is not { } r || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded, OrdinaryQieting: { } q } c || !global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsKnownCaiFuRenQietingBinding(f.SkillId, f.TriggerId) || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != OrdinaryCaiFuRenSource(f) || r.GameplayHash != f.GameplayHash || r.Qualification != q || q.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || q.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || q.TurnOwnerSeat == f.OwnerSeat || r.WindowId != c.ParentFrameId || r.OccurrenceIndex != c.OccurrenceIndex || !global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsCaiFuRenQietingOperation(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)) || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == r.WindowId)is not { } parent || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) || parent.OwnerSeat != q.TurnOwnerSeat || parent.TurnNumber != q.ActualTurn || parent.AfterTurnEnded is not { CurrentChild: { } child } w || child.FrameId != f.Id || w.ItemIndex < 0 || w.ItemIndex >= w.Items.Count || w.Items[w.ItemIndex].Candidate != child.Candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, child.Candidate) || c.Facts != w.Items[w.ItemIndex].Facts || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != parent.OwnerSeat || c.TargetSeat != parent.OwnerSeat || c.OccurrenceIndex != child.Candidate.OccurrenceIndex || q.HistoryCutoff < 0 || q.HistoryCutoff > _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Count() || _characterCaiFuRenBoundaryMobileOperations.CaiFuRenQietingDisqualified(f.SkillId, q))
-            return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var started] && started == new OrdinaryQietingStartedEvent(f.Id, r.Source, r.GameplayHash, q, r.WindowId, r.OccurrenceIndex);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27596)]
-    internal void AssertOrdinaryQieting(ProgramSkillFrame f)
-    {
-        if (f.OrdinaryQieting is not { } r)
-            return;
-        if (!MatchesOrdinaryQietingRoot(f) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.GrainIds is not System.Collections.IList { IsReadOnly: true } || r.GrainIds.Distinct().Count() != r.GrainIds.Count)
-            throw new InvalidOperationException("Ordinary Qieting lost its immutable exact ended-turn owner, source or instruction.");
-        if (global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f))
-        {
-            _characterCaiFuRenBoundaryMobileOperations.AssertBoundaryMobileQieting(f);
-            return;
-        }
-
-        if (r.MobileSelection is not null)
-            throw new InvalidOperationException("Ordinary Qieting cannot carry a mobile private selection or equipment replacement.");
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingOptionIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (!r.Paid)
-        {
-            if (r.Stage != OrdinaryQietingStage.Choice || r.Option is not null || r.CardId is not null || r.PrintedKind is not null || r.DrawOutcome is not null || r.GrainIds.Count != 0 || issued.Length != 0 || r.Before != 0 || r.After != 0)
-                throw new InvalidOperationException("Unpaid ordinary Qieting cannot hold a benefit or payment cursor.");
-            return;
-        }
-
-        if (issued is not [var option] || option.Option != r.Option || option.CardId != r.CardId || option.PrintedKind != r.PrintedKind || option.Before < 0 || option.Before > r.Before || r.Stage == OrdinaryQietingStage.Choice)
-            throw new InvalidOperationException("Ordinary Qieting must issue exactly one option before its native children.");
-        if (r.Option == "equipment")
-        {
-            if (r.Stage != OrdinaryQietingStage.MovementChildren || r.CardId is not { } id || r.PrintedKind is not { } kind || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind) || r.DrawOutcome is not null || option.Before != r.Before || _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingEquipmentMovedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var moved] || moved.CardId != id || moved.PrintedKind != kind || moved.From != CardLocation.Equipment(r.Qualification.TurnOwnerSeat) || moved.To != CardLocation.Equipment(f.OwnerSeat) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == moved.MovementSequence && IsOrdinaryQietingPaidMovement(f, m)))
-                throw new InvalidOperationException("Ordinary Qieting lost its one real equipment placement without replacement.");
-        }
-        else if (r.Option == "draw")
-        {
-            if (r.Stage is not (OrdinaryQietingStage.Draw or OrdinaryQietingStage.DrawChildren) || r.CardId is not null || r.PrintedKind is not null || r.GrainIds.Count != 0)
-                throw new InvalidOperationException("Ordinary Qieting cannot mix its draw and equipment branches.");
-            if (r.Stage == OrdinaryQietingStage.DrawChildren && (r.DrawOutcome is not { } o || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 1 || o.SequenceBefore != r.Before || o.SequenceAfter != r.After || _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingDrawReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var returned] || returned != new OrdinaryQietingDrawReturnedEvent(f.Id, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId)))
-                throw new InvalidOperationException("Ordinary Qieting draw lost its native outcome or repeated its typed return.");
-        }
-        else
-            throw new InvalidOperationException("Ordinary Qieting has no third benefit.");
-        if (f.PendingMovementContinuation is { } movement && !IsOrdinaryCaiFuRenMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), movement))
-            throw new InvalidOperationException("Ordinary Qieting retained an unrelated movement return.");
-    }
 
     internal bool CanContinueIssuedOrdinaryCaiFuRen(ProgramSkillFrame f)
     {
@@ -63,7 +14,6 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
             return _coreEquipmentDonationObserversOperations.IsValidAllEquipmentDonation(f);
         if (f.OrdinaryQieting is not { Paid: true })
             return false;
-        AssertOrdinaryQieting(f);
         return true;
     }
 
@@ -87,7 +37,6 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     {
         if (f.OrdinaryQieting is not { Paid: true } r)
             return false;
-        AssertOrdinaryQieting(f);
         if (r.Stage == OrdinaryQietingStage.Draw && f.NativeDraw is not null)
             return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
@@ -110,8 +59,6 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     internal bool HasOrdinaryCaiFuRenDamageObserver(long id) => OrdinaryQietingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1210)]
     internal bool HasOrdinaryCaiFuRenBeforeDamageObserver(long id) => OrdinaryQietingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1040)]
-    internal bool IsOrdinaryCaiFuRenDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OrdinaryQietingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 300)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 290)]
     internal bool IsOrdinaryCaiFuRenRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

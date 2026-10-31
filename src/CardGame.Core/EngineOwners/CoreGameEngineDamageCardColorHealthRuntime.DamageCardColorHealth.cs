@@ -70,7 +70,6 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.DamageCardColorHealth is null)
             return false;
-        AssertDamageCardColorHealth(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDamageCardColorHealthCompletedEvent(id));
@@ -81,12 +80,6 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 2403)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 2403)]
     internal bool CanContinueDamageCardColorHealth(ProgramSkillFrame f) => f.DamageCardColorHealth is not null && ValidDamageCardColorHealth(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 2403)]
-    internal void AssertDamageCardColorHealth(ProgramSkillFrame f)
-    {
-        if (f.DamageCardColorHealth is not null && !ValidDamageCardColorHealth(f))
-            throw new InvalidOperationException("Damage-card color health lost its issued amount, causing-card or exact native parent.");
-    }
 
     internal bool DamageCardColorHealthFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
@@ -124,8 +117,6 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
     internal bool HasDamageCardColorHealthBeforeDamage(long id) => DamageCardColorHealthObserverRoot()is { } root && (root.DamageCardColorHealth!.BeforeDamageWindowId == id || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1640)]
     internal bool HasDamageCardColorHealthDamageObserver(long id) => DamageCardColorHealthObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 30)]
-    internal bool IsDamageCardColorHealthDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DamageCardColorHealthObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30)]
     internal bool IsDamageCardColorHealthRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery)
     {

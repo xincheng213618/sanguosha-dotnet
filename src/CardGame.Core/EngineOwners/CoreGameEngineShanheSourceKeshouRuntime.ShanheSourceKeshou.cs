@@ -105,10 +105,4 @@ internal sealed partial class CoreGameEngineShanheSourceKeshouRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 62061)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 62061)]
     internal bool KeepPaidSourceKeshou(ProgramSkillFrame f) => ValidSourceKeshou(f) && SourceKeshouWasPaid(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62061)]
-    internal void AssertSourceKeshou(ProgramSkillFrame f)
-    {
-        if (f.SourceKeshou is not null && (!ValidSourceKeshou(f) || f.SourceKeshou.SoleFactionAfterCost is not null && !SourceKeshouWasPaid(f)))
-            throw new InvalidOperationException("Source993 lost its owning damage frame, original source or paid same-colour material set.");
-    }
 }

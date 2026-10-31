@@ -148,7 +148,6 @@ internal sealed partial class CharacterQinLangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { QinLangXianying: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QinLangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xianying changed its private chooser, frozen payment or actual legal use.");
-        AssertQinLang(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -220,7 +219,6 @@ internal sealed partial class CharacterQinLangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { QinLangXianying: { } r } f || f.Id != id)
             return;
-        AssertQinLang(f);
         if (r.Stage is QinLangXianyingStage.DrawChildren or QinLangXianyingStage.DiscardChildren or QinLangXianyingStage.NativeChildren)
         {
             if (DrainQinLang(id))

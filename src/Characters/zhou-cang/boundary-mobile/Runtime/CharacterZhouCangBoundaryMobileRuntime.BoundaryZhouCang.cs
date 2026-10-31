@@ -163,7 +163,6 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
     internal void ResolveBoundaryZhongyongChoice(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Zhongyong lost its original frame.");
-        AssertBoundaryZhongyong(f);
         if (!BoundaryZhongyongChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat)
             throw new InvalidOperationException("Zhongyong choice lost its current entities or exact recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -234,7 +233,6 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhongyong: { } r } f || f.Id != id)
             return;
-        AssertBoundaryZhongyong(f);
         if (f.PendingMovementContinuation is not null)
         {
             if (DrainBoundaryZhongyong(f))

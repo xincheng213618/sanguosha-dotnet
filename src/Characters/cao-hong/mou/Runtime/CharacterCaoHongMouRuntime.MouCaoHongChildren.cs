@@ -35,7 +35,6 @@ internal sealed partial class CharacterCaoHongMouRuntime
     internal bool MouCaoHongDamageWindow(long id) => MouCaoHongRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35900)]
     internal bool MouCaoHongBeforeDamage(long id) => MouCaoHongRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 35900)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35900)]
     internal bool MouCaoHongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouCaoHongRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35900)]

@@ -241,7 +241,6 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuJing: { } r } f || f.Id != id)
             return;
-        AssertWuJing(f);
         if (r.Stage is WuJingStage.IssuingUse or WuJingStage.NativeUse or WuJingStage.FactionRequest)
             return;
         if (r.Stage == WuJingStage.UseChoice)

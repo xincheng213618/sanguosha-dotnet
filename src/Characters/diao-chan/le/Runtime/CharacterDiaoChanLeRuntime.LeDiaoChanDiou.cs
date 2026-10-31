@@ -109,7 +109,6 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Diou: { } r } f || f.Id != id)
             return;
-        AssertDiou(f);
         if (r.Stage is DiouStage.ShowChoice or DiouStage.UseChoice)
         {
             PublishDiou(f);

@@ -5,8 +5,6 @@ internal sealed partial class CharacterLiuFengBoundaryEntries
     internal bool AdvanceBoundaryLiuFengChildren() => _resolve().AdvanceBoundaryLiuFengChildren();
     internal void AnswerBoundaryLiuFeng(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerBoundaryLiuFeng(selected);
     internal global::CardGame.Core.PendingDecision? AppendBoundaryLiuFengQinlingChoices(global::CardGame.Core.PendingDecision? p) => _resolve().AppendBoundaryLiuFengQinlingChoices(p);
-    internal void AssertBoundaryLiuFeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryLiuFeng(f);
-    internal void AssertBoundaryLiuFengRequests() => _resolve().AssertBoundaryLiuFengRequests();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryLiuFeng(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginBoundaryLiuFeng(supplied, op);
     internal void BeginBoundaryLiuFengMovement(global::CardGame.Core.ProgramSkillFrame f, int[] ids, global::CardGame.Core.CardLocation destination, string movement) => _resolve().BeginBoundaryLiuFengMovement(f, ids, destination, movement);
     internal void BindBoundaryLiuFengNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindBoundaryLiuFengNativeUse(use);
@@ -20,8 +18,6 @@ internal sealed partial class CharacterLiuFengBoundaryEntries
     internal bool BoundaryLiuFengDying() => _resolve().BoundaryLiuFengDying();
     internal bool BoundaryLiuFengFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().BoundaryLiuFengFirstChild(f, child);
     internal bool BoundaryLiuFengHasCost(int actor) => _resolve().BoundaryLiuFengHasCost(actor);
-    internal global::CardGame.Core.PendingDecision? BoundaryLiuFengInvariantDecision(global::CardGame.Core.PendingDecision? ordinary) => _resolve().BoundaryLiuFengInvariantDecision(ordinary);
-    internal global::CardGame.Core.ResolutionFrame? BoundaryLiuFengInvariantTop(global::CardGame.Core.ResolutionFrame? ordinary) => _resolve().BoundaryLiuFengInvariantTop(ordinary);
     internal bool BoundaryLiuFengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().BoundaryLiuFengMovement(f, e, p);
     internal bool BoundaryLiuFengNativeEdge(int child) => _resolve().BoundaryLiuFengNativeEdge(child);
     internal global::CardGame.Core.ProgramSkillFrame? BoundaryLiuFengNativeParent(global::CardGame.Core.CardUseFrame use) => _resolve().BoundaryLiuFengNativeParent(use);
@@ -29,7 +25,6 @@ internal sealed partial class CharacterLiuFengBoundaryEntries
     internal global::CardGame.Core.ProgramSkillFrame? BoundaryLiuFengObserverRoot() => _resolve().BoundaryLiuFengObserverRoot();
     internal bool BoundaryLiuFengPaidThisTurn(int owner) => _resolve().BoundaryLiuFengPaidThisTurn(owner);
     internal bool BoundaryLiuFengRequestChild(global::CardGame.Core.ProgramSkillFrame parent, global::CardGame.Core.ResolutionFrame child) => _resolve().BoundaryLiuFengRequestChild(parent, child);
-    internal global::CardGame.Core.ProgramSkillFrame? BoundaryLiuFengRequestDraft() => _resolve().BoundaryLiuFengRequestDraft();
     internal bool BoundaryLiuFengRequestTarget(global::CardGame.Core.BoundaryLiuFengNeed n, int target) => _resolve().BoundaryLiuFengRequestTarget(n, target);
     internal global::CardGame.Core.ProgramSkillFrame? BoundaryLiuFengReturnedProgramParent(long parentId, global::CardGame.Core.CardUseFrame use) => _resolve().BoundaryLiuFengReturnedProgramParent(parentId, use);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CardConversionSource> BoundaryLiuFengSources(int actor) => _resolve().BoundaryLiuFengSources(actor);
@@ -44,17 +39,11 @@ internal sealed partial class CharacterLiuFengBoundaryEntries
     internal bool DrainBoundaryLiuFeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainBoundaryLiuFeng(f);
     internal void FinishBoundaryLiuFeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishBoundaryLiuFeng(f);
     internal bool HasAcceptedBoundaryLiuFengKeAction(global::CardGame.Core.ProgramSkillFrame parent, global::CardGame.Core.LegalAction selected) => _resolve().HasAcceptedBoundaryLiuFengKeAction(parent, selected);
-    internal bool HasBoundaryLiuFengBorrowedSettlementRide(global::CardGame.Core.NativeOwners.BorrowedSwordHandle b) => _resolve().HasBoundaryLiuFengBorrowedSettlementRide(b);
     internal bool HasBoundaryLiuFengForcedSlash(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => _resolve().HasBoundaryLiuFengForcedSlash(actor, target, pending);
     internal bool HasBoundaryLiuFengForcedSlash2(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().HasBoundaryLiuFengForcedSlash(actor, target, pending);
     internal bool HasBoundaryLiuFengGenericBasic(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasBoundaryLiuFengGenericBasic(f);
-    internal bool HasBoundaryLiuFengNativeRequestContinuation(long ownerFrameId) => _resolve().HasBoundaryLiuFengNativeRequestContinuation(ownerFrameId);
     internal bool HasBoundaryLiuFengProgramPayment(global::CardGame.Core.ProgramSkillFrame parent, global::CardGame.Core.CardUseFrame? use = default) => _resolve().HasBoundaryLiuFengProgramPayment(parent, use);
     internal bool HasBoundaryLiuFengProgramSlash(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IEnumerable<int> targets) => _resolve().HasBoundaryLiuFengProgramSlash(actor, targets);
-    internal bool HasBoundaryLiuFengPrompt() => _resolve().HasBoundaryLiuFengPrompt();
-    internal bool HasBoundaryLiuFengQinglongPaymentRide(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().HasBoundaryLiuFengQinglongPaymentRide(attack);
-    internal bool HasBoundaryLiuFengQinglongSettlementRide(global::CardGame.Core.CardUseFrame original, long childUseId) => _resolve().HasBoundaryLiuFengQinglongSettlementRide(original, childUseId);
-    internal bool IsBoundaryLiuFengNativeAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsBoundaryLiuFengNativeAttackConsistent(attack, processing);
     internal bool IsBoundaryLiuFengQinlingAnswer(global::CardGame.Core.ChoiceId id) => _resolve().IsBoundaryLiuFengQinlingAnswer(id);
     internal bool IsBoundaryLiuFengUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsBoundaryLiuFengUse(use);
     internal void IssueBoundaryLiuFengSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueBoundaryLiuFengSlash(f);

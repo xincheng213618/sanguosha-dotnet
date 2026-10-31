@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineConfiguredConversionsEntries
 {
-    internal void AssertConfiguredCardDeclaration(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertConfiguredCardDeclaration(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginConfiguredCardDeclaration(global::CardGame.Core.ProgramSkillFrame frame, string bind, string state) => _resolve().BeginConfiguredCardDeclaration(frame, bind, state);
     internal bool ConfiguredConversionUnavailable(global::CardGame.Core.ProgramConfiguredViewAsQuery query) => _resolve().ConfiguredConversionUnavailable(query);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind> DeclarationNames(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramCardDeclarationDraft draft) => _resolve().DeclarationNames(frame, draft);

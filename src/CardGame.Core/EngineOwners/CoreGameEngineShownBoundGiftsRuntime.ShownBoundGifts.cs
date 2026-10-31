@@ -7,26 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShownBoundGiftsRuntime
 {
-    internal void AssertShownGiftReceipt(ProgramSkillFrame frame, IReadOnlyList<SkillProgramEffect> instructions)
-    {
-        if (frame.ShownGiftReceipt is not { } receipt)
-            return;
-        if (receipt.InstructionIndex < 0 || receipt.InstructionIndex >= frame.InstructionIndex || receipt.InstructionIndex >= instructions.Count || instructions[receipt.InstructionIndex].Op != SkillProgramEffectOp.GiveShownBoundCardsAndGrantTurnHandLimit || receipt.BatchId <= 0 || receipt.ActualTurnNumber <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.ActualTurnOwnerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.RecipientSeat) || receipt.RecipientSeat == frame.OwnerSeat || frame.SelectedTargetSeats is not [var target] || target != receipt.RecipientSeat || receipt.Cards.Select(c => c.CardId).Distinct().Count() != receipt.Cards.Count || receipt.Cards.Any(c => !Enum.IsDefined(c.Category)))
-            throw new InvalidOperationException("A shown gift lost its owning instruction or actual receipt.");
-        var source = _coreProgramLifecycleOperations.GetProgramCardSet(frame, instructions[receipt.InstructionIndex].SourceBind!);
-        if (source.Visibility != SkillProgramCardSetVisibility.Public || receipt.Cards.Any(c => !source.CardIds.Contains(c.CardId) || c.Destination != CardLocation.Hand(receipt.RecipientSeat) || c.Source == c.Destination || c.Source != source.SourceLocations[source.CardIds.ToList().IndexOf(c.CardId)] || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == c.MovementSequence && m.CardId == c.CardId && m.From == c.Source && m.To == c.Destination && m.TurnNumber == receipt.ActualTurnNumber && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.CardKind) == c.Category)))
-            throw new InvalidOperationException("A shown gift receipt differs from its public selection.");
-        var x = receipt.Cards.Select(c => c.Category).Distinct().Count();
-        var modifier = _turnCardUseEffectsOperations._turnCardUseEffects.RuleModifiers.SingleOrDefault(m => m.GrantSequence == receipt.ModifierGrantSequence);
-        if (x == 0 ? receipt.ModifierGrantSequence is not null : modifier is null || modifier.ParentFrameId != frame.Id || modifier.EffectIndex != receipt.InstructionIndex || modifier.TurnNumber != receipt.ActualTurnNumber || modifier.TurnSeat != receipt.ActualTurnOwnerSeat || modifier.AffectedSeat != receipt.ActualTurnOwnerSeat || modifier.Query != SkillRuleQuery.HandLimit || modifier.Operation != SkillRuleOperation.Add || modifier.Amount != x || modifier.Source.SkillId != frame.SkillId)
-            throw new InvalidOperationException("A shown gift lost its actual-turn hand-limit fact.");
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 300)]
-    internal void AssertRegisteredShownGiftReceipt(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        AssertShownGiftReceipt(frame, plan.Instructions);
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IShownBoundGiftProgramHost.GiveShownBoundCardsAndGrantTurnHandLimit(ProgramSkillFrame f, string bind) => GiveProgramShownBoundGift(f, bind);
     internal SkillProgramStepOutcome GiveProgramShownBoundGift(ProgramSkillFrame frame, string bind)

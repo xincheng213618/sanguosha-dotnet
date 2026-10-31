@@ -281,49 +281,6 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal bool TryGetResponseExchangeMovementDyingCosts(ProgramCardTriggerWindowFrame? window, out int[] costs)
-    {
-        costs = [];
-        if (window is not { Continuation: ProgramCardContinuation.NullificationResponse, Action.Type: CardActionType.Response, Action.EffectiveKind: CardKind.Nullification } || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } pending || window.ParentFrameId != pending.Id || _coreDyingCursorRuntimeOperations.ActiveDying is not { Continuation: DyingContinuationKind.ProgramSkill, KillerSeat: null } dying)
-            return false;
-        var i = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        if (i < 0 || i + 4 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[i + 1] is not ProgramSkillFrame exchange || exchange.WindowContext?.ParentFrameId != window.Id || exchange.ResponseEntityExchange is not { } draft || draft.ResponseActionId != window.Action.ActionId || exchange.PendingMovementContinuation is not { } movementPending || movementPending.SubjectSeat != exchange.OwnerSeat || movementPending.CoverageResultBind is not null || _resolutionStackOperations._resolutionStack[i + 2] is not CardsMovedTriggerWindowFrame movement || movement.Batch.ParentFrameId != exchange.Id || movement.ResumeProgramFrameId is { } resume && resume != exchange.Id || movement.Batch.OriginSkillId != exchange.SkillId || movement.Batch.OriginSkillInstanceId != exchange.SkillInstanceId || movement.Batch.OriginOwnerSeat != exchange.OwnerSeat || movement.Batch.Movements.Count == 0 || movement.Batch.Movements.Any(m => m.Reason.Value != "skill-program.response-entity-exchange" || !draft.OriginalCardIds.Concat(draft.ResponseCardIds).Contains(m.CardId)) || _resolutionStackOperations._resolutionStack[i + 3] is not ProgramSkillFrame program || program.WindowContext is not { } context || context.ParentFrameId != movement.Id || context.MovementBatch?.Id != movement.Batch.Id || context.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained) || program.Id != dying.ParentFrameId || _resolutionStackOperations._resolutionStack[i + 4] is not DyingFrame child || child.Id != dying.FrameId || child.ParentFrameId != program.Id || child.VictimSeat != dying.VictimSeat || child.KillerSeat != dying.KillerSeat || child.ResponderIndex != dying.ResponderIndex || !child.ResponderSeats.SequenceEqual(dying.ResponderSeats))
-            return false;
-        var paid = ProgramInstructionResolver.Default.Resolve(exchange, _contentRegistryOperations._contentRegistry.GetSkill(exchange.SkillId).Program!).GetPausedInstruction(exchange.InstructionIndex).Effect;
-        var effect = ProgramInstructionResolver.Default.Resolve(program, _contentRegistryOperations._contentRegistry.GetSkill(program.SkillId).Program!).GetPausedInstruction(program.InstructionIndex).Effect;
-        if (paid.Op != SkillProgramEffectOp.ExchangeRespondedCardEntities || effect.Op != SkillProgramEffectOp.LoseHp || global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(program, effect.Target) != dying.VictimSeat)
-            return false;
-        if (i + 5 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[i + 5] is CardUseFrame rescue)
-        {
-            if (rescue.DyingResponse is not { } response || response.ResolutionId != dying.FrameId || response.ResponderSeat != dying.ResponderSeat || rescue.SourceSeat != response.ResponderSeat || rescue.Action is not { Type: CardActionType.Use } action || action.ActorSeat != rescue.SourceSeat || action.ProviderSeat != rescue.SourceSeat || !rescue.TargetSeats.SequenceEqual([dying.VictimSeat]) || rescue.CardKind is not (CardKind.Peach or CardKind.Alcohol) || action.EffectiveKind != rescue.CardKind || !action.EffectiveDesignatedTargetSeats.SequenceEqual(rescue.TargetSeats) || !action.PhysicalCards.Select(c => c.CardId).SequenceEqual(rescue.PhysicalCardIds ?? [rescue.CardId]) || (rescue.CardKind == CardKind.Peach ? !response.UsedPeach : !response.UsedAlcohol || rescue.SourceSeat != dying.VictimSeat))
-                return false;
-            costs = (rescue.PhysicalCardIds ?? [rescue.CardId]).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray();
-        }
-
-        return true;
-    }
-
-    internal void AssertResponseEntityExchange(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.ResponseEntityExchange is { } exchange)
-        {
-            var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == frame.WindowContext?.ParentFrameId);
-            var original = window is null ? null : ActualRespondedAction(window.Action);
-            if (paused.Op != SkillProgramEffectOp.ExchangeRespondedCardEntities || exchange.StateId != paused.StateId || exchange.Stage is not (1 or 2) || window is null || original is null || original.ActionId != exchange.RespondedActionId || original.ActorSeat != frame.OwnerSeat || window.Action.ActionId != exchange.ResponseActionId || window.Action.ActorSeat != exchange.RecipientSeat || !window.Action.PhysicalCards.Select(c => c.CardId).SequenceEqual(exchange.ResponseCardIds) || exchange.OriginalCardIds.Count > 0 && (!original.PhysicalCards.Select(c => c.CardId).SequenceEqual(exchange.OriginalCardIds) || paused.ResponseExchangeMode is not null) || exchange.OriginalCardIds.Count == 0 && paused.ResponseExchangeMode is null && !ResponseExchangeUpgraded(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, exchange.StateId))
-                throw new InvalidOperationException("An entity exchange lost its exact responded/response identity or upgrade source.");
-        }
-
-        if (frame.PublicSuitDiscard is { } discard)
-        {
-            if (paused.Op != SkillProgramEffectOp.DrawPublicSuitThenEscalatingDiscard || discard.StateId != paused.StateId || discard.UpgradeSkillId != paused.SkillIds.Single() || discard.TargetSeat == frame.OwnerSeat || !frame.SelectedTargetSeats.SequenceEqual([discard.TargetSeat]) || discard.Required < 0 || discard.Stage is < 0 or > 3 || discard.Stage == 0 && paused.PublicSuitDiscardMode is null || discard.SelectedIds is { } selected && (selected.Distinct().Count() != selected.Count || selected.Count > discard.Required) || discard.Exhausted && (discard.Stage != 3 || discard.SelectedIds is not { Count: > 0 }) || (paused.PublicSuitDiscardMode is null ? discard.ChosenSuit is not null || discard.DrawCount is not null || discard.PaidHandIds is not null : discard.Stage == 0 ? discard.ChosenSuit is not null || discard.DrawCount is not null || discard.Required < 1 : discard.ChosenSuit is not (Suit.Spade or Suit.Heart or Suit.Club or Suit.Diamond) || discard.DrawCount is null or < 0 or > 5 || discard.Stage == 3 && (discard.PaidHandIds is null || discard.PaidHandIds.Distinct().Count() != discard.PaidHandIds.Count || discard.Exhausted != (discard.PaidHandIds.Count > 0 && discard.PaidHandIds.All(discard.SelectedIds!.Contains)))))
-                throw new InvalidOperationException("An escalating discard lost its real participant, source or paid set.");
-            if (discard.Stage == 0 && ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: false } suitPrompt || suitPrompt.PlayerSeat != frame.OwnerSeat || suitPrompt.Choices.Count != 4 || suitPrompt.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") != "public-suit-choice")))
-                throw new InvalidOperationException("An escalating discard lost its public suit choice.");
-            if (discard.Stage == 2 && ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != discard.TargetSeat || prompt.Choices.Count == 0 || prompt.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") != "public-suit-discard")))
-                throw new InvalidOperationException("An escalating discard lost its private payer choice.");
-        }
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IResponseExchangeProgramHost.ExchangeRespondedCardEntities(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginResponseEntityExchange(frame, effect);
     SkillProgramStepOutcome global::CardGame.Core.IResponseExchangeProgramHost.DrawPublicSuitThenEscalatingDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginPublicSuitEscalatingDiscard(frame, effect);
 }

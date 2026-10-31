@@ -19,14 +19,6 @@ internal sealed partial class CoreGameEngineHealthQueriesRuntime
         return _characterDaQiaoXiaoQiaoHappyGodOperations.TryBeginHappyQiaoHealthChoice(parent.Id, attack.TargetSeat, HpChangeKind.Loss, amount, HappyQiaoHealthReturnKind.Damage, $"damage-loss:{(attack.ResolutionId)}:{(attack.TargetSeat)}:{(_characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(attack.ResolutionId))}", attack.IsSourceLess ? null : attack.SourceSeat, attack.ResolutionId);
     }
 
-    internal bool HasHappyQiaoNativeDamageChoice(long attackId)
-    {
-        if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^1] is not HappyQiaoHealthChoiceFrame { IsQuery: false } choice || _resolutionStackOperations._resolutionStack[^2] is not { HappyQiaoHealth: { ReturnKind: HappyQiaoHealthReturnKind.Damage, Applied: false, Pool: null } receipt } parent || parent.Id != attackId || choice.ParentFrameId != parent.Id || receipt.AttackResolutionId != attackId || _coreLastDamageSourceReciprocityObserversOperations.LastDamageSourceOriginalAttack(attackId)is not { DamageWasApplied: false } attack || attack.TargetSeat != receipt.TargetSeat || choice.OwnerSeat != attack.TargetSeat || receipt.SourceSeat != (attack.IsSourceLess ? null : attack.SourceSeat))
-            return false;
-        _characterDaQiaoXiaoQiaoHappyGodOperations.RequireHappyQiaoHealthChoice(choice);
-        return true;
-    }
-
     internal bool TryBeginHappyQiaoInstructionQuery(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         IEnumerable<int> subjects = [];

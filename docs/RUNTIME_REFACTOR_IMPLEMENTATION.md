@@ -2,7 +2,7 @@
 
 本文件说明当前运行时的状态归属、提交及扩展边界。内容作者入口见 [人物模块与注册](CHARACTER_MODULES.md)，窗口与原生子结算返回见 [结算协议](RESOLUTION_PROTOCOLS.md)。
 
-正在将引擎业务迁为独立职责类，当前实现和后续范围见 [GameEngine 职责拆分](GAME_ENGINE_DECOMPOSITION.md)。
+引擎职责、共用入口与按局装配约定见 [GameEngine 职责与装配](GAME_ENGINE_DECOMPOSITION.md)。
 
 ## 状态归属
 
@@ -24,7 +24,7 @@
 
 ## 命令提交与故障
 
-独立 `CommandSession` 在提交之前运行规则、同步派生技能、验证不变量，并准备新 revision 的玩家视图和事件。`CommandEventJournal` 通过 `CommittedEventProjection` 冻结事件的嵌套集合，命令日志中的输入也经复制。预留容量后再追加命令和事件；外部观察者与调用者收到同一次准备的结果。`GameEngine.CommandSession.cs` 提供必要的原生端口及调用转接。
+独立 `CommandSession` 在提交之前运行规则、同步派生技能，并准备新 revision 的玩家视图和事件。`CommandEventJournal` 通过 `CommittedEventProjection` 冻结事件的嵌套集合，命令日志中的输入也经复制。预留容量后再追加命令和事件；外部观察者与调用者收到同一次准备的结果。`GameEngine.CommandSession.cs` 提供必要的原生端口及调用转接。
 
 规则或准备异常将会话标记为故障。若此前拥有完整接受前缀，`LastTrustedCheckpoint` 提供异常前的可信恢复数据；异常后的可变状态不用于继续游戏。交付异常保留已经可见的提交，普通观察者异常逐个隔离。派发期间拒绝重入推进。
 
@@ -68,11 +68,11 @@ Checkpoint 保存初始化和接受命令，在当前实现中重放；恢复校
 
 专用效果接口由独立 `[ProgramRuntimeModule, ProgramCapability]` 实现或迁移中的私有嵌套适配器提供。共享目录只保存类型和工厂；实例由 `MatchRuntime` 按对局延迟建立，处理器和能力入口共享同一实例。牌区、历史、批次状态和内容等实际所有者通过专用原生接口显式绑定；重复来源在装配时拒绝，独立测试目录不会隐式导入整局能力。`ProgramSkillHost` 只实现共同执行及效果 host，通过 `GetCapability<T>()` 获得专用能力。
 
-独立的延迟适配器使用 `[ProgramCapability(typeof(TargetRuntime))]`，只接收该类型的工厂 `Func<TargetRuntime>`。能力目录验证目标是已声明模块、构造器精确匹配且契约唯一；本局装配器建立工厂，接口解析不会提前创建目标。职责间允许在构造完成后相互调用，实际构造循环仍被拒绝。它保留引用参数和引用返回，不持有完整引擎或另一份待决状态。
+跨职责调用复用以 `[ProgramRuntimeEntry(typeof(TargetRuntime))]` 注册的共享入口，只保存该类型的解析函数。目录在注册时检查目标与构造形状，本局核心装配和规则模块使用同一个缓存入口，不按消费方复制接口和适配类。调用参数先求值，再解析实际模块；引用参数、引用返回及相互延迟调用保持原语义，入口不保存待决状态。
 
 `CardMovementBatchCoordinator` 独立负责批次开始和完成，扩展分为开始材料、已提交单条观察、上下文前事实及有序完成四个阶段。每项扩展在所属机制注册，前一项返回的上下文直接传给下一项；失败不进入后续阶段。开始材料在批次成为活动批次前封闭，待处理批次仍只追加到原 `CardMovementBatchStore`。
 
-`[ProgramRuntimeHook]` 在声明前、响应体力前后、判定阶段前、回复应用前和伤害应用前等规定位置推进所属机制；死亡后和失技后的继续权限独立声明。`[ProgramFrameInvariant]` 在通用选择状态检查两侧验证所属机制。阶段不是可以互换的优先级，不能跨过已支付体力或原生声明边界移动处理器。
+`[ProgramRuntimeHook]` 在声明前、响应体力前后、判定阶段前、回复应用前和伤害应用前等规定位置推进所属机制；死亡后和失技后的继续权限独立声明。阶段不是可以互换的优先级，不能跨过已支付体力或原生声明边界移动处理器。
 
 选择来源、卡牌/目标过滤、提交验证、目标解析、AI 修饰、动作来源及动作处理分别使用自身注册目录。只读选择模块通过 `IProgramSelectionQueries` 查询，不能取得引擎可变状态或提交入口。
 
@@ -102,7 +102,7 @@ Checkpoint 保存初始化和接受命令，在当前实现中重放；恢复校
 
 `ProgramPhaseSchedulingRuntime` 校验并挂起原程序及父帧，结束插入阶段时恢复同一已支付续接；唯一 `ProgramPhaseSchedule` 仍在原状态位置，运行实例没有第二份计划。实际阶段入口、抓牌、弃牌令牌与人物返回通过各自的原生协议执行。`ProgramPhaseFrameQueries` 统一证明 own PlayEnding 与 foreign actual-turn 帧，其他机制无需依赖拼点签发器；`ProgramPindianRuntime` 在此基础上检查原生来源、事件目标和当前指令，再签发同一原生拼点。
 
-`ProgramBoundaryInvariantRuntime` 从真实调度器的首帧和帧数验证生命周期、回合结束及出牌阶段开始边界，不为验证复制帧栈。`ForeignActualTurnWindowRuntime` 拥有他人实际回合开始窗口的候选排序、冻结、推进和类型化完成；窗口帧继续唯一持有候选、上下文和游标。人物专属资格和实际回合后续通过既有窄协议接入。
+`ForeignActualTurnWindowRuntime` 拥有他人实际回合开始窗口的候选排序、冻结、推进和类型化完成；窗口帧继续唯一持有候选、上下文和游标。人物专属资格和实际回合后续通过既有窄协议接入。
 
 `ForeignTurnContestRuntime` 保存规则在原帧上的结果归属，检查原始拼点事实、输赢效果、认领及 Slash 返回，原生签发只承担下层用牌入口。`ProgramHealthStateRuntime` 直接修改 `MatchParticipantStateAccess` 返回的原角色对象；跨事件后不重新构造人物状态。恢复、双体力和体力上限等原生协议仍保持原子结算及其支付凭据。
 

@@ -28,7 +28,6 @@ internal sealed partial class CoreGameEngineUnequalHandHpObserversRuntime
     }
 
     internal ProgramSkillFrame? UnequalHandHpObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreUnequalHandHpObserversOperations.UnequalHandHpFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 100, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 210)]
     internal bool IsUnequalHandHpDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && UnequalHandHpObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1760)]

@@ -44,20 +44,4 @@ internal sealed partial class CoreGameEngineComparedBlackSlashPoliciesRuntime
     }
 
     internal static void ValidateComparedBlackSlashPolicy(string path, SkillProgramCardPolicy policy) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ComparedBlackSlashPolicies.ValidateComparedBlackSlashPolicy(path, policy);
-    internal void AssertComparedBlackSlashReceipt(CardUseFrame use)
-    {
-        if (use.CardAttack?.ComparedBlackSlash is not { } r)
-            return;
-        var attack = use.CardAttack;
-        var action = use.Action;
-        if (action is null || action.Type != CardActionType.Use || action.EffectiveIsRed != false || r.CardUseFrameId != use.Id || r.ActionId != action.ActionId || r.ActorSeat != use.SourceSeat || r.ActorSeat != action.ActorSeat || r.ProviderSeat != action.ProviderSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || !use.TargetSeats.Contains(r.TargetSeat) || r.EffectiveKind != action.EffectiveKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.EffectiveKind) || r.EffectiveSuit != (action.EffectiveSuit ?? Suit.None) || r.EffectiveIsRed || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.ActorHandCount < 0 || r.TargetHandCount < 0 || r.ActorHp <= 0 || r.TargetHp <= 0 || r.TargetPolicySource is null && r.ActorPolicySource is null || (action.PhysicalCards.Count == 0 && r.EffectiveSuit is not (Suit.Spade or Suit.Club)) || r.Ineffective != (r.TargetPolicySource is not null && r.ActorHp >= r.TargetHp) || r.CannotRespond != (r.ActorPolicySource is not null && r.TargetHandCount <= r.ActorHandCount) || !ComparedBlackSlashPolicyMatches(r.TargetPolicySource, r.TargetPolicyHash, r.TargetSeat, SkillProgramCardPolicyKind.NullifyBlackSlashByCurrentHp) || !ComparedBlackSlashPolicyMatches(r.ActorPolicySource, r.ActorPolicyHash, r.ActorSeat, SkillProgramCardPolicyKind.ProhibitBlackSlashResponseByCurrentHand) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ComparedBlackSlashAppliedEvent>().Count(e => e.Receipt == r) != 1 || r.CannotRespond && (!attack.ProhibitsDodge || !attack.ResponseProhibitingSkillNames.Contains(_contentRegistryOperations._contentRegistry.GetSkill(r.ActorPolicySource!.SkillId).Name, StringComparer.Ordinal)) || r.Ineffective && use.IneffectiveTargetSeats?.Contains(r.TargetSeat) != true || attack.TargetSeat != r.TargetSeat && (!attack.DamageRedirected || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDamageTransferredEvent>().Any(e => e.ResolutionId == use.Id && e.OwnerSeat == r.TargetSeat && e.TargetSeat == attack.TargetSeat && e.SourceSeat == attack.SourceSeat)))
-            throw new InvalidOperationException("A black Slash conclusion changed its frozen same-use appearance, current actor, source metadata or original target.");
-    }
-
-    internal bool ComparedBlackSlashPolicyMatches(CardConversionSource? source, string? hash, int owner, SkillProgramCardPolicyKind kind)
-    {
-        if (source is null)
-            return hash is null;
-        return source.OwnerSeat == owner && !string.IsNullOrWhiteSpace(source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(source.SkillId)?.Program is { } program && program.GameplayHash == hash && program.CardPolicies.Any(p => p.Id == source.BindingId && p.Kind == kind);
-    }
 }

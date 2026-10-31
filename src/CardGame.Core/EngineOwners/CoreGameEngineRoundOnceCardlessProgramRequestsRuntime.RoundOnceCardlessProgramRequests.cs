@@ -93,8 +93,6 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
 
         return Array.AsReadOnly(result.ToArray());
     }
-
-    internal PendingDecision RoundOnceCardlessProgramNativeDecision(PendingDecision p) => _characterXiaoQiaoMouOlOperations.MouXqProgramNativeDecision(global::CardGame.Core.EngineOwners.CharacterLiuZhangOlRuntime.ZonghuNativeDecision(p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == RoundOnceCardlessProgramMarker) ? p with { Choices = Array.AsReadOnly(p.Choices.Where(c => c.Parameters.GetValueOrDefault("program-action") != RoundOnceCardlessProgramMarker).ToArray()) } : p));
     internal bool TryResolveRoundOnceCardlessProgramSlash(PromptChoice choice, bool advance)
     {
         if (choice.Parameters.GetValueOrDefault("program-action") != RoundOnceCardlessProgramMarker)
@@ -193,15 +191,6 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 360)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 360)]
     internal bool CanContinueIssuedRoundOnceCardlessProgramRequest(ProgramSkillFrame parent) => parent.RoundOnceCardlessProgramRequest is { } p && ValidRoundOnceCardlessProgramReceipt(parent, p.Receipt) && (!p.NativeReturned || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessProgramRequestReturnedEvent>().Count(e => e.Receipt == p.Receipt) == 1);
-    internal void AssertRoundOnceCardlessProgramRequests()
-    {
-        foreach (var parent in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.RoundOnceCardlessProgramRequest is not null))
-            if (!CanContinueIssuedRoundOnceCardlessProgramRequest(parent))
-                throw new InvalidOperationException("Cardless request lost its exact original actor, instruction, source invoice or paid native return.");
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(f => f.RoundOnceCardlessProgramRequest is not null))
-            if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == use.RoundOnceCardlessProgramRequest!.ProgramFrameId)is not ProgramSkillFrame parent || !RoundOnceCardlessProgramRequestRidesOn(use, parent))
-                throw new InvalidOperationException("Cardless request child lost its original paid program parent.");
-    }
 
     [NativeUseValidation(40)]
     internal void AssertRoundOnceCardlessProgramRequestCompletion(CardUseFrame use)

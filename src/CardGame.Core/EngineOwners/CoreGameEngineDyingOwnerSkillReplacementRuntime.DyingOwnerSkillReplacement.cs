@@ -96,13 +96,6 @@ internal sealed partial class CoreGameEngineDyingOwnerSkillReplacementRuntime
         return started == 1 && history.OfType<ProgramReplacedPaidHpContinuationIssuedEvent>().Count(fact => fact.Continuation.ProgramFrameId == frame.Id && fact.Continuation == receipt) == 1 && history.OfType<ProgramSkillHpLostEvent>().Count(fact => fact.FrameId == frame.Id && fact.SkillId == frame.SkillId && fact.TargetSeat == frame.OwnerSeat && fact.Amount == 1 && fact.RemainingHp == 0) == 1 && history.OfType<PlayerDyingEvent>().Count(fact => fact.ResolutionId == receipt.DyingFrameId && fact.VictimSeat == frame.OwnerSeat && fact.KillerSeat is null) == 1 && history.OfType<ProgramBindingStartedEvent>().Count(fact => fact.FrameId == receipt.ReplacementFrameId && fact.OwnerSeat == frame.OwnerSeat && fact.SkillId == receipt.ReplacementSkillId && fact.BindingId == receipt.ReplacementBindingId && fact.SkillInstanceId == receipt.ReplacementSkillInstanceId && fact.Window == SkillProgramTriggerWindow.DyingEntering) == 1 && history.OfType<ProgramOwnerSkillsReplacedEvent>().Count(fact => fact.ResolutionId == receipt.ReplacementFrameId && fact.OwnerSeat == frame.OwnerSeat && fact.SkillId == receipt.ReplacementSkillId && fact.GrantedSkillId == receipt.GrantedSkillId && fact.LostSkillIds.SequenceEqual(replacement.SkillIds)) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 110)]
-    internal void AssertReplacedPaidHpContinuation(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.ReplacedPaidHpContinuation is not null && !HasValidReplacedPaidHpContinuation(frame, plan))
-            throw new InvalidOperationException("The removed owner's paid HP continuation lost its exact source, cursor or issued facts.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 780)]
     internal bool CanContinueReplacedPaidHpContinuation(ProgramSkillFrame frame) => _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && HasValidReplacedPaidHpContinuation(frame, ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!));
 }

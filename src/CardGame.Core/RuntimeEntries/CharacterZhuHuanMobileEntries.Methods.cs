@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhuHuanMobileEntries
 {
     internal void AnswerMobileZhuHuanPingkou(global::CardGame.Core.PromptChoice chosen) => _resolve().AnswerMobileZhuHuanPingkou(chosen);
-    internal void AssertMobileZhuHuanPingkou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileZhuHuanPingkou(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileZhuHuanPingkou(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMobileZhuHuanPingkou(supplied);
     internal bool CanOfferMobileZhuHuanPingkou(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferMobileZhuHuanPingkou(gate);
     internal void IssueMobileZhuHuanPingkouDamage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMobileZhuHuanPingkouDamage(f);

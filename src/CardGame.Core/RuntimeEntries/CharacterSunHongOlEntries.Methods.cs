@@ -5,8 +5,6 @@ internal sealed partial class CharacterSunHongOlEntries
     internal bool AdvanceSunHongChildren() => _resolve().AdvanceSunHongChildren();
     internal void AnswerXianbi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerXianbi(choice);
     internal void AnswerZenrun(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerZenrun(choice);
-    internal void AssertXianbi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertXianbi(f);
-    internal void AssertZenrun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZenrun(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginXianbi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginXianbi(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZenrun(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginZenrun(supplied);
     internal bool CanActivateXianbi(global::CardGame.Core.CharacterState owner) => _resolve().CanActivateXianbi(owner);
@@ -25,7 +23,6 @@ internal sealed partial class CharacterSunHongOlEntries
     internal bool HasPrintedGeneralSkillTargetBan2(int owner, string skillId, int target, string? skillInstanceId = default) => _resolve().HasPrintedGeneralSkillTargetBan(owner, skillId, target, skillInstanceId);
     internal bool HasSunHongBeforeDamageObserver(long id) => _resolve().HasSunHongBeforeDamageObserver(id);
     internal bool HasSunHongDamageObserver(long id) => _resolve().HasSunHongDamageObserver(id);
-    internal bool HasSunHongDyingObserver() => _resolve().HasSunHongDyingObserver();
     internal bool IsSunHongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSunHongMovement(f, effect, pending);
     internal bool IsSunHongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunHongRecoveryParent(f, recovery);
     internal global::CardGame.Core.ProgramSkillFrame PrepareXianbiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.XianbiStage stage) => _resolve().PrepareXianbiMovement(f, stage);

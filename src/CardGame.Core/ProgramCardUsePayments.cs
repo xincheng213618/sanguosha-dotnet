@@ -142,13 +142,6 @@ internal sealed class ProgramCardUsePayments
         return false;
     }
 
-    internal bool AllowsProcessing(IReadOnlyList<Card> cards)
-    {
-        foreach (var allows in Handlers<Func<IReadOnlyList<Card>, bool>>(ProgramCardUsePaymentStage.ProcessingAllowance))
-            if (allows(cards)) return true;
-        return false;
-    }
-
     internal void CompleteSlashPayment(long useId)
     {
         foreach (var complete in Handlers<Action<long>>(ProgramCardUsePaymentStage.SlashPaymentCompleted)) complete(useId);

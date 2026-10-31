@@ -30,8 +30,6 @@ internal sealed partial class QuHuangRuntime
     }
     private static string GetProgramBindingId(ProgramSkillFrame frame) =>
         RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame);
-    private static bool MountObserverCandidateMatches(ProgramSkillFrame frame, ProgramTriggerCandidate candidate) =>
-        RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, candidate);
     private static bool AssistedChoicesEqual(IReadOnlyList<PromptChoice> actual, IReadOnlyList<PromptChoice> expected) =>
         RuntimeSkills.RuntimeRules_Core_AssistedPhysicalCards.AssistedChoicesEqual(actual, expected);
     private static bool LostLastHandCard(CardMovementBatchContext batch, int seat) =>

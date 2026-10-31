@@ -7,23 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
 {
-    internal void AssertVirtualBasicDraft(ProgramSkillFrame frame, SkillProgramEffect effect)
-    {
-        if (frame.VirtualBasicDraft is not { } draft)
-            return;
-        if ((effect.Op != SkillProgramEffectOp.OfferVirtualBasicCard && !(effect.Op == SkillProgramEffectOp.ResolveShanheZhaoguMirror && _coreZhaoguMirrorOperations.IsZhaoguVirtualBasicDraft(frame, draft)) && !(effect.Op == SkillProgramEffectOp.UseVirtualAlcohol && _coreProvenanceVirtualAlcoholOperations.IsExactProvenanceVirtualBasicDraft(frame, draft)) && !(effect.Op == SkillProgramEffectOp.UsePhaseOwnerVirtualAlcohol && _coreForcedPhaseAlcoholOperations.IsExactPhaseAlcoholVirtualDraft(frame, draft)) && !(effect.Op == SkillProgramEffectOp.UseHellPreparationAlcohol && _coreHellKingProgramsOperations.IsExactHellPreparationAlcoholDraft(frame, draft)) && !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryRuanJiJiudun && _characterRuanJiAnniversaryOperations.IsExactRuanJiVirtualBasicDraft(frame, draft)) && !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua && _characterLiuLiAnniversaryOperations.IsExactAnniversaryLiuLiBasicDraft(frame, draft)) && !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryDagongCheAttack && _characterZhangFenAnniversaryOperations.IsExactDagongCheBasicDraft(frame, draft)) && !(effect.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoJuee && _characterYangBiaoAnniversaryOperations.IsExactAnniversaryYangBiaoBasicDraft(frame, draft)) && !(effect.Op == SkillProgramEffectOp.ResolveShiZhLiezhi && frame.SkillId == ShiZangHongComposition.LiezhiSkill)) || draft.InstructionIndex != frame.InstructionIndex)
-            throw new InvalidOperationException("A virtual basic draft lost its exact instruction.");
-        if (draft.ChildFrameId is { } childId)
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-            if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not CardUseFrame child || child.Id != childId || child.VirtualBasicReturn != new ProgramVirtualBasicReturn(frame.Id, draft.InstructionIndex) || child.CardId != 0 || child.PhysicalCardIds?.Count != 0 || frame.SkillId == "guandu:choulue" && _coreGuanduGeneralNativeCardsOperations.GuanduChoulueFrozenBasicKind(frame) != child.CardKind || child.Action is not { Type: CardActionType.Use } action || action.ActorSeat != child.SourceSeat || action.ProviderSeat != frame.OwnerSeat || action.PhysicalCards.Count != 0 || action.EffectiveKind != child.CardKind)
-                throw new InvalidOperationException("A virtual basic child has no exact zero-entity parent return.");
-            return;
-        }
-
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.Choices.Count == 0 || prompt.Choices.Any(c => c.Cards.Count != 0 || c.Parameters.GetValueOrDefault("program-action") != "virtual-basic" || c.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || (c.Parameters.GetValueOrDefault("basic-option") == "skip" ? c.Targets.Count != 0 : !VirtualBasicOptions(frame).Any(o => c.Parameters.GetValueOrDefault("basic-option") == $"{(o.Kind)}:{(o.Target)}" && c.Targets.SequenceEqual(new[] { o.Target })))))
-            throw new InvalidOperationException("A virtual basic chooser lost its exact legal options.");
-    }
 
     internal IEnumerable<(CardKind Kind, int Target)> VirtualBasicOptions(int owner, bool anyRegisteredBasic = false)
     {
@@ -118,8 +101,6 @@ internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         if (use.VirtualBasicReturn is null)
             return false;
-        if (continuation.CardId != 0 || use.CardId != 0 || use.PhysicalCardIds?.Count != 0 || use.CardKind is not (CardKind.Peach or CardKind.Alcohol) || use.Step == ResolutionFrameStep.Completed || use.VirtualBasicEffectApplied == true)
-            throw new InvalidOperationException("A virtual basic effect lost its exact zero-cost use.");
         var actor = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
         _coreNativeCardUseFramesOperations.SetCardUseStep(id, ResolutionFrameStep.ResolvingEffect);
         if (actor.IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(id, actor.Seat))

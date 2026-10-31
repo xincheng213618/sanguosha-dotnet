@@ -68,8 +68,6 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         var continuation = new ProgramSimpleCardContinuation(equipment.Id, SimpleCardUseEffect.EquipmentPlacement);
         return _coreCardUseLifecycleOperations.TryBeginCommittedCardUse(id, ProgramCardContinuation.CommittedSimpleCard, simple: continuation) || ContinueHappyWeiYanIneffectiveSimple(id, continuation);
     }
-
-    internal static int HappyZiguFrozenCounterpart(int owner, ProgramSkillWindowContext context) => context.SourceSeat is { } source && context.TargetSeat is { } target && source != target && (source == owner || target == owner) ? source == owner ? target : source : -1;
     internal int HappyZiguCounterpart(int owner, ProgramSkillWindowContext context)
     {
         if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.SourceSeat is not { } source || context.TargetSeat is not { } target || source == target || source != owner && target != owner || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { IsSourceLess: false } attack || attack.SourceSeat != source || attack.TargetSeat != target)
@@ -125,7 +123,6 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            RequireHappyWeiYan(frame);
             var receipt = frame.HappyWeiYan!;
             if (receipt.Stage is HappyWeiYanStage.Replacing or HappyWeiYanStage.Placing or HappyWeiYanStage.GainChildren)
             {
@@ -215,7 +212,6 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
     internal void AnswerHappyWeiYan(PromptChoice chosen)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Wei Yan lost his original choice frame.");
-        RequireHappyWeiYan(frame);
         if (!HappyWeiYanChoices(frame).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Happy Wei Yan requires the exact current published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

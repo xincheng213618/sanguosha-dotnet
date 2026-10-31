@@ -105,7 +105,6 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHeYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != HeYanChooser(r, f.OwnerSeat) || !HeYanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("He Yan rejects a stale or foreign private choice.");
-        RequireHeYan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -215,7 +214,6 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
     [PublicHandRevealReturn(HeYanRevealReturn)]
     internal void ReturnHeYanReveal(ProgramSkillFrame f)
     {
-        RequireHeYan(f);
         if (f.AnniversaryHeYan is not { Stage: AnniversaryHeYanStage.Revealing } r)
             throw new InvalidOperationException("He Yan lost his complete public reveal return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryHeYan = r with { Stage = AnniversaryHeYanStage.SuitChoice } });
@@ -260,7 +258,6 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHeYan: { } r } f || f.Id != id)
             return false;
-        RequireHeYan(f);
         if (r.Stage is AnniversaryHeYanStage.SourceChoice or AnniversaryHeYanStage.DiscardChoice or AnniversaryHeYanStage.SealedChoice or AnniversaryHeYanStage.SuitChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

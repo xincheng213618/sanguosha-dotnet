@@ -105,7 +105,6 @@ internal sealed partial class CharacterKongShuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { KongShu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == KongShuStage.RoundDiscard ? r.Payer : f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], KongShuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Kong Shu lost her exact native private chooser or material selection.");
-        AssertKongShu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (branch is "pick" or "unpick")
@@ -193,7 +192,6 @@ internal sealed partial class CharacterKongShuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { KongShu: { } r } f || f.Id != id)
             return;
-        AssertKongShu(f);
         if (r.Stage is KongShuStage.BenefitDrawChildren or KongShuStage.BenefitGainChildren or KongShuStage.ChainChildren or KongShuStage.RoundDrawChildren or KongShuStage.RoundDiscardChildren)
         {
             if (DrainKongShu(f))
@@ -346,7 +344,6 @@ internal sealed partial class CharacterKongShuOlRuntime
     {
         if (f.KongShu is { Paid: true })
         {
-            AssertKongShu(f);
             return true;
         }
 

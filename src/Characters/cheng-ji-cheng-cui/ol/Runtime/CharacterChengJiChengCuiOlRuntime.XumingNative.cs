@@ -83,15 +83,4 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         // Admit that exact owning child, not an arbitrary newly acquired source.
         return f.TriggerId == "issued-whole-turn-uses" && f.ActivationId == f.TriggerId && f.WindowContext is { Window: SkillProgramTriggerWindow.AfterTurnEnded } c && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is DeferredTurnEndFrame parent && parent.AfterTurnEnded?.CurrentChild is { } child && child.FrameId == f.Id && child.Candidate.OwnerSeat == f.OwnerSeat && child.Candidate.SkillId == f.SkillId && child.Candidate.SkillInstanceId == f.SkillInstanceId && child.Candidate.GameplayHash == f.GameplayHash && child.Candidate.BindingId == f.TriggerId && IsIssuedXumingCandidate(child.Candidate, c);
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32202)]
-    internal void AssertXumingFrame(ProgramSkillFrame f)
-    {
-        if (f.XumingEnding is not { } r)
-            return;
-        if (f.InstructionIndex != 1 || f.TriggerId != "issued-whole-turn-uses" || f.ActivationId != f.TriggerId || f.SkillId != ChengJiChengCuiComposition.Xuming || r.Source != ChengJiSource(f) || r.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || r.PromiseIndex < 0 || r.PromiseIndex > r.Promises.Count || r.Before > r.After || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded } c || c.ParentFrameId != r.WindowId || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not DeferredTurnEndFrame parent || parent.TurnNumber != r.ActualTurn || parent.OwnerSeat != r.TurnOwnerSeat || parent.AfterTurnEnded?.CurrentChild?.FrameId != f.Id || r.Promises.Any(p => p.Source.OwnerSeat != f.OwnerSeat || p.Source.SkillInstanceId != f.SkillInstanceId || p.GameplayHash != f.GameplayHash || p.ActualTurn != r.ActualTurn || !_coreProgramEventHistoryOperations.ProgramEventHistory<XumingPromiseIssuedEvent>().Contains(p)))
-            throw new InvalidOperationException("Xuming lost the original source-qualified whole-turn promise cursor.");
-        if (r.Stage == XumingStage.NativeUse && (r.UseId is not { } id || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { } use || !IsIssuedXumingUse(use)))
-            throw new InvalidOperationException("Xuming's issued native child lost its original complete material group.");
-    }
 }

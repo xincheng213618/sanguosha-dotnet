@@ -55,6 +55,4 @@ internal sealed partial class CoreGameEngineBoundRankBonusObserversRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 80)]
     internal bool HasBoundRankBonusMovementObserver(long damageWindowId) => BoundRankBonusMovementRoot(damageWindowId)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 370, group: 10)]
-    internal bool IsBoundRankBonusMovementDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && BoundRankBonusMovementRoot(damage.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId && f.ParentFrameId == dying.ParentFrameId);
 }

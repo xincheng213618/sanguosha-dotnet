@@ -79,44 +79,4 @@ internal sealed partial class CharacterCuiYanOlRuntime
         ContinueCuiYanLegacyAlcohol(w.ParentFrameId);
         return true;
     }
-
-    internal bool IsCuiYanOriginalDyingRide()
-    {
-        if (!HasCuiYanCapability || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying)
-            return false;
-        var di = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId);
-        if (di < 0)
-            return false;
-        foreach (var u in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-        {
-            var ui = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == u.Id);
-            if (ui <= di)
-                continue;
-            var physical = u.DyingResponse is { } response && response.ResolutionId == dying.FrameId && response.ResponderSeat == u.SourceSeat && u.CardKind is CardKind.Peach or CardKind.Alcohol && u.TargetSeats.SequenceEqual([dying.VictimSeat]);
-            var legacy = u.CuiYanLegacyAlcohol is { } r && r.DyingId == dying.FrameId && r.Stage != CuiYanLegacyAlcoholStage.Recovery && IsCuiYanLegacyAlcoholUse(u.Id);
-            var otherLegacy = u.LiuYanLegacyAlcohol is { } lr && lr.DyingId == dying.FrameId && lr.Stage != LiuYanLegacyAlcoholStage.Recovery && _characterLiuYanOlOperations.IsLiuYanLegacyAlcoholUse(u.Id);
-            if (!physical && !legacy && !otherLegacy)
-                continue;
-            if (ui + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[ui + 1] is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != u.Id || w.Action.ActionId != u.Action?.ActionId || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count)
-                continue;
-            var candidate = w.Candidates[w.CandidateIndex];
-            if (ui + 2 == _resolutionStackOperations._resolutionStack.Count)
-                return legacy && _coreProgramLifecycleOperations.GetProgramTrigger2(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveShutongFinalizedUse);
-            if (_resolutionStackOperations._resolutionStack[ui + 2] is not ProgramSkillFrame binding || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(binding, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)) || binding.WindowContext?.ParentFrameId != w.Id)
-                continue;
-            if (binding.CuiYan is not null)
-            {
-                AssertCuiYan(binding);
-                if (ui + 3 == _resolutionStackOperations._resolutionStack.Count || CuiYanObserverRoot()?.Id == binding.Id)
-                    return true;
-            }
-
-            if (legacy && binding.LiuYan is not null && _characterLiuYanOlOperations.ValidLiuYan(binding) && (ui + 3 == _resolutionStackOperations._resolutionStack.Count || _characterLiuYanOlOperations.LiuYanObserverRoot()?.Id == binding.Id))
-                return true;
-            if (legacy && binding.ZhuJunCuipoDraw is not null && (ui + 3 == _resolutionStackOperations._resolutionStack.Count || _characterZhuJunOlOperations.ZhuJunObserverRoot()?.Id == binding.Id))
-                return true;
-        }
-
-        return false;
-    }
 }

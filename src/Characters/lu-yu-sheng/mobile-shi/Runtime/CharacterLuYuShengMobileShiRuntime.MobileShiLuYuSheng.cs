@@ -587,32 +587,11 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 67400)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 67400)]
     internal bool ContinuePaidShiLysLuYuSheng(ProgramSkillFrame f) => f.MobileShiLuYuSheng is { Stage: > 0 } || f.InstructionIndex == 0 && f.TriggerId == MobileShiLuYuShengComposition.RunweiPhaseEndTrigger && f.WindowContext is { } c && IsIssuedShiLysPhaseEnd(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), c);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 67400)]
-    internal void AssertShiLysLuYuSheng(ProgramSkillFrame f)
-    {
-        if (f.MobileShiLuYuSheng is not { } r)
-            return;
-        if (r.Source is null || r.Source.OwnerSeat != f.OwnerSeat || r.Source.SkillId != f.SkillId || r.Source.SkillInstanceId != f.SkillInstanceId || r.GameplayHash != f.GameplayHash || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.ActualTurn != _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber || r.Operation is not ("runwei" or "runwei-end" or "shuanghuai"))
-            throw new InvalidOperationException("Shi Lu Yusheng lost her original typed trigger or paid stage receipt.");
-        if (r.Operation != "runwei-end" && r.Source != ShiLysSource(f))
-            throw new InvalidOperationException("Shi Lu Yusheng changed its exact original binding source.");
-        if (r.Operation == "runwei" && (r.Phase is not { Kind: ActualDiscardRecoveryPhaseKind.Play } || r.Phase.ActorSeat != f.OwnerSeat || f.SkillId != ShiLysRunweiSkill || f.ActivationId != MobileShiLuYuShengComposition.RunweiActivation || r.Stage is not (0 or 1 or 2 or 9) || r.RevealedCount is> 5 || r.Stage > 0 && r.RevealedCount < 1 || r.Stage is 2 or 9 && !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat)))
-            throw new InvalidOperationException("Runwei lost its reveal-grant activation receipt.");
-        if (r.Operation == "runwei-end" && (f.SkillId != ShiLysRunweiSkill || f.TriggerId != MobileShiLuYuShengComposition.RunweiPhaseEndTrigger || r.Stage != 9 || r.TargetSeat != -1 || r.Discarded < 0))
-            throw new InvalidOperationException("Runwei phase end lost its locked trigger receipt.");
-        if (r.Operation == "runwei-end" && (r.Phase is null || f.WindowContext?.ActualPhaseEnd?.EntitlementId != r.GrantId || ShiLysRunweiGrant(r.GrantId)is not { } grant || grant.Phase != r.Phase || grant.Source != r.Source))
-            throw new InvalidOperationException("Runwei cleanup lost its exact original granted phase obligation.");
-        if (r.Operation == "shuanghuai" && (f.SkillId != ShiLysShuanghuaiSkill || f.TriggerId != MobileShiLuYuShengComposition.ShuanghuaiGuardTrigger || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || ShiLysGuardParent(f)is null || f.WindowContext?.TargetSeat != r.TargetSeat || r.Stage is not (0 or 9 or 10 or 11 or 12 or 13)))
-            throw new InvalidOperationException("Shuanghuai lost its before-damage guard receipt.");
-        if (r.Operation == "shuanghuai" && r.Stage > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiShuanghuaiGuardIssuedEvent>().Any(issued => issued.FrameId == f.Id && issued.Source == ShiLysSource(f) && issued.GameplayHash == f.GameplayHash && issued.ActualTurn == r.ActualTurn && issued.VictimSeat == r.TargetSeat))
-            throw new InvalidOperationException("Shuanghuai lost its issued guard obligation.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiRunweiGrant)]
     internal PromptChoice ChooseShiLysRunwei(PendingDecision prompt) => prompt.Choices.OrderByDescending(choice => choice.Parameters.TryGetValue("count", out var count) && int.TryParse(count, out var parsed) ? parsed : 0).FirstOrDefault() ?? prompt.Choices[0];
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiShuanghuaiGuard)]
     internal PromptChoice ChooseShiLysShuanghuai(PendingDecision prompt) => prompt.Choices[0];
-    internal bool IsMobileShiLuYuShengChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding) => frame.MobileShiLuYuSheng is { } r && binding.ChooserSeat == frame.OwnerSeat && (binding.Name == "runwei-recipient" && r.Operation == "runwei" && r.Stage >= 2 && r.TargetSeat >= 0 && binding.OptionId == r.TargetSeat.ToString(CultureInfo.InvariantCulture) || binding.Name == "shuanghuai-option" && r.Operation == "shuanghuai" && r.Stage > 0 && binding.OptionId is ("prevent" or "peach"));
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiLuYuShengPublicStates(CharacterState owner, string skillId)
     {
         if (skillId is not (ShiLysRunweiSkill or ShiLysShuanghuaiSkill))

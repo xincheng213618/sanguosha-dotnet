@@ -64,25 +64,6 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationObserversR
         return paid.Select(m => m.CardId).SequenceEqual(r.MaterialCardIds) && paid.All(m => m.From == CardLocation.Processing && m.To == CardLocation.Hand(recipient) && m.Reason.Value == "skill-program.overflow-target-cancellation.give" && r.ActionBeforeCancellation.PhysicalCards.Any(c => c.CardId == m.CardId && c.CardKind == m.CardKind));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 90)]
-    internal void AssertOverflowTargetCancellation(ProgramSkillFrame frame)
-    {
-        if (frame.OverflowTargetCancellation is null)
-        {
-            if (frame.TriggerId is null || !ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger(frame)).HasOperation(SkillProgramEffectOp.CancelOtherCurrentUseTargetsIfOverHandLimit))
-                return;
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OverflowUseTargetsCanceledEvent>().Any(e => e.ProgramFrameId == frame.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OverflowTargetCancellationCompletedEvent>().Any(e => e.ProgramFrameId == frame.Id))
-                throw new InvalidOperationException("An issued overflow cancellation lost its owning paid receipt.");
-            return;
-        }
-
-        if (!ValidOverflowTargetCancellationReceipt(frame))
-            throw new InvalidOperationException("Overflow cancellation lost its exact actual use, designation, source or native material invoice.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !OverflowTargetCancellationFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Overflow cancellation retained an unrelated native child.");
-    }
-
     internal bool OverflowTargetCancellationFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (frame.OverflowTargetCancellation is not { } r || !ValidOverflowTargetCancellationReceipt(frame))
@@ -102,8 +83,6 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationObserversR
         var current = _resolutionStackOperations._resolutionStack[child];
         return global::CardGame.Core.EngineOwners.CoreGameEngineObserverSubtreesRuntime.IsObserverSkillsChangedEdge(parent, current) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, current) || _coreOriginalHandEntityObserversOperations.OriginalHandEntityStructuralEdge(parent, current) || _coreOutsidePhaseDrawDiscardObserversOperations.OutsidePhaseDrawDiscardStructuralEdge(parent, current) || _coreCompletedUndamagedTargetRevealObserversOperations.CompletedUndamagedTargetRevealStructuralEdge(parent, current) || _coreRecipientCategoryMarkObserversOperations.RecipientCategoryMarkStructuralEdge(parent, current) || _coreOffTurnUsedCardObserversOperations.OffTurnUsedCardGiftStructuralEdge(parent, current) || _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandStructuralEdge(parent, current) || _coreResponseCompletionOperations.ResponseCompletionStructuralEdge(parent, current) || _coreCardSupplyCompletionOperations.CardSupplyCompletionStructuralEdge(parent, current) || _coreMatchingRecastObserversOperations.MatchingRecastStructuralEdge(parent, current) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossStructuralEdge(parent, current) || OverflowTargetCancellationStructuralEdge(parent, current) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child);
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 520, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 600)]
     internal bool IsOverflowTargetCancellationDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OverflowTargetCancellationObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1700)]

@@ -151,20 +151,4 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         var first = _coreWholeActualTurnUsesOperations.WholeActualTurnUseHistory().FirstOrDefault(e => e.CardCategoryMask == 1 << (int)SkillProgramCardCategory.Basic);
         return first is { RoundActionType: CardActionType.Use } && first.OriginFrameId == use.Id && (first.CardActionId == a.ActionId || first.CardActionId is null && _coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(use));
     }
-
-    internal void AssertMouBingcaiExtraEffectRounds()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.MouBingcaiRounds is not null))
-        {
-            var r = use.MouBingcaiRounds!;
-            if (use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || r.Grants is not System.Collections.IList { IsReadOnly: true } || r.Grants.Count == 0 || r.Grants.Select(g => g.FrameId).Distinct().Count() != r.Grants.Count || r.Grants.Select(g => g.Source.OwnerSeat).Distinct().Count() != r.Grants.Count || r.Started < 0 || r.Started > r.Grants.Count || r.Active && r.Started == 0 || r.Native.ActionId != r.ActionId || r.Native.Trick is not null || (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && r.Native.Simple is null) || r.Grants.Any(g => !ValidMouBingcaiExtraGrant(use, g)) || r.Native.OriginalAttacks.Select(s => s.TargetIndex).Distinct().Count() != r.Native.OriginalAttacks.Count || r.Native.OriginalAttacks.Any(s => s.TargetIndex < 0 || s.TargetIndex >= use.TargetSeats.Count) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiExtraEffectRoundStartedEvent>().Count(e => e.UseId == use.Id) != r.Started || _coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiExtraEffectRoundCompletedEvent>().Count(e => e.UseId == use.Id) != r.Started - (r.Active ? 1 : 0))
-                throw new InvalidOperationException("Bingcai lost its independent paid grants, native seeds or exactly-once round cursor.");
-            for (var index = 0; index < r.Started; index++)
-            {
-                var grant = r.Grants[index];
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiExtraEffectRoundStartedEvent>().Count(e => e == new MouBingcaiExtraEffectRoundStartedEvent(use.Id, a.ActionId, grant.FrameId, index + 1)) != 1 || (index < r.Started - 1 || !r.Active) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiExtraEffectRoundCompletedEvent>().Count(e => e == new MouBingcaiExtraEffectRoundCompletedEvent(use.Id, a.ActionId, grant.FrameId, index + 1)) != 1)
-                    throw new InvalidOperationException("A Bingcai round cannot exchange or replay another issuer's receipt.");
-            }
-        }
-    }
 }

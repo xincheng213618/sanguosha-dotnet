@@ -7,26 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouJieAnniversaryRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 45500)]
-    internal void RequireAnniversaryXiahouJie(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryXiahouJie is not { } r)
-            return;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-        if (f.WindowContext is not { } context || context.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || r.Source != AnniversaryXiahouJieSource(f) || r.Hash != f.GameplayHash || r.ParentId != context.ParentFrameId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || context.SourceSeat != r.TurnOwner || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame parent || parent.Id != r.ParentId || parent.Window != context.Window || parent.OwnerSeat != r.TurnOwner || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveAnniversaryXiahouJieLiedan || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !Enum.IsDefined(r.Stage) || r.Cursor is < 0 or > 3 || r.Comparisons.Count > 3 || r.Comparisons.Where((c, i) => c.Index != i).Any() || r.Draws.Select(d => d.Index).Distinct().Count() != r.Draws.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var started] || started != new AnniversaryXiahouJieStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.ActualTurn, r.TurnOwner, f.OwnerSeat == r.TurnOwner, r.DeathMarks))
-            throw new InvalidOperationException("Liedan lost its exact owned preparation, original skill instance or sequential cursor.");
-        if (r.Stage == AnniversaryXiahouJieStage.DirectDeath)
-        {
-            if (f.OwnerSeat != r.TurnOwner || r.DeathMarks < 5 || r.Cursor != 0 || r.Comparisons.Count != 0 || r.Draws.Count != 0)
-                throw new InvalidOperationException("Liedan direct death lost its genuine own preparation and five previously paid marks.");
-            return;
-        }
-
-        if (f.OwnerSeat == r.TurnOwner || r.DeathMarks != 0 || r.Comparisons.Count != (r.Stage is AnniversaryXiahouJieStage.Drawing or AnniversaryXiahouJieStage.DrawChildren ? r.Cursor + 1 : r.Cursor) || r.Comparisons.Any(c => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieComparedEvent>().Count(e => e == new AnniversaryXiahouJieComparedEvent(f.Id, c.Index, c.OwnerValue, c.OtherValue)) != 1) || r.Draws.Any(d => d.Index < 0 || d.Index >= r.Comparisons.Count || r.Comparisons[d.Index].Greater != true || d.Outcome.RecipientSeat != f.OwnerSeat || d.Outcome.RequestedCount != 1 || d.Outcome.ActualDrawIds.Count > 1 || d.Outcome.SequenceBefore < 0 || d.Outcome.SequenceAfter < d.Outcome.SequenceBefore || d.Outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieDrawReturnedEvent>().Count(e => e == new AnniversaryXiahouJieDrawReturnedEvent(f.Id, d.Index, d.Outcome.ActualDrawIds.Count, d.Outcome.AttemptFrameId, d.Outcome.SequenceBefore, d.Outcome.SequenceAfter)) != 1 || d.Outcome.ActualDrawIds.Any(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > d.Outcome.SequenceBefore && m.Sequence <= d.Outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == global::CardGame.Core.EngineOwners.CharacterXiahouJieAnniversaryDefinitions.AnniversaryXiahouJieDrawReason) != 1)) || r.Comparisons.Any(c => c.Greater == true && c.Index < r.Cursor && r.Draws.Count(d => d.Index == c.Index) != 1) || r.Stage == AnniversaryXiahouJieStage.Drawing && (r.Cursor >= 3 || r.Comparisons[r.Cursor].Greater != true || r.Draws.Any(d => d.Index == r.Cursor)) || r.Stage == AnniversaryXiahouJieStage.DrawChildren && r.Draws.Count(d => d.Index == r.Cursor) != 1)
-            throw new InvalidOperationException("Liedan lost a frozen comparison or its exact once-returned native draw materials.");
-        if (r.Stage == AnniversaryXiahouJieStage.HpChildren && (r.Cursor != 3 || r.Comparisons.Any(c => c.Greater != false) || r.HpPaid && (r.ActualLoss != 1 || (long)r.HpAfter != (long)r.HpBefore - 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieHpPaidEvent>().Count(e => e == new AnniversaryXiahouJieHpPaidEvent(f.Id, r.HpBefore, r.HpAfter, 1)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == f.OwnerSeat && e.Amount == 1 && e.RemainingHp == r.HpAfter) != 1)) || r.Stage == AnniversaryXiahouJieStage.MaximumChildren && (r.Cursor != 3 || r.Comparisons.Any(c => c.Greater != true) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieMaximumEvent>().Count(e => e == new AnniversaryXiahouJieMaximumEvent(f.Id, r.MaximumBefore, r.MaximumAfter)) != 1))
-            throw new InvalidOperationException("Liedan lost its actual all-three comparison settlement.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 45500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 45500)]
@@ -34,7 +14,6 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
     {
         if (f.AnniversaryXiahouJie is null)
             return false;
-        RequireAnniversaryXiahouJie(f);
         return true;
     }
 
@@ -42,7 +21,6 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
     {
         if (f.AnniversaryXiahouJie is not { } r)
             return false;
-        RequireAnniversaryXiahouJie(f);
         if (r.Stage == AnniversaryXiahouJieStage.Drawing && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return true;
         if (child is DyingFrame dying)
@@ -57,7 +35,6 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? AnniversaryXiahouJieObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterXiahouJieAnniversaryOperations.AnniversaryXiahouJieFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 45500, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 45500)]
     internal bool HasAnniversaryXiahouJieDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryXiahouJieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 45500)]

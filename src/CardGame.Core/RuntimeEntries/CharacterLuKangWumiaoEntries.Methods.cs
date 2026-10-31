@@ -10,11 +10,8 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal void AnswerWuLuKangDixian(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWuLuKangDixian(choice);
     internal void AnswerWuLuKangKegou(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerWuLuKangKegou(selected);
     internal void AnswerWuLuKangShenduan(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerWuLuKangShenduan(selected);
-    internal void AssertWuLuKang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuLuKang(f);
-    internal void AssertWuLuKangDixianFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuLuKangDixianFrame(f);
     internal void AssertWuLuKangDixianUses() => _resolve().AssertWuLuKangDixianUses();
     internal void AssertWuLuKangPairProcessing(global::CardGame.Core.PindianFrame pair) => _resolve().AssertWuLuKangPairProcessing(pair);
-    internal void AssertWuLuKangPindianSelection(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuLuKangPindianSelection(f);
     internal void AssertWuLuKangWindows() => _resolve().AssertWuLuKangWindows();
     internal bool AwaitWuLuKangDixianChildren(long id) => _resolve().AwaitWuLuKangDixianChildren(id);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuLuKangDixian(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginWuLuKangDixian(supplied);
@@ -61,7 +58,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool IsIssuedWuLuKangCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWuLuKangCandidate(candidate, context);
     internal bool IsIssuedWuLuKangKegouUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedWuLuKangKegouUse(use);
     internal bool IsWuLuKangAssignedPair(global::CardGame.Core.PindianFrame f, global::CardGame.Core.PindianResult result) => _resolve().IsWuLuKangAssignedPair(f, result);
-    internal bool IsWuLuKangDixianDying() => _resolve().IsWuLuKangDixianDying();
     internal bool IsWuLuKangDixianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWuLuKangDixianMovement(f, e, p);
     internal bool IsWuLuKangDixianRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWuLuKangDixianRecoveryParent(f, recovery);
     internal bool IsWuLuKangDying() => _resolve().IsWuLuKangDying();
@@ -70,7 +66,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool IsWuLuKangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWuLuKangMovement(f, e, p);
     internal bool IsWuLuKangOriginalInput(global::CardGame.Core.ResolutionFrame parent, int seat, int card, global::CardGame.Core.CardLocation from, bool top, long? sequence) => _resolve().IsWuLuKangOriginalInput(parent, seat, card, from, top, sequence);
     internal bool IsWuLuKangPairSubtree(global::CardGame.Core.PindianFrame pair) => _resolve().IsWuLuKangPairSubtree(pair);
-    internal bool IsWuLuKangPrivateGroup(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsWuLuKangPrivateGroup(f);
     internal bool IsWuLuKangPrivatePindianCard(int id) => _resolve().IsWuLuKangPrivatePindianCard(id);
     internal bool IsWuLuKangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWuLuKangRecoveryParent(f, recovery);
     internal void IssueWuLuKangDixianUse(global::CardGame.Core.CardUseFrame use) => _resolve().IssueWuLuKangDixianUse(use);
@@ -101,7 +96,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool ValidWuLuKangContest(global::CardGame.Core.ResolutionFrame parent) => _resolve().ValidWuLuKangContest(parent);
     internal bool ValidWuLuKangDixianDeclaration(global::CardGame.Core.WuLuKangDixianDeclarationReceipt r) => _resolve().ValidWuLuKangDixianDeclaration(r);
     internal bool ValidWuLuKangDixianGrant(global::CardGame.Core.WuLuKangDixianGrant g) => _resolve().ValidWuLuKangDixianGrant(g);
-    internal bool ValidWuLuKangGroupReveal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidWuLuKangGroupReveal(f);
     internal bool ValidWuLuKangKegou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidWuLuKangKegou(f);
     internal bool ValidWuLuKangShenduan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidWuLuKangShenduan(f);
     internal void ValidateWuLuKangKegouNative(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateWuLuKangKegouNative(use);
@@ -132,7 +126,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool WuLuKangObserverEdge(int n) => _resolve().WuLuKangObserverEdge(n);
     internal global::CardGame.Core.ProgramSkillFrame? WuLuKangObserverRoot() => _resolve().WuLuKangObserverRoot();
     internal bool WuLuKangObserverSuffix(int index) => _resolve().WuLuKangObserverSuffix(index);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PindianRevealedCard> WuLuKangOriginalSelectedGroup(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WuLuKangOriginalSelectedGroup(f);
     internal global::CardGame.Core.ResolutionFrame WuLuKangParent(long id) => _resolve().WuLuKangParent(id);
     internal bool WuLuKangPindianEdge(global::CardGame.Core.ResolutionFrame child, global::CardGame.Core.ResolutionFrame parent) => _resolve().WuLuKangPindianEdge(child, parent);
     internal global::System.Collections.Generic.IReadOnlyList<int> WuLuKangProgramSelectionSeats(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramTargetKind kind, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardZoneKind> zones, global::CardGame.Core.PlayerMarkerKind? marker, global::CardGame.Core.ProgramParticipantReference? actor) => _resolve().WuLuKangProgramSelectionSeats(frame, kind, zones, marker, actor);

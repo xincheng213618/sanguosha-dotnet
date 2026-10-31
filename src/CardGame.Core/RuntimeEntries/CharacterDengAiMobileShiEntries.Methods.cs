@@ -21,7 +21,6 @@ internal sealed partial class CharacterDengAiMobileShiEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiDengAiPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().MobileShiDengAiPublicStates(owner, skillId);
     internal void PublishShiDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiDa(f);
     internal void RecordShiDaTargets(long useId, global::CardGame.Core.CardActionContext action) => _resolve().RecordShiDaTargets(useId, action);
-    internal void RequireShiDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShiDa(f);
     internal bool ResumeShiDa(long id) => _resolve().ResumeShiDa(id);
     internal void ReturnShiDaDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiDaDraw(f, outcome);
     internal bool ReturnShiDaMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiDaMovement(f);

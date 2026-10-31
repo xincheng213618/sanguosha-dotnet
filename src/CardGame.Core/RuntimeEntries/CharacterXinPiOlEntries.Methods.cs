@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXinPiOlEntries
 {
-    internal void AssertXinPiFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertXinPiFrame(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginXinPi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect e) => _resolve().BeginXinPi(supplied, e);
     internal bool CanContinueXinPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueXinPi(f);
     internal bool CanOfferXinPi(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferXinPi(c, t, w);
@@ -20,9 +19,7 @@ internal sealed partial class CharacterXinPiOlEntries
     internal void FinishXinPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishXinPi(f);
     internal bool HasIssuedYinjuCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HasIssuedYinjuCandidate(c, w);
     internal bool HasXinPiBeforeDamageObserver(long id) => _resolve().HasXinPiBeforeDamageObserver(id);
-    internal bool HasXinPiCardObserver(long useId) => _resolve().HasXinPiCardObserver(useId);
     internal bool HasXinPiDamageObserver(long id) => _resolve().HasXinPiDamageObserver(id);
-    internal bool IsXinPiDying() => _resolve().IsXinPiDying();
     internal bool IsXinPiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXinPiMovement(f, e, p);
     internal bool IsXinPiPhysicalClaim(long useId, int cardId) => _resolve().IsXinPiPhysicalClaim(useId, cardId);
     internal bool IsXinPiRecoveryCompletion(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryAttempt attempt) => _resolve().IsXinPiRecoveryCompletion(f, attempt);

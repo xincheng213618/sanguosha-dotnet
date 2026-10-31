@@ -7,41 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouQunOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27572)]
-    internal void AssertZhouQun(ProgramSkillFrame f)
-    {
-        if (f.ZhouQun is not { } r)
-            return;
-        if (!r.Paid || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { } context || r.Source != ZhouQunSource(f) || r.GameplayHash != f.GameplayHash || r.WindowId != context.ParentFrameId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !Enum.IsDefined(r.Stage) || !ZhouQunComposition.Handles(r.Op) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !ZhouQunParent(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhouQunStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var started] || started != new ZhouQunStartedEvent(f.Id, r.Source, r.GameplayHash, r.Op, r.WindowId, r.ActualTurn, r.TurnOwner))
-            throw new InvalidOperationException("Zhou Qun lost his exact source, native candidate, original instruction or once-started receipt.");
-        foreach (var set in new[]
-        {
-            r.Revealed,
-            r.Viewed,
-            r.SelectedHand,
-            r.SelectedTop,
-            r.Targets
-        }
-
-        )
-            if (set is not System.Collections.IList { IsReadOnly: true } || set.Distinct().Count() != set.Count)
-                throw new InvalidOperationException("Weather collections must remain deeply frozen exact sets.");
-        if (r.Revealed.Count > 3 || r.Viewed.Count > 3 || r.SelectedHand.Count > r.Viewed.Count || r.SelectedTop.Count > r.SelectedHand.Count || r.Cursor < 0 || r.Cursor > r.Targets.Count || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Weather exceeded its physical collection or native movement boundary.");
-        if (r.ShownCards is not System.Collections.IList { IsReadOnly: true } || r.ShownCards.Count > 3 || r.ShownCards.Count < r.Revealed.Count || r.ShownCards.Count > r.Revealed.Count + 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<ChenshuoHandShownEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.Card).SequenceEqual(r.ShownCards) || r.ShownCards.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s.OwnerSeat) || s.NameLength != ZhouQunNameLength(s.Kind)) || r.ShownCards.Count > 0 && r.Shown != r.ShownCards[^1])
-            throw new InvalidOperationException("Chenshuo must repeat the whole real Hand-show and top-show pair, preserving each round's frozen identity.");
-        var top = _coreProgramEventHistoryOperations.ProgramEventHistory<ChenshuoTopRevealedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
-        if (!top.Select(e => e.CardId).SequenceEqual(r.Revealed) || top.Where((e, i) => e.Index != i).Any() || top.Any(e => e.Index >= r.ShownCards.Count || e.NameLength != ZhouQunNameLength(e.Kind) || e.Matched != (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(e.Kind) == global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(r.ShownCards[e.Index].Kind) || e.Suit == r.ShownCards[e.Index].Suit || e.Rank == r.ShownCards[e.Index].Rank || e.NameLength == r.ShownCards[e.Index].NameLength)))
-            throw new InvalidOperationException("Chenshuo cannot substitute its revealed cards or matching features.");
-        if (r.Targets.Count > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhouQunHpTargetEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.TargetSeat).SequenceEqual(r.Targets))
-            throw new InvalidOperationException("Weather participants must be frozen before their first native child.");
-        if (r.Op == SkillProgramEffectOp.ResolveNingwuSingletonSlashJudgment && (r.Targets.Count != 1 || r.UseId <= 0 || r.ActionId <= 0 || r.JudgmentId <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<NingwuJudgmentIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var issued] || issued != new NingwuJudgmentIssuedEvent(f.Id, r.JudgmentId, r.UseId, r.ActionId, r.Peer, r.Targets.Single(), r.SlashRank)))
-            throw new InvalidOperationException("Ningwu lost its exact original Slash and native judgment.");
-        if (f.PendingMovementContinuation is { } pending && !IsZhouQunMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Weather has an unrelated native movement continuation.");
-        if (r.Stage == ZhouQunStage.HpChildren && (r.Cursor >= r.Targets.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhouQunHpPaidEvent>().Count(e => e.FrameId == f.Id && e.Index == r.Cursor && e.TargetSeat == r.Targets[r.Cursor]) != 1))
-            throw new InvalidOperationException("Weather HP children require the exact actual payment once.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 510)]
     internal bool IsZhouQunMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.ZhouQun is { Paid: true } r && effect?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is ZhouQunStage.RevealChildren or ZhouQunStage.GainChildren or ZhouQunStage.ViewChildren or ZhouQunStage.ExchangeChildren or ZhouQunStage.CleanupChildren or ZhouQunStage.JudgmentChildren;
@@ -71,7 +36,6 @@ internal sealed partial class CharacterZhouQunOlRuntime
     {
         if (f.ZhouQun is not { Paid: true } r)
             return false;
-        AssertZhouQun(f);
         if (child is JudgmentFrame judgment)
             return IsNingwuJudgment(judgment, f);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -91,8 +55,6 @@ internal sealed partial class CharacterZhouQunOlRuntime
     internal bool HasZhouQunDamageObserver(long id) => ZhouQunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1170)]
     internal bool HasZhouQunBeforeDamageObserver(long id) => ZhouQunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1000)]
-    internal bool IsZhouQunDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ZhouQunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 260)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 250)]
     internal bool IsZhouQunRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

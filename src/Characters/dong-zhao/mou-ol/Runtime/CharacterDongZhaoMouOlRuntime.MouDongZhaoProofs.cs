@@ -31,7 +31,6 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 33500)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33500)]
     internal bool HasMouDongZhaoDamageObserver(long id) => MouDongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33500)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33500)]
     internal bool IsMouDongZhaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouDongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 33500)]

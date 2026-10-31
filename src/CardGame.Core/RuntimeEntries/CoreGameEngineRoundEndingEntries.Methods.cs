@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRoundEndingEntries
 {
     internal void ContinueRoundEndingBoundary(long frameId) => _resolve().ContinueRoundEndingBoundary(frameId);
-    internal bool HasRoundEndingBoundaryFrame() => _resolve().HasRoundEndingBoundaryFrame();
     internal bool IsExactRoundEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsExactRoundEndingCandidate(candidate, context);
     internal bool IsRoundEndingMovement(global::CardGame.Core.RoundEndingBoundaryFrame parent, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsRoundEndingMovement(parent, batch);
     internal void ReturnRoundEndingLifecycle(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame child) => _resolve().ReturnRoundEndingLifecycle(child);

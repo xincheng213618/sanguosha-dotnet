@@ -4,7 +4,6 @@ internal sealed partial class CharacterWangKuangOlEntries
 {
     internal bool AdvanceWangKuangSubtree() => _resolve().AdvanceWangKuangSubtree();
     internal void AnswerWangKuang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWangKuang(choice);
-    internal void AssertWangKuang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWangKuang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWangKuang(global::CardGame.Core.ProgramSkillFrame input, bool ending) => _resolve().BeginWangKuang(input, ending);
     internal global::CardGame.Core.WangKuangRenxiaPhaseKey? CaptureWangKuangRenxiaEndingPhase(global::CardGame.Core.CharacterState owner) => _resolve().CaptureWangKuangRenxiaEndingPhase(owner);
     internal global::CardGame.Core.PromptChoice ChooseWangKuangAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseWangKuangAi(p, f);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterWangKuangOlEntries
     internal bool DrainWangKuangChildren(long id) => _resolve().DrainWangKuangChildren(id);
     internal bool HasWangKuangDamageObserver(long id) => _resolve().HasWangKuangDamageObserver(id);
     internal bool IsIssuedWangKuangRenxiaCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWangKuangRenxiaCandidate(c, context);
-    internal bool IsWangKuangDying() => _resolve().IsWangKuangDying();
     internal bool IsWangKuangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWangKuangRecoveryParent(f, recovery);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedWangKuangRenxiaEndingCandidates(global::CardGame.Core.CharacterState owner) => _resolve().IssuedWangKuangRenxiaEndingCandidates(owner);
     internal void PayWangKuangDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayWangKuangDiscard(f);

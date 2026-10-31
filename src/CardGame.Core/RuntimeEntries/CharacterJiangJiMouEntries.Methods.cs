@@ -2,14 +2,12 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterJiangJiMouEntries
 {
-    internal void AssertMouJjEffects() => _resolve().AssertMouJjEffects();
     internal void AssertMouJjNativeUse(global::CardGame.Core.CardUseFrame u) => _resolve().AssertMouJjNativeUse(u);
     internal void BindMouJjNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindMouJjNativeUse(use);
     internal void CompleteMouJjEffect(long id) => _resolve().CompleteMouJjEffect(id);
     internal bool ExecuteMouJjForeign(global::CardGame.Core.CharacterState actor, global::CardGame.Core.LegalAction action, global::System.Collections.Generic.IReadOnlyList<int> cards, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().ExecuteMouJjForeign(actor, action, cards, targets);
     internal bool HasUnstartedMouJjEffect(long id) => _resolve().HasUnstartedMouJjEffect(id);
     internal bool IsMouJjEffectRound(long id) => _resolve().IsMouJjEffectRound(id);
-    internal bool IsMouJjEffectSubset(global::CardGame.Core.CardUseFrame use, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().IsMouJjEffectSubset(use, targets);
     internal bool IsMouJjExactCardQuery(global::CardGame.Core.CharacterState actor, int? selected) => _resolve().IsMouJjExactCardQuery(actor, selected);
     internal bool IsTargetScopedMouJjEffect(long id) => _resolve().IsTargetScopedMouJjEffect(id);
     internal void IssueMouJjForeign(int actor, int owner) => _resolve().IssueMouJjForeign(actor, owner);

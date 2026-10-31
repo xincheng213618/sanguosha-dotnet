@@ -136,7 +136,6 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
     internal void ResolveLastDamageSourceReciprocityChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Last-source discard lost its owning program.");
-        _coreLastDamageSourceReciprocityObserversOperations.AssertLastDamageSourceReciprocity(f);
         var r = f.LastDamageSourceReciprocity!;
         if (r.Stage != LastDamageSourceReciprocityStage.ChoosingDiscard || r.MovementIssued || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != r.ParticipantSeat || choice.Parameters.GetValueOrDefault("program-action") != "last-damage-source-discard" || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Cards is not [var id] || choice.Targets.Count != 0 || !LastDamageSourceDiscardChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(choice.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Last-source discard changed its private chooser, frozen entity or owning frame.");
@@ -174,7 +173,6 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != frameId || f.LastDamageSourceReciprocity is not { } r)
             return false;
-        _coreLastDamageSourceReciprocityObserversOperations.AssertLastDamageSourceReciprocity(f);
         if (r.Stage == LastDamageSourceReciprocityStage.ChoosingDiscard)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -199,7 +197,6 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
     {
         if (f.LastDamageSourceReciprocity is not { MovementIssued: true } || f.PendingMovementContinuation is null)
             return false;
-        _coreLastDamageSourceReciprocityObserversOperations.AssertLastDamageSourceReciprocity(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

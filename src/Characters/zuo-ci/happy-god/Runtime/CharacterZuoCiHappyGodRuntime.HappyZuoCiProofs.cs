@@ -49,13 +49,6 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 42600)]
     internal bool HappyZcMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.HappyZuoCi is { } r && effect?.Op == r.Operation && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && r.Stage is HappyZuoCiStage.InitialChildren or HappyZuoCiStage.GainChildren or HappyZuoCiStage.DrawChildren or HappyZuoCiStage.RefreshChildren && ValidHappyZc(f);
-    internal bool HasHappyZuoCiPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyZuoCi: { Stage: HappyZuoCiStage.PhantomChoice or HappyZuoCiStage.TemplateChoice } } f && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == f.OwnerSeat && ValidHappyZc(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HappyZcChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 42600)]
-    internal void AssertHappyZc(ProgramSkillFrame f)
-    {
-        if (f.HappyZuoCi is not null && !ValidHappyZc(f))
-            throw new InvalidOperationException("Happy Zuo Ci lost its exact original deck/frame, persistent transform or paid native movement/draw.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 42600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 42600)]

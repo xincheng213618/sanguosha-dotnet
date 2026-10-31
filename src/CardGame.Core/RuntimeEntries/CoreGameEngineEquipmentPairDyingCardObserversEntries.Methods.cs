@@ -8,6 +8,5 @@ internal sealed partial class CoreGameEngineEquipmentPairDyingCardObserversEntri
     internal bool EquipmentPairDyingCardSuffix(int rootIndex) => _resolve().EquipmentPairDyingCardSuffix(rootIndex);
     internal global::CardGame.Core.ProgramSkillFrame? EquipmentPairPaymentObserverRoot() => _resolve().EquipmentPairPaymentObserverRoot();
     internal bool IsEquipmentPairOrDyingCardProgramDying() => _resolve().IsEquipmentPairOrDyingCardProgramDying();
-    internal bool IsExactDyingOwnedCardRide(long dyingId) => _resolve().IsExactDyingOwnedCardRide(dyingId);
     internal bool PaymentRemovedSilverLion(global::CardGame.Core.ProgramSkillFrame root, string reason, long before, int? ownerSeat = default) => _resolve().PaymentRemovedSilverLion(root, reason, before, ownerSeat);
 }

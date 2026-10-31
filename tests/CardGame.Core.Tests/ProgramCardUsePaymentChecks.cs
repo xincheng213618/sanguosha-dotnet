@@ -24,7 +24,6 @@ internal static class ProgramCardUsePaymentChecks
             foreach (var stage in new[] { ProgramCardUsePaymentStage.LeadingTail, ProgramCardUsePaymentStage.TrailingTail,
                          ProgramCardUsePaymentStage.HpObserverTail, ProgramCardUsePaymentStage.SharedProcessingTail })
                 Check(() => a.Payments.AllowsTail(stage, a.Use, a.Continuation));
-            Check(() => a.Payments.AllowsProcessing(a.Cards));
             foreach (var stage in new[] { ProgramCardUsePaymentStage.BeforeSlashDebit,
                          ProgramCardUsePaymentStage.AfterSlashDebitIdentity, ProgramCardUsePaymentStage.SlashCountExemption })
                 Check(() => a.Payments.ExemptsSlashDebit(stage, a.Use.Id, 2));
@@ -57,7 +56,7 @@ internal static class ProgramCardUsePaymentChecks
             _ => throw new InvalidOperationException("Empty stages must not bind a handler."));
         Need(!empty.TryPayMaterials(a.Cards, 2, null, CardMoveReasons.Use) && !empty.MatchesBatch(a.Use, a.Batch) &&
             !empty.AllowsTail(ProgramCardUsePaymentStage.LeadingTail, a.Use, a.Continuation) &&
-            !empty.AllowsProcessing(a.Cards) && !empty.ExemptsSlashDebit(ProgramCardUsePaymentStage.BeforeSlashDebit, a.Use.Id, 2),
+            !empty.ExemptsSlashDebit(ProgramCardUsePaymentStage.BeforeSlashDebit, a.Use.Id, 2),
             "Absence of a payment proof denies the special path and leaves fallback handling to the native caller.");
         empty.CaptureMovement(a.Batch); empty.CompleteSlashPayment(a.Use.Id); empty.PayAcceptedConversionCosts(a.Action);
 
@@ -136,12 +135,6 @@ internal static class ProgramCardUsePaymentChecks
         [ProgramCardUsePayment(ProgramCardUsePaymentStage.HpObserverTail, 30)]
         [ProgramCardUsePayment(ProgramCardUsePaymentStage.SharedProcessingTail, 30)]
         private bool Tail3(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) { NeedTail(use, continuation); return Query(3); }
-        [ProgramCardUsePayment(ProgramCardUsePaymentStage.ProcessingAllowance, 10)]
-        private bool Processing1(IReadOnlyList<Card> cards) { Need(ReferenceEquals(cards, Cards), "Processing materials changed."); return Query(1); }
-        [ProgramCardUsePayment(ProgramCardUsePaymentStage.ProcessingAllowance, 20)]
-        private bool Processing2(IReadOnlyList<Card> cards) => Query(2);
-        [ProgramCardUsePayment(ProgramCardUsePaymentStage.ProcessingAllowance, 30)]
-        private bool Processing3(IReadOnlyList<Card> cards) => Query(3);
         [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 10)]
         [ProgramCardUsePayment(ProgramCardUsePaymentStage.AfterSlashDebitIdentity, 10)]
         [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 10)]

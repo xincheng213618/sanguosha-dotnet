@@ -31,7 +31,6 @@ internal sealed partial class CharacterZhangHeMouMobileRuntime
     internal bool MouQiaobianDamage(long id) => MouQiaobianNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 34200)]
     internal bool MouQiaobianBeforeDamage(long id) => MouQiaobianNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 34200)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 34200)]
     internal bool MouQiaobianDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouQiaobianNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 34200)]

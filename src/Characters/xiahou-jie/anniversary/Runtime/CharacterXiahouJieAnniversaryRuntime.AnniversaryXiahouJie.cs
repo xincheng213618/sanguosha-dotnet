@@ -65,7 +65,6 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
         var r = new AnniversaryXiahouJieReceipt(AnniversaryXiahouJieSource(f), f.GameplayHash, context.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, own ? AnniversaryXiahouJieStage.DirectDeath : AnniversaryXiahouJieStage.Comparing, DeathMarks: own ? _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.XiahouJieLie) : 0);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryXiahouJie = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXiahouJieStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.ActualTurn, r.TurnOwner, own, r.DeathMarks));
-        RequireAnniversaryXiahouJie(f);
         if (own)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.OwnerSeat));
@@ -82,7 +81,6 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryXiahouJie: { } r } f && f.Id == id)
         {
-            RequireAnniversaryXiahouJie(f);
             if (r.Stage == AnniversaryXiahouJieStage.Drawing)
                 return;
             if (r.Stage == AnniversaryXiahouJieStage.HpChildren && !r.HpPaid)
@@ -185,7 +183,6 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
     internal void ReturnAnniversaryXiahouJieDraw(ProgramSkillFrame supplied, NativeDrawOutcome draw)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        RequireAnniversaryXiahouJie(f);
         var r = f.AnniversaryXiahouJie!;
         if (r.Stage != AnniversaryXiahouJieStage.Drawing || f.NativeDraw is not null || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != 1 || r.Draws.Any(d => d.Index == r.Cursor) || draw.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Liedan lost its once-issued native comparison draw.");

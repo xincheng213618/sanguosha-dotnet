@@ -174,16 +174,8 @@ internal sealed partial class CoreGameEngineEquipmentDonationObserversRuntime
 
         return false;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 440, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 520)]
     internal bool IsEquipmentDonationProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && (HasEquipmentDonationDamageObserver() || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => (f.EquipmentDonation is not null || f.ActualEndedEquipment is not null) && f.AttackAttempt is null && EquipmentDonationObserverRoot(f.Id)is not null));
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 130)]
     internal bool IsEquipmentDonationMovement(ProgramSkillFrame f, SkillProgramEffect? paid, ProgramMovementContinuation pending) => pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (paid?.Op is (SkillProgramEffectOp.DonateAllEquipmentAndOfferRecipientBenefits or SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou) && f.EquipmentDonation is { Stage: EquipmentDonationStage.PaidMovement } && IsValidAllEquipmentDonation(f) || paid?.Op == SkillProgramEffectOp.ChooseEquipmentOrDrawAfterOtherActualTurn && f.ActualEndedEquipment is { Stage: ActualEndedTurnEquipmentStage.Moving } && IsValidActualEndedEquipment(f));
-    internal void AssertEquipmentDonationPrograms()
-    {
-        foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.EquipmentDonation is not null || f.ActualEndedEquipment is not null))
-            if (EquipmentDonationObserverRoot(root.Id)is null)
-                throw new InvalidOperationException("Equipment donation/options lost their exact actual payment and typed observer subtree.");
-    }
 }

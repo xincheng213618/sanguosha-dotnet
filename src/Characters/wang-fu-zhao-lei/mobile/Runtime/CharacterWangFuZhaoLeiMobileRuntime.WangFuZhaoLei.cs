@@ -113,7 +113,6 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
 
     internal void BeginNextXunyiPoint(ProgramSkillFrame frame)
     {
-        RequireXunyi(frame);
         var pending = frame.Xunyi!;
         if (pending.StepIndex >= XunyiStepCount(pending.Receipt))
         {
@@ -151,7 +150,6 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
     internal void ResolveXunyiDiscard(PromptChoice choice)
     {
         var frame = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        RequireXunyi(frame);
         var seat = XunyiStep(frame.Xunyi!).Seat;
         if (frame.Xunyi!.Stage != XunyiStage.DiscardChoice || XunyiStep(frame.Xunyi).Draw || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XunyiChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xunyi discard lost its actual recipient authority.");
@@ -199,7 +197,6 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xunyi: { Stage: XunyiStage.Children } pending } frame || frame.Id != id)
             return false;
-        RequireXunyi(frame);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Xunyi = pending with { StepIndex = pending.StepIndex + 1, Stage = XunyiStage.DiscardChoice, Before = 0, After = 0, Count = 0, CardId = null, From = null }, PendingMovementContinuation = null });

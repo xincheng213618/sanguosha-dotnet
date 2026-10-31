@@ -5,7 +5,6 @@ internal sealed partial class CharacterZhouYuMouMobileEntries
     internal bool AdvanceMouZyMobileChildren() => _resolve().AdvanceMouZyMobileChildren();
     internal global::CardGame.Core.PromptChoice AiMouZyMobile(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouZyMobile(p, f);
     internal void AnswerMouZyMobile(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouZyMobile(selected);
-    internal void AssertMouZyMobile(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouZyMobile(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouZyMobile(global::CardGame.Core.ProgramSkillFrame supplied, bool yingzi) => _resolve().BeginMouZyMobile(supplied, yingzi);
     internal bool CanStartMouZyMobile(global::CardGame.Core.CharacterState owner) => _resolve().CanStartMouZyMobile(owner);
     internal void ContinueMouZyMobile(long id) => _resolve().ContinueMouZyMobile(id);

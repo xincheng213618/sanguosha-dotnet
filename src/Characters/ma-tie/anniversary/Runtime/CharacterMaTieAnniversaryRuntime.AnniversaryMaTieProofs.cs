@@ -29,30 +29,6 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         return _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) && r.Target != f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieSelectedEvent>().Count(e => e.FrameId == f.Id && e.Target == r.Target && e.Count == r.Actors.Count) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieQueueEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.Actor).SequenceEqual(r.Actors);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 46700)]
-    internal void RequireMaTie(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryMaTie is not { } r)
-            return;
-        if (!ValidMaTie(f))
-            throw new InvalidOperationException("Ma Tie lost its original lifecycle/card candidate, frozen queue, content identity or actual turn.");
-        if (r.TargetDamaged && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieTargetDamagedEvent>().Any(e => e.FrameId == f.Id && e.Target == r.Target && e.Amount > 0))
-            throw new InvalidOperationException("Quxian cannot replace actual issued-use damage with unrelated HP loss.");
-        if (r.Stage is AnniversaryMaTieStage.NativeUse or AnniversaryMaTieStage.NativeReturned && (r.UseId <= 0 || r.ActionId <= 0 || r.SelectedAction is null || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieSlashIssuedEvent>().Count(e => e.Origin.FrameId == f.Id && e.Origin.Index == r.Cursor && e.Origin.UseId == r.UseId && e.Origin.ActionId == r.ActionId) != 1))
-            throw new InvalidOperationException("Quxian native child lost its accepted use identity.");
-        if (r.HpPaid && (r.Stage != AnniversaryMaTieStage.HpChildren || r.Used.Count <= 0 || r.HpBefore - r.HpAfter != r.Used.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieHpPaidEvent>().Count(e => e == new AnniversaryMaTieHpPaidEvent(f.Id, r.PenaltyCursor, r.HpTarget, r.Used.Count, r.HpBefore, r.HpAfter)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.TargetSeat == r.HpTarget && e.Amount == r.Used.Count && e.RemainingHp == r.HpAfter) != 1))
-            throw new InvalidOperationException("Quxian lost its once-paid actual HP loss before Dying.");
-    }
-
-    internal bool HasAnniversaryMaTiePrompt()
-    {
-        if (_coreRequestedDeckBasicOwnershipOperations.RequestedDeckBasicInvariantTop()is not ProgramSkillFrame { AnniversaryMaTie: { Stage: AnniversaryMaTieStage.Target or AnniversaryMaTieStage.SlashChoice } r } f || !ValidMaTie(f) || _coreRequestedDeckBasicOwnershipOperations.RequestedDeckBasicInvariantDecision()is not { } p)
-            return false;
-        p = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramNativeDecision(_characterChengJiChengCuiOlOperations.TousuiProgramNativeDecision(_characterMaXiuMaTieOlOperations.KenshangProgramNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineChainedStateBasicConversionsRuntime.ChainedStateBasicNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(global::CardGame.Core.EngineOwners.CharacterGuoTuOlRuntime.WeijieNativeDecision(p))))));
-        var actor = r.Stage == AnniversaryMaTieStage.Target ? f.OwnerSeat : r.Actors[r.Cursor];
-        return p.Kind == DecisionKind.ProgramTrigger && p.IsPrivate && p.PlayerSeat == actor && p.TargetSeat == actor && p.SkillPrompt?.SkillId == f.SkillId && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.KenshangRequest is null && f.TousuiRequest is null ? MaTieChoices(f) : r.OriginalDecision!.Choices);
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46700)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46700)]
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 46700)]
@@ -112,7 +88,6 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
     internal bool MaTieDamage(long id) => MaTieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46700)]
     internal bool MaTieBeforeDamage(long id) => MaTieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 46700)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46700)]
     internal bool MaTieDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MaTieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 46700)]

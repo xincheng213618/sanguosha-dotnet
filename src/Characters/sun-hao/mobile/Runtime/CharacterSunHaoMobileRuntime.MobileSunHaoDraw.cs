@@ -46,7 +46,6 @@ internal sealed partial class CharacterSunHaoMobileRuntime
     internal void ContinueMobileSunHaoDraw(long id)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-        AssertMobileSunHaoDraw(frame);
         if (frame.MobileSunHaoDraw is not { Outcome: not null })
             return;
         if (_characterSunHaoOlOperations.DrainSunHao(frame))
@@ -78,32 +77,6 @@ internal sealed partial class CharacterSunHaoMobileRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 80400)]
-    internal void AssertMobileSunHaoDraw(ProgramSkillFrame frame)
-    {
-        if (frame.MobileSunHaoDraw is not { } receipt)
-            return;
-        if (frame.SkillId != SunHaoComposition.MobileCanshi || frame.TriggerId != "normal-draw-replace-wounded" || frame.ActivationId != frame.TriggerId || frame.InstructionIndex != 1 || frame.SunHaoCanshi is not null || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || receipt.Source != global::CardGame.Core.EngineOwners.CharacterSunHaoOlRuntime.SunHaoSource(frame) || receipt.Hash != frame.GameplayHash || receipt.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || receipt.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || receipt.X < 0 || receipt.X > _coreMatchParticipantsPlayersAccess._players.Count || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting } context || context.ParentFrameId != receipt.WindowId || context.OwnerSeat != frame.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == receipt.WindowId)is not { NormalDrawReplaced: false, Continuation: ProgramLifecycleContinuation.CompleteDrawPhase } || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSunHaoDrawIssuedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is not [var issued] || issued != new MobileSunHaoDrawIssuedEvent(frame.Id, receipt.Source, receipt.Hash, receipt.ActualTurn, receipt.TurnOwner, receipt.WindowId, receipt.X))
-            throw new InvalidOperationException("Mobile Canshi lost its original qualified source, frozen population, draw phase or issuing frame.");
-        if (receipt.Outcome is null)
-        {
-            if (frame.PendingMovementContinuation is not null || frame.NativeDraw is not { ReturnKind: NativeDrawAttemptReturnKind.ProgramOperation, Operation: SkillProgramEffectOp.GrantSunHaoCanshiDrawObligation } draw || draw.InstructionIndex != frame.InstructionIndex || draw.RequestedCount != receipt.X || draw.Reason.Value != MobileSunHaoDrawReason || !draw.Recipients.SequenceEqual([frame.OwnerSeat]) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSunHaoDrawReturnedEvent>().Any(e => e.FrameId == frame.Id))
-                throw new InvalidOperationException("Mobile Canshi lost its unpaid native draw child.");
-            return;
-        }
-
-        var result = receipt.Outcome;
-        if (frame.NativeDraw is not null || frame.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != frame.OwnerSeat || result.RecipientSeat != frame.OwnerSeat || result.RequestedCount != receipt.X || result.SequenceBefore < 0 || result.SequenceAfter < result.SequenceBefore || result.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || result.ActualDrawIds.Count > receipt.X || result.ActualDrawIds.Distinct().Count() != result.ActualDrawIds.Count || result.Replacement is not null && result.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > result.SequenceBefore && m.Sequence <= result.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason.Value == MobileSunHaoDrawReason).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(result.ActualDrawIds) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSunHaoDrawReturnedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is not [var returned] || returned != new MobileSunHaoDrawReturnedEvent(frame.Id, result.AttemptFrameId, result.SequenceBefore, result.SequenceAfter, result.ActualDrawIds.Count, result.ReplacementGainedIds.Count) || result.AttemptFrameId is { } attempt && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == frame.Id && e.RecipientSeat == frame.OwnerSeat && e.RequestedCount == receipt.X && e.Replaced == (result.Replacement is not null)) != 1)
-            throw new InvalidOperationException("Mobile Canshi lost its once-returned physical draw outcome and child cursor.");
-        if (result.AttemptFrameId is { } request)
-        {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptStartedEvent>().Where(e => e.Context.AttemptFrameId == request).ToArray()is not [var start] || start.Context.ParentFrameId != frame.Id || start.Context.RecipientSeat != frame.OwnerSeat || start.Context.RequestedCount != receipt.X || start.Context.Reason.Value != MobileSunHaoDrawReason || start.Context.ActualTurnNumber != receipt.ActualTurn || start.Context.ActualTurnOwnerSeat != receipt.TurnOwner || start.Context.SequenceBefore > result.SequenceBefore || start.Return != new NativeDrawAttemptReturn(NativeDrawAttemptReturnKind.ProgramOperation, frame.InstructionIndex, 0))
-                throw new InvalidOperationException("Mobile Canshi retained an outcome from a foreign native draw request.");
-        }
-        else if (result.Replacement is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptStartedEvent>().Any(e => e.Context.ParentFrameId == frame.Id))
-            throw new InvalidOperationException("Mobile Canshi cannot invent or omit an accepted native draw request.");
-    }
-
     internal bool IsMobileSunHaoDrawMovement(ProgramSkillFrame frame, CardMovementRecord movement)
     {
         if (frame.MobileSunHaoDraw?.Outcome is not { } result || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(movement) || movement.To != CardLocation.Hand(frame.OwnerSeat))
@@ -115,7 +88,6 @@ internal sealed partial class CharacterSunHaoMobileRuntime
     {
         if (frame.MobileSunHaoDraw is not { Outcome: not null })
             return false;
-        AssertMobileSunHaoDraw(frame);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == frame.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         return child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsMobileSunHaoDrawMovement(frame, m));

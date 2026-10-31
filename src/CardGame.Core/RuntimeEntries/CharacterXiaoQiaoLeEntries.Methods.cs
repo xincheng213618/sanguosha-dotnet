@@ -4,8 +4,6 @@ internal sealed partial class CharacterXiaoQiaoLeEntries
 {
     internal bool AdvanceQiqinChildren() => _resolve().AdvanceQiqinChildren();
     internal bool AdvanceWeiwanChildren() => _resolve().AdvanceWeiwanChildren();
-    internal void AssertQiqin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertQiqin(f);
-    internal void AssertWeiwan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWeiwan(f);
     internal void AssertWeiwanUses() => _resolve().AssertWeiwanUses();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginQiqinCollect(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginQiqinCollect(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWeiwan(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginWeiwan(supplied);
@@ -35,11 +33,9 @@ internal sealed partial class CharacterXiaoQiaoLeEntries
     internal bool HasWeiwanUseDistance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.CardKind kind, long? useId = default) => _resolve().HasWeiwanUseDistance(actor, target, kind, useId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeQiqin(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeQiqin(supplied);
     internal bool IsIssuedQiqinCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedQiqinCandidate(c, context);
-    internal bool IsQiqinDying() => _resolve().IsQiqinDying();
     internal bool IsQiqinHandLimitExempt(global::CardGame.Core.CharacterState owner, int id) => _resolve().IsQiqinHandLimitExempt(owner, id);
     internal bool IsQiqinMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsQiqinMovement(f, effect, pending);
     internal bool IsQiqinRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsQiqinRecoveryParent(f, recovery);
-    internal bool IsWeiwanDying() => _resolve().IsWeiwanDying();
     internal bool IsWeiwanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWeiwanMovement(f, effect, pending);
     internal bool IsWeiwanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWeiwanRecoveryParent(f, recovery);
     internal bool IsWeiwanTargetForbidden(int actor, int target, global::CardGame.Core.CardKind kind, long? useId = default) => _resolve().IsWeiwanTargetForbidden(actor, target, kind, useId);

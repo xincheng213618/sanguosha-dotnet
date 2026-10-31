@@ -101,7 +101,6 @@ internal sealed partial class CharacterPangJiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Douyu: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertDouyuProgram(f);
         if (r.Stage == DouyuStage.OpponentChoice)
         {
             PublishDouyu(f);

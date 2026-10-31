@@ -50,14 +50,6 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
         return !r.Returned || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHaoMengUseReturnedEvent>().Count(e => e == new AnniversaryHaoMengUseReturnedEvent(f.Id, r.UseId, r.ActionId)) == 1;
     }
 
-    internal bool HasAnniversaryHaoMengPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, AnniversaryHaoMeng.Stage: AnniversaryHaoMengStage.Cards or AnniversaryHaoMengStage.Targets } f && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && p.SourceSeat == f.OwnerSeat && ValidHaoMeng(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HaoMengChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 49700)]
-    internal void AssertHaoMeng(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryHaoMeng is not null && (!ValidHaoMeng(f) || f.PendingMovementContinuation is { } p && !HaoMengMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p)))
-            throw new InvalidOperationException("Xiongmang lost its original source, distinct-suit materials, native use return or actual phase consequence.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49700)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49700)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49700)]
@@ -101,7 +93,6 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
     internal bool HaoMengDamageObserver(long id) => HaoMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49700)]
     internal bool HaoMengBeforeDamage(long id) => HaoMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 49700)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49700)]
     internal bool HaoMengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HaoMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49700)]

@@ -16,7 +16,6 @@ internal sealed partial class CharacterLuSuMobileGodEntries
     internal bool KeepShenLsPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepShenLsPaid(f);
     internal void MoveShenLs(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> cards, global::CardGame.Core.ShenLuSuStage stage, global::CardGame.Core.CardLocation destination, global::System.Func<global::CardGame.Core.Card, global::CardGame.Core.CardLocation, global::CardGame.Core.CardLocation>? perCard) => _resolve().MoveShenLs(f, cards, stage, destination, perCard);
     internal void PublishShenLs(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShenLs(f);
-    internal void RequireShenLs(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShenLs(f);
     internal bool ResumeShenLs(long id) => _resolve().ResumeShenLs(id);
     internal bool ReturnShenLsMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShenLsMovement(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShenLsChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShenLsChoices(f);

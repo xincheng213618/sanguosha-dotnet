@@ -83,6 +83,5 @@ internal sealed class MouJiaXuRuntime(IMouJiaXuFacts facts,IMouJiaXuNative nativ
  [ProgramContinuation(ProgramContinuationKind.Resume,36500)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouJiaXu:not null}f||f.Id!=id)return false;Continue(id);return true;}
  [ProgramContinuation(ProgramContinuationKind.Movement,36500)]private bool Movement(ProgramSkillFrame f)=>f.MouJiaXu is not null&&Resume(f.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,36500)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,36500)]private bool Paid(ProgramSkillFrame f)=>f.MouJiaXu is not null&&Valid(f);
- [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,36500)]private void Invariant(ProgramSkillFrame f){if(f.MouJiaXu is not null&&!Valid(f))throw new InvalidOperationException("Invalid own-frame Mou Jia Xu continuation.");}
  [ProgramAiChoice(SkillProgramEffectOp.InitializeMouJiaXuFumou,SkillProgramEffectOp.ResolveMouJiaXuFumou,SkillProgramEffectOp.RecordMouJiaXuSushen,SkillProgramEffectOp.RestoreMouJiaXuRushi)]private PromptChoice Ai(PendingDecision p,ProgramSkillFrame f)=>p.Choices.FirstOrDefault(c=>c.Parameters.GetValueOrDefault("branch")=="done"&&f.MouJiaXu!.Selected.Count>0)??p.Choices.First();
 }

@@ -25,13 +25,10 @@ internal sealed partial class CharacterCaoXiOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CaoXiGangshuIncreasedEvent> FreezeCaoXiGangshuDrawUse(global::CardGame.Core.CharacterState player) => _resolve().FreezeCaoXiGangshuDrawUse(player);
     internal bool HasCaoXiDamageObserver(long id) => _resolve().HasCaoXiDamageObserver(id);
     internal bool IsCaoXiDrawUnitEligible(global::CardGame.Core.CaoXiGangshuIncreasedEvent unit, global::CardGame.Core.ActualDiscardRecoveryPhaseKey? phase) => _resolve().IsCaoXiDrawUnitEligible(unit, phase);
-    internal bool IsCaoXiDying() => _resolve().IsCaoXiDying();
     internal void IssueCaoXiDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueCaoXiDraw(f);
     internal void ObserveCaoXiGangshuExpiry(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveCaoXiGangshuExpiry(payload);
     internal void PublishCaoXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCaoXi(f);
-    internal void RequireCaoXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireCaoXi(f);
     internal bool ResumeCaoXi(long id) => _resolve().ResumeCaoXi(id);
-    internal bool ValidCaoXiGangshu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidCaoXiGangshu(f);
     internal bool ValidCaoXiJianxuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidCaoXiJianxuan(f);
     internal bool HasCaoXiCapability { get => _resolve().HasCaoXiCapability; }
     internal bool HasCaoXiGangshuCapability { get => _resolve().HasCaoXiGangshuCapability; }

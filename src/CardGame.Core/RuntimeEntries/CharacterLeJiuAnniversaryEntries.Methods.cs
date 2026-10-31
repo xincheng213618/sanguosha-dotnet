@@ -4,7 +4,6 @@ internal sealed partial class CharacterLeJiuAnniversaryEntries
 {
     internal bool AdmitLeJiuIssuedCompletion(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().AdmitLeJiuIssuedCompletion(c, w);
     internal void ArmLeJiuCuijin(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ArmLeJiuCuijin(supplied);
-    internal void AssertLeJiuFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLeJiuFrame(f);
     internal void AssertLeJiuNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertLeJiuNativeUse(use);
     internal void BindLeJiuCuijin(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BindLeJiuCuijin(supplied);
     internal bool CanOfferLeJiu(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferLeJiu(c, t, w);

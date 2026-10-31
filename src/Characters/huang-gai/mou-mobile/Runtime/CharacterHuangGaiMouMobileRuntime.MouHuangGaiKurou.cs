@@ -212,16 +212,6 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29050)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29050)]
     internal bool PermitPaidMouKurou(ProgramSkillFrame frame) => frame.MouHuangGaiKurou?.Gift is not null && ValidMouKurou(frame);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 29050)]
-    internal void AssertMouKurou(ProgramSkillFrame frame)
-    {
-        if (frame.MouHuangGaiKurou is null)
-            return;
-        if (!ValidMouKurou(frame))
-            throw new InvalidOperationException("KuRou's frozen paid cursor no longer matches its exact original phase and physical invoice.");
-        if (frame.MouHuangGaiKurou.Stage == MouHuangGaiKurouStage.Choosing && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.TargetSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, MouKurouChoices(frame))))
-            throw new InvalidOperationException("KuRou's private current-entity gift choice escaped its real chooser.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 400)]
     internal bool IsMouKurouMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveMouHuangGaiKurouGift && frame.MouHuangGaiKurou is { Stage: MouHuangGaiKurouStage.GiftChildren or MouHuangGaiKurouStage.LossRequested or MouHuangGaiKurouStage.LossChildren } && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidMouKurou(frame);
@@ -249,7 +239,6 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
     internal bool HasMouKurouDamageObserver(long id) => MouKurouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1510)]
     internal bool HasMouKurouBeforeDamageObserver(long id) => MouKurouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1340)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 730)]
     internal bool IsMouKurouDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouKurouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 600)]

@@ -109,7 +109,6 @@ internal sealed partial class CharacterLiuPanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Pijing: { } r } f || r.Stage is not (PijingStage.Toggles or PijingStage.Reciprocal) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Reciprocal ? r.ActorSeat : f.OwnerSeat) || !PijingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Pijing requires its original actual chooser and currently legal public target choice.");
-        AssertPijing(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = selected.Parameters["branch"];

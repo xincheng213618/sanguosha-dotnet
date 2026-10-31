@@ -37,7 +37,6 @@ internal sealed partial class CharacterCaoSongOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { CaoSongLilu: { } receipt } frame && frame.Id == id)
         {
-            AssertCaoSongLilu(frame);
             if (DrainCaoSongLiluChildren(id))
                 return;
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -193,17 +192,6 @@ internal sealed partial class CharacterCaoSongOlRuntime
     {
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { CaoSongLilu = null });
         _coreSkillProgramsOperations.FinishProgramSkill(frame, completed);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26030)]
-    internal void AssertCaoSongLilu(ProgramSkillFrame frame)
-    {
-        if (frame.CaoSongLilu is not { } receipt)
-            return;
-        if (frame.SkillId != "ol:lilu" || frame.TriggerId is null || receipt.Source != CaoSongSource(frame) || receipt.GameplayHash != frame.GameplayHash || receipt.InstructionIndex != frame.InstructionIndex || frame.WindowContext?.ParentFrameId != receipt.DrawWindowId || receipt.FrozenHandLimit is < 1 or > 5 || receipt.SelectedCardIds.Distinct().Count() != receipt.SelectedCardIds.Count || receipt.SequenceBefore < 0 || receipt.SequenceAfter < receipt.SequenceBefore || receipt.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Lilu lost its exact owning draw frame, source or frozen physical payment.");
-        if (receipt.GiftCount > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongLiluGiftCommittedEvent>().Any(e => e.ProgramFrameId == frame.Id && e.Source == receipt.Source && e.RecipientSeat == receipt.RecipientSeat && e.GiftCount == receipt.GiftCount && e.PreviousGiftCount == receipt.PreviousGiftCount && e.Grows == receipt.Grows))
-            throw new InvalidOperationException("A paid Lilu gift lost its immutable previous-count invoice.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26030)]

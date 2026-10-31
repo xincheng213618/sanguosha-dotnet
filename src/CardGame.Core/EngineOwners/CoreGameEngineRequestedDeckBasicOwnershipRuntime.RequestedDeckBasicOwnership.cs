@@ -14,21 +14,6 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicOwnershipRuntime
         _ => CardActionType.Response
     };
     internal static PendingDecision RequestedDeckBasicNativeDecision(PendingDecision p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RequestedDeckBasicOwnership.RequestedDeckBasicNativeDecision(p);
-    internal PendingDecision? RequestedDeckBasicInvariantDecision()
-    {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not RequestedDeckBasicFrame view)
-            return _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p ? RequestedDeckBasicNativeDecision(p) : null;
-        AssertRequestedDeckBasicFrame(view);
-        return RequestedDeckBasicNativeDecision(view.OriginalDecision);
-    }
-
-    internal ResolutionFrame? RequestedDeckBasicInvariantTop()
-    {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not RequestedDeckBasicFrame view)
-            return _resolutionStackOperations._resolutionStack.LastOrDefault();
-        AssertRequestedDeckBasicFrame(view);
-        return _resolutionStackOperations._resolutionStack.Single(f => f.Id == view.ParentFrameId);
-    }
 
     internal bool HasValidRequestedDeckBasicMaterial(ResolutionFrame owner)
     {
@@ -56,15 +41,6 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicOwnershipRuntime
             return false;
         AssertRequestedDeckBasicFrame(view);
         return true;
-    }
-
-    internal void AssertRequestedDeckBasicMaterials()
-    {
-        foreach (var owner in _resolutionStackOperations._resolutionStack.Where(f => f.RequestedDeckBasicMaterial is not null))
-            if (!HasValidRequestedDeckBasicMaterial(owner))
-                throw new InvalidOperationException("A requested DrawPile material lost its owning-view/payment proof.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is RequestedDeckBasicFrame view)
-            AssertRequestedDeckBasicFrame(view);
     }
 
     internal bool IsRequestedDeckBasicRescueCost(CardUseFrame use, DyingFrame dying, CardActionCost cost) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == dying.Id)is { RequestedDeckBasicMaterial: { Intent: RequestedDeckBasicIntent.Dying, Claiming: true } r } owner && HasValidRequestedDeckBasicMaterial(owner) && r.OwnerFrameId == dying.Id && r.Cursor == dying.ResponderIndex && r.ActorSeat == use.SourceSeat && r.SelectedCardId == cost.CardId && r.SelectedKind == cost.CardKind && cost.From == CardLocation.DrawPile && cost.CardKind == use.CardKind && r.PaidMovementSequence is not null;

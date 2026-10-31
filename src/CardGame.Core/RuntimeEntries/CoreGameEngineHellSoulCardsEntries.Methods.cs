@@ -4,12 +4,10 @@ internal sealed partial class CoreGameEngineHellSoulCardsEntries
 {
     internal void AddHellSoulActions(global::System.Collections.Generic.List<global::CardGame.Core.LegalAction> actions, global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IEnumerable<global::CardGame.Core.Card> cards) => _resolve().AddHellSoulActions(actions, actor, cards);
     internal bool AllowsHellSoulVoluntaryActivation(global::CardGame.Core.ProgramActivationLegalityContext context) => _resolve().AllowsHellSoulVoluntaryActivation(context);
-    internal void AssertHellSoulCardState() => _resolve().AssertHellSoulCardState();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHellSoulRestoration(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHellSoulRestoration(supplied);
     internal bool CanContinueHellSoulProgram(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueHellSoulProgram(frame);
     internal void ContinueHellSoulRestoration(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ContinueHellSoulRestoration(frame);
     internal void DestroyHellReturnSoulIfDiscarded(global::CardGame.Core.Card card, global::CardGame.Core.CardLocation to) => _resolve().DestroyHellReturnSoulIfDiscarded(card, to);
-    internal bool HasHellSoulPrompt() => _resolve().HasHellSoulPrompt();
     internal global::System.Collections.Generic.IReadOnlyList<int> HellReturnSoulTargets(int actorSeat) => _resolve().HellReturnSoulTargets(actorSeat);
     internal global::System.Collections.Generic.IReadOnlyList<int> HellReturnSoulUseTargets(global::CardGame.Core.CharacterState actor, global::CardGame.Core.Card card) => _resolve().HellReturnSoulUseTargets(actor, card);
     internal bool HellSoulFrameRidesOn(global::CardGame.Core.ResolutionFrame child, global::CardGame.Core.ResolutionFrame parent) => _resolve().HellSoulFrameRidesOn(child, parent);

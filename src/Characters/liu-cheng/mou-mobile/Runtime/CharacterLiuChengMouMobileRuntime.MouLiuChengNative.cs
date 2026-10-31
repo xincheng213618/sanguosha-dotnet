@@ -148,14 +148,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         return true;
     }
 
-    internal bool IsMouLiuChengAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouLiuChengOrigin: { } o } use || !IsIssuedMouLiuChengUse(use) || attack.Card is not null || attack.PhysicalCards.Count != 0 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.SourceSeat != use.SourceSeat || attack.EffectiveCardKind != use.CardKind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && attack.ProgramSkillCardUseFrameId != o.ProgramFrameId || attack.ProgramSkillCardUseFrameId is { } issuingProgram && issuingProgram != o.ProgramFrameId)
-            return false;
-        var ancestors = MouLiuChengNativeAncestorProcessing(use.Id);
-        return ancestors is not null && processing.Select(c => c.Id).Distinct().Order().SequenceEqual(ancestors.Order());
-    }
-
     [NativeUseValidation(29401)]
     internal void ValidateMouLiuChengNativeUse(CardUseFrame use)
     {

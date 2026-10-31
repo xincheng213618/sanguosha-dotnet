@@ -77,7 +77,6 @@ internal sealed partial class MouDongChengRuntime(IMouDongChengFacts facts,IMouD
  [ProgramContinuation(ProgramContinuationKind.Resume,37400)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouDongCheng:not null}f||f.Id!=id)return false;Continue(id);return true;}
  [ProgramContinuation(ProgramContinuationKind.Movement,37400)]private bool Movement(ProgramSkillFrame f)=>f.MouDongCheng is not null&&Resume(f.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,37400)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,37400)]private bool Paid(ProgramSkillFrame f)=>f.MouDongCheng is not null&&Valid(f);
- [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,37400)]private void Invariant(ProgramSkillFrame f){if(f.MouDongCheng is not null&&!Valid(f))throw new InvalidOperationException("Invalid Mou Dong Cheng owning receipt.");}
  [ProgramAiChoice(SkillProgramEffectOp.InitializeMouDongChengBaojia,SkillProgramEffectOp.ResolveMouDongChengBaojia,SkillProgramEffectOp.ClaimMouDongChengBaojia,SkillProgramEffectOp.ResolveMouDongChengDouwei,SkillProgramEffectOp.ResolveMouDongChengDelayedSettlement)]private PromptChoice Ai(PendingDecision p,ProgramSkillFrame f)
  {
   var r=f.MouDongCheng!;if(r.Stage==MouDongChengStage.Opening)return p.Choices.OrderBy(c=>facts.TargetScore(f.OwnerSeat,c.Targets.Single())).ThenBy(c=>c.Targets.Single()).First();

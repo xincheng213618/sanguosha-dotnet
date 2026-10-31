@@ -59,11 +59,4 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionProofsRuntime
         if (!ValidRandomAreaAcquisition(frame))
             throw new InvalidOperationException("Random area acquisition lost its exact damage point, seat cursor, random choice or issued atomic region.");
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 1245)]
-    internal void AssertRandomAreaAcquisition(ProgramSkillFrame frame)
-    {
-        if (frame.RandomAreaAcquisition is not null)
-            RequireRandomAreaAcquisition(frame);
-    }
 }

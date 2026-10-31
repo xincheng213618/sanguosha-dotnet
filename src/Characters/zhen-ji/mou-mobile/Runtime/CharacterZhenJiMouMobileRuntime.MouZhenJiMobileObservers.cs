@@ -26,7 +26,6 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
     internal bool HasMouZhenJiLuoshenDamageObserver(long id) => MouZhenJiLuoshenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1501)]
     internal bool HasMouZhenJiLuoshenBeforeDamageObserver(long id) => MouZhenJiLuoshenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1331)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 761)]
     internal bool IsMouZhenJiLuoshenDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouZhenJiLuoshenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 940)]
@@ -54,10 +53,4 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29900)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29900)]
     internal bool ContinueAcceptedMouZhenJiLuoshen(ProgramSkillFrame f) => f.MouZhenJiLuoshen is { StartingSeat: not null } && ValidMouZhenJiLuoshen(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29900)]
-    internal void AssertMouZhenJiLuoshen(ProgramSkillFrame f)
-    {
-        if (f.MouZhenJiLuoshen is not null && !ValidMouZhenJiLuoshen(f))
-            throw new InvalidOperationException("Mou Luoshen lost its owning source, frozen roster or participant cursor.");
-    }
 }

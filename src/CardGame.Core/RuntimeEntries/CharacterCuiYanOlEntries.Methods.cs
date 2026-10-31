@@ -5,7 +5,6 @@ internal sealed partial class CharacterCuiYanOlEntries
     internal bool AdvanceCuiYanChildren() => _resolve().AdvanceCuiYanChildren();
     internal global::CardGame.Core.PromptChoice AiCuiYanDamage(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiCuiYanDamage(p, f);
     internal void AnswerCuiYanDamage(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerCuiYanDamage(choice);
-    internal void AssertCuiYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertCuiYan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCuiYan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginCuiYan(supplied, op);
     internal bool CanOfferCuiYan(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferCuiYan(c, t, context);
     internal bool CaptureCuiYanFinalUse(global::CardGame.Core.CardUseFrame use) => _resolve().CaptureCuiYanFinalUse(use);
@@ -28,12 +27,10 @@ internal sealed partial class CharacterCuiYanOlEntries
     internal void FinishCuiYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCuiYan(f);
     internal bool HasCuiYanBeforeDamageObserver(long id) => _resolve().HasCuiYanBeforeDamageObserver(id);
     internal bool HasCuiYanDamageObserver(long id) => _resolve().HasCuiYanDamageObserver(id);
-    internal bool IsCuiYanDying() => _resolve().IsCuiYanDying();
     internal bool IsCuiYanLegacyAlcoholUse(long id) => _resolve().IsCuiYanLegacyAlcoholUse(id);
     internal bool IsCuiYanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsCuiYanMovement(f, effect, p);
     internal bool IsCuiYanNativeResponseForbidden(global::CardGame.Core.CharacterState owner, global::CardGame.Core.CardKind required, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().IsCuiYanNativeResponseForbidden(owner, required, cards);
     internal bool IsCuiYanNextUseForbidden(int actorSeat, global::System.Collections.Generic.IReadOnlyList<int> materialIds, global::CardGame.Core.Suit? nativeEffectiveSuit) => _resolve().IsCuiYanNextUseForbidden(actorSeat, materialIds, nativeEffectiveSuit);
-    internal bool IsCuiYanOriginalDyingRide() => _resolve().IsCuiYanOriginalDyingRide();
     internal void ObserveCuiYanCardHistory(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveCuiYanCardHistory(payload);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ShutongNextUseGrantedEvent> OutstandingShutong(int seat) => _resolve().OutstandingShutong(seat);
     internal void PublishCuiYanDamage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCuiYanDamage(f);

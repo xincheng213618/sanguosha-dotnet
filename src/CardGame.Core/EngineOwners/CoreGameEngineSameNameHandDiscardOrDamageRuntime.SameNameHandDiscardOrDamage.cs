@@ -92,7 +92,6 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
     internal void ResolveSameNameHandDiscardOrDamageChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A same-name demand lost its owning program.");
-        _coreSameNameHandDiscardOrDamageObserversOperations.AssertSameNameHandDiscardOrDamage(f);
         var r = f.SameNameHandDiscardOrDamage!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandDiscardOrDamageChoice(f, prompt) || !SameNameHandChoices(f).Any(c => SameNameHandChoicesEqual(c, choice)))
             throw new InvalidOperationException("A same-name demand requires its current private published choice.");
@@ -152,7 +151,6 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SameNameHandDiscardOrDamage: { } r } f || f.Id != id)
             return false;
-        _coreSameNameHandDiscardOrDamageObserversOperations.AssertSameNameHandDiscardOrDamage(f);
         if (r.Stage is SameNameHandStage.ChoosingTarget or SameNameHandStage.ChoosingPayment)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -186,7 +184,6 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
     {
         if (f.SameNameHandDiscardOrDamage is not { Stage: SameNameHandStage.DiscardChildren } || f.PendingMovementContinuation is null)
             return false;
-        _coreSameNameHandDiscardOrDamageObserversOperations.AssertSameNameHandDiscardOrDamage(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

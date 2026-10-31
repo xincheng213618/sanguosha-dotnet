@@ -6,9 +6,6 @@ internal sealed partial class CharacterHuangYueyingOlMouEntries
     internal void AnswerMouBingcai(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouBingcai(choice);
     internal void AnswerMouLixian(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouLixian(choice);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? AppendMouLixianProgressMarkers(global::CardGame.Core.CharacterState player, bool canSeeGeneral, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? ordinary) => _resolve().AppendMouLixianProgressMarkers(player, canSeeGeneral, ordinary);
-    internal void AssertMouBingcai(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouBingcai(f);
-    internal void AssertMouBingcaiExtraEffectRounds() => _resolve().AssertMouBingcaiExtraEffectRounds();
-    internal void AssertMouLixian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouLixian(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouBingcai(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouBingcai(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouLixian(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouLixian(supplied);
     internal void BindMouLixianNativeUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().BindMouLixianNativeUse(supplied);
@@ -35,9 +32,6 @@ internal sealed partial class CharacterHuangYueyingOlMouEntries
     internal bool IsMouBingcaiExtraRound(long id) => _resolve().IsMouBingcaiExtraRound(id);
     internal bool IsMouBingcaiFirstBasicAction(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardActionContext action) => _resolve().IsMouBingcaiFirstBasicAction(use, action);
     internal bool IsMouBingcaiLegacyAlcoholUse(long id) => _resolve().IsMouBingcaiLegacyAlcoholUse(id);
-    internal bool IsMouBingcaiLegacyDyingParent(global::CardGame.Core.ProgramSkillFrame root) => _resolve().IsMouBingcaiLegacyDyingParent(root);
-    internal bool IsMouBingcaiLegacyDyingWindow() => _resolve().IsMouBingcaiLegacyDyingWindow();
-    internal bool IsMouHuangYueyingDying() => _resolve().IsMouHuangYueyingDying();
     internal bool IsMouHuangYueyingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouHuangYueyingMovement(f, effect, pending);
     internal bool IsMouHuangYueyingRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouHuangYueyingRecoveryParent(f, recovery);
     internal bool IsMouLixianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouLixianMovement(f, effect, pending);
@@ -57,11 +51,9 @@ internal sealed partial class CharacterHuangYueyingOlMouEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind> MouLixianAddedNames(int owner) => _resolve().MouLixianAddedNames(owner);
     internal bool MouLixianCardWindowEdge(int index) => _resolve().MouLixianCardWindowEdge(index);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouLixianChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouLixianChoices(f);
-    internal global::CardGame.Core.ProgramSkillFrame? MouLixianDamageCursorRoot(global::CardGame.Core.DamageTriggerWindowFrame window, scoped out long? ownedDyingId) => _resolve().MouLixianDamageCursorRoot(window, out ownedDyingId);
     internal bool MouLixianEndingUnlocked(int owner) => _resolve().MouLixianEndingUnlocked(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> MouLixianMaterials(int owner) => _resolve().MouLixianMaterials(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind> MouLixianNames(int owner) => _resolve().MouLixianNames(owner);
-    internal global::System.Collections.Generic.IReadOnlyList<int>? MouLixianNativeAttackAncestorProcessing(long useId) => _resolve().MouLixianNativeAttackAncestorProcessing(useId);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouLixianOptions(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind) => _resolve().MouLixianOptions(f, card, kind);
     internal global::CardGame.Core.ActualDiscardRecoveryPhaseKey? MouLixianPhase(int owner, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().MouLixianPhase(owner, window);
     internal bool MouLixianPreparationUnlocked(int owner) => _resolve().MouLixianPreparationUnlocked(owner);
@@ -74,7 +66,6 @@ internal sealed partial class CharacterHuangYueyingOlMouEntries
     internal void ReturnMouBingcaiDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnMouBingcaiDraw(supplied, outcome);
     internal bool ReturnMouHuangYueyingMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMouHuangYueyingMovement(f);
     internal void ReturnMouLixianNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnMouLixianNativeUse(use);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> SeparateMouLixianDamageChildProcessing(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().SeparateMouLixianDamageChildProcessing(attack, processing);
     internal global::System.Collections.Generic.IReadOnlyList<long> SignMouLixianNativeBatches(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame use) => _resolve().SignMouLixianNativeBatches(f, use);
     internal bool TryAdvanceMouLixianAiNullification() => _resolve().TryAdvanceMouLixianAiNullification();
     internal bool TryBeginMouBingcaiExtraEffectRound(long id, bool afterAttack) => _resolve().TryBeginMouBingcaiExtraEffectRound(id, afterAttack);

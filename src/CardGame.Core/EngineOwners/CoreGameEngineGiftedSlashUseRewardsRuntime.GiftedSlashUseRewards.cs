@@ -26,7 +26,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
     internal SkillProgramStepOutcome BeginGiftedSlashGift(SkillProgramEffect effect, ProgramSkillFrame input, int recipient)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        AssertGiftedSlashPrograms(frame);
         if (!ExactGiftedSlashGiftActivation(frame) || effect != _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!.Activations.Single(a => a.Id == frame.ActivationId).Effects[2] || frame.SelectedTargetSeats.Single() != recipient || frame.PendingMovementContinuation is not null || frame.GiftedSlashGiftReceipt is not null || frame.GiftedSlashRewardReceipt is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GiftedSlashGiftStartedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("A gifted Slash transfer requires its exact unpaid activation, target ledger and instruction.");
         var bound = _coreProgramLifecycleOperations.GetProgramCardSet(frame, effect.SourceBind!);
@@ -193,7 +192,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
     internal SkillProgramStepOutcome BeginGiftedSlashUseReward(SkillProgramEffect effect, ProgramSkillFrame input)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        AssertGiftedSlashPrograms(frame);
         if (effect.Op != SkillProgramEffectOp.RewardGiftedSlashUse || !ExactGiftedSlashRewardParent(frame) || frame.PendingMovementContinuation is not null || frame.GiftedSlashGiftReceipt is not null || frame.GiftedSlashRewardReceipt is not null)
             throw new InvalidOperationException("A gifted Slash reward requires its exact completed use, frozen giver candidate and unpaid instruction.");
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(u => u.Id == frame.WindowContext!.CardUse!.ParentCardUseFrameId);
@@ -222,7 +220,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != id || frame.GiftedSlashGiftReceipt is null && frame.GiftedSlashRewardReceipt is null)
             return false;
-        AssertGiftedSlashPrograms(frame);
         if (_corePublicPilePreparationOperations.PreparationGameEnded())
             return true;
         if (DrainGiftedSlashChildren(frame))
@@ -246,7 +243,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
     {
         if (frame.GiftedSlashGiftReceipt is null && frame.GiftedSlashRewardReceipt is null || frame.PendingMovementContinuation is null)
             return false;
-        AssertGiftedSlashPrograms(frame);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
@@ -272,26 +268,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
             return false;
         var invoice = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > receipt.Before && move.Sequence <= receipt.After && move.Reason.Value == GiftedSlashDrawReason(frame.SkillId)).ToArray();
         return invoice.Length == receipt.DrawActual && invoice.Select(move => move.CardId).Distinct().Count() == receipt.DrawActual && invoice.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(frame.OwnerSeat)) && (receipt.DrawActual > 0 || receipt.Before == receipt.After);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 160)]
-    internal void AssertGiftedSlashPrograms(ProgramSkillFrame frame)
-    {
-        if (frame.GiftedSlashGiftReceipt is null && frame.GiftedSlashRewardReceipt is null)
-        {
-            if (!TracksGiftedSlash)
-                return;
-            var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-            if (history.OfType<GiftedSlashGiftStartedEvent>().Any(e => e.FrameId == frame.Id) && !history.OfType<GiftedSlashGiftResolvedEvent>().Any(e => e.FrameId == frame.Id) || history.OfType<GiftedSlashRewardDrawIssuedEvent>().Any(e => e.FrameId == frame.Id) && !history.OfType<GiftedSlashRewardResolvedEvent>().Any(e => e.FrameId == frame.Id))
-                throw new InvalidOperationException("A paid gifted Slash instruction cannot lose its owning movement receipt.");
-            return;
-        }
-
-        if (frame.GiftedSlashGiftReceipt is not null ? !ValidGiftedSlashGift(frame) : !ValidGiftedSlashReward(frame))
-            throw new InvalidOperationException("A gifted Slash instruction lost its exact paid source, physical invoice or once-issued reward.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !GiftedSlashFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("A gifted Slash instruction retained an unrelated native movement child.");
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 20)]

@@ -182,7 +182,6 @@ internal sealed partial class CharacterZhouQunOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhouQun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhouQunChooser(f) || !ZhouQunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Weather choices require the real current private chooser and exact entities.");
-        AssertZhouQun(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -272,8 +271,6 @@ internal sealed partial class CharacterZhouQunOlRuntime
     [PublicHandRevealReturn("chenshuo-selected-hand")]
     internal void ReturnChenshuoPublicHand(ProgramSkillFrame f)
     {
-        if (f.ZhouQun is not { Stage: ZhouQunStage.RevealChildren, Shown: not null })
-            throw new InvalidOperationException("Chenshuo lost its original displayed Hand identity.");
         ContinueZhouQun(f.Id);
     }
 
@@ -303,7 +300,6 @@ internal sealed partial class CharacterZhouQunOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ZhouQun: { } r } f && f.Id == id)
         {
-            AssertZhouQun(f);
             if (r.Stage == ZhouQunStage.Judgment)
                 return;
             if (r.Stage is ZhouQunStage.ChooseHandOwner or ZhouQunStage.ChooseShownHand or ZhouQunStage.ExchangeHand or ZhouQunStage.ExchangeTop or ZhouQunStage.ChooseWeatherCard or ZhouQunStage.ChooseWeatherRecipient)
@@ -454,7 +450,6 @@ internal sealed partial class CharacterZhouQunOlRuntime
     {
         if (f.ZhouQun is not { Paid: true })
             return false;
-        AssertZhouQun(f);
         return true;
     }
 

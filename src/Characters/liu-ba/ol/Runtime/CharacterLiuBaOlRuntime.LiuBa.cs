@@ -143,7 +143,6 @@ internal sealed partial class CharacterLiuBaOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiuBa: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LiuBaChooser(f) || !LiuBaChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
             throw new InvalidOperationException("Liu Ba requires the exact current participant's private answer.");
-        AssertLiuBa(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (r.Op is SkillProgramEffectOp.IssueTongduHandGift or SkillProgramEffectOp.RecastZhubiAndMarkActualDraw) && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -243,7 +242,6 @@ internal sealed partial class CharacterLiuBaOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { LiuBa: { } r } f && f.Id == id)
         {
-            AssertLiuBa(f);
             if (!r.Paid)
             {
                 if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -312,7 +310,6 @@ internal sealed partial class CharacterLiuBaOlRuntime
     {
         if (f.LiuBa is { Paid: true })
         {
-            AssertLiuBa(f);
             return true;
         }
 

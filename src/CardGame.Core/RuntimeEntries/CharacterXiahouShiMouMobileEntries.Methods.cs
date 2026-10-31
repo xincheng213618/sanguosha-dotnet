@@ -8,7 +8,6 @@ internal sealed partial class CharacterXiahouShiMouMobileEntries
     internal void AnswerMouXiahouShiQiaoshi(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouXiahouShiQiaoshi(selected);
     internal void AnswerMouXiahouShiSupport(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouXiahouShiSupport(selected);
     internal void AssertMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouXiahouShi(f);
-    internal void AssertMouXiahouShiFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouXiahouShiFrame(f);
     internal void AssertMouXiahouShiFrames() => _resolve().AssertMouXiahouShiFrames();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouXiahouShiDiscard(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouXiahouShiDiscard(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouXiahouShiQiaoshi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouXiahouShiQiaoshi(supplied);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterXiahouShiMouMobileEntries
     internal void FinishMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouXiahouShi(f);
     internal bool HasMouXiahouShiBeforeDamageObserver(long id) => _resolve().HasMouXiahouShiBeforeDamageObserver(id);
     internal bool HasMouXiahouShiDamageObserver(long id) => _resolve().HasMouXiahouShiDamageObserver(id);
-    internal bool HasPaidMouXiahouShiSelection(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPaidMouXiahouShiSelection(f);
     internal bool IsMouXiahouShiDirectRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouXiahouShiDirectRecoveryParent(f, recovery);
     internal bool IsMouXiahouShiDying() => _resolve().IsMouXiahouShiDying();
     internal bool IsMouXiahouShiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouXiahouShiMovement(f, e, pending);

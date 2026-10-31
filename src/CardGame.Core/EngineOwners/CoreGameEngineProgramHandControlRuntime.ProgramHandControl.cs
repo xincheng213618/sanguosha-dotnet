@@ -398,39 +398,9 @@ internal sealed partial class CoreGameEngineProgramHandControlRuntime
         return obtained >= 2 ? _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(frame.Id, frame.SkillId, frame.OwnerSeat, 1) : SkillProgramStepOutcome.Continue;
     }
 
-    internal void AssertProgramHandControlDraft(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.HandControlDraft is not { } draft)
-            return;
-        var stages = draft.Operation switch
-        {
-            SkillProgramEffectOp.ChooseHandCountIntervention => new[]
-            {
-                "intervention",
-                "intervention-card"
-            },
-            SkillProgramEffectOp.RevealHandColorDiscardAndTake => ["color", "take-targets", "take-card"],
-            SkillProgramEffectOp.DrawThenPutOwnedCardOnTopParticipants => ["participants", "participant-draw", "participant-top"],
-            SkillProgramEffectOp.DrawTurnOwnerThenDiscardMaximumHandForDodge => ["response-draw", "response-compare", "response-targets", "response-card", "response-complete"],
-            _ => []
-        };
-        var needsCardOwner = draft.Stage is "intervention-card" or "take-card" or "participant-top" or "response-card";
-        if (draft.Operation != paused.Op || draft.Maximum < 1 || draft.ParticipantSeats.Distinct().Count() != draft.ParticipantSeats.Count || draft.ParticipantSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat)) || draft.ParticipantIndex < 0 || draft.ParticipantIndex > draft.ParticipantSeats.Count || draft.ObtainedCount < 0 || draft.ObtainedCount > draft.Maximum || draft.CardOwnerSeat is { } seat && !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || needsCardOwner != draft.CardOwnerSeat.HasValue || !stages.Contains(draft.Stage) || draft.Operation is SkillProgramEffectOp.RevealHandColorDiscardAndTake or SkillProgramEffectOp.DrawThenPutOwnedCardOnTopParticipants && draft.ParticipantSeats.Count > draft.Maximum || draft.Operation == SkillProgramEffectOp.RevealHandColorDiscardAndTake && (draft.RevealedCardIds is null || draft.RevealedCardIds.Count == 0 || draft.RevealedCardIds.Distinct().Count() != draft.RevealedCardIds.Count || draft.Maximum > draft.RevealedCardIds.Count || draft.ParticipantSeats.Count != draft.ObtainedCount || draft.ParticipantSeats.Contains(frame.OwnerSeat)) || draft.Operation != SkillProgramEffectOp.RevealHandColorDiscardAndTake && draft.RevealedCardIds is not null || (draft.CandidateCardIds is null) != (draft.CandidateLocations is null) || draft.CandidateCardIds is { } ids && (draft.Stage != "participant-top" || ids.Count != draft.CandidateLocations!.Count || ids.Distinct().Count() != ids.Count || ids.Where((id, index) => _cardZonesOperations._cardZones.GetLocation(id) != draft.CandidateLocations[index]).Any()))
-            throw new InvalidOperationException("Invalid hand-control instruction-owned draft.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } decision && decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "hand-control"))
-        {
-            var chooser = draft.Stage == "participant-top" ? draft.CardOwnerSeat : frame.OwnerSeat;
-            var expected = BuildProgramHandControlChoices(frame);
-            if (!decision.IsPrivate || decision.PlayerSeat != chooser || decision.Choices.Count != expected.Count || !decision.Choices.Zip(expected).All(pair => pair.First.Id == pair.Second.Id && pair.First.Cards.SequenceEqual(pair.Second.Cards) && pair.First.Targets.SequenceEqual(pair.Second.Targets) && pair.First.Parameters.Count == pair.Second.Parameters.Count && pair.First.Parameters.All(parameter => pair.Second.Parameters.GetValueOrDefault(parameter.Key) == parameter.Value)))
-                throw new InvalidOperationException("Hand-control prompt lost its fresh choices or private chooser.");
-        }
-    }
-
     [PublicHandRevealReturn("hand-color-whole-hand")]
     internal void ReturnHandColorPublicHand(ProgramSkillFrame frame)
     {
-        if (frame.HandControlDraft is not { Stage: "color" })
-            throw new InvalidOperationException("Hand color control lost its original displayed roster.");
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
         if (ExecuteProgramHandControl(effect, frame) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);

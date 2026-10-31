@@ -4,7 +4,6 @@ internal sealed partial class CharacterWenChouMouOlEntries
 {
     internal bool AdvanceMouWenChouChildren() => _resolve().AdvanceMouWenChouChildren();
     internal void AnswerMouWenChouOl(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouWenChouOl(choice);
-    internal void AssertMouWenChouOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouWenChouOl(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouWenChouLunzhan(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouWenChouLunzhan(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouWenChouTrigger(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouWenChouTrigger(supplied, op);
     internal bool CanActivateMouWenChouLunzhan(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateMouWenChouLunzhan(c);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterWenChouMouOlEntries
     internal bool HasMouWenChouBeforeDamage(long id) => _resolve().HasMouWenChouBeforeDamage(id);
     internal bool HasMouWenChouDamage(long id) => _resolve().HasMouWenChouDamage(id);
     internal bool IsMouWenChouDuel(long id) => _resolve().IsMouWenChouDuel(id);
-    internal bool IsMouWenChouDuelAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouWenChouDuelAttackConsistent(attack, processing);
     internal bool IsMouWenChouDying() => _resolve().IsMouWenChouDying();
     internal bool IsMouWenChouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsMouWenChouMovement(f, effect, movement);
     internal bool IsMouWenChouNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsMouWenChouNativeSettlementBatch(f, b);

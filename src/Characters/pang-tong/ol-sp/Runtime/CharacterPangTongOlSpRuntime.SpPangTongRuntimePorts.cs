@@ -16,7 +16,6 @@ internal sealed partial class CharacterPangTongOlSpRuntime
     bool global::CardGame.Core.ISpPangTongNativeFacts.IsRuleWounded(CharacterState player) => _coreTreatedWoundedOperations.IsRuleWounded(player);
     int global::CardGame.Core.ISpPangTongNativeFacts.EffectiveOwnedCardRank(CharacterState owner, Card card) => _coreAlcoholIdentityPoliciesOperations.EffectiveOwnedCardRank(owner, card);
     bool global::CardGame.Core.ISpPangTongNativeFacts.IsSourceEquipment(int owner, string skillId, string instanceId, Card card) => _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, skillId, instanceId, card);
-    bool global::CardGame.Core.ISpPangTongNativeFacts.IsDiouCarrier(int cardId) => _characterDiaoChanLeOperations.IsDiouCarrier(cardId);
     CardLocation global::CardGame.Core.ISpPangTongNativeFacts.NormalizeEphemeralDestination(Card card, CardLocation from, CardLocation to) => _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, from, to);
     bool global::CardGame.Core.ISpPangTongNativeFacts.RecoveryRidesOn(ResolutionFrame child, ResolutionFrame parent) => _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent);
     bool global::CardGame.Core.ISpPangTongNativeFacts.SameNameObserverSuffix(long rootFrameId) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(_resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == rootFrameId));

@@ -71,7 +71,6 @@ internal interface IYangFuAdjacencyFacts : IProgramSelectionQuery
     bool HasDesignatedExtraTargetTail(CardUseFrame use);
     bool HasRecipientCategorySlashTargetTail(CardUseFrame use);
     bool HasZhangYanLangdaoTargetTail(CardUseFrame use);
-    bool MountObserverCandidateMatches(ProgramSkillFrame frame, ProgramTriggerCandidate candidate);
     DyingFrame? ActiveDying { get; }
     bool MovementObserverEdge(long childId);
     bool DyingExitEdge(long childId);

@@ -4,14 +4,12 @@ internal sealed partial class CharacterMuShunAnniversaryEntries
 {
     internal void AfterMuShunChain(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().AfterMuShunChain(attack);
     internal void AnswerMuShun(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMuShun(choice);
-    internal void AssertMuShun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMuShun(f);
     internal void BeforeMuShunChain(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().BeforeMuShunChain(attack);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMuShunJinjian(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMuShunJinjian(supplied);
     internal bool CanMuShunContest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanMuShunContest(f);
     internal void CloseMuShunWithoutContest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CloseMuShunWithoutContest(f);
     internal void ConsumeMuShunDamage(global::CardGame.Core.IGameEvent payload) => _resolve().ConsumeMuShunDamage(payload);
     internal bool ContinueIssuedMuShun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueIssuedMuShun(f);
-    internal bool HasAnniversaryMuShunPrompt() => _resolve().HasAnniversaryMuShunPrompt();
     internal bool IsMuShunPindianSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsMuShunPindianSettlementBatch(f, batch);
     internal global::CardGame.Core.PromptChoice MuShunAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().MuShunAi(p, f);
     internal global::CardGame.Core.ProgramTriggerCandidate MuShunCandidate(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MuShunCandidate(f);

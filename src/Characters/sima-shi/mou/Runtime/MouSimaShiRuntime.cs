@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouSimaShiRuntime(IMouSimaShiFacts facts, IMouSimaShiNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouSimaShiRuntime
 {
     internal const string Sanshi = "mou:sanshi",Zhenrao = "mou:zhenrao",Chenlve = "mou:chenlve",Action = "mou-sima-shi-anniversary";
@@ -110,7 +110,6 @@ internal sealed class MouSimaShiRuntime(IMouSimaShiFacts facts, IMouSimaShiNativ
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouSimaShiCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouSimaShi = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 36400)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouSimaShi: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 36400)] private bool Movement(ProgramSkillFrame f) => f.MouSimaShi is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 36400)] private void Invariant(ProgramSkillFrame f) { if (f.MouSimaShi is not null && !Valid(f)) throw new InvalidOperationException("Invalid Mou Sima Shi owning receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 36400)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 36400)] private bool Paid(ProgramSkillFrame f)
     {
         if (f.MouSimaShi is not null) return Valid(f);

@@ -5,7 +5,6 @@ internal sealed partial class CharacterXiahouDunMouMobileEntries
     internal bool AdvanceMouXiahouDunChildren() => _resolve().AdvanceMouXiahouDunChildren();
     internal global::CardGame.Core.PromptChoice AiMouXiahouDun(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouXiahouDun(p, f);
     internal void AnswerMouXiahouDun(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouXiahouDun(selected);
-    internal void AssertMouXiahouDunMobile(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouXiahouDunMobile(f);
     internal bool CanOfferMouXiahouDunQingjian(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferMouXiahouDunQingjian(gate);
     internal bool CanStartMouXiahouDunGanglie(global::CardGame.Core.CharacterState owner) => _resolve().CanStartMouXiahouDunGanglie(owner);
     internal global::CardGame.Core.CardMovementBatchContext CompleteMovementBatchRecordMouXiahouDunDiscardOrigins(global::CardGame.Core.CardMovementBatchBuilder batch, global::CardGame.Core.CardMovementBatchContext completed) => _resolve().CompleteMovementBatchRecordMouXiahouDunDiscardOrigins(batch, completed);

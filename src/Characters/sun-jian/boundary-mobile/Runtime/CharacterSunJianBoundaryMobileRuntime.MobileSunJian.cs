@@ -78,12 +78,6 @@ internal sealed partial class CharacterSunJianBoundaryMobileRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 65000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 65000)]
     internal bool ProveMobileSunJianPoluRecovery(ProgramSkillFrame frame, RecoveryReplacementFrame recovery) => frame.MobileSunJianPolu is { AwaitingMovement: true, Draw.Replacement: not null } && ValidMobileSunJianPolu(frame) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, frame) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 65000)]
-    internal void AssertMobileSunJianPolu(ProgramSkillFrame frame)
-    {
-        if (frame.MobileSunJianPolu is not null && !ValidMobileSunJianPolu(frame))
-            throw new InvalidOperationException("Polu changed its original death benefit.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 65000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 65000)]

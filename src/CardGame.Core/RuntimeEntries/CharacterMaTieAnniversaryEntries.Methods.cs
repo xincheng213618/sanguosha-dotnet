@@ -21,7 +21,6 @@ internal sealed partial class CharacterMaTieAnniversaryEntries
     internal bool DrainMaTie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMaTie(f);
     internal bool FinishAnniversaryMaTieFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => _resolve().FinishAnniversaryMaTieFactionDeclined(id, pending);
     internal void FinishMaTie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMaTie(f);
-    internal bool HasAnniversaryMaTiePrompt() => _resolve().HasAnniversaryMaTiePrompt();
     internal bool IsAnniversaryMaTiePaymentFrame(global::CardGame.Core.ChainedStateBasicFrame paid) => _resolve().IsAnniversaryMaTiePaymentFrame(paid);
     internal bool IsAnniversaryMaTiePaymentFrame2(global::CardGame.Core.DrawFundedDistinctBasicFrame paid) => _resolve().IsAnniversaryMaTiePaymentFrame(paid);
     internal bool IsAnniversaryMaTieSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsAnniversaryMaTieSlashQuery(actor);
@@ -54,7 +53,6 @@ internal sealed partial class CharacterMaTieAnniversaryEntries
     internal bool PrepareAnniversaryMaTieSuppliedSlash(global::CardGame.Core.ProgramSkillFrame supplied, int actor, int provider, int target, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards, global::CardGame.Core.CardConversionSource? conversion) => _resolve().PrepareAnniversaryMaTieSuppliedSlash(supplied, actor, provider, target, kind, cards, conversion);
     internal void PublishMaTie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishMaTie(f);
     internal global::CardGame.Core.SkillProgramStepOutcome RecordMaTieZhuiji(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().RecordMaTieZhuiji(supplied);
-    internal void RequireMaTie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireMaTie(f);
     internal bool ResumeMaTie(long id) => _resolve().ResumeMaTie(id);
     internal bool RetainMaTie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainMaTie(f);
     internal bool ReturnMaTieAttack() => _resolve().ReturnMaTieAttack();

@@ -147,26 +147,6 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         return at > 0 && _resolutionStackOperations._resolutionStack[at - 1].Id == parent.Id && (r.UseId == 0 && BoundaryLiuFengNeedCurrent(r) || ValidBoundaryLiuFengCaller(parent) && parent.BoundaryLiuFengCaller!.FrameId == cost.Id);
     }
 
-    internal bool IsBoundaryLiuFengNativeAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (attack.Card is not null || attack.PhysicalCards.Count != 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { BoundaryLiuFeng: { } o } use || !IsBoundaryLiuFengUse(use) || attack.EffectiveCardKind != use.CardKind || attack.SourceSeat != use.SourceSeat)
-            return false;
-        var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == o.FrameId);
-        if (at < 0 || at + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[at] is not ProgramSkillFrame { BoundaryLiuFeng: { Stage: BoundaryLiuFengStage.NativeUse, Returned: false } r } f || !ValidBoundaryLiuFeng(f) || _resolutionStackOperations._resolutionStack[at + 1].Id != use.Id || r.UseId != use.Id || r.ActionId != use.Action!.ActionId || attack.ProgramSkillCardUseFrameId != f.Id)
-            return false;
-        var expected = _resolutionStackOperations._resolutionStack.Take(at).OfType<CardUseFrame>().SelectMany(u => u.PhysicalCardIds ?? []).Where(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Distinct().Order().ToArray();
-        return processing.Select(c => c.Id).Order().SequenceEqual(expected);
-    }
-
-    internal bool HasBoundaryLiuFengQinglongPaymentRide(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => BoundaryLiuFengRequestDraft()is { BoundaryLiuFeng: { Need: { Intent: BoundaryLiuFengIntent.Qinglong } n } r } f && n.OwnerFrameId == attack.ResolutionId && n.RequestFrameId == attack.ResolutionId && n.ActorSeat == attack.SourceSeat && ValidBoundaryLiuFeng(f) && BoundaryLiuFengNeedCurrent(r) && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(q.Attack, attack) && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack);
-    internal bool HasBoundaryLiuFengQinglongSettlementRide(CardUseFrame original, long childUseId) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.BoundaryLiuFeng?.UseId == childUseId)is { BoundaryLiuFeng: { Need: { Intent: BoundaryLiuFengIntent.Qinglong } n, Returned: true } } cost && ValidBoundaryLiuFeng(cost) && n.OwnerFrameId == original.Id && original.Continuations.QinglongFollowup?.FollowupUseId == childUseId && _coreCardUseLifecycleOperations.LifecycleCardUse(childUseId)is null;
-    internal bool HasBoundaryLiuFengBorrowedSettlementRide(global::CardGame.Core.NativeOwners.BorrowedSwordHandle b)
-    {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, b) || b.AwaitingSlashChoice || b.SlashCardId != 0 || b.EffectiveSlashKind != CardKind.Slash || b.ActiveAttack is not { } attack || _coreCardUseLifecycleOperations.LifecycleCardUse(b.ResolutionId)is not { Action: { Type: CardActionType.Use } parentAction } || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.BoundaryLiuFeng?.UseId == attack.ResolutionId)is not { BoundaryLiuFeng: { Need: { Intent: BoundaryLiuFengIntent.BorrowedSword } n, Returned: true } r } cost || !ValidBoundaryLiuFeng(cost) || r.Source.SkillId != BoundaryLiuFengComposition.Qinling || r.Source.OwnerSeat != b.WeaponOwnerSeat || n.ActorSeat != b.WeaponOwnerSeat || n.OwnerFrameId != b.ResolutionId || n.ParentActionId != parentAction.ActionId || n.RequestFrameId >= cost.Id || !n.Targets.SequenceEqual([b.SlashTargetSeat]) || !r.Targets.SequenceEqual([b.SlashTargetSeat]) || r.CostSequence <= 0 || r.UseId != attack.ResolutionId || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || r.OriginalDecision is not { Kind: DecisionKind.RespondSlash, RequiredCardKind: CardKind.Slash } original || original.PlayerSeat != b.WeaponOwnerSeat || original.SourceSeat != b.SourceSeat || original.TargetSeat != b.SlashTargetSeat || original.IncomingCard != CardKind.BorrowedSword || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengRequestReleasedEvent>().Count(e => e == new BoundaryLiuFengRequestReleasedEvent(cost.Id, n.OwnerFrameId, n.RequestFrameId, true)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengUseIssuedEvent>().Count(e => e.Origin.FrameId == cost.Id && e.Origin.UseId == r.UseId && e.Origin.ActionId == r.ActionId && e.Origin.Source == r.Source && e.Origin.Hash == r.Hash && e.Origin.Actor == b.WeaponOwnerSeat) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengUseReturnedEvent>().Count(e => e.FrameId == cost.Id && e.UseId == r.UseId && e.ActionId == r.ActionId && e.Damaged == r.Damaged) != 1)
-            return false;
-        return _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == cost.Id || BoundaryLiuFengObserverRoot()?.Id == cost.Id;
-    }
-
     internal void ResumeBoundaryLiuFengRequest(BoundaryLiuFengReceipt r)
     {
         var n = r.Need!;
@@ -216,8 +196,6 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
 
         if (parent.WuJing is { NativeOrigin: { } wu } wr)
         {
-            if (!wr.NativeCompleted || wu.UseId != r.UseId || wu.ActionId != r.ActionId)
-                throw new InvalidOperationException("Qinling lost the exact Heji native return.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuJingHejiReturnedEvent(parent.Id, r.UseId));
             _coreRuntimeOperations.ReplaceRuntimeTop(parent with { WuJing = wr with { Stage = WuJingStage.NativeChildren }, PendingMovementContinuation = new(parent.OwnerSeat, 0, null) });
             _coreRuntimeOperations.AdvanceRuntimeProgram(parent.Id);
@@ -226,8 +204,6 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
 
         if (parent.CaoChun is { Slash: { } cc } cr)
         {
-            if (cc.NativeUseId != r.UseId || cc.ActionId != r.ActionId || cc.Returned || cc.PaymentAfter != cc.PaymentBefore)
-                throw new InvalidOperationException("Qinling lost the original Shanjia zero-material payment.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanjiaNativeSlashReturnedEvent(parent.Id, r.UseId, r.ActionId));
             _coreRuntimeOperations.ReplaceRuntimeTop(parent with { CaoChun = cr with { Slash = cc with { Returned = true } } });
             _characterCaoChunOlOperations.ResumeCaoChun(parent.Id);

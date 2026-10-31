@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSignedDamagePaymentsEntries
 {
-    internal void AssertSignedDamagePayment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSignedDamagePayment(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSignedDamagePayment(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginSignedDamagePayment(input);
     internal bool CanOfferSignedDamagePayment(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferSignedDamagePayment(candidate, trigger, c);
     internal global::CardGame.Core.GameEngine.SignedDamageProfile CaptureSignedDamageProfile(int ownerSeat, int otherSeat, global::CardGame.Core.SkillProgramEffect effect) => _resolve().CaptureSignedDamageProfile(ownerSeat, otherSeat, effect);

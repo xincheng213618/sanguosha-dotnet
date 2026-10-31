@@ -5,7 +5,6 @@ internal sealed partial class CharacterWenYangOlEntries
     internal bool AdvanceWenYangChildren() => _resolve().AdvanceWenYangChildren();
     internal void AnswerWenYang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWenYang(choice);
     internal void AppendWenYangEndingItems(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendWenYangEndingItems(items);
-    internal void AssertWenYang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWenYang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWenYang(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginWenYang(input, op);
     internal bool CanOfferWenYang(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferWenYang(candidate, t, c);
     internal global::CardGame.Core.PromptChoice ChooseWenYangAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseWenYangAi(p, f);
@@ -19,7 +18,6 @@ internal sealed partial class CharacterWenYangOlEntries
     internal bool HasWenYangDamageObserver(long id) => _resolve().HasWenYangDamageObserver(id);
     internal bool IsIssuedWenYangQingjiaoEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWenYangQingjiaoEndingCandidate(c, context);
     internal bool IsWenYangChoujueCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsWenYangChoujueCandidate(candidate, c);
-    internal bool IsWenYangDying() => _resolve().IsWenYangDying();
     internal bool IsWenYangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWenYangRecoveryParent(f, recovery);
     internal void MoveWenYang(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.WenYangEntity> cards, global::CardGame.Core.WenYangStage stage, string reason, bool discard) => _resolve().MoveWenYang(f, cards, stage, reason, discard);
     internal void PublishWenYang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishWenYang(f);

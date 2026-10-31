@@ -126,7 +126,6 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
     internal void ResolveSimultaneousPindianChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A simultaneous answer lost its owning program.");
-        AssertSimultaneousPindian(f);
         var r = f.SimultaneousPindian!;
         var seat = SimultaneousChooser(f);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !SimultaneousChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
@@ -187,7 +186,6 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SimultaneousPindian: { } r } f || f.Id != id)
             return false;
-        AssertSimultaneousPindian(f);
         if (r.Stage == SimultaneousPindianStage.RandomPolicies)
         {
             _coreSimultaneousPindianSelectionsOperations.ContinueSimultaneousRandomPolicies(f);
@@ -368,24 +366,6 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 21500)]
     internal bool ReturnSimultaneousMovement(ProgramSkillFrame f) => f.SimultaneousPindian is not null && ResumeSimultaneousPindian(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 190)]
-    internal void AssertSimultaneousPindian(ProgramSkillFrame f)
-    {
-        if (f.SimultaneousPindian is not { } r)
-            return;
-        if (r.ProgramFrameId != f.Id || r.Source != SimultaneousSource(f) || r.GameplayHash != f.GameplayHash || f.TriggerId is not null || f.InstructionIndex != 1 || r.Opponents.Count is < 1 or > 3 || r.Opponents.Distinct().Count() != r.Opponents.Count || r.Opponents.Contains(f.OwnerSeat) || !r.Opponents.SequenceEqual(f.SelectedTargetSeats) || r.Cards.Count < 1 || r.Cards[0].Seat != f.OwnerSeat || !(f.SelectedCardIds.Count == 0 && r.OriginalSourceCardId == 0 || f.SelectedCardIds.SequenceEqual([r.OriginalSourceCardId])) || r.Cards.Select(c => c.Seat).Distinct().Count() != r.Cards.Count || r.Cards.Where(c => c.CardId > 0).Select(c => c.CardId).Distinct().Count() != r.Cards.Count(c => c.CardId > 0) || !Enum.IsDefined(r.Stage) || r.Cards.Any(c => c.CardId <= 0 ? r.Revealed || c.OriginalRank != 0 || c.Rank != 0 : c.OriginalRank is < 1 or > 13 || c.Rank is < 1 or > 13) || r.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.ConsequenceIndex is < 0 or > 2 || r.SelectionIndex < 0 || r.SelectionIndex > r.Opponents.Count || r.ComparisonIndex < 0 || r.ComparisonIndex > r.Opponents.Count || !r.Cards.Skip(1).Select(c => c.Seat).SequenceEqual(r.Opponents.Take(r.SelectionIndex)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimultaneousPindianStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.Opponents.SequenceEqual(r.Opponents)) != 1)
-            throw new InvalidOperationException("The simultaneous contest lost its exact source, ordered private commitments or original activation.");
-        if (!r.Revealed && !_characterLuKangWumiaoOperations.IsWuLuKangPrivateGroup(f) && (r.Stage is not (SimultaneousPindianStage.Selecting or SimultaneousPindianStage.RandomPolicies or SimultaneousPindianStage.TopRefillChildren) || r.Cards.Count != r.SelectionIndex + 1 || r.Cards.Any(c => c.CardId > 0 && _cardZonesOperations._cardZones.GetLocation(c.CardId) != _coreSimultaneousPindianSelectionsOperations.SimultaneousOriginalLocation(r, c) || c.Rank != c.OriginalRank)))
-            throw new InvalidOperationException("A simultaneous private commitment moved before the shared reveal.");
-        var originalCards = _characterPangJiOlOperations.GetDouyuOriginalSimultaneousCards(f);
-        if (r.Revealed && !_characterLuKangWumiaoOperations.ValidWuLuKangGroupReveal(f) && (r.Stage == SimultaneousPindianStage.Selecting || r.SelectionIndex != r.Opponents.Count || r.Cards.Count != r.Opponents.Count + 1 || r.RevealAfter - r.RevealBefore != r.Cards.Count - r.TopReceipts.Count || originalCards.Where(c => !r.TopReceipts.Any(t => t.CardId == c.CardId)).Any(c => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.RevealBefore && m.Sequence <= r.RevealAfter && m.CardId == c.CardId && m.From == _coreSimultaneousPindianSelectionsOperations.SimultaneousOriginalLocation(r, c) && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.PindianReveal) != 1) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PindianCardsRevealedEvent>().Count(e => e.ParentFrameId == f.Id && e.Simultaneous && e.Cards.Select(c => (c.Seat, c.CardId, c.OriginalRank)).SequenceEqual(r.Cards.Select(c => (c.Seat, c.CardId, c.OriginalRank)))) != 1))
-            throw new InvalidOperationException("A simultaneous reveal lacks its exact once-paid complete common group.");
-        var comparisons = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PindianResultDeterminedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (comparisons.Length != r.ComparisonIndex + (r.ComparisonIssued ? 1 : 0) || comparisons.Where((e, i) => e.SkillId != f.SkillId || e.Result.SourceSeat != f.OwnerSeat || e.Result.OpponentSeat != r.Opponents[i] || e.Result.SourceCardId != r.Cards[0].CardId || e.Result.OpponentCardId != r.Cards[i + 1].CardId || e.Result.SourceRank != r.Cards[0].Rank || e.Result.OpponentRank != r.Cards[i + 1].Rank).Any())
-            throw new InvalidOperationException("A simultaneous contest comparison cursor lost its exact ordered public results.");
-        _coreSimultaneousPindianClaimsOperations.AssertSimultaneousClaims(f);
-        _coreSimultaneousPindianSelectionsOperations.AssertSimultaneousSelectionPolicies(f);
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 20)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 20)]

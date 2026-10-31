@@ -52,11 +52,4 @@ internal sealed partial class CharacterKeBiNengOlRuntime
             _ => false
         };
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27040)]
-    internal void AssertKeBiNeng(ProgramSkillFrame f)
-    {
-        if (f.KeBiNengPingduan is not null && !ValidKeBiNeng(f))
-            throw new InvalidOperationException("Pingduan lost its original source, instruction, actual recipient, frozen current item or native paid use.");
-    }
 }

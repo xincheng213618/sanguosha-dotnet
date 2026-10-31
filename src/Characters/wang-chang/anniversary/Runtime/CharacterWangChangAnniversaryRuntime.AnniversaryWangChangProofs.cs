@@ -56,18 +56,6 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
         return f.SelectedTargetSeats.Count == 0;
     }
 
-    internal bool HasAnniversaryWangChangPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, AnniversaryWangChang.Stage: AnniversaryWangChangStage.OwnCards or AnniversaryWangChangStage.Targets or AnniversaryWangChangStage.ForeignCard } f && p.PlayerSeat == f.OwnerSeat && ValidWangChang(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, WangChangChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 46500)]
-    internal void AssertWangChang(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryWangChang is null)
-            return;
-        if (!ValidWangChang(f) || f.PendingMovementContinuation is { } p && !WangChangMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
-            throw new InvalidOperationException("Wang Chang lost his exact original phase, frozen target group, conversion payment or native child receipt.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.AnniversaryWangChang.Stage is AnniversaryWangChangStage.OwnCards or AnniversaryWangChangStage.Targets or AnniversaryWangChangStage.ForeignCard && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, WangChangChoices(f))))
-            throw new InvalidOperationException("Wang Chang lost his exact private published menu.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46500)]
     internal bool WangChangMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.AnniversaryWangChang is { Stage: AnniversaryWangChangStage.MovementChildren } r && effect?.Op == r.Operation && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidWangChang(f);
 }

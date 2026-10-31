@@ -48,15 +48,6 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
         return gain.To == CardLocation.Hand(frame.OwnerSeat) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > gain.Sequence && move.Sequence <= payment.After).ToArray()is [var destroyed] && destroyed.Sequence == payment.After && destroyed.CardId == payment.CardId && destroyed.From == gain.To && destroyed.HappyZuoCiPhantomDestination is { OriginalForeignGainSequence: { } original, OriginalRecipient: { } recipient, Issuer: var issuer } && original == gain.Sequence && recipient == frame.OwnerSeat && issuer == payment.TargetSeat && _characterZuoCiHappyGodOperations.IsHappyZuoCiDestroyedMaterial(destroyed);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 40300)]
-    internal void RequireMobileGuixin(ProgramSkillFrame f)
-    {
-        if (f.MobileGuixin is null)
-            return;
-        if (!ValidMobileGuixin(f) || f.PendingMovementContinuation is { } pending && !MobileGuixinMovementProof(f, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect, pending))
-            throw new InvalidOperationException("Mobile Guixin lost its original damage point, source instance, paid card movement or continuation cursor.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 40300)]
     internal bool MobileGuixinMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveMobileShenCaoCaoGuixin && f.MobileGuixin is { Stage: MobileGuixinStage.MovementChildren } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidMobileGuixin(f);
 }

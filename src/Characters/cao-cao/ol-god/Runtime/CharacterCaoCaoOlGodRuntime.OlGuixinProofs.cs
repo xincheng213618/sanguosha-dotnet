@@ -52,15 +52,6 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
         return r.FaceDownBefore is null && r.FaceDownAfter is null && r.Stage != OlGuixinStage.TurnoverChildren;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 40700)]
-    internal void RequireOlGuixin(ProgramSkillFrame f)
-    {
-        if (f.OlGuixin is null)
-            return;
-        if (!ValidOlGuixin(f) || f.PendingMovementContinuation is { } pending && !OlGuixinMovementProof(f, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect, pending))
-            throw new InvalidOperationException("OL Guixin lost its original damage point, immutable priority, private RNG choice or actual paid movement.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 40700)]
     internal bool OlGuixinMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveOlShenCaoCaoGuixin && f.OlGuixin is { Stage: OlGuixinStage.MovementChildren } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidOlGuixin(f);
 }

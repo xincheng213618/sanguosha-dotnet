@@ -173,16 +173,6 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 48200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 48200)]
     internal bool PaidShiXxy(ProgramSkillFrame f) => f.ShiXinXianYing is { Stage: ShiXinXianYingStage.JiejieChildren or ShiXinXianYingStage.QingshiInvocation or ShiXinXianYingStage.QingDiscardChildren or ShiXinXianYingStage.Drawing or ShiXinXianYingStage.DrawChildren };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 48200)]
-    internal void AssertShiXxyFrame(ProgramSkillFrame f)
-    {
-        if (f.ShiXinXianYing is not { } r)
-            return;
-        if (r.Source != ShiXxySource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Round != _coreActualRoundProgressRoundNumberAccess._roundNumber || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Actor) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Viewed.Select(c => c.CardId).Distinct().Count() != r.Viewed.Count || r.Selected.Select(c => c.CardId).Distinct().Count() != r.Selected.Count || r.Selected.Count > 2 || r.Jiejie != (f.SkillId == ShiXxyJiejie) || f.SkillId is not (ShiXxyJiejie or ShiXxyQingshi) || r.QingIssued && (_coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingQingshiIssuedEvent>().SingleOrDefault(e => e.FrameId == f.Id)is not { } q || q.Target != r.Target || q.SameCamp != r.SameCamp || q.FromJiejie != r.Jiejie))
-            throw new InvalidOperationException("Shi Xin Xian Ying lost her exact source, round, private view, actual participant or once-issued Qingshi.");
-        if (r.Stage == ShiXinXianYingStage.Suit && (!r.Viewed.Select(c => c.CardId).SequenceEqual(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.Actor]).Select(c => c.Id)) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramPrivateHandViewedEvent>().Count(e => e.FrameId == f.Id && e.ViewerSeat == f.OwnerSeat && e.SourceSeat == r.Actor && e.Count == r.Viewed.Count) != 1))
-            throw new InvalidOperationException("Jiejie cannot substitute new hand entities for its original private view.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiXinXianYingJiejie, SkillProgramEffectOp.ResolveMobileShiXinXianYingQingshi)]
     internal PromptChoice ShiXxyAi(PendingDecision p, ProgramSkillFrame f)

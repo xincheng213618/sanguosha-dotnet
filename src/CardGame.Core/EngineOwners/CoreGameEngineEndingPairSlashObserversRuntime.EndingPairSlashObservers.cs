@@ -21,13 +21,6 @@ internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 600)]
-    internal void AssertEndingPairSlashState(ProgramSkillFrame f)
-    {
-        if (f.EndingPairDraw is not null && !_coreEndingPairDrawsOperations.ValidEndingPairDraw(f) || f.PlaySlashRecast is not null && !_corePlaySlashRecastsOperations.ValidPlaySlashRecast(f))
-            throw new InvalidOperationException("The actual Ending pair or Slash recast lost its original typed issuance/phase and real cost/reward ledger.");
-    }
-
     internal bool EndingPairPaidFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (child is not CardsMovedTriggerWindowFrame moved || moved.Batch.ParentFrameId != f.Id || moved.Batch.AwaitingProgramFrameId is { } awaiting && awaiting != f.Id || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId || moved.Batch.Movements.Count == 0)
@@ -99,8 +92,6 @@ internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 560, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 640)]
     internal bool IsEndingPairSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && EndingPairPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1770)]

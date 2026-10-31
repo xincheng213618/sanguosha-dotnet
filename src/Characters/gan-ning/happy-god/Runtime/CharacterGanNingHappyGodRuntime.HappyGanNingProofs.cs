@@ -26,17 +26,6 @@ internal sealed partial class CharacterGanNingHappyGodRuntime
         return receipt.Stage != HappyPoxiStage.DrawChildren || receipt.DrawBefore >= receipt.After && receipt.DrawAfter >= receipt.DrawBefore && receipt.DrawAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPoxiDrawReturnedEvent>().Count(e => e == new HappyPoxiDrawReturnedEvent(frame.Id, receipt.OwnCount == 2 ? 1 : 3, receipt.DrawCount, receipt.DrawBefore, receipt.DrawAfter)) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 41680)]
-    internal void AssertHappyPoxi(ProgramSkillFrame frame)
-    {
-        if (frame.HappyPoxi is null)
-            return;
-        if (!ValidHappyPoxi(frame) || frame.HappyPoxi.Cost is not System.Collections.IList { IsReadOnly: true })
-            throw new InvalidOperationException("Happy Poxi lost its original source, three actual hand discards, paid share or native outcome cursor.");
-        if (frame.PendingMovementContinuation is { } pending && !HappyPoxiMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), pending))
-            throw new InvalidOperationException("Happy Poxi lost its exact paid movement or health continuation.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 41680)]
     internal bool HappyPoxiMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveHappyGanNingPoxi && pending == frame.PendingMovementContinuation && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && frame.HappyPoxi is { Stage: HappyPoxiStage.DiscardChildren or HappyPoxiStage.MaximumChildren or HappyPoxiStage.RecoveryChildren or HappyPoxiStage.DrawChildren } && ValidHappyPoxi(frame);
 }

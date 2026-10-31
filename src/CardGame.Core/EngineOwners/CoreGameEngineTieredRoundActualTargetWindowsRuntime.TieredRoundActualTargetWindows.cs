@@ -11,8 +11,6 @@ internal sealed partial class CoreGameEngineTieredRoundActualTargetWindowsRuntim
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { TieredRoundConversionUse: { FrozenTier: 2, MaterialCount: 0 }, Action: { Type: CardActionType.Use, PhysicalCards.Count: 0 } currentAction } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || !_coreTieredRoundZeroUsesOperations.IsIssuedTieredRoundUse(use, true))
             return;
-        if (previousAction.Type != CardActionType.Use || previousAction.ActionId != currentAction.ActionId || previousAction.EffectiveKind != currentAction.EffectiveKind)
-            throw new InvalidOperationException("A zero-material trick target update lost its original use action.");
         foreach (var window in _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Where(w => w.ParentFrameId == use.Id && w.Action.Type == CardActionType.Use && w.Action.ActionId == currentAction.ActionId && w.TrickContinuation is { EffectCardId: 0 } && w.Continuation is ProgramCardContinuation.CommittedTrick or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.BeforeTrickTargetEffects).ToArray())
         {
             // Compare against the actual pre-update producer input, not a

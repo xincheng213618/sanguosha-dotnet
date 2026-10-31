@@ -32,13 +32,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitObserversRuntim
             throw new InvalidOperationException("The first Slash/Duel benefit lost its exact declared use, candidate, source or once-issued draw.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 80)]
-    internal void AssertRegisteredFirstSlashDuelBenefit(ProgramSkillFrame frame)
-    {
-        if (frame.FirstSlashDuelBenefit is not null)
-            RequireFirstSlashDuelBenefit(frame);
-    }
-
     internal bool FirstSlashDuelFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (!_coreFirstSlashDuelBenefitsOperations.CanContinueFirstSlashDuelBenefit(root) || root.FirstSlashDuelBenefit is not { } r || child is not CardsMovedTriggerWindowFrame moved)
@@ -50,8 +43,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitObserversRuntim
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1590)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 130)]
     internal bool HasFirstSlashDuelDamageObserver(long id) => FirstSlashDuelObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 140)]
-    internal bool IsFirstSlashDuelDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FirstSlashDuelObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 100)]
     internal bool TryAdvanceFirstSlashDuelSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FirstSlashDuelObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

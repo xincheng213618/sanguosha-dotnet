@@ -31,13 +31,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
             throw new InvalidOperationException("Dixian must retain its exact requested native draw and actual replacement result.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29701)]
-    internal void AssertWuLuKangDixianFrame(ProgramSkillFrame f)
-    {
-        if (f.WuLuKangDixian is not null)
-            RequireWuLuKangDixian(f);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29701)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29701)]
     internal bool ContinueAcceptedWuLuKangDixian(ProgramSkillFrame f)
@@ -90,8 +83,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     internal bool HasWuLuKangDixianDamageObserver(long id) => WuLuKangDixianObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1470)]
     internal bool HasWuLuKangDixianBeforeDamageObserver(long id) => WuLuKangDixianObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1300)]
-    internal bool IsWuLuKangDixianDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuLuKangDixianObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 500)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 490)]
     internal bool IsWuLuKangDixianRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

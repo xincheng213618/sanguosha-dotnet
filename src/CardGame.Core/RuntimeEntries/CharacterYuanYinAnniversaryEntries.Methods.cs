@@ -4,7 +4,6 @@ internal sealed partial class CharacterYuanYinAnniversaryEntries
 {
     internal bool AdvanceYuanYinChildren() => _resolve().AdvanceYuanYinChildren();
     internal void AnswerYuanYin(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerYuanYin(selected);
-    internal void AssertYuanYin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertYuanYin(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginYuanYinMoshou(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginYuanYinMoshou(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginYuanYinYunjiu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginYuanYinYunjiu(supplied);
     internal bool CanOfferYuanYin(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferYuanYin(c, t, w);
@@ -15,7 +14,6 @@ internal sealed partial class CharacterYuanYinAnniversaryEntries
     internal void ContinueYuanYinYunjiu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ContinueYuanYinYunjiu(supplied);
     internal bool DrainYuanYin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainYuanYin(f);
     internal void FinishYuanYin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishYuanYin(f);
-    internal bool HasAnniversaryYuanYinPrompt() => _resolve().HasAnniversaryYuanYinPrompt();
     internal void PublishYuanYin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishYuanYin(f);
     internal bool RetainYuanYin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainYuanYin(f);
     internal void ReturnYuanYinMoshouDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnYuanYinMoshouDraw(f, draw);

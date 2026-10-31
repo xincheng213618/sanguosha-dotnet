@@ -31,7 +31,6 @@ internal sealed partial class CharacterLvYiMobileShiEntries
     internal global::CardGame.Core.ShiLyHuilvGrantedEvent? ShiLyOpenGrant(int ownerSeat, int actorSeat) => _resolve().ShiLyOpenGrant(ownerSeat, actorSeat);
     internal bool ShiLyShishiCannotRespond(int sourceSeat, int responderSeat) => _resolve().ShiLyShishiCannotRespond(sourceSeat, responderSeat);
     internal bool ShiLyShishiUseUnanswered(int ownerSeat) => _resolve().ShiLyShishiUseUnanswered(ownerSeat);
-    internal int[]? ShiLySongyanAncestorProcessing(long id) => _resolve().ShiLySongyanAncestorProcessing(id);
     internal bool ShiLySongyanConversionForbidden(global::CardGame.Core.ProgramViewAsLegalityQuery query) => _resolve().ShiLySongyanConversionForbidden(query);
     internal bool HasShiLyCapability { get => _resolve().HasShiLyCapability; }
 }

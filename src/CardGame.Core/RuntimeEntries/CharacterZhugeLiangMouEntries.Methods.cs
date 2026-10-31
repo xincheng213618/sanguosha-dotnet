@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhugeLiangMouEntries
 {
-    internal void AssertMouZhijueProgram(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertMouZhijueProgram(frame, paused);
     internal bool CanStartMouZhuge(global::CardGame.Core.CharacterState owner, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().CanStartMouZhuge(owner, plan);
     internal void CaptureMouWujingAllowance(long batchId, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> movements) => _resolve().CaptureMouWujingAllowance(batchId, movements);
     internal void CaptureMovementBatchFactsCaptureMouWujingAllowance(global::CardGame.Core.CardMovementBatchBuilder batch, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> movements) => _resolve().CaptureMovementBatchFactsCaptureMouWujingAllowance(batch, movements);
@@ -13,11 +12,8 @@ internal sealed partial class CharacterZhugeLiangMouEntries
     internal bool FinishMouZhijueZeroAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouZhijueZeroAttack(attack, out paused);
     internal bool HasMouOperation(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().HasMouOperation(owner, op);
     internal bool HasMouWujingAllowance(global::CardGame.Core.CharacterState owner) => _resolve().HasMouWujingAllowance(owner);
-    internal bool IsMouZhijueBorrowedAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouZhijueBorrowedAttackConsistent(attack, processing);
     internal bool IsMouZhijueUse(long id) => _resolve().IsMouZhijueUse(id);
-    internal bool IsMouZhijueZeroAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouZhijueZeroAttackConsistent(attack, processing);
     internal bool IsMouZhijueZeroUse(long id) => _resolve().IsMouZhijueZeroUse(id);
-    internal bool IsZeroEntityProcessingParent(long id, int cardId) => _resolve().IsZeroEntityProcessingParent(id, cardId);
     internal bool IsZeroEntityUse(long id) => _resolve().IsZeroEntityUse(id);
     internal void IssueMouZhijueUse(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.LegalAction action, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption? trick, global::CardGame.Core.Card card, global::System.Collections.Generic.IReadOnlyList<int> physicalIds) => _resolve().IssueMouZhijueUse(frame, action, trick, card, physicalIds);
     internal bool MatchesMouZhijueUseAction(long id, global::CardGame.Core.CardActionContext action, int cardId) => _resolve().MatchesMouZhijueUseAction(id, action, cardId);

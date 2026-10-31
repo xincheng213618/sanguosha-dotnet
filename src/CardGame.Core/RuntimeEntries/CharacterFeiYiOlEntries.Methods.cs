@@ -6,8 +6,6 @@ internal sealed partial class CharacterFeiYiOlEntries
     internal global::CardGame.Core.PromptChoice AiFeiYi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiFeiYi(p, f);
     internal bool AllowsFeiYiYanru(global::CardGame.Core.CharacterState actor) => _resolve().AllowsFeiYiYanru(actor);
     internal void AnswerFeiYi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerFeiYi(choice);
-    internal void AssertFeiYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertFeiYi(f);
-    internal void AssertFeiYiEffectRounds() => _resolve().AssertFeiYiEffectRounds();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginFeiYi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginFeiYi(supplied, op);
     internal void BeginFeiYiDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginFeiYiDiscard(f);
     internal void BeginFeiYiDraw(global::CardGame.Core.ProgramSkillFrame f, bool hezhong) => _resolve().BeginFeiYiDraw(f, hezhong);
@@ -41,7 +39,6 @@ internal sealed partial class CharacterFeiYiOlEntries
     internal bool HasFeiYiTrickPaymentTail(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation) => _resolve().HasFeiYiTrickPaymentTail(use, continuation);
     internal bool HasUnstartedFeiYiExtraEffect(long id) => _resolve().HasUnstartedFeiYiExtraEffect(id);
     internal bool IsFeiYiAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsFeiYiAwaitedMovement(f, e, p);
-    internal bool IsFeiYiDying() => _resolve().IsFeiYiDying();
     internal bool IsFeiYiExtraEffectRound(long id) => _resolve().IsFeiYiExtraEffectRound(id);
     internal bool IsFeiYiSingletonTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsFeiYiSingletonTrigger(t);
     internal bool IsFeiYiTrickPaymentBatch(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsFeiYiTrickPaymentBatch(use, batch);

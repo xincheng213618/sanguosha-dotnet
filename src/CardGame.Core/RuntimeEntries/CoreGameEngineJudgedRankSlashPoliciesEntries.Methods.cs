@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineJudgedRankSlashPoliciesEntries
 {
     internal bool AllowsRegisteredIsOtherActualBasicDiscardTrigger(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsRegisteredIsOtherActualBasicDiscardTrigger(gate);
-    internal void AssertJudgedRankSlashPolicies() => _resolve().AssertJudgedRankSlashPolicies();
     internal bool CanRunOtherActualBasicDiscard(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunOtherActualBasicDiscard(candidate, context);
     internal global::CardGame.Core.TurnJudgedRankSlashPolicy? CurrentJudgedRankSlashPolicy(int actor) => _resolve().CurrentJudgedRankSlashPolicy(actor);
     internal bool DistancePhysicalSlash140HasIssuedJudgedRankSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash140HasIssuedJudgedRankSlashDistance(q);

@@ -4,13 +4,11 @@ internal sealed partial class CharacterZhangHengAnniversaryEntries
 {
     internal bool AdvanceZhangHengChildren() => _resolve().AdvanceZhangHengChildren();
     internal void AnswerZhangHeng(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerZhangHeng(selected);
-    internal void AssertZhangHeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhangHeng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhangHengDangzai(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginZhangHengDangzai(supplied);
     internal global::CardGame.Core.AnniversaryZhangHengMovement? CaptureAnniversaryZhangHengMovement(global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to) => _resolve().CaptureAnniversaryZhangHengMovement(card, from, to);
     internal global::CardGame.Core.PromptChoice ChooseZhangHeng(global::CardGame.Core.PendingDecision p) => _resolve().ChooseZhangHeng(p);
     internal bool ContinueZhangHeng(long id) => _resolve().ContinueZhangHeng(id);
     internal void FinishZhangHeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhangHeng(f);
-    internal bool HasAnniversaryZhangHengPrompt() => _resolve().HasAnniversaryZhangHengPrompt();
     internal void PublishZhangHeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishZhangHeng(f);
     internal bool QualifyAnniversaryZhangHeng(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().QualifyAnniversaryZhangHeng(c, t, w);
     internal bool RetainZhangHeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainZhangHeng(f);

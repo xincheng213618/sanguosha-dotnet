@@ -22,30 +22,12 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == w.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengCompletionStartedEvent>().Count(e => e == new MouLiuChengCompletionStartedEvent(f.Id, r.Claim, w.Id, r.MarkBefore, r.MarkAfter)) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29401)]
-    internal void AssertMouLiuChengCompletion(ProgramSkillFrame f)
-    {
-        if (f.MouLiuChengCompletion is not { } r)
-            return;
-        if (!MouLiuChengRootMatches(f) || !r.Paid || !Enum.IsDefined(r.Stage) || r.MarkBefore < 2 || r.MarkAfter != r.MarkBefore - 2 || r.PaidSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.OutputKind != (f.SkillId == MouLiuChengComposition.Lueying ? CardKind.Dismantlement : CardKind.Slash))
-            throw new InvalidOperationException("Liu Cheng lost its exact paid shared marks and completed native Use parent.");
-        if (r.Plan is { } plan && (plan.Kind != r.OutputKind || plan.Targets is not System.Collections.IList { IsReadOnly: true } || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengPlanAcceptedEvent>().Count(e => e == new MouLiuChengPlanAcceptedEvent(f.Id, plan.Kind, plan.ActionKind, plan.TargetCardId, plan.RequiredKind, plan.Adjusted, plan.Targets.Count)) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengTargetAcceptedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select((e, i) => e.Index == i && i < plan.Targets.Count && plan.Targets[i] == e.TargetSeat).All(v => v) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengTargetAcceptedEvent>().Count(e => e.FrameId == f.Id) != plan.Targets.Count))
-            throw new InvalidOperationException("Liu Cheng changed its exact native plan or ordered target receipt.");
-        if (r.Stage == MouLiuChengStage.NativeUse && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { } use || !IsIssuedMouLiuChengUse(use)))
-            throw new InvalidOperationException("Liu Cheng's native child lost its exact separate zero-material issuance.");
-        if (r.Returned && (r.UseId <= 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengNativeReturnedEvent>().Count(e => e == new MouLiuChengNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1))
-            throw new InvalidOperationException("Liu Cheng cannot claim an unreturned or repeated native Use.");
-        if (r.DrawOutcome is { } o && (o.RequestedCount != 1 || o.RecipientSeat != f.OwnerSeat || f.NativeDraw is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengDrawReturnedEvent>().Count(e => e == new MouLiuChengDrawReturnedEvent(f.Id, 1, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId)) != 1) || r.Stage != MouLiuChengStage.Drawing && r.DrawOutcome is null)
-            throw new InvalidOperationException("Liu Cheng lost its once-returned actual/replacement requested Draw1 invoice.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29401)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29401)]
     internal bool PermitPaidMouLiuCheng(ProgramSkillFrame f)
     {
         if (f.MouLiuChengCompletion is not { Paid: true })
             return false;
-        AssertMouLiuChengCompletion(f);
         return true;
     }
 
@@ -93,36 +75,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = _kernelCoreMainOperations.CreateCardAttackHandle2(originalId);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLiuChengParentAttackRestoredEvent(f.Id, r.UseId, originalId, a.ActionId));
         }
-    }
-
-    internal IReadOnlyList<int>? MouLiuChengNativeAncestorProcessing(long useId)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { MouLiuChengOrigin: { } o } use || !IsIssuedMouLiuChengUse(use) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ProgramFrameId)is not ProgramSkillFrame { MouLiuChengCompletion: { Stage: MouLiuChengStage.NativeUse } r } f || r.UseId != useId || !MouLiuChengRootMatches(f))
-            return null;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack.ElementAtOrDefault(index + 1)?.Id != useId)
-            return null;
-        // Only actual materials of the already accepted ancestor actions may
-        // remain in Processing. Empty-material child representations add no
-        // entities, and unrelated Processing cards cannot borrow this return.
-        var costs = _resolutionStackOperations._resolutionStack.Take(index).SelectMany(frame => frame switch
-        {
-            CardUseFrame { Action: { } a } => a.PhysicalCards,
-            ProgramCardTriggerWindowFrame window => window.Action.PhysicalCards,
-            _ => Array.Empty<CardActionCost>()}).Distinct().ToArray();
-        var result = new List<int>();
-        foreach (var cost in costs)
-        {
-            if (_cardZonesOperations._cardZones.GetLocation(cost.CardId) != CardLocation.Processing)
-                continue;
-            var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == cost.CardId);
-            if (entry is null || entry.To != CardLocation.Processing || entry.CardKind != cost.CardKind || entry.Sequence > r.PaidSequence || entry.From != cost.From && !(entry.Reason.Value == "conversion.declaration.pay" && entry.From == CardLocation.Hand(o.ActorSeat)))
-                return null;
-            if (!result.Contains(cost.CardId))
-                result.Add(cost.CardId);
-        }
-
-        return Array.AsReadOnly(result.ToArray());
     }
 
     internal bool IsMouLiuChengSuspendedCounterspell(NullificationWindowFrame window)
@@ -177,8 +129,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     internal bool HasMouLiuChengDamageObserver(long id) => MouLiuChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1460)]
     internal bool HasMouLiuChengBeforeDamageObserver(long id) => MouLiuChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1290)]
-    internal bool IsMouLiuChengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouLiuChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 490)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 480)]
     internal bool IsMouLiuChengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

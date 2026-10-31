@@ -161,8 +161,6 @@ internal sealed partial class CharacterYuanYinAnniversaryRuntime
             _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 1, null, null);
         }
     }
-
-    internal bool HasAnniversaryYuanYinPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryYuanYin: { Mode: "yunjiu", Stage: "recipient" or "card" }, Step: ResolutionFrameStep.AwaitingResponse } f && ValidYuanYin(f) && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, YuanYinChoices(f));
     [ProgramAiChoice(SkillProgramEffectOp.ResolveAnniversaryYuanYinYunjiu)]
     internal PromptChoice ChooseYuanYin(PendingDecision p) => p.Choices.First();
 }

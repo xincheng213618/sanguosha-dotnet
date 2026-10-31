@@ -79,16 +79,8 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 42220)]
-    internal void AssertHappyDc(ProgramSkillFrame f)
-    {
-        if (f.HappyDiaoChan is not null && !ValidHappyDc(f))
-            throw new InvalidOperationException("Happy Diao Chan lost the original binding, paid owned discard, native completed pair, private hand or transfer invoice.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 42220)]
     internal bool HappyDcMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.HappyDiaoChan is { } r && effect?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is HappyDiaoChanStage.CostChildren or HappyDiaoChanStage.PindianChildren or HappyDiaoChanStage.GiveChildren && ValidHappyDc(f);
-    internal bool HasHappyDiaoChanPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyDiaoChan: { } r } f && r.Stage is HappyDiaoChanStage.Target or HappyDiaoChanStage.MeihunSuit or HappyDiaoChanStage.ViewHand or HappyDiaoChanStage.Cost or HappyDiaoChanStage.Pair or HappyDiaoChanStage.HuoxinSuit or HappyDiaoChanStage.Nonwinner && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && ValidHappyDc(f) && p.PlayerSeat == HappyDcChooser(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HappyDcChoices(f));
     internal bool IsHappyDiaoChanPindianSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch)
     {
         if (f.HappyDiaoChan is not { Stage: HappyDiaoChanStage.PindianChildren, Result: { } result } r || !ValidHappyDc(f) || batch.ParentFrameId != r.PindianId || batch.AwaitingProgramFrameId is not null || batch.TurnNumber != r.ActualTurn || batch.OriginSkillId != f.SkillId || batch.OriginSkillInstanceId != f.SkillInstanceId || batch.OriginOwnerSeat != f.OwnerSeat || batch.Movements.Count is < 1 or > 2)

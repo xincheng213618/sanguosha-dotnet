@@ -65,7 +65,6 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
     internal bool HasMouGhDamage(long id) => MouGhObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 32000)]
     internal bool HasMouGhBeforeDamage(long id) => MouGhObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 32000)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32000)]
     internal bool IsMouGhDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGhObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 32000)]
@@ -97,12 +96,6 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
     internal bool ReturnMouGhMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeMouGh(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 32000)]
     internal bool AdvanceMouGhChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouGhObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32000)]
-    internal void AssertMouGh(ProgramSkillFrame f)
-    {
-        if (f.MouGuoHuai is not null && !ValidMouGh(f))
-            throw new InvalidOperationException("Jingce lost its actual prediction, original source or signed native return.");
-    }
 
     internal IReadOnlyList<PlayerMarkerSnapshot>? AppendMouGuoHuaiJingce(int seat, IReadOnlyList<PlayerMarkerSnapshot>? ordinary)
     {

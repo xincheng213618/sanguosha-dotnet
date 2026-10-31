@@ -119,7 +119,6 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     {
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShenJiangWei: { } r } f && f.Id == id)
         {
-            RequireShenJw(f);
             if (r.Stage is ShenJiangWeiStage.DrawAttempt or ShenJiangWeiStage.NativeIssuing or ShenJiangWeiStage.NativeUse)
                 return;
             if (DrainShenJw(id))
@@ -276,7 +275,6 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenJiangWei: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenJwChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Shen Jiang Wei requires an exact current native choice.");
-        RequireShenJw(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var option = c.Parameters["option"];

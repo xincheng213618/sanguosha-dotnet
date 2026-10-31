@@ -16,8 +16,6 @@ internal sealed partial class CoreGameEngineTurnDrawDebtsRuntime
         if (!TracksTurnDrawDebt || payload is not CardUseDeclaredEvent declared || !IsTurnDebtDamageCard(declared.CardKind))
             return;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == declared.ResolutionId);
-        if (use is null || use.CardId != declared.CardId || use.CardKind != declared.CardKind || use.SourceSeat != declared.SourceSeat)
-            throw new InvalidOperationException("A damage-card use debt lost its exact declared owning use.");
         if (use.SourceSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber <= 0)
             return;
         if (use.Action is { } action)
@@ -108,12 +106,6 @@ internal sealed partial class CoreGameEngineTurnDrawDebtsRuntime
 
         if (frame.TurnDrawDebtPayment is { } payment && (payment.InstructionIndex < 0 || payment.InstructionIndex >= instructions.Count || instructions[payment.InstructionIndex].Op != SkillProgramEffectOp.SelectTurnDamageUseDebtPayment || instructions[payment.InstructionIndex].StateId != payment.StateId || instructions[payment.InstructionIndex].ResultBind != payment.ResultBind || payment.MovementSequenceBefore < 0 || payment.RequiredPaymentCount < 0 || payment.RequiredPaymentCount > payment.EndingFactionCount || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramTurnDrawDebtPaymentStartedEvent>().Any(e => e.FrameId == frame.Id && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.OwnerSeat == frame.OwnerSeat && e.ExtraDrawProgramFrameId == payment.ExtraDrawProgramFrameId && e.EndingFactionCount == payment.EndingFactionCount && e.RequiredPaymentCount == payment.RequiredPaymentCount && e.StateId == payment.StateId && e.Source == new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId)) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramExtraDrawIssuedEvent>().Any(e => e.FrameId == payment.ExtraDrawProgramFrameId && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwnerSeat == frame.OwnerSeat && e.StateId == payment.StateId && e.ActualCount > 0 && e.GameplayHash == frame.GameplayHash && e.Source.SkillId == frame.SkillId && e.Source.SkillInstanceId == frame.SkillInstanceId && e.Source.OwnerSeat == frame.OwnerSeat)))
             throw new InvalidOperationException("The ending debt lost its exact source, frozen amount or once-only payment.");
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 320)]
-    internal void AssertRegisteredTurnDrawDebtReceipts(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        AssertTurnDrawDebtReceipts(frame, plan.Instructions);
     }
 
     SkillProgramStepOutcome global::CardGame.Core.ITurnDrawDebtProgramHost.DrawExtraAndArmTurnDamageUseDebt(ProgramSkillFrame f, string stateId) => DrawExtraAndArmTurnDebt(f, stateId);

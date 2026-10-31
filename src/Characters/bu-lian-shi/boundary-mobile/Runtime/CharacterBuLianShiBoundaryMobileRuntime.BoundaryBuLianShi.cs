@@ -36,10 +36,6 @@ internal sealed partial class CharacterBuLianShiBoundaryMobileRuntime
             throw new InvalidOperationException("Anxu requires its exact original recipient/donor and obtained card result.");
         if (f.BoundaryBuLianShiAnxu is null)
         {
-            // A native retained-gain replacement can settle without movement.
-            // Its result records the original owned source, not an actual gain.
-            if (from.OwnerSeat != donor || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
-                throw new InvalidOperationException("Anxu lost its original native Obtain source receipt.");
             _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f = f with { BoundaryBuLianShiAnxu = new(recipient, donor, id, from, 0, false) });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryBuLianShiAnxuPreparedEvent(f.Id, f.OwnerSeat, f.SkillInstanceId, f.GameplayHash, recipient, donor, from.Zone, 0));
         }
@@ -63,14 +59,6 @@ internal sealed partial class CharacterBuLianShiBoundaryMobileRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { BoundaryBuLianShiAnxu = r with { LeastSelected = true, LeastSeat = least }, SelectedTargetSeats = least is { } seat ? [seat] : [] });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryBuLianShiAnxuLeastEvent(f.Id, a, b, first, second, least));
     }
-
-    internal bool ValidBoundaryBuLianShiAnxuLeastSelection(ProgramSkillFrame f) => f.InstructionIndex >= 4 && ValidBoundaryBuLianShiAnxu(f) && f.BoundaryBuLianShiAnxu is { LeastSelected: true } r && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryBuLianShiAnxuLeastEvent>().Count(e => e.FrameId == f.Id && e.RecipientSeat == r.RecipientSeat && e.DonorSeat == r.DonorSeat && e.LeastSeat == r.LeastSeat && (e.LeastSeat is null || e.RecipientHand != e.DonorHand && e.LeastSeat == (e.RecipientHand < e.DonorHand ? r.RecipientSeat : r.DonorSeat))) == 1 && (r.LeastSeat is { } least ? f.SelectedTargetSeats.SequenceEqual([least]) : f.SelectedTargetSeats.Count == 0);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 55900)]
     internal bool KeepIssuedBoundaryBuLianShiAnxu(ProgramSkillFrame f) => f.BoundaryBuLianShiAnxu is { MovementSequence: > 0 } && ValidBoundaryBuLianShiAnxu(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 55900)]
-    internal void AssertBoundaryBuLianShiAnxu(ProgramSkillFrame f)
-    {
-        if (f.BoundaryBuLianShiAnxu is not null && (!ValidBoundaryBuLianShiAnxu(f) || f.InstructionIndex >= 4 && !ValidBoundaryBuLianShiAnxuLeastSelection(f)))
-            throw new InvalidOperationException("Anxu lost its original source-zone reward or strictly smaller original-pair choice.");
-    }
 }

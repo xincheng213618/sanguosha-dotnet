@@ -67,13 +67,6 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         return _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlDiscardPaidEvent>().Count(e => e.FrameId == f.Id && e.PayerSeat == payer && e.CardId == card && e.Before == r.Before && e.After == r.After && e.Defense == defense) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == card && m.From.OwnerSeat == payer && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == reason) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33000)]
-    internal void AssertMouZhangXiuOl(ProgramSkillFrame f)
-    {
-        if (f.MouZhangXiuOl is not null && !ValidMouZhangXiuOl(f))
-            throw new InvalidOperationException("Mou Zhang Xiu lost its exact phase, source, native card parent or paid entity receipt.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33000)]
     internal bool IsMouZhangXiuOlMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.MouZhangXiuOl is { Stage: MouZhangXiuOlStage.CostChildren or MouZhangXiuOlStage.DefenseChildren or MouZhangXiuOlStage.PenaltyChildren or MouZhangXiuOlStage.DrawChildren or MouZhangXiuOlStage.Children } r && effect?.Op == r.Operation && movement == f.PendingMovementContinuation && movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && ValidMouZhangXiuOl(f);
     internal bool MouZhangXiuOlLionPayment(ProgramSkillFrame f, int seat, CardMoveReason? reason) => f.MouZhangXiuOl is { PaidCardId: { } card } r && r.Stage is MouZhangXiuOlStage.CostChildren or MouZhangXiuOlStage.DefenseChildren or MouZhangXiuOlStage.PenaltyChildren && seat == (r.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash ? r.TargetSeat : f.OwnerSeat) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == card && m.CardKind == CardKind.SilverLion && m.From == CardLocation.Equipment(seat) && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason == reason);
@@ -118,7 +111,6 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
     internal bool HasMouZhangXiuOlDamage(long id) => MouZhangXiuOlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33000)]
     internal bool HasMouZhangXiuOlBeforeDamage(long id) => MouZhangXiuOlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33000)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33000)]
     internal bool IsMouZhangXiuOlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouZhangXiuOlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33000)]

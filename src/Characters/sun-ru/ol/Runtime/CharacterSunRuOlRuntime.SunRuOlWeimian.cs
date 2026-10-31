@@ -124,7 +124,6 @@ internal sealed partial class CharacterSunRuOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && f.Id == id && (f.SunRuOlChishi is not null || f.SunRuOlWeimian is not null))
         {
-            AssertSunRuOl(f);
             if (DrainSunRuOlChildren(id))
                 return;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

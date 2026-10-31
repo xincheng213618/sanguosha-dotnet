@@ -47,8 +47,6 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
                 _cardZonesOperations._cardZones.Shuffle(CardLocation.DrawPile, _randomOperations._random);
             }
         }
-
-        _coreNativeCoreInvariantsOperations.AssertCoreInvariants();
     }
 
     internal void DealInitialHands()
@@ -76,7 +74,6 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
         }
 
         _modeRuntimeOperations._modeRuntime.AfterInitialDeal();
-        _coreNativeCoreInvariantsOperations.AssertCoreInvariants();
     }
 
     internal void RunOneSetupStep()

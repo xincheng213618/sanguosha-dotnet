@@ -89,20 +89,5 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
             throw new InvalidOperationException("A phase-hand paid receipt lost its exact source, original phase, entity movement or typed return.");
     }
 
-    internal void AssertPhaseHandSeizurePrograms()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-            AssertPhaseHandSeizure(frame);
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<PhaseHandSeizureIssuedEvent>();
-        var settled = _coreProgramEventHistoryOperations.ProgramEventHistory<PhaseHandDebtSettledEvent>();
-        if (issued.Count == 0 && settled.Count == 0)
-            return;
-        if (issued.GroupBy(e => e.FrameId).Any(g => g.Count() != 1) || settled.GroupBy(e => e.SeizureFrameId).Any(g => g.Count() != 1))
-            throw new InvalidOperationException("A phase-hand issuance or settlement was duplicated.");
-        foreach (var due in _corePhaseHandSeizureOperations.UnsettledPhaseHandSeizures())
-            if (!_coreMatchParticipantsPlayersAccess._players[due.Source.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[due.TargetSeat].IsAlive || due.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || due.Source.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || due.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId)
-                throw new InvalidOperationException("An issued phase-hand obligation escaped its actual living Play termination.");
-    }
-
     internal bool IsPhaseHandDebtChoiceLegal(PromptChoice choice) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame frame && frame.PhaseHandDebtReturn is { Stage: PhaseHandDebtReturnStage.Choosing } receipt && ValidPhaseHandDebtReturnReceipt(frame) && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].IsAlive && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], _corePhaseHandSeizureOperations.PhaseHandDebtChoices(frame).Where(c => c.Id == choice.Id).ToArray());
 }

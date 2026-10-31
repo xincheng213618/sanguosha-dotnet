@@ -4,7 +4,6 @@ internal sealed partial class CharacterSunYuanOlEntries
 {
     internal bool AdvanceSunYuanChildren() => _resolve().AdvanceSunYuanChildren();
     internal void AnswerSunYuan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerSunYuan(choice);
-    internal void AssertSunYuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSunYuan(f);
     internal void BeginSayingFactionRequest(global::CardGame.Core.ProgramSkillFrame f, int actor, int target) => _resolve().BeginSayingFactionRequest(f, actor, target);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSunYuan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginSunYuan(supplied, op);
     internal void BindDongxinEntityUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().BindDongxinEntityUse(supplied);
@@ -34,7 +33,6 @@ internal sealed partial class CharacterSunYuanOlEntries
     internal bool IsSayingRemovedMaterial(long useId, int cardId) => _resolve().IsSayingRemovedMaterial(useId, cardId);
     internal bool IsSayingSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsSayingSlashQuery(actor);
     internal bool IsSayingSlashRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsSayingSlashRequest(f);
-    internal bool IsSunYuanDying() => _resolve().IsSunYuanDying();
     internal bool IsSunYuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSunYuanMovement(f, effect, pending);
     internal bool IsSunYuanPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsSunYuanPaidMovement(f, m);
     internal bool IsSunYuanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunYuanRecoveryParent(f, recovery);

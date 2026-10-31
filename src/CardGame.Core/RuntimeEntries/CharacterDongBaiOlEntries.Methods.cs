@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterDongBaiOlEntries
 {
-    internal void AssertRegisteredLianZhu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredLianZhu(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLianZhu(global::CardGame.Core.ProgramSkillFrame supplied, int recipient) => _resolve().BeginLianZhu(supplied, recipient);
     internal bool CanContinueLianZhu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueLianZhu(f);
     internal void CleanupDongBaiRecipientDeath(int seat) => _resolve().CleanupDongBaiRecipientDeath(seat);
@@ -10,7 +9,6 @@ internal sealed partial class CharacterDongBaiOlEntries
     internal bool DrainLianZhu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainLianZhu(f);
     internal void FinishLianZhu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLianZhu(f);
     internal bool HasLianZhuDamageObserver(long id) => _resolve().HasLianZhuDamageObserver(id);
-    internal bool IsLianZhuDying() => _resolve().IsLianZhuDying();
     internal bool IsLianZhuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLianZhuMovement(f, effect, p);
     internal bool IsXiaHuiDiscardForbidden(int actorSeat, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.OwnedCardMoveIntent intent) => _resolve().IsXiaHuiDiscardForbidden(actorSeat, card, from, intent);
     internal bool IsXiaHuiHandLimitExempt(int owner, global::CardGame.Core.Card card) => _resolve().IsXiaHuiHandLimitExempt(owner, card);

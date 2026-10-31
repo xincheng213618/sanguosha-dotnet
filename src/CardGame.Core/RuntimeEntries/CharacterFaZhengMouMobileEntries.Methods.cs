@@ -5,7 +5,6 @@ internal sealed partial class CharacterFaZhengMouMobileEntries
     internal bool AdvanceMouFaZhengChildren() => _resolve().AdvanceMouFaZhengChildren();
     internal global::CardGame.Core.PromptChoice AiMouFaZheng(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouFaZheng(p, f);
     internal void AnswerMouFaZheng(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouFaZheng(choice);
-    internal void AssertMouFaZheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouFaZheng(f);
     internal bool CanMouFaZhengMark(int owner, int target) => _resolve().CanMouFaZhengMark(owner, target);
     internal bool CanOfferMouFaZheng(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMouFaZheng(c, t, context);
     internal bool CanStartMouFaZheng(global::CardGame.Core.CharacterState owner) => _resolve().CanStartMouFaZheng(owner);

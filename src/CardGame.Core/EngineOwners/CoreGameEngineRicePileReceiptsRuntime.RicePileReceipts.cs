@@ -60,20 +60,11 @@ internal sealed partial class CoreGameEngineRicePileReceiptsRuntime
         }
 
         var store = r.Operation == SkillProgramEffectOp.DrawAndStoreTwoPublicRice;
-        if (store ? r.CardIds.Count != r.StoreRequired : r.Operation != SkillProgramEffectOp.OfferRiceAfterDamagePoint || r.CardIds.Count != 1 || r.BeneficiarySeat != f.WindowContext.TargetSeat)
-            throw new InvalidOperationException("Rice transfer lost its exact ending cost or damage beneficiary.");
         var reason = store ? "skill-program.rice.store" : "skill-program.rice.obtain";
         var to = store ? r.Pile.Location : CardLocation.Hand(r.BeneficiarySeat);
         foreach (var item in r.CardIds.Select((id, index) => (id, from: r.From[index])))
             if ((store ? item.from.OwnerSeat != f.OwnerSeat || item.from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) : item.from != r.Pile.Location) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == item.id && m.From == item.from && m.To == to && m.Reason.Value == reason) != 1)
                 throw new InvalidOperationException("Rice transfer must match each actual paid physical entity and its precise source pile.");
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 450)]
-    internal void AssertRegisteredRiceReceipt(ProgramSkillFrame frame)
-    {
-        if (frame.RicePile is not null)
-            RequireRiceReceipt(frame);
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 40)]

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePaidColorConversionsEntries
 {
     internal void AddPaidColorEquipmentDuelActions(global::System.Collections.Generic.List<global::CardGame.Core.LegalAction> actions, global::CardGame.Core.CharacterState owner, int? selectedPhysicalCardId = default) => _resolve().AddPaidColorEquipmentDuelActions(actions, owner, selectedPhysicalCardId);
-    internal void AssertPaidColorTurnConversions() => _resolve().AssertPaidColorTurnConversions();
     internal global::CardGame.Core.SkillProgramStepOutcome AwaitPaidColorDamageClaimMovements(long id) => _resolve().AwaitPaidColorDamageClaimMovements(id);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPaidColorConversion(global::CardGame.Core.ProgramSkillFrame frame, string bind) => _resolve().BeginPaidColorConversion(frame, bind);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardConversionSource> GetPaidColorTurnDuelConversions(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind, bool forResponse, global::CardGame.Core.CardZoneKind zone) => _resolve().GetPaidColorTurnDuelConversions(owner, card, kind, forResponse, zone);

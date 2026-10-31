@@ -39,14 +39,6 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         return !r.Returned || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengUseReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId && e.Damaged == r.Damaged) == 1;
     }
 
-    internal bool HasBoundaryLiuFengPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { BoundaryLiuFeng: { Stage: BoundaryLiuFengStage.Collect or BoundaryLiuFengStage.Targets or BoundaryLiuFengStage.Cost } } f && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && ValidBoundaryLiuFeng(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, BoundaryLiuFengChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 50200)]
-    internal void AssertBoundaryLiuFeng(ProgramSkillFrame f)
-    {
-        if (f.BoundaryLiuFeng is not null && !ValidBoundaryLiuFeng(f))
-            throw new InvalidOperationException("Liu Feng lost its original source, actual-turn payment or native use receipt.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 50200)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 50200)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 50200)]
@@ -92,7 +84,6 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
     internal bool BoundaryLiuFengDamageObserver(long id) => BoundaryLiuFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 50200)]
     internal bool BoundaryLiuFengBeforeDamage(long id) => BoundaryLiuFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 50200)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50200)]
     internal bool BoundaryLiuFengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BoundaryLiuFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 50200)]

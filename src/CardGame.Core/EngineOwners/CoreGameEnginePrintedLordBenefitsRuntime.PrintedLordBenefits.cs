@@ -61,7 +61,6 @@ internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
     internal void ResolvePrintedLordChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        _coreRecipientConsequencesReceiptsOperations.AssertRecipientConsequences(f);
         var r = f.PrintedLordBenefit!;
         if (r.Stage != PrintedLordBenefitStage.ChoosingBeneficiary || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [PrintedLordChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Printed lord benefit lost its exact published beneficiary.");
@@ -88,7 +87,6 @@ internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.PrintedLordBenefit is not { } r)
             return false;
-        _coreRecipientConsequencesReceiptsOperations.AssertRecipientConsequences(f);
         if (_coreRecipientConsequencesReceiptsOperations.RecipientConsequencesGameEnded())
             return true;
         if (r.Stage == PrintedLordBenefitStage.ChoosingBeneficiary)

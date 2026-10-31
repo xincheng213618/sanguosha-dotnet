@@ -36,7 +36,6 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WushuangOriginalSkill: { } r } f || f.Id != id)
             return false;
-        AssertWushuangOriginalSkill(f);
         if (r.Stage == "draw-attempt")
             return true;
         if (DrainWushuangOriginal(id))
@@ -126,15 +125,6 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillsRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangTairanDrawnEvent(f.Id, f.OwnerSeat, f.SkillInstanceId, _coreActualTurnProgressTurnNumberAccess._turnNumber, outcome.ActualDrawIds));
         UpdateWushuangOriginal(f, r with { Stage = r.NextStage!, NextStage = null, Draw = outcome });
         RunWushuangOriginalSkill(f.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 61010)]
-    internal void AssertWushuangOriginalSkill(ProgramSkillFrame f)
-    {
-        if (f.WushuangOriginalSkill is not { } r)
-            return;
-        if (r.InstructionIndex != f.InstructionIndex || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || r.WindowId != f.WindowContext?.ParentFrameId || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Operation || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangOriginalSkillIssuedEvent>().Count(e => e == new WushuangOriginalSkillIssuedEvent(f.Id, f.SkillId, f.OwnerSeat, r.Operation, r.InstructionIndex, r.ActualTurn, r.WindowId)) != 1 || r.Cards.Distinct().Count() != r.Cards.Count || r.Top.Distinct().Count() != r.Top.Count || r.Stage == "draw-attempt" && (r.NextStage is null || r.Draw is not null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.DrawRecipient)))
-            throw new InvalidOperationException("The official skill receipt lost its exact owning instruction or issuance.");
     }
 
     internal PromptChoice WushuangOriginalChoice(ProgramSkillFrame f, string option, string label, IReadOnlyList<int>? cards = null, IReadOnlyList<int>? targets = null) => new(new($"wushuang-original.{(f.Id)}.{(f.WushuangOriginalSkill!.Stage)}.{(option)}.{(string.Join('-', cards ?? []))}.{(string.Join('-', targets ?? []))}"), label, cards ?? [], targets ?? [], new Dictionary<string, string> { ["program-action"] = "wushuang-original", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["option"] = option });

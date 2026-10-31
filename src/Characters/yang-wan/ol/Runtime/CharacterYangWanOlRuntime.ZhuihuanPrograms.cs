@@ -119,8 +119,6 @@ internal sealed partial class CharacterYangWanOlRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
-
-    internal bool IsValidZhuihuanContinuation(ProgramSkillFrame frame, SkillProgramEffect paused) => paused.Op == SkillProgramEffectOp.ZhuihuanRetaliate && frame.ZhuihuanRetaliate is { } state && frame.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SourceSeat: { } boundarySeat } && state.ChosenSeat == boundarySeat && state.ChosenSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(state.ChosenSeat) && state.DamagedSeats.Count > 0 && state.DamagedSeats.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat) && state.PendingDamagers.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat) && state.DiscardedSeats.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat) && state.DiscardedCardCount >= 0 && state.DiscardedCardCount <= 2 * state.DiscardedSeats.Count;
     internal IReadOnlyList<int> CollectZhuihuanPendingDamagers(int ownerSeat, int chosenSeat)
     {
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();

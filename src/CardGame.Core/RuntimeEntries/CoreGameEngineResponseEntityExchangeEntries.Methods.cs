@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineResponseEntityExchangeEntries
 {
     internal global::CardGame.Core.CardActionContext? ActualRespondedAction(global::CardGame.Core.CardActionContext response) => _resolve().ActualRespondedAction(response);
-    internal void AssertResponseEntityExchange(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertResponseEntityExchange(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPublicSuitEscalatingDiscard(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginPublicSuitEscalatingDiscard(frame, effect);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginResponseEntityExchange(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginResponseEntityExchange(frame, effect);
     internal bool CanExchangeResponseEntities(int owner, string skill, string instance, global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.CardActionContext response) => _resolve().CanExchangeResponseEntities(owner, skill, instance, effect, response);
@@ -25,6 +24,5 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeEntries
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.IGameEvent> ResponseExchangeHistory() => _resolve().ResponseExchangeHistory();
     internal bool ResponseExchangeUpgraded(int owner, string skill, string instance, string state) => _resolve().ResponseExchangeUpgraded(owner, skill, instance, state);
     internal global::CardGame.Core.SkillProgramStepOutcome StartPublicSuitDraw(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.Suit suit, int previous, int required) => _resolve().StartPublicSuitDraw(frame, suit, previous, required);
-    internal bool TryGetResponseExchangeMovementDyingCosts(global::CardGame.Core.ProgramCardTriggerWindowFrame? window, scoped out int[] costs) => _resolve().TryGetResponseExchangeMovementDyingCosts(window, out costs);
     internal bool TryResumeResponseEntityExchange(long id) => _resolve().TryResumeResponseEntityExchange(id);
 }

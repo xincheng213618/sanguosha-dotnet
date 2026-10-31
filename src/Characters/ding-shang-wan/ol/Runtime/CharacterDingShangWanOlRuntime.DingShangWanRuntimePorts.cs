@@ -18,7 +18,6 @@ internal sealed partial class CharacterDingShangWanOlRuntime
     bool global::CardGame.Core.IDingShangWanNativeFacts.ValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool global::CardGame.Core.IDingShangWanNativeFacts.HasSkillInstance(int seat, string skill, string instance) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skill, instance);
     SkillProgramTrigger global::CardGame.Core.IDingShangWanNativeFacts.Trigger(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.GetProgramTrigger(frame);
-    SkillProgramEffect? global::CardGame.Core.IDingShangWanNativeFacts.PausedEffect(ProgramSkillFrame frame) => _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame);
     bool global::CardGame.Core.IDingShangWanNativeFacts.IsActualAfterTurnEndedParent(DeferredTurnEndFrame frame) => _coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(frame);
     ProgramTriggerCandidate global::CardGame.Core.IDingShangWanNativeFacts.AfterTurnEndedCandidate(DeferredTurnEndFrame frame) => _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(frame);
     bool global::CardGame.Core.IDingShangWanNativeFacts.ValidResponseCompletionWindow(ProgramCardTriggerWindowFrame frame) => _coreResponseCompletionOperations.ValidResponseCompletionWindow(frame);

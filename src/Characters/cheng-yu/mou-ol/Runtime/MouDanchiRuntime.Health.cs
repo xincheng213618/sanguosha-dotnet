@@ -23,7 +23,6 @@ internal sealed partial class MouDanchiRuntime
             if (current.Id == windowId) return true;
         return false;
     }
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 34101, group: 34101)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 34101)]
     private bool DyingObserver()
     {

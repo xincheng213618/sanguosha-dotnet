@@ -127,7 +127,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoQuanyu: { Stage: MoQuanyuStage.Choosing } r } f || r.Votes.Count >= r.Participants.Count || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.Participants[r.Votes.Count].Seat || !MoQuanyuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !int.TryParse(choice.Parameters.GetValueOrDefault("effect"), out var number) || number is < 1 or > 6)
             throw new InvalidOperationException("Quanyu requires the current participant's exact published private choice.");
-        AssertMoQuanyu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect, MoQuanyu = r with { Votes = r.Votes.Append(new(r.Participants[r.Votes.Count].Seat, (MoQuanyuEffect)number)).ToArray() } });
         ContinueMoQuanyu(f.Id);

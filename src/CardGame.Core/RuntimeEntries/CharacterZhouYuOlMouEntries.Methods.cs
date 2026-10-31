@@ -6,8 +6,6 @@ internal sealed partial class CharacterZhouYuOlMouEntries
     internal bool AdvanceMouZuifengChildren() => _resolve().AdvanceMouZuifengChildren();
     internal global::CardGame.Core.PromptChoice AiMouZuifeng(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouZuifeng(p, f);
     internal void AnswerMouZuifeng(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouZuifeng(choice);
-    internal void AssertMouGuqu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouGuqu(f);
-    internal void AssertMouZuifeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouZuifeng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouGuqu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouGuqu(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouZuifeng(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouZuifeng(supplied);
     internal void BindMouZuifengAlcoholUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().BindMouZuifengAlcoholUse(supplied);
@@ -42,7 +40,6 @@ internal sealed partial class CharacterZhouYuOlMouEntries
     internal bool IsIssuedMouGuquCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedMouGuquCandidate(c, context);
     internal bool IsIssuedMouZuifengAlcoholUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedMouZuifengAlcoholUse(use);
     internal bool IsMouGuquCardlessAllowed(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, bool forResponse, bool dyingUse = false) => _resolve().IsMouGuquCardlessAllowed(actor, kind, forResponse, dyingUse);
-    internal bool IsMouGuquDying() => _resolve().IsMouGuquDying();
     internal bool IsMouGuquMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouGuquMovement(f, effect, p);
     internal bool IsMouGuquPaidResponseAllowed(global::CardGame.Core.CardActionContext action) => _resolve().IsMouGuquPaidResponseAllowed(action);
     internal bool IsMouGuquPlayActionAllowed(global::CardGame.Core.CharacterState actor, global::CardGame.Core.LegalAction action, global::CardGame.Core.CardKind kind) => _resolve().IsMouGuquPlayActionAllowed(actor, action, kind);
@@ -51,7 +48,6 @@ internal sealed partial class CharacterZhouYuOlMouEntries
     internal bool IsMouGuquResponseAllowed(global::CardGame.Core.CharacterState provider, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardConversionSource? source = default, bool dyingUse = false) => _resolve().IsMouGuquResponseAllowed(provider, kind, ids, source, dyingUse);
     internal bool IsMouGuquUseAllowed(int actorSeat, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int> physicalIds, global::CardGame.Core.CardConversionSource? source = default, long? existingUseFrameId = default) => _resolve().IsMouGuquUseAllowed(actorSeat, kind, physicalIds, source, existingUseFrameId);
     internal bool IsMouGuquViewAsAllowed(global::CardGame.Core.CharacterState owner, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardConversionSource source, bool forResponse, bool dyingUse = false, int? requestedUseTarget = default) => _resolve().IsMouGuquViewAsAllowed(owner, kind, ids, source, forResponse, dyingUse, requestedUseTarget);
-    internal bool IsMouZuifengDying() => _resolve().IsMouZuifengDying();
     internal bool IsMouZuifengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouZuifengMovement(f, effect, pending);
     internal bool IsMouZuifengNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsMouZuifengNativeSettlementBatch(f, batch);
     internal bool IsMouZuifengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouZuifengRecoveryParent(f, recovery);

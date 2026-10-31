@@ -162,17 +162,4 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         _coreNativeSlashUseOperations.ContinueSlashDefense(attack);
         return true;
     }
-
-    internal void AssertMouHqRounds()
-    {
-        foreach (var u in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-        {
-            if (u.MouHqIneffective is not null)
-                IsMouHqUseIneffective(u);
-            if (u.MouHqRounds is not { } r)
-                continue;
-            if (u.Action?.ActionId != r.ActionId || r.Started < 0 || r.Started > r.Grants.Count || r.Active && r.Started == 0 || r.Grants.Count == 0 || r.Grants.Any(g => !ValidMouHqEffectGrant(u, g, true)) || r.Grants.Select(g => g.FrameId).Distinct().Count() != r.Grants.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHqEffectRoundStartedEvent>().Count(e => e.UseId == u.Id) != r.Started || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHqEffectRoundCompletedEvent>().Count(e => e.UseId == u.Id) != r.Started - (r.Active ? 1 : 0))
-                throw new InvalidOperationException("Qiaodui lost its exact original-use grant or native extra-effect cursor.");
-        }
-    }
 }

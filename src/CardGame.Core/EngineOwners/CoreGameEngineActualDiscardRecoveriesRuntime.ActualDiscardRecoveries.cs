@@ -58,7 +58,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
     internal void ResolveActualDiscardRecovery(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Discard recovery lost its owning frame.");
-        AssertActualDiscardRecovery(f);
         var r = f.ActualDiscardRecovery!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || !ActualDiscardRecoveryChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(selected.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Discard recovery must name its exact published original entity or claim choice.");
@@ -107,7 +106,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.ActualDiscardRecovery is not { } r)
             return false;
-        AssertActualDiscardRecovery(f);
         if (r.Stage is ActualDiscardRecoveryStage.SelectingReturn or ActualDiscardRecoveryStage.SelectingClaim)
             return true;
         if (DrainCapturedEquipmentOrDiscardChildren(f))
@@ -146,32 +144,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
         if (f.ActualDiscardRecovery!.Stage == ActualDiscardRecoveryStage.SelectingClaim)
             return p.Choices.Single(c => c.Parameters["option"] == "claim");
         return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 540)]
-    internal void AssertActualDiscardRecovery(ProgramSkillFrame f)
-    {
-        if (f.ActualDiscardRecovery is not { } r)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.RestoreActualDiscardBatch || effect.StateId != r.StateId || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || f.WindowContext is not { MovementBatch: { } batch, SourceSeat: { } source } context || context.ParentFrameId != r.WindowFrameId || batch.Id != r.BatchId || batch.DiscardRecoveryPhase != r.Phase || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || batch.TurnNumber != r.Phase.TurnNumber || source != r.DiscardOwnerSeat || source == f.OwnerSeat || !Enum.IsDefined(r.Stage) || r.OriginalEntities.Count < 2 || !r.OriginalEntities.SequenceEqual(_coreActualDiscardRecoveryPhasesOperations.ActualDiscardRecoveryEntities(batch, source)) || r.OriginalEntities is not System.Collections.IList { IsReadOnly: true } || _coreActualDiscardRecoveryPhasesOperations.ActualDiscardRecoveryQualification(batch, source)is not { OriginalCount: >= 2 } q || q.OriginalCount != r.OriginalEntities.Count)
-            throw new InvalidOperationException("Discard recovery lost its original public phase/batch/cohort/candidate.");
-        var wi = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == r.WindowFrameId);
-        if (wi < 0 || _resolutionStackOperations._resolutionStack[wi] is not CardsMovedTriggerWindowFrame window || window.Batch != batch || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]))
-            throw new InvalidOperationException("Discard recovery lost its exact owning movement candidate.");
-        if (r.Stage == ActualDiscardRecoveryStage.SelectingReturn && (r.ReturnedCardId is not null || r.ReturnMovementSequence != 0) || r.Stage != ActualDiscardRecoveryStage.ClaimPaid && (r.ClaimRemaining is not null || r.ClaimedCardIds is not null || r.ClaimSequenceBefore != 0 || r.ClaimSequenceAfter != 0))
-            throw new InvalidOperationException("Discard recovery carries a payment/tail before its actual issued stage.");
-        if (r.Stage != ActualDiscardRecoveryStage.SelectingReturn)
-        {
-            if (r.ReturnedCardId is not { } id || !r.OriginalEntities.Any(e => e.CardId == id) || r.ReturnMovementSequence <= 0 || _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence == r.ReturnMovementSequence && m.CardId == id && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(source) && m.Reason.Value == $"skill-program.{(f.SkillId)}.actual-discard-return") != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActualDiscardRecoveryReturnedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.StateId == r.StateId && e.Phase == r.Phase && e.BatchId == batch.Id && e.DiscardOwnerSeat == source && e.CardId == id && e.MovementSequence == r.ReturnMovementSequence) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActualDiscardRecoveryReturnedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId && e.StateId == r.StateId && e.Phase.Token == r.Phase.Token) != 1 || _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > r.OriginalEntities.Single(e => e.CardId == id).MovementSequence && m.Sequence < r.ReturnMovementSequence && m.From == CardLocation.DiscardPile))
-                throw new InvalidOperationException("Discard recovery lost its one actual returned entity and phase consumption.");
-        }
-
-        if (r.Stage == ActualDiscardRecoveryStage.ClaimPaid)
-        {
-            if (r.ClaimRemaining is null || r.ClaimedCardIds is null || r.ClaimedCardIds is not System.Collections.IList { IsReadOnly: true } || r.ClaimedCardIds.Distinct().Count() != r.ClaimedCardIds.Count || r.ClaimedCardIds.Any(id => id == r.ReturnedCardId || !r.OriginalEntities.Any(e => e.CardId == id)) || r.ClaimSequenceBefore < r.ReturnMovementSequence || r.ClaimSequenceAfter < r.ClaimSequenceBefore || !r.ClaimRemaining.Value && r.ClaimedCardIds.Count > 0 || r.ClaimedCardIds.Any(id => _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > r.OriginalEntities.Single(e => e.CardId == id).MovementSequence && m.Sequence <= r.ClaimSequenceBefore && m.From == CardLocation.DiscardPile)) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > r.ClaimSequenceBefore && m.Sequence <= r.ClaimSequenceAfter && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == $"skill-program.{(f.SkillId)}.actual-discard-claim").Select(m => m.CardId).SequenceEqual(r.ClaimedCardIds) || _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence > r.ClaimSequenceBefore && m.Sequence <= r.ClaimSequenceAfter && !(r.ClaimedCardIds.Contains(m.CardId) && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == $"skill-program.{(f.SkillId)}.actual-discard-claim")) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActualDiscardRecoveryClaimedEvent>().Count(e => e.ProgramFrameId == f.Id && e.BatchId == r.BatchId && e.CardIds.SequenceEqual(r.ClaimedCardIds) && e.SequenceBefore == r.ClaimSequenceBefore && e.SequenceAfter == r.ClaimSequenceAfter) != 1)
-                throw new InvalidOperationException("Discard recovery lost its frozen one-time atomic claim tail.");
-        }
     }
 
     SkillProgramStepOutcome global::CardGame.Core.IActualDiscardRecoveryProgramHost.PlaceCapturedEquipmentAndDraw(ProgramSkillFrame f, int target, string bind, int draw) => _coreCapturedEquipmentDrawsOperations.BeginCapturedEquipmentAndDraw(f, target, bind, draw);

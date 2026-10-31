@@ -62,12 +62,6 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1283)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1283)]
     internal bool ContinuePaidLiushiClear(ProgramSkillFrame f) => HasPaidLiushiClear(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 1283)]
-    internal void AssertLiushiClearPayment(ProgramSkillFrame f)
-    {
-        if (f.LiushiDrawPayment is not null)
-            _ = HasPaidLiushiClear(f);
-    }
 
     internal void ClearProgramLiushiEffect(ProgramSkillFrame frame)
     {

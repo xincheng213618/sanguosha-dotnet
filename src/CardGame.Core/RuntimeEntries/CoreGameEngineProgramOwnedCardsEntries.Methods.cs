@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramOwnedCardsEntries
 {
-    internal void AssertProgramOwnedCardSelection(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertProgramOwnedCardSelection(frame, paused);
     internal global::CardGame.Core.SkillProgramEffect GetOwnedSelectionEffect(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().GetOwnedSelectionEffect(frame);
     internal int GetProgramOwnerLostHp(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().GetProgramOwnerLostHp(frame);
     internal void PublishProgramOwnedCardSelection(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishProgramOwnedCardSelection(frame);

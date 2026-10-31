@@ -6,12 +6,10 @@ internal sealed partial class CharacterHouChengAnniversaryEntries
     internal bool AdvanceHouChengChildren() => _resolve().AdvanceHouChengChildren();
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardConversionSource> AnniversaryHouChengWineSources(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind, bool forResponse, bool dyingUse) => _resolve().AnniversaryHouChengWineSources(owner, card, kind, forResponse, dyingUse);
     internal void AnswerHouCheng(global::CardGame.Core.PromptChoice c) => _resolve().AnswerHouCheng(c);
-    internal void AssertHouCheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHouCheng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHouCheng(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHouCheng(supplied);
     internal bool CanOfferHouCheng(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferHouCheng(candidate, t, c);
     internal void ContinueHouCheng(long id) => _resolve().ContinueHouCheng(id);
     internal bool DrainHouCheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainHouCheng(f);
-    internal bool HasAnniversaryHouChengPrompt() => _resolve().HasAnniversaryHouChengPrompt();
     internal global::CardGame.Core.PromptChoice HouChengAi(global::CardGame.Core.PendingDecision p) => _resolve().HouChengAi(p);
     internal bool HouChengBeforeDamageObserver(long id) => _resolve().HouChengBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HouChengChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HouChengChoices(f);

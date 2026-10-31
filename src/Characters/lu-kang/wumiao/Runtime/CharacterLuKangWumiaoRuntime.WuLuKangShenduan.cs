@@ -83,8 +83,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
 
     internal void PublishWuLuKang(ProgramSkillFrame f, int chooser, IReadOnlyList<PromptChoice> choices, string text)
     {
-        if (choices.Count == 0)
-            throw new InvalidOperationException("Wu Lu Kang lost its exact legal published choices.");
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, chooser, text, choices.SelectMany(c => c.Cards).Distinct().ToArray(), choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
         {
@@ -160,7 +158,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuKangShenduan: { } r } f || f.Id != id)
             return;
-        AssertWuLuKang(f);
         if (r.Stage is WuLuKangShenduanStage.DiscardChoice or WuLuKangShenduanStage.Drawing)
             return;
         if (DrainWuLuKangChildren(f))

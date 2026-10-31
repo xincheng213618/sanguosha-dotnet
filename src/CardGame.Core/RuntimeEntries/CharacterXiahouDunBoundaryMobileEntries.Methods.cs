@@ -6,7 +6,6 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileEntries
     internal global::CardGame.Core.PromptChoice AiBoundaryXiahouDun(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiBoundaryXiahouDun(prompt, f);
     internal void AnswerBoundaryXiahouDun(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerBoundaryXiahouDun(selected);
     internal void AppendBoundaryXiahouDunEnding(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendBoundaryXiahouDunEnding(items);
-    internal void AssertBoundaryXiahouDun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryXiahouDun(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryXiahouDun(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginBoundaryXiahouDun(supplied, op);
     internal bool BoundaryXiahouDunBeforeDamageObserver(long id) => _resolve().BoundaryXiahouDunBeforeDamageObserver(id);
     internal global::CardGame.Core.PromptChoice BoundaryXiahouDunChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, int value, string text, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().BoundaryXiahouDunChoice(f, branch, value, text, cards, targets);

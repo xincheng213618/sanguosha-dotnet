@@ -4,7 +4,6 @@ internal sealed partial class CharacterWuTuGuOlEntries
 {
     internal bool AdvanceWuTuGuChildren() => _resolve().AdvanceWuTuGuChildren();
     internal void AssertWuTuGuNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertWuTuGuNativeUse(use);
-    internal void AssertWuTuGuRanshang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuTuGuRanshang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuTuGu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginWuTuGu(supplied, op);
     internal bool CanOfferWuTuGu(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferWuTuGu(c, t, context);
     internal void CaptureWuTuGuHanyongUse(global::CardGame.Core.IGameEvent payload) => _resolve().CaptureWuTuGuHanyongUse(payload);
@@ -13,7 +12,6 @@ internal sealed partial class CharacterWuTuGuOlEntries
     internal void ContinueWuTuGu(long id) => _resolve().ContinueWuTuGu(id);
     internal bool HasWuTuGuBeforeDamageObserver(long id) => _resolve().HasWuTuGuBeforeDamageObserver(id);
     internal bool HasWuTuGuDamageObserver(long id) => _resolve().HasWuTuGuDamageObserver(id);
-    internal bool IsWuTuGuDying() => _resolve().IsWuTuGuDying();
     internal bool ResumeWuTuGu(long id) => _resolve().ResumeWuTuGu(id);
     internal bool ValidWuTuGuHanyongUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidWuTuGuHanyongUse(use);
     internal bool ValidWuTuGuRanshang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidWuTuGuRanshang(f);

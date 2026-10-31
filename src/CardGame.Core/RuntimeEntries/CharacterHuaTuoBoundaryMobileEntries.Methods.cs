@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterHuaTuoBoundaryMobileEntries
 {
-    internal void AssertBoundaryHuaTuoFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryHuaTuoFrame(f);
     internal global::CardGame.Core.SkillGrantPhaseExpiry? BoundaryHuaTuoCurrentPlay(int owner) => _resolve().BoundaryHuaTuoCurrentPlay(owner);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.BoundaryHuaTuoQingnangPaidEvent> BoundaryHuaTuoPayments(int owner) => _resolve().BoundaryHuaTuoPayments(owner);
     internal void CaptureBoundaryHuaTuoPayment(global::CardGame.Core.CardMovedEvent moved) => _resolve().CaptureBoundaryHuaTuoPayment(moved);

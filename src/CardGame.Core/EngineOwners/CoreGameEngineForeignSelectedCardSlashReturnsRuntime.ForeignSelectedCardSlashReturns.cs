@@ -93,7 +93,6 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsRunti
 
     internal bool ForeignSelectedCardSlashStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => parent is ProgramSkillFrame frame && SelectedForeignCardSlashFirstChild(frame, child);
     internal ProgramSkillFrame? SelectedForeignCardSlashObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.ForeignSelectedCardSlash is { Stage: ForeignSelectedCardSlashStage.SettlementChildren or ForeignSelectedCardSlashStage.DrawChildren } && _coreForeignSelectedCardSlashReturnsOperations.SelectedForeignCardSlashFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30, group: 80)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 140)]
     internal bool IsSelectedForeignCardSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SelectedForeignCardSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1650)]
@@ -120,34 +119,6 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsRunti
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || SelectedForeignCardSlashObserverRoot()is null)
             return false;
         return _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
-    }
-
-    internal void AssertSelectedForeignCardSlashes()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-        {
-            if (frame.ForeignSelectedCardSlash is null)
-            {
-                if (_coreForeignSelectedCardSlashOperations.IsSelectedForeignSlashActivation(frame) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ForeignSelectedCardSlashStartedEvent>().Any(e => e.ProgramFrameId == frame.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ForeignSelectedCardSlashFinishedEvent>().Any(e => e.ProgramFrameId == frame.Id))
-                    throw new InvalidOperationException("An issued selected foreign-card Slash lost its owning paid receipt.");
-                continue;
-            }
-
-            if (!ValidSelectedForeignCardSlash(frame))
-                throw new InvalidOperationException("The selected foreign-card Slash changed its original entity, issuer or whole-use return.");
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-            if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !SelectedForeignCardSlashFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
-                throw new InvalidOperationException($"The selected foreign-card Slash retained an unrelated native child: " + $"root={(frame.Id)}, stage={(frame.ForeignSelectedCardSlash.Stage)}, child={(_resolutionStackOperations._resolutionStack[index + 1].Kind)}/{(_resolutionStackOperations._resolutionStack[index + 1].Id)}, " + $"use={(frame.ForeignSelectedCardSlash.SlashReturn?.CardUseFrameId)}, " + $"accepted={((_resolutionStackOperations._resolutionStack[index + 1] as CardUseFrame)?.ProgramUseAccepted)}.");
-            if (index == _resolutionStackOperations._resolutionStack.Count - 1 && frame.ForeignSelectedCardSlash.Stage == ForeignSelectedCardSlashStage.ChoosingCard && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != frame.OwnerSeat || decision.SourceSeat != frame.OwnerSeat || decision.TargetSeat != frame.ForeignSelectedCardSlash.ActorSeat || decision.ValidTargetSeats.Count != 0 || !decision.ValidCardIds.SequenceEqual(decision.Choices.SelectMany(c => c.Cards).Distinct()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(decision.Choices, _coreForeignSelectedCardSlashOperations.SelectedForeignCardSlashChoices(frame))))
-                throw new InvalidOperationException("The selected foreign-card Slash changed its private owner-only HEJ slot prompt.");
-        }
-
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.ForeignSelectedCardSlashReturn is not null))
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != use.ForeignSelectedCardSlashReturn!.ProgramFrameId || !IsSelectedForeignCardSlashUse(use))
-                throw new InvalidOperationException("The selected foreign-card Slash lost its exact native-use owner or accepted material provenance.");
-        }
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 120)]

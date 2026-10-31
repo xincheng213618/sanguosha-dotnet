@@ -5,9 +5,6 @@ internal sealed partial class CharacterChengJiChengCuiOlEntries
     internal global::CardGame.Core.PromptChoice AiXumingUse(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiXumingUse(p, f);
     internal void AnswerTousuiRequest(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerTousuiRequest(selected);
     internal void AnswerXumingUse(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerXumingUse(selected);
-    internal void AssertTousuiRequestState(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertTousuiRequestState(f);
-    internal void AssertTousuiRequests() => _resolve().AssertTousuiRequests();
-    internal void AssertXumingFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertXumingFrame(f);
     internal void BeginTousuiRequest(global::CardGame.Core.TousuiRequestReceipt r) => _resolve().BeginTousuiRequest(r);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginXumingEnding(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginXumingEnding(supplied);
     internal bool CanOfferXumingEnding(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferXumingEnding(candidate, context);
@@ -37,10 +34,8 @@ internal sealed partial class CharacterChengJiChengCuiOlEntries
     internal void SignTousuiBottomPayment(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().SignTousuiBottomPayment(batch);
     internal void StoreTousuiRequest(global::CardGame.Core.TousuiRequestReceipt? r, long id) => _resolve().StoreTousuiRequest(r, id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> TousuiBorrowedSlashChoices(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => _resolve().TousuiBorrowedSlashChoices(pending);
-    internal global::CardGame.Core.PendingDecision? TousuiNativeOriginalDecision(long ownerId) => _resolve().TousuiNativeOriginalDecision(ownerId);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> TousuiPhysicalCards(global::CardGame.Core.CharacterState actor) => _resolve().TousuiPhysicalCards(actor);
     internal bool TousuiProgramActor(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffectOp op, int actor) => _resolve().TousuiProgramActor(f, op, actor);
-    internal global::CardGame.Core.PendingDecision TousuiProgramNativeDecision(global::CardGame.Core.PendingDecision p) => _resolve().TousuiProgramNativeDecision(p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> TousuiProgramSlashChoices(global::CardGame.Core.ProgramSkillFrame f, int actorSeat, global::System.Collections.Generic.IReadOnlyList<int> targets, string? resultBind = default) => _resolve().TousuiProgramSlashChoices(f, actorSeat, targets, resultBind);
     internal int[] TousuiProgramTargets(global::CardGame.Core.ProgramSkillFrame f, int actor, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().TousuiProgramTargets(f, actor, op);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> TousuiQinglongSlashChoices(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().TousuiQinglongSlashChoices(pending);

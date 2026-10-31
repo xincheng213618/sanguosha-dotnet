@@ -46,17 +46,4 @@ internal sealed partial class CoreTeamActivityProgramsRuntime
     }
 
     internal static string PublicTeamTargetSeatsKey(IReadOnlyList<int> seats) => string.Join(",", seats.Select(seat => seat.ToString(System.Globalization.CultureInfo.InvariantCulture)));
-    internal bool IsExactPublicTeamTargetSelection(ProgramSkillFrame frame, SkillProgramEffect selection, ProgramExecutionPlan plan)
-    {
-        if (selection.Op is not (SkillProgramEffectOp.SelectAllPublicTeamTargets or SkillProgramEffectOp.SelectRandomPublicTeamTarget) || selection.TargetKind is not { } kind || frame.SelectedTargetSeats.Count < selection.MinimumTargets || frame.SelectedTargetSeats.Count > selection.MaximumTargets || frame.SelectedTargetSeats.Distinct().Count() != frame.SelectedTargetSeats.Count)
-            return false;
-        var producerIndex = 0;
-        for (var index = 0; index < frame.InstructionIndex; index++)
-            if (ReferenceEquals(plan.Instructions[index], selection))
-                producerIndex = index + 1;
-        if (producerIndex == 0)
-            return false;
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<PublicTeamTargetsBoundEvent>().Where(e => e.ProgramFrameId == frame.Id).ToArray();
-        return issued is [var receipt] && receipt.OwnerSeat == frame.OwnerSeat && receipt.Kind == kind && receipt.InstructionIndex == producerIndex && receipt.SelectionOp == selection.Op && receipt.Count == frame.SelectedTargetSeats.Count && receipt.TargetSeatsKey == PublicTeamTargetSeatsKey(frame.SelectedTargetSeats);
-    }
 }

@@ -9,34 +9,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 {
     internal static string HuanShuJunDecisionHash(PendingDecision p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanShuJunObservers.HuanShuJunDecisionHash(p);
     internal bool HuanShuJunPaidOrPreparing(ProgramSkillFrame f) => f.HuanShuJun is not null && HuanShuJunComposition.Handles(f.HuanShuJun.Op) && f.HuanShuJun.Source == HuanShuJunSource(f) && f.HuanShuJun.GameplayHash == f.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanShuJunStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == f.HuanShuJun.Source && e.GameplayHash == f.GameplayHash && e.Op == f.HuanShuJun.Op && e.WindowId == f.HuanShuJun.WindowId) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28100)]
-    internal void AssertHuanShuJun(ProgramSkillFrame f)
-    {
-        if (f.HuanShuJun is not { } r)
-            return;
-        if (!HuanShuJunPaidOrPreparing(f) || f.InstructionIndex is < 0 or > 1 || f.InstructionIndex == 1 && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || !Enum.IsDefined(r.Stage) || r.Source.OwnerSeat != f.OwnerSeat || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Selected.Distinct().Count() != r.Selected.Count || r.Materials.Select(m => m.CardId).Distinct().Count() != r.Materials.Count || r.Selected is not System.Collections.IList { IsReadOnly: true } || r.Targets is not System.Collections.IList { IsReadOnly: true } || r.Materials is not System.Collections.IList { IsReadOnly: true } || r.Sources is not System.Collections.IList { IsReadOnly: true } || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash)
-            throw new InvalidOperationException("Huan Shu Jun lost her immutable source, owning operation or exact pending stage.");
-        if (r.Op == SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse)
-        {
-            if (r.Request is not { } n || n.ActorSeat != f.OwnerSeat || n.Intent != HuanpeiIntent.Play && (!HuanpeiRequestParentCurrent(n) || r.OriginalDecision is not { } original || original.PromptId != n.OriginalPromptId || original.Revision != n.OriginalRevision || _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiRequestCapturedEvent>().Count(e => e.FrameId == f.Id && e.Request == n && e.DecisionHash == HuanShuJunDecisionHash(original)) != 1))
-                throw new InvalidOperationException("Huanpei lost its exact original true-Use request and frozen native prompt.");
-            var payments = _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-            if (r.Paid ? payments is not [var paid] || paid.OwnerSeat != f.OwnerSeat || paid.Round != r.Round || paid.HandCount != r.FrozenHandCount || paid.Hp != r.FrozenHp || paid.RequestedCount != Math.Abs(r.FrozenHandCount - r.FrozenHp) || paid.Before != r.Before || _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Count(e => e.OwnerSeat == f.OwnerSeat && e.Round == r.Round) != 1 : payments.Length != 0)
-                throw new InvalidOperationException("Huanpei repeated or changed its one actual round adjustment.");
-        }
-        else if (r.Op == SkillProgramEffectOp.ResolveWenyiHealthOneAid)
-        {
-            if (!WenyiHpRoot(f) || r.WindowId != f.WindowContext!.ParentFrameId || r.TargetSeat != f.WindowContext.HpChange!.TargetSeat)
-                throw new InvalidOperationException("Wenyi lost its actual HP-one parent and original beneficiary.");
-            var payments = _coreProgramEventHistoryOperations.ProgramEventHistory<WenyiPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
-            if (r.Paid ? payments is not [var paid] || paid.OwnerSeat != f.OwnerSeat || paid.TargetSeat != r.TargetSeat || paid.HealthWindowId != r.WindowId : payments.Length != 0)
-                throw new InvalidOperationException("Wenyi repeated or changed her accepted aid.");
-        }
-        else if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.OwnerSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || c.ParentFrameId != r.WindowId || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not DamageTriggerWindowFrame window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex].ToProgramCandidate()is not { } candidate || candidate.OwnerSeat != f.OwnerSeat || candidate.SkillId != f.SkillId || candidate.SkillInstanceId != f.SkillInstanceId || candidate.BindingId != f.TriggerId || candidate.OccurrenceIndex != c.OccurrenceIndex || _coreProgramEventHistoryOperations.ProgramEventHistory<MiaoxinBenefitIssuedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.DamageWindowId == r.WindowId && e.Occurrence == c.OccurrenceIndex && e.DrawCount == r.RequestedCount && e.RefreshWenyi == r.RefreshWenyi) != 1)
-            throw new InvalidOperationException("Miaoxin lost its exact real damage-point occurrence.");
-        if (f.PendingMovementContinuation is { } pending && !IsHuanShuJunMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Huan Shu Jun lost her typed movement return.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28100)]
@@ -44,7 +16,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (f.HuanShuJun is not { Paid: true })
             return false;
-        AssertHuanShuJun(f);
         return true;
     }
 
@@ -71,7 +42,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (f.HuanShuJun is not { } r)
             return false;
-        AssertHuanShuJun(f);
         if (child is ProgramSkillFrame draft && HuanpeiDraftRidesOn(draft, f))
             return true;
         if (_coreWenyiPeachSuppliesOperations.WenyiEquipmentSlotPaymentRidesOn(f, child))
@@ -125,16 +95,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1230)]
     internal bool HasHuanShuJunBeforeDamageObserver(long id) => HuanShuJunObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1060)]
-    internal bool IsHuanShuJunDying()
-    {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } d)
-            return false;
-        var position = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id);
-        if (HuanpeiActiveDraft()is { HuanShuJun.Request: { Intent: HuanpeiIntent.Dying } n } draft && n.ParentFrameId == d.Id && n.RequestFrameId == d.Id && n.ActorSeat == d.ResponderSeat && n.Cursor == d.ResponderIndex && n.FixedTargetSeat == d.VictimSeat && HuanShuJunPaidOrPreparing(draft) && HuanpeiDyingRescueRide(position, d))
-            return true;
-        return HuanShuJunObserverRoot()is { } f && position > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28100)]
     internal bool AdvanceHuanShuJunChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuanShuJunObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);

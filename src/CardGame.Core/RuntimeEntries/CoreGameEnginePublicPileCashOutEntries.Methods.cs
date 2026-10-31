@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePublicPileCashOutEntries
 {
-    internal void AssertPublicPileCashOut(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertPublicPileCashOut(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPublicPileCashOut(global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginPublicPileCashOut(effect, input);
     internal bool CanRunPublicPileCashOut(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunPublicPileCashOut(candidate, trigger, context);
     internal bool DrainPublicPileCashOut(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DrainPublicPileCashOut(frame);

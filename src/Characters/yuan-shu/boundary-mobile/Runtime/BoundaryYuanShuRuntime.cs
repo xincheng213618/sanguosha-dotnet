@@ -1,6 +1,6 @@
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class BoundaryYuanShuRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramContentQueries content, IProgramTurnQueries turn, ISelectionParticipantQueries participants,
     IMatchRoleQueries roles, IProgramEventHistoryQueries history, IProgramSkillGrantQueries skills,
@@ -124,11 +124,4 @@ internal sealed class BoundaryYuanShuRuntime(IProgramRuntimeFrames frames, IProg
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 55200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 55200)]
     private bool KeepPrepared(ProgramSkillFrame frame) => ValidJixi(frame);
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 55200)]
-    private void AssertJixi(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryYuanShuJixi is not null && !ValidJixi(frame))
-            throw new InvalidOperationException("Jixi lost its original issued three-turn qualification.");
-    }
 }

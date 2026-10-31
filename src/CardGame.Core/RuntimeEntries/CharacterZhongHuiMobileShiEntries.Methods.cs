@@ -4,7 +4,6 @@ internal sealed partial class CharacterZhongHuiMobileShiEntries
 {
     internal void AnswerShiZhHui(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerShiZhHui(selected);
     internal void ApplyShiZhHuiFactionChange(global::CardGame.Core.ProgramSkillFrame frame, string faction) => _resolve().ApplyShiZhHuiFactionChange(frame, faction);
-    internal void AssertShiZhHui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiZhHui(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiZhHui(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginShiZhHui(input);
     internal bool CanOfferShiZhHui(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShiZhHui(candidate, trigger, context);
     internal bool CanStartShiZhHuiSizi(global::CardGame.Core.CharacterState owner, string skill) => _resolve().CanStartShiZhHuiSizi(owner, skill);

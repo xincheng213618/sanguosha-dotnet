@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsEntries
 {
-    internal void AssertFixedSlashAndDeclaredDeckDrafts(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertFixedSlashAndDeclaredDeckDrafts(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDeclaredDeckCriterion(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginDeclaredDeckCriterion(frame);
     internal void BeginFixedTargetFactionSlash(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginFixedTargetFactionSlash(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginOwnerSlashAgainstTurnOwner(global::CardGame.Core.ProgramSkillFrame frame, bool ignoreDistance) => _resolve().BeginOwnerSlashAgainstTurnOwner(frame, ignoreDistance);

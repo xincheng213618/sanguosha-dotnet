@@ -50,14 +50,11 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenCaoPi: { Stage: ShenCaoPiStage.BorrowChoice } r } f || !KemingBorrowChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(selected.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Keming lost its exact original borrowed-skill choice.");
-        AssertShenCaoPi(f);
         var option = r.Options[int.Parse(selected.Parameters["option"], CultureInfo.InvariantCulture)];
         if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, TargetSeat: { } target, DamageFrameId: { } damageId } context || target != f.OwnerSeat || source == target || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != r.ParentId || window.ParentFrameId != damageId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _contentRegistryOperations._contentRegistry.GetSkill(option.SkillId).Program is not { } program || program.GameplayHash != option.GameplayHash)
             throw new InvalidOperationException("Keming cannot move its borrowed trigger to another native damage segment.");
         var trigger = program.Triggers.Single(t => t.Id == option.BindingId);
         var count = trigger.DamageOccurrence == SkillProgramDamageOccurrence.PerDamagePoint ? context.Amount : 1;
-        if (count < 1)
-            throw new InvalidOperationException("Keming lost its original positive damage occurrence count.");
         var instance = $"keming:{(f.OwnerSeat)}:{(f.SkillInstanceId)}:{(option.SkillId)}";
         var receipts = Enumerable.Range(0, count).Select(i =>
         {

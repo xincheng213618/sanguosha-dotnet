@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhugeGuoOlEntries
 {
-    internal void AssertRegisteredZhugeGuo(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredZhugeGuo(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhugeGuo(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect e) => _resolve().BeginZhugeGuo(supplied, e);
     internal bool CanContinueZhugeGuo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueZhugeGuo(f);
     internal bool CanOfferZhugeGuo(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferZhugeGuo(candidate, trigger, context);
@@ -11,7 +10,6 @@ internal sealed partial class CharacterZhugeGuoOlEntries
     internal global::CardGame.Core.CardSnapshot[] GetZhugeGuoPrivatelyViewedCards(int viewer) => _resolve().GetZhugeGuoPrivatelyViewedCards(viewer);
     internal bool HasZhugeGuoBeforeDamageObserver(long id) => _resolve().HasZhugeGuoBeforeDamageObserver(id);
     internal bool HasZhugeGuoDamageObserver(long id) => _resolve().HasZhugeGuoDamageObserver(id);
-    internal bool IsZhugeGuoDying() => _resolve().IsZhugeGuoDying();
     internal bool IsZhugeGuoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhugeGuoMovement(f, e, p);
     internal void IssueQirangAcquiredBenefit(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ZhugeGuoReceipt r, global::CardGame.Core.CardMovementRecord movement) => _resolve().IssueQirangAcquiredBenefit(f, r, movement);
     internal void MarkYuhuaTopPlacement(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.ProgramTopReorder state) => _resolve().MarkYuhuaTopPlacement(supplied, state);

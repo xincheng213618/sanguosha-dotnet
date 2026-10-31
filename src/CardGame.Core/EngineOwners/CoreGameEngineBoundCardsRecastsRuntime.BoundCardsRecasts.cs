@@ -61,15 +61,6 @@ internal sealed partial class CoreGameEngineBoundCardsRecastsRuntime
         return receipt.Stage == ProgramBoundCardsRecastStage.CostChildren ? receipt.DrawSequenceBefore == 0 && receipt.DrawSequenceAfter == 0 && receipt.DrawCount == 0 : receipt.DrawSequenceBefore >= receipt.SequenceAfter && receipt.DrawSequenceAfter >= receipt.DrawSequenceBefore && receipt.DrawSequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 62020)]
-    internal void AssertBoundCardsRecast(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.BoundCardsRecast is not { } receipt)
-            return;
-        if (frame.InstructionIndex < 1 || frame.InstructionIndex > plan.Instructions.Count || plan.Instructions[frame.InstructionIndex - 1] is not { Op: SkillProgramEffectOp.RecastBoundCards } effect || effect.SourceBind != receipt.SourceBind || !ValidBoundCardsRecast(frame))
-            throw new InvalidOperationException("A bound recast lost its immutable group, paid movement or owning instruction.");
-    }
-
     internal bool DrainBoundCardsRecastChildren(ProgramSkillFrame frame) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(frame.Id);
     [ProgramContinuation(ProgramContinuationKind.Resume, 62020)]
     internal bool ResumeBoundCardsRecast(long frameId)

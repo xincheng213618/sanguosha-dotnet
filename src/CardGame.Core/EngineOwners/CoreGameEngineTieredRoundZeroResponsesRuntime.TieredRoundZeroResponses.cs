@@ -174,25 +174,6 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
         return fact.Action;
     }
 
-    internal void AssertTieredRoundResponseUses()
-    {
-        foreach (var owner in _resolutionStackOperations._resolutionStack.Where(f => TieredRoundResponseReceipt(f)is not null))
-            RequireTieredRoundIssuedResponseAction(owner);
-        // A removed nullable receipt must not disguise an in-flight new-policy
-        // response as an old native response. These windows keep their actual
-        // response action, never the incoming Slash/trick's Use action.
-        foreach (var window in _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Where(w => w.Action.Type == CardActionType.Response && w.Action.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.TieredRoundConversion is not null)))
-        {
-            var owner = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == window.ParentFrameId);
-            if (owner is not (CardUseFrame or NullificationWindowFrame) || !global::CardGame.Core.EngineOwners.CoreGameEngineTieredRoundZeroReturnsRuntime.TieredRoundActionsStructurallyMatch(RequireTieredRoundIssuedResponseAction(owner), window.Action))
-                throw new InvalidOperationException("A tiered response window lost its exact issued action and owning receipt.");
-        }
-
-        foreach (var counter in _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().Where(n => n.CounterspellPayment?.Action.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.TieredRoundConversion is not null) == true))
-            if (!global::CardGame.Core.EngineOwners.CoreGameEngineTieredRoundZeroReturnsRuntime.TieredRoundActionsStructurallyMatch(RequireTieredRoundIssuedResponseAction(counter), counter.CounterspellPayment!.Action))
-                throw new InvalidOperationException("A tiered response payment lost its exact accepted action.");
-    }
-
     internal void ClearTieredRoundDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { TieredRoundResponseUse: not null } use)

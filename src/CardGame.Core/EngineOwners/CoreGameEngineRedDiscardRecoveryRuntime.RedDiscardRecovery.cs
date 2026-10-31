@@ -229,25 +229,6 @@ internal sealed partial class CoreGameEngineRedDiscardRecoveryRuntime
         return decision.Choices.First(choice => choice.Parameters.GetValueOrDefault("mode") == "draw");
     }
 
-    internal void AssertRedDiscardRecoveryDraft(ProgramSkillFrame f, SkillProgramEffect paused)
-    {
-        if (f.RedDiscardRecoveryDraft is not { } d)
-            return;
-        if (paused.Op != SkillProgramEffectOp.OfferRedDiscardRecoveryChoice || !_characterMengHuoBoundaryMobileOperations.ValidMobileOrOlRedDiscardRecoveryWindow(f) || d.Budget < 0 || d.Selected is null || d.Selected.Distinct().Count() != d.Selected.Count || d.Selected.Any(seat => !_characterMengHuoBoundaryMobileOperations.CanMobileOrOlRedDiscardRecoverySelect(f, seat)) || d.Selected.Count > d.Budget || d.Cursor < 0 || d.Cursor > d.Selected.Count || (d.AskingSeat is { } asking && (!d.Committed || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(asking) || !d.Selected.Contains(asking))) || (!d.Committed && d.AskingSeat is not null))
-            throw new InvalidOperationException("Red discard recovery lost its frozen selection or effect cursor.");
-        if (d.Committed && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramRedDiscardRecoveryCommittedEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Budget == d.Budget && e.Seats.SequenceEqual(d.Selected)))
-            throw new InvalidOperationException("Red discard recovery lost its exact public commitment.");
-        if (!ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()))
-            return;
-        if (d.AskingSeat is { } asked)
-        {
-            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != asked || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, RedDiscardRecoveryQuestionChoices(f)))
-                throw new InvalidOperationException("Red discard recovery lost its exact beneficiary question.");
-        }
-        else if (!d.Committed && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, RedDiscardRecoverySelectionChoices(f))))
-            throw new InvalidOperationException("Red discard recovery lost its legal selection prompt.");
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IRedDiscardRecoveryHost.OfferRedDiscardRecoveryChoice(ProgramSkillFrame f) => BeginRedDiscardRecovery(f);
     [ProgramPipelineHook(ProgramPipelinePhase.CaptureMovementBatchFacts, 400)]
     internal void CaptureMovementBatchFactsCaptureTurnRedDiscardCount(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements) => CaptureTurnRedDiscardCount(batch.TurnNumber, movements);

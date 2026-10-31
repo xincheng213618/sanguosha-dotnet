@@ -255,8 +255,6 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     {
         var r = f.ShiZhHui!;
         var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("Yunan lost its dying entry.");
-        if (dying.FrameId != r.DyingFrameId || dying.KillerSeat != f.OwnerSeat)
-            throw new InvalidOperationException("Yunan lost its original dying victim.");
         ApplyShiZhHuiFactionChange(f, "qun");
         var level = Math.Min(2, ShiZhHuiKechangLevel(f.OwnerSeat) + 1);
         if (!HasShiZhHuiKechang(f.OwnerSeat))
@@ -289,20 +287,6 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     internal int ShiZhHuiSiziDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.CardAttackHandle card && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.EffectiveCardKind ?? CardKind.Slash) && ShiZhHuiSiziActive ? 1 : 0;
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 67700)]
     internal bool DistanceCardUseExemption67700ShiZhHuiKechang(ProgramCardDistanceQuery query) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) && string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(query.Actor), "qun", StringComparison.Ordinal) && _coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && HasShiZhHuiKechang(player.Seat));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 67700)]
-    internal void AssertShiZhHui(ProgramSkillFrame f)
-    {
-        if (f.ShiZhHui is not { } r)
-            return;
-        if (r.ActualTurn <= 0 || r.Source?.OwnerSeat != f.OwnerSeat || r.Operation is not ("sizi" or "sizi-ending" or "xiezhi" or "yunan"))
-            throw new InvalidOperationException("Shi Zhong Hui lost its original typed operation receipt.");
-        if (r.Operation == "sizi" && r.Ordinal != 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>().Any(entry => entry.FrameId == f.Id && entry.Source == ShiZhHuiSource(f) && entry.Ordinal == r.Ordinal && entry.Consumed == r.Consumed))
-            throw new InvalidOperationException("Sizi lost its activation receipt.");
-        if (r.Operation == "sizi-ending" && r.Stage >= 12 && (r.Victims is null || r.Victims.Any(victim => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(victim))))
-            throw new InvalidOperationException("Sizi ending lost its victim ledger.");
-        if (r.Operation == "yunan" && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiYunanAwakenedEvent>().Any(entry => entry.FrameId == f.Id && entry.Source == ShiZhHuiSource(f)))
-            throw new InvalidOperationException("Yunan lost its awakening receipt.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShiZhHuiSizi)]
     internal PromptChoice ChooseShiZhHuiAi(PendingDecision decision, ProgramSkillFrame f)

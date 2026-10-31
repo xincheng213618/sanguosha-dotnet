@@ -16,13 +16,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
         return r.Entities.All(entity => _coreProgramEventHistoryOperations.ProgramEventHistory<DaQiaoXiaoQiaoEntityPaidEvent>().Where(e => e.FrameId == f.Id && e.Step == r.MovementStep && e.CardId == entity.Id).ToArray()is [var receipt] && receipt.From == entity.From && receipt.Sequence > r.Before && receipt.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == receipt.Sequence && m.CardId == entity.Id && m.From == entity.From && m.To == receipt.To && m.Reason.Value == reason) == 1 && receipt.To == _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreCardAttackStateOperations.GetAttackCard(entity.Id), entity.From, (entity.From.Zone == CardZoneKind.Equipment && _coreCardAttackStateOperations.GetAttackCard(entity.Id).IsGeneralWeapon ? CardLocation.OutsideGame : paid.Stage == DaQiaoXiaoQiaoStage.DepositChildren ? r.Pile.Location : CardLocation.DiscardPile)));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27340)]
-    internal void AssertDaQiaoXiaoQiao(ProgramSkillFrame f)
-    {
-        if (f.DaQiaoXiaoQiao is not null && !ValidDaQiaoXiaoQiao(f))
-            throw new InvalidOperationException("Xingwu lost its exact actual-phase parent, original source, frozen paid entities or once-only native child receipt.");
-    }
-
     internal bool DaQiaoXiaoQiaoMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.DaQiaoXiaoQiao!;
@@ -59,8 +52,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
     internal bool HasDaQiaoXiaoQiaoDamageObserver(long id) => DaQiaoXiaoQiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 940)]
     internal bool HasDaQiaoXiaoQiaoBeforeDamageObserver(long id) => HasDaQiaoXiaoQiaoDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 770)]
-    internal bool IsDaQiaoXiaoQiaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DaQiaoXiaoQiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27340)]
     internal bool AdvanceDaQiaoXiaoQiaoChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DaQiaoXiaoQiaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

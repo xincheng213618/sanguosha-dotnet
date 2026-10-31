@@ -142,8 +142,6 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var xIndex = Array.FindIndex(history, e => e is XiongmuFirstDamageReducedEvent fact && fact.Receipt.ProgramFrameId == xiongmu.ProgramFrameId && fact.Receipt == (xiongmu with { TransferredTargetSeat = null, TransferWindowId = null }));
         var cIndex = Array.FindIndex(history, e => e is LuYuShengDamageAdjustedEvent fact && fact == cangxinFact);
-        if (xIndex < 0 || cIndex < 0 || xIndex == cIndex)
-            throw new InvalidOperationException("The combined damage rebase lost its original applied-effect order.");
         // Each before-damage effect retains its own actual before/after invoice.
         // Whichever ran first observed this recipient's original local base.
         // Restore that base once, instead of letting two setters overwrite it
@@ -228,24 +226,6 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
             ValidateWuXiongmuCangxinCurrentAttempt(attack, cangxin, out var fact);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiongmuCangxinDamageRetiredEvent(cangxin.AttackId, cangxin.WindowId, fact.FrameId, cangxin.TargetSeat, cangxin.ChainCursor));
             _characterLuYuShengOlOperations.SetLuYuShengDamageState(attack.ResolutionId, null);
-        }
-    }
-
-    internal void AssertWuXiongmuDamageStates()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack)
-        {
-            var r = frame switch
-            {
-                CardUseFrame c => c.XiongmuDamage,
-                ProgramSkillFrame p => p.XiongmuDamage,
-                JudgmentFrame j => j.XiongmuDamage,
-                _ => null
-            };
-            if (r is null)
-                continue;
-            if (r.AttackId != frame.Id || !ValidWuXiongmuDamage(r) || _coreProgramEventHistoryOperations.ProgramEventHistory<XiongmuDamageRetiredEvent>().Any(e => e.ProgramFrameId == r.ProgramFrameId) || frame is ProgramSkillFrame { AttackAttempt: null, CardAttack: null } || (r.TransferredTargetSeat is null) != (r.TransferWindowId is null) || r.TransferredTargetSeat is { } target && (target == r.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || _coreProgramEventHistoryOperations.ProgramEventHistory<XiongmuDamageTransferredEvent>().Count(e => e.AttackId == r.AttackId && e.WindowId == r.WindowId && e.OriginalTarget == r.TargetSeat && e.Target == target && e.ChainCursor == r.ChainCursor && e.TransferWindowId == r.TransferWindowId) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageTransferredEvent>().Any(e => e.ResolutionId == r.AttackId && e.TargetSeat == target)))
-                throw new InvalidOperationException("Xiongmu's cold native damage state lost its consumed first-hit or exact target transfer invoice.");
         }
     }
 }

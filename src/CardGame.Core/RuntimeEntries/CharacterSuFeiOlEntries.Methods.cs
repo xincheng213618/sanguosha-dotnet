@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSuFeiOlEntries
 {
-    internal void AssertRegisteredSuFei(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredSuFei(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSuFei(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginSuFei(supplied, effect);
     internal bool CanContinueSuFei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueSuFei(f);
     internal bool CanGiveSuFei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanGiveSuFei(f);
@@ -12,7 +11,6 @@ internal sealed partial class CharacterSuFeiOlEntries
     internal void FinishSuFei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSuFei(f);
     internal bool HasSuFeiBeforeDamageObserver(long id) => _resolve().HasSuFeiBeforeDamageObserver(id);
     internal bool HasSuFeiDamageObserver(long id) => _resolve().HasSuFeiDamageObserver(id);
-    internal bool IsSuFeiDying() => _resolve().IsSuFeiDying();
     internal bool IsSuFeiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsSuFeiMovement(f, e, p);
     internal void ObserveSuFeiTurnOrDeath(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveSuFeiTurnOrDeath(payload);
     internal void PublishSuFeiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishSuFeiChoice(f);

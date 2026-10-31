@@ -130,7 +130,6 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversarySunQuan: { } r } f || !AnniversarySunQuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Jichao requires its exact current branch or other living participant.");
-        RequireAnniversarySunQuan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = int.Parse(selected.Parameters["branch"], CultureInfo.InvariantCulture);
@@ -182,7 +181,6 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversarySunQuan: not null } f || f.Id != id)
             return false;
-        RequireAnniversarySunQuan(f);
         if (f.AnniversarySunQuan.Stage == AnniversarySunQuanStage.Drawing)
             return true;
         if (f.AnniversarySunQuan.Stage is AnniversarySunQuanStage.ChoosingBranch or AnniversarySunQuanStage.ChoosingTarget)

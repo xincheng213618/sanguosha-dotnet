@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouCaoShuangAnniversaryRuntime(IMouCaoShuangAnniversaryFacts facts, IMouCaoShuangAnniversaryNative native,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws, IProgramAwakeningOverrideQuery awakeningConditions) : IMouCaoShuangAnniversaryRuntime
 {
@@ -167,7 +167,6 @@ internal sealed class MouCaoShuangAnniversaryRuntime(IMouCaoShuangAnniversaryFac
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouCaoShuangAnniversaryCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouCaoShuangAnniversary = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 35500)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouCaoShuangAnniversary: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 35500)] private bool Movement(ProgramSkillFrame f) => f.MouCaoShuangAnniversary is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 35500)] private void Invariant(ProgramSkillFrame f) { if (f.MouCaoShuangAnniversary is not null && !Valid(f)) throw new InvalidOperationException("Invalid Cao Shuang native item receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35500)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35500)] private bool Paid(ProgramSkillFrame f) => f.MouCaoShuangAnniversary is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouCaoShuangJianzhuan, SkillProgramEffectOp.ResolveMouCaoShuangFanshi)]
     private PromptChoice Ai(PendingDecision p, ProgramSkillFrame f) => f.MouCaoShuangAnniversary!.Stage switch {

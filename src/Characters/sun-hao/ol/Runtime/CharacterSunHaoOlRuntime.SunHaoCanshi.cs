@@ -125,7 +125,6 @@ internal sealed partial class CharacterSunHaoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunHaoCanshi: { Stage: SunHaoCanshiStage.SelectDiscard } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !SunHaoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Canshi requires the exact current owner's legal private HE payment.");
-        AssertSunHao(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var id = choice.Cards.Single();
         var from = _cardZonesOperations._cardZones.GetLocation(id);
@@ -147,7 +146,6 @@ internal sealed partial class CharacterSunHaoOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { SunHaoCanshi: { } r } f && f.Id == id)
         {
-            AssertSunHao(f);
             if (r.Stage == SunHaoCanshiStage.DiscardChildren)
             {
                 if (DrainSunHao(f))
@@ -206,13 +204,11 @@ internal sealed partial class CharacterSunHaoOlRuntime
     {
         if (f.MobileSunHaoDraw is not null)
         {
-            _characterSunHaoMobileOperations.AssertMobileSunHaoDraw(f);
             return true;
         }
 
         if (f.SunHaoCanshi is not null)
         {
-            AssertSunHao(f);
             return true;
         }
 
@@ -224,13 +220,11 @@ internal sealed partial class CharacterSunHaoOlRuntime
     {
         if (f.MobileSunHaoDraw is not null)
         {
-            _characterSunHaoMobileOperations.AssertMobileSunHaoDraw(f);
             return true;
         }
 
         if (f.SunHaoCanshi is null)
             return false;
-        AssertSunHao(f);
         return true;
     }
 

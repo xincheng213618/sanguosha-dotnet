@@ -81,12 +81,4 @@ internal sealed partial class CoreGameEngineShanheLeizhenRuntime
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ShanheLeizhen = receipt with { BaseApplied = true, BaseBefore = before, BaseAfter = after }, ProgramAdjustedSlashBaseDamage = current.ProgramAdjustedSlashBaseDamage is { } original ? checked(original + 1) : null, PreparedTargetAttacks = current.PreparedTargetAttacks is { } prepared ? Array.AsReadOnly(prepared.Select(s => s with { DamageAmount = checked(s.DamageAmount + 1) }).ToArray()) : null });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheLeizhenBaseAppliedEvent(use.Id, use.SourceSeat, before, after));
     }
-
-    internal void AssertShanheLeizhenUse(CardUseFrame use)
-    {
-        if (use.ShanheLeizhen is not { } r)
-            return;
-        if (r.UseFrameId != use.Id || r.OwnerSeat != use.SourceSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLeizhenChargeSpentEvent>().Where(e => e.UseFrameId == use.Id).ToArray()is not [var spent] || spent.EarningActionId != r.EarningActionId || spent.OwnerSeat != r.OwnerSeat || spent.WeaponCardId != r.WeaponCardId || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLeizhenChargeEarnedEvent>().Count(e => e.ActionId == r.EarningActionId && e.OwnerSeat == r.OwnerSeat && e.WeaponCardId == r.WeaponCardId) != 1 || (r.BaseApplied ? r.BaseBefore is not { } before || r.BaseAfter != before + 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLeizhenBaseAppliedEvent>().Count(e => e.UseFrameId == use.Id && e.OwnerSeat == use.SourceSeat && e.BaseBefore == before && e.BaseAfter == before + 1) != 1 : r.BaseBefore is not null || r.BaseAfter is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLeizhenBaseAppliedEvent>().Any(e => e.UseFrameId == use.Id)))
-            throw new InvalidOperationException("Leizhen lost its once-consumed public benefit and original native Slash base receipt.");
-    }
 }

@@ -5,7 +5,6 @@ internal sealed partial class CharacterHaoMengAnniversaryEntries
     internal bool AdvanceHaoMengChildren() => _resolve().AdvanceHaoMengChildren();
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.RuleQueryContribution> AnniversaryHaoMengSlashContributions(global::CardGame.Core.CharacterState player, global::CardGame.Core.SkillRuleQuery query) => _resolve().AnniversaryHaoMengSlashContributions(player, query);
     internal void AnswerHaoMeng(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHaoMeng(choice);
-    internal void AssertHaoMeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHaoMeng(f);
     internal bool BanHaoMengConversion(global::CardGame.Core.ProgramViewAsLegalityQuery q) => _resolve().BanHaoMengConversion(q);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHaoMeng(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginHaoMeng(supplied, op);
     internal void BindHaoMengUse(global::CardGame.Core.CardUseDeclaredEvent e) => _resolve().BindHaoMengUse(e);
@@ -31,9 +30,7 @@ internal sealed partial class CharacterHaoMengAnniversaryEntries
     internal bool HaoMengOriginal(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().HaoMengOriginal(f, op);
     internal bool HaoMengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().HaoMengRecoveryParent(f, recovery);
     internal bool HaoMengSuffix(int i) => _resolve().HaoMengSuffix(i);
-    internal bool HasAnniversaryHaoMengPrompt() => _resolve().HasAnniversaryHaoMengPrompt();
     internal bool IsAnniversaryHaoMengSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsAnniversaryHaoMengSettlementBatch(f, b);
-    internal bool IsHaoMengMaterialSlashAttack(global::CardGame.Core.NativeOwners.FangtianHalberdHandle pending, global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsHaoMengMaterialSlashAttack(pending, attack, processing);
     internal bool IsHaoMengNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsHaoMengNativeUse(use);
     internal bool IsIssuedHaoMengConsequence(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedHaoMengConsequence(c, w);
     internal void IssueHaoMengUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueHaoMengUse(f);

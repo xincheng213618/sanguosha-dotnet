@@ -43,20 +43,6 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
         if (!ValidGaoXiang(f))
             throw new InvalidOperationException("Chiying lost its original skill/frame, frozen actor/participant queue or actual once-paid discard/gain receipt.");
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 44900)]
-    internal void AssertGaoXiang(ProgramSkillFrame f)
-    {
-        if (f.GaoXiangChiying is not { } r)
-            return;
-        RequireGaoXiang(f);
-        if (f.PendingMovementContinuation is { } pending && !GaoXiangMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Chiying lost its original paid movement cursor.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && r.Stage is GaoXiangChiyingStage.Actor or GaoXiangChiyingStage.Victims or GaoXiangChiyingStage.Card && (p.PlayerSeat != GaoXiangChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, GaoXiangChoices(f))))
-            throw new InvalidOperationException("Chiying's exact participant/opaque-card menu changed.");
-    }
-
-    internal bool HasAnniversaryGaoXiangPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { GaoXiangChiying: { Stage: GaoXiangChiyingStage.Actor or GaoXiangChiyingStage.Victims or GaoXiangChiyingStage.Card } } f && f.Step == ResolutionFrameStep.AwaitingResponse && p.PlayerSeat == GaoXiangChooser(f) && ValidGaoXiang(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, GaoXiangChoices(f));
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 44900)]
     internal bool GaoXiangMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.GaoXiangChiying is { Stage: GaoXiangChiyingStage.DiscardChildren or GaoXiangChiyingStage.GainChildren } && ValidGaoXiang(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryGaoXiangChiying && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool GaoXiangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -84,8 +70,6 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
     internal bool GaoXiangDamageObserver(long id) => GaoXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 44900)]
     internal bool GaoXiangBeforeDamageObserver(long id) => GaoXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 44900)]
-    internal bool GaoXiangDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GaoXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 44900)]
     internal bool AdvanceGaoXiangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && GaoXiangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

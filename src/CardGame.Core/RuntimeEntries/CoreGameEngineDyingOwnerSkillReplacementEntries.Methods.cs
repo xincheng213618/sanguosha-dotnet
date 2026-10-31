@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDyingOwnerSkillReplacementEntries
 {
     internal global::System.Collections.Generic.IReadOnlyList<string> AcquireDyingOwnerReplacementSkills(global::CardGame.Core.ProgramSkillFrame frame, global::System.Collections.Generic.IReadOnlyList<string> skillIds) => _resolve().AcquireDyingOwnerReplacementSkills(frame, skillIds);
-    internal void AssertReplacedPaidHpContinuation(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().AssertReplacedPaidHpContinuation(frame, plan);
     internal bool CanContinueReplacedPaidHpContinuation(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueReplacedPaidHpContinuation(frame);
     internal global::CardGame.Core.ProgramReplacedPaidHpContinuation? CaptureDyingOwnerReplacementContinuation(global::CardGame.Core.ProgramSkillFrame replacement, global::CardGame.Core.SkillProgramEffect effect) => _resolve().CaptureDyingOwnerReplacementContinuation(replacement, effect);
     internal bool HasValidReplacedPaidHpContinuation(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().HasValidReplacedPaidHpContinuation(frame, plan);

@@ -40,69 +40,6 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)) && child.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(parent, candidate);
     }
 
-    internal IReadOnlyList<Card> SeparateMouLixianDamageChildProcessing(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (processing.Count == 0 || MouHuangYueyingObserverRoot()is not { MouLixian: { Paid: true, Stage: MouLixianStage.NativeUse } r } parent || !ValidMouLixianStarted(parent) || parent.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.WindowId)is not DamageTriggerWindowFrame window || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || context.ParentFrameId != window.Id || !_coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(parent, window) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window), attack) || _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window).ResolutionId != attack.ResolutionId || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Action.PhysicalCards: [{ } cost] } use || use.MouLixianOrigin?.ProgramFrameId != parent.Id || !IsIssuedMouLixianUse(use) || cost.CardId != r.MaterialId || cost.CardKind != r.PrintedKind || cost.From != r.From || _cardZonesOperations._cardZones.GetLocation(cost.CardId) != CardLocation.Processing || attack.PhysicalCards.Any(c => c.Id == cost.CardId) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLixianMaterialPaidEvent>().Count(p => p.FrameId == parent.Id && p.UseId == use.Id && p.CardId == cost.CardId && p.PrintedKind == cost.CardKind && p.From == cost.From && p.To == CardLocation.Processing && p.MovementSequence == r.MovementSequence) != 1)
-            return processing;
-        var wi = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        var pi = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == parent.Id);
-        var ui = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        var ai = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == attack.ResolutionId);
-        if (ai < 0 || wi < 0 || pi != wi + 1 || ui != pi + 1 || ai >= wi)
-            return processing;
-        return processing.Where(c => c.Id != cost.CardId).ToArray();
-    }
-
-    internal ProgramSkillFrame? MouLixianDamageCursorRoot(DamageTriggerWindowFrame window, out long? ownedDyingId)
-    {
-        ownedDyingId = null;
-        if (MouHuangYueyingObserverRoot()is not { MouLixian: { Paid: true } r } parent || !ValidMouLixianStarted(parent) || r.WindowId != window.Id || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || parent.WindowContext?.ParentFrameId != window.Id || !_coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(parent, window) || r.MovementSequence <= r.Before || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLixianMaterialPaidEvent>().Count(p => p.FrameId == parent.Id && p.UseId == r.UseId && p.CardId == r.MaterialId && p.PrintedKind == r.PrintedKind && p.From == r.From && p.MovementSequence == r.MovementSequence) != 1)
-            return null;
-        var wi = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        var pi = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == parent.Id);
-        if (wi < 0 || pi != wi + 1)
-            return null;
-        if (r.Stage == MouLixianStage.NativeUse)
-        {
-            if (_resolutionStackOperations._resolutionStack[pi + 1] is not CardUseFrame use || use.Id != r.UseId || use.MouLixianOrigin?.ProgramFrameId != parent.Id || !IsIssuedMouLixianUse(use))
-                return null;
-        }
-        else if (!IsReturnedMouLixianUse(parent) || _resolutionStackOperations._resolutionStack[pi + 1] is not CardsMovedTriggerWindowFrame movement || movement.ResumeProgramFrameId != parent.Id || !IsMouLixianNativeSettlementBatch(parent, movement.Batch))
-            return null;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is { } dying)
-        {
-            if (!IsMouHuangYueyingDying() || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) <= pi)
-                return null;
-            ownedDyingId = dying.Id;
-        }
-
-        return parent;
-    }
-
-    internal IReadOnlyList<int>? MouLixianNativeAttackAncestorProcessing(long useId)
-    {
-        if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { TriggerWindow: SkillProgramTriggerWindow.AfterDamageApplied } window || MouLixianDamageCursorRoot(window, out _)is not { MouLixian: { Stage: MouLixianStage.NativeUse } r } parent || r.UseId != useId || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { } childAction } use || !IsIssuedMouLixianUse(use))
-            return null;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
-        var ai = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == attack.ResolutionId);
-        var wi = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        if (ai < 0 || ai >= wi || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == window.ParentFrameId)is not DamageFrame damage || damage.ParentFrameId != attack.ResolutionId || damage.Id != parent.WindowContext?.DamageFrameId || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } cardAttack && !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(cardAttack, attack) || _coreNativeCardContinuationCursorsOperations.ActiveDuel is { } duel && !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(duel.Attack, attack) || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } group && group.ResolutionId != attack.ResolutionId || _coreNativeCardContinuationCursorsOperations.ActiveFireAttack is { } fire && fire.Id != attack.ResolutionId || attack.PhysicalCards.Select(c => c.Id).Distinct().Count() != attack.PhysicalCards.Count)
-            return null;
-        var originalUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == attack.ResolutionId);
-        var ids = new List<int>();
-        foreach (var card in attack.PhysicalCards)
-        {
-            if (_cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Processing)
-                continue;
-            var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == card.Id);
-            if (childAction.PhysicalCards.Any(c => c.CardId == card.Id) || entry is null || entry.To != CardLocation.Processing || entry.From == CardLocation.Processing || entry.CardKind != card.Kind || entry.Sequence > r.Before || originalUse is { Action: { } action } && !action.PhysicalCards.Any(c => c.CardId == card.Id && c.CardKind == card.Kind && c.From == entry.From))
-                return null;
-            ids.Add(card.Id);
-        }
-
-        return Array.AsReadOnly(ids.ToArray());
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuangYueyingLixian)]
     internal PromptChoice ChooseMouLixian(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") != "cancel") ?? decision.Choices[0];
 }

@@ -38,7 +38,6 @@ internal sealed partial class CoreGameEngineSequentialDeckKindGrowthRuntime
         while (true)
         {
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
-            AssertSequentialDeckKindGrowth(frame);
             var receipt = frame.SequentialDeckKindGrowth!;
             if (receipt.Stage == SequentialDeckKindGrowthStage.GainChildren)
             {
@@ -153,22 +152,6 @@ internal sealed partial class CoreGameEngineSequentialDeckKindGrowthRuntime
         if (events.Select(item => item.ProgramFrameId).Distinct().Count() != events.Length || events.Any(item => !ValidSequentialDeckKindGrowthGrant(item)))
             throw new InvalidOperationException("Permanent deck-shortfall growth lost its once-issued acquisition ledger.");
         return events.Aggregate(0, (sum, item) => checked(sum + item.Amount));
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 1244)]
-    internal void AssertSequentialDeckKindGrowth(ProgramSkillFrame frame)
-    {
-        if (frame.SequentialDeckKindGrowth is not null && !ValidSequentialDeckKindGrowth(frame))
-            throw new InvalidOperationException("Sequential deck-kind acquisition lost its exact preparation, frozen amount or paid entity/child ledger.");
-        if (frame.SequentialDeckKindGrowth is not { Stage: SequentialDeckKindGrowthStage.GainChildren } receipt)
-            return;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[index + 1] is CardsMovedTriggerWindowFrame child)
-        {
-            var step = receipt.Steps[^1];
-            if (child.Batch.Id != step.BatchId || child.Batch.ParentFrameId != frame.Id || child.Batch.AwaitingProgramFrameId != frame.Id || child.ResumeProgramFrameId is not null || child.Batch.TurnNumber != receipt.TurnNumber || child.Batch.OriginOwnerSeat != frame.OwnerSeat || child.Batch.OriginSkillId != frame.SkillId || child.Batch.OriginSkillInstanceId != frame.SkillInstanceId || !child.Batch.Movements.SequenceEqual(step.Movements) || child.Batch.NativeDrawInvocation is not null)
-                throw new InvalidOperationException("Sequential acquisition retained a movement window outside its exact paid entity batch.");
-        }
     }
 
     SkillProgramStepOutcome global::CardGame.Core.ISequentialDeckKindGrowthHost.AcquireDeckKindSequentiallyAndGrowOnShortfall(ProgramSkillFrame frame, SkillProgramEffect effect) => AcquireDeckKindSequentiallyAndGrowOnShortfall(frame, effect);

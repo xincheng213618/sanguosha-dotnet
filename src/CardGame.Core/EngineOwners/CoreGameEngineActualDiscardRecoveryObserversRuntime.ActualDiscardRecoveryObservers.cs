@@ -55,8 +55,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveryObserversRuntim
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id);
         if (index < 0 || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.CapturedEquipmentDraw is null && root.ActualDiscardRecovery is null)
             return null;
-        _coreCapturedEquipmentDrawsOperations.AssertCapturedEquipmentAndDraw(root);
-        _coreActualDiscardRecoveriesOperations.AssertActualDiscardRecovery(root);
         if (index == _resolutionStackOperations._resolutionStack.Count - 1)
             return root;
         if (!ActualEquipmentOrDiscardFirstObserver(index, root))
@@ -71,8 +69,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveryObserversRuntim
 
         return root;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 490, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 570)]
     internal bool IsActualEquipmentOrDiscardProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => (f.CapturedEquipmentDraw is not null || f.ActualDiscardRecovery is not null) && ActualEquipmentOrDiscardObserverRoot(f.Id)is not null && _resolutionStackOperations._resolutionStack.FindIndex(d => d.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(r => r.Id == f.Id));
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1780)]
@@ -131,13 +127,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveryObserversRuntim
         }
 
         return false;
-    }
-
-    internal void AssertActualEquipmentOrDiscardPrograms()
-    {
-        foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.ActualDiscardRecovery is not null || f.CapturedEquipmentDraw is not null))
-            if (ActualEquipmentOrDiscardObserverRoot(root.Id)is null)
-                throw new InvalidOperationException("Actual equipment/discard recovery lost its exact paid receipt and typed descendant subtree.");
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 110)]

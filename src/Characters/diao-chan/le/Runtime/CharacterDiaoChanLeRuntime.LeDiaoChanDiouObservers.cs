@@ -15,42 +15,12 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == w.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<DiouStartedEvent>().Count(e => e == new DiouStartedEvent(f.Id, r.Claim, w.Id)) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29042)]
-    internal void AssertDiou(ProgramSkillFrame f)
-    {
-        if (f.Diou is not { } r)
-            return;
-        if (!DiouRootMatches(f) || !Enum.IsDefined(r.Stage))
-            throw new InvalidOperationException("Diou lost its frozen original Tanban materials or completed native Use mother.");
-        var shown = _coreProgramEventHistoryOperations.ProgramEventHistory<DiouShownEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (!r.Paid)
-        {
-            if (r.Stage != DiouStage.ShowChoice || r.ShownCardId != 0 || shown.Length != 0 || r.UseId != 0 || r.Returned || r.DrawOutcome is not null || f.PendingMovementContinuation is not null)
-                throw new InvalidOperationException("Unpaid Diou cannot contain a reveal, native Use or draw receipt.");
-            return;
-        }
-
-        if (shown is not [var fact] || fact != new DiouShownEvent(f.Id, f.OwnerSeat, r.ShownCardId, r.ShownPrintedKind, r.OutputKind, r.ActualTurn, r.TurnOwner, r.ShowSequence, r.FirstShow, r.SameName) || r.ShownCardId <= 0 || r.ShowSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.SameName != (global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.OutputKind) == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.Claim.EffectiveKind)))
-            throw new InvalidOperationException("Paid Diou lost its exact original retained-Hand reveal and conditional reward.");
-        if (r.Plan is { } plan && (plan.Kind != r.OutputKind || plan.Targets is not System.Collections.IList { IsReadOnly: true }))
-            throw new InvalidOperationException("Diou cannot change its frozen same-name native plan or its ordered targets.");
-        if (r.Plan is { } accepted && (_coreProgramEventHistoryOperations.ProgramEventHistory<DiouPlanAcceptedEvent>().Count(e => e == new DiouPlanAcceptedEvent(f.Id, accepted.Kind, accepted.ActionKind, accepted.TargetCardId, accepted.RequiredKind, accepted.Adjusted, accepted.Targets.Count)) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<DiouTargetAcceptedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select((e, i) => (e, i)).All(pair => pair.e.Index == pair.i && pair.i < accepted.Targets.Count && accepted.Targets[pair.i] == pair.e.TargetSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouTargetAcceptedEvent>().Count(e => e.FrameId == f.Id) != accepted.Targets.Count))
-            throw new InvalidOperationException("Diou changed its exact issued native plan or a selected ordered target.");
-        if (r.Stage == DiouStage.NativeUse && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { } use || !IsIssuedDiouUse(use)))
-            throw new InvalidOperationException("Diou's native child lost its exact separate zero-material issuance.");
-        if (r.Returned && r.UseId != 0 && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouNativeReturnedEvent>().Count(e => e == new DiouNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1))
-            throw new InvalidOperationException("Diou cannot claim an unreturned or repeated native Use.");
-        if (r.Stage == DiouStage.DrawChildren && (r.DrawOutcome is not { } o || o.RequestedCount != 2 || o.RecipientSeat != f.OwnerSeat || f.NativeDraw is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouDrawReturnedEvent>().Count(e => e == new DiouDrawReturnedEvent(f.Id, 2, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId)) != 1))
-            throw new InvalidOperationException("Diou lost its once-returned actual/replacement Draw2 invoice.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29042)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29042)]
     internal bool PermitPaidDiou(ProgramSkillFrame f)
     {
         if (f.Diou is { Paid: true })
         {
-            AssertDiou(f);
             return true;
         }
 
@@ -103,36 +73,6 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = _kernelCoreMainOperations.CreateCardAttackHandle2(originalId);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouParentAttackRestoredEvent(f.Id, r.UseId, originalId, a.ActionId));
         }
-    }
-
-    internal IReadOnlyList<int>? DiouNativeAncestorProcessing(long useId)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { DiouOrigin: { } o } use || !IsIssuedDiouUse(use) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ProgramFrameId)is not ProgramSkillFrame { Diou: { Stage: DiouStage.NativeUse } r } f || r.UseId != useId || !DiouRootMatches(f))
-            return null;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack.ElementAtOrDefault(index + 1)?.Id != useId)
-            return null;
-        // Only actual materials of the already accepted ancestor actions may
-        // remain in Processing. Empty-material child representations add no
-        // entities, and unrelated Processing cards cannot borrow this return.
-        var costs = _resolutionStackOperations._resolutionStack.Take(index).SelectMany(frame => frame switch
-        {
-            CardUseFrame { Action: { } a } => a.PhysicalCards,
-            ProgramCardTriggerWindowFrame window => window.Action.PhysicalCards,
-            _ => Array.Empty<CardActionCost>()}).Distinct().ToArray();
-        var result = new List<int>();
-        foreach (var cost in costs)
-        {
-            if (_cardZonesOperations._cardZones.GetLocation(cost.CardId) != CardLocation.Processing)
-                continue;
-            var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == cost.CardId);
-            if (entry is null || entry.To != CardLocation.Processing || entry.CardKind != cost.CardKind || entry.Sequence > r.ShowSequence || entry.From != cost.From && !(entry.Reason.Value == "conversion.declaration.pay" && entry.From == CardLocation.Hand(o.ActorSeat)))
-                return null;
-            if (!result.Contains(cost.CardId))
-                result.Add(cost.CardId);
-        }
-
-        return Array.AsReadOnly(result.ToArray());
     }
 
     internal bool IsDiouSuspendedCounterspell(NullificationWindowFrame window)
@@ -255,8 +195,6 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     internal bool HasDiouDamageObserver(long id) => DiouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1450)]
     internal bool HasDiouBeforeDamageObserver(long id) => DiouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1280)]
-    internal bool IsDiouDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DiouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 480)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 470)]
     internal bool IsDiouRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

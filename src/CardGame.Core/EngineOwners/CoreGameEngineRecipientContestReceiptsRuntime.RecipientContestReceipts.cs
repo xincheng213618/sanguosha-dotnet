@@ -90,22 +90,4 @@ internal sealed partial class CoreGameEngineRecipientContestReceiptsRuntime
             _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
         return (action.ActorSeat == returned.WinnerSeat && use.SourceSeat == returned.WinnerSeat || _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, returned.WinnerSeat)) && (use.TargetSeats.Count == 1 || ((_characterQianZhaoOlOperations.HasWeifuTargetTail(use) || ((_characterYangFuOlOperations.HasBingzhongTargetTail(use) || _characterMaChengOlOperations.HasChenglieTargetTail(use)) || _characterLiuPanOlOperations.HasPijingTargetTail(use))) || _characterMaWanOlOperations.HasMaWanHunjiangTargetTail(use) || (_characterZhangYanOlOperations.HasZhangYanLangdaoTargetTail(use) || _characterMaXiuMaTieOlOperations.HasKenshangTargetTail(use))) || _coreShortRangeSlashTargetsOperations.HasShortRangeSlashTail(use) || _coreSameTypeActualUseAidOperations.HasSameTypeAidTargetTail(use) || _coreOriginalTargetAdditionsOperations.HasIssuedOriginalTargetAdditionTail(use) || _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use));
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 580)]
-    internal void AssertRecipientContestPrograms(ProgramSkillFrame f)
-    {
-        if (f.UniqueHpPeer is not null && !ValidUniqueHpPeer(f) || f.RecipientContest is not null && !ValidRecipientContest(f))
-            throw new InvalidOperationException("A unique-HP cost or recipient contest lost its original immutable issuance, actual ledger or typed parent.");
-    }
-
-    internal void AssertPindianWinnerUses()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.PindianWinnerSlashReturn is not null))
-        {
-            var returned = use.PindianWinnerSlashReturn!;
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
-            if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame f || f.Id != returned.ProgramFrameId || f.RecipientContest?.SlashReturn != returned || !ValidRecipientContest(f))
-                throw new InvalidOperationException("The zero-entity winner Slash lost its exact paid original program.");
-        }
-    }
 }

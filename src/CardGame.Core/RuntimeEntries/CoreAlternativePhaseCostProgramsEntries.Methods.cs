@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreAlternativePhaseCostProgramsEntries
 {
-    internal void AssertAlternativePhaseCost(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertAlternativePhaseCost(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAlternativePhaseCost(global::CardGame.Core.ProgramSkillFrame frame, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardZoneKind> zones, global::CardGame.Core.PlayerMarkerKind marker) => _resolve().BeginAlternativePhaseCost(frame, zones, marker);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BuildAlternativePhaseCostChoices(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BuildAlternativePhaseCostChoices(frame, effect);
     internal bool CanOfferAlternativePhaseCost(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().CanOfferAlternativePhaseCost(owner, trigger, candidate);

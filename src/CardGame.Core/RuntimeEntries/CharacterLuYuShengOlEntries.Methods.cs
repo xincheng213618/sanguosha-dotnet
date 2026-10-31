@@ -6,7 +6,6 @@ internal sealed partial class CharacterLuYuShengOlEntries
     internal global::CardGame.Core.PromptChoice AiLuYuSheng(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiLuYuSheng(p, f);
     internal void AnswerLuYuSheng(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerLuYuSheng(choice);
     internal void ApplyLuYuShengReduction(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ApplyLuYuShengReduction(f);
-    internal void AssertLuYuSheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLuYuSheng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLuYuSheng(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginLuYuSheng(supplied, op);
     internal bool CanOfferLuYuSheng(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferLuYuSheng(c, t, context);
     internal void ContinueLuYuSheng(long id) => _resolve().ContinueLuYuSheng(id);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterLuYuShengOlEntries
     internal void FinishLuYuSheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLuYuSheng(f);
     internal bool HasLuYuShengDamageObserver(long id) => _resolve().HasLuYuShengDamageObserver(id);
     internal bool IsLuYuShengAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLuYuShengAwaitedMovement(f, e, p);
-    internal bool IsLuYuShengDying() => _resolve().IsLuYuShengDying();
     internal bool IsLuYuShengIssuedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsLuYuShengIssuedMovement(f, m);
     internal bool IsLuYuShengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLuYuShengRecoveryParent(f, recovery);
     internal void IssueLuYuShengDraw(global::CardGame.Core.ProgramSkillFrame f, int count) => _resolve().IssueLuYuShengDraw(f, count);

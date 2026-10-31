@@ -193,7 +193,6 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 47400)]
     internal bool ReturnShiKaijiMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeShiKaiji(f.Id);
-    internal bool IsMobileShiWangChangChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => f.MobileShiWangChang is { } r && r.Source == ShiWangChangSource(f) && r.GameplayHash == f.GameplayHash && b.ChooserSeat == f.OwnerSeat && (f.SkillId == ShiKaiji && f.InstructionIndex >= 2 && b.Name == "kaiji-reward" && b.OptionId == (r.NonBasicGained ? "yes" : "no") && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiKaijiRewardBoundEvent>().Count(e => e.FrameId == f.Id && e.Qualified == r.NonBasicGained) == 1 || f.SkillId == ShiShepan && f.InstructionIndex >= 1 && b.Name == "shepan-mode" && b.OptionId == r.Mode && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiShepanChosenEvent>().Count(e => e.FrameId == f.Id && e.Mode == r.Mode && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1);
     [ProgramAiChoice(SkillProgramEffectOp.SelectMobileShiKaijiTargets, SkillProgramEffectOp.ChooseMobileShiShepan)]
     internal PromptChoice ChooseShiWangChangAi(PendingDecision decision, ProgramSkillFrame f)
     {

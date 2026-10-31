@@ -96,13 +96,6 @@ internal sealed partial class CharacterXuRongOlRuntime
         return r.PaidCardIds.Distinct().Count() == r.PaidCardIds.Count && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XuRongCardsPaidEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Kind == reason && e.Before == r.MovementBefore && e.After == r.MovementAfter && e.CardIds.SequenceEqual(r.PaidCardIds)) == 1 && r.PaidCardIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.Reason.Value == reason && m.To == CardLocation.Hand(f.OwnerSeat)) == 1);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 230)]
-    internal void RequireIssuedXuRong(ProgramSkillFrame f)
-    {
-        if (f.XuRong is not null && !ValidXuRong(f))
-            throw new InvalidOperationException("Xu Rong lost its exact marked phase, frozen random payment or native dying causal invoice.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 190)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 190)]
     internal bool CanContinueIssuedXuRong(ProgramSkillFrame f) => ValidXuRong(f);
@@ -135,8 +128,6 @@ internal sealed partial class CharacterXuRongOlRuntime
     internal bool HasXuRongDamageObserver(long id) => XuRongObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 350)]
     internal bool HasXuRongBeforeDamageObserver(long id) => XuRongObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 120)]
-    internal bool IsXuRongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && XuRongObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 260)]
     internal bool TryAdvanceXuRongSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XuRongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramContinuation(ProgramContinuationKind.Resume, 23600)]
@@ -144,7 +135,6 @@ internal sealed partial class CharacterXuRongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XuRong: { } r } f || f.Id != id)
             return false;
-        RequireIssuedXuRong(f);
         if (f.AttackAttempt is not null)
             return true;
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, f.PendingMovementContinuation is null ? PostEventContinuation.Program : PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, f.PendingMovementContinuation is null ? PostEventContinuation.Program : PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))

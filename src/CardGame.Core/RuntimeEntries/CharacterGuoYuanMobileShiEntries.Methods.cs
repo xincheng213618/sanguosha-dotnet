@@ -12,8 +12,6 @@ internal sealed partial class CharacterGuoYuanMobileShiEntries
     internal bool ContinueShiGy(long id) => _resolve().ContinueShiGy(id);
     internal bool DrainShiGy(long id) => _resolve().DrainShiGy(id);
     internal void FinishShiGy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShiGy(f);
-    internal bool HasShiGyCompletedUseObserver(long id) => _resolve().HasShiGyCompletedUseObserver(id);
-    internal bool HasShiGyPrompt() => _resolve().HasShiGyPrompt();
     internal bool HasShiGyUseDistance(int actor, global::System.Collections.Generic.IReadOnlyList<int>? ids, long? useId) => _resolve().HasShiGyUseDistance(actor, ids, useId);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> IncludeShiGyDrawObservers(global::CardGame.Core.CharacterState subject, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> existing) => _resolve().IncludeShiGyDrawObservers(subject, existing);
     internal bool IsShiGyDeclarationQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsShiGyDeclarationQuery(actor, id);
@@ -25,7 +23,6 @@ internal sealed partial class CharacterGuoYuanMobileShiEntries
     internal bool MatchesShiGyDeclaration(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.CardDeclarationFrame d) => _resolve().MatchesShiGyDeclaration(root, d);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiGuoYuanPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().MobileShiGuoYuanPublicStates(owner, skillId);
     internal void PublishShiGy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiGy(f);
-    internal void RequireShiGy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShiGy(f);
     internal bool RetainShiGy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainShiGy(f);
     internal bool ReturnShiGyAttack() => _resolve().ReturnShiGyAttack();
     internal void ReturnShiGyDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome d) => _resolve().ReturnShiGyDraw(supplied, d);

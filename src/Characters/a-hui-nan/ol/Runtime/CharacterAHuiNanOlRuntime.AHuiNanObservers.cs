@@ -24,8 +24,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     internal bool HasAHuiNanDamageObserver(long id) => AHuiNanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 840)]
     internal bool HasAHuiNanBeforeDamageObserver(long id) => HasAHuiNanDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 660)]
-    internal bool IsAHuiNanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && AHuiNanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27200)]
     internal bool AdvanceAHuiNanChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && AHuiNanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveJuemanFirstBasicTurnEnd)]

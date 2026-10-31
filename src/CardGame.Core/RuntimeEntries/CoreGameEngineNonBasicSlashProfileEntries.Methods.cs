@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineNonBasicSlashProfileEntries
 {
-    internal void AssertNonBasicSlashPolicies() => _resolve().AssertNonBasicSlashPolicies();
     internal bool DistancePhysicalSlash80HasIssuedNonBasicSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash80HasIssuedNonBasicSlashDistance(q);
     internal bool HasIssuedNonBasicSlashDistance(long? useId) => _resolve().HasIssuedNonBasicSlashDistance(useId);
     internal bool IgnoresNonBasicSlashDistance(global::CardGame.Core.CharacterState owner, global::CardGame.Core.CardConversionSource source) => _resolve().IgnoresNonBasicSlashDistance(owner, source);

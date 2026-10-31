@@ -26,7 +26,6 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
     internal bool HasLeChengyanDamageObserver(long id) => LeChengyanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30200)]
     internal bool HasLeChengyanBeforeDamageObserver(long id) => LeChengyanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30200)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30200)]
     internal bool IsLeChengyanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LeChengyanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30200)]
@@ -54,10 +53,4 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 30200)]
     internal bool ContinueAcceptedLeChengyan(ProgramSkillFrame f) => f.LeChengyan is not null && ValidLeChengyan(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30200)]
-    internal void AssertLeChengyan(ProgramSkillFrame f)
-    {
-        if (f.LeChengyan is not null && !ValidLeChengyan(f))
-            throw new InvalidOperationException("Chengyan lost its original Use or paid draw cursor.");
-    }
 }

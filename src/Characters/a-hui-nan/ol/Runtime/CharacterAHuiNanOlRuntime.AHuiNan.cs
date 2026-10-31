@@ -139,7 +139,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AHuiNanJueman: { Stage: AHuiNanJuemanStage.UseChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AHuiNanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Jueman changed its genuine private chooser or current legal basic use.");
-        AssertAHuiNan(f);
         var targets = AHuiNanUseTargets(f)[int.Parse(choice.Parameters["option-index"], CultureInfo.InvariantCulture)];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var o = new AHuiNanJuemanUseOrigin(f.Id, _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1, r.Source, r.GameplayHash, r.ActualTurn, f.OwnerSeat, r.History[2].Kind, string.Join(',', targets));
@@ -153,7 +152,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AHuiNanJueman: { } r } f || f.Id != id)
             return;
-        AssertAHuiNan(f);
         if (r.Stage is AHuiNanJuemanStage.DrawChildren or AHuiNanJuemanStage.NativeChildren)
         {
             if (DrainAHuiNan(id))

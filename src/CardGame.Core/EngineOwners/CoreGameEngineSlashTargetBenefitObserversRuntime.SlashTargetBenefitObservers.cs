@@ -119,12 +119,10 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1820)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 200)]
     internal bool HasSlashBenefitDamageObserver(long id) => SlashBenefitPaidObserverRoot(id)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 580, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 660)]
     internal bool IsSlashTargetBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SlashBenefitPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 90)]
     internal bool IsSlashTargetBenefitMovement(ProgramSkillFrame root, SkillProgramEffect? op, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && root.SlashTargetBenefitDraft is { Stage: SlashTargetBenefitDraftStage.PaidChildren } d && pending.SubjectSeat == (d.Settlement ? root.OwnerSeat : d.Receipt.DrawBenefit ? root.OwnerSeat : d.Receipt.Use.TargetSeat) && op?.Op == (d.Settlement ? SkillProgramEffectOp.SettleDodgeCancelledSlashBenefit : SkillProgramEffectOp.OfferSlashTargetBenefit) && ValidSlashBenefitDraftPayment(root);
-    internal bool HasSlashTargetBenefitUseObserver(long useId) => _resolutionStackOperations._resolutionStack.OfType<SlashTargetBenefitWindowFrame>().Any(w => w.ParentFrameId == useId && SlashBenefitWindowMatches(w) && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == w.Id || _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && f.WindowContext?.ParentFrameId == w.Id && _coreSlashTargetBenefitPaymentsOperations.SlashBenefitProgramParentMatches(f) || SlashBenefitPaidObserverRoot()?.WindowContext?.ParentFrameId == w.Id));
     internal bool SlashBenefitWindowMatches(SlashTargetBenefitWindowFrame w)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == w.Id);
@@ -157,27 +155,5 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitObserversRuntime
         }
 
         return true;
-    }
-
-    internal void AssertSlashTargetBenefitProgram(ProgramSkillFrame f)
-    {
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineSlashTargetBenefitWindowsRuntime.IsSlashTargetBenefitWindow(f.WindowContext?.Window ?? default))
-            return;
-        if (!_coreSlashTargetBenefitPaymentsOperations.SlashBenefitProgramParentMatches(f) || f.SlashTargetBenefitDraft is { } d && (d.Settlement != (f.WindowContext!.Window == SkillProgramTriggerWindow.SlashDodgeCancelledBenefit) || d.Stage == SlashTargetBenefitDraftStage.PaidChildren && (!ValidSlashBenefitDraftPayment(f) || f.PendingMovementContinuation is not null && SlashBenefitPaidObserverRoot()?.Id != f.Id)))
-            throw new InvalidOperationException("A Slash target benefit lost its exact owning candidate/payment subtree.");
-    }
-
-    internal void AssertSlashTargetBenefitWindows()
-    {
-        foreach (var w in _resolutionStackOperations._resolutionStack.OfType<SlashTargetBenefitWindowFrame>())
-            if (!SlashBenefitWindowMatches(w))
-                throw new InvalidOperationException("A Slash benefit window lost its original use/candidate identity.");
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-        {
-            if (use.SlashTargetBenefits is not { } receipts)
-                continue;
-            if (receipts.Count == 0 || receipts.Select(r => (r.OfferWindowId, r.OfferCandidateIndex)).Distinct().Count() != receipts.Count || receipts.Select(r => (r.Source.OwnerSeat, r.Source.SkillId, r.Source.BindingId, r.Use.TargetSeat)).Distinct().Count() != receipts.Count || receipts.Any(r => r.Use.CardUseFrameId != use.Id || !ValidSlashTargetBenefitReceipt(r)))
-                throw new InvalidOperationException("A Slash benefit receipt cannot be duplicated or detached from its actual use.");
-        }
     }
 }

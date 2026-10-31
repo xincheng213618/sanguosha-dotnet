@@ -273,52 +273,6 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
     internal PromptChoice SelectAiNearestLegalSlash(PendingDecision decision) => decision.Choices.Select(choice => (Choice: choice, Value: choice.Parameters.GetValueOrDefault("request-option") == "decline" ? -22d : _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(decision.PlayerSeat), choice.Targets.Single(), new(0, 0, 0, 0, 0, 1, false, false)))).OrderByDescending(item => item.Value).ThenBy(item => item.Choice.Id.Value, StringComparer.Ordinal).First().Choice;
     [ProgramAiChoice(SkillProgramEffectOp.OfferUnlimitedVirtualSlash)]
     internal PromptChoice SelectAiUnlimitedSlash(PendingDecision decision) => decision.Choices.Select(choice => (Choice: choice, Value: choice.Parameters["offer-option"] == "decline" ? 0d : _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(decision.PlayerSeat), choice.Targets.Single(), new(0, 0, 0, 0, 0, 1, false, false)))).OrderByDescending(item => item.Value).ThenBy(item => item.Choice.Id.Value, StringComparer.Ordinal).First().Choice;
-    internal void AssertNearestLegalSlashState(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.NearestLegalSlashRequest is { } draft)
-        {
-            if (paused.Op != SkillProgramEffectOp.RequestLegalSlashByNearest || !frame.ReexecuteParticipantInstruction || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(draft.ActorSeat) || draft.ActorSeat == frame.OwnerSeat && !_coreWenheChaosOperations.IsExactWenheChaos(frame) || !frame.SelectedTargetSeats.SequenceEqual([draft.ActorSeat]) || draft.NearestSeats.Distinct().Count() != draft.NearestSeats.Count || draft.NearestSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || seat == draft.ActorSeat) || draft.AwaitingFaction != (draft.TargetSeat is not null) || draft.TargetSeat is { } target && !draft.NearestSeats.Contains(target))
-                throw new InvalidOperationException("Nearest legal Slash owning draft lost its exact cursor or frozen actors.");
-            if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && !draft.AwaitingFaction && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != draft.ActorSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_characterChengJiChengCuiOlOperations.TousuiProgramNativeDecision(_characterMaXiuMaTieOlOperations.KenshangProgramNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineChainedStateBasicConversionsRuntime.ChainedStateBasicNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(global::CardGame.Core.EngineOwners.CharacterGuoTuOlRuntime.WeijieNativeDecision(decision)))))).Choices, NearestLegalSlashChoices(frame))))
-                throw new InvalidOperationException("Nearest legal Slash prompt changed its actual material choices.");
-        }
-
-        if (paused.Op == SkillProgramEffectOp.OfferUnlimitedVirtualSlash && ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } offer || offer.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(offer.Choices, UnlimitedVirtualSlashChoices(frame))))
-            throw new InvalidOperationException("Unlimited Slash offer changed its exact live prompt.");
-    }
-
-    internal bool IsValidNearestSlashProgramSelection(ProgramSkillFrame frame, SkillProgramEffect effect, IReadOnlyList<SkillProgramEffect> instructions)
-    {
-        var ownerIndex = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        var child = ownerIndex >= 0 && ownerIndex + 1 < _resolutionStackOperations._resolutionStack.Count ? _resolutionStackOperations._resolutionStack[ownerIndex + 1] : null;
-        if (effect.Op == SkillProgramEffectOp.RequestLegalSlashByNearest)
-        {
-            var instructionIndex = Enumerable.Range(0, Math.Min(frame.InstructionIndex, instructions.Count)).Single(index => ReferenceEquals(instructions[index], effect));
-            var cursor = frame.NumberBindings.SingleOrDefault(binding => binding.Name == "participant-cursor-" + instructionIndex)?.Value ?? 0;
-            var wenhe = frame.WenheChaos is not null && _coreWenheChaosOperations.IsExactWenheChaos(frame) ? frame.WenheChaos : null;
-            if (cursor < 1 || cursor > (wenhe?.ActorSeats.Count ?? _coreMatchDefinitionPlayerCountAccess._playerCount - 1) || !frame.ReexecuteParticipantInstruction || frame.SelectedTargetSeats is not [var actor] || actor != (wenhe is null ? _coreTableOrderOperations.TableStepSeat(frame.OwnerSeat, cursor) : wenhe.ActorSeats[cursor - 1]))
-                return false;
-            if (frame.NearestLegalSlashRequest is { } draft)
-                return draft.ActorSeat == actor;
-            return child switch
-            {
-                CardEffectBeforeApplyFrame { NativeTargetReturn.WenheProgramFrameId: var parentId } window => parentId == frame.Id && window.NativeTargetReturn.TargetSeat == actor && _characterLuXunMouMobileOperations.ValidNativeTrickTargetEffect(window),
-                ChainedStateBasicFrame paid => _coreChainedStateBasicReturnsOperations.IsChainedStateBasicProgramSelection(frame, effect, paid),
-                DrawFundedDistinctBasicFrame paid => _coreDrawFundedDistinctBasicReturnsOperations.IsDrawFundedDistinctBasicProgramSelection(frame, effect, paid),
-                CardUseFrame { RoundOnceCardlessProgramRequest: not null } use => _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramRequestRidesOn(use, frame),
-                CardUseFrame use => use.SourceSeat == actor && use.CardAttack?.ProgramSkillCardUseFrameId == frame.Id && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == actor && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind),
-                DyingFrame dying => dying.ParentFrameId == frame.Id && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.VictimSeat == actor,
-                HpChangedTriggerWindowFrame hp => hp.ResumeFrameId == frame.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.ParentFrameId == frame.Id && hp.Change.TargetSeat == actor,
-                _ => false
-            };
-        }
-
-        if (effect.Op != SkillProgramEffectOp.OfferUnlimitedVirtualSlash || frame.TriggerId is not null)
-            return false;
-        if (frame.SelectedTargetSeats.Count == 0)
-            return ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } offer && offer.PlayerSeat == frame.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(offer.Choices, UnlimitedVirtualSlashChoices(frame));
-        return frame.SelectedTargetSeats is [var target] && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && target != frame.OwnerSeat && _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(item => item.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).OfType<ProgramUnlimitedSlashChoiceEvent>().Any(fact => fact.FrameId == frame.Id && fact.SkillId == frame.SkillId && fact.SkillInstanceId == frame.SkillInstanceId && fact.OwnerSeat == frame.OwnerSeat && fact.Used && fact.TargetSeat == target) && child is CardUseFrame { PhysicalCardIds.Count: 0 } virtualUse && (virtualUse.CardKind == CardKind.Slash || _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(virtualUse)) && virtualUse.SourceSeat == frame.OwnerSeat && virtualUse.CardAttack?.ProgramSkillCardUseFrameId == frame.Id && virtualUse.Action is { Type: CardActionType.Use, PhysicalCards.Count: 0 } virtualAction && virtualAction.ActorSeat == frame.OwnerSeat && (virtualAction.TargetSeats.SequenceEqual([target]) || _coreOriginalTargetAdditionsOperations.TryGetOriginalTargetVirtualSlashReturn(virtualUse, frame, out _));
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.INearestLegalSlashProgramHost.RequestLegalNearestSlashes(SkillProgramEffect effect, ProgramSkillFrame frame) => RequestLegalNearestSlashes(effect, frame);
     SkillProgramStepOutcome global::CardGame.Core.INearestLegalSlashProgramHost.OfferUnlimitedVirtualSlash(ProgramSkillFrame frame) => OfferUnlimitedVirtualSlash(frame);

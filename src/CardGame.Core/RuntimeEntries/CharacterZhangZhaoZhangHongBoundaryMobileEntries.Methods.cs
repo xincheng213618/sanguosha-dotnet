@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileEntries
 {
     internal void AnswerBoundaryZhangZhaoPhase(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryZhangZhaoPhase(choice);
-    internal void AssertBoundaryZhangZhaoPhase(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryZhangZhaoPhase(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryZhangZhaoPhase(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginBoundaryZhangZhaoPhase(f);
     internal global::CardGame.Core.PromptChoice BoundaryZhangZhaoPhaseAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryZhangZhaoPhaseAi(p, f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryZhangZhaoPhaseChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryZhangZhaoPhaseChoices(f);

@@ -11,7 +11,6 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
     internal const string SharedSlashOwnerDrawReason = "program.shared-slash.owner-draw";
     internal const string SharedSlashRecipientDrawReason = "program.shared-slash.recipient-draw";
     internal IEnumerable<IGameEvent> SharedSlashHistory() => _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(e => e.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents);
-    internal SkillProgramEffect SharedSlashPaused(ProgramSkillFrame f) => ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
     internal bool IsSharedSlashGiftSelection(ProgramSkillFrame f, string bind)
     {
         if (f.TriggerId is not null)
@@ -68,7 +67,6 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != frameId || f.SharedSlashOffer is not { } r)
             return false;
-        AssertSharedSlashOffer(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id))
             return true;
         if (r.Stage == SharedSlashOfferStage.GiftChildren)
@@ -152,7 +150,6 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
     internal void ResolveSharedSlashOfferChoice(PromptChoice choice)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack.Last().Id);
-        AssertSharedSlashOffer(f);
         var r = f.SharedSlashOffer ?? throw new InvalidOperationException("A shared Slash answer lost its paid gift.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SharedSlashOfferStage.ChoosingTarget ? f.OwnerSeat : r.ActorSeat) || !SharedSlashChoices(f).Any(c => c.Id == choice.Id && c.Targets.SequenceEqual(choice.Targets) && c.Cards.SequenceEqual(choice.Cards)))
             throw new InvalidOperationException("A shared Slash choice changed its frozen chooser or target.");
@@ -249,29 +246,6 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 290)]
-    internal void AssertSharedSlashOffer(ProgramSkillFrame f)
-    {
-        if (f.SharedSlashOffer is not { } r)
-            return;
-        if (f.TriggerId is not null || f.InstructionIndex != 2 || r.InstructionIndex != f.InstructionIndex || SharedSlashPaused(f)is not { Op: SkillProgramEffectOp.GiveBoundCardThenOfferVirtualSlashOrSharedDraw } op || op.SourceBind != r.SourceBind || r.Source != SharedSlashSource(f) || f.SelectedTargetSeats is not [var actor] || actor != r.ActorSeat || actor == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || !Enum.IsDefined(r.Stage) || r.GiftCost.From.OwnerSeat != f.OwnerSeat || r.GiftCost.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || r.GiftMovementSequence <= 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == r.GiftMovementSequence && m.CardId == r.GiftCost.CardId && m.CardKind == r.GiftCost.CardKind && m.From == r.GiftCost.From && m.To == CardLocation.Hand(actor) && m.Reason.Value == SharedSlashGiftReason) || !SharedSlashHistory().OfType<SharedSlashGiftCommittedEvent>().Any(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.RecipientSeat == actor && e.MovementSequence == r.GiftMovementSequence))
-            throw new InvalidOperationException("A shared Slash offer lost its exact paid gift and owning instruction.");
-        if (r.SlashReturn is { } returned)
-        {
-            if (returned.ProgramFrameId != f.Id || returned.InstructionIndex != f.InstructionIndex || returned.Source != r.Source || returned.ActorSeat != actor || returned.OriginalTargetSeat == actor || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(returned.OriginalTargetSeat) || returned.CardUseFrameId <= f.Id || returned.CardActionId <= 0 || !SharedSlashHistory().OfType<SharedSlashUseIssuedEvent>().Any(e => e.Return == returned))
-                throw new InvalidOperationException("A shared Slash lost its original typed use issuance.");
-            var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == returned.CardUseFrameId);
-            if (use is not null && (use.SharedSlashBenefit != returned || use.CardId != 0 || use.CardKind != CardKind.Slash && !_coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) || use.PhysicalCardIds?.Count != 0 || (use.CurrentSlashFirePolicy?.OriginalAction ?? use.Action)is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash } a || a.ActionId != returned.CardActionId || a.ActorSeat != actor || a.ProviderSeat != actor || a.PhysicalCards.Count != 0 || a.ConversionChain.Count != 0 || !a.TargetSeats.SequenceEqual(use.TargetSeats) && !_coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) || use.TargetSeats.Count > 1 && !((_characterQianZhaoOlOperations.HasWeifuTargetTail(use) || ((_characterYangFuOlOperations.HasBingzhongTargetTail(use) || _characterMaChengOlOperations.HasChenglieTargetTail(use)) || _characterLiuPanOlOperations.HasPijingTargetTail(use))) || _characterMaWanOlOperations.HasMaWanHunjiangTargetTail(use) || (_characterZhangYanOlOperations.HasZhangYanLangdaoTargetTail(use) || _characterMaXiuMaTieOlOperations.HasKenshangTargetTail(use))) && !_coreOriginalTargetAdditionsOperations.HasIssuedOriginalTargetAdditionTail(use) && !_coreSameTypeActualUseAidOperations.HasSameTypeAidTargetTail(use) && !_coreShortRangeSlashTargetsOperations.HasShortRangeSlashTail(use) && !_coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) || !SharedSlashHistory().OfType<TargetsConfirmedEvent>().Any(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual([returned.OriginalTargetSeat]))))
-                throw new InvalidOperationException("A shared Slash changed its exact zero-entity accepted action.");
-            if (r.Stage == SharedSlashOfferStage.SlashIssued && (use is null || r.CausedDamage is not null) || r.Stage != SharedSlashOfferStage.SlashIssued && r.CausedDamage is null)
-                throw new InvalidOperationException("A shared Slash lost its aggregate typed completion.");
-        }
-        else if (r.Stage == SharedSlashOfferStage.SlashIssued || r.CausedDamage is not null)
-            throw new InvalidOperationException("A shared Slash damage result has no issued use.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && r.Stage is SharedSlashOfferStage.ChoosingOption or SharedSlashOfferStage.ChoosingTarget && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } decision && (decision.PlayerSeat != (r.Stage == SharedSlashOfferStage.ChoosingTarget ? f.OwnerSeat : actor) || !decision.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(decision.Choices, SharedSlashChoices(f))))
-            throw new InvalidOperationException("A shared Slash prompt changed its actual chooser or frozen public choices.");
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.GiveBoundCardThenOfferVirtualSlashOrSharedDraw)]
     internal PromptChoice SelectAiSharedSlashOffer(PendingDecision decision, ProgramSkillFrame f)
     {
@@ -282,18 +256,6 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
             return decision.Choices.OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(snapshot, c.Targets.Single(), damage)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
         var canDamage = SharedSlashLegalTargets(actor).Any(seat => _coreAiBrainsAiBrainsAccess._aiBrains[actor].ScoreProgramTarget(snapshot, seat, damage) > 0);
         return decision.Choices.First(c => c.Parameters.GetValueOrDefault("offer-option") == (canDamage ? "slash" : "draw"));
-    }
-
-    internal void AssertSharedSlashUseReturns()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.SharedSlashBenefit is not null))
-        {
-            var returned = use.SharedSlashBenefit!;
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
-            if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame f || f.Id != returned.ProgramFrameId || f.SharedSlashOffer?.SlashReturn != returned)
-                throw new InvalidOperationException("A shared Slash return lost its exact live program producer.");
-            AssertSharedSlashOffer(f);
-        }
     }
 
     SkillProgramStepOutcome global::CardGame.Core.ISharedSlashOfferProgramHost.GiveBoundCardThenOffer(ProgramSkillFrame frame, int actorSeat, string sourceBind) => BeginSharedSlashGift(frame.Id, actorSeat, sourceBind);

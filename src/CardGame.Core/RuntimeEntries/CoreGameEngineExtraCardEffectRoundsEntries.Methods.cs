@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineExtraCardEffectRoundsEntries
 {
     internal void ApplyExtraCapableAlcoholEffect(long id, global::CardGame.Core.CharacterState target) => _resolve().ApplyExtraCapableAlcoholEffect(id, target);
-    internal void AssertExtraCardEffectReceipts() => _resolve().AssertExtraCardEffectReceipts();
     internal void CaptureExtraCardEffectAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().CaptureExtraCardEffectAttack(attack);
     internal void CaptureExtraGroupDamageSource(global::CardGame.Core.NativeOwners.GroupCardHandle group) => _resolve().CaptureExtraGroupDamageSource(group);
     internal bool ContinueExtraCardEffectFangtian(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().ContinueExtraCardEffectFangtian(attack);

@@ -48,7 +48,6 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
             var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            RequireOlGuixin(f);
             var r = f.OlGuixin!;
             if (r.Stage is OlGuixinStage.MovementChildren or OlGuixinStage.TurnoverChildren)
             {
@@ -140,7 +139,6 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
     internal void AnswerOlGuixinPriority(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("OL Guixin lost its original frame.");
-        RequireOlGuixin(f);
         var r = f.OlGuixin!;
         if (r.Stage != OlGuixinStage.PriorityChoice || !OlGuixinPriorityChoices(f.Id).Any(c => c.Id == chosen.Id && c.Cards.SequenceEqual(chosen.Cards) && c.Targets.SequenceEqual(chosen.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(chosen.Parameters.OrderBy(p => p.Key))))
             throw new InvalidOperationException("OL Guixin needs one published priority-area choice for this actual damage point.");

@@ -25,7 +25,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     {
         if (f.Weiwan is not { } r || !HasPaidWeiwanSelection(f))
             return false;
-        AssertWeiwan(f);
         if (child is IdentityAppearanceFrame appearance)
             return r.Stage == WeiwanStage.HealthIssuing && r.Branch == WeiwanBranch.LoseHp && appearance.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && appearance.Receipt.ParentFrameId == f.Id && appearance.Receipt.OwnerSeat == r.TargetSeat && appearance.Receipt.RequestedDeduction == 1 && appearance.Receipt.OriginalInstructionIndex == f.InstructionIndex;
         if (child is DyingFrame dying)
@@ -49,8 +48,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     internal bool HasWeiwanDamageObserver(long id) => WeiwanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1290)]
     internal bool HasWeiwanBeforeDamageObserver(long id) => WeiwanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1120)]
-    internal bool IsWeiwanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WeiwanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28620)]
     internal bool AdvanceWeiwanChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WeiwanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

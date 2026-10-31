@@ -14,7 +14,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
     {
         if (f.MouCaoPi is not { Stage: not MouCaoPiStage.Choosing } r)
             return false;
-        AssertMouCaoPi(f);
         if (child is NativeDrawAttemptFrame)
             return r.Stage == MouCaoPiStage.DrawRequest && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f) && f.NativeDraw is { RequestedCount: 3, Operation: SkillProgramEffectOp.MouCaoPiXingshang };
         if (child is RecoveryReplacementFrame recovery)
@@ -34,8 +33,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
     internal bool HasMouCaoPiDamageObserver(long id) => MouCaoPiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1120)]
     internal bool HasMouCaoPiBeforeDamageObserver(long id) => MouCaoPiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 950)]
-    internal bool IsMouCaoPiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouCaoPiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28000)]
     internal bool AdvanceMouCaoPiChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouCaoPiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

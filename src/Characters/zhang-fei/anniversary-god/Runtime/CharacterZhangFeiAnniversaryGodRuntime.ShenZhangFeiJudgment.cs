@@ -60,19 +60,6 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
         return _cardZonesOperations._cardZones.GetLocation(e.CardId) == location && (child is { ShenZhangFei: { Stage: ShenZhangFeiStage.GainChildren, Paid: true } r } && r.RootId == root.Id && r.JudgmentId == j.Id && r.CardId == e.CardId && r.After == e.Sequence && child.WindowContext?.ParentFrameId == window.Id || child is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(p => p.FrameId == e.ClaimId && p.Completed && p.BindingId == "judgment-first-gain" && p.OwnerSeat == e.OwnerSeat));
     }
 
-    internal bool IsExactShenZfJudgmentGainSubtree(ProgramJudgmentTriggerWindowFrame window, JudgmentFrame? judgment, int index)
-    {
-        if (judgment is null || !window.Activated || window.ZhenyiBeforeResult == true || index < 2 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index] != window || _resolutionStackOperations._resolutionStack[index - 1] != judgment || window.ParentFrameId != judgment.Id || window.CandidateIndex != 0 || _resolutionStackOperations._resolutionStack[index - 2] is not ProgramSkillFrame root || !IsShenZfJudgment(judgment, root) || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame { ShenZhangFei: { Stage: ShenZhangFeiStage.GainChildren, Paid: true } r } child || r.RootId != root.Id || r.JudgmentId != judgment.Id || child.OwnerSeat != root.OwnerSeat || child.SkillId != root.SkillId || child.SkillInstanceId != root.SkillInstanceId || child.GameplayHash != root.GameplayHash || child.TriggerId != "judgment-first-gain" || child.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentFinalized } context || context.ParentFrameId != window.Id || context.Judgment != window.Judgment || window.Candidates.Count == 0 || window.Candidates[0] != new ProgramJudgmentTriggerCandidate(child.OwnerSeat, child.SkillId, child.TriggerId, child.SkillInstanceId, child.GameplayHash) || !HasShenZfJudgmentGainDisposition(judgment) || child.PendingMovementContinuation is not { } pending || !ShenZfMovementProof(child, ProgramInstructionResolver.Default.Resolve(child, _contentRegistryOperations._contentRegistry.GetSkill(child.SkillId).Program!).Instructions[0], pending))
-            return false;
-        if (index + 2 == _resolutionStackOperations._resolutionStack.Count)
-            return true;
-        if (_resolutionStackOperations._resolutionStack[index + 2] is not CardsMovedTriggerWindowFrame moved || moved.ResumeProgramFrameId is not null || moved.Batch.ParentFrameId != child.Id || moved.Batch.AwaitingProgramFrameId != child.Id || !moved.Batch.Movements.Any(m => m.Sequence == r.After && m.CardId == r.CardId && m.From == r.From && m.To == r.To && m.Reason.Value == ShenZfReason + "judgment-gain"))
-            return false;
-        // The first real gain batch is proved above; keep the existing exact
-        // movement, HP, rescue and nested observer edges for its whole suffix.
-        return _coreObserverSubtreesOperations.HasMovementObserverSuffix(index + 1);
-    }
-
     internal bool HasUnclaimedShenZfJudgmentResult(ProgramSkillFrame f, int cardId, long before)
     {
         if (f.ShenZhangFei is not { Operation: SkillProgramEffectOp.ResolveShenZhangFeiShencai, ResultCardId: { } resultId, ResultKind: { } kind } r || f.TriggerId is not null || f.ActivationId != "sentence" || resultId != cardId || _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Count(e => e.ResolutionId == r.JudgmentId && e.ParentResolutionId == f.Id && e.TargetSeat == r.TargetSeat && e.Reason == "anniversary-shencai" && e.CardId == cardId && e.CardKind == kind) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiJudgmentReturnedEvent>().Count(e => e == new ShenZhangFeiJudgmentReturnedEvent(f.Id, r.JudgmentId, cardId, kind)) != 1)

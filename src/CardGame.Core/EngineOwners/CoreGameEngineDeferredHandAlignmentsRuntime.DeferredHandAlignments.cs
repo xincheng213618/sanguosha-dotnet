@@ -200,20 +200,4 @@ internal sealed partial class CoreGameEngineDeferredHandAlignmentsRuntime
         ContinueDeferredTurnEnd();
         return true;
     }
-
-    internal bool IsExactDeferredChild(ProgramSkillFrame child) => _resolutionStackOperations._resolutionStack.FirstOrDefault()is DeferredTurnEndFrame parent && parent.AfterTurnEnded is null && parent.Prelude is not { Completed: false } && parent.Current is { } due && _resolutionStackOperations._resolutionStack.Count >= 2 && _resolutionStackOperations._resolutionStack[1] is ProgramSkillFrame active && active.Id == child.Id && child.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } context && context.ParentFrameId == parent.Id && context.OwnerSeat == child.OwnerSeat && context.TargetSeat == due.TargetSeat && parent.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && parent.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Finished && child.OwnerSeat == due.Source.OwnerSeat && child.SkillId == due.Source.SkillId && child.SkillInstanceId == due.Source.SkillInstanceId && child.TriggerId == due.ContinuationId && child.SelectedTargetSeats is [var target] && target == due.TargetSeat;
-    internal bool HasDeferredTurnEndBoundaryFrame()
-    {
-        if (_resolutionStackOperations._resolutionStack.FirstOrDefault()is not DeferredTurnEndFrame frame)
-            return false;
-        if (frame.Prelude is { Completed: false })
-            return _coreDeferredTurnEndPreludesOperations.HasDeferredTurnEndPreludeBoundary(frame);
-        if (frame.SoleTargetQuarantineReturns is { MovementChildFrameId: not null })
-            return _coreSoleTargetQuarantineOperations.HasSoleTargetQuarantineEndBoundary(frame);
-        if (frame.AfterTurnEnded is not null)
-            return _coreAfterTurnEndedProgramsOperations.HasAfterTurnEndedBoundaryFrame(frame);
-        if (frame.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || frame.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Finished || frame.ItemIndex < 1 || frame.ItemIndex > frame.DueIds.Count || frame.Current is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[1] is not ProgramSkillFrame child || child.WindowContext?.ParentFrameId != frame.Id || child.SkillId != frame.Current.Source.SkillId || child.SkillInstanceId != frame.Current.Source.SkillInstanceId || child.TriggerId != frame.Current.ContinuationId || child.SelectedTargetSeats is not [var target] || target != frame.Current.TargetSeat)
-            throw new InvalidOperationException("A deferred end boundary lost its exact active child.");
-        return true;
-    }
 }

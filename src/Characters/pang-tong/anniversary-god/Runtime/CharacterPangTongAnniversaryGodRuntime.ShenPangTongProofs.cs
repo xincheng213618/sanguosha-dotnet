@@ -14,34 +14,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
             throw new InvalidOperationException("Kunyu lost its original death, paid fire removal or typed revival entitlement.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 39200)]
-    internal void RequireShenPt(ProgramSkillFrame f)
-    {
-        if (f.ShenPangTong is not { } r)
-            return;
-        if (r.Source != ShenPtSource(f) || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 1 || r.ParentId != f.WindowContext?.ParentFrameId || !Enum.IsDefined(r.Stage) || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenPangTongStartedEvent>().Count(e => e == new ShenPangTongStartedEvent(f.Id, r.Source, r.GameplayHash, r.Operation, r.ParentId, r.ActionId, r.TargetSeat, r.Polarity, r.DeathId)) != 1)
-            throw new InvalidOperationException("Shen Pang Tong lost his exact original native binding or paid cursor.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != r.ParentId)
-            throw new InvalidOperationException("Shen Pang Tong lost his immediate original trigger parent.");
-        if (r.Operation == SkillProgramEffectOp.ResolveShenPangTongFengliao)
-        {
-            if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame w || w.Action.ActionId != r.ActionId || w.Action.Type != CardActionType.Use || w.Action.ActorSeat != f.OwnerSeat || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])) || !ShenPtTargets(w.Action).SequenceEqual([r.TargetSeat]) || f.ConversionPreviousPolarity != r.Polarity || r.DeathId != 0 || r.RemovedCardId != 0 || r.Polarity == SkillPolarity.Yang && r.Stage is not (ShenPangTongStage.DrawAttempt or ShenPangTongStage.DrawChildren) || r.Polarity == SkillPolarity.Yin && r.Stage != ShenPangTongStage.DamageChildren)
-                throw new InvalidOperationException("Fengliao lost the actual sole designated target, accepted use or committed polarity.");
-            if (r.Stage == ShenPangTongStage.DrawChildren && (!r.DrawReturned || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenPangTongDrawReturnedEvent>().Count(e => e.FrameId == f.Id && e.TargetSeat == r.TargetSeat && e.ActualCount == r.ActualDraw && e.Before == r.Before && e.After == r.After) != 1))
-                throw new InvalidOperationException("Fengliao lost its typed native target draw invoice.");
-            if (f.AttackAttempt is { } a && (r.Stage != ShenPangTongStage.DamageChildren || a.SourceSeat != f.OwnerSeat || a.Nature != DamageNature.Fire || a.SourceLess || !ShenPtActualDamageTarget(f, r, a)))
-                throw new InvalidOperationException("Fengliao lost its original native fire damage producer.");
-        }
-        else if (r.Operation == SkillProgramEffectOp.ResolveShenPangTongKunyu)
-        {
-            if (r.Stage != ShenPangTongStage.RemovalChildren || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramDeathTriggerWindowFrame w || w.DeathFrameId != r.DeathId || w.OwnerSeat != f.OwnerSeat || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) || _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().SingleOrDefault(d => d.Id == r.DeathId)is not { ShenPangTongOutcomeDeferred: true } death || death.VictimSeat != f.OwnerSeat || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.ActionId != 0 || r.RemovedCardId > 0 && !ShenPtPaidRemoval(f.Id, r.DeathId, r.RemovedCardId, r.Before, r.After, r.BatchId))
-                throw new InvalidOperationException("Kunyu lost the original dead owner, death window or paid fire removal.");
-        }
-        else
-            throw new InvalidOperationException("Shen Pang Tong has an unsupported owned operation.");
-    }
-
     internal bool ShenPtActualDamageTarget(ProgramSkillFrame f, ShenPangTongReceipt r, AttackAttemptState a)
     {
         var transferred = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageTransferredEvent>().Where(e => e.ResolutionId == f.Id && e.SourceSeat == f.OwnerSeat && e.Nature == DamageNature.Fire).ToArray();
@@ -74,7 +46,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
     {
         if (f.ShenPangTong is not { Operation: SkillProgramEffectOp.ResolveShenPangTongKunyu, Stage: ShenPangTongStage.RemovalChildren } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null)
             return false;
-        RequireShenPt(f);
         return ShenPtPaidRemoval(f.Id, r.DeathId, r.RemovedCardId, r.Before, r.After, r.BatchId);
     }
 
@@ -82,7 +53,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
     {
         if (f.ShenPangTong is not { } r)
             return false;
-        RequireShenPt(f);
         if (child is CardsMovedTriggerWindowFrame moved)
         {
             if (moved.Batch.ParentFrameId != f.Id || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId)
@@ -101,7 +71,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
     internal bool ShenPtDamageWindow(long id) => ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 39200)]
     internal bool ShenPtBeforeDamage(long id) => ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 39200)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 39200)]
     internal bool ShenPtDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 39200)]

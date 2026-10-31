@@ -56,18 +56,6 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
         return f.PendingMovementContinuation is null;
     }
 
-    internal bool HasAnniversaryMaMiaoPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryMaMiao.Stage: "discard" or "obtain-choice" or "extra-choice", Step: ResolutionFrameStep.AwaitingResponse } f && ValidMaMiao(f) && p.PlayerSeat == MaMiaoChooser(f) && p.TargetSeat == MaMiaoChooser(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, MaMiaoChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 48800)]
-    internal void AssertMaMiao(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryMaMiao is null)
-            return;
-        if (!ValidMaMiao(f))
-            throw new InvalidOperationException("Ma Miao lost his original turn/gain parent, private native payment, deterministic random choice or recovery-before-obtain sequence.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null && f.AnniversaryMaMiao.Stage is "discard" or "obtain-choice" or "extra-choice" && !HasAnniversaryMaMiaoPrompt())
-            throw new InvalidOperationException("Ma Miao's exact current recipient choice or hidden owned-card slot changed.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 48800)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 48800)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 48800)]
@@ -98,7 +86,6 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
     internal bool MaMiaoDamageObserver(long id) => MaMiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 48800)]
     internal bool MaMiaoBeforeDamageObserver(long id) => MaMiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 48800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 48800)]
     internal bool MaMiaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MaMiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 48800)]

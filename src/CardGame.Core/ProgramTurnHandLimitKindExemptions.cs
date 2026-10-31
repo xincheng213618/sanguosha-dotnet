@@ -84,10 +84,4 @@ internal sealed partial class TurnCardUseEffectStore
             .Select(policy => policy.GrantSequence);
     private void ExpireHandLimitKindExemptions(HashSet<long> expired) =>
         _handLimitKindExemptions.RemoveAll(policy => expired.Contains(policy.GrantSequence));
-    private bool HandLimitKindExemptionsAreInvalid() => _handLimitKindExemptions.Any(policy =>
-        policy.TurnNumber <= 0 || policy.TurnSeat < 0 || policy.ParentFrameId <= 0 || policy.EffectIndex < 0 ||
-        policy.Source.OwnerSeat < 0 || string.IsNullOrWhiteSpace(policy.Source.SkillId) ||
-        string.IsNullOrWhiteSpace(policy.Source.BindingId) || string.IsNullOrWhiteSpace(policy.Source.SkillInstanceId) ||
-        policy.CardKinds.Count == 0 || policy.CardKinds.Distinct().Count() != policy.CardKinds.Count ||
-        !Enum.IsDefined(policy.Expiration) || policy.CardKinds.Any(kind => !Enum.IsDefined(kind)));
 }

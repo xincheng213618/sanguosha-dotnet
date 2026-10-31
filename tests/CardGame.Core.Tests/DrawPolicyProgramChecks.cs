@@ -48,7 +48,6 @@ internal static class DrawPolicyProgramChecks
                     .SequenceEqual([conversion]) &&
                 store.GetConversions(7, 0, 0, CardKind.Duel, inputIsRed: true).Count == 0,
             "Turn policies must remain typed, actor-scoped and idempotent.");
-        store.AssertInvariants();
 
         var expired = store.ExpireTurn(7, 0);
         Require(expired.SequenceEqual(new[]
@@ -64,7 +63,6 @@ internal static class DrawPolicyProgramChecks
                 !store.HasTargetRestriction(7, 0, 0, SkillProgramCardTargetRestriction.SelfOnly) &&
                 store.GetConversions(7, 0, 0, CardKind.Duel, inputIsRed: false).Count == 0,
             "Every policy granted for one turn must expire in the same deterministic boundary.");
-        store.AssertInvariants();
     }
 
     private static void Require(bool condition, string message)

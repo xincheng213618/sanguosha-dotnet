@@ -2,13 +2,10 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOriginalHandEntityObserversEntries
 {
-    internal void AssertOriginalHandEntityProgram(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertOriginalHandEntityProgram(f);
-    internal void AssertOriginalHandEntityState() => _resolve().AssertOriginalHandEntityState();
     internal bool ExactOriginalHandBenefitParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactOriginalHandBenefitParent(f);
     internal bool ExactOriginalHandInheritanceParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactOriginalHandInheritanceParent(f);
     internal bool ExactOriginalHandLifecycleParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().ExactOriginalHandLifecycleParent(f, window);
     internal bool HasOriginalHandEntityDamageObserver(long windowId) => _resolve().HasOriginalHandEntityDamageObserver(windowId);
-    internal bool IsOriginalHandEntityChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision decision) => _resolve().IsOriginalHandEntityChoice(f, decision);
     internal bool IsOriginalHandEntityProgramDying() => _resolve().IsOriginalHandEntityProgramDying();
     internal bool OriginalHandBenefitFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().OriginalHandBenefitFirstChild(f, child);
     internal bool OriginalHandBindingStarted(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().OriginalHandBindingStarted(f, window);

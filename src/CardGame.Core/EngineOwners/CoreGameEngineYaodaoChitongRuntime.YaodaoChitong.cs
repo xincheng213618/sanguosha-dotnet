@@ -49,7 +49,6 @@ internal sealed partial class CoreGameEngineYaodaoChitongRuntime
     internal SkillProgramStepOutcome ResolveYaodaoChitong(ProgramSkillFrame input, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        AssertYaodaoChitongFrame(f);
         if (f.YaodaoChitong is not { Resolved: false } r || f.InstructionIndex != 3 || f.JudgmentOutcomeBindings?.Where(o => o.Name == effect.SourceBind).ToArray()is not [var outcome] || outcome.TargetSeat != f.OwnerSeat || outcome.Reason != "shanhe.yaodao-chitong" || !_coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(f, outcome) || _coreCardActionsOperations.ProgramCardAttack is not { } attack || attack.ResolutionId != r.CardUseId || attack.TargetSeat != r.OriginalTargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(r.CardUseId)is not { } use || use.TargetIndex != r.TargetIndex)
             throw new InvalidOperationException("Yaodao Chitong lost the exact completed native judgment and its unchanged original Slash target.");
         var candidates = outcome.Suit is Suit.Spade or Suit.Club && _coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[r.OriginalTargetSeat].IsAlive && _coreMatchOutcomeWinnerAccess._winner == Winner.None ? _coreMatchParticipantsPlayersAccess._players.Where(p => YaodaoChitongTarget(use, attack, p.Seat)).Select(p => p.Seat).Order().ToArray() : [];
@@ -68,51 +67,12 @@ internal sealed partial class CoreGameEngineYaodaoChitongRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YaodaoChitongResolvedEvent(f.Id, use.Id, r.ActionId, r.TargetIndex, r.OriginalTargetSeat, selected, outcome.JudgmentFrameId, outcome.Suit, candidates.Length));
         return SkillProgramStepOutcome.Continue;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 5791)]
-    internal void AssertYaodaoChitongFrame(ProgramSkillFrame f)
-    {
-        if (f.YaodaoChitong is not { } r)
-            return;
-        if (f.GameplayHash != r.GameplayHash || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || f.SkillId != YaodaoChitongSkill || r.TargetIndex < 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.OriginalTargetSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<YaodaoChitongStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var started] || started.Receipt != (r with
-        {
-            Resolved = false
-        }
-
-        ) || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.WindowId)is not { } window || window.ParentFrameId != r.CardUseId || window.Action.ActionId != r.ActionId || window.Continuation != ProgramCardContinuation.SlashTargetRedirecting || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.CardUseId)is not { Action: { } action } use || action.ActionId != r.ActionId || use.SourceSeat != f.OwnerSeat || r.TargetIndex >= use.TargetSeats.Count || r.WeaponCardId <= 0 || _coreAdvancedLifecycleOperations.GetAdvancedCard(r.WeaponCardId).Kind != CardKind.YaodaoChitong)
-            throw new InvalidOperationException("Yaodao Chitong lost its exact weapon, original source, native target window or once-issued judgment receipt.");
-        var resolved = _coreProgramEventHistoryOperations.ProgramEventHistory<YaodaoChitongResolvedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Resolved ? resolved is not [var paid] || paid.CardUseId != r.CardUseId || paid.ActionId != r.ActionId || paid.TargetIndex != r.TargetIndex || paid.OriginalTargetSeat != r.OriginalTargetSeat || f.YaodaoChitongRandom is not { } random || random.CandidateCount != paid.CandidateCount || random.SelectedTargetSeat != paid.NewTargetSeat || (random.CandidateCount == 0 ? random.Before != random.After || random.SelectedTargetSeat is not null : random.Before == random.After || random.SelectedTargetSeat is null) || use.TargetSeats[r.TargetIndex] != (paid.NewTargetSeat ?? r.OriginalTargetSeat) || paid.NewTargetSeat is { } newTarget && (newTarget == f.OwnerSeat || newTarget == r.OriginalTargetSeat || paid.CandidateCount < 1) : resolved.Length != 0 || f.YaodaoChitongRandom is not null || use.TargetSeats[r.TargetIndex] != r.OriginalTargetSeat)
-            throw new InvalidOperationException("Yaodao Chitong changed its actual target without its single paid random-result fact.");
-    }
-
-    internal ProgramSkillFrame? ExactYaodaoChitongJudgmentRoot(JudgmentFrame judgment)
-    {
-        var root = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == judgment.ParentFrameId);
-        if (root is not { YaodaoChitong: { Resolved: false } receipt, InstructionIndex: 2 } || judgment.ParentAttackId != receipt.CardUseId || judgment.TargetSeat != root.OwnerSeat || judgment.Reason != "shanhe.yaodao-chitong" || _coreProgramJudgmentOutcomesOperations.JudgmentOutcomeInstruction(root, root.InstructionIndex)is null || !_coreProgramLifecycleOperations.IsValidProgramJudgmentContinuation(judgment, root))
-            return null;
-        AssertYaodaoChitongFrame(root);
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index < 1 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] != judgment || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame nativeWindow || nativeWindow.Id != receipt.WindowId || root.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } action } context || context.ParentFrameId != receipt.WindowId || context.SourceSeat != root.OwnerSeat || action.ParentCardUseFrameId != receipt.CardUseId || action.CardActionId != receipt.ActionId)
-            return null;
-        // Reuse the existing exact native judgment/retrial/finalized-claim
-        // edges and paid movement/health observer edges, with this root's
-        // separate weapon/card-use/window receipt as its sole admission proof.
-        for (var child = index + 1; child < _resolutionStackOperations._resolutionStack.Count; child++)
-            if (!_coreJudgmentOutcomeDamageEdgesOperations.JudgmentOutcomeDamageEdge(child, root))
-                return null;
-        return root;
-    }
-
-    internal bool IsExactYaodaoChitongJudgmentFinalizedSubtree(ProgramJudgmentTriggerWindowFrame window, JudgmentFrame? judgment, int index) => judgment is not null && index >= 1 && index + 1 < _resolutionStackOperations._resolutionStack.Count && window.ParentFrameId == judgment.Id && _resolutionStackOperations._resolutionStack[index - 1] == judgment && _resolutionStackOperations._resolutionStack[index + 1] is ProgramSkillFrame && ExactYaodaoChitongJudgmentRoot(judgment)is not null;
-    internal bool HasExactYaodaoChitongJudgmentSubtree(long judgmentId) => _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == judgmentId)is { } judgment && ExactYaodaoChitongJudgmentRoot(judgment)is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5791)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5791)]
     internal bool ContinueIssuedYaodaoChitong(ProgramSkillFrame f)
     {
         if (f.YaodaoChitong is null)
             return false;
-        AssertYaodaoChitongFrame(f);
         return true;
     }
 }

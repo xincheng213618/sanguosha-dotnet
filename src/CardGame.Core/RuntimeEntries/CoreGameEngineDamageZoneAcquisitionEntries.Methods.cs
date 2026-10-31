@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDamageZoneAcquisitionEntries
 {
-    internal void AssertRegisteredDamageAcquisitionReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredDamageAcquisitionReceipt(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDamageZoneAcquisition(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginDamageZoneAcquisition(input);
     internal bool CanContinueDamageZoneAcquisition(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueDamageZoneAcquisition(f);
     internal bool CanOfferDamageZoneAndAdjacentTarget(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferDamageZoneAndAdjacentTarget(candidate, trigger, context);

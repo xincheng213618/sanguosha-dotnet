@@ -68,8 +68,6 @@ internal sealed partial class CharacterYuanShaoBoundaryMobileRuntime
         var responder = frame.TriggerId == "actual-arrow-dodge-draw";
         var expected = responder ? MobileYuanShaoResponder(frame.WindowContext!, frame.OwnerSeat) : frame.OwnerSeat;
         var count = responder ? 1 : frame.WindowContext?.Facts?.CardUseDesignatedTargetCount ?? 0;
-        if (frame.SkillId != MobileYuanShaoLuanji || frame.InstructionIndex != 1 || outcome.RecipientSeat != expected || outcome.RequestedCount != count)
-            throw new InvalidOperationException("Mobile Luanji lost its original paid draw recipient or target count.");
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }

@@ -131,20 +131,4 @@ internal sealed partial class CharacterLuMengMouRuntime
         ResolveYingboGiftChoice(selected);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }
-
-    internal void AssertYingboInvariant()
-    {
-        if (ActiveYingboGift is null)
-        {
-            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.Kind == DecisionKind.Yingbo)
-                throw new InvalidOperationException("A Yingbo prompt cannot exist without its card continuation.");
-            return;
-        }
-
-        var pending = ActiveYingboGift;
-        if (!_coreMouLuMengOperations.UsesFormalMouLuMeng || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.Yingbo, IsPrivate: true } decision || decision.PlayerSeat != pending.SourceSeat || _cardZonesOperations._cardZones.GetLocation(pending.Card.Id) != CardLocation.Processing || !IsYingboUnrespondable(pending.ResolutionId))
-        {
-            throw new InvalidOperationException("A Yingbo gift must retain its owner, private prompt and physical card in Processing.");
-        }
-    }
 }

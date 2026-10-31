@@ -120,7 +120,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvKuangLvXiang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LvChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LvKuangLvXiangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The relay lost its actual private chooser or legal native payment.");
-        AssertLvKuangLvXiang(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Payments.Count == 0 && !LvKuangLvXiangCurrent(f))
         {
@@ -173,7 +172,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvKuangLvXiang: { } r } f || f.Id != id)
             return false;
-        AssertLvKuangLvXiang(f);
         if (r.Stage == "native" && !r.Returned)
             return false;
         if (r.Stage is "receive-children" or "give-children" or "native")

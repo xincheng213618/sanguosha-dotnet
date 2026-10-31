@@ -4,7 +4,6 @@ internal sealed partial class CharacterPeiYuanShaoOlEntries
 {
     internal bool AdvanceFulueSubtree() => _resolve().AdvanceFulueSubtree();
     internal void AnswerFulue(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerFulue(choice);
-    internal void AssertFulue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertFulue(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginFulue(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginFulue(supplied, op);
     internal bool CanRunIssuedFulueCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunIssuedFulueCandidate(c, context);
     internal global::CardGame.Core.PromptChoice ChooseFulueAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseFulueAi(p, f);
@@ -30,7 +29,6 @@ internal sealed partial class CharacterPeiYuanShaoOlEntries
     internal bool HasFulueDamageObserver(long id) => _resolve().HasFulueDamageObserver(id);
     internal bool HasFulueObtainableCard(int user, int target) => _resolve().HasFulueObtainableCard(user, target);
     internal bool HasIssuedFulueRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasIssuedFulueRequest(f);
-    internal bool IsFulueDying() => _resolve().IsFulueDying();
     internal bool IsFulueMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFulueMovement(f, effect, pending);
     internal bool IsFulueRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsFulueRecoveryParent(f, recovery);
     internal bool IsIssuedFulueCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedFulueCandidate(c);

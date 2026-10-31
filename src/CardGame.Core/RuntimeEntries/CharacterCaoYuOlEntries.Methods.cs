@@ -7,7 +7,6 @@ internal sealed partial class CharacterCaoYuOlEntries
     internal void AfterGongjieGifts(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AfterGongjieGifts(f);
     internal global::CardGame.Core.PromptChoice AiCaoYu(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiCaoYu(p, f);
     internal void AnswerCaoYu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerCaoYu(choice);
-    internal void AssertCaoYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertCaoYu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCaoYu(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginCaoYu(input, op);
     internal bool CaoYuActualTurnOpen(int turn, int owner) => _resolve().CaoYuActualTurnOpen(turn, owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CaoYuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CaoYuChoices(f);
@@ -19,7 +18,6 @@ internal sealed partial class CharacterCaoYuOlEntries
     internal global::CardGame.Core.ProgramSkillFrame? CaoYuObserverRoot() => _resolve().CaoYuObserverRoot();
     internal bool CaoYuOpportunityConsumed(long id) => _resolve().CaoYuOpportunityConsumed(id);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CaoYuMinimumTransitionEvent> CaoYuOutstanding(int turn) => _resolve().CaoYuOutstanding(turn);
-    internal bool CaoYuParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CaoYuParent(f);
     internal bool CaoYuRoundFirst(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CaoYuRoundFirst(c, context);
     internal global::CardGame.Core.CaoYuMinimumTransitionEvent? CaoYuTransition(global::CardGame.Core.ProgramTriggerCandidate c, long? id = default) => _resolve().CaoYuTransition(c, id);
     internal global::CardGame.Core.GameEngine.CaoYuDeathMinimumCapture? CaptureCaoYuDeathMinimumSources(int victimSeat) => _resolve().CaptureCaoYuDeathMinimumSources(victimSeat);
@@ -38,7 +36,6 @@ internal sealed partial class CharacterCaoYuOlEntries
     internal bool HasCaoYuBeforeDamageObserver(long id) => _resolve().HasCaoYuBeforeDamageObserver(id);
     internal bool HasCaoYuDamageObserver(long id) => _resolve().HasCaoYuDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> IncludeXiangxuAfterTurnEndedItems(global::CardGame.Core.DeferredTurnEndFrame parent, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> ordinary) => _resolve().IncludeXiangxuAfterTurnEndedItems(parent, ordinary);
-    internal bool IsCaoYuDying() => _resolve().IsCaoYuDying();
     internal bool IsCaoYuIssuedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsCaoYuIssuedMovement(f, m);
     internal bool IsCaoYuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsCaoYuMovement(f, e, p);
     internal bool IsCaoYuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsCaoYuRecoveryParent(f, recovery);

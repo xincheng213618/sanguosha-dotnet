@@ -172,17 +172,4 @@ internal sealed partial class CoreGameEngineFinalTargetTurnCountsRuntime
 
         return false;
     }
-
-    internal void AssertNamedTurnFlow(ProgramSkillFrame frame, SkillProgramEffect effect)
-    {
-        if (frame.NamedTurnCountFlow is not { } draft)
-            return;
-        var payment = effect.Op == SkillProgramEffectOp.DiscardNonFinalTargetCardThenDraw;
-        if ((!payment && effect.Op != SkillProgramEffectOp.DiscardHandToNamedTurnCount) || draft.Stage is not ("target-movement" or "target-draw" or "hand" or "hand-movement") || payment != (draft.Stage is "target-movement" or "target-draw") || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(draft.TargetSeat) || draft.Required < 0 || draft.CardIds.Distinct().Count() != draft.CardIds.Count || draft.SelectedIds.Distinct().Count() != draft.SelectedIds.Count || draft.SelectedIds.Any(id => !draft.CardIds.Contains(id)) || draft.SelectedIds.Count > draft.Required)
-            throw new InvalidOperationException("Named-turn flow lost its typed stage and payment cursor.");
-        if (payment && (draft.ActionId != NonFinalTargetUse(frame).Action!.ActionId || !NamedTurnActionAlreadyCommitted(frame.OwnerSeat, frame.SkillId, draft.ActionId!.Value)))
-            throw new InvalidOperationException("Named-turn flow lost its committed action.");
-        if (draft.Stage == "hand" && (draft.CardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(frame.OwnerSeat)) || ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || _corePendingDecisionPolicyPipelineOperations._pendingDecision.IsPrivate != true)))
-            throw new InvalidOperationException("Named-turn hand draft lost its private physical costs.");
-    }
 }

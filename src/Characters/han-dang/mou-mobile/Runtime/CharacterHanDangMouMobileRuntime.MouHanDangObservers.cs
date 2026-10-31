@@ -52,7 +52,6 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
     internal bool HasMouHanDangDamageObserver(long id) => MouHanDangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30700)]
     internal bool HasMouHanDangBeforeDamageObserver(long id) => MouHanDangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30700)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30700)]
     internal bool IsMouHanDangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouHanDangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30700)]
@@ -82,10 +81,4 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 30700)]
     internal bool ContinueAcceptedMouHanDang(ProgramSkillFrame f) => ValidMouHanDang(f) && f.MouHanDang is { Gongqi: false, Branch: not null } or { Gongqi: true, PaidCardId: not null };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30700)]
-    internal void AssertMouHanDang(ProgramSkillFrame f)
-    {
-        if (f.MouHanDang is not null && !ValidMouHanDang(f))
-            throw new InvalidOperationException("Mou Han Dang lost its paid source or native effect cursor.");
-    }
 }

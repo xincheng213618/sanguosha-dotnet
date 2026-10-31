@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoZhangBoundaryMobileEntries
 {
     internal global::CardGame.Core.BoundaryJiangchiIssuedEvent? ActiveBoundaryJiangchi(int owner) => _resolve().ActiveBoundaryJiangchi(owner);
-    internal void AssertBoundaryJiangchiFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryJiangchiFrame(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.RuleQueryContribution> BoundaryCaoZhangPhaseContributions(global::CardGame.Core.CharacterState player, global::CardGame.Core.SkillRuleQuery query) => _resolve().BoundaryCaoZhangPhaseContributions(player, query);
     internal bool BoundaryJiangchiCardDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().BoundaryJiangchiCardDistance(q);
     internal bool BoundaryJiangchiConvertedDistance(global::CardGame.Core.ProgramSlashConversionDistanceQuery q) => _resolve().BoundaryJiangchiConvertedDistance(q);

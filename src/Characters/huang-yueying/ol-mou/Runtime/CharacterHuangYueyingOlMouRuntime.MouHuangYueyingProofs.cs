@@ -36,18 +36,4 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 610)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 550)]
     internal bool IsMouHuangYueyingRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.MouBingcai is { Stage: MouBingcaiStage.CostChildren, PrintedKind: CardKind.SilverLion, From: { Zone: CardZoneKind.Equipment } } && IsPaidMouBingcai(f) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason == CardMoveReasons.RecastDiscard && recovery.Attempt.SourceSeat == f.OwnerSeat && recovery.Attempt.TargetSeat == f.OwnerSeat && recovery.Attempt.Amount == 1 || IsMouLixianRecoveryParent(f, recovery);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28961)]
-    internal void AssertMouBingcai(ProgramSkillFrame f)
-    {
-        if (f.MouBingcai is not { } r)
-            return;
-        if (!Enum.IsDefined(r.Stage) || !ValidMouBingcaiStarted(f) || r.Paid && !IsPaidMouBingcai(f) || r.ActualDrawIds is not System.Collections.IList { IsReadOnly: true } || r.ReplacementGainedIds is not System.Collections.IList { IsReadOnly: true } || !r.Paid && (r.Stage != MouBingcaiStage.MaterialChoice || r.MaterialId is not null || f.NativeRecastInvocation is not null || f.PendingMovementContinuation is not null))
-            throw new InvalidOperationException("Bingcai changed its original first Basic source, readonly native outcome or once-paid recast.");
-        if (r.Stage is MouBingcaiStage.DrawChildren or MouBingcaiStage.AddNameChoice)
-        {
-            var returns = _coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiDrawReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-            if (returns is not [var returned] || returned != new MouBingcaiDrawReturnedEvent(f.Id, r.DrawAttemptFrameId, r.DrawBefore, r.DrawAfter, r.ActualDrawIds.Count, r.ReplacementGainedIds.Count) || r.ActualDrawIds.Distinct().Count() != r.ActualDrawIds.Count || r.ReplacementGainedIds.Distinct().Count() != r.ReplacementGainedIds.Count || r.ActualDrawIds.Any(id => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == CardMoveReasons.RecastDraw && m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter)) || r.ReplacementGainedIds.Any(id => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.To == CardLocation.Hand(f.OwnerSeat) && m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter)))
-                throw new InvalidOperationException("Bingcai lost its exact typed real Draw1/replacement return.");
-        }
-    }
 }

@@ -12,7 +12,6 @@ internal sealed partial class CoreGameEngineGuanduGeneralNativeCardsEntries
     internal global::CardGame.Core.CardKind? GuanduLastDamageCard(int seat) => _resolve().GuanduLastDamageCard(seat);
     internal global::CardGame.Core.GuanduMoushiGiftedEvent? GuanduMoushiOccurrence(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().GuanduMoushiOccurrence(owner, instance, c);
     internal bool GuanduMoushiQualifies(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().GuanduMoushiQualifies(owner, instance, c);
-    internal bool IsGuanduChoiceResult(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramChoiceResultBinding binding) => _resolve().IsGuanduChoiceResult(f, binding);
     internal bool IsGuanduChoulueVirtualOrdinaryProgram(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect effect) => _resolve().IsGuanduChoulueVirtualOrdinaryProgram(f, effect);
     internal bool ValidGuanduYuanlveOffer(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidGuanduYuanlveOffer(f);
 }

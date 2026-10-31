@@ -44,12 +44,6 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     }
 
     internal bool HasMouXqProgramSlash(CharacterState actor, IEnumerable<int> targets) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && MouXqProgramSlashChoices(f, actor.Seat, targets.ToArray()).Count > 0;
-    internal PendingDecision MouXqProgramNativeDecision(PendingDecision p) => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == MouXqRequestAction) ? p with
-    {
-        Choices = Array.AsReadOnly(p.Choices.Where(c => c.Parameters.GetValueOrDefault("program-action") != MouXqRequestAction).ToArray())
-    }
-
-    : p;
     [ProgramAnswer(MouXqRequestAction)]
     internal void BeginMouXqProgramSlash(PromptChoice choice)
     {

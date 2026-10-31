@@ -57,14 +57,6 @@ internal sealed partial class CharacterSunJianMouOlRuntime
         return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) : use.SourceSeat == o.ActorSeat && a.ActorSeat == o.ActorSeat;
     }
 
-    internal bool HasMouSunJianOlSuspendedCompletedParent(ProgramCardTriggerWindowFrame window)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        if (window.Continuation != ProgramCardContinuation.CompletedSlash || index < 1 || index + 2 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index - 1] is not CardUseFrame { Step: ResolutionFrameStep.Completed, CardAttack.Active: false } outer || outer.Id != window.ParentFrameId || outer.Action?.ActionId != window.Action.ActionId || window.AttackOwnerFrameId != outer.Id || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame { MouSunJianOlHulie: { Stage: MouSunJianOlHulieStage.NativeUse, Accepted: true, OuterWasActive: true } r } owner || !ValidMouSunJianOlHulie(owner) || owner.WindowContext?.ParentFrameId != window.Id || r.Entry.UseId != outer.Id || r.Entry.ActionId != window.Action.ActionId || _resolutionStackOperations._resolutionStack[index + 2] is not CardUseFrame { MouSunJianOlCounter: { } origin } counter || origin.FrameId != owner.Id || origin.OriginalUseId != outer.Id || origin.OriginalActionId != window.Action.ActionId || r.UseId != counter.Id || r.ActionId != origin.ActionId || !IsMouSunJianOlCounterUse(counter))
-            return false;
-        return window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(owner, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]));
-    }
-
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 32501)]
     internal bool FinishMouSunJianOlCounterAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
     {

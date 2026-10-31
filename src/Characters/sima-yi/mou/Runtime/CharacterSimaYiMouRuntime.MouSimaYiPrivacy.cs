@@ -141,8 +141,6 @@ internal sealed partial class CharacterSimaYiMouRuntime
         var c = p.Candidates[p.CandidateIndex];
         return c.OwnerSeat == candidate.OwnerSeat && c.SkillId == candidate.SkillId && c.TriggerId == candidate.BindingId && c.SkillInstanceId == candidate.SkillInstanceId && c.GameplayHash == candidate.GameplayHash && candidate.OccurrenceIndex == 0 && info.ParentCardUseFrameId == back.UseId && info.CardActionId == back.ActionId && info.ActorSeat == candidate.OwnerSeat && info.EffectiveKind == p.Action.EffectiveKind && info.DesignatedTargetSeats is { } designated && designated.SequenceEqual(p.Action.EffectiveDesignatedTargetSeats);
     }
-
-    internal bool HasMouSmPrivateContinuation(long useId) => _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Any(p => p.MouSimaYiPrivate?.UseId == useId && ValidMouSmPrivateWindow(p) && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.WindowContext?.ParentFrameId == p.Id && f.MouSimaYi is { Operation: SkillProgramEffectOp.ResolveMouSimaYiPingliao } r && r.UseId == useId && MouSimaYi.Valid(f)));
     internal void DiscloseMouSmTargets(ProgramSkillFrame f)
     {
         if (!MouSimaYi.Valid(f) || f.MouSimaYi is not { Operation: SkillProgramEffectOp.ResolveMouSimaYiPingliao } r || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Action: { } a, MouSimaYiSecret: { Started: true, Released: false } s } u || s.WindowId != r.ParentId || a.ActionId != r.ActionId || !u.TargetSeats.SequenceEqual(r.Targets))

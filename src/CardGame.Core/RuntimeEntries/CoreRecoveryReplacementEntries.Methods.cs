@@ -4,12 +4,10 @@ internal sealed partial class CoreRecoveryReplacementEntries
 {
     internal void ApplyRecoveryAttemptProducerFacts(long childId, global::CardGame.Core.RecoveryAttempt attempt, int recovered) => _resolve().ApplyRecoveryAttemptProducerFacts(childId, attempt, recovered);
     internal void ApplyRecoveryReplacement(global::CardGame.Core.RecoveryReplacementFrame frame, int? candidateIndex) => _resolve().ApplyRecoveryReplacement(frame, candidateIndex);
-    internal void AssertRecoveryReplacementInvariants() => _resolve().AssertRecoveryReplacementInvariants();
     internal void CompleteDeferredRecoveryProducer(global::CardGame.Core.RecoveryAttempt attempt, int recovered, long parentId) => _resolve().CompleteDeferredRecoveryProducer(attempt, recovered, parentId);
     internal void CompletePaidEquipmentEntry(global::CardGame.Core.CharacterState source, global::CardGame.Core.Card equipment, long useId, global::CardGame.Core.EquipmentSlot slot, int? replacedCardId) => _resolve().CompletePaidEquipmentEntry(source, equipment, useId, slot, replacedCardId);
     internal void ContinueRecoveryPaidCardUse(long useId) => _resolve().ContinueRecoveryPaidCardUse(useId);
     internal void ContinueRecoveryReplacement() => _resolve().ContinueRecoveryReplacement();
-    internal bool HasRecoveryPaidCardUseObserver(long useId) => _resolve().HasRecoveryPaidCardUseObserver(useId);
     internal bool IsRecoveryReplacementCandidateCurrent(global::CardGame.Core.RecoveryReplacementFrame frame, global::CardGame.Core.RecoveryReplacementCandidate c) => _resolve().IsRecoveryReplacementCandidateCurrent(frame, c);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.RecoveryReplacementCandidate> RecoveryReplacementCandidates(int seat) => _resolve().RecoveryReplacementCandidates(seat);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> RecoveryReplacementChoices(global::CardGame.Core.RecoveryReplacementFrame frame) => _resolve().RecoveryReplacementChoices(frame);

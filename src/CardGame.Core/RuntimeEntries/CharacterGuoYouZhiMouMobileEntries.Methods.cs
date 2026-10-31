@@ -4,7 +4,6 @@ internal sealed partial class CharacterGuoYouZhiMouMobileEntries
 {
     internal bool AdvanceMouGyzChildren() => _resolve().AdvanceMouGyzChildren();
     internal void AnswerMouGyz(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouGyz(choice);
-    internal void AssertMouGyz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouGyz(f);
     internal void AssertMouGyzNativeCompletion(global::CardGame.Core.CardUseFrame use) => _resolve().AssertMouGyzNativeCompletion(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouGyz(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouGyz(supplied, op);
     internal void BindMouGyzNativeUse(global::CardGame.Core.IGameEvent fact) => _resolve().BindMouGyzNativeUse(fact);

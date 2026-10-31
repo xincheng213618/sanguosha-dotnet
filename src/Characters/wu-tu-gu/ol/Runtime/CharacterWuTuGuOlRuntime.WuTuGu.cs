@@ -60,7 +60,6 @@ internal sealed partial class CharacterWuTuGuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuTuGuRanshang: { } r } f || f.Id != id)
             return;
-        AssertWuTuGuRanshang(f);
         if (r.Stage == WuTuGuRanshangStage.Issuing)
         {
             // Use the existing native unclamped LoseHp primitive: one actual

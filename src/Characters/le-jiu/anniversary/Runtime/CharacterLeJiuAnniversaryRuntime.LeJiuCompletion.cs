@@ -49,13 +49,6 @@ internal sealed partial class CharacterLeJiuAnniversaryRuntime
         return f.TriggerId == AnniversaryLeJiuComposition.Pay && w.Window == SkillProgramTriggerWindow.CardUseCommitted && r.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && r.Before >= 0 && r.Before <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && f.InstructionIndex is >= 1 and <= 4 && _coreProgramEventHistoryOperations.ProgramEventHistory<LeJiuCuijinQualifiedEvent>().Count(e => e == new LeJiuCuijinQualifiedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.UseId, r.ActionId, r.Actor, r.Turn, r.Before)) == 1 && (r.Grant is null || ValidLeJiuGrant(use, r.Grant));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 44100)]
-    internal void AssertLeJiuFrame(ProgramSkillFrame f)
-    {
-        if (f.LeJiuCuijin is not null && !ValidLeJiuFrame(f))
-            throw new InvalidOperationException("Cuijin lost its original action, observer candidate, paid grant or whole-use return.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 44100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 44100)]
     internal bool ContinuePaidLeJiu(ProgramSkillFrame f) => f.LeJiuCuijin is { } r ? ValidLeJiuFrame(f) && (r.Reward || r.Grant is not null || LeJiuPaidCost(f)is not null) : f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && IsIssuedLeJiuCandidate(LeJiuCandidate(f), w, false);

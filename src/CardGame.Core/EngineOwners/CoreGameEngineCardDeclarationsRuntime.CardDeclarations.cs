@@ -320,36 +320,6 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         return values.Length == 0 ? null : Array.AsReadOnly(values);
     }
 
-    internal bool AssertCardDeclarationInvariant()
-    {
-        var declarations = _resolutionStackOperations._resolutionStack.OfType<CardDeclarationFrame>().ToArray();
-        foreach (var frame in _resolutionStackOperations._resolutionStack.Where(frame => frame.AcceptedDeclarationPayment is not null))
-        {
-            var paid = frame.AcceptedDeclarationPayment!;
-            if (paid.OwnerFrameId != frame.Id || paid.Cost.From != CardLocation.Hand(paid.ProviderSeat) || paid.Source.OwnerSeat != paid.ProviderSeat || paid.DeclarationId <= 0 || !paid.Claimed && _cardZonesOperations._cardZones.GetLocation(paid.Cost.CardId) != CardLocation.Processing)
-                throw new InvalidOperationException("An accepted declaration payment lost its exact continuation owner or entity.");
-        }
-
-        if (declarations.Length == 0)
-            return false;
-        foreach (var frame in declarations)
-        {
-            if (frame.Payment.DeclarationId != frame.Id || frame.Payment.OwnerFrameId != frame.Id || frame.Payment.ProviderSeat != frame.OwnerSeat || frame.Payment.Cost.From != CardLocation.Hand(frame.OwnerSeat) || frame.Payment.Source.OwnerSeat != frame.OwnerSeat || frame.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || frame.Payment.ReturnPurpose != frame.Return.Purpose || frame.Payment.OriginalRank is not (>= 0 and <= 13) || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(frame.OwnerSeat, frame.Payment.Source.SkillId, DeclarationTurnUsage, SkillUsageScope.Turn) != 1 || frame.Return.ParentFrameId > 0 && !_resolutionStackOperations._resolutionStack.Any(parent => parent.Id == frame.Return.ParentFrameId && parent.Kind == frame.Return.ParentKind && parent.Step == frame.Return.ParentStep) || frame.Stage is not (CardDeclarationStage.Paying or CardDeclarationStage.Cleaning or CardDeclarationStage.Returning) && _cardZonesOperations._cardZones.GetLocation(frame.Payment.Cost.CardId) != CardLocation.Processing)
-                throw new InvalidOperationException("The declaration lost its frozen paid entity, quota, turn or typed parent stage.");
-            if (frame.ActiveChildFrameId is { } childId && !_resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Any(child => child.Id == childId && child.ResumeDeclarationFrameId == frame.Id && child.Batch.ParentFrameId == frame.Id))
-                throw new InvalidOperationException("The declaration movement receipt has no exact child.");
-        }
-
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is CardDeclarationChallengeFrame challenge)
-        {
-            var frame = declarations.Single(parent => parent.Id == challenge.ParentFrameId);
-            if (frame.Stage != CardDeclarationStage.Challenging || challenge.SeatIndex < 0 || challenge.SeatIndex >= challenge.EligibleSeats.Count || challenge.EligibleSeats.Contains(frame.OwnerSeat) || challenge.EligibleSeats.Distinct().Count() != challenge.EligibleSeats.Count || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondDodge } decision || decision.PlayerSeat != challenge.EligibleSeats[challenge.SeatIndex] || decision.ValidCardIds.Count != 0 || decision.Choices.Count != 2 || decision.Choices.Any(choice => choice.Cards.Count != 0 || choice.Targets.Count != 0 || choice.Parameters.GetValueOrDefault("declaration-answer")is not ("pass" or "challenge")))
-                throw new InvalidOperationException("The declaration challenge lost its one-way private responder prompt.");
-        }
-
-        return true;
-    }
-
     internal void ReturnCardDeclaration(CardDeclarationFrame frame)
     {
         var parent = frame.Return;

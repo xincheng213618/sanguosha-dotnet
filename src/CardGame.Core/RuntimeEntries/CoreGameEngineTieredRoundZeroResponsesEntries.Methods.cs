@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineTieredRoundZeroResponsesEntries
 {
-    internal void AssertTieredRoundResponseUses() => _resolve().AssertTieredRoundResponseUses();
     internal global::CardGame.Core.NullificationWindowFrame ClearTieredRoundCounterspellResponse(global::CardGame.Core.NullificationWindowFrame input) => _resolve().ClearTieredRoundCounterspellResponse(input);
     internal void ClearTieredRoundDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().ClearTieredRoundDodgeResponse(attack);
     internal bool HasTieredRoundZeroDyingResponse(global::CardGame.Core.CharacterState responder) => _resolve().HasTieredRoundZeroDyingResponse(responder);

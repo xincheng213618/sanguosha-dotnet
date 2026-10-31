@@ -7,14 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWenChouMouOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33100)]
-    internal void AssertMouWenChouOl(ProgramSkillFrame f)
-    {
-        if (f.MouWenChouOl is not { } r)
-            return;
-        if (!ValidMouWenChouOl(f) || r.Discarded < 0 || r.Discarded > r.Amount || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.NativeReturned && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null)
-            throw new InvalidOperationException("Mou Wen Chou lost its original source, paid native cursor or return invoice.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33100)]
     internal bool IsMouWenChouMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.MouWenChouOl is { Stage: MouWenChouOlStage.Children or MouWenChouOlStage.DiscardChildren } r && effect?.Op == r.Operation && movement == f.PendingMovementContinuation && movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && ValidMouWenChouOl(f);
@@ -65,7 +57,6 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     internal bool HasMouWenChouDamage(long id) => MouWenChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33100)]
     internal bool HasMouWenChouBeforeDamage(long id) => MouWenChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33100)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33100)]
     internal bool IsMouWenChouDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouWenChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33100)]

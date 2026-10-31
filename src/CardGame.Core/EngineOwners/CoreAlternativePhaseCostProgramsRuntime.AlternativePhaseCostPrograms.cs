@@ -97,7 +97,6 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != frameId || frame.AlternativePhaseCost is null)
             return false;
-        AssertAlternativePhaseCost(frame);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { AlternativePhaseCost = null });
@@ -108,16 +107,6 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
         }
 
         return false;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 10)]
-    internal void AssertAlternativePhaseCost(ProgramSkillFrame frame)
-    {
-        if (frame.AlternativePhaseCost is not { } receipt)
-            return;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        if (!Enum.IsDefined(receipt.Kind) || receipt.InstructionIndex != frame.InstructionIndex || receipt.InstructionIndex < 1 || receipt.InstructionIndex > plan.Instructions.Count || plan.Instructions[receipt.InstructionIndex - 1].Op != SkillProgramEffectOp.PayOwnedCardOrMarker || plan.Instructions[receipt.InstructionIndex - 1].Marker != receipt.Marker || receipt.Kind == ProgramAlternativePhaseCostKind.DiscardCard && (receipt.CardId is null || receipt.SourceLocation is not { OwnerSeat: var owner, Zone: CardZoneKind.Hand or CardZoneKind.Equipment } || owner != frame.OwnerSeat) || receipt.Kind == ProgramAlternativePhaseCostKind.RemoveMarker && (receipt.CardId is not null || receipt.SourceLocation is not null))
-            throw new InvalidOperationException("A paid alternative phase cost lost its exact producer receipt.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.PayOwnedCardOrMarker)]

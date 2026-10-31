@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineConditionalDiscardDuelReturnsEntries
 {
-    internal void AssertConditionalDiscardDuels() => _resolve().AssertConditionalDiscardDuels();
     internal void CompleteConditionalDiscardDuelAttackReturn(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().CompleteConditionalDiscardDuelAttackReturn(completion);
     internal bool IsConditionalDiscardDuelUse(long id) => _resolve().IsConditionalDiscardDuelUse(id);
     internal bool MatchesConditionalDuelOrigin(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ConditionalDiscardDuelOrigin o) => _resolve().MatchesConditionalDuelOrigin(f, o);

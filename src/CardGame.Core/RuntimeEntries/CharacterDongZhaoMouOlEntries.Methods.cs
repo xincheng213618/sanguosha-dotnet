@@ -8,7 +8,6 @@ internal sealed partial class CharacterDongZhaoMouOlEntries
     internal global::CardGame.Core.PromptChoice AiMouYishi(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouYishi(prompt, f);
     internal void AnswerMouDongZhao(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouDongZhao(selected);
     internal void AnswerMouYishi(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouYishi(f, selected);
-    internal void AssertMouDongZhao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouDongZhao(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouShunji(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouShunji(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouYishi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouYishi(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouYishiLoss(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouYishiLoss(supplied);

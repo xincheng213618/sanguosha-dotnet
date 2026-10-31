@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterChenZhiMobileShiEntries
 {
     internal void AnswerShiCz(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiCz(choice);
-    internal void AssertShiCzFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiCzFrame(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiCz(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiCz(input, op);
     internal bool CanOfferShiCz(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferShiCz(gate);
     internal void CaptureShiCzFirstDiscard(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureShiCzFirstDiscard(batch);

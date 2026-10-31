@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsEntries
 {
     internal global::CardGame.Core.GiftedSlashHandPolicy? ActiveGiftedSlashPolicy(int recipient, int cardId) => _resolve().ActiveGiftedSlashPolicy(recipient, cardId);
     internal void AssertGiftedSlashPolicyOrigin(global::CardGame.Core.GiftedSlashHandPolicy policy) => _resolve().AssertGiftedSlashPolicyOrigin(policy);
-    internal void AssertGiftedSlashPrograms(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertGiftedSlashPrograms(frame);
     internal void AssertGiftedSlashUseBenefit(global::CardGame.Core.CardUseFrame use) => _resolve().AssertGiftedSlashUseBenefit(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGiftedSlashGift(global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ProgramSkillFrame input, int recipient) => _resolve().BeginGiftedSlashGift(effect, input, recipient);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGiftedSlashUseReward(global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginGiftedSlashUseReward(effect, input);

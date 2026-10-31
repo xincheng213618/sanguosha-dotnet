@@ -2,12 +2,10 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreHulaoActivityProgramsEntries
 {
-    internal void AssertHulaoProgram(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHulaoProgram(f);
     internal bool ContinuePaidHulaoAfterSkillLoss(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidHulaoAfterSkillLoss(f);
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteHulaoActivity(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().ExecuteHulaoActivity(supplied, effect);
     internal bool HulaoActivityFrameRidesOn(global::CardGame.Core.ResolutionFrame child, global::CardGame.Core.ResolutionFrame parent) => _resolve().HulaoActivityFrameRidesOn(child, parent);
     internal bool HulaoAwaitMovementChildren(long id) => _resolve().HulaoAwaitMovementChildren(id);
-    internal global::CardGame.Core.SkillProgramEffect HulaoPausedEffect(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HulaoPausedEffect(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HulaoPeachChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HulaoPeachChoices(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> HulaoPeaches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HulaoPeaches(f);
     internal bool HulaoProgramSourceValid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HulaoProgramSourceValid(f);

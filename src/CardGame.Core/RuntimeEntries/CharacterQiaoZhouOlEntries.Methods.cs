@@ -6,7 +6,6 @@ internal sealed partial class CharacterQiaoZhouOlEntries
     internal global::CardGame.Core.PromptChoice AiQiaoZhouForecast(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiQiaoZhouForecast(p, f);
     internal void AnswerQiaoZhouForecast(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerQiaoZhouForecast(choice);
     internal void AnswerQiaoZhouPreparation(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerQiaoZhouPreparation(choice);
-    internal void AssertQiaoZhouForecast(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertQiaoZhouForecast(f);
     internal void AssertQiaoZhouPreparation(global::CardGame.Core.QiaoZhouPreparationFrame f) => _resolve().AssertQiaoZhouPreparation(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginQiaoZhouForecast(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginQiaoZhouForecast(supplied);
     internal void CleanupQiaoZhouForecast(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CleanupQiaoZhouForecast(f);
@@ -16,8 +15,6 @@ internal sealed partial class CharacterQiaoZhouOlEntries
     internal bool DrainQiaoZhouChildren(long id) => _resolve().DrainQiaoZhouChildren(id);
     internal void ExpireQiaoZhouForecasts(global::CardGame.Core.IGameEvent payload) => _resolve().ExpireQiaoZhouForecasts(payload);
     internal bool HasQiaoZhouDamageObserver(long id) => _resolve().HasQiaoZhouDamageObserver(id);
-    internal bool HasQiaoZhouPreparationBoundaryFrame() => _resolve().HasQiaoZhouPreparationBoundaryFrame();
-    internal bool IsQiaoZhouDying() => _resolve().IsQiaoZhouDying();
     internal bool IsQiaoZhouPreparationMovement(global::CardGame.Core.QiaoZhouPreparationFrame f, global::CardGame.Core.CardsMovedTriggerWindowFrame child) => _resolve().IsQiaoZhouPreparationMovement(f, child);
     internal void PayQiaoZhouPreparation(global::CardGame.Core.QiaoZhouPreparationFrame f, int cardId) => _resolve().PayQiaoZhouPreparation(f, cardId);
     internal void PublishQiaoZhouForecast(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishQiaoZhouForecast(f);

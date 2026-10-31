@@ -62,8 +62,6 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelObserversRunti
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 240, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 350)]
     internal bool IsConditionalDiscardDuelProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ConditionalDuelPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

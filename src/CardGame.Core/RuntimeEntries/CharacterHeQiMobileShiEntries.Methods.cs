@@ -4,7 +4,6 @@ internal sealed partial class CharacterHeQiMobileShiEntries
 {
     internal bool AdvanceShiHqChildren() => _resolve().AdvanceShiHqChildren();
     internal void AnswerShiHq(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiHq(choice);
-    internal void AssertShiHq(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiHq(f);
     internal bool BanShiHqRepeatedTarget(global::CardGame.Core.ProgramLegalActionQuery q) => _resolve().BanShiHqRepeatedTarget(q);
     internal bool BanShiHqUnmarkedConversion(global::CardGame.Core.ProgramViewAsSourceQuery q) => _resolve().BanShiHqUnmarkedConversion(q);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiHq(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiHq(supplied, op);

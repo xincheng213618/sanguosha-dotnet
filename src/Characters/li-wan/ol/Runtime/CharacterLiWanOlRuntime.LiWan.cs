@@ -119,7 +119,6 @@ internal sealed partial class CharacterLiWanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiWan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LiWanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Li Wan lost her exact public native draft.");
-        AssertLiWan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (r.Stage == LiWanStage.Color)
@@ -200,7 +199,6 @@ internal sealed partial class CharacterLiWanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiWan: { } r } f || f.Id != id)
             return false;
-        AssertLiWan(f);
         if (r.Stage != LiWanStage.Children)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

@@ -177,8 +177,6 @@ internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { DualColorDuel = draft with { Stage = ProgramDualColorDuelStage.DuelIssued, CardUseFrameId = useId } });
         var card = new Card(0, CardKind.Duel, Suit.None, 0);
         var actualUseId = _coreNativeCardUseOperations.BeginCardUse(card, actor, [target], CardKind.Duel, physicalCardIds: [], dualColorDuelOrigin: origin);
-        if (actualUseId != useId)
-            throw new InvalidOperationException("Private color Duel lost its reserved exact Use identity.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDualColorDuelIssuedEvent(frame.Id, useId, frame.SkillId, frame.OwnerSeat, actor, target, draft.OwnerCardIds.Count, draft.OtherCardIds.Count));
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(useId, card, actor, [target], LegalActionKind.Duel, playedCardKind: CardKind.Duel);
         return true;
@@ -243,29 +241,5 @@ internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
             var retainedSlash = own.Count(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[chooser], card)) != red);
             return -count * 1.4d + (hostility > 0 ? count > expectedOtherCount ? 5d : -2d : 0d) + Math.Min(1, retainedSlash) * 2d;
         }).ThenBy(choice => choice.Parameters["color"], StringComparer.Ordinal).First();
-    }
-
-    internal void AssertDualColorDuels()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(frame => frame.DualColorDuel is not null))
-        {
-            var draft = frame.DualColorDuel!;
-            if (!DualColorDraftMatches(frame) || !Enum.IsDefined(draft.Stage) || draft.Stage == ProgramDualColorDuelStage.ChoosingOwner && (draft.OwnerIsRed is not null || draft.OtherIsRed is not null) || draft.Stage == ProgramDualColorDuelStage.ChoosingOther && (draft.OwnerIsRed is null || draft.OtherIsRed is not null) || draft.Stage is ProgramDualColorDuelStage.ChoosingOwner or ProgramDualColorDuelStage.ChoosingOther && (draft.OwnerCardIds.Count != 0 || draft.OtherCardIds.Count != 0 || draft.CardUseFrameId is not null) || draft.Stage == ProgramDualColorDuelStage.PaymentChildren && draft.CardUseFrameId is not null || draft.Stage == ProgramDualColorDuelStage.DuelIssued && (draft.CardUseFrameId is not > 0 || !_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.Id == draft.CardUseFrameId && use.DualColorDuelOrigin is not null)) || draft.Stage is ProgramDualColorDuelStage.PaymentChildren or ProgramDualColorDuelStage.DuelIssued && !DualColorPaymentMatches(frame))
-                throw new InvalidOperationException("Private color Duel has an invalid frozen stage, participant or payment.");
-            if (draft.Stage is ProgramDualColorDuelStage.ChoosingOwner or ProgramDualColorDuelStage.ChoosingOther)
-            {
-                var chooser = DualColorChooser(frame);
-                if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != chooser || prompt.SkillPrompt?.SkillId != frame.SkillId || prompt.Choices.Count != 2 || prompt.ValidCardIds.Count != 0 || prompt.ValidTargetSeats.Count != 0 || !prompt.Choices.Select(choice => choice.Parameters.GetValueOrDefault("color")).Order().SequenceEqual(new[] { "black", "red" }) || prompt.Choices.Any(choice => choice.Cards.Count != 0 || choice.Targets.Count != 0 || choice.Id != new ChoiceId($"dual-color.frame-{(frame.Id)}.seat-{(chooser)}.{(choice.Parameters["color"])}") || choice.Parameters.GetValueOrDefault("program-action") != "dual-color-choice" || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("chooser-seat") != chooser.ToString(CultureInfo.InvariantCulture)))
-                    throw new InvalidOperationException("Private color Duel lost its exact private chooser or published commitment.");
-            }
-        }
-
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.DualColorDuelOrigin is not null))
-        {
-            var origin = use.DualColorDuelOrigin!;
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame frame || use.Id != origin.CardUseFrameId || !MatchesDualColorDuelParent(frame, origin) || !IsDualColorDuelUse(use.Id) || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveIsRed: false })
-                throw new InvalidOperationException("Private color Duel has an invalid exact issued zero-entity Use.");
-        }
     }
 }

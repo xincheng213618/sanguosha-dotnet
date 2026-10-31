@@ -44,7 +44,6 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
 
     internal void PublishOrdinaryQieting(ProgramSkillFrame f)
     {
-        AssertOrdinaryQieting(f);
         var choices = OrdinaryQietingChoices(f);
         if (choices.Count == 0)
         {
@@ -77,7 +76,6 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
 
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OrdinaryQieting: { Stage: OrdinaryQietingStage.Choice, Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OrdinaryQietingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Ordinary Qieting requires its current original single option.");
-        AssertOrdinaryQieting(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var option = selected.Parameters["option"];
         Card? card = option == "draw" ? null : _coreAdvancedLifecycleOperations.GetAdvancedCard(selected.Cards.Single());
@@ -119,7 +117,6 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OrdinaryQieting: { } r } f || f.Id != id)
             return;
-        AssertOrdinaryQieting(f);
         if (r.Stage is OrdinaryQietingStage.Choice or OrdinaryQietingStage.Viewing)
         {
             if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))

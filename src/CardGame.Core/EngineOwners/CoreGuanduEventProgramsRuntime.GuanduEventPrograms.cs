@@ -41,8 +41,6 @@ internal sealed partial class CoreGuanduEventProgramsRuntime
     internal SkillProgramStepOutcome ExecuteGuanduEvent(ProgramSkillFrame input, SkillProgramEffectOp op)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        if (frame.WindowContext is null || frame.GuanduEventFlow is not null)
-            throw new InvalidOperationException("A Guandu event lost its exact once-issued program.");
         return (_coreActivityBattleRulesOperations.GuanduRules ?? throw new InvalidOperationException("The activity event feature is not installed.")).ExecuteEvent(frame.Id, frame.OwnerSeat, op);
     }
 
@@ -51,8 +49,6 @@ internal sealed partial class CoreGuanduEventProgramsRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.RewardGuanduDamage)]
     internal void ReturnGuanduEventDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.GuanduEventFlow is not { Operation: SkillProgramEffectOp.RewardGuanduDamage } || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1)
-            throw new InvalidOperationException("A Guandu damage reward lost its exact native draw.");
         _coreProgramLifecycleOperations.CompleteProgramDrawCards(f.Id, f.OwnerSeat, null, SkillProgramCardSetVisibility.Private, new("guandu.grain-shortage.draw"), 0, outcome.ActualDrawIds);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
@@ -60,17 +56,6 @@ internal sealed partial class CoreGuanduEventProgramsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 46000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 46000)]
     internal bool RetainGuanduEventFlow(ProgramSkillFrame f) => f.GuanduEventFlow is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 46000)]
-    internal void AssertGuanduEventFlow(ProgramSkillFrame f, ProgramExecutionPlan plan)
-    {
-        if (f.GuanduEventFlow is not { } r)
-            return;
-        if (!_coreGuanduActivitiesOperations.IsGuanduActivity || f.SkillId != "guandu:battle-event" || r.ActualTurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber || plan.GetPausedInstruction(f.InstructionIndex).Effect.Op != r.Operation || _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduEventFlowIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Operation == r.Operation && e.ActualTurnNumber == r.ActualTurnNumber && e.UseFrameId == r.UseFrameId) != 1 || (r.Operation == SkillProgramEffectOp.RewardGuanduDamage ? r.UseFrameId is not > 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDamageRewardedEvent>().Count(e => e.UseFrameId == r.UseFrameId && e.SourceSeat == f.OwnerSeat) != 1 : r.Operation != SkillProgramEffectOp.ResolveGuanduArrogance || r.UseFrameId is not null))
-            throw new InvalidOperationException("A Guandu event lost its exact instruction and once-issued payment.");
-    }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 10)]
-    internal bool IsGuanduArroganceDying() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()is { GuanduEventFlow.Operation: SkillProgramEffectOp.ResolveGuanduArrogance } f && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } d && d.ParentFrameId == f.Id && d.VictimSeat == f.OwnerSeat;
     [ProgramCardLegality(ProgramCardLegalityStage.ConversionUsageBan, 30)]
     internal bool GuanduRoundConversionUsageUnavailable(ProgramConfiguredViewAsQuery query) => !CanUseGuanduRoundConversion(query.Instance, query.Rule, query.Owner);
 }

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhouFeiLeEntries
 {
     internal bool AdvanceLeZhouFeiXianshuChildren() => _resolve().AdvanceLeZhouFeiXianshuChildren();
-    internal void AssertLeZhouFeiXianshu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertLeZhouFeiXianshu(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLeZhouFeiXianshu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginLeZhouFeiXianshu(supplied);
     internal bool CanActivateLeZhouFeiXianshu(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().CanActivateLeZhouFeiXianshu(gate);
     internal bool CanOfferLingkong(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferLingkong(gate);
@@ -32,7 +31,6 @@ internal sealed partial class CharacterZhouFeiLeEntries
     internal bool IsIssuedLingkongCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLingkongCandidate(candidate, context);
     internal bool IsIssuedLingkongGainCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLingkongGainCandidate(candidate, context);
     internal bool IsIssuedLingkongInitialCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLingkongInitialCandidate(candidate, context);
-    internal bool IsLeZhouFeiXianshuDying() => _resolve().IsLeZhouFeiXianshuDying();
     internal bool IsLeZhouFeiXianshuMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLeZhouFeiXianshuMovement(frame, effect, pending);
     internal bool IsLeZhouFeiXianshuRecoveryParent(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLeZhouFeiXianshuRecoveryParent(frame, recovery);
     internal bool IsLingkongHandLimitExempt(global::CardGame.Core.CharacterState owner, int cardId) => _resolve().IsLingkongHandLimitExempt(owner, cardId);

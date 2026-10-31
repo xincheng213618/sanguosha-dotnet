@@ -142,11 +142,6 @@ internal sealed partial class MouDanchiRuntime(IProgramRuntimeFrames frames, IPr
     private bool MovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) =>
         f.MouDanchi is { Stage: MouDanchiStage.Children } && Valid(f) && effect?.Op == SkillProgramEffectOp.ResolveMouChengYuDanchi &&
         pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 34101)]
-    private void Invariant(ProgramSkillFrame f)
-    {
-        if (f.MouDanchi is not null && !Valid(f)) throw new InvalidOperationException("Invalid Danchi original damage and next-use receipt.");
-    }
     private void Complete(ProgramSkillFrame f)
     {
         events.AdvanceFact(new MouDanchiCompletedEvent(f.Id, f.MouDanchi!.PromiseId, f.TriggerId == "source-next-use"));

@@ -8,13 +8,11 @@ internal sealed partial class CharacterHuCheErAnniversaryEntries
     internal int AnniversaryHuCheErDrawBonus(global::CardGame.Core.CharacterState p) => _resolve().AnniversaryHuCheErDrawBonus(p);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.RuleQueryContribution> AnniversaryHuCheErHandLimitContributions(global::CardGame.Core.CharacterState p) => _resolve().AnniversaryHuCheErHandLimitContributions(p);
     internal void AnswerHuCheEr(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHuCheEr(choice);
-    internal void AssertHuCheEr(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHuCheEr(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHuCheEr(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginHuCheEr(input);
     internal bool CanOfferHuCheEr(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferHuCheEr(c, t, w);
     internal void ContinueHuCheEr(long id) => _resolve().ContinueHuCheEr(id);
     internal bool DrainHuCheEr(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainHuCheEr(f);
     internal void FinishHuCheEr(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuCheEr(f);
-    internal bool HasAnniversaryHuCheErPrompt() => _resolve().HasAnniversaryHuCheErPrompt();
     internal bool HuCheErBeforeDamageObserver(long id) => _resolve().HuCheErBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HuCheErChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuCheErChoices(f);
     internal bool HuCheErDamageObserver(long id) => _resolve().HuCheErDamageObserver(id);

@@ -4,7 +4,6 @@ internal sealed partial class CharacterCaoChunOlEntries
 {
     internal void ArmCaoChunDebt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ArmCaoChunDebt(f);
     internal void AssertCaoChunNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertCaoChunNativeUse(use);
-    internal void AssertRegisteredCaoChun(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredCaoChun(frame);
     internal void BeginCaoChunFactionSlash(global::CardGame.Core.ProgramSkillFrame f, int target) => _resolve().BeginCaoChunFactionSlash(f, target);
     internal void BindCaoChunNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindCaoChunNativeUse(use);
     internal bool CanContinueCaoChun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueCaoChun(f);
@@ -40,7 +39,6 @@ internal sealed partial class CharacterCaoChunOlEntries
     internal bool HasCaoChunDamageObserver(long id) => _resolve().HasCaoChunDamageObserver(id);
     internal bool HasIssuedCaoChunDebtCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedCaoChunDebtCandidate(candidate, context);
     internal void InitializeAcquiredCaoChun(int seat, string skillId) => _resolve().InitializeAcquiredCaoChun(seat, skillId);
-    internal bool IsCaoChunDying() => _resolve().IsCaoChunDying();
     internal bool IsCaoChunInitialRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsCaoChunInitialRequest(f);
     internal bool IsCaoChunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsCaoChunMovement(f, e, p);
     internal bool IsCaoChunNativeEdge(int index) => _resolve().IsCaoChunNativeEdge(index);

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSlashSuitDiscardEntries
 {
-    internal void AssertProgramSlashSuitDiscard(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertProgramSlashSuitDiscard(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginProgramSlashSuitDiscard(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginProgramSlashSuitDiscard(frame, effect);
     internal void CaptureProgramSlashSuitJudgment(global::CardGame.Core.JudgmentFrame judgment, global::CardGame.Core.Suit suit) => _resolve().CaptureProgramSlashSuitJudgment(judgment, suit);
     internal void FinishProgramSlashSuitDiscard(global::CardGame.Core.ProgramSkillFrame frame, bool paid) => _resolve().FinishProgramSlashSuitDiscard(frame, paid);

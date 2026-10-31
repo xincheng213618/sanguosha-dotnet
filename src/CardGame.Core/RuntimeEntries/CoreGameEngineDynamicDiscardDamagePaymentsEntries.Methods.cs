@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsEntries
 {
-    internal void AssertDynamicDiscardDamage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertDynamicDiscardDamage(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDynamicDiscardDamage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginDynamicDiscardDamage(f);
     internal bool CanSelectDynamicDiscardDamageTarget(global::CardGame.Core.CharacterState owner, string skill, int target) => _resolve().CanSelectDynamicDiscardDamageTarget(owner, skill, target);
     internal bool CanStartDynamicDiscardDamage(global::CardGame.Core.CharacterState owner, string skill) => _resolve().CanStartDynamicDiscardDamage(owner, skill);

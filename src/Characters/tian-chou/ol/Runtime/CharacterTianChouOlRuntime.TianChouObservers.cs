@@ -31,8 +31,6 @@ internal sealed partial class CharacterTianChouOlRuntime
     internal bool HasTianChouDamageObserver(long id) => TianChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 790)]
     internal bool HasTianChouBeforeDamageObserver(long id) => HasTianChouDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 610)]
-    internal bool IsTianChouDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && TianChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27090)]
     internal bool AdvanceTianChouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && TianChouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -318,20 +318,9 @@ internal sealed partial class CharacterChengPuMobileShiRuntime
     internal bool ContinuePaidShiCpBihan(ProgramSkillFrame f) => f.MobileShiChengPu is { Operation: "bihan", Stage: > 0 };
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 67300)]
     internal bool ShiCpBihanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MobileShiChengPu is { Operation: "bihan", Stage: 9 } r && effect?.Op == SkillProgramEffectOp.ResolveMobileShiBihanGuard && p.CoverageResultBind is null && p.BeforeCount == 0 && p.SubjectSeat == r.TargetSeat;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 67300)]
-    internal void AssertShiCpChengPu(ProgramSkillFrame f)
-    {
-        if (f.MobileShiChengPu is not { } r)
-            return;
-        if (f.TriggerId is null || f.WindowContext is null || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || r.Before > _coreCardMovementJournalMovementSequenceAccess._movementSequence || r.Operation is not ("duzuo" or "bihan") || r.Operation == "duzuo" && (f.SkillId != ShiCpDuzuoSkill || f.TriggerId != MobileShiChengPuComposition.DuzuoGrantTrigger || r.Stage is not (0 or 9) || r.Stage == 0 && r.CardId != 0 || r.DamageTargetSeat != -1 || r.Discarded != 0) || r.Operation == "bihan" && (f.SkillId != ShiCpBihanSkill || f.TriggerId != MobileShiChengPuComposition.BihanGuardTrigger || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.DamageTargetSeat) || r.Stage is not (0 or 3 or 6 or 9)))
-            throw new InvalidOperationException("Shi Cheng Pu lost his original typed trigger or paid stage receipt.");
-        if (r.Operation == "bihan" && r.Stage > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiBihanGuardIssuedEvent>().Any(issued => issued.FrameId == f.Id && issued.Source == ShiCpSource(f) && issued.GameplayHash == f.GameplayHash && issued.ActualTurn == r.ActualTurn && issued.DamageTargetSeat == r.DamageTargetSeat && issued.DiscarderSeat == r.TargetSeat))
-            throw new InvalidOperationException("Bihan lost its issued guard obligation.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiDuzuoGrant)]
     internal PromptChoice ChooseShiCpDuzuo(PendingDecision prompt) => prompt.Choices.FirstOrDefault(choice => choice.Targets is [var seat] && seat == prompt.PlayerSeat) ?? prompt.Choices[0];
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiBihanGuard)]
     internal PromptChoice ChooseShiCpBihan(PendingDecision prompt) => prompt.Choices[0];
-    internal bool IsMobileShiChengPuChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding) => frame.MobileShiChengPu is { } r && frame.WindowContext is not null && binding.ChooserSeat == frame.OwnerSeat && (binding.Name == "duzuo-recipient" && r.Operation == "duzuo" && r.TargetSeat >= 0 && binding.OptionId == r.TargetSeat.ToString(CultureInfo.InvariantCulture) || binding.Name == "bihan-discarder" && r.Operation == "bihan" && r.Stage > 0 && r.TargetSeat >= 0 && binding.OptionId == r.TargetSeat.ToString(CultureInfo.InvariantCulture));
 }

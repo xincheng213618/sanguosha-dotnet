@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiaoHuaBoundaryMobileEntries
 {
     internal void AnswerBoundaryLiaoHuaDiscardSlash(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerBoundaryLiaoHuaDiscardSlash(selected);
-    internal void AssertBoundaryLiaoHuaDiscard(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryLiaoHuaDiscard(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryLiaoHuaDiscardSlash(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryLiaoHuaDiscardSlash(supplied);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryLiaoHuaDiscardChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryLiaoHuaDiscardChoices(frame);
     internal global::CardGame.Core.PromptChoice ChooseBoundaryLiaoHuaDiscard(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ChooseBoundaryLiaoHuaDiscard(prompt, frame);

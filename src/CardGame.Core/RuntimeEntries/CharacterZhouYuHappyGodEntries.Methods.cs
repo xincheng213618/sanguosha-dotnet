@@ -21,7 +21,6 @@ internal sealed partial class CharacterZhouYuHappyGodEntries
     internal bool HappyZyRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().HappyZyRecoveryParent(f, recovery);
     internal void IssueHappyZy(global::CardGame.Core.ProgramSkillFrame f, bool skipped, global::CardGame.Core.HappyZyStage next) => _resolve().IssueHappyZy(f, skipped, next);
     internal void PublishHappyZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishHappyZy(f);
-    internal void RequireHappyZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireHappyZy(f);
     internal bool ResumeHappyZy(long id) => _resolve().ResumeHappyZy(id);
     internal bool RetainIssuedHappyZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainIssuedHappyZy(f);
     internal void ReturnHappyZyDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnHappyZyDraw(f, outcome);

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterHuangQuanMouEntries
 {
-    internal void AssertMouHqRounds() => _resolve().AssertMouHqRounds();
     internal void CaptureMouHqAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().CaptureMouHqAttack(attack);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> CollectMouHqGiveCandidates(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CollectMouHqGiveCandidates(batch);
     internal void CollectWindow_CollectMouHqGiveCandidates(global::CardGame.Core.CardMovementBatchContext batch, global::System.Collections.Generic.List<global::CardGame.Core.ProgramTriggerCandidate> result) => _resolve().CollectWindow_CollectMouHqGiveCandidates(batch, result);

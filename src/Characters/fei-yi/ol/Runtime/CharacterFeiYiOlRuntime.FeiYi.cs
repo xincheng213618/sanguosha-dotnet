@@ -94,7 +94,6 @@ internal sealed partial class CharacterFeiYiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FeiYi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FeiYiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Fei Yi lost its exact private legal choice.");
-        AssertFeiYi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (r.Stage == FeiYiStage.DirectionChoice)
@@ -152,7 +151,6 @@ internal sealed partial class CharacterFeiYiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FeiYi: { } r } f || f.Id != id)
             return;
-        AssertFeiYi(f);
         if (r.Stage is FeiYiStage.DiscardChoice or FeiYiStage.DirectionChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

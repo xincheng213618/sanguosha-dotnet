@@ -60,14 +60,6 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         return true;
     }
 
-    internal bool HasAnniversaryCuiLiePrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, AnniversaryCuiLie.Stage: AnniversaryCuiLieStage.Number or AnniversaryCuiLieStage.Payment or AnniversaryCuiLieStage.BorrowedVictim } f && p.PlayerSeat == CuiLieChooser(f) && p.TargetSeat == p.PlayerSeat && p.SourceSeat == f.OwnerSeat && ValidCuiLie(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, CuiLieChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 46900)]
-    internal void AssertCuiLie(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryCuiLie is not null && (!ValidCuiLie(f) || f.PendingMovementContinuation is { } p && !CuiLieMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p)))
-            throw new InvalidOperationException("Cui Lie lost his original recipient, paid native contest, issued lease or real movement return.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46900)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46900)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46900)]
@@ -108,7 +100,6 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     internal bool CuiLieDamageObserver(long id) => CuiLieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46900)]
     internal bool CuiLieBeforeDamage(long id) => CuiLieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 46900)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46900)]
     internal bool CuiLieDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && CuiLieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46900)]

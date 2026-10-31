@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineRecipientConsequencesObserversRuntim
 {
     internal bool RecipientConsequencesFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
-        _coreRecipientConsequencesReceiptsOperations.AssertRecipientConsequences(f);
         if (child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count;
         if (f.BlackGiftContest is { } r)
@@ -94,12 +93,5 @@ internal sealed partial class CoreGameEngineRecipientConsequencesObserversRuntim
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || RecipientConsequencesObserverRoot()is null)
             return false;
         return _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: false, routeUnreturnedAttackThroughRuntime: true);
-    }
-
-    internal void AssertRecipientConsequencesSubtrees()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.BlackGiftContest is not null || f.PrintedLordBenefit is not null))
-            if (!RecipientConsequencesPrefix(f, _resolutionStackOperations._resolutionStack.Count - 1))
-                throw new InvalidOperationException("Recipient consequences lost their continuous exact paid-child subtree.");
     }
 }

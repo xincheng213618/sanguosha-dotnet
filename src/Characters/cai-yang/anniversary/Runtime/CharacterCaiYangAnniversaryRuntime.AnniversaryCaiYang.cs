@@ -78,7 +78,6 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryCaiYang: { } r } f || f.Id != id)
             return;
-        RequireCaiYang(f);
         if (r.Stage == AnniversaryCaiYangStage.Drawing)
             return;
         if (r.Stage == AnniversaryCaiYangStage.Duel)
@@ -129,10 +128,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     internal void ReturnCaiYangDraw(ProgramSkillFrame supplied, NativeDrawOutcome draw)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        RequireCaiYang(f);
         var r = f.AnniversaryCaiYang!;
-        if (r.Stage != AnniversaryCaiYangStage.Drawing || r.Draw is not null || f.NativeDraw is not null || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != 1 || draw.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Jiaofeng lost its original once-issued native one-card draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCaiYang = r with { Stage = AnniversaryCaiYangStage.DrawChildren, Draw = draw } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaiYangJiaofengDrawReturnedEvent(f.Id, draw.ActualDrawIds.Count, draw.AttemptFrameId, draw.SequenceBefore, draw.SequenceAfter));
         ContinueCaiYang(f.Id);

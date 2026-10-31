@@ -328,23 +328,4 @@ internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime
     }
 
     internal int[] PublicHandDraftStartingSeats(ProgramSkillFrame frame) => _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.StateId == "eligible-start" ? frame.PublicHandDraft!.RecipientSeats.Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive).ToArray() : _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).Select(player => player.Seat).ToArray();
-    internal void AssertNamedDefenseAndPublicDraft(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.NamedTargetDefense is { } defense)
-        {
-            if (paused.Op != SkillProgramEffectOp.DeclareNameForTargetDefense || defense.LedgerId != paused.StateId || defense.Stage is < 0 or > 3 || (defense.Stage == 0) != (defense.Name is null) || defense.Name is { } name && (!paused.CardKinds.Contains(name) || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(frame.OwnerSeat, frame.SkillId, DefenseNameUsage(defense.LedgerId, name), SkillUsageScope.Game) != 1))
-                throw new InvalidOperationException("A named defense lost its declared canonical name or paid instruction.");
-            _ = NamedDefenseUse(frame);
-        }
-
-        if (frame.PublicHandDraft is { } draft && (paused.Op != SkillProgramEffectOp.DrawAndDraftLowHandPopulation || draft.Stage is < 0 or > 3 || draft.RecipientSeats.Distinct().Count() != draft.RecipientSeats.Count || draft.CardIds.Distinct().Count() != draft.CardIds.Count || draft.CardIds.Count > draft.RecipientSeats.Count || draft.Cursor < 0 || draft.Cursor > draft.RecipientSeats.Count || frame.WindowContext?.Facts?.LowHandPopulationSeats is not { } frozen || !draft.RecipientSeats.Order().SequenceEqual(frozen.Order())))
-            throw new InvalidOperationException("A public draft lost its frozen participants, real card set or cursor.");
-        if (frame.NamedTargetDefense is null && frame.PublicHandDraft is null || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || frame.PendingMovementContinuation is not null)
-            return;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.Choices.Count == 0 || prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString()))
-            throw new InvalidOperationException("The named/draft operation lost its published decision.");
-        var expectedChooser = frame.NamedTargetDefense is { } named ? named.Stage == 0 ? frame.OwnerSeat : NamedDefenseUse(frame).Action!.ActorSeat : frame.PublicHandDraft!.Stage == 3 ? frame.PublicHandDraft.RecipientSeats[frame.PublicHandDraft.Cursor] : frame.OwnerSeat;
-        if (prompt.PlayerSeat != expectedChooser || prompt.IsPrivate != (frame.NamedTargetDefense is not null || frame.PublicHandDraft!.Stage < 2))
-            throw new InvalidOperationException("The named/draft decision changed its actor or privacy boundary.");
-    }
 }

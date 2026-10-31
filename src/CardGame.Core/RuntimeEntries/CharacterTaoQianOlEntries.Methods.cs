@@ -8,8 +8,6 @@ internal sealed partial class CharacterTaoQianOlEntries
     internal void AnswerTaoQian(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerTaoQian(choice);
     internal void AnswerZhaohuo(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerZhaohuo(choice);
     internal void AppendZhaohuoDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.DamageTriggerCandidate> candidates) => _resolve().AppendZhaohuoDamageCandidates(attack, window, candidates);
-    internal void AssertTaoQian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertTaoQian(f);
-    internal void AssertZhaohuo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhaohuo(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginTaoQian(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginTaoQian(supplied, op);
     internal void BindZongluanSlashUse(long id) => _resolve().BindZongluanSlashUse(id);
     internal bool CanActivateWenren(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateWenren(c);
@@ -33,10 +31,8 @@ internal sealed partial class CharacterTaoQianOlEntries
     internal bool HasZhaohuoDamageObserver(long id) => _resolve().HasZhaohuoDamageObserver(id);
     internal bool IsIssuedZhaohuoCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedZhaohuoCandidate(candidate, context);
     internal bool IsIssuedZongluanUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedZongluanUse(use);
-    internal bool IsTaoQianDying() => _resolve().IsTaoQianDying();
     internal bool IsTaoQianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsTaoQianMovement(f, e, p);
     internal bool IsTaoQianRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().IsTaoQianRecoveryParent(f, child);
-    internal bool IsZhaohuoDying() => _resolve().IsZhaohuoDying();
     internal bool IsZhaohuoHandLimitExempt(int ownerSeat, int cardId) => _resolve().IsZhaohuoHandLimitExempt(ownerSeat, cardId);
     internal bool IsZhaohuoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsZhaohuoMovement(f, effect, pending);
     internal bool IsZhaohuoPhysicalRestricted(int actorSeat, int cardId) => _resolve().IsZhaohuoPhysicalRestricted(actorSeat, cardId);
@@ -65,11 +61,9 @@ internal sealed partial class CharacterTaoQianOlEntries
     internal global::CardGame.Core.ProgramSkillFrame? TaoQianObserverRoot() => _resolve().TaoQianObserverRoot();
     internal bool TaoQianObserverSuffix(int index) => _resolve().TaoQianObserverSuffix(index);
     internal bool TaoQianPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().TaoQianPaidMovement(f, m);
-    internal bool TaoQianWindowMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().TaoQianWindowMatches(f);
     internal bool ValidZhaohuoPayment(long frameId, long damageId, global::CardGame.Core.CardConversionSource source, string hash, int donor, int cardId, global::CardGame.Core.CardKind kind, int turn, int turnOwner) => _resolve().ValidZhaohuoPayment(frameId, damageId, source, hash, donor, cardId, kind, turn, turnOwner);
     internal bool ValidZhaohuoPhysicalGift(global::CardGame.Core.ZhaohuoGiftPaidEvent e) => _resolve().ValidZhaohuoPhysicalGift(e);
     internal bool ValidZhaohuoSelfGift(global::CardGame.Core.ZhaohuoSelfGiftCommittedEvent e) => _resolve().ValidZhaohuoSelfGift(e);
-    internal bool ValidZhaohuoStarted(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidZhaohuoStarted(f);
     internal void ValidateZongluanNative(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateZongluanNative(use);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ZhaohuoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhaohuoChoices(f);
     internal global::CardGame.Core.ZhaohuoFirstVictimDamageEvent? ZhaohuoFirst(long damageId) => _resolve().ZhaohuoFirst(damageId);

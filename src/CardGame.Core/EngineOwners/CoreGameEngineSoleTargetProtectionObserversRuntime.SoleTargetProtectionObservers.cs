@@ -32,16 +32,6 @@ internal sealed partial class CoreGameEngineSoleTargetProtectionObserversRuntime
     }
 
     internal ProgramSkillFrame? SoleTargetProtectionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreSoleTargetProtectionObserversOperations.SoleTargetProtectionFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    internal bool HasSoleTargetProtectionCardObserver(long useId) => SoleTargetProtectionObserverRoot()?.SoleTargetProtection?.CardUseFrameId == useId;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 110)]
-    internal bool IsSoleTargetProtectionDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SoleTargetProtectionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 40)]
     internal bool TryAdvanceSoleTargetProtectionSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SoleTargetProtectionObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
-    internal bool IsSoleTargetQuarantinedAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !_coreSoleTargetQuarantineOperations.HasExactSoleTargetQuarantine(use) || attack.CardUserSeat != use.SourceSeat || attack.EffectiveCardKind != use.CardKind || attack.PhysicalCards.Any(c => !use.Action!.PhysicalCards.Any(p => p.CardId == c.Id) || !_coreSoleTargetQuarantineOperations.IsSoleTargetQuarantinedMaterial(use.Id, c.Id) && !_coreAlternativeViewAsCostsOperations.IsProgramAlternativeCost(use.Action!, c.Id) && !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(use.Id, c.Id) && !_coreResponseEntityExchangeOperations.IsExchangedCardClaim(use.Action!.ActionId, c.Id)) || use.SoleTargetQuarantine!.Materials.Any(m => !attack.PhysicalCards.Any(c => c.Id == m.CardId)))
-            return false;
-        var parentIds = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(p => p.Id != use.Id && p.Action is { Type: CardActionType.Use }).SelectMany(p => p.PhysicalCardIds ?? (p.CardId == 0 ? [] : new[] { p.CardId })).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToHashSet();
-        return processing.Select(c => c.Id).ToHashSet().SetEquals(parentIds);
-    }
 }

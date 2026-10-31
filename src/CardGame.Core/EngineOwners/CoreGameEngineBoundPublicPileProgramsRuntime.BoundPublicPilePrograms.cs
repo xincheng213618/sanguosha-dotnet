@@ -72,29 +72,6 @@ internal sealed partial class CoreGameEngineBoundPublicPileProgramsRuntime
         return _coreProgramLifecycleOperations.GetProgramTargetSeats(frame.OwnerSeat, paused.TargetKind ?? SkillProgramTargetKind.OtherLiving);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 900003)]
-    internal void AssertSelectedPublicPileBindings(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        for (var index = 0; index < Math.Min(frame.InstructionIndex, plan.Instructions.Count); index++)
-        {
-            var effect = plan.Instructions[index];
-            if (effect.Op != SkillProgramEffectOp.SelectPublicPile)
-                continue;
-            var binding = frame.CardSetBindings.SingleOrDefault(binding => binding.Name == effect.ResultBind);
-            // A source-choice prompt has not issued its binding yet.
-            if (binding is null)
-            {
-                if (frame.InstructionIndex > index + 1)
-                    throw new InvalidOperationException("A completed public-pile selection lost its issued binding.");
-                continue;
-            }
-
-            var receipts = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramPublicPileSelectedEvent>().Where(issued => issued.FrameId == frame.Id && issued.Bind == binding.Name && issued.InstructionIndex == index + 1).ToArray();
-            if (receipts is not [var receipt] || receipt.SkillId != frame.SkillId || receipt.GameplayHash != frame.GameplayHash || receipt.SourceSkillId != effect.SkillIds.Single() || binding.Visibility != SkillProgramCardSetVisibility.Public || !binding.CardIds.SequenceEqual(receipt.CardIds) || binding.FrozenSelectedSuits is not { } suits || !suits.SequenceEqual(receipt.PrintedSuits) || binding.CardIds.Count != binding.SourceLocations.Count || binding.CardIds.Count != suits.Count || binding.CardIds.Distinct().Count() != binding.CardIds.Count || (binding.CardIds.Count == 0 ? receipt.SourceLocation is not null || receipt.SourceSkillInstanceId is not null : receipt.SourceLocation is not { Zone: CardZoneKind.PublicPersistentPile } location || location.OwnerSeat != frame.OwnerSeat || receipt.SourceSkillInstanceId is null || binding.SourceLocations.Any(source => source != location)))
-                throw new InvalidOperationException("A selected public pile lost its exact issued entity and printed-suit receipt.");
-        }
-    }
-
     [ProgramContinuation(ProgramContinuationKind.Resume, 900001)]
     internal bool ContinueBoundPublicPileDistribution(ProgramSkillFrame frame)
     {

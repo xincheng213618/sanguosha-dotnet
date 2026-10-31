@@ -5,7 +5,6 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileEntries
     internal void AnswerBoundaryAnguo(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryAnguo(choice);
     internal void ApplyBoundaryAnguoPayment(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ApplyBoundaryAnguoPayment(frame);
     internal global::CardGame.Core.RuleQueryEvaluation ApplyBoundaryZhuZhiHandLimit(global::CardGame.Core.CharacterState player, global::CardGame.Core.RuleQueryEvaluation ordinary) => _resolve().ApplyBoundaryZhuZhiHandLimit(player, ordinary);
-    internal void AssertBoundaryAnguo(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryAnguo(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryAnguo(global::CardGame.Core.ProgramSkillFrame supplied, bool rescue) => _resolve().BeginBoundaryAnguo(supplied, rescue);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryAnguoPayment(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryAnguoPayment(supplied);
     internal global::CardGame.Core.PromptChoice BoundaryAnguoAi(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryAnguoAi(decision, frame);

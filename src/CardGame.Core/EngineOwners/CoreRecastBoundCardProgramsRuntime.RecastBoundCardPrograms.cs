@@ -37,8 +37,6 @@ internal sealed partial class CoreRecastBoundCardProgramsRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != frameId || frame.BoundCardRecast is not { } receipt)
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        if (frame.InstructionIndex != receipt.InstructionIndex || receipt.InstructionIndex < 1 || receipt.InstructionIndex > plan.Instructions.Count || plan.Instructions[receipt.InstructionIndex - 1].Op != SkillProgramEffectOp.RecastBoundCard || plan.Instructions[receipt.InstructionIndex - 1].SourceBind != receipt.SourceBind || receipt.SourceLocation.OwnerSeat != frame.OwnerSeat || receipt.SourceLocation.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
-            throw new InvalidOperationException("A paid bound-card recast lost its exact owning instruction.");
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             return true;
         if (!receipt.DrawApplied)

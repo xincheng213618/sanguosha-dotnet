@@ -89,39 +89,6 @@ internal sealed partial class CoreGameEngineJudgedRankSlashPoliciesRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.AfterSlashDebitIdentity, 10)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 10)]
     internal bool HasIssuedJudgedRankSlashQuota(long useId, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.JudgedRankSlashUse is { ActorSeat: var owner, IgnoresQuota: true } && owner == actor;
-    internal void AssertJudgedRankSlashPolicies()
-    {
-        if (!HasJudgedRankSlashCapability && !HasOtherActualBasicDiscardCapability)
-            return;
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(f => f.JudgedRankSlashUse is not null))
-        {
-            var r = use.JudgedRankSlashUse!;
-            if (use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || r.CardUseFrameId != use.Id || r.CardActionId != action.ActionId || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, action.ProviderSeat) || r.EffectiveRank != action.EffectiveRank || r.ActorSeat != r.Policy.Source.OwnerSeat || r.IgnoresDistance != (r.EffectiveRank is> 0 && r.EffectiveRank < r.Policy.Rank) || r.IgnoresQuota != (r.EffectiveRank is> 0 && r.EffectiveRank > r.Policy.Rank) || _coreProgramEventHistoryOperations.ProgramEventHistory<TurnJudgedRankSlashPolicyGrantedEvent>().Count(e => e.Policy == r.Policy) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<JudgedRankSlashUsePolicyAppliedEvent>().Count(e => e.Receipt == r) != 1)
-                throw new InvalidOperationException("An issued rank-split Slash lost its frozen owner, rank or quota decision.");
-        }
-
-        foreach (var grant in _turnCardUseEffectsOperations._turnCardUseEffects.JudgedRankSlashPolicies)
-        {
-            var program = _contentRegistryOperations._contentRegistry.GetSkill(grant.Source.SkillId).Program;
-            var activation = program?.Activations.SingleOrDefault(a => a.Id == grant.Source.BindingId);
-            if (program?.GameplayHash != grant.GameplayHash || activation?.Effects is not [{ Op: SkillProgramEffectOp.StartJudgment }, { Op: SkillProgramEffectOp.GrantJudgedRankSplitSlashTurnPolicy }] || (activation.Effects[1].JudgedRankSlashExpiry == JudgedRankSlashPolicyExpiry.ActualPlayPhase ? grant.PhaseInstanceId is not > 0 : grant.PhaseInstanceId is not null) || grant.EffectIndex != 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(grant.Source.OwnerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(grant.TurnSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == grant.ParentFrameId && e.OwnerSeat == grant.Source.OwnerSeat && e.SkillId == grant.Source.SkillId && e.ActivationId == grant.Source.BindingId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<TurnJudgedRankSlashPolicyGrantedEvent>().Count(e => e.Policy == grant) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Count(e => e.ResolutionId == grant.JudgmentFrameId && e.ParentResolutionId == grant.ParentFrameId && e.TargetSeat == grant.Source.OwnerSeat && e.CardId == grant.JudgmentCardId && e.Rank == grant.Rank) != 1)
-                throw new InvalidOperationException("A judged-rank turn policy lost its exact issued public result.");
-        }
-
-        var issuedDraws = _coreProgramEventHistoryOperations.ProgramEventHistory<OtherActualBasicDiscardDrawIssuedEvent>();
-        if (issuedDraws.Count == 0)
-            return;
-        if (issuedDraws.Where(e => _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program!.Triggers.Single(t => t.Id == e.Source.BindingId).UsageScope == SkillUsageScope.Turn).GroupBy(e => (e.Source.OwnerSeat, e.Source.SkillId, e.ActualTurnNumber, e.ActualTurnOwnerSeat)).Any(g => g.Count() != 1) || issuedDraws.GroupBy(e => (e.Source.OwnerSeat, e.Source.SkillId, e.MovementBatchId)).Any(g => g.Count() != 1))
-            throw new InvalidOperationException("A basic discard benefit exceeded its declared actual-turn quota or repeated one physical discard batch.");
-        foreach (var issued in issuedDraws)
-        {
-            var program = _contentRegistryOperations._contentRegistry.GetSkill(issued.Source.SkillId).Program;
-            var trigger = program?.Triggers.SingleOrDefault(t => t.Id == issued.Source.BindingId);
-            var movement = _coreCardMovementJournalCardMovementsAccess._cardMovements.SingleOrDefault(m => m.Sequence == issued.MovementSequence);
-            if (program?.GameplayHash != issued.GameplayHash || trigger is null || !IsOtherActualBasicDiscardTrigger(trigger) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(issued.Source.OwnerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(issued.ActualTurnOwnerSeat) || issued.ActualTurnOwnerSeat == issued.Source.OwnerSeat || issued.DiscardOwnerSeat == issued.Source.OwnerSeat || movement is null || movement.CardId != issued.CardId || movement.TurnNumber != issued.ActualTurnNumber || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement)?.OwnerSeat != issued.DiscardOwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(movement.CardKind, SkillProgramCardCategory.Basic) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == issued.FrameId && e.OwnerSeat == issued.Source.OwnerSeat && e.SkillId == issued.Source.SkillId && e.BindingId == issued.Source.BindingId && e.SkillInstanceId == issued.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.DiscardPileReceived) != 1)
-                throw new InvalidOperationException("An issued basic discard draw lost its exact physical origin and accepted binding.");
-        }
-    }
 
     void global::CardGame.Core.IJudgedRankSlashProgramHost.GrantJudgedRankSplitSlashTurnPolicy(ProgramSkillFrame frame, string bind) => GrantOriginalJudgedRankSlashPolicy(frame, bind);
     void global::CardGame.Core.IJudgedRankSlashProgramHost.DrawFromOtherActualBasicDiscard(ProgramSkillFrame frame) => DrawFromOriginalOtherBasicDiscard(frame);

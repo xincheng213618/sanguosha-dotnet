@@ -157,16 +157,6 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         new SkillProgramExecutor().Run(f.Id, host, host);
     }
 
-    internal ProgramSkillFrame? BoundaryLiuFengRequestDraft() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.BoundaryLiuFeng is { Need: not null, UseId: 0, Stage: not BoundaryLiuFengStage.Completed });
-    internal PendingDecision? BoundaryLiuFengInvariantDecision(PendingDecision? ordinary) => BoundaryLiuFengRequestDraft()?.BoundaryLiuFeng?.OriginalDecision is { } p ? BoundaryLiuFengNativeDecision(p) : ordinary is null ? null : BoundaryLiuFengNativeDecision(ordinary);
-    internal ResolutionFrame? BoundaryLiuFengInvariantTop(ResolutionFrame? ordinary) => BoundaryLiuFengRequestDraft()?.BoundaryLiuFeng?.Need is { } n ? _resolutionStackOperations._resolutionStack.Single(f => f.Id == n.RequestFrameId) : ordinary;
-    internal bool HasBoundaryLiuFengNativeRequestContinuation(long ownerFrameId) => BoundaryLiuFengRequestDraft()is { BoundaryLiuFeng: { Need: { } n } r } f && n.OwnerFrameId == ownerFrameId && ValidBoundaryLiuFeng(f) && BoundaryLiuFengNeedCurrent(r);
-    internal void AssertBoundaryLiuFengRequests()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.BoundaryLiuFeng is not null))
-            AssertBoundaryLiuFeng(f);
-    }
-
     internal bool HasBoundaryLiuFengProgramSlash(CharacterState actor, IEnumerable<int> targets) => BoundaryLiuFengSources(actor.Seat).Any() && BoundaryLiuFengHasCost(actor.Seat) && CaptureBoundaryLiuFengNeed(actor.Seat, DecisionKind.ProgramTrigger, _resolutionStackOperations._resolutionStack.LastOrDefault())is { } n && n.Targets.Any(t => targets.Contains(t) && BoundaryLiuFengRequestTarget(n, t));
     internal bool HasBoundaryLiuFengGenericBasic(ProgramSkillFrame f) => f.KeBiNengPingduan is { } r && HasBoundaryLiuFengProgramSlash(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != r.ActorSeat).Select(p => p.Seat));
     internal bool HasBoundaryLiuFengForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == pending.ResolutionId && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && BoundaryLiuFengSources(actor.Seat).Any() && BoundaryLiuFengHasCost(actor.Seat) && actor.IsAlive && target.IsAlive && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Slash, CardActionType.Use) && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, CardKind.Slash, Suit.None, false, null, 0, []);

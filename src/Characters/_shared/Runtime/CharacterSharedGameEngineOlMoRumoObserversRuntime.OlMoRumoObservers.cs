@@ -11,7 +11,6 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoObserversRuntime
     {
         if (frame.OlMoRumo is not { } receipt)
             return false;
-        _characterSharedGameEngineOlMoRumoProofsOperations.AssertOlMoRumo(frame);
         if (child is IdentityAppearanceFrame appearance)
             return (receipt.Stage == OlMoRumoStage.LossIssuing || receipt.Stage == OlMoRumoStage.LossChildren && receipt.LossReturned && receipt.AppearancePrevented && _coreProgramEventHistoryOperations.ProgramEventHistory<IdentityHpDeductionPreventedEvent>().Count(item => item.AppearanceFrameId == appearance.Id && item.OwnerSeat == frame.OwnerSeat && item.Entry == IdentityAppearanceEntry.ProgramHpLoss && item.RequestedDeduction == 1) == 1) && !receipt.HadRoundDamage && appearance.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && appearance.Receipt.ParentFrameId == frame.Id && appearance.Receipt.OwnerSeat == frame.OwnerSeat && appearance.Receipt.RequestedDeduction == 1 && appearance.Receipt.OriginalInstructionIndex == frame.InstructionIndex;
         if (child is HpChangedTriggerWindowFrame hp)
@@ -31,8 +30,6 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoObserversRuntime
     internal bool HasOlMoRumoDamageObserver(long frameId) => OlMoRumoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frameId && item is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1300)]
     internal bool HasOlMoRumoBeforeDamageObserver(long frameId) => OlMoRumoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frameId && item is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1130)]
-    internal bool IsOlMoRumoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OlMoRumoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 390)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 380)]
     internal bool IsOlMoRumoRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery)

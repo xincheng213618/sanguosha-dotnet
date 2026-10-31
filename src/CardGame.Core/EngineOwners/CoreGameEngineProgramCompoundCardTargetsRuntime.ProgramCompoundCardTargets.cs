@@ -38,14 +38,4 @@ internal sealed partial class CoreGameEngineProgramCompoundCardTargetsRuntime
         _coreCardUseLifecycleOperations.TryMarkTargetsAdjusted(use.Id);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    internal void AssertProgramCompoundCardTarget(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "add-compound-card-target") != true)
-            return;
-        var use = _coreProgramCardUseRolesOperations.GetProgramRoleCardUse(frame);
-        var owner = frame.SelectedTargetSeats.Single();
-        if (paused.Op != SkillProgramEffectOp.AddCurrentCardUseTarget || use.CardKind != CardKind.BorrowedSword || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: false } decision || decision.PlayerSeat != frame.OwnerSeat || decision.TargetSeat != owner || decision.Choices.Any(choice => choice.Cards.Count != 0 || choice.Targets.Count != 1 || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || !_coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[choice.Targets[0]])))
-            throw new InvalidOperationException("A compound target prompt lost its exact owner, instruction or victim domain.");
-    }
 }

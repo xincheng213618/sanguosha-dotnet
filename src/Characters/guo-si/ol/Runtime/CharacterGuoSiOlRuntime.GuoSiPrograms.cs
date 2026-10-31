@@ -167,12 +167,5 @@ internal sealed partial class CharacterGuoSiOlRuntime
             throw new InvalidOperationException("Sidao terminal completion requires its once-returned native use.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 290)]
-    internal void AssertRegisteredIssuedGuoSi(ProgramSkillFrame frame)
-    {
-        if (frame.GuoSi is not null)
-            RequireIssuedGuoSi(frame);
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IGuoSiProgramHost.ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame f) => ExecuteGuoSi(op, f);
 }

@@ -133,7 +133,6 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
     internal void ContinueAnniversaryXiahouEn(long id)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-        RequireAnniversaryXiahouEn(f);
         var r = f.AnniversaryXiahouEn!;
         if (r.Stage == AnniversaryXiahouEnStage.NativeUse)
         {

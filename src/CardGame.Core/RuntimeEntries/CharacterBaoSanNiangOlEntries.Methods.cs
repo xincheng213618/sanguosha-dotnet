@@ -3,8 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterBaoSanNiangOlEntries
 {
     internal void AdvanceBaoOutcomes(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AdvanceBaoOutcomes(f);
-    internal void AssertChosenAssaults() => _resolve().AssertChosenAssaults();
-    internal void AssertRegisteredBao2025(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredBao2025(frame);
     internal int[] BaoAssaultLegalTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BaoAssaultLegalTargets(f);
     internal global::CardGame.Core.PromptChoice BaoChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().BaoChoice(f, branch, label, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BaoChoices(f);
@@ -21,9 +19,7 @@ internal sealed partial class CharacterBaoSanNiangOlEntries
     internal void FinishBao2025(global::CardGame.Core.ProgramSkillFrame f, bool completed) => _resolve().FinishBao2025(f, completed);
     internal bool HasBaoDamageObserver(long id) => _resolve().HasBaoDamageObserver(id);
     internal bool HasBaoSilverLionPayment(global::CardGame.Core.ProgramSkillFrame f, int seat) => _resolve().HasBaoSilverLionPayment(f, seat);
-    internal bool IsBaoDying() => _resolve().IsBaoDying();
     internal bool IsBaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsBaoMovement(f, e, p);
-    internal bool IsChosenAssaultAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsChosenAssaultAttackConsistent(attack, processing);
     internal bool IsChosenAssaultUse(long id) => _resolve().IsChosenAssaultUse(id);
     internal void IssueBaoAssault(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueBaoAssault(f);
     internal bool MatchesChosenAssaultUseAction(long id, global::CardGame.Core.CardActionContext action, int cardId) => _resolve().MatchesChosenAssaultUseAction(id, action, cardId);

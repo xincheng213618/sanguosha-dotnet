@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSunRuOlEntries
 {
     internal void AnswerSunRuOlChoice(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerSunRuOlChoice(choice);
-    internal void AssertSunRuOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSunRuOl(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSunRuOlChishi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginSunRuOlChishi(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSunRuOlWeimian(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginSunRuOlWeimian(supplied);
     internal bool CanActivateSunRuOlWeimian(int ownerSeat) => _resolve().CanActivateSunRuOlWeimian(ownerSeat);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterSunRuOlEntries
     internal bool DrainSunRuOlChildren(long id) => _resolve().DrainSunRuOlChildren(id);
     internal bool ExcludeOrdinaryMovement_IsSunRuOlChishiTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsSunRuOlChishiTrigger(candidate, trigger);
     internal bool HasSunRuOlDamageObserver(long id) => _resolve().HasSunRuOlDamageObserver(id);
-    internal bool IsSunRuOlDying() => _resolve().IsSunRuOlDying();
     internal bool IsSunRuOlRecoveryParent(global::CardGame.Core.ProgramSkillFrame producer, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunRuOlRecoveryParent(producer, recovery);
     internal void IssueSunRuOlRefreshDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueSunRuOlRefreshDraw(f);
     internal bool? ProveSunRuMovement(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ProveSunRuMovement(trigger, candidate, context);

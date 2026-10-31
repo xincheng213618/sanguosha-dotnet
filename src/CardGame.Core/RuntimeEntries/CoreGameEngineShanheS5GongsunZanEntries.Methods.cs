@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheS5GongsunZanEntries
 {
-    internal void AssertShanheS5Qiaomeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShanheS5Qiaomeng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheS5Qiaomeng(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheS5Qiaomeng(supplied);
     internal bool CanOfferShanheS5Gongsun(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShanheS5Gongsun(candidate, trigger, context);
     internal bool IsShanheS5QiaomengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsShanheS5QiaomengMovement(f, effect, pending);

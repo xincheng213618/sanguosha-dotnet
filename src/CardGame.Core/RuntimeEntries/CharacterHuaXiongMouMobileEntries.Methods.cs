@@ -5,7 +5,6 @@ internal sealed partial class CharacterHuaXiongMouMobileEntries
     internal bool AdvanceMouHuaXiongChildren() => _resolve().AdvanceMouHuaXiongChildren();
     internal void AnswerMouYaowu(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouYaowu(selected);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? AppendMouHuaXiongWei(int owner, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? ordinary) => _resolve().AppendMouHuaXiongWei(owner, ordinary);
-    internal void AssertMouHuaXiong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouHuaXiong(f);
     internal bool CanActivateMouYangwei(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateMouYangwei(c);
     internal bool CanOfferMouYaowu(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferMouYaowu(c);
     internal void CommitMouYaowuChoice(global::CardGame.Core.ProgramSkillFrame f, string benefit, int? recipient) => _resolve().CommitMouYaowuChoice(f, benefit, recipient);
@@ -13,7 +12,6 @@ internal sealed partial class CharacterHuaXiongMouMobileEntries
     internal bool HasMouHuaXiongBeforeDamageObserver(long id) => _resolve().HasMouHuaXiongBeforeDamageObserver(id);
     internal bool HasMouHuaXiongDamageObserver(long id) => _resolve().HasMouHuaXiongDamageObserver(id);
     internal bool HasMouHuaXiongWei(int owner) => _resolve().HasMouHuaXiongWei(owner);
-    internal bool IsMouHuaXiongChoiceResult(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramChoiceResultBinding binding) => _resolve().IsMouHuaXiongChoiceResult(f, binding);
     internal bool IsMouHuaXiongDying() => _resolve().IsMouHuaXiongDying();
     internal bool IsMouHuaXiongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouHuaXiongRecoveryParent(f, recovery);
     internal bool KeepPaidMouHuaXiong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidMouHuaXiong(f);

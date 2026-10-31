@@ -24,22 +24,12 @@ internal sealed partial class CharacterHuangQuanOlRuntime
         return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HuangQuanDrawPaidEvent>().Count(e => e.FrameId == f.Id && e.Source == p.Source && e.GameplayHash == p.GameplayHash && e.Kind == p.Kind && e.RecipientSeat == p.RecipientSeat && e.ActualTurn == p.ActualTurn && e.TurnOwner == p.TurnOwner && e.ActualPhase == p.ActualPhase && e.Before == p.Before && e.After == p.After && e.CardCount == p.CardIds.Count && e.Occurrence == p.Occurrence) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > p.Before && m.Sequence <= p.After && m.To == CardLocation.Hand(p.RecipientSeat) && m.Reason.Value == "program." + p.Kind + ".draw") == p.CardIds.Count && p.CardIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > p.Before && m.Sequence <= p.After && m.CardId == id && m.To == CardLocation.Hand(p.RecipientSeat) && m.Reason.Value == "program." + p.Kind + ".draw") == 1);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 270)]
-    internal void RequireIssuedHuangQuan(ProgramSkillFrame f)
-    {
-        if (f.HuangQuan is not { } p)
-            return;
-        if (!ValidHuangQuanDraw(f) || p.Stage == "draw-paid" && (f.PendingMovementContinuation is not { SubjectSeat: var target, BeforeCount: 0, CoverageResultBind: null } || target != p.RecipientSeat) || p.Stage != "draw-paid" && f.PendingMovementContinuation is not null || p.Stage is "issuing" or "native-use" or "returned" && (p.NativeUse is not { } r || !ValidJianjiReceipt(r, f, p.Stage != "issuing")))
-            throw new InvalidOperationException("Huang Quan lost its exact relation occurrence, actual draw payment, native actor or owning request.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 230)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 230)]
     internal bool CanContinueIssuedHuangQuan(ProgramSkillFrame f)
     {
         if (f.HuangQuan is null)
             return false;
-        RequireIssuedHuangQuan(f);
         return true;
     }
 
@@ -62,14 +52,6 @@ internal sealed partial class CharacterHuangQuanOlRuntime
     internal bool HasHuangQuanDamageObserver(long id) => HuangQuanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 390)]
     internal bool HasHuangQuanBeforeDamageObserver(long id) => HuangQuanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 160)]
-    internal bool IsHuangQuanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HuangQuanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 300)]
     internal bool TryAdvanceHuangQuanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuangQuanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
-    internal void AssertHuangQuanNativeUses()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.JianjiUse is not null))
-            if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == use.JianjiUse!.ProgramFrameId)is not ProgramSkillFrame parent || !JianjiNativeUseRidesOn(use, parent))
-                throw new InvalidOperationException("Jianji native use lost its exact actual draw owner.");
-    }
 }

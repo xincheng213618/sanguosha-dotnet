@@ -59,8 +59,6 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
             var context = f.WindowContext!;
             var parent = _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
             global::CardGame.Core.GameEngine.IDamageAttempt attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(parent);
-            if (attack.IsSourceLess || context.DamageFrameId != parent.ParentFrameId || context.SourceSeat != attack.SourceSeat || context.Amount != attack.DamageAmount)
-                throw new InvalidOperationException("Reflected damage lost its original paid damage segment.");
             target = attack.SourceSeat;
             amount = attack.DamageAmount;
             nature = _coreNativeCardClassificationsOperations.GetDamageNature(attack);

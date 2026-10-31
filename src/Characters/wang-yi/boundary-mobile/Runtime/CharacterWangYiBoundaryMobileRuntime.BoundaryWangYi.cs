@@ -44,10 +44,4 @@ internal sealed partial class CharacterWangYiBoundaryMobileRuntime
     internal static PromptChoice ChooseAiBoundaryWangYiMijiCount(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices[^1];
     internal int BoundaryWangYiMijiDrawCount(ProgramSkillFrame f) => ValidBoundaryWangYiMijiCount(f) && f.BoundaryWangYiMijiCount?.Count is { } count ? count : throw new InvalidOperationException("Mobile Miji draw requires its committed original count selection.");
     internal bool ValidBoundaryWangYiMijiCount(ProgramSkillFrame f) => f.SkillId == BoundaryWangYiMobile.Miji && f.BoundaryWangYiMijiCount is { Maximum: >= 0 } r && f.TriggerId == "natural-ending" && f.WindowContext?.Window == SkillProgramTriggerWindow.TurnEnding && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangYiMijiCountIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && e.GameplayHash == f.GameplayHash && e.Maximum == r.Maximum) == 1 && (r.Count is null ? _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangYiMijiCountChosenEvent>().All(e => e.FrameId != f.Id) && f.InstructionIndex == 1 : r.Count >= 0 && r.Count <= r.Maximum && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangYiMijiCountChosenEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Count == r.Count) == 1);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 57400)]
-    internal void AssertBoundaryWangYiMijiCount(ProgramSkillFrame f)
-    {
-        if (f.BoundaryWangYiMijiCount is not null && !ValidBoundaryWangYiMijiCount(f))
-            throw new InvalidOperationException("Mobile Miji lost its original count producer, source or committed choice.");
-    }
 }

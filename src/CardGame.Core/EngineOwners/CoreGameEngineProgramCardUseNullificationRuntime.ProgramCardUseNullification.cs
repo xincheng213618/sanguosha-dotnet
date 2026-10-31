@@ -77,8 +77,6 @@ internal sealed partial class CoreGameEngineProgramCardUseNullificationRuntime
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, current => current with { BeforeSimpleTargetEffectsStarted = true });
         return _coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardUseBeforeTargetEffects, use.TargetSeats, ProgramCardContinuation.BeforeSimpleTargetEffects, simpleContinuation: continuation);
     }
-
-    internal bool IsExactSimpleBeforeTargetWindow(ProgramCardTriggerWindowFrame window) => window.Continuation == ProgramCardContinuation.BeforeSimpleTargetEffects && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { BeforeSimpleTargetEffectsStarted: true, Action: { } action } use && action.Type == CardActionType.Use && action.ActionId == window.Action.ActionId && action.TargetSeats.SequenceEqual(use.TargetSeats) && window.SimpleContinuation is { } continuation && continuation.CardId == use.CardId && continuation.Effect is SimpleCardUseEffect.Recovery or SimpleCardUseEffect.Alcohol && HasBeforeTargetCardProgram(use.CardKind);
     internal double GetWholeCardUseNullificationAiScore(int ownerSeat, ProgramCardTriggerWindowFrame window)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId) ?? throw new InvalidOperationException("A use-nullification estimate lost its actual use.");

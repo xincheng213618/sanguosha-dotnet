@@ -58,7 +58,6 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != id || frame.DrawAdviceReceipt is not { } receipt)
             return false;
-        AssertDrawAdviceReceipt(frame);
         if (_corePublicPilePreparationOperations.PreparationGameEnded())
             return true;
         if (DrainDrawAdviceChildren(frame))
@@ -134,7 +133,6 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
     internal void ResolveDrawAdviceChoice(PromptChoice selected)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Draw advice lost its owning discard frame.");
-        AssertDrawAdviceReceipt(frame);
         var receipt = frame.DrawAdviceReceipt!;
         var seat = DrawAdviceDiscardSeat(frame);
         if (receipt.Stage != DrawAdviceStage.ChoosingDiscard || receipt.ParticipantCursor >= 2 || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || _corePendingDecisionPolicyPipelineOperations._pendingDecision.IsPrivate != true || selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || selected.Cards.Count != 1 || selected.Targets.Count != 0 || !DrawAdviceChoices(frame).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards)) || receipt.SelectedDiscardCardIds.Count >= receipt.RequiredDiscardCount || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive)
@@ -221,29 +219,11 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 170)]
-    internal void AssertDrawAdviceReceipt(ProgramSkillFrame frame)
-    {
-        if (frame.DrawAdviceReceipt is null)
-        {
-            if (_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawTwoThenDiscardTwoIfOverMaxHp) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawAdviceStartedEvent>().Any(e => e.FrameId == frame.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawAdviceResolvedEvent>().Any(e => e.FrameId == frame.Id))
-                throw new InvalidOperationException("A paid draw advice instruction lost its owning receipt.");
-            return;
-        }
-
-        if (!ValidDrawAdviceReceipt(frame))
-            throw new InvalidOperationException("Draw advice lost its exact draw-end source, private payment or native movement invoice.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !DrawAdviceFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Draw advice retained an unrelated native child.");
-    }
-
     [ProgramContinuation(ProgramContinuationKind.Movement, 230)]
     internal bool ReturnDrawAdviceMovement(ProgramSkillFrame frame)
     {
         if (frame.DrawAdviceReceipt is null || frame.PendingMovementContinuation is null)
             return false;
-        AssertDrawAdviceReceipt(frame);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }

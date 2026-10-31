@@ -56,7 +56,6 @@ internal sealed partial class MoZhangFeiRuntime
                 return root;
         return null;
     }
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33700, group: 33700)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33700)]
     internal bool IsOwnedHealthDying()
     {

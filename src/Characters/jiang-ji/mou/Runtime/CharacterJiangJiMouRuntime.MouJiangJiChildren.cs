@@ -40,7 +40,6 @@ internal sealed partial class CharacterJiangJiMouRuntime
     internal bool MouJjDamageWindow(long id) => MouJjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 36300)]
     internal bool MouJjBeforeDamage(long id) => MouJjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 36300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36300)]
     internal bool MouJjDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouJjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36300)]

@@ -8,7 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoPiOlGodRuntime
 {
     OlCaoPiPlayer global::CardGame.Core.IOlShenCaoPiFacts.Player(int seat) => new(seat, _coreMatchParticipantsPlayersAccess._players[seat].IsAlive, _coreMatchParticipantsPlayersAccess._players[seat].IsHuman, _coreMatchParticipantsPlayersAccess._players[seat].MaxHp);
-    bool global::CardGame.Core.IOlShenCaoPiFacts.ValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     long global::CardGame.Core.IOlShenCaoPiFacts.MovementSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
     Winner global::CardGame.Core.IOlShenCaoPiFacts.Winner => _coreMatchOutcomeWinnerAccess._winner;

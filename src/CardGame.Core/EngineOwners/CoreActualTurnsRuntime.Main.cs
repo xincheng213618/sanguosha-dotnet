@@ -104,8 +104,6 @@ internal sealed partial class CoreActualTurnsRuntime
     {
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !current.IsAlive)
         {
-            if (current.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || current.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || _resolutionStackOperations._resolutionStack.Count != 0 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
-                throw new InvalidOperationException("A completed actual-turn prelude lost its original clean owner return.");
             // Deferred offers have already paid and returned their HP/death
             // children. They may end this actor before Preparation even starts.
             _coreActualDiscardRecoveryPhasesOperations.ClearActualDiscardRecoveryPhase();

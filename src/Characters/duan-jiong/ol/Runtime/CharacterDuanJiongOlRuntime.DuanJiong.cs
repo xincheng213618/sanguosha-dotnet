@@ -108,7 +108,6 @@ internal sealed partial class CharacterDuanJiongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuanJiongSaogu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == DuanJiongSaoguStage.DelegateChoice ? f.OwnerSeat : r.ActorSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SaoguChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Saogu requires the exact original chooser, materials and native targets.");
-        AssertSaogu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == DuanJiongSaoguStage.UseChoice)
         {
@@ -200,7 +199,6 @@ internal sealed partial class CharacterDuanJiongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuanJiongSaogu: { } r } f || f.Id != id)
             return;
-        AssertSaogu(f);
         if (r.Stage is DuanJiongSaoguStage.DelegateChoice or DuanJiongSaoguStage.DiscardChoice or DuanJiongSaoguStage.UseChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

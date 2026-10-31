@@ -95,9 +95,6 @@ internal sealed partial class CharacterZhouFangMobileRuntime
             FinishMobileDuanfa(f);
             return;
         }
-
-        if (r.Stage != MobileDuanfaStage.CostChildren)
-            throw new InvalidOperationException("Duanfa lost its exact paid native draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileDuanfa = r with { Stage = MobileDuanfaStage.Drawing } });
         _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, r.ActualCount, new(MobileDuanfaDraw));
     }
@@ -161,8 +158,6 @@ internal sealed partial class CharacterZhouFangMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.MobileDuanfa ?? throw new InvalidOperationException("Duanfa draw lost its original payment.");
-        if (r.Stage != MobileDuanfaStage.Drawing || f.NativeDraw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.ActualCount || outcome.ActualDrawIds.Count > r.ActualCount)
-            throw new InvalidOperationException("Duanfa draw lost its exact equal-cost native request.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileDuanfaDrawReturnedEvent(f.Id, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));
         FinishMobileDuanfa(f);
     }

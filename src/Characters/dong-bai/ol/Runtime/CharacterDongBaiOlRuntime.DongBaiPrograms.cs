@@ -226,13 +226,6 @@ internal sealed partial class CharacterDongBaiOlRuntime
             throw new InvalidOperationException("LianZhu discard invoice changed.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 140)]
-    internal void AssertRegisteredLianZhu(ProgramSkillFrame frame)
-    {
-        if (frame.LianZhu is not null)
-            RequireLianZhu(frame);
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IDongBaiProgramHost.BeginLianZhu(ProgramSkillFrame f, int recipient) => BeginLianZhu(f, recipient);
     [PublicHandRevealReturn("lianzhu-gift-hand")]
     internal void ContinueLianzhuAfterPublicReveal(ProgramSkillFrame f)

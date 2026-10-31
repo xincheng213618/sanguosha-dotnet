@@ -46,14 +46,4 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
             return false;
         return red ? p.Count is >= 0 and <= 2 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > p.Before && m.Sequence <= p.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(target) && m.Reason.Value == "program.chouce.red") == p.Count : p.Count == 1 && p.CardId is { } id && p.CardLocation is { } location && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > p.Before && m.Sequence <= p.After && m.CardId == id && m.From == location && m.Reason.Value == "program.chouce.black" && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(id).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)))) == 1;
     }
-
-    internal bool IsExactChouceFinalizedChildSubtree(ProgramJudgmentTriggerWindowFrame frame, JudgmentFrame? judgmentFrame, int frameIndex)
-    {
-        if (judgmentFrame is null || frameIndex < 2 || frameIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[frameIndex].Id != frame.Id || _resolutionStackOperations._resolutionStack[frameIndex - 1].Id != judgmentFrame.Id || _resolutionStackOperations._resolutionStack[frameIndex - 2] is not ProgramSkillFrame { Chouce: { } pending } root || root.Id != judgmentFrame.ParentFrameId || pending.Receipt.JudgmentFrameId != judgmentFrame.Id || pending.Receipt.Reason != judgmentFrame.Reason || frame.ParentFrameId != judgmentFrame.Id || frame.Judgment.JudgmentFrameId != judgmentFrame.Id || frame.Judgment.SubjectSeat != root.OwnerSeat || frame.CandidateIndex < 0 || frame.CandidateIndex >= frame.Candidates.Count || _resolutionStackOperations._resolutionStack[frameIndex + 1] is not ProgramSkillFrame child || child.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentFinalized, Judgment: { } final } context || context.ParentFrameId != frame.Id || final != frame.Judgment)
-            return false;
-        var candidate = frame.Candidates[frame.CandidateIndex];
-        if (candidate.OwnerSeat != child.OwnerSeat || candidate.SkillId != child.SkillId || candidate.TriggerId != child.TriggerId || candidate.SkillInstanceId != child.SkillInstanceId || candidate.GameplayHash != child.GameplayHash)
-            return false;
-        return ValidChouce(root) && _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXiZhiCaiOlOperations.XiZhiCaiFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterXiZhiCaiOlOperations.XiZhiCaiObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)), root.Id)is not null;
-    }
 }

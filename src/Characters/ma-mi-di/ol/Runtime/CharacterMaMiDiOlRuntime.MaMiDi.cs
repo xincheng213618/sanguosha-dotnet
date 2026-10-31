@@ -129,7 +129,6 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaMiDi: { Stage: MaMiDiStage.TargetChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MaMiDiCurrentTarget(r).Target || !MaMiDiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Bingjie requires the actual target's current private physical discard.");
-        AssertMaMiDi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var pair = MaMiDiCurrentTarget(r);
         var id = choice.Cards.Single();
@@ -156,7 +155,6 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MaMiDi: { } r } f && f.Id == id)
         {
-            AssertMaMiDi(f);
             if (r.Stage != MaMiDiStage.TargetChoice)
             {
                 if (DrainMaMiDi(f))
@@ -227,7 +225,6 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     {
         if (f.MaMiDi is not null)
         {
-            AssertMaMiDi(f);
             return true;
         }
 

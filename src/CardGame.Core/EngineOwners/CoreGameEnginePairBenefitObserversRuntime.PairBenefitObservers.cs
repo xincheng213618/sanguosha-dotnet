@@ -113,8 +113,6 @@ internal sealed partial class CoreGameEnginePairBenefitObserversRuntime
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 550, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 630)]
     internal bool IsPairBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairBenefitObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1760)]

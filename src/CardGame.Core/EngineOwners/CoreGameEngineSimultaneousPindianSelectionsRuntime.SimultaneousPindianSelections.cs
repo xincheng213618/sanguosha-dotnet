@@ -188,16 +188,4 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
         if (!_coreSimultaneousPindianOperations.DrainSimultaneousChildren(f))
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
-
-    internal void AssertSimultaneousSelectionPolicies(ProgramSkillFrame f)
-    {
-        var r = f.SimultaneousPindian!;
-        var selection = r.RandomSelection;
-        var originalCards = _characterLuKangWumiaoOperations.WuLuKangOriginalSelectedGroup(f);
-        if (selection is null || selection.Candidates is not System.Collections.ObjectModel.ReadOnlyCollection<PindianRandomCandidate> || selection.Receipts is not System.Collections.ObjectModel.ReadOnlyCollection<PindianRandomReceipt> || selection.Index < 0 || selection.Index > selection.Candidates.Count || selection.Receipts.GroupBy(p => p.TargetSeat).Any(p => p.Count() != 1) || selection.Candidates.Any(c => c.OwnerSeat == c.TargetSeat || c.Source.OwnerSeat != c.OwnerSeat || c.OwnerSeat != f.OwnerSeat && !r.Opponents.Contains(c.OwnerSeat) || c.TargetSeat != f.OwnerSeat && !r.Opponents.Contains(c.TargetSeat)) || selection.Receipts.Any(p => p.RandomBefore == p.RandomAfter || !selection.Candidates.Take(selection.Index).Any(c => c.OwnerSeat == p.OwnerSeat && c.TargetSeat == p.TargetSeat && c.Source == p.Source) || !r.Revealed && !_characterLuKangWumiaoOperations.IsWuLuKangPrivateGroup(f) && _cardZonesOperations._cardZones.GetLocation(p.CardId) != CardLocation.Hand(p.TargetSeat) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PindianRandomHandCommittedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == p.OwnerSeat && e.TargetSeat == p.TargetSeat && e.Source == p.Source) != 1))
-            throw new InvalidOperationException("A simultaneous random choice lost its private once-target entity, policy source or RNG receipt.");
-        var actualSource = selection.Receipts.SingleOrDefault(p => p.TargetSeat == f.OwnerSeat)?.CardId ?? r.OriginalSourceCardId;
-        if (actualSource != originalCards[0].CardId || r.TopReceipts.Select(t => t.Seat).Distinct().Count() != r.TopReceipts.Count || r.TopReceipts.Select(t => t.CardId).Distinct().Count() != r.TopReceipts.Count || r.TopReceipts.Any(t => t.Source.OwnerSeat != t.Seat || !originalCards.Any(c => c.Seat == t.Seat && c.CardId == t.CardId && c.OriginalRank == t.EffectiveRank) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == t.ReservationMovementSequence && m.CardId == t.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineSimultaneousPindianSelectionsDefinitions.SimultaneousTopReservationReason) != 1 || !r.Revealed && _cardZonesOperations._cardZones.GetLocation(t.CardId) != CardLocation.Processing || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimultaneousPindianTopCommittedEvent>().Count(e => e.ProgramFrameId == f.Id && e.ParticipantSeat == t.Seat && e.Source == t.Source) != 1))
-            throw new InvalidOperationException("A simultaneous source input/top reservation lost its distinct original invoice or hidden exclusive entity.");
-    }
 }

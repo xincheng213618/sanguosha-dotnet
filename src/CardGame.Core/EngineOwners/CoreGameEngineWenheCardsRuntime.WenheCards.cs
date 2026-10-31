@@ -203,30 +203,7 @@ internal sealed partial class CoreGameEngineWenheCardsRuntime
     }
 
     internal bool IsWenheCardEffectMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame movement) => movement.ResumeWenheCardEffectFrameId == use.Id && movement.Id == movement.Batch.Id && movement.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(movement with { ResumeWenheCardEffectFrameId = null }) && IsWenheCardEffectMovement(use, movement.Batch);
-    internal bool IsWenheCardEffectStateReturn(CardUseFrame use, ProgramLifecycleTriggerWindowFrame state) => use.WenheCardEffect is { Applied: true, Stage: WenheCardEffectStage.Children } && state.ResumeProgramFrameId == use.Id && state.CharacterStateContinuation == CharacterStateContinuation.WenheCardEffect && state.ResumeCardId is null && state.ResumeCardKind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.Id == state.Id && e.Change.ParentFrameId == use.Id) == 1;
     internal bool IsWenheCardEffectHpReturn(CardUseFrame use, HpChangedTriggerWindowFrame hp) => use.WenheCardEffect is { Applied: true, Stage: WenheCardEffectStage.Children } && hp.Continuation == PostEventContinuation.WenheCardEffect && hp.ResumeFrameId == use.Id && hp.Change.ParentFrameId == use.Id && hp.CardId is null && hp.CardKind is null;
-    internal bool HasWenheCardEffectProcessing(IReadOnlyList<Card> processing)
-    {
-        var uses = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray();
-        if (!uses.Any(use => use.WenheCardEffect is not null))
-            return false;
-        foreach (var use in uses.Where(use => use.WenheCardEffect is not null))
-            AssertWenheCardReceipt(use);
-        var ids = uses.SelectMany(use => use.PhysicalCardIds ?? (use.CardId == 0 ? [] : new[] { use.CardId })).ToHashSet();
-        return processing.All(card => ids.Contains(card.Id));
-    }
-
-    internal bool IsWenheChaosAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        var producer = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.WenheChaos?.CardActionId is not null && frame.Id == attack.ProgramSkillCardUseFrameId);
-        if (producer?.WenheChaos is not { } chaos || !_coreWenheChaosOperations.IsExactWenheChaos(producer) || _coreCardUseLifecycleOperations.LifecycleCardUse(chaos.ParentFrameId)is not { Action: { } parentAction } parent || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } child || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || producer.SelectedTargetSeats is not [var actor] || action.ActorSeat != actor || child.SourceSeat != actor || attack.CardUserSeat != actor || action.ParentActionId != parentAction.ActionId)
-            return false;
-        AssertWenheCardReceipt(parent);
-        var parentIds = parentAction.PhysicalCards.Select(card => card.CardId).ToHashSet();
-        if (!processing.Any(card => parentIds.Contains(card.Id)) || attack.PhysicalCards.Any(card => parentIds.Contains(card.Id)))
-            return false;
-        return _coreNativeCoreInvariantsOperations.IsActiveAttackCardConsistent(attack, processing.Where(card => !parentIds.Contains(card.Id)).ToArray());
-    }
 
     internal void AssertWenheCardReceipt(CardUseFrame use)
     {
@@ -243,11 +220,5 @@ internal sealed partial class CoreGameEngineWenheCardsRuntime
 
         if (!r.Applied || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.WenheChaos && _coreProgramEventHistoryOperations.ProgramEventHistory<WenheCardChaosReturnedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<WenheCardEffectAppliedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId && e.Kind == r.Kind && e.MovedCards == r.Materials.Count(m => m.From != m.To) && e.MovementBefore == r.MovementBefore && e.MovementAfter == r.MovementAfter) != 1 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter).Select(m => (m.CardId, m.CardKind, m.From, m.To)).SequenceEqual(r.Materials.Where(m => m.From != m.To).Select(m => (m.CardId, m.PrintedKind, m.From, m.To))))
             throw new InvalidOperationException("Wenhe changed its already applied entities or repeated a paid redistribution.");
-    }
-
-    internal void AssertWenheCardState()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-            AssertWenheCardReceipt(use);
     }
 }

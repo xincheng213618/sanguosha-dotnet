@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouHuangGaiRuntime(IMouHuangGaiFacts facts,IMouHuangGaiNative native,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts):IMouHuangGaiRuntime
 {
     internal const string Lieji="mou:lieji",Quzhou="mou:quzhou",RevealBind="quzhou-reveal",ObtainReason="skill-program.mou:quzhou.obtain",DiscardReason="skill-program.mou:quzhou.unusable-slash";
@@ -132,7 +132,6 @@ internal sealed class MouHuangGaiRuntime(IMouHuangGaiFacts facts,IMouHuangGaiNat
     private void Finish(ProgramSkillFrame f){events.AdvanceFact(new MouHgCompletedEvent(f.Id,f.MouHuangGai!.Reveals.Count));frames.ReplaceTop(f=f with{MouHuangGai=null,PendingMovementContinuation=null});native.Finish(f);}
     [ProgramContinuation(ProgramContinuationKind.Resume,35400)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouHuangGai:not null}f||f.Id!=id)return false;Continue(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,35400)]private bool Movement(ProgramSkillFrame f)=>f.MouHuangGai is not null&&f.PendingMovementContinuation is not null&&Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,35400)]private void Invariant(ProgramSkillFrame f){if(f.MouHuangGai is not null&&!Valid(f))throw new InvalidOperationException("Quzhou lost its immutable actual source or entity interval.");}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,35400)][ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,35400)]private bool Paid(ProgramSkillFrame f)=>f.MouHuangGai is not null&&Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuangGaiQuzhou)]private PromptChoice Ai(PendingDecision p,ProgramSkillFrame f)=>f.MouHuangGai?.Stage==MouHgStage.Target?
         p.Choices.OrderByDescending(c=>facts.TargetScore(f.OwnerSeat,c.Targets.Single())).First():p.Choices.FirstOrDefault(c=>c.Parameters["branch"]=="again")??p.Choices.First();

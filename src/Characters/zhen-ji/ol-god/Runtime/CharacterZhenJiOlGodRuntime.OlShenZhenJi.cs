@@ -19,7 +19,6 @@ internal sealed partial class CharacterZhenJiOlGodRuntime
     IReadOnlyList<OlShenfuPlayer> global::CardGame.Core.IOlShenZhenJiFacts.Players => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Select(player => new OlShenfuPlayer(player.Seat, player.Name, player.IsAlive, player.IsHuman, player.Hp)).ToArray());
 
     OlShenfuPlayer global::CardGame.Core.IOlShenZhenJiFacts.Player(int seat) => new(seat, _coreMatchParticipantsPlayersAccess._players[seat].Name, _coreMatchParticipantsPlayersAccess._players[seat].IsAlive, _coreMatchParticipantsPlayersAccess._players[seat].IsHuman, _coreMatchParticipantsPlayersAccess._players[seat].Hp);
-    bool global::CardGame.Core.IOlShenZhenJiFacts.ValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     IReadOnlyList<Card> global::CardGame.Core.IOlShenZhenJiFacts.Hand(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]);
     bool global::CardGame.Core.IOlShenZhenJiFacts.HasSkillInstance(int seat, string skillId, string instance) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skillId, instance);
     int global::CardGame.Core.IOlShenZhenJiFacts.RelativeOrder(int from, int target) => _coreTableOrderOperations.RelativeTableOrder(from, target);

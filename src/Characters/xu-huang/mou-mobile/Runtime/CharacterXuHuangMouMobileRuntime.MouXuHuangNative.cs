@@ -140,7 +140,6 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     }
 
     internal long? MouXuHuangDuelProgramParent(long id) => IsMouXuHuangZeroUse(id) ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.MouXuHuangNative!.ProgramFrameId : null;
-    internal bool IsMouXuHuangDuelAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => IsMouXuHuangZeroUse(attack.ResolutionId) && attack.Card is null && attack.PhysicalCards.Count == 0 && processing.Count == 0 && attack.EffectiveCardKind == CardKind.Duel && attack.ProgramSkillCardUseFrameId == _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!.MouXuHuangNative!.ProgramFrameId;
     [NativeUseValidation(29500)]
     internal void ValidateMouXuHuangNative(CardUseFrame use)
     {

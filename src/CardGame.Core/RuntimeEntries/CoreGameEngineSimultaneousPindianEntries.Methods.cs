@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSimultaneousPindianEntries
 {
-    internal void AssertSimultaneousPindian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSimultaneousPindian(f);
     internal bool CanContinueSimultaneousPindian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueSimultaneousPindian(f);
     internal void CleanupSimultaneousPindianCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CleanupSimultaneousPindianCards(f);
     internal bool DrainSimultaneousChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainSimultaneousChildren(f);

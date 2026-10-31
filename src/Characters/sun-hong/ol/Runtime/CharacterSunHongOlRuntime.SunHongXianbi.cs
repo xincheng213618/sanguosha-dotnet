@@ -90,7 +90,6 @@ internal sealed partial class CharacterSunHongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xianbi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !XianbiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xianbi needs its current exact own private choice.");
-        AssertXianbi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -206,7 +205,6 @@ internal sealed partial class CharacterSunHongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xianbi: { } r } f || f.Id != id)
             return;
-        AssertXianbi(f);
         if (r.Stage == XianbiStage.DrawRequest)
             return;
         if (r.Stage is XianbiStage.Target or XianbiStage.DiscardChoice)

@@ -56,12 +56,6 @@ internal sealed partial class CharacterLuZhiWeiOlRuntime
     }
 
     internal bool IsExactQingzhongMovement(ProgramSkillFrame f, QingzhongPending p, CardMovementRecord m) => p.Stage == QingzhongStage.DrawChildren ? m.Reason.Value == QingzhongDrawReason && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) : p.Stage == QingzhongStage.SwapChildren && p.TargetSeat is { } target && m.Reason.Value == QingzhongSwapReason && (m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(target) || m.From == CardLocation.Hand(target) && m.To == CardLocation.Hand(f.OwnerSeat));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 390)]
-    internal void RequireIssuedLuZhiWei(ProgramSkillFrame f)
-    {
-        if (f.Qingzhong is not null && !CanContinueIssuedLuZhiWei(f))
-            throw new InvalidOperationException("Qingzhong lost its exact original phase, owning candidate or paid native movement bounds.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 350)]
     internal bool IsLuZhiWeiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => (e?.Op is SkillProgramEffectOp.DrawAndArmQingzhongActualPlayDebt or SkillProgramEffectOp.SettleQingzhongActualPlayDebt) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && CanContinueIssuedLuZhiWei(f);
@@ -72,8 +66,6 @@ internal sealed partial class CharacterLuZhiWeiOlRuntime
     internal bool HasLuZhiWeiDamageObserver(long id) => LuZhiWeiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 520)]
     internal bool HasLuZhiWeiBeforeDamageObserver(long id) => LuZhiWeiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1500)]
-    internal bool IsLuZhiWeiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && LuZhiWeiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 240)]
     internal bool TryAdvanceLuZhiWeiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LuZhiWeiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

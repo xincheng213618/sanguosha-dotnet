@@ -78,7 +78,6 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OlMoRumo: { } receipt } frame || frame.Id != frameId || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        _characterSharedGameEngineOlMoRumoProofsOperations.AssertOlMoRumo(frame);
         if (receipt.Stage == OlMoRumoStage.LossIssuing)
         {
             if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
@@ -102,7 +101,6 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
 
     internal void CompleteOlMoRumo(ProgramSkillFrame frame)
     {
-        _characterSharedGameEngineOlMoRumoProofsOperations.AssertOlMoRumo(frame);
         var receipt = frame.OlMoRumo!;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OlMoRumoRoundCompletedEvent(frame.Id, receipt.EntryId, receipt.BoundaryId, frame.OwnerSeat, receipt.RoundNumber, receipt.HadRoundDamage, receipt.ActualLoss, receipt.AppearancePrevented));
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { OlMoRumo = null });
@@ -124,7 +122,6 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
     {
         if (frame.OlMoRumo is not null)
         {
-            _characterSharedGameEngineOlMoRumoProofsOperations.AssertOlMoRumo(frame);
             return true;
         }
 

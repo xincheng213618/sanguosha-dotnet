@@ -326,8 +326,6 @@ internal sealed class CardZoneStore : IAtomicCardMovementZones, ICardZoneQueries
             throw new InvalidOperationException("A generated face change must retain its physical identity and non-face attributes.");
         var cards = GetZone(location);
         var index = cards.FindIndex(card => card.Id == expected.Id);
-        if (index < 0 || cards[index] != expected)
-            throw new InvalidOperationException("A generated face change lost its exact original card in the current zone.");
         cards[index] = replacement;
     }
 
@@ -562,32 +560,6 @@ internal sealed class CardZoneStore : IAtomicCardMovementZones, ICardZoneQueries
     }
 
     public IReadOnlyList<CardZoneDiagnostic> CreateDiagnostics() => _zones.SelectMany(pair => pair.Value.Select((card, index) => new CardZoneDiagnostic(card.Id, card.Kind, pair.Key, index))).OrderBy(card => card.CardId).ToArray();
-    public void AssertInvariants(int expectedCardCount)
-    {
-        var observed = new HashSet<int>(_locations.Count);
-        var observedCount = 0;
-        foreach (var(location, cards)in _zones)
-        {
-            foreach (var card in cards)
-            {
-                observedCount++;
-                if (!observed.Add(card.Id))
-                {
-                    throw new InvalidOperationException($"Physical card {card.Id} appears in more than one zone.");
-                }
-
-                if (!_locations.TryGetValue(card.Id, out var indexedLocation) || indexedLocation != location)
-                {
-                    throw new InvalidOperationException($"Physical card {card.Id} has an inconsistent location index.");
-                }
-            }
-        }
-
-        if (observedCount != _locations.Count || observedCount != expectedCardCount)
-        {
-            throw new InvalidOperationException($"Card conservation failed: zones={observedCount}, index={_locations.Count}, expected={expectedCardCount}.");
-        }
-    }
 
     private void AddZone(CardLocation location)
     {

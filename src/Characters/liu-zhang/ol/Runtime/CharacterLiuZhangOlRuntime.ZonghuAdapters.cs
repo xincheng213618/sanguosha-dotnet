@@ -7,30 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuZhangOlRuntime
 {
-    internal bool IsZonghuProgramRequestAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (attack.Card is not null || attack.PhysicalCards.Count != 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ZonghuOrigin: { } p } use || !IsIssuedZonghuUse(use) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.EffectiveCardKind != use.CardKind || attack.SourceSeat != use.SourceSeat || p.Need.OwnerFrameId != p.Need.RequestFrameId)
-            return false;
-        var parentIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == p.Need.OwnerFrameId);
-        var useIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
-        if (parentIndex < 0 || useIndex != parentIndex + 1 || _resolutionStackOperations._resolutionStack[parentIndex] is not ProgramSkillFrame { ZonghuReturn: { } r } parent || r.Origin != p || r.UseId != use.Id || r.ActionId != use.Action!.ActionId || parent.InstructionIndex != p.Need.InstructionIndex || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(parent)?.Op != p.Need.RequestOp || attack.ProgramSkillCardUseFrameId != parent.Id || r.Returned)
-            return false;
-        if ((parent.SunYuan is not null || parent.Chanshuang is not null || parent.WuJing is not null || parent.LvKuangLvXiang is not null || parent.CaoChun is not null) && !HasZonghuSpecializedPayment(parent, use))
-            return false;
-        var outerCards = _resolutionStackOperations._resolutionStack.Take(parentIndex).OfType<CardUseFrame>().SelectMany(frame => frame.PhysicalCardIds ?? []).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Distinct().Order().ToArray();
-        return processing.Select(card => card.Id).Order().SequenceEqual(outerCards);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27513)]
-    internal void AssertZonghuCaller(ProgramSkillFrame f)
-    {
-        if (f.KeBiNengPingduan is { SelectedBasicAction: { } ks } && ks.ConversionSource?.SkillId == "ol:zonghu" && !HasAcceptedZonghuKeAction(f, ks))
-            throw new InvalidOperationException("Zonghu Pingduan changed its actual issued private basic action.");
-        if (f.ZonghuReturn is not { } r)
-            return;
-        if (!ValidZonghuPayment(r.Origin) || r.Origin.Need.OwnerFrameId != f.Id || r.Origin.Need.InstructionIndex != f.InstructionIndex || r.UseId < 0 || r.ActionId < 0 || r.UseId == 0 && r.ActionId != 0 || r.UseId > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuUseIssuedEvent>().Count(e => e.AttemptId == r.Origin.AttemptId && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1 || r.Returned && _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuUseReturnedEvent>().Count(e => e.AttemptId == r.Origin.AttemptId && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1)
-            throw new InvalidOperationException("Zonghu caller lost its genuine paid request, original cursor or once-returned child.");
-    }
 
     internal bool HasZonghuSpecializedPayment(ProgramSkillFrame f, CardUseFrame? use = null)
     {

@@ -57,14 +57,4 @@ internal sealed partial class CharacterLingTongBoundaryMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLingTongEquipmentPairSelectedEvent(f.Id, f.OwnerSeat, f.SkillInstanceId, f.GameplayHash, source, destination));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
-
-    internal bool ValidBoundaryLingTongEquipmentSelection(ProgramSkillFrame f)
-    {
-        if (f.SkillId != BoundaryLingTongComposition.Skill)
-            return false;
-        var receipts = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLingTongEquipmentPairSelectedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (receipts.Length == 0)
-            return f.SelectedTargetSeats.Count == 0;
-        return receipts is [var r] && r.OwnerSeat == f.OwnerSeat && r.SkillInstanceId == f.SkillInstanceId && r.GameplayHash == f.GameplayHash && r.SourceSeat != f.OwnerSeat && r.DestinationSeat != f.OwnerSeat && r.SourceSeat != r.DestinationSeat && f.SelectedTargetSeats.SequenceEqual(new[] { r.SourceSeat, r.DestinationSeat }) && f.ChoiceBindings.Any(c => c.Name == "xuanfeng-branch" && c.OptionId == "move" && c.ChooserSeat == f.OwnerSeat);
-    }
 }

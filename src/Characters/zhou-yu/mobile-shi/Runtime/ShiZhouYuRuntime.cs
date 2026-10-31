@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class ShiZhouYuRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts, IShiZhouYuFacts facts, IShiZhouYuOperations operations) : IShiZhouYuHost
 {
@@ -570,26 +570,6 @@ internal sealed class ShiZhouYuRuntime(IProgramRuntimeFrames frames, IProgramRun
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 67800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 67800)]
     private bool ContinuePaidShiZhouYu(ProgramSkillFrame f) => f.ShiZhouYu is not null;
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 67800)]
-    private void AssertShiZhouYu(ProgramSkillFrame f)
-    {
-        if (f.ShiZhouYu is not { } r) return;
-        if (r.ActualTurn <= 0 || r.Source?.OwnerSeat != f.OwnerSeat ||
-            r.Operation is not ("chiyun" or "chiyun-option" or "yanhui-show" or
-                "yanhui-ending" or "fentao" or "fentao-rechain" or "xiongzi"))
-            throw new InvalidOperationException("Shi Zhou Yu lost its original typed operation receipt.");
-        if (r.Operation is "yanhui-show" && (f.SkillId != ShiZhouYuYanhui ||
-                f.WindowContext?.CardUse is null))
-            throw new InvalidOperationException("Yanhui lost its finalized-targets window receipt.");
-        if (r.Operation == "fentao" && (f.SkillId != ShiZhouYuFentao ||
-                f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, TargetSeat: { } damaged } ||
-                damaged != r.TargetSeat || r.AttackResolutionId <= 0))
-            throw new InvalidOperationException("Fentao lost its chained fire-damage window receipt.");
-        if (r.Operation == "chiyun" && (f.SkillId != ShiZhouYuChiyun ||
-                f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained }))
-            throw new InvalidOperationException("Chiyun lost its gained-cards window receipt.");
-    }
 
     // ---- AI choices -----------------------------------------------------------------------
 

@@ -49,13 +49,6 @@ internal sealed partial class CharacterYuanYinAnniversaryRuntime
         return r.Stage != "recovery-children" || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYuanYinBenefitIssuedEvent>().Count(e => e == new AnniversaryYuanYinBenefitIssuedEvent(f.Id, "recovery", f.OwnerSeat, 1)) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 49300)]
-    internal void AssertYuanYin(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryYuanYin is not null && !ValidYuanYin(f))
-            throw new InvalidOperationException("Yuan Yin lost his original target/death parent, private native gift or one-time health/draw receipt.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49300)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49300)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49300)]
@@ -88,7 +81,6 @@ internal sealed partial class CharacterYuanYinAnniversaryRuntime
     internal bool YuanYinDamageObserver(long id) => YuanYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49300)]
     internal bool YuanYinBeforeDamageObserver(long id) => YuanYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 49300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49300)]
     internal bool YuanYinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && YuanYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49300)]

@@ -2,12 +2,10 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineAlternatingSuitAndCompletedTopEntries
 {
-    internal void AssertAlternatingSuitTop(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertAlternatingSuitTop(f, paused);
     internal int[] AvailableCompletedTopCosts(global::CardGame.Core.CardActionContext a, long parentFrameId) => _resolve().AvailableCompletedTopCosts(a, parentFrameId);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAlternatingSuitDrawDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginAlternatingSuitDrawDiscard(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginFirstCategoryCompletedTop(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginFirstCategoryCompletedTop(f);
     internal void CommitAlternatingSuitTop(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CommitAlternatingSuitTop(f);
-    internal global::CardGame.Core.CardActionContext CompletedTopAction(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompletedTopAction(f);
     internal bool DistanceBorrowedSlash150HasPhaseSuitAllowance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistanceBorrowedSlash150HasPhaseSuitAllowance(q);
     internal bool DistanceCardUseExemption120HasPhaseSuitAllowance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().DistanceCardUseExemption120HasPhaseSuitAllowance(q);
     internal bool DistancePhysicalSlash190HasPhaseSuitAllowance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash190HasPhaseSuitAllowance(q);

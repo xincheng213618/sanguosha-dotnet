@@ -5,7 +5,6 @@ internal sealed partial class CharacterMaMiDiOlEntries
     internal bool AdvanceMaMiDiSubtree() => _resolve().AdvanceMaMiDiSubtree();
     internal global::CardGame.Core.PromptChoice AiMaMiDi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMaMiDi(p, f);
     internal void AnswerMaMiDi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMaMiDi(choice);
-    internal void AssertMaMiDi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMaMiDi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMaMiDi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMaMiDi(supplied, op);
     internal global::CardGame.Core.MaMiDiResponseLinkedEvent? BuildMaMiDiResponseLink(global::CardGame.Core.ProgramCardTriggerWindowFrame w) => _resolve().BuildMaMiDiResponseLink(w);
     internal bool CanOfferMaMiDi(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMaMiDi(candidate, trigger, context);
@@ -20,10 +19,8 @@ internal sealed partial class CharacterMaMiDiOlEntries
     internal bool HasMaMiDiBeforeDamageObserver(long id) => _resolve().HasMaMiDiBeforeDamageObserver(id);
     internal bool HasMaMiDiDamageObserver(long id) => _resolve().HasMaMiDiDamageObserver(id);
     internal bool IsIssuedBingjieCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsIssuedBingjieCandidate(candidate, c);
-    internal bool IsMaMiDiDying() => _resolve().IsMaMiDiDying();
     internal bool IsMaMiDiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMaMiDiMovement(f, e, p);
     internal bool IsMaMiDiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMaMiDiRecoveryParent(f, recovery);
-    internal bool IsMaMiDiShopEquipmentDiscard(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.MaMiDiDiscardStep step) => _resolve().IsMaMiDiShopEquipmentDiscard(frame, step);
     internal bool IsMaMiDiStepMovement(global::CardGame.Core.MaMiDiDiscardStep step, global::CardGame.Core.CardMovementRecord m) => _resolve().IsMaMiDiStepMovement(step, m);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MaMiDiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MaMiDiChoices(f);
     internal (global::CardGame.Core.BingjieGrantedEvent Grant, int Target) MaMiDiCurrentTarget(global::CardGame.Core.MaMiDiReceipt r) => _resolve().MaMiDiCurrentTarget(r);

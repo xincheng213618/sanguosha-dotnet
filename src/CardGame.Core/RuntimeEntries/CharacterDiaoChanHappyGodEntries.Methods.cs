@@ -4,7 +4,6 @@ internal sealed partial class CharacterDiaoChanHappyGodEntries
 {
     internal global::CardGame.Core.PromptChoice AiHappyDc(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiHappyDc(p, f);
     internal void AnswerHappyDc(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerHappyDc(answer);
-    internal void AssertHappyDc(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHappyDc(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyDc(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginHappyDc(supplied, operation);
     internal bool CanOfferHappyMeihun(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferHappyMeihun(gate);
     internal bool CanStartHappyHuoxin(global::CardGame.Core.CharacterState actor) => _resolve().CanStartHappyHuoxin(actor);
@@ -33,7 +32,6 @@ internal sealed partial class CharacterDiaoChanHappyGodEntries
     internal int[] HappyDcSuitCards(int seat, global::CardGame.Core.Suit suit) => _resolve().HappyDcSuitCards(seat, suit);
     internal bool HappyDcViewAsBan(global::CardGame.Core.ProgramViewAsLegalityQuery q) => _resolve().HappyDcViewAsBan(q);
     internal bool HappyDiaoChanStructuralEdge(global::CardGame.Core.ResolutionFrame child, global::CardGame.Core.ResolutionFrame parent) => _resolve().HappyDiaoChanStructuralEdge(child, parent);
-    internal bool HasHappyDiaoChanPrompt() => _resolve().HasHappyDiaoChanPrompt();
     internal bool IsHappyDiaoChanPindianSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsHappyDiaoChanPindianSettlementBatch(f, batch);
     internal bool IsHappyDiaoChanSuitForbidden(int seat, global::CardGame.Core.Suit suit) => _resolve().IsHappyDiaoChanSuitForbidden(seat, suit);
     internal bool KeepHappyDcPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepHappyDcPaid(f);

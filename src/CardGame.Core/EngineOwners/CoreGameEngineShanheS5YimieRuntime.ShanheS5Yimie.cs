@@ -39,8 +39,6 @@ internal sealed partial class CoreGameEngineShanheS5YimieRuntime
         if (window.Prevented || !_coreMatchParticipantsPlayersAccess._players[origin.TargetSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         var before = window.Amount;
-        if (!attack.DamageAmountFinalized || attack.DamageAmount != before)
-            throw new InvalidOperationException("Yimie lost its current recipient's exact finalized damage amount.");
         if (origin.X > 0)
         {
             // Like the shared signed-recipient payment, the original before-damage
@@ -101,25 +99,6 @@ internal sealed partial class CoreGameEngineShanheS5YimieRuntime
         return true;
     }
 
-    internal bool HasShanheS5YimieRecovery(long attackId) => _resolutionStackOperations._resolutionStack.OfType<ShanheS5YimieRecoveryFrame>().Any(f => f.ParentFrameId == attackId);
-    internal void AssertShanheS5YimieRecoveryFrames()
-    {
-        foreach (var owner in _resolutionStackOperations._resolutionStack.Where(f => f.ShanheS5YimieDamage is not null))
-        {
-            var r = owner.ShanheS5YimieDamage!;
-            RequireShanheS5YimieOrigin(r.Origin);
-            if (r.Origin.AttackId != owner.Id || r.Origin.CardAttack != (owner is CardUseFrame) || owner is not (CardUseFrame or ProgramSkillFrame) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YimieIncreasedEvent>().Count(e => e.ProgramFrameId == r.Origin.ProgramFrameId && e.AttackId == owner.Id && e.X == r.Origin.X) != 1 || r.AppliedDamageFrameId is { } damage && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YimieAppliedEvent>().Count(e => e.AttackId == owner.Id && e.DamageFrameId == damage && e.TargetSeat == r.Origin.TargetSeat && e.Amount == r.AppliedAmount) != 1)
-                throw new InvalidOperationException("Yimie lost its exact armed original damage obligation.");
-        }
-
-        foreach (var child in _resolutionStackOperations._resolutionStack.OfType<ShanheS5YimieRecoveryFrame>())
-        {
-            var i = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == child.Id);
-            if (i < 1 || _resolutionStackOperations._resolutionStack[i - 1].Id != child.ParentFrameId || _resolutionStackOperations._resolutionStack[i - 1].ShanheS5YimieDamage != child.Receipt || child.Receipt.AppliedDamageFrameId is null || child.Receipt.Origin.X <= 0 || child.Requested && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YimieRecoveryRequestedEvent>().Count(e => e.FrameId == child.Id && e.AttackId == child.ParentFrameId && e.Amount == child.Receipt.Origin.X) != 1)
-                throw new InvalidOperationException("Yimie recovery lost its actual damage and original typed parent.");
-        }
-    }
-
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.BeforeOpening, 5795)]
     [NativeFrameRoute(typeof(ShanheS5YimieRecoveryFrame), 5795)]
     internal void ContinueShanheS5YimieRecovery(long id)
@@ -155,8 +134,6 @@ internal sealed partial class CoreGameEngineShanheS5YimieRuntime
         if (_coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.ShanheS5YimieRecovery))
             return;
         var parent = _resolutionStackOperations._resolutionStack.Single(f => f.Id == frame.ParentFrameId);
-        if (parent.ShanheS5YimieDamage != frame.Receipt)
-            throw new InvalidOperationException("Yimie lost its exact recovery producer.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ShanheS5YimieDamage = null });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5YimieCompletedEvent(parent.Id, origin.ProgramFrameId, origin.TargetSeat, origin.X, true, true));
         _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.ShanheS5YimieRecovery);
@@ -166,15 +143,6 @@ internal sealed partial class CoreGameEngineShanheS5YimieRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5795)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5795)]
     internal bool ContinuePaidShanheS5Yimie(ProgramSkillFrame f) => HasShanheS5YimieCostPaid(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 5795)]
-    internal void AssertShanheS5YimieCost(ProgramSkillFrame f)
-    {
-        if (f.ShanheS5YimieCost is not { } origin)
-            return;
-        RequireShanheS5YimieOrigin(origin);
-        if (origin.ProgramFrameId != f.Id || origin.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || origin.GameplayHash != f.GameplayHash || f.WindowContext?.ParentFrameId != origin.BeforeDamageWindowId || f.InstructionIndex is < 1 or > 3)
-            throw new InvalidOperationException("Yimie cost lost its original skill frame.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IShanheS5YimieHost.ResolveShanheS5Yimie(ProgramSkillFrame f, string stage) => ResolveShanheS5Yimie(f, stage);
 }

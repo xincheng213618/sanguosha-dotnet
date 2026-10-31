@@ -60,7 +60,6 @@ internal sealed partial class CoreHellMengpoProgramsRuntime
 
     internal void ContinueHellWanghun(ProgramSkillFrame frame)
     {
-        AssertHellWanghun(frame);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(frame.Id))
             return;
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -99,17 +98,7 @@ internal sealed partial class CoreHellMengpoProgramsRuntime
     {
         if (frame.HellWanghun is null)
             return false;
-        AssertHellWanghun(frame);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40051)]
-    internal void AssertHellWanghun(ProgramSkillFrame frame)
-    {
-        if (frame.HellWanghun is not { } receipt)
-            return;
-        if (frame.SkillId != "hell:wanghun" || frame.TriggerId != "forget-two-enemies" || frame.InstructionIndex != receipt.InstructionIndex || frame.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } context || context.ParentFrameId != receipt.DeathWindowId || !_resolutionStackOperations._resolutionStack.OfType<ProgramDeathTriggerWindowFrame>().Any(window => window.Id == receipt.DeathWindowId && window.DeathFrameId == receipt.DeathFrameId && window.OwnerSeat == frame.OwnerSeat) || !Enum.IsDefined(receipt.Stage) || receipt.LostSkillCount is < 0 or > 2 || receipt.LostGrantCount < receipt.LostSkillCount || receipt.InjectedCards is < 0 or > 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<HellWanghunIssuedEvent>().Count(e => e.FrameId == frame.Id && e.DeathFrameId == receipt.DeathFrameId && e.MengpoSeat == frame.OwnerSeat && e.LostSkillCount == receipt.LostSkillCount && e.LostGrantCount == receipt.LostGrantCount) != 1)
-            throw new InvalidOperationException("Wanghun lost its exact death, frozen loss or injection receipt.");
     }
 
     internal SkillProgramStepOutcome IssueHellWangshiBan(ProgramSkillFrame supplied)

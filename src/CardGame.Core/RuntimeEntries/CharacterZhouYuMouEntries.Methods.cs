@@ -9,7 +9,6 @@ internal sealed partial class CharacterZhouYuMouEntries
     internal bool HasMouZyFireTargets(global::CardGame.Core.CharacterState actor) => _resolve().HasMouZyFireTargets(actor);
     internal bool IsMouZyExactCardQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsMouZyExactCardQuery(actor, id);
     internal bool IsMouZyTargetAction(global::CardGame.Core.CharacterState actor, global::CardGame.Core.LegalAction action) => _resolve().IsMouZyTargetAction(actor, action);
-    internal bool IsMouZyZeroFireAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouZyZeroFireAttackConsistent(attack, processing);
     internal bool IsMouZyZeroFireUse(long id) => _resolve().IsMouZyZeroFireUse(id);
     internal void IssueMouZyUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouZyUse(f);
     internal bool MouZyAdvanceChildren() => _resolve().MouZyAdvanceChildren();
@@ -22,7 +21,6 @@ internal sealed partial class CharacterZhouYuMouEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<int>> MouZyFireOptions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouZyFireOptions(f);
     internal bool MouZyFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouZyFirstChild(f, child);
     internal bool MouZyMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouZyMovement(f, effect, p);
-    internal global::System.Collections.Generic.IReadOnlyList<int>? MouZyNativeAncestorProcessing(long id) => _resolve().MouZyNativeAncestorProcessing(id);
     internal bool MouZyNativeRidesOn(global::CardGame.Core.CardUseFrame u, global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouZyNativeRidesOn(u, f);
     internal global::CardGame.Core.ProgramSkillFrame? MouZyObserverRoot() => _resolve().MouZyObserverRoot();
     internal bool MouZyOffTurnUse(long id, int actor) => _resolve().MouZyOffTurnUse(id, actor);

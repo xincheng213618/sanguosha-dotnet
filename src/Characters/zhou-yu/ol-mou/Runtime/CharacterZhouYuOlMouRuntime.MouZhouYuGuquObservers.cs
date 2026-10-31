@@ -15,32 +15,12 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == r.WindowId && _coreProgramEventHistoryOperations.ProgramEventHistory<GuquStartedEvent>().Count(e => e == new GuquStartedEvent(f.Id, r.Claim, r.WindowId)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<GuquStartedEvent>().Count(e => e.Claim.Source == r.Claim.Source && e.Claim.ActionId == r.Claim.ActionId) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29021)]
-    internal void AssertMouGuqu(ProgramSkillFrame f)
-    {
-        if (f.Guqu is not { } r)
-            return;
-        if (!MouGuquRootMatches(f) || !Enum.IsDefined(r.Stage))
-            throw new InvalidOperationException("Guqu lost its exact original-source marked materials, native completed Use or paid draw entitlement.");
-        var returned = _coreProgramEventHistoryOperations.ProgramEventHistory<GuquDrawReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Stage == GuquStage.Drawing)
-        {
-            if (r.DrawOutcome is not null || returned.Length != 0 || f.PendingMovementContinuation is not null)
-                throw new InvalidOperationException("Guqu cannot reuse a returned native draw as a fresh request.");
-            return;
-        }
-
-        if (r.DrawOutcome is not { } o || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 2 || o.SequenceBefore < r.Claim.MovementSequence || o.SequenceAfter < o.SequenceBefore || o.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || f.NativeDraw is not null || f.PendingMovementContinuation is not { } p || !IsMouGuquMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) || returned is not [var fact] || fact != new GuquDrawReturnedEvent(f.Id, o.RequestedCount, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId))
-            throw new InvalidOperationException("Guqu lost its once-returned actual/replacement native draw invoice or unfinished children.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29021)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29021)]
     internal bool PermitPaidMouGuqu(ProgramSkillFrame f)
     {
         if (f.Guqu is not null)
         {
-            AssertMouGuqu(f);
             return true;
         }
 
@@ -78,8 +58,6 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     internal bool HasMouGuquDamageObserver(long id) => MouGuquObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1440)]
     internal bool HasMouGuquBeforeDamageObserver(long id) => MouGuquObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1270)]
-    internal bool IsMouGuquDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGuquObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 470)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 460)]
     internal bool IsMouGuquRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

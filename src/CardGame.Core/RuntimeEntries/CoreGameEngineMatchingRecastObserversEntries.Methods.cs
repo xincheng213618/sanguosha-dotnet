@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineMatchingRecastObserversEntries
 {
-    internal void AssertMatchingRecast(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMatchingRecast(f);
     internal bool HasMatchingRecastBeforeDamageObserver(long windowId) => _resolve().HasMatchingRecastBeforeDamageObserver(windowId);
     internal bool HasMatchingRecastDamageObserver(long windowId) => _resolve().HasMatchingRecastDamageObserver(windowId);
     internal bool IsMatchingRecastChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision decision) => _resolve().IsMatchingRecastChoice(f, decision);

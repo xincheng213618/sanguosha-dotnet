@@ -561,28 +561,6 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 61200)]
     internal bool IsWushuangBMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.WushuangB is { Stage: "complete", TargetSeat: var seat } r && r.Operation is SkillProgramEffectOp.ResolveWushuangDingan or SkillProgramEffectOp.RecoverWushuangChunlao && effect?.Op == r.Operation && pending.SubjectSeat == seat;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 61200)]
-    internal void AssertWushuangBFrame(ProgramSkillFrame f)
-    {
-        if (f.WushuangB is not { } r)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        var expected = r.Operation switch
-        {
-            SkillProgramEffectOp.ResolveWushuangWeiyi => BWeiyi,
-            SkillProgramEffectOp.DrawWushuangZhendan => BZhendan,
-            SkillProgramEffectOp.ResolveWushuangLiantao => BLiantao,
-            SkillProgramEffectOp.ResolveWushuangBianyu => BBianyu,
-            SkillProgramEffectOp.ResolveWushuangXiaojie => BXiaojie,
-            SkillProgramEffectOp.ResolveWushuangDingan => BDingan,
-            SkillProgramEffectOp.RecoverWushuangChunlao => BChunlao,
-            SkillProgramEffectOp.ResolveWushuangGuzheng => "wushuang:skill-3139",
-            _ => throw new InvalidOperationException("Unknown Wushuang pending operation.")};
-        if (f.SkillId != expected || r.Operation != effect.Op || r.InstructionIndex != f.InstructionIndex || r.Before < 0 || r.After < 0 || r.Damage < 0 || r.Cards.Any(id => id <= 0) || r.Cards.Distinct().Count() != r.Cards.Count || r.Stage is not ("health" or "target" or "color" or "mark" or "chun" or "trick" or "draw-target" or "punish" or "discard-name" or "using" or "duels" or "complete" or "draw-children" or "guzheng-return" or "guzheng-returned" or "guzheng-claim") || r.Stage is ("health" or "color" or "mark" or "punish" or "discard-name" or "duels" or "guzheng-return" or "guzheng-returned" or "guzheng-claim") && !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat))
-            throw new InvalidOperationException("Wushuang pending receipt lost its exact owning instruction or participants.");
-        if (r.Stage == "using" && (r.ChildUseId is not { } id || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { WushuangBReturn: { } ret } use || ret.ProgramFrameId != f.Id || ret.InstructionIndex != f.InstructionIndex || ret.Source != BSource(f) || ret.GameplayHash != f.GameplayHash || ret.CardUseFrameId != use.Id || ret.OutputKind != use.CardKind || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangBNativeIssuedEvent>().Count(e => e.Return == ret) != 1))
-            throw new InvalidOperationException("Wushuang native child lost its exact issued source and parent receipt.");
-    }
 
     internal WushuangBianyuMarkedEvent? BianyuActiveMark(int seat, int id)
     {

@@ -41,8 +41,6 @@ internal sealed partial class CharacterQinLangOlRuntime
     internal bool HasQinLangDamageObserver(long id) => QinLangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1580)]
     internal bool HasQinLangBeforeDamageObserver(long id) => HasQinLangDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1410)]
-    internal bool IsQinLangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && QinLangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27170)]
     internal bool AdvanceQinLangChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && QinLangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveXianyingDrawDiscard, SkillProgramEffectOp.ResolveXianyingTurnEndUses)]

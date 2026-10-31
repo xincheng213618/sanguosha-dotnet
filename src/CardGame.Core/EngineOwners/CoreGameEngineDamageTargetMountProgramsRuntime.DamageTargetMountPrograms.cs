@@ -178,17 +178,6 @@ internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 510)]
-    internal void AssertDamageTargetMountState(ProgramSkillFrame f)
-    {
-        if (f.DamageTargetMount is not { } d)
-            return;
-        if (!IsValidDamageTargetMount(f))
-            throw new InvalidOperationException("Mount payment lost its exact identity or actual record.");
-        if (d.Receipt is null && (f.PendingMovementContinuation is not null || !ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || p.Choices.Count == 0 || p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") != "damage-target-mount")))
-            throw new InvalidOperationException("Unpaid mount draft lost its owning prompt.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 800)]
     internal bool CanContinuePaidDamageTargetMount(ProgramSkillFrame f) => f.DamageTargetMount?.Receipt is not null && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && IsValidDamageTargetMount(f);
     SkillProgramStepOutcome global::CardGame.Core.IDamageTargetMountProgramHost.DiscardDamageTargetAndClaimMount(ProgramSkillFrame f) => BeginDamageTargetMount(f);

@@ -14,9 +14,8 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelReturnsRuntime
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries _coreCardUseLifecycleOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineConditionalDiscardDuelsEntries _coreConditionalDiscardDuelsOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineEphemeralCardMaterialsEntries _coreEphemeralCardMaterialsOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries _corePendingDecisionPolicyPipelineOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CoreGameEngineConditionalDiscardDuelReturnsRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries coreCardAttackStateOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries coreCardUseLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineConditionalDiscardDuelsEntries coreConditionalDiscardDuelsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineEphemeralCardMaterialsEntries coreEphemeralCardMaterialsOperations, global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    internal CoreGameEngineConditionalDiscardDuelReturnsRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries coreCardAttackStateOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries coreCardUseLifecycleOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineConditionalDiscardDuelsEntries coreConditionalDiscardDuelsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineEphemeralCardMaterialsEntries coreEphemeralCardMaterialsOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
@@ -24,7 +23,6 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelReturnsRuntime
         this._coreCardUseLifecycleOperations = coreCardUseLifecycleOperations;
         this._coreConditionalDiscardDuelsOperations = coreConditionalDiscardDuelsOperations;
         this._coreEphemeralCardMaterialsOperations = coreEphemeralCardMaterialsOperations;
-        this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
         this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
     }
 }

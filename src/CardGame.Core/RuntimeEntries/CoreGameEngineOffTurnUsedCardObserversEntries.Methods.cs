@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOffTurnUsedCardObserversEntries
 {
-    internal void AssertOffTurnUsedCardGiftObservers() => _resolve().AssertOffTurnUsedCardGiftObservers();
     internal bool CanContinueOffTurnUsedCardGift(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueOffTurnUsedCardGift(frame);
     internal bool HasOffTurnUsedCardGiftBeforeDamageObserver(long windowId) => _resolve().HasOffTurnUsedCardGiftBeforeDamageObserver(windowId);
     internal bool HasOffTurnUsedCardGiftDamageObserver(long windowId) => _resolve().HasOffTurnUsedCardGiftDamageObserver(windowId);

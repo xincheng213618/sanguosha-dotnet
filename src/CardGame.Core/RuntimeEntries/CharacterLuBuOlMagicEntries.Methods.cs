@@ -6,7 +6,6 @@ internal sealed partial class CharacterLuBuOlMagicEntries
     internal bool AdvanceMoLuBuChildren() => _resolve().AdvanceMoLuBuChildren();
     internal void AnswerMoLuBu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMoLuBu(choice);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? AppendMoLuBuKuangMarker(int owner, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? ordinary) => _resolve().AppendMoLuBuKuangMarker(owner, ordinary);
-    internal void AssertMoLuBu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMoLuBu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMoDuoqi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMoDuoqi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMoKuangmo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMoKuangmo(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMoKuangmoDeath(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMoKuangmoDeath(f);

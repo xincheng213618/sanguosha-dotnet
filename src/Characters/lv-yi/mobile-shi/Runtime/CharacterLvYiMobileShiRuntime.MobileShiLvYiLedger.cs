@@ -10,7 +10,6 @@ internal sealed partial class CharacterLvYiMobileShiRuntime
     internal bool HasShiLyCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiLyHuilv);
 
     internal bool IsShiLySongyanDrawTwo(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardId: 0, CardKind: CardKind.DrawTwo, PhysicalCardIds: { Count: 0 }, ShiLySongyanOrigin: { UseId: var use }, } && use == id;
-    internal int[]? ShiLySongyanAncestorProcessing(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ShiLySongyanOrigin: { UseId: var use } origin } && use == id ? origin.OuterProcessing : null;
     internal bool ShiLyShishiCannotRespond(int sourceSeat, int responderSeat)
     {
         if (!HasShiLyCapability || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || sourceSeat == responderSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(sourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(responderSeat) || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[sourceSeat], ShiLyShishi))

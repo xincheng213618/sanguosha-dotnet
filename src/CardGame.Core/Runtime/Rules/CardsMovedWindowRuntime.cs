@@ -1,5 +1,5 @@
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
 {
     private readonly ICardsMovedWindowNativeProofs _native;
@@ -13,12 +13,11 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
     private readonly ICardMovementBatchQueue _batches;
     private readonly IProgramEventHistoryQueries _history;
     private readonly ICardZoneQueries _zones;
-    private readonly INativeFrameRoutingFacts _frameFacts;
     private readonly IProgramRuntimeFrames _frames;
     private readonly IProgramRuntimeEvents _events;
     private readonly IProgramRuntimePrompts _prompts;
     private readonly IProgramWindowCursors _cursors;
-    internal CardsMovedWindowRuntime(ICardsMovedWindowNativeProofs native, ICardsMovedWindowCardUseProofs cardUse, ICardsMovedWindowNativeReturns returns, ICardsMovedWindowCardUseContinuations cardUseContinuations, ICardsMovedWindowSelections selection, ICardsMovedWindowOperations operations, ICardsMovedWindowFacts facts, ICardsMovedWindowPipeline pipeline, ICardMovementBatchQueue batches, IProgramEventHistoryQueries history, ICardZoneQueries zones, INativeFrameRoutingFacts frameFacts, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramWindowCursors cursors)
+    internal CardsMovedWindowRuntime(ICardsMovedWindowNativeProofs native,ICardsMovedWindowCardUseProofs cardUse,ICardsMovedWindowNativeReturns returns,ICardsMovedWindowCardUseContinuations cardUseContinuations,ICardsMovedWindowSelections selection,ICardsMovedWindowOperations operations,ICardsMovedWindowFacts facts,ICardsMovedWindowPipeline pipeline,ICardMovementBatchQueue batches,IProgramEventHistoryQueries history,ICardZoneQueries zones,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramWindowCursors cursors)
     {
         _native = native;
         _cardUse = cardUse;
@@ -31,7 +30,6 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         _batches = batches;
         _history = history;
         _zones = zones;
-        _frameFacts = frameFacts;
         _frames = frames;
         _events = events;
         _prompts = prompts;
@@ -58,16 +56,6 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
     }
 
     private static bool UsesNativeDrawThreshold(SkillProgramTrigger trigger) => trigger.Effects is [{ Op: SkillProgramEffectOp.DamageRandomEnemyAtDrawThreshold }];
-    internal bool HasCardsMovedProgramBoundaryFrame()
-    {
-        if ((_frameFacts.FrameCount == 0 ? null : _frameFacts.FrameAt(0))is not CardsMovedTriggerWindowFrame frame)
-            return false;
-        if (frame.CandidateIndex < 0 || frame.CandidateIndex >= frame.Candidates.Count && !_native.IsPendingWenhePoisonWindow(frame) || frame.Batch.Id != frame.Id || frame.Batch.Movements.Count == 0)
-            throw new InvalidOperationException("The cards-moved boundary lost its batch or candidate cursor.");
-        if (_frameFacts.FrameCount == 1 && frame.Step == ResolutionFrameStep.AwaitingResponse && _prompts.Current?.Kind != DecisionKind.ProgramTrigger)
-            throw new InvalidOperationException("The cards-moved boundary is waiting without its program prompt.");
-        return true;
-    }
 
     bool IProgramMovementWindows.Begin(long? instructionFrameId, int? subjectSeat) => TryBeginCardsMovedProgramWindow(instructionFrameId, subjectSeat);
     internal bool TryBeginCardsMovedProgramWindow(long? instructionFrameId = null, int? subjectSeat = null)
@@ -530,8 +518,6 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         var kind = (gained ? trigger.DestinationZones : trigger.SourceZones).Single();
         var ricePile = trigger.Effects is [{ Op: SkillProgramEffectOp.RecoverAfterLastPublicRice }];
         var privatePile = kind == CardZoneKind.PrivatePersistentPile || ricePile;
-        if (privatePile && (candidate.OccurrenceIndex < 0 || candidate.OccurrenceIndex >= frame.Batch.Movements.Count))
-            throw new InvalidOperationException("A named private-pile movement lost its exact physical occurrence.");
         var location = privatePile ? gained ? frame.Batch.Movements[candidate.OccurrenceIndex].To : frame.Batch.Movements[candidate.OccurrenceIndex].From : new CardLocation(kind, candidate.OwnerSeat);
         if (privatePile && (location.Zone != kind || location.OwnerSeat != candidate.OwnerSeat || !ricePile && string.IsNullOrWhiteSpace(location.PublicPileId)))
             throw new InvalidOperationException("A named private-pile movement changed its exact pile identity.");

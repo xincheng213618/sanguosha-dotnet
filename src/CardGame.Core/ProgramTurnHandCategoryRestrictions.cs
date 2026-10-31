@@ -30,6 +30,4 @@ internal sealed partial class TurnCardUseEffectStore
     private IEnumerable<long> ExpiringHandCategoryRestrictions(int turn, int seat) => _handCategoryRestrictions
         .Where(p => p.TurnNumber == turn && p.TurnSeat == seat).Select(p => p.GrantSequence);
     private void ExpireHandCategoryRestrictions(IReadOnlySet<long> ids) => _handCategoryRestrictions.RemoveAll(p => ids.Contains(p.GrantSequence));
-    private bool HandCategoryRestrictionsAreInvalid() => _handCategoryRestrictions.Any(p => p.TurnNumber < 1 ||
-        p.TurnSeat < 0 || p.AffectedSeat < 0 || p.ProducerProgramFrameId < 1 || p.DamageWindowFrameId < 1 || !Enum.IsDefined(p.Category));
 }

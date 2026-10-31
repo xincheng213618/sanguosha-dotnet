@@ -4,7 +4,6 @@ internal sealed partial class CharacterXinXianYingMobileShiEntries
 {
     internal bool AdvanceShiXxyChildren() => _resolve().AdvanceShiXxyChildren();
     internal void AnswerShiXxy(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiXxy(choice);
-    internal void AssertShiXxyFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiXxyFrame(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiXxy(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op, int actor) => _resolve().BeginShiXxy(supplied, op, actor);
     internal void CompleteShiXxyJiejie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompleteShiXxyJiejie(f);
     internal void ContinueShiXxy(long id) => _resolve().ContinueShiXxy(id);

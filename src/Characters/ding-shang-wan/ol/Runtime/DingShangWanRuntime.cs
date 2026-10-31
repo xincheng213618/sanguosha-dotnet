@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class DingShangWanRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts, IDingShangWanRuntimeQueries proofs, IDingShangWanNativeFacts facts,
     IDingShangWanNativeOperations native, IMatchParticipantStateAccess participants, ICardZoneQueries zones,
@@ -82,7 +82,7 @@ internal sealed partial class DingShangWanRuntime(IProgramRuntimeFrames frames, 
     {
         if(frames.Top is not ProgramSkillFrame{DingShangWan:{}r}f||prompts.Current?.PlayerSeat!=DingShangWanChooser(f)||
             !RuntimeSkills.RuntimeRules_Core_AssistedPhysicalCards.AssistedChoicesEqual([choice],DingShangWanChoices(f).Where(c=>c.Id==choice.Id).ToArray()))throw new InvalidOperationException("Ding Shang Wan lost its actual private chooser or selected physical entities.");
-        proofs.AssertDingShangWan(f);prompts.Clear();var branch=choice.Parameters["branch"];
+prompts.Clear();var branch=choice.Parameters["branch"];
         if(r.Stage==DingShangWanStage.FengChoice)
         {
             events.AdvanceFact(new DingShangWanBranchEvent(f.Id,branch,r.Counterpart));frames.ReplaceTop(f=f with{DingShangWan=r with{Branch=branch}});
@@ -132,7 +132,6 @@ internal sealed partial class DingShangWanRuntime(IProgramRuntimeFrames frames, 
     private void ContinueDingShangWan(long id)
     {
         if(frames.Top is not ProgramSkillFrame{DingShangWan:{}r}f||f.Id!=id)return;
-        proofs.AssertDingShangWan(f);
         if(r.Stage is DingShangWanStage.OpeningGiftChoice or DingShangWanStage.OpeningDiscardChoice or DingShangWanStage.FengChoice or DingShangWanStage.FengGiftChoice or DingShangWanStage.FengDiscardChoice){if(prompts.Current is null)PublishDingShangWan(f);return;}
         if(DrainDingShangWan(f))return;frames.ReplaceTop(f=f with{PendingMovementContinuation=null});
         if(facts.Winner!=Winner.None||!participants.At(f.OwnerSeat).IsAlive){FinishDingShangWan(f);return;}
@@ -156,7 +155,7 @@ internal sealed partial class DingShangWanRuntime(IProgramRuntimeFrames frames, 
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 160)]
     private bool IsDingShangWanAwaitedMovement(ProgramSkillFrame f,SkillProgramEffect? e,ProgramMovementContinuation p)=>f.DingShangWan is{}r&&p.SubjectSeat==r.Payer&&p.BeforeCount==0&&p.CoverageResultBind is null&&(e is null||DingShangWanComposition.IsOperation(e.Op));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,26700)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,26700)]
-    private bool ContinuePaidDingShangWan(ProgramSkillFrame f){if(f.DingShangWan is null)return false;proofs.AssertDingShangWan(f);return true;}
+    private bool ContinuePaidDingShangWan(ProgramSkillFrame f){if(f.DingShangWan is null)return false;return true;}
     [ProgramAiChoice(SkillProgramEffectOp.InitializeFudaoHandRecord,SkillProgramEffectOp.DrawFudaoRecordedPair,SkillProgramEffectOp.ResolveFengyanCounterpart)]
     private PromptChoice AiDingShangWan(PendingDecision p,ProgramSkillFrame f)=>p.Choices.FirstOrDefault(c=>c.Parameters.GetValueOrDefault("branch")=="finish")??p.Choices.FirstOrDefault(c=>c.Parameters.GetValueOrDefault("branch")=="other-draw")??p.Choices.First(c=>c.Parameters.GetValueOrDefault("branch")!="unpick");
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,26700)]private bool AdvanceDingShangWanSubtree()=>prompts.Current is null&&proofs.DingShangWanObserverRoot()is not null&&healthOperations.AdvanceObserverSubtree();

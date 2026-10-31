@@ -5,7 +5,6 @@ internal sealed partial class CharacterHuangYueyingMouMobileEntries
     internal bool AdvanceMouHyChildren() => _resolve().AdvanceMouHyChildren();
     internal global::CardGame.Core.PromptChoice AiMouHyQicai(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouHyQicai(p, f);
     internal void AnswerMouHyQicai(global::CardGame.Core.PromptChoice c) => _resolve().AnswerMouHyQicai(c);
-    internal void AssertMouHy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouHy(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouHyJizhi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouHyJizhi(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouHyQiTransfer(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouHyQiTransfer(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouHyQicai(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouHyQicai(supplied);

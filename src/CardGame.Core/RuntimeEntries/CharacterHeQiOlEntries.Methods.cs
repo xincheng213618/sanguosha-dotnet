@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterHeQiOlEntries
 {
-    internal void AssertRegisteredHeQi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredHeQi(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHeQi(global::CardGame.Core.ProgramSkillFrame supplied, int target) => _resolve().BeginHeQi(supplied, target);
     internal bool CanContinueEquipmentSuitProgram(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueEquipmentSuitProgram(frame);
     internal bool CanContinueHeQi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueHeQi(f);
@@ -24,7 +23,6 @@ internal sealed partial class CharacterHeQiOlEntries
     internal bool HeQiTargetAllowed(int owner, int target) => _resolve().HeQiTargetAllowed(owner, target);
     internal bool IsEquipmentSuitGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsEquipmentSuitGrantQualified(owner, grant);
     internal bool IsHeQiActivation(global::CardGame.Core.SkillProgramActivation a) => _resolve().IsHeQiActivation(a);
-    internal bool IsHeQiDying() => _resolve().IsHeQiDying();
     internal bool IsHeQiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsHeQiMovement(f, e, p);
     internal void IssueHeQiSegment(long id, global::CardGame.Core.HeQiReceipt r) => _resolve().IssueHeQiSegment(id, r);
     internal void PublishHeQiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishHeQiChoice(f);

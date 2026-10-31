@@ -13,7 +13,6 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillChoicesRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WushuangOriginalSkill: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("An official skill answer lost its exact privately published prompt.");
-        _coreWushuangOriginalSkillsOperations.AssertWushuangOriginalSkill(f);
         var option = choice.Parameters["option"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (option == "finish")

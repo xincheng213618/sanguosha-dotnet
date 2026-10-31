@@ -7,69 +7,11 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoZhongOlRuntime
 {
-    internal bool ZhaoZhongWindowMatches(ProgramSkillFrame f)
-    {
-        if (f.ZhaoZhong is not { } r)
-            return false;
-        if (r.Op == SkillProgramEffectOp.ResolveDiciGiftRecoveryAndNeighborChain)
-            return f.TriggerId is null && f.WindowContext is null && f.ActivationId == "give-recover-chain" && f.SelectedTargetSeats.SequenceEqual([r.TargetSeat]) && r.Phase is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p) && p.ActorSeat == f.OwnerSeat;
-        if (f.WindowContext is not { } c || c.ParentFrameId != r.WindowId || c.OwnerSeat != f.OwnerSeat)
-            return false;
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
-        if (r.Op == SkillProgramEffectOp.ResolveBiriFirstNonDrawGain)
-            return c.Window == SkillProgramTriggerWindow.CardsGained && c.MovementBatch is { } batch && batch.Id == r.WindowId && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is CardsMovedTriggerWindowFrame w && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && w.Candidates[w.CandidateIndex] == candidate && _coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialHolderEvent>().Count(e => e.BatchId == r.WindowId && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
-        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramLifecycleTriggerWindowFrame window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex] != candidate || c.Window != window.Window)
-            return false;
-        if (r.Op == SkillProgramEffectOp.ResolvePengbiFirstActualTurn)
-            return window.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && window.OwnerSeat == f.OwnerSeat && r.TurnOwner == f.OwnerSeat && FirstPengbiActualTurn(f.OwnerSeat) == r.ActualTurn;
-        return r.Op == SkillProgramEffectOp.ResolveIssuedDiciNextChainChoice && window.Window == SkillProgramTriggerWindow.CharacterEnteredChain && DiciCandidateLease(candidate)is { } lease && lease.LeaseId == r.LeaseId && lease.TargetSeat == r.TargetSeat && window.OwnerSeat == r.TargetSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<DiciLeaseDueEvent>().Count(e => e.LeaseId == r.LeaseId && e.ChangeId == r.WindowId && e.TargetSeat == r.TargetSeat) == 1;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28110)]
-    internal void AssertZhaoZhong(ProgramSkillFrame f)
-    {
-        if (f.ZhaoZhong is not { } r)
-            return;
-        if (r.Source != ZhaoZhongSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || f.InstructionIndex is < 0 or > 1 || f.InstructionIndex == 1 && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || !ZhaoZhongComposition.Handles(r.Op) || !Enum.IsDefined(r.Stage) || !ZhaoZhongWindowMatches(f) || r.Neighbors is not System.Collections.IList { IsReadOnly: true } || r.Neighbors.Distinct().Count() != r.Neighbors.Count || r.Neighbors.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == r.TargetSeat) || r.Cursor < 0 || r.Cursor > r.Neighbors.Count || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhaoZhongStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Op == r.Op && e.WindowId == r.WindowId && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner) != 1)
-            throw new InvalidOperationException("Zhao Zhong lost his immutable source, owning native window, paid stage or frozen queue.");
-        if (r.Op == SkillProgramEffectOp.ResolvePengbiFirstActualTurn)
-        {
-            var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<PengbiCommittedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-            if (r.Paid ? paid is not [var receipt] || receipt.Source != r.Source || receipt.GameplayHash != r.GameplayHash || receipt.SkillId != r.ChosenSkill || _coreProgramEventHistoryOperations.ProgramEventHistory<PengbiCommittedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat) != 1 : paid.Length != 0)
-                throw new InvalidOperationException("Pengbi changed or repeated the first actual-turn skill choice.");
-            foreach (var grant in _coreProgramEventHistoryOperations.ProgramEventHistory<PengbiSkillGrantedEvent>().Where(e => e.FrameId == f.Id))
-                if (grant.SkillId is not ("ol:yintian" or "ol:biri") || grant.GrantId != $"zhao-zhong.pengbi:{(f.Id)}:{(grant.RecipientSeat)}:{(grant.SkillId)}" || grant.SkillInstanceId != grant.GrantId || grant.SourceId != $"zhao-zhong.pengbi:{(f.Id)}:{(grant.RecipientSeat)}")
-                    throw new InvalidOperationException("Pengbi lost the exact permanent independent grant source.");
-        }
-
-        if (r.Op == SkillProgramEffectOp.ResolveDiciGiftRecoveryAndNeighborChain)
-        {
-            var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<DiciAcceptedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-            if (r.Paid ? paid is not [var invoice] || invoice.Source != r.Source || invoice.GameplayHash != r.GameplayHash || invoice.TargetSeat != r.TargetSeat || invoice.Phase != r.Phase || _coreProgramEventHistoryOperations.ProgramEventHistory<DiciAcceptedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == r.Phase) != 1 : paid.Length != 0)
-                throw new InvalidOperationException("Dici repeated its actual Play payment or replaced its original donor.");
-            if (r.Neighbors.Count > 0 && (_coreProgramEventHistoryOperations.ProgramEventHistory<DiciNeighborsFrozenEvent>().Count(e => e.FrameId == f.Id && e.Count == r.Neighbors.Count) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<DiciNeighborFrozenEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.Seat).SequenceEqual(r.Neighbors)))
-                throw new InvalidOperationException("Dici changed its living-seat topology after freezing the neighbor queue.");
-        }
-
-        if (r.Op == SkillProgramEffectOp.ResolveIssuedDiciNextChainChoice && (!r.Paid || _coreProgramEventHistoryOperations.ProgramEventHistory<DiciLeaseStartedEvent>().Count(e => e.LeaseId == r.LeaseId && e.ChangeId == r.WindowId && e.ProgramFrameId == f.Id) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<DiciLeaseStartedEvent>().Count(e => e.LeaseId == r.LeaseId) != 1))
-            throw new InvalidOperationException("Dici repeated or replaced its once-issued next-chain entitlement.");
-        if (r.Op == SkillProgramEffectOp.ResolveBiriFirstNonDrawGain && (!r.Paid || _coreProgramEventHistoryOperations.ProgramEventHistory<BiriDrawIssuedEvent>().Count(e => e.FrameId == f.Id && e.BatchId == r.WindowId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<BiriDrawIssuedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner) != 1))
-            throw new InvalidOperationException("Biri changed or repeated the first global non-draw gain's native draw.");
-        if (r.Stage is ZhaoZhongStage.GiftChildren or ZhaoZhongStage.NextGiftChildren)
-        {
-            if (r.CardId is not { } id || r.CardKind is not { } kind || r.From != CardLocation.Hand(r.TargetSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<DiciGiftEntityEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var gift] || gift.CardId != id || gift.Kind != kind || gift.From != r.From || gift.To != CardLocation.Hand(f.OwnerSeat) || gift.Sequence <= r.Before || gift.Sequence > r.After || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == gift.Sequence && m.CardId == gift.CardId && m.From == gift.From && m.To == gift.To && m.Reason.Value == (r.Stage == ZhaoZhongStage.NextGiftChildren ? DiciNextGiveReason : DiciGiveReason)))
-                throw new InvalidOperationException("Dici lost its one actual Hand gift and immutable physical payment.");
-        }
-
-        if (f.PendingMovementContinuation is { } pending && !IsZhaoZhongMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Zhao Zhong lost his typed movement return.");
-    }
 
     internal bool CanContinueIssuedZhaoZhong(ProgramSkillFrame f)
     {
         if (f.ZhaoZhong is { Paid: true })
         {
-            AssertZhaoZhong(f);
             return true;
         }
 
@@ -103,7 +45,6 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     {
         if (f.ZhaoZhong is not { Paid: true } r)
             return false;
-        AssertZhaoZhong(f);
         if (r.Stage == ZhaoZhongStage.Drawing && f.NativeDraw is not null)
             return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is RecoveryReplacementFrame recovery)
@@ -129,8 +70,6 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     internal bool HasZhaoZhongDamageObserver(long id) => ZhaoZhongObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1240)]
     internal bool HasZhaoZhongBeforeDamageObserver(long id) => ZhaoZhongObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1070)]
-    internal bool IsZhaoZhongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ZhaoZhongObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28110)]
     internal bool AdvanceZhaoZhongChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhaoZhongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

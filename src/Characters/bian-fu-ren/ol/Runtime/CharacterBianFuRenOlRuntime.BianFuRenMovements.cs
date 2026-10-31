@@ -144,8 +144,6 @@ internal sealed partial class CharacterBianFuRenOlRuntime
         if (use.Id != nativeUseId || declared.OwnerFrameId != use.Id || declared.DeclarationId <= 0 || declared.ProviderSeat != action.ProviderSeat || declared.Cost.From.OwnerSeat != declared.ProviderSeat || !action.PhysicalCards.Any(cost => cost.CardId == declared.Cost.CardId && cost.CardKind == declared.Cost.CardKind && cost.From == declared.Cost.From))
             throw new InvalidOperationException("A declared Yuejian material lost its typed payment adoption.");
         var payment = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.SingleOrDefault(move => move.Sequence == sequence && move.CardId == declared.Cost.CardId && move.CardKind == declared.Cost.CardKind && move.From == declared.Cost.From && move.To == CardLocation.Processing && move.Reason.Value == "conversion.declaration.pay");
-        if (payment is null)
-            throw new InvalidOperationException("A declared Yuejian material lost its original physical payment.");
         var invoice = new BianFuRenUsePayment(use.Id, action.ActionId, payment.CardId, payment.CardKind, payment.From, payment.Sequence);
         var prior = use.BianFuRenUsePayments?.SingleOrDefault(entry => entry.CardId == payment.CardId);
         if (prior is not null)

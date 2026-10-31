@@ -43,9 +43,6 @@ internal sealed class ProgramDamageInsertionRuntime(IProgramDamageInsertionFacts
         return false;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 93001)]
-    internal void AssertInsertion(ProgramSkillFrame frame, ProgramExecutionPlan plan) => AssertScope(frame);
-
     internal void AssertScope(ProgramSkillFrame frame)
     {
         if (frame.AttackReturn?.Insertion is not { } origin) return;

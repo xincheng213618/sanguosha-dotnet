@@ -3,13 +3,11 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhouCangBoundaryMobileEntries
 {
     internal bool AdvanceBoundaryZhongyong() => _resolve().AdvanceBoundaryZhongyong();
-    internal void AssertBoundaryZhongyong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryZhongyong(f);
     internal int[] AvailableBoundaryZhongyong(global::CardGame.Core.ProgramSkillFrame f, bool slash) => _resolve().AvailableBoundaryZhongyong(f, slash);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryZhongyong(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryZhongyong(supplied);
     internal bool BoundaryZhongyongBeforeDamageObserver(long id) => _resolve().BoundaryZhongyongBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryZhongyongChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryZhongyongChoices(f);
     internal bool BoundaryZhongyongDamageObserver(long id) => _resolve().BoundaryZhongyongDamageObserver(id);
-    internal bool BoundaryZhongyongDyingObserver() => _resolve().BoundaryZhongyongDyingObserver();
     internal bool BoundaryZhongyongEntityAvailable(long action, int id) => _resolve().BoundaryZhongyongEntityAvailable(action, id);
     internal bool BoundaryZhongyongFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().BoundaryZhongyongFirstChild(f, child);
     internal bool BoundaryZhongyongLegalBan(global::CardGame.Core.ProgramLegalActionQuery q) => _resolve().BoundaryZhongyongLegalBan(q);
@@ -28,7 +26,6 @@ internal sealed partial class CharacterZhouCangBoundaryMobileEntries
     internal void ContinueBoundaryZhongyong(long id) => _resolve().ContinueBoundaryZhongyong(id);
     internal bool DrainBoundaryZhongyong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainBoundaryZhongyong(f);
     internal void FinishBoundaryZhongyong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishBoundaryZhongyong(f);
-    internal bool HasBoundaryZhouCangCompletedUseObserver(long useId) => _resolve().HasBoundaryZhouCangCompletedUseObserver(useId);
     internal bool HasBoundaryZhouCangResponseObserver(global::CardGame.Core.CardActionContext a, global::CardGame.Core.ProgramCardContinuation continuation) => _resolve().HasBoundaryZhouCangResponseObserver(a, continuation);
     internal bool IsBoundaryZhongyongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsBoundaryZhongyongMovement(f, e, p);
     internal bool IsBoundaryZhouCangPhysicalClaim(long useId, int cardId) => _resolve().IsBoundaryZhouCangPhysicalClaim(useId, cardId);

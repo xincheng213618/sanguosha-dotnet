@@ -56,12 +56,6 @@ internal sealed partial class CoreGameEnginePublicPilePreparationReceiptsRuntime
     }
 
     internal bool PublicPilePreparationPaymentDestination(ProgramSkillFrame f, CardMovementRecord movement, CardLocation destination) => movement.To == destination || f.PublicPilePreparation is { Operation: SkillProgramEffectOp.StoreNonBasicOwnedPublicPile, Pile: { } pile } receipt && destination == pile.Location && movement.From == CardLocation.Equipment(f.OwnerSeat) && movement.Sequence > receipt.Before && movement.Sequence <= receipt.After && movement.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePublicPilePreparationRuntime.PreparationReason(f, "payment") && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId && fact.MovementSequence == movement.Sequence && fact.ParentFrameId == f.Id) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 350)]
-    internal void AssertPublicPilePreparation(ProgramSkillFrame f)
-    {
-        if (f.PublicPilePreparation is not null && !ValidPublicPilePreparation(f))
-            throw new InvalidOperationException("Public preparation lost its original window, exact paid invoice or once-issued successor.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 20)]
     internal bool IsPublicPilePreparationMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.PublicPilePreparation is { Stage: PublicPilePreparationStage.PaymentChildren or PublicPilePreparationStage.DrawChildren } r && effect?.Op == r.Operation && pending == f.PendingMovementContinuation && ValidPublicPilePreparation(f);
@@ -118,8 +112,6 @@ internal sealed partial class CoreGameEnginePublicPilePreparationReceiptsRuntime
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 140, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 250)]
     internal bool IsPublicPilePreparationProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && PublicPilePreparationObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1910)]

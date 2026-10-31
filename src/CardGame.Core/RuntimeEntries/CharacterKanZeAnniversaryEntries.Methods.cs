@@ -12,6 +12,5 @@ internal sealed partial class CharacterKanZeAnniversaryEntries
     internal bool HasIssuedAnniversaryKuanshiFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasIssuedAnniversaryKuanshiFrame(f);
     internal bool IsIssuedAnniversaryKanZeKuanshiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedAnniversaryKanZeKuanshiCandidate(c, w);
     internal void IssueAnniversaryKuanshiDamage(global::CardGame.Core.DamageAppliedEvent fact) => _resolve().IssueAnniversaryKuanshiDamage(fact);
-    internal void RequireAnniversaryKuanshiRecoveryFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireAnniversaryKuanshiRecoveryFrame(f);
     internal bool HasAnniversaryKuanshi { get => _resolve().HasAnniversaryKuanshi; }
 }

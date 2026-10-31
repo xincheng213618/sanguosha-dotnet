@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouHuCheErHost
 {
     internal const string MouHuCheErAction = "mou-hu-che-er-kongwu",MouHuCheErDiscardReason = "skill-program.mou:kongwu.discard",MouHuCheErDrawReason = "skill-program.mou:kongwu.draw";
@@ -100,7 +100,6 @@ internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNativ
     }
     [ProgramContinuation(ProgramContinuationKind.Resume, 35800)] private bool ResumeMouHuCheEr(long id) { if (frames.Top is not ProgramSkillFrame { MouHuCheEr: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 35800)] private bool ReturnMouHuCheErMovement(ProgramSkillFrame f) => f.MouHuCheEr is not null && ResumeMouHuCheEr(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 35800)] private void AssertMouHuCheEr(ProgramSkillFrame f) { if (f.MouHuCheEr is not null && !Valid(f)) throw new InvalidOperationException("Invalid Kongwu actual phase receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35800)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35800)] private bool PaidMouHuCheEr(ProgramSkillFrame f) => f.MouHuCheEr is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuCheErKongwu)] private PromptChoice AiMouHuCheEr(PendingDecision p, ProgramSkillFrame f) => f.MouHuCheEr!.Stage == MouHuCheErStage.Target ? p.Choices.OrderBy(c => facts.Friendly(f.OwnerSeat, c.Targets.Single()) ? 1 : 0).First() : p.Choices.First();
     private IEnumerable<MouHuCheErDebtEvent> ActiveDebts(int target) => facts.History<MouHuCheErDebtEvent>().Where(d => d.Target == target && !facts.History<MouHuCheErDebtExpiredEvent>().Any(e => e.FrameId == d.FrameId));

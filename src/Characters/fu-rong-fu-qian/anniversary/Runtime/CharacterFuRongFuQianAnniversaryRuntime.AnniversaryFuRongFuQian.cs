@@ -174,7 +174,6 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryFuRongFuQian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AnniversaryFuPairChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Fu Rong Fu Qian requires his original current public target selection.");
-        RequireAnniversaryFuPair(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage == AnniversaryFuRongFuQianStage.ArmChoice)
@@ -203,7 +202,6 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryFuRongFuQian: { } r } f && f.Id == id)
         {
-            RequireAnniversaryFuPair(f);
             if (r.Stage == AnniversaryFuRongFuQianStage.Drawing)
                 return;
             if (r.Stage is AnniversaryFuRongFuQianStage.ArmChoice or AnniversaryFuRongFuQianStage.TargetsChoice)
@@ -280,7 +278,6 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
     internal void ReturnAnniversaryFuPairDraw(ProgramSkillFrame supplied, NativeDrawOutcome draw)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        RequireAnniversaryFuPair(f);
         var r = f.AnniversaryFuRongFuQian!;
         if (r.Stage != AnniversaryFuRongFuQianStage.Drawing || f.NativeDraw is not null || draw.RecipientSeat != r.DrawRecipient || draw.RequestedCount != r.RequestedDraw || r.Draws.Any(d => d.Index == r.Cursor) || draw.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Fu Rong Fu Qian lost his exact once-issued native draw return.");

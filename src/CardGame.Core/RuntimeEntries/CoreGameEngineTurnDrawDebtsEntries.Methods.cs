@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineTurnDrawDebtsEntries
 {
-    internal void AssertRegisteredTurnDrawDebtReceipts(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().AssertRegisteredTurnDrawDebtReceipts(frame, plan);
     internal void AssertTurnDrawDebtReceipts(global::CardGame.Core.ProgramSkillFrame frame, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.SkillProgramEffect> instructions) => _resolve().AssertTurnDrawDebtReceipts(frame, instructions);
     internal bool CanRunTurnDrawDebtPayment(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunTurnDrawDebtPayment(candidate, trigger, context);
     internal global::CardGame.Core.ProgramExtraDrawIssuedEvent? CurrentTurnDrawDebt(int owner, string skill, string instance, string hash, string stateId) => _resolve().CurrentTurnDrawDebt(owner, skill, instance, hash, stateId);

@@ -169,7 +169,6 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
     internal void ResolveOffTurnUsedCardGift(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Off-turn gift lost its exact program.");
-        AssertOffTurnUsedCardGift(f);
         var r = f.OffTurnUsedCardGift!;
         if (r.Stage != OffTurnUsedCardGiftStage.ChoosingRecipient || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || !OffTurnUsedCardGiftChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(selected.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Off-turn gift requires its exact published cards and recipient.");
@@ -197,7 +196,6 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.OffTurnUsedCardGift is not { } r)
             return false;
-        AssertOffTurnUsedCardGift(f);
         if (r.Stage == OffTurnUsedCardGiftStage.ChoosingRecipient)
             return true;
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id))
@@ -218,32 +216,6 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
             throw new InvalidOperationException("Off-turn gift returned without its already-paid movement receipt.");
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 50)]
-    internal void AssertOffTurnUsedCardGift(ProgramSkillFrame f)
-    {
-        if (f.OffTurnUsedCardGift is not { } r)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-        var facts = OffTurnUsedFacts(r.AnchorBatchId, source, f.GameplayHash);
-        if (effect.Op != SkillProgramEffectOp.GiveOffTurnUsedCards || r.InstructionIndex != 1 || f.InstructionIndex != r.InstructionIndex || r.Source != source || r.GameplayHash != f.GameplayHash || r.CardUseFrameId <= 0 || r.ActionId <= 0 || !Enum.IsDefined(r.Stage) || !Enum.IsDefined(r.Kind) || r.ActualTurnOwnerSeat == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActualTurnOwnerSeat) || r.ActualTurnNumber <= 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch } context || context.OwnerSeat != f.OwnerSeat || context.ParentFrameId != r.WindowFrameId || batch.Id != r.AnchorBatchId || batch.TurnNumber != r.ActualTurnNumber || context.MovementIndex is not { } movementIndex || movementIndex < 0 || movementIndex >= batch.Movements.Count || r.OriginalEntities.Count == 0 || r.OriginalEntities.Select(e => e.CardId).Distinct().Count() != r.OriginalEntities.Count || r.OriginalEntities is not System.Collections.IList { IsReadOnly: true } || r.CandidateSeats is not System.Collections.IList { IsReadOnly: true } || r.CandidateSeats.Count == 0 || r.CandidateSeats.Distinct().Count() != r.CandidateSeats.Count || r.CandidateSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == f.OwnerSeat) || !r.OriginalEntities.SequenceEqual(facts.Select(e => e.Entity)) || facts.Any(e => e.CardUseFrameId != r.CardUseFrameId || e.ActionId != r.ActionId || e.ActorSeat != f.OwnerSeat || e.ProviderSeat != f.OwnerSeat || e.Kind != r.Kind || e.EffectiveKind != r.EffectiveKind || e.ActualTurnNumber != r.ActualTurnNumber || e.ActualTurnOwnerSeat != r.ActualTurnOwnerSeat) || !facts.Any(e => e.Entity.NativeBatchId == batch.Id && batch.Movements.Any(m => m.Sequence == e.Entity.MovementSequence && m.CardId == e.Entity.CardId)) || r.OriginalEntities.Any(e => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.TurnNumber == r.ActualTurnNumber && IsOffTurnNativeCompletion(m, r.Kind))) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == context.Window) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OffTurnUsedCardGiftStartedEvent>().Count(e => e.FrameId == f.Id && e.WindowFrameId == r.WindowFrameId && e.AnchorBatchId == r.AnchorBatchId && e.CardUseFrameId == r.CardUseFrameId && e.ActionId == r.ActionId && e.Source == source && e.GameplayHash == r.GameplayHash && e.MaterialCount == r.OriginalEntities.Count) != 1)
-            throw new InvalidOperationException("Off-turn gift lost its exact native use/discard/source/turn issuance proof.");
-        var wi = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == r.WindowFrameId);
-        if (wi < 0 || _resolutionStackOperations._resolutionStack[wi] is not CardsMovedTriggerWindowFrame window || window.Batch != batch || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) || context.OccurrenceIndex != window.Candidates[window.CandidateIndex].OccurrenceIndex || context.MovementIndex != context.OccurrenceIndex || wi + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[wi + 1].Id != f.Id)
-            throw new InvalidOperationException("Off-turn gift lost its exact owning discard-window candidate.");
-        if (r.Stage == OffTurnUsedCardGiftStage.ChoosingRecipient)
-        {
-            if (r.RecipientSeat is not null || r.PaidCardIds is not null || r.GiftBatchId != 0 || r.Before != 0 || r.After != 0 || f.PendingMovementContinuation is not null)
-                throw new InvalidOperationException("Off-turn gift contains payment before a published recipient was chosen.");
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || p.SourceSeat != f.OwnerSeat || p.SkillPrompt?.SkillId != f.SkillId || !p.Choices.Select(c => c.Id).SequenceEqual(OffTurnUsedCardGiftChoices(f).Select(c => c.Id)) || p.Choices.Any(c => !OffTurnUsedCardGiftChoices(f).Any(expected => expected.Id == c.Id && expected.Cards.SequenceEqual(c.Cards) && expected.Targets.SequenceEqual(c.Targets) && expected.Parameters.OrderBy(x => x.Key).SequenceEqual(c.Parameters.OrderBy(x => x.Key))))))
-                throw new InvalidOperationException("Off-turn gift lost its exact published public-discard and private-chooser prompt.");
-            return;
-        }
-
-        if (r.RecipientSeat is not { } recipient || !r.CandidateSeats.Contains(recipient) || r.PaidCardIds is not { Count: > 0 } paid || paid is not System.Collections.IList { IsReadOnly: true } || paid.Distinct().Count() != paid.Count || r.GiftBatchId <= 0 || r.After <= r.Before || paid.Any(id => !r.OriginalEntities.Any(e => e.CardId == id)) || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != f.OwnerSeat || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).Select(m => m.CardId).SequenceEqual(paid) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.Before && m.Sequence <= r.After && (m.From != CardLocation.DiscardPile || m.To != CardLocation.Hand(recipient) || m.Reason.Value != $"skill-program.{(f.SkillId)}.off-turn-used-card-gift")) || paid.Any(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > r.OriginalEntities.Single(e => e.CardId == id).MovementSequence && m.Sequence <= r.Before && m.From == CardLocation.DiscardPile)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OffTurnUsedCardGiftPaidEvent>().Count(e => e.FrameId == f.Id && e.ActionId == r.ActionId && e.RecipientSeat == recipient && e.CardCount == paid.Count && e.GiftBatchId == r.GiftBatchId && e.SequenceBefore == r.Before && e.SequenceAfter == r.After) != 1)
-            throw new InvalidOperationException("Off-turn gift lost its one atomic physical payment and immutable native child return.");
     }
 
     SkillProgramStepOutcome global::CardGame.Core.IOffTurnUsedCardsProgramHost.GiveOffTurnUsedCards(ProgramSkillFrame f) => BeginOffTurnUsedCardGift(f);

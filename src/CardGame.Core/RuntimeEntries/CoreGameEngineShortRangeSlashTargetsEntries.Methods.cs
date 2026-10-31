@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShortRangeSlashTargetsEntries
 {
     internal void AppendShortRangeLegacyCandidate(global::CardGame.Core.CardUseFrame use, long windowId, global::System.Collections.Generic.List<(global::CardGame.Core.ProgramTriggerCandidate Candidate, global::CardGame.Core.ProgramSkillWindowContext Context)> entries) => _resolve().AppendShortRangeLegacyCandidate(use, windowId, entries);
-    internal void AssertShortRangeSlashDraft(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShortRangeSlashDraft(frame);
     internal bool CanRunShortRangeSlash(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunShortRangeSlash(candidate, trigger, context);
     internal int FreezeShortRangeSlashResponseRequirement(long attackId, int source, int target, global::CardGame.Core.CardKind kind, int ordinary) => _resolve().FreezeShortRangeSlashResponseRequirement(attackId, source, target, kind, ordinary);
     internal bool HasShortRangeSlashTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasShortRangeSlashTail(use);

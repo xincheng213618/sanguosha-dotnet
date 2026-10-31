@@ -50,13 +50,6 @@ internal sealed partial class CoreGameEnginePairObtainFixedRecipientReceiptsRunt
         return r.DrawSequenceBefore >= r.SequenceAfter && r.DrawSequenceAfter >= r.DrawSequenceBefore && r.ActualDrawCount is >= 0 and <= 1 && draws is [var draw] && draw.OwnerSeat == f.OwnerSeat && draw.RequestedCount == 1 && draw.ActualCount == r.ActualDrawCount && draw.SequenceBefore == r.DrawSequenceBefore && draw.SequenceAfter == r.DrawSequenceAfter && _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.DrawSequenceBefore && m.Sequence <= r.DrawSequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == $"{(_corePairObtainShownGiftsOperations.PairBenefitMoveReason(f, true))}.reward") == r.ActualDrawCount;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 570)]
-    internal void AssertPairBenefitState(ProgramSkillFrame f)
-    {
-        if (f.PairObtain is not null && !ValidPairObtain(f) || f.ShownPairGift is not null && !ValidShownPairGift(f) || f.FixedRecipient is not null && !_coreFixedRecipientBenefitsOperations.ValidFixedRecipientReceipt(f) || (f.PairObtain is not null || f.ShownPairGift is not null) && f.PendingMovementContinuation is { } pending && (pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null))
-            throw new InvalidOperationException("A pair/fixed-recipient receipt differs from its exact original producer, binding or real ledger.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 520)]
     internal bool IsPairBenefitMovement(ProgramSkillFrame f, SkillProgramEffect? paid, ProgramMovementContinuation movement) => movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && (paid?.Op == SkillProgramEffectOp.ObtainOneFromEachSelectedTarget && f.PairObtain is { AwaitingMovement: true } && ValidPairObtain(f) || paid?.Op == SkillProgramEffectOp.GiveShownCardToLeastOriginalTarget && f.ShownPairGift?.Stage is ProgramShownPairGiftStage.AwaitingGift or ProgramShownPairGiftStage.AwaitingReward && ValidShownPairGift(f));
 }

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineWushuangAuditCombatEntries
 {
     internal bool AllowsWushuangCampClaim(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsWushuangCampClaim(gate);
-    internal void AssertWushuangCampClaim(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().AssertWushuangCampClaim(frame, plan);
     internal global::CardGame.Core.SkillProgramStepOutcome CaptureWushuangWangong(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().CaptureWushuangWangong(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome ClaimWushuangCampHand(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ClaimWushuangCampHand(supplied);
     internal bool HasWushuangWangongPrivilege(global::CardGame.Core.CharacterState actor, long? existingUseId = default) => _resolve().HasWushuangWangongPrivilege(actor, existingUseId);

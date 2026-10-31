@@ -99,18 +99,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelLegacyWindowsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(w with { CandidateIndex = w.CandidateIndex + 1, Step = ResolutionFrameStep.ResolvingEffect });
         _coreRuntimeOperations.AdvanceRuntimeTop<FirstSlashDuelLegacyWindowFrame>();
     }
-
-    internal void AssertFirstSlashDuelLegacyWindows()
-    {
-        foreach (var w in _resolutionStackOperations._resolutionStack.OfType<FirstSlashDuelLegacyWindowFrame>())
-        {
-            var use = _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId);
-            if (use is null || !IsFirstLegacySlashUse(use, w.ProducerFrameId, requireSingle: false) || w.Candidates.Count == 0 || w.Contexts.Count != w.Candidates.Count || w.CandidateIndex < 0 || w.CandidateIndex > w.Candidates.Count || w.Candidates.Where((c, i) => c.OwnerSeat != use.SourceSeat || w.Contexts[i].ParentFrameId != w.Id || w.Contexts[i].Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || w.Contexts[i].CardUse is not null || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit }]).Any())
-                throw new InvalidOperationException("The first-benefit legacy window lost its original Action-null Slash and exact producer.");
-        }
-    }
-
-    internal bool HasFirstSlashDuelLegacyUseObserver(long id) => _resolutionStackOperations._resolutionStack.OfType<FirstSlashDuelLegacyWindowFrame>().Any(w => w.ParentFrameId == id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsFirstLegacySlashUse(use, w.ProducerFrameId, requireSingle: false));
     [ProgramTriggerProof(ProgramTriggerProofPhase.LegacyWindow, 10, ProgramTriggerProofMatch.Decision)]
     internal bool? ProveFirstSlashLegacy(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolutionStackOperations._resolutionStack.OfType<FirstSlashDuelLegacyWindowFrame>().Any(window => window.Id == context.ParentFrameId) ? CanRunFirstLegacyBenefit(candidate, context) : null;
 }

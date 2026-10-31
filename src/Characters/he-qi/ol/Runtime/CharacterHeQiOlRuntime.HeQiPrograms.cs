@@ -212,13 +212,6 @@ internal sealed partial class CharacterHeQiOlRuntime
             throw new InvalidOperationException("HeQi cannot resume without its exact paid entities.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 400)]
-    internal void AssertRegisteredHeQi(ProgramSkillFrame frame)
-    {
-        if (frame.HeQi is not null)
-            RequireHeQi(frame);
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IHeQiProgramHost.BeginHeQi(ProgramSkillFrame f, int target) => BeginHeQi(f, target);
     [PublicHandRevealReturn("joint-hands-dodges")]
     internal void ContinueHeQiAfterPublicReveal(ProgramSkillFrame f)

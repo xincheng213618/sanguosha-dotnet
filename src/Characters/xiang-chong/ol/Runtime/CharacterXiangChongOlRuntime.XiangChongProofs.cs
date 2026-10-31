@@ -59,22 +59,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27140)]
-    internal void AssertXiang(ProgramSkillFrame f)
-    {
-        if (f.XiangChong is null)
-            return;
-        if (!ValidXiang(f))
-            throw new InvalidOperationException("XiangChong lost its original actual loss/phase, source generation, frozen material or once-paid child invoice.");
-        var r = f.XiangChong;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null && r.Stage is XiangChongStage.Choice or XiangChongStage.Targets or XiangChongStage.Cards or XiangChongStage.ClaimChoice)
-        {
-            var actor = r.Stage == XiangChongStage.Choice ? r.TurnOwner : f.OwnerSeat;
-            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != actor || p.SkillPrompt?.SkillId != f.SkillId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, XiangChoices(f)))
-                throw new InvalidOperationException("XiangChong's private chooser or exact legal payment frontier changed.");
-        }
-    }
-
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 880)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 820)]
     internal bool IsXiangChongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.XiangChong is { } r && ValidXiang(f) && XiangSilverLionSeats(r).Contains(recovery.Attempt.TargetSeat) && recovery.ParentFrameId == f.Id && recovery.Return == new RecoveryReplacementReturn(PostEventContinuation.Program, f.Id) && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == recovery.Attempt.TargetSeat && recovery.Attempt.Amount == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardKind == CardKind.SilverLion && m.From == CardLocation.Equipment(recovery.Attempt.TargetSeat) && m.Reason == recovery.Attempt.Completion.MoveReason);
@@ -117,8 +101,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
     internal bool HasXiangChongDamageObserver(long id) => XiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1600)]
     internal bool HasXiangChongBeforeDamageObserver(long id) => HasXiangChongDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1430)]
-    internal bool IsXiangChongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && XiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27140)]
     internal bool AdvanceXiangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XiangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

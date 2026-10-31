@@ -185,20 +185,4 @@ internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
     internal bool IsSlashDodgeCancellationPrevented(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _coreWushuangCombatTacticsOperations.WushuangDrunkenSlashUnrespondable(attack) || _coreFinalTargetSlashOperations.FinalTargetSlashReceipts(attack.ResolutionId, attack.TargetSeat).Any(item => item.PreventCancellation) || _coreCurrentCardEnhancementsOperations.HasCurrentCardEnhancement(attack.ResolutionId, CurrentCardEnhancement.Uncancelable) || _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).JudgmentSuitDodgeRestriction?.TargetSeat == attack.TargetSeat;
     [ProgramAiChoice(SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeSuitDiscard)]
     internal PromptChoice SelectAiSlashSuitDiscard(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices.OrderBy(choice => choice.Cards.Count == 0 ? double.MaxValue : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(SlashSuitDiscardCards(frame.SlashSuitDiscard!).Single(card => card.Id == choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[frame.SlashSuitDiscard!.TargetSeat])).First();
-    internal void AssertProgramSlashSuitDiscard(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.SlashSuitDiscard is not { } draft)
-            return;
-        if (_coreShanheS5MaSiblingsOperations.IsShanheS5Tieqi(frame))
-        {
-            _coreShanheS5MaSiblingsOperations.AssertShanheS5Tieqi(frame);
-            return;
-        }
-
-        if (paused.Op != SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeSuitDiscard || paused.JudgmentReason != draft.JudgmentReason || paused.ResultBind != draft.ResultBind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(draft.TargetSeat) || draft.TargetSeat == frame.OwnerSeat || draft.Stage == ProgramSlashSuitDiscardStage.PaymentMovement && (draft.PaidCardId is null || draft.PaidFrom is null))
-            throw new InvalidOperationException("Suit discard lost its typed cursor.");
-        _ = SlashSuitDiscardAttack(frame, requireActive: false);
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && draft.Stage == ProgramSlashSuitDiscardStage.Choosing && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != draft.TargetSeat || !decision.IsPrivate || !decision.Choices.Select(choice => choice.Id).SequenceEqual(SlashSuitDiscardChoices(frame).Select(choice => choice.Id))))
-            throw new InvalidOperationException("Suit discard lost its exact target-private HE choices.");
-    }
 }

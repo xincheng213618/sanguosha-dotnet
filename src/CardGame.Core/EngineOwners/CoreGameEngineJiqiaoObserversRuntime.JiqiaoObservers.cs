@@ -34,12 +34,6 @@ internal sealed partial class CoreGameEngineJiqiaoObserversRuntime
         _ => false
     };
     internal bool IsJiqiaoPaidCostDestination(ProgramSkillFrame frame, CardMovementRecord movement) => movement.To == CardLocation.DiscardPile || frame.JiqiaoPaid is { } pending && movement.From == CardLocation.Equipment(frame.OwnerSeat) && movement.Reason.Value == "program.jiqiao.cost" && movement.Sequence > pending.Invoice.CostBefore && movement.Sequence <= pending.Invoice.CostAfter && _coreProgramLifecycleOperations.GetProgramCardSet(frame, pending.Invoice.CostBind).CardIds.Contains(movement.CardId) && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId && fact.MovementSequence == movement.Sequence && fact.ParentFrameId == frame.Id) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 150)]
-    internal void RequireIssuedJiqiao(ProgramSkillFrame f)
-    {
-        if (f.JiqiaoPaid is not null && !CanContinueIssuedJiqiao(f))
-            throw new InvalidOperationException("Jiqiao lost its actual paid equipment, native stage movements or owning source invoice.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 110)]
     internal bool IsJiqiaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.DiscardEquipmentAndResolveJiqiao && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && CanContinueIssuedJiqiao(f);
@@ -64,8 +58,6 @@ internal sealed partial class CoreGameEngineJiqiaoObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 70)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 180)]
     internal bool HasJiqiaoDamageObserver(long id) => JiqiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30)]
-    internal bool IsJiqiaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && JiqiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 150)]
     internal bool TryAdvanceJiqiaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && JiqiaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     SkillProgramStepOutcome global::CardGame.Core.IJiqiaoProgramHost.ExecutePaidJiqiao(ProgramSkillFrame f, SkillProgramEffect e) => _coreJiqiaoProgramsOperations.ExecutePaidJiqiao(f, e);

@@ -26,14 +26,12 @@ internal sealed partial class CharacterBaiLingYunAnniversaryEntries
     internal bool DrainAnniversaryBly(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainAnniversaryBly(f);
     internal global::CardGame.Core.Card? FindAnniversaryBaiLingYunViewedCard(global::CardGame.Core.CharacterState actor, int id) => _resolve().FindAnniversaryBaiLingYunViewedCard(actor, id);
     internal void GainAndReturnAnniversaryBly(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GainAndReturnAnniversaryBly(f);
-    internal bool HasAnniversaryBaiLingYunPrompt() => _resolve().HasAnniversaryBaiLingYunPrompt();
     internal bool IsAnniversaryBaiLingYunExactCardQuery(global::CardGame.Core.CharacterState actor, int? selectedPhysicalCardId) => _resolve().IsAnniversaryBaiLingYunExactCardQuery(actor, selectedPhysicalCardId);
     internal bool IsAnniversaryBaiLingYunSlashSource(long? programId, int source, int target, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind, int provider, global::CardGame.Core.CardLocation from, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card>? physical, bool counts) => _resolve().IsAnniversaryBaiLingYunSlashSource(programId, source, target, card, kind, provider, from, physical, counts);
     internal bool IsAnniversaryBlyNative(global::CardGame.Core.CardUseFrame use) => _resolve().IsAnniversaryBlyNative(use);
     internal void IssueAnniversaryBlyUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueAnniversaryBlyUse(f);
     internal bool PayAnniversaryBlyProcessing(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards, int provider, global::CardGame.Core.CardLocation? from, global::CardGame.Core.CardMoveReason reason) => _resolve().PayAnniversaryBlyProcessing(cards, provider, from, reason);
     internal void PublishAnniversaryBly(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishAnniversaryBly(f);
-    internal void RequireAnniversaryBly(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireAnniversaryBly(f);
     internal bool RetainAnniversaryBly(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainAnniversaryBly(f);
     internal bool ReturnAnniversaryBlyAttack() => _resolve().ReturnAnniversaryBlyAttack();
     internal bool ReturnAnniversaryBlyMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnAnniversaryBlyMovement(f);

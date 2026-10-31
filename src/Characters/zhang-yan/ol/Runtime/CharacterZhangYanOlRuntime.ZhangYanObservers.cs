@@ -7,42 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYanOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27000)]
-    internal void AssertZhangYan(ProgramSkillFrame f)
-    {
-        if (f.ZhangYan is not { } r)
-            return;
-        if (f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { } ctx || r.Source != ZhangYanSource(f) || r.GameplayHash != f.GameplayHash || r.WindowId != ctx.ParentFrameId || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Operation || !ZhangYanComposition.IsOperation(r.Operation) || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.PhaseOwner) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Grain.Distinct().Count() != r.Grain.Count || r.AddedTargets.Distinct().Count() != r.AddedTargets.Count || r.Options.Distinct().Count() != r.Options.Count || r.Options.Any(o => !Enum.IsDefined(o)) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.WindowId == r.WindowId && e.Operation == r.Operation && e.Turn == r.Turn && e.PhaseOwner == r.PhaseOwner && e.DamageId == r.DamageId) != 1)
-            throw new InvalidOperationException("Zhang Yan lost its owning instruction, immutable collections or exact issued native start.");
-        if (r.Operation == SkillProgramEffectOp.UseBlackCardAtWoundedPlayStart)
-        {
-            if (r.Stage is not (ZhangYanStage.SujiCard or ZhangYanStage.SujiTarget or ZhangYanStage.IssuingUse or ZhangYanStage.NativeUse or ZhangYanStage.NativeChildren) || r.DamageId is not null || r.Votes.Count != 0 || r.Options.Count != 0 || r.AddedTargets.Count != 0)
-                throw new InvalidOperationException("Suji lost its physical conversion stage.");
-            if (r.Stage is ZhangYanStage.NativeUse or ZhangYanStage.NativeChildren)
-            {
-                if (r.NativeReturn is not { } ret || ret.Source != r.Source || ret.GameplayHash != r.GameplayHash || ret.ProgramFrameId != f.Id || ret.Turn != r.Turn || ret.PhaseOwner != r.PhaseOwner || ret.CardId != r.CardId || ret.From != r.From || ret.OriginalTarget != r.Target || r.BatchId is null || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanSujiIssuedEvent>().Count(e => e.Return == ret) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanSujiPaidEvent>().Count(e => e.FrameId == f.Id && e.UseId == ret.UseId && e.CardId == ret.CardId && e.From == ret.From && e.Before == r.Before && e.After == r.After && e.BatchId == r.BatchId) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == ret.CardId && m.From == ret.From && m.Reason == CardMoveReasons.Use) != 1)
-                    throw new InvalidOperationException("Suji lost its once-paid original native entity and whole-use return.");
-                if (r.Stage == ZhangYanStage.NativeChildren && (!r.NativeCompleted || _coreCardUseLifecycleOperations.LifecycleCardUse(ret.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanSujiReturnedEvent>().Count(e => e.Return == ret) != 1))
-                    throw new InvalidOperationException("Suji cannot settle an unretired native Use.");
-            }
-        }
-        else if (r.Operation == SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard)
-        {
-            if (r.Stage is not (ZhangYanStage.RewardChoice or ZhangYanStage.RewardChildren) || r.NativeReturn is not { } ret || ret.Source.OwnerSeat != f.OwnerSeat || ret.Source.SkillId != f.SkillId || ret.Source.SkillInstanceId != f.SkillInstanceId || ret.GameplayHash != f.GameplayHash || ret.PhaseOwner != r.PhaseOwner || r.DamageId != ctx.DamageFrameId || r.DamageId is null || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanSujiIssuedEvent>().Count(e => e.Return == ret) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.DamageId)is not DamageFrame damage || damage.ParentFrameId != ret.UseId || damage.TargetSeat != r.PhaseOwner || damage.Amount <= 0 || ctx.TargetSeat != r.PhaseOwner)
-                throw new InvalidOperationException("Suji reward lost its original phase owner and actual same-use positive damage.");
-            if (r.Stage == ZhangYanStage.RewardChildren && (r.CardId is null || r.From?.OwnerSeat != r.PhaseOwner || f.PendingMovementContinuation is null || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanRewardIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == ret.UseId && e.DamageId == r.DamageId && e.PhaseOwner == r.PhaseOwner && e.CardId == r.CardId && e.From == r.From && e.Before == r.Before && e.After == r.After) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).Any(m => !IsZhangYanRewardMovement(f, m))))
-                throw new InvalidOperationException("Suji reward lost its once-issued HE entity and native attached grain.");
-        }
-        else
-        {
-            if (r.Stage is not (ZhangYanStage.LangdaoVotes or ZhangYanStage.LangdaoTargets) || r.Options.Count is < 1 or > 3 || r.Votes.Count > 2 || r.Votes.Where((v, i) => v.Seat != (i == 0 ? f.OwnerSeat : r.PhaseOwner) || !r.Options.Contains(v.Option)).Any() || !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanLangdaoOptionFrozenEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.Option).SequenceEqual(r.Options) || (r.Stage == ZhangYanStage.LangdaoVotes ? r.Votes.Count > 1 : r.Votes.Count != 2 || r.AddedTargets.Count > r.Votes.Count(v => v.Option == LangdaoOption.ExtraTarget)))
-                throw new InvalidOperationException("Langdao lost its two independently sealed original option sets or counted additive directions.");
-        }
-
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && r.Stage is ZhangYanStage.SujiCard or ZhangYanStage.SujiTarget or ZhangYanStage.RewardChoice or ZhangYanStage.LangdaoVotes or ZhangYanStage.LangdaoTargets)
-            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != ZhangYanChooser(f) || p.IsPrivate != (r.Stage != ZhangYanStage.LangdaoTargets) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhangYanChoices(f)))
-                throw new InvalidOperationException("Zhang Yan lost its actual source/target-private choice boundary.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 230)]
     internal bool IsZhangYanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ZhangYan is { } r && r.Stage is ZhangYanStage.NativeChildren or ZhangYanStage.RewardChildren && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && (e is null || ZhangYanComposition.IsOperation(e.Op));
@@ -89,9 +53,6 @@ internal sealed partial class CharacterZhangYanOlRuntime
         var own = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
         return index > own || index + 1 == own && root.WindowContext?.ParentFrameId == id && root.ZhangYan!.Operation == SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 550)]
-    internal bool IsZhangYanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ZhangYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27000)]
     internal bool AdvanceZhangYanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangYanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramPipelineHook(ProgramPipelinePhase.IsProgramMovementSettlement, 200)]

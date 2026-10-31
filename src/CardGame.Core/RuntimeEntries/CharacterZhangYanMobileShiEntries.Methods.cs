@@ -7,7 +7,6 @@ internal sealed partial class CharacterZhangYanMobileShiEntries
     internal void AfterShiZyReveal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AfterShiZyReveal(f);
     internal bool AllowsShiZy(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().AllowsShiZy(c, t, w);
     internal void AnswerShiZy(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiZy(choice);
-    internal void AssertShiZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiZy(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiZy(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiZy(input, op);
     internal global::CardGame.Core.PromptChoice ChooseShiZy(global::CardGame.Core.PendingDecision p) => _resolve().ChooseShiZy(p);
     internal void CompleteShiZyDuelReturn(global::CardGame.Core.ProgramSkillFrame f, long useId, global::CardGame.Core.ProgramVirtualOrdinaryTrickOrigin origin) => _resolve().CompleteShiZyDuelReturn(f, useId, origin);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterZhangYanMobileShiEntries
     internal bool DrainShiZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainShiZy(f);
     internal void FinishShiZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShiZy(f);
     internal global::CardGame.Core.CardUseFrame? FrozenShiZyCompletedSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FrozenShiZyCompletedSlash(f);
-    internal bool HasShiZySuspendedCompletedParent(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().HasShiZySuspendedCompletedParent(window);
     internal void IssueShiZyVirtualDuel(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueShiZyVirtualDuel(f);
     internal bool KeepShiZyPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepShiZyPaid(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiZhangYanPublicStates(global::CardGame.Core.CharacterState owner, string id) => _resolve().MobileShiZhangYanPublicStates(owner, id);

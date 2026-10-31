@@ -7,7 +7,6 @@ internal sealed partial class CharacterSunJianMouOlEntries
     internal global::CardGame.Core.PromptChoice AiMouSunJianOlYipo(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouSunJianOlYipo(p, f);
     internal void AnswerMouSunJianOlHulie(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouSunJianOlHulie(choice);
     internal void AnswerMouSunJianOlYipo(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouSunJianOlYipo(choice);
-    internal void AssertMouSunJianOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouSunJianOl(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouSunJianOlHulie(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouSunJianOlHulie(supplied, op);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouSunJianOlYipo(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouSunJianOlYipo(supplied);
     internal void BindMouSunJianOlCounter(global::CardGame.Core.IGameEvent fact) => _resolve().BindMouSunJianOlCounter(fact);
@@ -26,7 +25,6 @@ internal sealed partial class CharacterSunJianMouOlEntries
     internal bool HasMouSunJianOlBeforeDamage(long id) => _resolve().HasMouSunJianOlBeforeDamage(id);
     internal bool HasMouSunJianOlDamage(long id) => _resolve().HasMouSunJianOlDamage(id);
     internal bool HasMouSunJianOlHpSubject(int seat) => _resolve().HasMouSunJianOlHpSubject(seat);
-    internal bool HasMouSunJianOlSuspendedCompletedParent(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().HasMouSunJianOlSuspendedCompletedParent(window);
     internal bool IsMouSunJianOlCounterUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsMouSunJianOlCounterUse(use);
     internal bool IsMouSunJianOlDying() => _resolve().IsMouSunJianOlDying();
     internal bool IsMouSunJianOlMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsMouSunJianOlMovement(f, effect, movement);

@@ -31,7 +31,6 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyObserversRun
     }
 
     internal ProgramSkillFrame? IncomingDistanceCourtesyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreIncomingDistanceCourtesyObserversOperations.IncomingDistanceCourtesyFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 130, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 240)]
     internal bool IsIncomingDistanceCourtesyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && IncomingDistanceCourtesyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1790)]

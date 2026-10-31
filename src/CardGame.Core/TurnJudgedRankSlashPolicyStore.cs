@@ -25,7 +25,4 @@ internal sealed partial class TurnCardUseEffectStore
         .Where(g => g.TurnNumber == turn && g.TurnSeat == turnSeat).Select(g => g.GrantSequence);
     private void ExpireJudgedRankSlashPolicies(IReadOnlySet<long> expired) =>
         _judgedRankSlashPolicies.RemoveAll(g => expired.Contains(g.GrantSequence));
-    private bool JudgedRankSlashPoliciesAreInvalid() => _judgedRankSlashPolicies.Any(g => g.TurnNumber < 1 || g.TurnSeat < 0 ||
-        g.ParentFrameId <= 0 || g.EffectIndex != 1 || g.JudgmentFrameId <= 0 || g.JudgmentCardId <= 0 || g.Rank is < 1 or > 13 ||
-        g.PhaseInstanceId is <= 0 || g.Source.OwnerSeat < 0 || string.IsNullOrWhiteSpace(g.Source.SkillInstanceId) || string.IsNullOrWhiteSpace(g.GameplayHash));
 }

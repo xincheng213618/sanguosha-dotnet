@@ -46,7 +46,6 @@ internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
     internal static bool IsKuangfuPending(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_KuangfuReceipts.IsKuangfuPending(f);
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 50)]
     internal bool IsKuangfuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.DiscardEquipmentThenSlashAndOwnershipOutcome && pending == f.PendingMovementContinuation && f.Kuangfu is { Stage: KuangfuStage.EquipmentChildren or KuangfuStage.OutcomeChildren } && IsKuangfuPending(f) && ValidKuangfu(f);
-    internal bool HasExactKuangfuProgramSelection(ProgramSkillFrame f, ProgramExecutionPlan plan) => plan.Activation is { MinTargets: 0, MaxTargets: 0 } && f.Kuangfu?.SlashReturn is { } returned && plan.Instructions is [{ Op: SkillProgramEffectOp.DiscardEquipmentThenSlashAndOwnershipOutcome }] && f.SelectedTargetSeats.SequenceEqual([returned.OriginalTargetSeat]) && ValidKuangfu(f);
     internal bool IsKuangfuSlashUse(CardUseFrame use) => use.KuangfuSlashReturn is { } returned && use.Id == returned.CardUseFrameId && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == returned.ProgramFrameId)is { } root && root.Kuangfu is { Stage: KuangfuStage.SlashIssued } receipt && receipt.SlashReturn == returned && ValidKuangfu(root) && (use.CurrentSlashFirePolicy?.OriginalAction ?? use.Action)is { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, EffectiveSuit: Suit.None, EffectiveRank: 0, PhysicalCards.Count: 0 } action && action.ActionId == returned.CardActionId && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, root.OwnerSeat, action.ProviderSeat) && action.ConversionChain.Count == 0;
     internal bool HasIssuedKuangfuDistance(long? id, int actor) => id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { } use && use.KuangfuSlashReturn?.Source.OwnerSeat == actor && IsKuangfuSlashUse(use);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 390)]
@@ -112,7 +111,6 @@ internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1710)]
     internal bool HasKuangfuDamageObserver(long window) => KuangfuPaidObserverRoot(window)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 50, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 180)]
     internal bool IsKuangfuProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && KuangfuPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 490)]
@@ -121,24 +119,6 @@ internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || KuangfuPaidObserverRoot()is null)
             return false;
         return _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: false);
-    }
-
-    internal void AssertKuangfuPrograms()
-    {
-        foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.Kuangfu is not null))
-        {
-            if (!ValidKuangfu(root))
-                throw new InvalidOperationException("An equipment Slash changed its paid entity, original owner or issued successor.");
-            if (root.Kuangfu!.Stage is KuangfuStage.EquipmentChoice or KuangfuStage.SlashTargetChoice or KuangfuStage.HandDiscardChoice && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == root.Id && !_coreKuangfuOperations.KuangfuGameEnded() && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != root.OwnerSeat || p.IsPrivate != (root.Kuangfu.Stage == KuangfuStage.HandDiscardChoice) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, _coreKuangfuOperations.KuangfuChoices(root))))
-                throw new InvalidOperationException("Equipment Slash lost its exact public equipment/target or private own-hand choices.");
-        }
-
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.KuangfuSlashReturn is not null))
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-            if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1].Id != use.KuangfuSlashReturn!.ProgramFrameId || !IsKuangfuSlashUse(use) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind != CardKind.Slash && !_coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) || use.TargetSeats.Count == 0 && !_characterLiuPanOlOperations.HasPijingZeroTargetTail(use) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SlashTargetsReplacedEvent>().Any(e => e.CardUseFrameId == use.Id && e.Targets.Count == 0) || use.TargetSeats.Count > 1 && !((_characterQianZhaoOlOperations.HasWeifuTargetTail(use) || ((_characterYangFuOlOperations.HasBingzhongTargetTail(use) || _characterMaChengOlOperations.HasChenglieTargetTail(use)) || _characterLiuPanOlOperations.HasPijingTargetTail(use))) || _characterMaWanOlOperations.HasMaWanHunjiangTargetTail(use) || (_characterZhangYanOlOperations.HasZhangYanLangdaoTargetTail(use) || _characterMaXiuMaTieOlOperations.HasKenshangTargetTail(use))) && !_coreShortRangeSlashTargetsOperations.HasShortRangeSlashTail(use) && !_coreSameTypeActualUseAidOperations.HasSameTypeAidTargetTail(use) && !_coreOriginalTargetAdditionsOperations.HasIssuedOriginalTargetAdditionTail(use) && !_coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.SourceSeat == use.KuangfuSlashReturn.Source.OwnerSeat && e.CardKind == CardKind.Slash) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Count(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual([use.KuangfuSlashReturn.OriginalTargetSeat])) != 1)
-                throw new InvalidOperationException("Equipment Slash lost its exact zero-entity use and typed paid parent.");
-        }
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 110)]

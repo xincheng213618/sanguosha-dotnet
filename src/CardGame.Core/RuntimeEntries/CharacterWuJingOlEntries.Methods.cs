@@ -5,7 +5,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool AdvanceWuJingSubtree() => _resolve().AdvanceWuJingSubtree();
     internal global::CardGame.Core.PromptChoice AiWuJing(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiWuJing(p, f);
     internal void AnswerWuJing(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWuJing(choice);
-    internal void AssertWuJing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuJing(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuJing(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginWuJing(supplied, op);
     internal void BeginWuJingFaction(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginWuJingFaction(f);
     internal void BeginWuJingRoundOnce(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardConversionSource source) => _resolve().BeginWuJingRoundOnce(f, source);
@@ -37,7 +36,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool HasWuJingHejiTrickPaymentTail(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation) => _resolve().HasWuJingHejiTrickPaymentTail(use, continuation);
     internal bool HasWuJingZeroSupply(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasWuJingZeroSupply(f);
     internal bool IsIssuedWuJingHejiReward(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWuJingHejiReward(c, context);
-    internal bool IsWuJingDying() => _resolve().IsWuJingDying();
     internal bool IsWuJingHejiRemovedMaterial(long useId, int cardId) => _resolve().IsWuJingHejiRemovedMaterial(useId, cardId);
     internal bool IsWuJingHejiRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsWuJingHejiRequest(f);
     internal bool IsWuJingHejiTrickPaymentBatch(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsWuJingHejiTrickPaymentBatch(use, batch);

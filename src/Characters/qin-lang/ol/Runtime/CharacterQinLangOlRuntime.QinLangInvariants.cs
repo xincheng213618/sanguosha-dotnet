@@ -42,11 +42,4 @@ internal sealed partial class CharacterQinLangOlRuntime
             return r.Use is { } completed && returned.Count(e => e.Origin == completed) == 1 && issued.Length == returned.Length;
         return r.Use is null && issued.Length == returned.Length;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27170)]
-    internal void AssertQinLang(ProgramSkillFrame f)
-    {
-        if (f.QinLangXianying is not null && !ValidQinLang(f))
-            throw new InvalidOperationException("Xianying lost its actual turn, source generation, frozen payment, distinct round count or typed native use return.");
-    }
 }

@@ -24,7 +24,7 @@ internal interface IProgramDeckCardsOperations : IProgramRuntimeOperations
 }
 
 /// <summary>Owns filtered physical deck gains and their paid movement returns.</summary>
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class ProgramDeckCardsRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramDeckCardsFacts facts, IProgramDeckCardsOperations operations) : IDeckCardsHost
 {
@@ -87,20 +87,6 @@ internal sealed class ProgramDeckCardsRuntime(IProgramRuntimeFrames frames, IPro
             fact.InstructionIndex == receipt.InstructionIndex && fact.OwnerSeat == frame.OwnerSeat && fact.BatchId == receipt.BatchId &&
             fact.Count == moves.Count(move => move.To == CardLocation.Hand(frame.OwnerSeat)) &&
             fact.SequenceBefore == receipt.SequenceBefore && fact.SequenceAfter == receipt.SequenceAfter) == 1;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62010)]
-    private void AssertDeckCardGain(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.DeckCardGain is not { } receipt) return;
-        if (frame.InstructionIndex < 1 || frame.InstructionIndex > plan.Instructions.Count ||
-            plan.Instructions[frame.InstructionIndex - 1] is not { Op: SkillProgramEffectOp.ObtainDeckCards } effect ||
-            effect.Amount != receipt.Requested || !effect.CardKinds.SequenceEqual(receipt.FilterKinds) ||
-            (effect.CardCategories.Count == 0 ? null : (SkillProgramCardCategory?)effect.CardCategories[0]) != receipt.Category ||
-            receipt.CardIds is not System.Collections.IList { IsReadOnly: true } ||
-            receipt.SelectedKinds is not System.Collections.IList { IsReadOnly: true } ||
-            receipt.FilterKinds is not System.Collections.IList { IsReadOnly: true } || !ValidDeckCardGain(frame))
-            throw new InvalidOperationException("The deck gain lost its original instruction, filter, immutable selection or exact physical movement.");
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 62010)]

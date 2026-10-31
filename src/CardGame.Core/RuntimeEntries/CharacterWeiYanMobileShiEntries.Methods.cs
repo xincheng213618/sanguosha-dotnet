@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterWeiYanMobileShiEntries
 {
     internal void AnswerMobileShiWeiYan(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMobileShiWeiYan(selected);
-    internal void AssertMobileShiWeiYanPending(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().AssertMobileShiWeiYanPending(f, plan);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileShiWeiYan(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginMobileShiWeiYan(input, operation);
     internal bool CanOfferMobileShiWeiYan(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferMobileShiWeiYan(gate);
     internal void CaptureMobileShiWeiYanUse(global::CardGame.Core.IGameEvent payload) => _resolve().CaptureMobileShiWeiYanUse(payload);

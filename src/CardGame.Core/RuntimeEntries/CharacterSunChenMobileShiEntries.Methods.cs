@@ -19,7 +19,6 @@ internal sealed partial class CharacterSunChenMobileShiEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiSunChenPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().MobileShiSunChenPublicStates(owner, skillId);
     internal global::CardGame.Core.PendingDecision? ProjectShiScCardSelection(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ProjectShiScCardSelection(decision, f);
     internal void PublishShiSc(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiSc(f);
-    internal void RequireShiSc(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShiSc(f);
     internal void ReturnShiScDraw(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiScDraw(input, outcome);
     internal bool ReturnShiScMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiScMovement(f);
     internal void SetShiScChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt a, int amount) => _resolve().SetShiScChainAmount(a, amount);

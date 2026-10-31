@@ -7,7 +7,6 @@ internal sealed partial class CharacterCuiLieAnniversaryEntries
     internal int AnniversaryCuiLiePindianBonus(int owner) => _resolve().AnniversaryCuiLiePindianBonus(owner);
     internal void AnswerCuiLie(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerCuiLie(answer);
     internal void ApplyCuiLieMutation(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> added) => _resolve().ApplyCuiLieMutation(f, added);
-    internal void AssertCuiLie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertCuiLie(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCuiLie(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginCuiLie(supplied, op);
     internal bool CanOfferCuiLie(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferCuiLie(c);
     internal long CaptureAnniversaryCuiLieQualificationStamp(long underlying) => _resolve().CaptureAnniversaryCuiLieQualificationStamp(underlying);
@@ -42,7 +41,6 @@ internal sealed partial class CharacterCuiLieAnniversaryEntries
     internal void GiveCuiLie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GiveCuiLie(f);
     internal bool HasAnniversaryCuiLieCancellation(global::CardGame.Core.CardUseFrame use) => _resolve().HasAnniversaryCuiLieCancellation(use);
     internal bool HasAnniversaryCuiLieDelayedTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasAnniversaryCuiLieDelayedTail(use);
-    internal bool HasAnniversaryCuiLiePrompt() => _resolve().HasAnniversaryCuiLiePrompt();
     internal bool IsAnniversaryCuiLieClaimedUseMaterial(long useId, int cardId) => _resolve().IsAnniversaryCuiLieClaimedUseMaterial(useId, cardId);
     internal bool IsAnniversaryCuiLieDelayedMaterialPlaced(global::CardGame.Core.CardUseFrame use) => _resolve().IsAnniversaryCuiLieDelayedMaterialPlaced(use);
     internal bool IsAnniversaryCuiLieGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsAnniversaryCuiLieGrantQualified(owner, grant);

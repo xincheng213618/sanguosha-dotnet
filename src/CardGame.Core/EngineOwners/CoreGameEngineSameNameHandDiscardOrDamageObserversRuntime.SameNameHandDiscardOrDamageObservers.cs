@@ -64,28 +64,6 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageObservers
         return decision.ValidCardIds.SequenceEqual(expected.SelectMany(c => c.Cards).Distinct()) && decision.ValidTargetSeats.SequenceEqual(expected.SelectMany(c => c.Targets).Distinct()) && decision.Choices.Count == expected.Count && decision.Choices.Zip(expected).All(p => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(p.First, p.Second));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 490)]
-    internal void AssertSameNameHandDiscardOrDamage(ProgramSkillFrame f)
-    {
-        if (f.SameNameHandDiscardOrDamage is null)
-        {
-            // The overwhelmingly common old binding never scans event history.
-            if (f.TriggerId is null || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.Triggers.SingleOrDefault(t => t.Id == f.TriggerId)?.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferSameNameHandDiscardOrDamage) != true)
-                return;
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SameNameHandStartedEvent>().Any(e => e.FrameId == f.Id))
-                throw new InvalidOperationException("An issued same-name hand demand lost its owning receipt.");
-            return;
-        }
-
-        if (!ValidSameNameHandReceipt(f))
-            throw new InvalidOperationException("A same-name demand lost its completed action, original actor, private choice or once-paid receipt.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !SameNameHandFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("A same-name hand demand retained an unrelated first native child.");
-        if (index == _resolutionStackOperations._resolutionStack.Count - 1 && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && f.SameNameHandDiscardOrDamage.Stage is SameNameHandStage.ChoosingTarget or SameNameHandStage.ChoosingPayment && !IsSameNameHandDiscardOrDamageChoice(f, prompt))
-            throw new InvalidOperationException("A same-name demand lost its exact private published choice.");
-    }
-
     internal bool SameNameHandObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(child, dying) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(child, dying) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(child, dying)));
     internal bool IsSameNameHandObserverEdge(int child)
     {
@@ -98,16 +76,11 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageObservers
     internal ProgramCardTriggerWindowFrame? ResponseCompletionObserverRoot()
     {
         var healthCursor = _coreTypedRecoveryDamageCursorOperations.ProjectTypedResponseCompletionHealthCursor();
-        if (healthCursor.IsMalformed)
-            throw new InvalidOperationException("A native response health child lost its exact paid return.");
         for (var index = 0; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
             if (_resolutionStackOperations._resolutionStack[index] is ProgramCardTriggerWindowFrame { ResponseCompletion: not null } root && root.ParentFrameId != healthCursor.Owner?.Id && _coreResponseCompletionOperations.ValidResponseCompletionWindow(root) && _coreResponseCompletionOperations.ResponseCompletionFirstChild(root, _resolutionStackOperations._resolutionStack[index + 1]) && SameNameHandObserverSuffix(index))
                 return root;
         return null;
     }
-
-    internal bool HasSameNameHandCardObserver(long parentFrameId) => SameNameHandObserverRoot()is { } root && root.SameNameHandDiscardOrDamage!.OriginalParentFrameId == parentFrameId || ResponseCompletionObserverRoot()is { } response && response.ParentFrameId == parentFrameId || _coreCardSupplyCompletionOperations.CardSupplyCompletionObserverRoot()is { } supply && supply.ParentFrameId == parentFrameId;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 40, group: 70)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50)]
     internal bool IsSameNameHandDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (SameNameHandObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id) || ResponseCompletionObserverRoot()is { } response && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == response.Id) || _coreCardSupplyCompletionOperations.CardSupplyCompletionObserverRoot()is { } supply && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == supply.Id));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1820)]

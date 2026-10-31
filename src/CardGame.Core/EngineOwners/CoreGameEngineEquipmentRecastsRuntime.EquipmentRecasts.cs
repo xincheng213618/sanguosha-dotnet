@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEquipmentRecastsRuntime
 {
-    internal bool HasEquipmentRecastNativeDrawBoundary() => _resolutionStackOperations._resolutionStack.FirstOrDefault()is EquipmentRecastFrame { DrawApplied: false, NativeDraw: { ActiveAttemptId: { } attemptId, AttemptReturned: false, ReturnKind: NativeDrawAttemptReturnKind.EquipmentRecast } } recast && _resolutionStackOperations._resolutionStack.Count > 1 && _resolutionStackOperations._resolutionStack[1] is NativeDrawAttemptFrame attempt && attempt.Id == attemptId && attempt.Context.ParentFrameId == recast.Id && attempt.Context.RecipientSeat == recast.ActorSeat && attempt.Context.RequestedCount == 1 && attempt.Context.Reason == CardMoveReasons.RecastDraw && attempt.Return is { Kind: NativeDrawAttemptReturnKind.EquipmentRecast, InstructionIndex: 0, RecipientIndex: 0 };
     internal void BeginEquipmentRecast(CharacterState actor, Card card, CardKind effectiveKind)
     {
         var cost = _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(actor, card);

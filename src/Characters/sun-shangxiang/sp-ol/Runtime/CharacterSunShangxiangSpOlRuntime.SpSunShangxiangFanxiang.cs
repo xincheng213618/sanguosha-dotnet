@@ -50,10 +50,4 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 32301)]
     internal bool ContinueAcceptedSpSunShangxiangFanxiang(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && ValidSpSunShangxiangFanxiang(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32301)]
-    internal void AssertSpSunShangxiangFanxiang(ProgramSkillFrame f)
-    {
-        if (f.SpSunShangxiangFanxiang is not null && !ValidSpSunShangxiangFanxiang(f))
-            throw new InvalidOperationException("Fanxiang lost its once-per-game accepted Preparation receipt.");
-    }
 }

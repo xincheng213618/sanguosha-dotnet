@@ -20,7 +20,6 @@ internal sealed partial class CharacterLuSuMobileShiEntries
     internal void FinishShiLs(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShiLs(f);
     internal bool HasShiLsHandGrantsToExpire(int owner) => _resolve().HasShiLsHandGrantsToExpire(owner);
     internal bool HasShiLsHandView(int actor, int provider) => _resolve().HasShiLsHandView(actor, provider);
-    internal bool HasShiLsPrompt() => _resolve().HasShiLsPrompt();
     internal bool HasShiLsUsePaymentTail(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation) => _resolve().HasShiLsUsePaymentTail(use, continuation);
     internal bool IsShiLsAuthorizedResponseMaterial(global::CardGame.Core.CardActionContext action, global::CardGame.Core.CardActionCost cost) => _resolve().IsShiLsAuthorizedResponseMaterial(action, cost);
     internal bool IsShiLsAutonomousResponse(global::CardGame.Core.CardActionContext a) => _resolve().IsShiLsAutonomousResponse(a);
@@ -34,7 +33,6 @@ internal sealed partial class CharacterLuSuMobileShiEntries
     internal global::CardGame.Core.CardActionContext NormalizeShiLsResponseAction(global::CardGame.Core.CardActionContext a) => _resolve().NormalizeShiLsResponseAction(a);
     internal global::CardGame.Core.PendingDecision? ProjectShiLsCardSelection(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ProjectShiLsCardSelection(decision, f);
     internal void PublishShiLs(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiLs(f);
-    internal void RequireShiLs(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShiLs(f);
     internal void ReturnShiLsDraw(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiLsDraw(input, outcome);
     internal bool ReturnShiLsMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiLsMovement(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> ShiLsAuthorizedHandCards(global::CardGame.Core.CharacterState actor) => _resolve().ShiLsAuthorizedHandCards(actor);

@@ -158,7 +158,6 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhaoZhong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhaoZhongChooser(f) || !ZhaoZhongChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zhao Zhong requires the actual chooser's exact published private choice.");
-        AssertZhaoZhong(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters[ZhaoZhongAction];
@@ -212,7 +211,6 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ZhaoZhong: { } r } f && f.Id == id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
-            AssertZhaoZhong(f);
             if (f.NativeDraw is not null || f.AttackAttempt is not null)
                 return;
             if (r.Stage is ZhaoZhongStage.SelfGrantChildren or ZhaoZhongStage.OtherGrantChildren or ZhaoZhongStage.GiftChildren or ZhaoZhongStage.RecoveryChildren or ZhaoZhongStage.UnlinkChildren or ZhaoZhongStage.NeighborChildren or ZhaoZhongStage.NextGiftChildren or ZhaoZhongStage.NextDamageChildren or ZhaoZhongStage.DrawChildren)

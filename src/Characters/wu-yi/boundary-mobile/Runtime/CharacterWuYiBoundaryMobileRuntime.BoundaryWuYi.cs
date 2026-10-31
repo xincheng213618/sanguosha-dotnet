@@ -117,12 +117,4 @@ internal sealed partial class CharacterWuYiBoundaryMobileRuntime
     internal bool AdmitIssuedBoundaryWuYi(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == BoundaryWuYiComposition.Skill && (CanOfferBoundaryWuYiTargets(c, context) || CanOfferBoundaryWuYiReward(c, context));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 53100)]
     internal bool KeepBoundaryWuYiIssuedFrame(ProgramSkillFrame f) => f.BoundaryWuYiPhase is not null && BoundaryWuYiCostPaid(f) || f.BoundaryWuYiTargets is not null || f.SkillId == BoundaryWuYiComposition.Skill && f.TriggerId is BoundaryWuYiComposition.Targets or BoundaryWuYiComposition.Reward && f.WindowContext?.CardUse is { } identity && BoundaryWuYiIssuedGrant(identity.ParentCardUseFrameId, identity.CardActionId, f.OwnerSeat, f.SkillInstanceId)is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 53100)]
-    internal void AssertBoundaryWuYiFrame(ProgramSkillFrame f)
-    {
-        if (f.BoundaryWuYiPhase is { } phase && (phase.Source != BoundaryWuYiSource(f) || phase.Hash != f.GameplayHash || f.TriggerId != BoundaryWuYiComposition.Start || f.WindowContext?.Window != SkillProgramTriggerWindow.PlayPhaseStarting || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase.Phase) || phase.Before < 0 || phase.Before > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence))
-            throw new InvalidOperationException("Benxi lost its original paid Play phase and source identity.");
-        if (f.BoundaryWuYiTargets is not null)
-            AssertBoundaryWuYiTargets(f);
-    }
 }

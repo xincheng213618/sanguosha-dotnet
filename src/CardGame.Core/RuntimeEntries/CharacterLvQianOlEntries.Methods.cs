@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLvQianOlEntries
 {
-    internal void AssertLvQian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLvQian(f);
     internal bool CanContinueLvQian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueLvQian(f);
     internal bool CanOfferLvQian(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferLvQian(c, t, w);
     internal global::CardGame.Core.WeiluPhaseKey? CaptureWeiluEndingPhase(global::CardGame.Core.CharacterState owner) => _resolve().CaptureWeiluEndingPhase(owner);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterLvQianOlEntries
     internal bool IsDurableZengdaoGrant(global::CardGame.Core.ZengdaoPublicGrant g) => _resolve().IsDurableZengdaoGrant(g);
     internal bool IsDurableZengdaoPublicPile(global::CardGame.Core.PublicPersistentPileSource pile) => _resolve().IsDurableZengdaoPublicPile(pile);
     internal bool IsIssuedZengdaoCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedZengdaoCandidate(c, w);
-    internal bool IsLvQianDying() => _resolve().IsLvQianDying();
     internal bool IsLvQianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLvQianMovement(f, e, p);
     internal bool IsLvQianRecoveryCompletion(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryAttempt attempt) => _resolve().IsLvQianRecoveryCompletion(f, attempt);
     internal void IssueLvQianSegment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueLvQianSegment(f);

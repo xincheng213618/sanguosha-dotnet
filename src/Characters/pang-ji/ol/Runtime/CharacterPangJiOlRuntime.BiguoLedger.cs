@@ -122,14 +122,6 @@ internal sealed partial class CharacterPangJiOlRuntime
     }
 
     internal bool IsBiguoPindianFrame(PindianFrame child) => _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == child.ParentFrameId)is ProgramSkillFrame { PangJi: { Paid: true, Stage: PangJiStage.Pindian } r } f && r.Op == SkillProgramEffectOp.ResolveBiguoTargetedPindianAndCategoryBan && r.PindianId == child.Id && child.SkillId == f.SkillId && child.SourceSeat == f.OwnerSeat && child.ProgramResultBind == BiguoResultBind && child.ProgramResultVisibility == SkillProgramCardSetVisibility.Public && _coreProgramEventHistoryOperations.ProgramEventHistory<BiguoPindianIssuedEvent>().Count(e => e.FrameId == f.Id && e.PindianId == child.Id && e.ArmFrameId == r.Target!.ArmFrameId && e.UseId == r.Target.UseId && e.ActionId == r.Target.ActionId && e.OwnerSeat == f.OwnerSeat && e.Before == r.Before) == 1;
-    internal bool HasBiguoPindianContinuation()
-    {
-        var p = _resolutionStackOperations._resolutionStack.OfType<PindianFrame>().SingleOrDefault();
-        if (p is null || !IsBiguoPindianFrame(p) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == p.ParentFrameId)is not ProgramSkillFrame { PangJi: { Target: { } origin } } f || f.WindowContext is not { } c || _coreCardUseLifecycleOperations.LifecycleCardUse(origin.UseId)is not { } use || c.ParentFrameId != f.PangJi.WindowId)
-            return false;
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
-        return BiguoTargetRoot(candidate, c, false) && use.Action?.ActionId == origin.ActionId;
-    }
 
     internal bool IsAcceptedBiguoUse(int actorSeat, CardKind kind, CardActionType actionType, long? useId) => actionType == CardActionType.Use && useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { Type: CardActionType.Use } action } use && use.SourceSeat == actorSeat && use.CardKind == kind && action.ActorSeat == actorSeat && action.EffectiveKind == kind && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == id && e.SourceSeat == actorSeat && e.CardKind == kind && e.CardId == use.CardId) == 1;
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeIntrinsicUseBan, 10)]

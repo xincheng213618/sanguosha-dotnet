@@ -71,7 +71,6 @@ internal sealed partial class CharacterWenChouMouOlRuntime
 
     internal bool IsMouWenChouZeroDuel(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardId: 0, PhysicalCardIds.Count: 0 } && IsMouWenChouDuel(id);
     internal long? MouWenChouDuelProgramParent(long id) => IsMouWenChouDuel(id) ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.MouWenChouLunzhan!.ProgramFrameId : null;
-    internal bool IsMouWenChouDuelAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => IsMouWenChouDuel(attack.ResolutionId) && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MouWenChouLunzhan: { } o, Action: { } a } use && attack.ProgramSkillCardUseFrameId == o.ProgramFrameId && attack.EffectiveCardKind == CardKind.Duel && attack.PhysicalCards.Select(c => c.Id).Order().SequenceEqual(use.PhysicalCardIds!.Order()) && processing.Select(c => c.Id).Order().SequenceEqual(use.PhysicalCardIds.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Order()) && (o.MaterialCount == 0 ? attack.Card is null : attack.Card?.Id == o.CardId);
     internal Card ReadMouWenChouUseAppearance(long id, CardAppearanceReference appearance)
     {
         if (!IsMouWenChouZeroDuel(id))

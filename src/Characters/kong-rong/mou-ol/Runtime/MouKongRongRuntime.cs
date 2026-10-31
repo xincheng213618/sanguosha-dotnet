@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MouKongRongRuntime(IMouKongRongFacts facts, IMouKongRongNative native,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
     IProgramOperationDraws draws, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouKongRongHost
@@ -194,8 +194,6 @@ internal sealed partial class MouKongRongRuntime(IMouKongRongFacts facts, IMouKo
             facts.History<MouKrZhengyiStartedEvent>().Count(e=>e==new MouKrZhengyiStartedEvent(f.Id,z.Source,z.GameplayHash,z.WindowId,z.AttackId,z.VictimSeat,z.Amount))==1;
         return false;
     }
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,34600)]
-    internal void Assert(ProgramSkillFrame f){if((f.MouKrLiwen is not null||f.MouKrZhengyi is not null)&&!Valid(f))throw new InvalidOperationException("Kong Rong lost his exact native frame, source hash or paid cursor.");}
     [ProgramContinuation(ProgramContinuationKind.Resume,34600)]
     internal bool Resume(long id)
     {

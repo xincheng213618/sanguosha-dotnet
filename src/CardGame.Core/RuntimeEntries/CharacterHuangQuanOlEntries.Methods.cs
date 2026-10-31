@@ -4,7 +4,6 @@ internal sealed partial class CharacterHuangQuanOlEntries
 {
     internal bool AllowsRegisteredIsDianhuDrawTrigger(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsRegisteredIsDianhuDrawTrigger(gate);
     internal global::CardGame.Core.SkillProgramStepOutcome ArmDianhuRelation(global::CardGame.Core.ProgramSkillFrame supplied, int target) => _resolve().ArmDianhuRelation(supplied, target);
-    internal void AssertHuangQuanNativeUses() => _resolve().AssertHuangQuanNativeUses();
     internal void AssertJianjiNativeUseCompletion(global::CardGame.Core.CardUseFrame use) => _resolve().AssertJianjiNativeUseCompletion(use);
     internal void BindJianjiNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindJianjiNativeUse(use);
     internal bool CanContinueIssuedHuangQuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIssuedHuangQuan(f);
@@ -28,7 +27,6 @@ internal sealed partial class CharacterHuangQuanOlEntries
     internal global::CardGame.Core.ProgramSkillFrame? HuangQuanObserverRoot() => _resolve().HuangQuanObserverRoot();
     internal global::CardGame.Core.CardConversionSource HuangQuanSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuangQuanSource(f);
     internal bool IsDianhuDrawTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsDianhuDrawTrigger(t);
-    internal bool IsHuangQuanDying() => _resolve().IsHuangQuanDying();
     internal bool IsHuangQuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation continuation) => _resolve().IsHuangQuanMovement(f, e, continuation);
     internal bool IsJianjiExactCardQuery(global::CardGame.Core.CharacterState actor, int? selectedId) => _resolve().IsJianjiExactCardQuery(actor, selectedId);
     internal bool IsJianjiOffTurnNativeUse(long id, int actor) => _resolve().IsJianjiOffTurnNativeUse(id, actor);
@@ -43,7 +41,6 @@ internal sealed partial class CharacterHuangQuanOlEntries
     internal bool? ProveDianhuHealth(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ProveDianhuHealth(trigger, candidate, context);
     internal void PublishJianjiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishJianjiChoice(f);
     internal void RecordJianjiOrdinaryAlcoholUse(long id) => _resolve().RecordJianjiOrdinaryAlcoholUse(id);
-    internal void RequireIssuedHuangQuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireIssuedHuangQuan(f);
     internal bool ResumeHuangQuan(long id) => _resolve().ResumeHuangQuan(id);
     internal bool ReturnHuangQuanMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnHuangQuanMovement(f);
     internal void ReturnJianjiNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnJianjiNativeUse(use);

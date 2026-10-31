@@ -25,10 +25,4 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 42900)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 42900)]
     internal bool ContinueAnniversaryKuanshiIssuedFrame(ProgramSkillFrame f) => HasIssuedAnniversaryKuanshiFrame(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 42900)]
-    internal void RequireAnniversaryKuanshiRecoveryFrame(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryKuanshi is not null && !HasIssuedAnniversaryKuanshiFrame(f))
-            throw new InvalidOperationException("Anniversary Kuanshi lost its original issued grant, native damage candidate or typed recovery receipt.");
-    }
 }

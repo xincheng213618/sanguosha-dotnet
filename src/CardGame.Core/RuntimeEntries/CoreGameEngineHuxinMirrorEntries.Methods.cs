@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineHuxinMirrorEntries
 {
     internal global::CardGame.Core.Card? ActiveHuxinMirror(int owner, string instance) => _resolve().ActiveHuxinMirror(owner, instance);
-    internal void AssertPaidHuxinMirror(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertPaidHuxinMirror(frame);
     internal bool CanOfferHuxinMirror(global::CardGame.Core.ProgramTriggerLegalityContext context) => _resolve().CanOfferHuxinMirror(context);
     internal void ContinueHuxinMirrorPlacement(long id) => _resolve().ContinueHuxinMirrorPlacement(id);
     internal bool HuxinMirrorDamageQualifies(int owner, int amount, global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().HuxinMirrorDamageQualifies(owner, amount, attack);

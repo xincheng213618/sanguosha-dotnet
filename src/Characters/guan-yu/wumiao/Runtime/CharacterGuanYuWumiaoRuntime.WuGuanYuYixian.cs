@@ -46,7 +46,6 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal void PublishWuYixian(ProgramSkillFrame f)
     {
-        AssertWuYixian(f);
         var choices = WuYixianChoices(f);
         if (choices.Count == 0)
         {
@@ -72,7 +71,6 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Yixian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WuYixianChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Yixian requires its original private branch or recipient choice.");
-        AssertWuYixian(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -130,7 +128,6 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Yixian: { } r } f && f.Id == id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
-            AssertWuYixian(f);
             if (f.NativeDraw is not null)
                 return;
             if (r.Stage is YixianStage.EquipmentChildren or YixianStage.DrawChildren or YixianStage.RecoveryChildren)

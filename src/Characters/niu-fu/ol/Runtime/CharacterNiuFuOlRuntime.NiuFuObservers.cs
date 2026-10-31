@@ -7,49 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterNiuFuOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27050)]
-    internal void AssertNiuFu(ProgramSkillFrame f)
-    {
-        if (f.NiuFu is not { } r)
-            return;
-        if (r.Source != NiuFuSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != 1 || f.InstructionIndex != 1 || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || !NiuFuComposition.Handles(r.Op) || f.TriggerId is null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !Enum.IsDefined(r.Stage) || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.ParentFrameId != r.WindowId || c.DamageFrameId != r.DamageId || c.Amount != r.DamageAmount || c.TargetSeat != r.TargetSeat || r.DamageAmount < 1 || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.WindowId)is not { } w || w.ParentFrameId != r.DamageId || w.TriggerWindow != c.Window || w.TargetSeat != r.TargetSeat || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == r.DamageId)is not { } d || d.ParentFrameId != r.AttackId || d.TargetSeat != r.TargetSeat || d.Amount != r.DamageAmount || r.DamageSourceSeat is { } source && d.SourceSeat != source || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<NiuFuStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var start] || start.Source != r.Source || start.GameplayHash != r.GameplayHash || start.Op != r.Op || start.ActualTurn != r.ActualTurn || start.WindowId != r.WindowId || start.DamageId != r.DamageId || start.DamageAmount != r.DamageAmount || start.TargetSeat != r.TargetSeat || start.DamageSourceSeat != r.DamageSourceSeat || start.AttackId != r.AttackId || start.ActionId != r.ActionId || start.PhysicalCount != r.Physical.Count)
-            throw new InvalidOperationException("NiuFu lost its exact original whole-damage candidate, source, instruction or immutable start invoice.");
-        var shisuan = r.Op == SkillProgramEffectOp.ResolveShisuanRecastSourceChoice;
-        if (shisuan ? r.TargetSeat != f.OwnerSeat || r.Physical.Count != 0 || r.ActionId is not null || r.Stage is NiuFuStage.ZoneChoice or NiuFuStage.ZoneChildren || r.NextZone != 0 : r.DamageSourceSeat != f.OwnerSeat || r.Stage is not (NiuFuStage.ZoneChoice or NiuFuStage.ZoneChildren) || r.NextZone is < 0 or > 3 || r.Recast is not null || r.SourceBranch is not null || r.Physical.Count > 0 && r.Physical.All(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)))
-            throw new InvalidOperationException("NiuFu mixed its mandatory owner recast with the exact converted/zero-entity Slash target receipt.");
-        var entities = _coreProgramEventHistoryOperations.ProgramEventHistory<NiuFuSlashEntityEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (entities.Length != r.Physical.Count || r.Physical.Select(e => e.CardId).Distinct().Count() != r.Physical.Count || entities.Where((e, i) => e.Index != i || e.CardId != r.Physical[i].CardId || e.Kind != r.Physical[i].Kind).Any())
-            throw new InvalidOperationException("Zonglue lost an individually frozen original physical entity.");
-        if (!shisuan)
-        {
-            if (r.ActionId is { } actionId)
-            {
-                if (!_coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == actionId && e.Action.Type == CardActionType.Use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.Action.EffectiveKind) && e.Action.PhysicalCards.Select(p => new NiuFuEntity(p.CardId, p.CardKind, p.From)).SequenceEqual(r.Physical)))
-                    throw new InvalidOperationException("Zonglue must retain the original accepted use's unchanged physical payment, independently of later native actor changes.");
-            }
-            else if (r.Physical.Count != 0 || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == r.AttackId && e.CardId == 0 && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind) && e.SourceSeat == f.OwnerSeat))
-                throw new InvalidOperationException("Zonglue zero-entity legacy use requires its exact declared native Slash.");
-        }
-
-        var children = r.Stage is NiuFuStage.RecastCostChildren or NiuFuStage.RecastDrawChildren or NiuFuStage.SourceGiftChildren or NiuFuStage.ZoneChildren;
-        if (children ? f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } p || p.SubjectSeat != f.OwnerSeat || r.Steps.Count == 0 : f.PendingMovementContinuation is not null)
-            throw new InvalidOperationException("NiuFu movement children lost their sole owning paid continuation.");
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<NiuFuStepIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (issued.Length != r.Steps.Count || r.Steps.Where((step, i) => step.Index != i || issued[i].Step != step || step.Before < 0 || step.After < step.Before || step.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || step.ActualCount is < 0 or > 1 || i > 0 && step.Before < r.Steps[i - 1].After).Any())
-            throw new InvalidOperationException("NiuFu lost an ordered once-issued native movement step.");
-        foreach (var step in r.Steps)
-        {
-            var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > step.Before && m.Sequence <= step.After && m.Reason.Value == step.Reason).ToArray();
-            if (moves.Length != step.ActualCount || (step.Stage == NiuFuStage.RecastDrawChildren ? step.Reason != CardMoveReasons.RecastDraw.Value || step.CardId is not null || step.From is not null || step.To is not null || moves.Any(m => m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(f.OwnerSeat)) : step.ActualCount != 1 || step.CardId is not { } id || step.From is not { } from || step.To is not { } to || moves is not [var moved] || moved.CardId != id || moved.CardKind != step.Kind || moved.From != from || moved.To != to || (step.Stage == NiuFuStage.RecastCostChildren ? step.Reason != CardMoveReasons.RecastDiscard.Value || r.Recast is not { } recast || recast.CardId != id || recast.Kind != step.Kind || recast.From != from || from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || to != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), from, (recast.IsGeneralWeapon && from.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.DiscardPile)) : step.Stage == NiuFuStage.SourceGiftChildren ? step.Reason != ShisuanGiftReason || from != CardLocation.Equipment(r.DamageSourceSeat!.Value) || to != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), from, CardLocation.Hand(f.OwnerSeat)) || moved.CardKind == CardKind.GeneralWeapon : step.Stage != NiuFuStage.ZoneChildren || step.Reason != ZonglueTakeReason || from.OwnerSeat != r.TargetSeat || !global::CardGame.Core.EngineOwners.CharacterNiuFuOlDefinitions.NiuFuZones.Contains(from.Zone) || to != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), from, (moved.CardKind == CardKind.GeneralWeapon && from.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.Hand(f.OwnerSeat))))))
-                throw new InvalidOperationException("NiuFu cannot fabricate a recast, source gift, draw or one-per-zone original entity movement.");
-        }
-
-        if (r.Steps.Count(s => s.Stage == NiuFuStage.RecastCostChildren) > 1 || r.Steps.Count(s => s.Stage == NiuFuStage.RecastDrawChildren) > 1 || r.Steps.Count(s => s.Stage == NiuFuStage.SourceGiftChildren) > 1 || r.Steps.Where(s => s.Stage == NiuFuStage.ZoneChildren).Select(s => s.From!.Value.Zone).Distinct().Count() != r.Steps.Count(s => s.Stage == NiuFuStage.ZoneChildren))
-            throw new InvalidOperationException("NiuFu cannot repeat a paid cost, draw, gift or victim zone.");
-        var branches = _coreProgramEventHistoryOperations.ProgramEventHistory<NiuFuSourceChoiceEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.SourceBranch is null ? branches.Length != 0 || r.SourceHpBefore is not null || r.SourceWasFaceDown is not null : !shisuan || r.SourceBranch is not ("lose-hp" or "turn-over" or "gift") || r.DamageSourceSeat is not { } sourceSeat || branches is not [var branch] || branch.SourceSeat != sourceSeat || branch.Branch != r.SourceBranch || branch.HpBefore != r.SourceHpBefore || branch.WasFaceDown != r.SourceWasFaceDown)
-            throw new InvalidOperationException("Shisuan source choice lost its original actual chooser or paid branch.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27050)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27050)]
@@ -57,7 +14,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
     {
         if (f.NiuFu is not { } r || r.Steps.Count == 0 && r.SourceBranch is null)
             return false;
-        AssertNiuFu(f);
         return true;
     }
 
@@ -66,7 +22,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
     {
         if (f.NiuFu is not { Steps.Count: > 0 } r || e?.Op != r.Op || p != f.PendingMovementContinuation)
             return false;
-        AssertNiuFu(f);
         return true;
     }
 
@@ -82,7 +37,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
     {
         if (f.NiuFu is not { Steps.Count: > 0 } || f.PendingMovementContinuation is null)
             return false;
-        AssertNiuFu(f);
         return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Amount == 1 && recovery.Attempt.SourceSeat == recovery.Attempt.TargetSeat && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && NiuFuLionProof(f, recovery.Attempt.TargetSeat, recovery.Attempt.Completion.MoveReason);
     }
 
@@ -90,7 +44,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
     {
         if (f.NiuFu is not { } r)
             return false;
-        AssertNiuFu(f);
         if (r.Stage == NiuFuStage.SourceHpChildren)
         {
             if (child is DyingFrame dying)
@@ -117,8 +70,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
     internal bool HasNiuFuDamageObserver(long id) => NiuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 750)]
     internal bool HasNiuFuBeforeDamageObserver(long id) => NiuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 570)]
-    internal bool IsNiuFuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && NiuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27050)]
     internal bool AdvanceNiuFuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && NiuFuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

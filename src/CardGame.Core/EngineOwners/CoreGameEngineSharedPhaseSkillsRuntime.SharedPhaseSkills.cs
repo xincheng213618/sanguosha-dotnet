@@ -127,15 +127,4 @@ internal sealed partial class CoreGameEngineSharedPhaseSkillsRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.OfferRandomPlayPhaseSkill)]
     internal PromptChoice SelectRandomPhaseSkillForAi(PendingDecision decision) => decision.Choices.First();
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27180)]
-    internal void AssertSharedPhaseSkillFrame(ProgramSkillFrame frame)
-    {
-        if (frame.ActivatingSeat is { } actor && (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || actor == frame.OwnerSeat || frame.ActivationPhase is not { } phase || phase.PhaseActorSeat != actor || phase.PhaseInstanceId <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSharedActivationStartedEvent>().Count(item => item.FrameId == frame.Id && item.ActorSeat == actor && item.Phase == phase) != 1))
-            throw new InvalidOperationException("The shared activation lost its exact actor and originating phase.");
-        if (frame.RandomPhaseSkillOffer is not { } offer)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.OfferRandomPlayPhaseSkill || offer.InstructionIndex != frame.InstructionIndex || offer.SkillIds.Count != effect.Amount || offer.SkillIds.Distinct(StringComparer.Ordinal).Count() != offer.SkillIds.Count || offer.SkillIds.Any(id => !effect.SkillIds.Contains(id, StringComparer.Ordinal)) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramRandomPhaseSkillsOfferedEvent>().Count(item => item.FrameId == frame.Id && item.InstructionIndex == offer.InstructionIndex && item.SkillIds.SequenceEqual(offer.SkillIds) && item.Phase == offer.Phase && item.ChooserSeat == frame.OwnerSeat && item.RecipientSeat == offer.RecipientSeat) != 1)
-            throw new InvalidOperationException("The random phase skill offer lost its frozen program and issued candidates.");
-    }
 }

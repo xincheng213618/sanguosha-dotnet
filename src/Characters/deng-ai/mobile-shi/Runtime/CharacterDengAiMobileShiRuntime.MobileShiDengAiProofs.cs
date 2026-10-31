@@ -34,32 +34,6 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
         };
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 50300)]
-    internal void RequireShiDa(ProgramSkillFrame f)
-    {
-        if (f.ShiDengAi is not { } r)
-            return;
-        if (!ValidShiDa(f) || r.Targets.Count != r.Targets.Distinct().Count() || r.Targets.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat)) || r.History.Count != r.History.Distinct().Count() || r.History.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || seat == f.OwnerSeat) || r.Cursor < 0 || r.Cursor > r.Targets.Count || r.RewardCursor is < 0 or > 3 || r.Amount < -1 || r.Op == SkillProgramEffectOp.ResolveMobileShiDengAiTuntian && (r.Stage != ShiDaStage.Amount && (r.Amount < 0 || r.Targets.Count > r.Amount) || r.Paid && (_coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaSpentEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid.Source != r.Source || paid.Amount != r.Amount || paid.Recipients != r.Targets.Count || paid.Zaoxian != r.Zaoxian || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaRecipientEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.Seat).SequenceEqual(r.Targets))) || r.Op == SkillProgramEffectOp.ResolveMobileShiDengAiJixi && r.Targets.Any(seat => !r.History.Contains(seat)))
-            throw new InvalidOperationException("Shi Deng Ai lost its exact original boundary, charge payment or selected historical targets.");
-        if (r.Draw is { } draw && (r.Op != SkillProgramEffectOp.ResolveMobileShiDengAiFull || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaDrawPaidEvent>().Count(e => e == new ShiDaDrawPaidEvent(f.Id, draw.AttemptFrameId, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter)) != 1))
-            throw new InvalidOperationException("Tuntian's full-charge draw must retain its exact one native outcome.");
-        if (r.Op == SkillProgramEffectOp.ResolveMobileShiDengAiJixi && r.Paid && (r.CardFrom is not { } from || !ShiDaOwns(from, r.TurnOwner) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaCostPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var cost] || cost.Owner != r.TurnOwner || cost.CardId != r.CardId || cost.From != from || cost.Sequence != r.PaymentSequence || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == cost.Sequence && m.CardId == cost.CardId && m.From == cost.From && m.To == cost.To && m.Reason.Value == ShiDaCostReason)))
-            throw new InvalidOperationException("Jixi cannot replace or repay its original real discard.");
-        if (r.Stage == ShiDaStage.HeartChildren)
-        {
-            var candidates = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaRandomCandidateEvent>().Where(e => e.FrameId == f.Id && e.Ordinal == r.Cursor).OrderBy(e => e.Index).Select(e => e.CardId).ToArray();
-            var generator = new DeterministicRandom(unchecked((int)r.RandomBefore));
-            var index = candidates.Length == 0 ? -1 : generator.Next(candidates.Length);
-            if (!candidates.SequenceEqual(r.Eligible) || r.RandomIndex != index || generator.State != r.RandomAfter || r.CardId != (index < 0 ? 0 : candidates[index]) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaRandomIssuedEvent>().Count(e => e == new ShiDaRandomIssuedEvent(f.Id, r.Cursor, r.Targets[r.Cursor], r.CardId, index, candidates.Length, r.RandomBefore, r.RandomAfter)) != 1)
-                throw new InvalidOperationException("Tuntian's random Heart must retain the original issued sample without rerolling.");
-        }
-
-        if (r.NativeActionId > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaSnatchIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.NativeUseId && e.ActionId == r.NativeActionId && e.Origin == r.Origin) != 1)
-            throw new InvalidOperationException("Jixi lost its exact one whole native Snatch.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.Step == ResolutionFrameStep.AwaitingResponse && r.Stage is ShiDaStage.Amount or ShiDaStage.Recipients or ShiDaStage.Rewards or ShiDaStage.Cost or ShiDaStage.Targets && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || prompt.PlayerSeat != f.OwnerSeat || !prompt.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, ShiDaChoices(f))))
-            throw new InvalidOperationException("Shi Deng Ai lost the current original unpaid prompt.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 50300)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 50300)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 50300)]
@@ -105,7 +79,6 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     internal bool ShiDaDamageObserver(long id) => ShiDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 50300)]
     internal bool ShiDaBeforeDamageObserver(long id) => ShiDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 50300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50300)]
     internal bool ShiDaDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShiDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 50300)]

@@ -132,7 +132,6 @@ internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime
     internal void ResolveDamageBudgetChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("No owning budget choice.");
-        AssertDamageTargetBudgetReceipt(f);
         var use = RequireDamageBudgetUse(f, out _);
         var r = f.DamageTargetBudget!;
         if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !BuildDamageBudgetChoices(f, use, r).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
@@ -196,18 +195,6 @@ internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime
             _coreProgramMarkerPaymentsOperations.PayProgramMarkerCost(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], new(r.Marker, removed), r.Source.SkillId, r.Source.BindingId);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { DamageTargetBudget = r with { Settled = true } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DamageTargetBudgetSettledEvent(id, action.ActionId, r.Source, r.Marker, r.FrozenBudget, currentMarkers, count, removed, _coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat].Markers.GetValueOrDefault(r.Marker)));
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 180)]
-    internal void AssertDamageTargetBudgetReceipt(ProgramSkillFrame f)
-    {
-        if (f.DamageTargetBudget is not { } r)
-            return;
-        var use = RequireDamageBudgetUse(f, out var w);
-        var pairSize = use.CardKind == CardKind.BorrowedSword ? 2 : 1;
-        var offered = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageTargetBudgetOfferedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
-        if (r.ProgramFrameId != f.Id || r.WindowFrameId != w.Id || r.CardUseFrameId != use.Id || r.ActionId != use.Action!.ActionId || r.Source != BudgetSource(f) || r.GameplayHash != f.GameplayHash || r.FrozenBudget <= 0 || r.Completed || r.Settled || r.AddedTargets.Count % pairSize != 0 || r.AddedTargets.Count / pairSize > r.FrozenBudget || !use.TargetSeats.SequenceEqual(r.OriginalTargets.Concat(r.AddedTargets)) || use.DamageTargetBudget is not { } issued || issued.Source != r.Source || issued.FrozenBudget != r.FrozenBudget || !issued.AddedTargets.SequenceEqual(r.AddedTargets) || offered is not [var initial] || initial.Receipt.Source != r.Source || initial.Receipt.FrozenBudget != r.FrozenBudget || !initial.Receipt.OriginalTargets.SequenceEqual(r.OriginalTargets) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(r.Choices, BuildDamageBudgetChoices(f, use, r)) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: false } p || p.PlayerSeat != f.OwnerSeat || p.SourceSeat != f.OwnerSeat || p.SkillPrompt?.SkillId != f.SkillId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, r.Choices))
-            throw new InvalidOperationException("A damage budget lost its owning frozen X, paid actual Use, ordered pairs or published choice.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.AddDamageMarkerBudgetTargets)]

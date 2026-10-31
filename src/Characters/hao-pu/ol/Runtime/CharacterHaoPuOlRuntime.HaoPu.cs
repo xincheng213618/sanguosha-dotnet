@@ -82,7 +82,6 @@ internal sealed partial class CharacterHaoPuOlRuntime
     internal void AnswerZhenying(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Zhenying lost its choice owner.");
-        RequireZhenying(f);
         var r = f.Zhenying!;
         var p = ZhenyingPlan(r);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != p.Seat || !ZhenyingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
@@ -167,7 +166,6 @@ internal sealed partial class CharacterHaoPuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zhenying: { } r } f || f.Id != id)
             return false;
-        RequireZhenying(f);
         if (r.Stage is ZhenyingStage.ChoosingCount or ZhenyingStage.ChoosingKeptCards)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

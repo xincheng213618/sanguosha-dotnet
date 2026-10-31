@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineWushuangZengouEntries
 {
     internal void AnswerWushuangZengou(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerWushuangZengou(selected);
-    internal void AssertWushuangZengou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWushuangZengou(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWushuangZengou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginWushuangZengou(f);
     internal bool CanTriggerWushuangZengou(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanTriggerWushuangZengou(c, trigger, context);
     internal global::CardGame.Core.PromptChoice ChooseWushuangZengou(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ChooseWushuangZengou(prompt, frame);

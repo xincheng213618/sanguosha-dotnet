@@ -143,7 +143,6 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryXuJing: { } r } f || !AnniversaryXuJingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xu Jing rejects a stale gift recipient or draw count.");
-        RequireAnniversaryXuJing(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage == AnniversaryXuJingStage.CountChoice)
@@ -172,7 +171,6 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
             return false;
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryXuJing: { } r } f && f.Id == id)
         {
-            RequireAnniversaryXuJing(f);
             if (r.Stage is AnniversaryXuJingStage.CountChoice or AnniversaryXuJingStage.GiftChoice)
             {
                 PublishAnniversaryXuJing(f);

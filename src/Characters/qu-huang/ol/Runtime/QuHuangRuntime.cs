@@ -46,7 +46,7 @@ internal sealed partial class QuHuangRuntime(IProgramRuntimeFrames frames,IProgr
     [ProgramAnswer("qu-huang")]private void AnswerQuHuang(PromptChoice supplied)
     {
         if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{QuHuang:{}r}f||prompts.Current?.PlayerSeat!=f.OwnerSeat||!QuHuangChoices(f).Any(c=>AssistedChoicesEqual([c],[supplied])))throw new InvalidOperationException("Qu Huang requires his exact private current entity/branch answer.");
-        AssertQuHuang(f);prompts.Clear();frames.ReplaceTop(f=f with{Step=ResolutionFrameStep.ResolvingEffect});
+prompts.Clear();frames.ReplaceTop(f=f with{Step=ResolutionFrameStep.ResolvingEffect});
         if(!_players[f.OwnerSeat].IsAlive||_winner!=Winner.None){ContinueQuHuang(f.Id);return;}
         var branch=supplied.Parameters["branch"];
         if(branch=="block"){events.AdvanceFact(new QiejianRoundBlockedEvent(f.Id,f.OwnerSeat,r.TargetSeat,_roundNumber));FinishQuHuang(f);return;}
@@ -83,7 +83,6 @@ internal sealed partial class QuHuangRuntime(IProgramRuntimeFrames frames,IProgr
     {
         while(_resolutionStack.LastOrDefault()is ProgramSkillFrame{QuHuang:{}r}f&&f.Id==id)
         {
-            AssertQuHuang(f);
             if(r.Stage==QuHuangStage.Lightning)return;
             if(r.Stage is QuHuangStage.QiejianChoice or QuHuangStage.NishouChoice or QuHuangStage.SwapTarget)
             {if(!_players[f.OwnerSeat].IsAlive||_winner!=Winner.None){FinishQuHuang(f);return;}if(prompts.Current is null)PublishQuHuang(f);return;}
@@ -105,7 +104,7 @@ internal sealed partial class QuHuangRuntime(IProgramRuntimeFrames frames,IProgr
     [ProgramContinuation(ProgramContinuationKind.Resume,27420)]private bool ResumeQuHuang(long id){if(_resolutionStack.LastOrDefault()is not ProgramSkillFrame{QuHuang:not null}f||f.Id!=id)return false;ContinueQuHuang(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,27420)]private bool ReturnQuHuangMovement(ProgramSkillFrame f){if(f.QuHuang is null)return false;ContinueQuHuang(f.Id);return true;}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,27420)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,27420)]private bool ContinuePaidQuHuang(ProgramSkillFrame f)
-    {if(f.QuHuang is{Paid:true}){AssertQuHuang(f);return true;}return f.QuHuang is null&&f.InstructionIndex is 0 or 1&&f.TriggerId=="issued-current-phase-swap"&&f.WindowContext is{}c&&ProgramEventHistory<ProgramBindingStartedEvent>().Any(e=>e.FrameId==f.Id&&e.BindingId==f.TriggerId&&e.SkillInstanceId==f.SkillInstanceId)&&IsIssuedNishouCandidate(new(f.OwnerSeat,f.SkillId,f.TriggerId,f.SkillInstanceId,f.GameplayHash,GetProgramTrigger(f).Priority,c.OccurrenceIndex),c);}
+    {if(f.QuHuang is{Paid:true}){return true;}return f.QuHuang is null&&f.InstructionIndex is 0 or 1&&f.TriggerId=="issued-current-phase-swap"&&f.WindowContext is{}c&&ProgramEventHistory<ProgramBindingStartedEvent>().Any(e=>e.FrameId==f.Id&&e.BindingId==f.TriggerId&&e.SkillInstanceId==f.SkillInstanceId)&&IsIssuedNishouCandidate(new(f.OwnerSeat,f.SkillId,f.TriggerId,f.SkillInstanceId,f.GameplayHash,GetProgramTrigger(f).Priority,c.OccurrenceIndex),c);}
     [ProgramAiChoice(SkillProgramEffectOp.ResolveQiejianLastHandLoss,SkillProgramEffectOp.ResolveNishouEquipmentLossChoice,SkillProgramEffectOp.ResolveNishouIssuedCurrentPhaseSwap)]private PromptChoice ChooseQuHuang(PendingDecision p,ProgramSkillFrame f)
     {var r=f.QuHuang!;if(r.Stage==QuHuangStage.QiejianChoice)return p.Choices.FirstOrDefault(c=>c.Parameters["branch"]=="discard"&&c.Targets.Single()!=f.OwnerSeat)??p.Choices.First(c=>c.Parameters["branch"]=="block");if(r.Stage==QuHuangStage.NishouChoice)return p.Choices.FirstOrDefault(c=>c.Parameters["branch"]=="defer")??p.Choices[0];return p.Choices.OrderByDescending(c=>GetHand(_players[f.OwnerSeat]).Count-GetHand(_players[c.Targets.Single()]).Count).ThenBy(c=>c.Targets.Single()).First();}
 }

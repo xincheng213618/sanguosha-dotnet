@@ -15,14 +15,12 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodEntries
     internal bool DrainShenJw(long id) => _resolve().DrainShenJw(id);
     internal void FinishShenJw(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().FinishShenJw(supplied);
     internal bool HasShenJwPaidPingxiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasShenJwPaidPingxiang(f);
-    internal bool IsShenJwAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle a, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsShenJwAttackConsistent(a, processing);
     internal bool IsShenJwNativeSlash(global::CardGame.Core.CardUseFrame use) => _resolve().IsShenJwNativeSlash(use);
     internal void IssueShenJwDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueShenJwDraw(f);
     internal void IssueShenJwSlash(global::CardGame.Core.ProgramSkillFrame f, int targetSeat) => _resolve().IssueShenJwSlash(f, targetSeat);
     internal void MoveShenJwJiufa(global::CardGame.Core.ProgramSkillFrame f, bool gain) => _resolve().MoveShenJwJiufa(f, gain);
     internal bool ProveShenJwMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().ProveShenJwMovement(f, e, pending);
     internal void PublishShenJw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShenJw(f);
-    internal void RequireShenJw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShenJw(f);
     internal bool ResumeShenJw(long id) => _resolve().ResumeShenJw(id);
     internal bool ReturnShenJwAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnShenJwAttack(completion);
     internal void ReturnShenJwDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome o) => _resolve().ReturnShenJwDraw(supplied, o);

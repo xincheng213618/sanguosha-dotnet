@@ -14,7 +14,6 @@ internal sealed partial class CharacterLuZhiWeiOlEntries
     internal bool HasLuZhiWeiBeforeDamageObserver(long id) => _resolve().HasLuZhiWeiBeforeDamageObserver(id);
     internal bool HasLuZhiWeiDamageObserver(long id) => _resolve().HasLuZhiWeiDamageObserver(id);
     internal bool IsExactQingzhongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.QingzhongPending p, global::CardGame.Core.CardMovementRecord m) => _resolve().IsExactQingzhongMovement(f, p, m);
-    internal bool IsLuZhiWeiDying() => _resolve().IsLuZhiWeiDying();
     internal bool IsLuZhiWeiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLuZhiWeiMovement(f, e, p);
     internal void IssueQingzhongMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueQingzhongMovement(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedQingzhongEndingCandidates(global::CardGame.Core.CharacterState owner) => _resolve().IssuedQingzhongEndingCandidates(owner);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterLuZhiWeiOlEntries
     internal void ObserveQingzhongDebtTermination(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveQingzhongDebtTermination(payload);
     internal void PublishQingzhongMinimum(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishQingzhongMinimum(f);
     internal int[] QingzhongMinimumSeats() => _resolve().QingzhongMinimumSeats();
-    internal void RequireIssuedLuZhiWei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireIssuedLuZhiWei(f);
     internal void ResolveQingzhongMinimumChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveQingzhongMinimumChoice(choice);
     internal bool ResumeQingzhong(long id) => _resolve().ResumeQingzhong(id);
     internal bool ReturnQingzhongMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnQingzhongMovement(f);

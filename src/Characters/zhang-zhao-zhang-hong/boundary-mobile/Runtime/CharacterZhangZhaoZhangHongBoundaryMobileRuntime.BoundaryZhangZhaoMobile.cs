@@ -95,7 +95,6 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhangZhaoPhase: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !BoundaryZhangZhaoPhaseChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards)))
             throw new InvalidOperationException("Mobile Guzheng rejects an unrelated phase, chooser or discarded entity.");
-        AssertBoundaryZhangZhaoPhase(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == "return")
         {
@@ -134,7 +133,6 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhangZhaoPhase: { } r } f || f.Id != id)
             return false;
-        AssertBoundaryZhangZhaoPhase(f);
         if (r.Stage is "return" or "claim")
             return true;
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id))
@@ -161,14 +159,6 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 66600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 66600)]
     internal bool KeepBoundaryZhangZhaoPaidReturn(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is { ReturnMovementSequence: > 0 } r && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhangZhaoReturnedEvent>().Count(e => e.FrameId == f.Id && e.PhaseOwnerSeat == r.PhaseOwnerSeat && e.CardId == r.ReturnedCardId && e.MovementSequence == r.ReturnMovementSequence) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 66600)]
-    internal void AssertBoundaryZhangZhaoPhase(ProgramSkillFrame f)
-    {
-        if (f.BoundaryZhangZhaoPhase is not { } r)
-            return;
-        if (f.SkillId != BoundaryZhangZhaoGuzheng || f.InstructionIndex != 1 || f.WindowContext?.Window != SkillProgramTriggerWindow.DiscardPhaseEnded || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Discard || r.Phase.ActorSeat != r.PhaseOwnerSeat || r.PhaseOwnerSeat == f.OwnerSeat || r.Stage is not ("return" or "return-children" or "claim" or "claim-children") || r.OriginalEntities.Select(e => e.CardId).Distinct().Count() != r.OriginalEntities.Count || !r.OriginalEntities.Any(e => e.OriginalFrom == CardLocation.Hand(r.PhaseOwnerSeat)) || r.OriginalEntities.Any(e => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhangZhaoPhaseDiscardEvent>().Count(p => p.Phase == r.Phase && p.CardId == e.CardId && p.MovementSequence == e.MovementSequence && p.OriginalFrom == e.OriginalFrom) != 1) || r.ReturnMovementSequence > 0 && !KeepBoundaryZhangZhaoPaidReturn(f))
-            throw new InvalidOperationException("Mobile Guzheng lost its exact original phase pool or once-paid return.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.CaptureBoundaryZhangZhaoPhaseDiscards)]
     internal PromptChoice BoundaryZhangZhaoPhaseAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();

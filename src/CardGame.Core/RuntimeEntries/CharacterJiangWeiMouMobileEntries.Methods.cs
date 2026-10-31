@@ -5,7 +5,6 @@ internal sealed partial class CharacterJiangWeiMouMobileEntries
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.MouJiangWeiBeifaGrantedEvent> ActiveMouJwBeifa(int holder) => _resolve().ActiveMouJwBeifa(holder);
     internal bool AdvanceMouJwChildren() => _resolve().AdvanceMouJwChildren();
     internal void AnswerMouJw(global::CardGame.Core.PromptChoice c) => _resolve().AnswerMouJw(c);
-    internal void AssertMouJw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouJw(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouJw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouJw(supplied, op);
     internal void BeginMouJwFaction(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMouJwFaction(f);
     internal void BindMouJwSlash(global::CardGame.Core.CardUseDeclaredEvent fact) => _resolve().BindMouJwSlash(fact);

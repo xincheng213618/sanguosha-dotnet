@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterTaishiCiMobileGodEntries
 {
     internal void AnswerShenTscPowei(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShenTscPowei(choice);
-    internal void AssertShenTscPowei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShenTscPowei(f);
     internal bool CanOfferShenTaishiCi(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferShenTaishiCi(gate);
     internal global::CardGame.Core.PromptChoice ChooseShenTscPowei(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseShenTscPowei(p, f);
     internal bool ContinuePaidShenTscPowei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidShenTscPowei(f);

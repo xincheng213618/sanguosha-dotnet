@@ -106,7 +106,6 @@ internal sealed partial class CharacterWangKuangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WangKuangRenxia: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WangKuangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Renxia lost its original private chooser.");
-        AssertWangKuang(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == WangKuangRenxiaStage.BranchChoice)
         {
@@ -208,7 +207,6 @@ internal sealed partial class CharacterWangKuangOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { WangKuangRenxia: { } r } f && f.Id == id)
         {
-            AssertWangKuang(f);
             if (r.Stage is WangKuangRenxiaStage.BranchChoice or WangKuangRenxiaStage.DiscardChoice)
             {
                 if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

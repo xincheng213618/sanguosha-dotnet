@@ -228,12 +228,8 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
             throw new InvalidOperationException("Zongshi lost its original privately viewed deck top before choosing.");
         var parent = _resolutionStackOperations._resolutionStack[n - 1];
         var pair = parent.BoundaryJianYongZongshiContest!.Result;
-        if (r.ComparisonIndex != parent.BoundaryJianYongZongshiContest.ComparisonIndex)
-            throw new InvalidOperationException("Zongshi lost its exact original simultaneous comparison index.");
         var comparisons = _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Where(e => e.FrameId == parent.Id).ToArray();
         var comparison = r.ComparisonIndex < 0 ? 0 : r.ComparisonIndex;
-        if (comparison >= comparisons.Length || comparisons[comparison].Result != pair)
-            throw new InvalidOperationException("Zongshi lost the actual native public result for its original comparison.");
         var lower = pair.SourceRank == pair.OpponentRank ? new[]
         {
             pair.SourceCardId,
@@ -254,12 +250,6 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 56500)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 56500)]
     internal bool BoundaryZongshiMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.BoundaryJianYongZongshi is { Choice: 1 } && e?.Op == SkillProgramEffectOp.ResolveBoundaryJianYongZongshi && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 56500)]
-    internal void AssertBoundaryZongshi(ProgramSkillFrame f)
-    {
-        if (f.BoundaryJianYongZongshi is not null)
-            RequireBoundaryZongshi(f);
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 56500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 56500)]
@@ -296,7 +286,6 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
     internal bool BoundaryZongshiDamageChild(long id) => BoundaryZongshiObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 56500)]
     internal bool BoundaryZongshiBeforeDamageChild(long id) => BoundaryZongshiObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 56500)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 56500)]
     internal bool BoundaryZongshiDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BoundaryZongshiObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 56500)]

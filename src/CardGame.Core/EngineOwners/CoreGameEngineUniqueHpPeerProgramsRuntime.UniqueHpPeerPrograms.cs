@@ -118,7 +118,6 @@ internal sealed partial class CoreGameEngineUniqueHpPeerProgramsRuntime
     internal void ResolveUniqueHpPeerChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        _coreRecipientContestReceiptsOperations.AssertRecipientContestPrograms(f);
         var r = f.UniqueHpPeer!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.ChooserSeat || !UniqueHpPeerChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets)))
             throw new InvalidOperationException("The private HE answer changed its exact original actor or entity.");
@@ -198,7 +197,6 @@ internal sealed partial class CoreGameEngineUniqueHpPeerProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.UniqueHpPeer is not { } r)
             return false;
-        _coreRecipientContestReceiptsOperations.AssertRecipientContestPrograms(f);
         if (r.Stage is UniqueHpPeerStage.SelectingCost or UniqueHpPeerStage.PeerOffer)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

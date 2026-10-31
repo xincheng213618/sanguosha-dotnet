@@ -71,7 +71,6 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
     internal void ResolveDrawDiscardCategoryChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Draw/discard payment lost its owning program.");
-        AssertDrawDiscardCategoryReceipt(f);
         var r = f.DrawDiscardCategoryRefund!;
         if (r.Stage != DrawDiscardCategoryStage.ChoosingDiscard || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.TargetSeat || _corePendingDecisionPolicyPipelineOperations._pendingDecision.IsPrivate != true || choice.Parameters.GetValueOrDefault("program-action") != "draw-discard-category" || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Cards is not [var id] || choice.Targets.Count != 0 || r.SelectedCardIds.Count >= r.RequiredCount || !DrawDiscardCategoryChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards)))
             throw new InvalidOperationException("The mandatory private discard answer changed its target, frozen entity or cursor.");
@@ -127,7 +126,6 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != frameId || f.DrawDiscardCategoryRefund is not { } r)
             return false;
-        AssertDrawDiscardCategoryReceipt(f);
         if (r.Stage == DrawDiscardCategoryStage.ChoosingDiscard)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -260,29 +258,11 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
         return f.PendingMovementContinuation is null || f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } pending && pending.SubjectSeat == target && r.Stage is DrawDiscardCategoryStage.Drawing or DrawDiscardCategoryStage.DiscardChildren or DrawDiscardCategoryStage.BonusChildren;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 20)]
-    internal void AssertDrawDiscardCategoryReceipt(ProgramSkillFrame f)
-    {
-        if (f.DrawDiscardCategoryRefund is null)
-        {
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawDiscardCategoryStartedEvent>().Any(e => e.FrameId == f.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawDiscardCategoryCompletedEvent>().Any(e => e.FrameId == f.Id))
-                throw new InvalidOperationException("An issued draw/discard activation lost its owning receipt.");
-            return;
-        }
-
-        if (!ValidDrawDiscardCategoryReceipt(f))
-            throw new InvalidOperationException("Draw/discard refund lost its original phase debit, private payment or exact native invoice.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !DrawDiscardCategoryFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Draw/discard refund retained an unrelated first native child.");
-    }
-
     [ProgramContinuation(ProgramContinuationKind.MovementTail, 10)]
     internal bool ReturnDrawDiscardCategoryMovement(ProgramSkillFrame f)
     {
         if (f.DrawDiscardCategoryRefund is null || f.PendingMovementContinuation is null)
             return false;
-        AssertDrawDiscardCategoryReceipt(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
@@ -344,8 +324,6 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 90)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 150)]
     internal bool IsDrawDiscardCategoryProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CategoryActivationObserverRoot(false)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1940)]

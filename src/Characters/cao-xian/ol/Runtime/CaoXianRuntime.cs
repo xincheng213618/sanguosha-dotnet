@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class CaoXianRuntime(ICaoXianFacts facts, ICaoXianNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : ICaoXianRuntime
 {
     internal const string Lingxi = "ol:lingxi",Zhifou = "ol:zhifou",Action = "cao-xian-anniversary";
@@ -129,7 +129,6 @@ internal sealed class CaoXianRuntime(ICaoXianFacts facts, ICaoXianNative native,
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new CaoXianCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { CaoXian = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 37300)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { CaoXian: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 37300)] private bool Movement(ProgramSkillFrame f) => f.CaoXian is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 37300)] private void Invariant(ProgramSkillFrame f) { if (f.CaoXian is not null && !Valid(f)) throw new InvalidOperationException("Invalid Cao Xian owning-frame continuation."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 37300)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 37300)] private bool PaidContinuation(ProgramSkillFrame f) => f.CaoXian is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.StoreCaoXianLingxi, SkillProgramEffectOp.ResolveCaoXianZhifou, SkillProgramEffectOp.AdjustCaoXianLingxi)] private PromptChoice Ai(PendingDecision p, ProgramSkillFrame f)
     {

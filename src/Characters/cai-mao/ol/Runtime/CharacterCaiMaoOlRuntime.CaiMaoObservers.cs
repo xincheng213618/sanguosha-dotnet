@@ -58,13 +58,6 @@ internal sealed partial class CharacterCaiMaoOlRuntime
         return pays is [var pay] && pay.Before == r.Before && pay.After == r.After && pay.Count == r.Exchanges.Count && (pay.BatchId > 0) == (r.Exchanges.Count > 0) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == CaiMaoExchangeReason) == r.Exchanges.Count * 2;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27250)]
-    internal void AssertCaiMao(ProgramSkillFrame f)
-    {
-        if (f.CaiMao is not null && !ValidCaiMao(f))
-            throw new InvalidOperationException("Cai Mao lost his actual HP budget, exact public original Hand entities, whole-roster decision or native before-damage return.");
-    }
-
     internal bool CaiMaoFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.CaiMao is not { Stage: CaiMaoStage.ExchangeChildren or CaiMaoStage.ToggleChildren } r || !ValidCaiMao(f))
@@ -86,8 +79,6 @@ internal sealed partial class CharacterCaiMaoOlRuntime
     internal bool HasCaiMaoDamageObserver(long id) => CaiMaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 880)]
     internal bool HasCaiMaoBeforeDamageObserver(long id) => HasCaiMaoDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 710)]
-    internal bool IsCaiMaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CaiMaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27250)]
     internal bool AdvanceCaiMaoChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaiMaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

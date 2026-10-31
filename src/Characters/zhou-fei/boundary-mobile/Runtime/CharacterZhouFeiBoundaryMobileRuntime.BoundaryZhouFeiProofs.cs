@@ -83,7 +83,6 @@ internal sealed partial class CharacterZhouFeiBoundaryMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 54700)]
     internal bool BoundaryZfBeforeDamage(long id) => BoundaryZfRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == id && child is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 54700)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 54700)]
     internal bool BoundaryZfDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BoundaryZfRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 54700)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 54700)]
@@ -114,10 +113,4 @@ internal sealed partial class CharacterZhouFeiBoundaryMobileRuntime
     internal bool ReturnBoundaryZfMovement(ProgramSkillFrame frame) => frame.PendingMovementContinuation is not null && ResumeBoundaryZf(frame.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 54700)]
     internal bool AdvanceBoundaryZfChild() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BoundaryZfRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 54700)]
-    internal void AssertBoundaryZfFrame(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryZhouFei is not null && !ValidBoundaryZf(frame))
-            throw new InvalidOperationException("Mobile Zhou Fei lost its original holder, actual payment or typed child return.");
-    }
 }

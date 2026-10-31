@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRedDiscardRecoveryEntries
 {
-    internal void AssertRedDiscardRecoveryDraft(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertRedDiscardRecoveryDraft(f, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginRedDiscardRecovery(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginRedDiscardRecovery(f);
     internal void CaptureMovementBatchFactsCaptureTurnRedDiscardCount(global::CardGame.Core.CardMovementBatchBuilder batch, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> movements) => _resolve().CaptureMovementBatchFactsCaptureTurnRedDiscardCount(batch, movements);
     internal void CaptureTurnRedDiscardCount(int turn, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> movements) => _resolve().CaptureTurnRedDiscardCount(turn, movements);

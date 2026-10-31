@@ -182,8 +182,6 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.SourceExecutionerHuanfu ?? throw new InvalidOperationException("Huanfu's native draw lost its paid wager.");
-        if (r.Stage != SourceExecutionerHuanfuStage.Drawing || f.NativeDraw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != checked(r.ActualCount * 2) || outcome.ActualDrawIds.Count > outcome.RequestedCount)
-            throw new InvalidOperationException("Huanfu lost its exact twice-wager native draw return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SourceExecutionerHuanfuDrawReturnedEvent(f.Id, r.UseId, outcome.RequestedCount, outcome.ActualDrawIds.Count));
         FinishSourceHuanfu(f);
     }

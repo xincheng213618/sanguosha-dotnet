@@ -72,7 +72,6 @@ internal sealed partial class CharacterZhangJiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangJi: { Stage: "rank" } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.Target)
             throw new InvalidOperationException("Lueming requires its actual recipient's rank decision.");
-        AssertZhangJi(f);
         var choice = ZhangJiChoices(f).SingleOrDefault(c => c.Id == supplied.Id && PromptChoiceEquals(c, supplied)) ?? throw new InvalidOperationException("Invalid Lueming rank choice.");
         var rank = int.Parse(choice.Parameters["rank"], CultureInfo.InvariantCulture);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -125,7 +124,6 @@ internal sealed partial class CharacterZhangJiOlRuntime
     {
         if (f.ZhangJi is null)
             return false;
-        AssertZhangJi(f);
         if (f.PendingMovementContinuation is not { } p || !IsZhangJiMovement(f, ZhangJiPausedEffect(f), p))
             throw new InvalidOperationException("Foreign Lueming movement return.");
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd() || _coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))
@@ -139,7 +137,6 @@ internal sealed partial class CharacterZhangJiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangJi: { } r } f || f.Id != id)
             return false;
-        AssertZhangJi(f);
         if (f.PendingMovementContinuation is not null)
         {
             if (!_coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))

@@ -12,7 +12,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoQuanyu: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertMoQuanyu(f);
         if (r.Stage == MoQuanyuStage.Choosing)
         {
             while (r.Votes.Count < r.Participants.Count)
@@ -81,7 +80,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
 
     internal void CompleteMoQuanyu(ProgramSkillFrame f)
     {
-        AssertMoQuanyu(f);
         var r = f.MoQuanyu!;
         if (r.Stage == MoQuanyuStage.Choosing || f.NativeDraw is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuChoicesCompletedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Quanyu cannot complete before every private choice and native child returns.");

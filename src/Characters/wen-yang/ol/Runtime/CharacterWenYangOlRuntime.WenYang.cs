@@ -129,7 +129,6 @@ internal sealed partial class CharacterWenYangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WenYang: { Stage: WenYangStage.Choice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WenYangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Lvli requires the original owner's exact private branch.");
-        AssertWenYang(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var branch = choice.Parameters["branch"];
@@ -205,7 +204,6 @@ internal sealed partial class CharacterWenYangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WenYang: { } r } f || f.Id != id)
             return;
-        AssertWenYang(f);
         if (r.Stage == WenYangStage.Choice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

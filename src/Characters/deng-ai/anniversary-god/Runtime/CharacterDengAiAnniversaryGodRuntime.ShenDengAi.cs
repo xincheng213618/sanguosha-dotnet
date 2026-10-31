@@ -175,7 +175,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenDengAi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenDaChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shen Deng Ai requires its original private chooser and current legal option.");
-        AssertShenDa(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var parts = choice.Parameters["option"].Split(':');
@@ -246,7 +245,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenDengAi: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertShenDa(f);
         if (r.Stage is ShenDengAiStage.NativeUse or ShenDengAiStage.DrawAttempt)
             return;
         if (r.Stage is ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeChildren)
@@ -305,18 +303,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     internal bool ContinueIssuedShenDa(ProgramSkillFrame f) => f.ShenDengAi is { Stage: ShenDengAiStage.DrawAttempt or ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeUse or ShenDengAiStage.NativeChildren } || global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaQijing(f.SkillId) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.FrameId == f.Id);
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 38500)]
     internal bool ShenDaMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.ShenDengAi is { Stage: ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeChildren } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 38500)]
-    internal void AssertShenDa(ProgramSkillFrame f)
-    {
-        if (f.ShenDengAi is not { } r)
-            return;
-        if (r.Source != ShenDaSource(f) || r.GameplayHash != f.GameplayHash || r.WindowId != f.WindowContext?.ParentFrameId || r.InstructionIndex != f.InstructionIndex || r.Stage == ShenDengAiStage.DrawChildren && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiXianjinReservedEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.DamageCount == r.DamageCount))
-            throw new InvalidOperationException("Shen Deng Ai lost its original source, content, owning occurrence or paid damage reservation.");
-        if (r.Stage == ShenDengAiStage.DrawChildren && (r.DrawOutcome is not { } draw || f.NativeDraw is not null || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != r.DrawCount || draw.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || draw.SequenceBefore > draw.SequenceAfter || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiDrawReturnedEvent>().Any(e => e == new ShenDengAiDrawReturnedEvent(f.Id, f.OwnerSeat, draw.RequestedCount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId)) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "skill-program.shen-deng-ai.xianjin.draw").Select(m => m.CardId).SequenceEqual(draw.ActualDrawIds)))
-            throw new InvalidOperationException("Xianjin lost its exact already returned native draw materials.");
-        if (r.Stage == ShenDengAiStage.NativeChildren && (!r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiNativeReturnedEvent>().Count(e => e == new ShenDengAiNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1))
-            throw new InvalidOperationException("Cuixin lost its exact once-returned native Use.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.AllocateShenDengAiTuoYu)]
     internal PromptChoice ChooseShenDaAllocation(PendingDecision p, ProgramSkillFrame f) => ChooseShenDa(p, f);

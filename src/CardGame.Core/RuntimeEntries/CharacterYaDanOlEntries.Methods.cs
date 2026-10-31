@@ -6,7 +6,6 @@ internal sealed partial class CharacterYaDanOlEntries
     internal void AnswerQingyaNativeUse(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PromptChoice choice) => _resolve().AnswerQingyaNativeUse(f, choice);
     internal void AnswerYaDan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerYaDan(choice);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> AppendQingyaDiscardCards(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> held) => _resolve().AppendQingyaDiscardCards(actor, held);
-    internal void AssertYaDan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertYaDan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginYaDan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginYaDan(supplied, op);
     internal void BindQingyaNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindQingyaNativeUse(use);
     internal global::CardGame.Core.PromptChoice ChooseYaDanAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseYaDanAi(p, f);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterYaDanOlEntries
     internal bool IsIssuedQingyaUse(long id) => _resolve().IsIssuedQingyaUse(id);
     internal bool IsQingyaDiscardQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsQingyaDiscardQuery(actor, id);
     internal bool IsQingyaSelectedDiscard(int actor, int id) => _resolve().IsQingyaSelectedDiscard(actor, id);
-    internal bool IsYaDanDying() => _resolve().IsYaDanDying();
     internal bool IsYaDanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsYaDanMovement(f, effect, pending);
     internal void NextQingyaHand(global::CardGame.Core.ProgramSkillFrame f) => _resolve().NextQingyaHand(f);
     internal void PublishYaDan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishYaDan(f);
@@ -47,6 +45,5 @@ internal sealed partial class CharacterYaDanOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> YaDanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().YaDanChoices(f);
     internal bool YaDanFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().YaDanFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? YaDanObserverRoot() => _resolve().YaDanObserverRoot();
-    internal bool YaDanOwnsActualPhaseEnd(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ActualPhaseEndContext due) => _resolve().YaDanOwnsActualPhaseEnd(f, due);
     internal bool HasYaDanCapability { get => _resolve().HasYaDanCapability; }
 }

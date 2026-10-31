@@ -398,17 +398,4 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
             return decision.Choices.Single(choice => choice.Parameters.GetValueOrDefault("criterion") == "trick");
         return decision.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("request-option") == "use" || choice.Parameters.GetValueOrDefault("program-action") == "round-once-cardless-request") ?? decision.Choices[0];
     }
-
-    internal void AssertFixedSlashAndDeclaredDeckDrafts(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.FixedTargetSlash is { } slash && (((paused.Op != SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner || frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnEnding || frame.WindowContext.TargetSeat != slash.TargetSeat) && !_characterLeiBoAnniversaryOperations.IsAnniversaryLeiBoFixedSlash(frame)) || slash.TargetSeat == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(slash.TargetSeat) || slash.IgnoreDistance != paused.BooleanValue))
-            throw new InvalidOperationException("The fixed Slash draft lost its frozen target or instruction.");
-        if (frame.DeckCriterion is { } d && (paused.Op != SkillProgramEffectOp.DeclareDeckCriterionAndGiveMatchingCard || frame.TriggerId is not null || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || d.Stage is not ("declare" or "search" or "recipient" or "gift") || d.Remaining < 0 || (d.Stage == "declare" ? d.Criterion is not null : d.Criterion is null || !global::CardGame.Core.EngineOwners.CoreGameEngineFixedSlashAndDeclaredDeckProgramsDefinitions.DeckCriteria.Contains(d.Criterion)) || (d.Stage is "recipient" or "gift") != (d.MatchedCardId is not null) || (d.Stage == "gift") != (d.RecipientSeat is not null)))
-            throw new InvalidOperationException("The declared deck draft lost its finite search or committed recipient.");
-        if (!ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || frame.PendingMovementContinuation is not null)
-            return;
-        IReadOnlyList<PromptChoice>? expected = frame.FixedTargetSlash is { Issued: false } ? FixedTargetSlashChoices(frame) : frame.DeckCriterion is { Stage: "declare" } ? DeclaredDeckCriterionChoices(frame) : frame.DeckCriterion is { Stage: "recipient" } ? DeclaredDeckRecipientChoices(frame) : null;
-        if (expected is not null && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_characterChengJiChengCuiOlOperations.TousuiProgramNativeDecision(_characterMaXiuMaTieOlOperations.KenshangProgramNativeDecision(global::CardGame.Core.EngineOwners.CharacterLiuZhangOlRuntime.ZonghuNativeDecision(global::CardGame.Core.EngineOwners.CharacterGuoTuOlRuntime.WeijieNativeDecision(p)))).Choices, expected)))
-            throw new InvalidOperationException("Fixed Slash or declared deck lost its canonical private prompt.");
-    }
 }

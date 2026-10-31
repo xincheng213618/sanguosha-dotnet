@@ -4,7 +4,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
 {
     internal bool AdvanceDiouChildren() => _resolve().AdvanceDiouChildren();
     internal void AnswerDiou(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerDiou(choice);
-    internal void AssertDiou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertDiou(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDiou(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginDiou(supplied);
     internal void BindDiouNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindDiouNativeUse(use);
     internal bool CanOfferDiou(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferDiou(gate);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> DiouChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DiouChoices(f);
     internal bool DiouDrawMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().DiouDrawMovement(f, m);
     internal bool DiouFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().DiouFirstChild(f, child);
-    internal global::System.Collections.Generic.IReadOnlyList<int>? DiouNativeAncestorProcessing(long useId) => _resolve().DiouNativeAncestorProcessing(useId);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.DiouUsePlan> DiouNativePlans(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardConversionSource source) => _resolve().DiouNativePlans(actor, kind, source);
     internal bool DiouNativeWindowEdge(int index) => _resolve().DiouNativeWindowEdge(index);
     internal global::CardGame.Core.ProgramSkillFrame? DiouObserverRoot() => _resolve().DiouObserverRoot();
@@ -42,12 +40,10 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool HasIssuedDiouResponse(global::CardGame.Core.CardActionContext action) => _resolve().HasIssuedDiouResponse(action);
     internal bool HasTanbanEntityMark(int cardId) => _resolve().HasTanbanEntityMark(cardId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeTanban(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeTanban(supplied);
-    internal bool IsDiouAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsDiouAttackConsistent(attack, processing);
     internal bool IsDiouCarrier(int id) => _resolve().IsDiouCarrier(id);
     internal bool IsDiouCarrierDestroyedMaterial(global::CardGame.Core.CardMovementRecord movement) => _resolve().IsDiouCarrierDestroyedMaterial(movement);
     internal bool IsDiouCarrierDestroyedMaterial2(int cardId, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to) => _resolve().IsDiouCarrierDestroyedMaterial(cardId, from, to);
     internal bool IsDiouCarrierDestroyedMaterial3(long useId, int cardId) => _resolve().IsDiouCarrierDestroyedMaterial(useId, cardId);
-    internal bool IsDiouDying() => _resolve().IsDiouDying();
     internal bool IsDiouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsDiouMovement(f, e, p);
     internal bool IsDiouNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsDiouNativeSettlementBatch(f, b);
     internal bool IsDiouRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDiouRecoveryParent(f, recovery);

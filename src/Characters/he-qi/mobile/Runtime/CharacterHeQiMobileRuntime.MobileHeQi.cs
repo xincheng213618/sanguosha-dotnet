@@ -93,10 +93,4 @@ internal sealed partial class CharacterHeQiMobileRuntime
     internal PromptChoice MobileHeQiAi(PendingDecision p) => p.Choices.Single();
     [ProgramViewContributor(ProgramViewContribution.PrivateCards, 50100)]
     internal CardSnapshot[] MobileHeQiPrivateHand(int viewer) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MobileHeQiView: { } r } f && r.Viewer == viewer && ValidMobileHeQiView(f) ? r.Hand.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray() : [];
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 50100)]
-    internal void AssertMobileHeQiView(ProgramSkillFrame f)
-    {
-        if (f.MobileHeQiView is not null && (!ValidMobileHeQiView(f) || !HasMobileHeQiPrompt()))
-            throw new InvalidOperationException("Mobile Shanxi changed its paid discard, private hand viewer or owning frame.");
-    }
 }

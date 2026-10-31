@@ -5,7 +5,6 @@ internal sealed partial class CharacterGuoHuaiMouMobileEntries
     internal bool AdvanceMouGhChildren() => _resolve().AdvanceMouGhChildren();
     internal void AnswerMouGh(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouGh(choice);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? AppendMouGuoHuaiJingce(int seat, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? ordinary) => _resolve().AppendMouGuoHuaiJingce(seat, ordinary);
-    internal void AssertMouGh(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouGh(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouGh(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouGh(supplied, op);
     internal bool CanOfferMouGh(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMouGh(c, t, context);
     internal void CaptureMouGuoHuaiGainBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureMouGuoHuaiGainBatch(batch);

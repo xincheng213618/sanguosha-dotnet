@@ -80,7 +80,6 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouXuHuangDuanliang: { } r } f || f.Id != id)
             return;
-        AssertMouXuHuang(f);
         if (r.Stage == MouXuHuangDuanliangStage.NativeChildren && !r.AttackReturned)
             return;
         if (r.Stage == MouXuHuangDuanliangStage.NativeUse || r.Stage == MouXuHuangDuanliangStage.NativeIssuing)

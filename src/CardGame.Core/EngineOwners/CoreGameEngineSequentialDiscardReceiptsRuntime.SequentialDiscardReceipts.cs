@@ -88,12 +88,4 @@ internal sealed partial class CoreGameEngineSequentialDiscardReceiptsRuntime
             return false;
         return f.PendingMovementContinuation is not { } continuation || continuation.SubjectSeat == p.ChooserSeat && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null;
     }
-
-    internal void AssertSequentialDiscard(ProgramSkillFrame f)
-    {
-        if (f.SequentialDiscardTopPayment is { } top && !HasSequentialDiscardTopPayment(f, top.ResultBind))
-            throw new InvalidOperationException("A sequential discard lost its exact captured hand-to-top payment.");
-        if (f.SequentialDiscard is not null && !ValidSequentialDiscard(f))
-            throw new InvalidOperationException("A sequential discard lost its exact original activation, immutable private selection, payment ledger or actual turn.");
-    }
 }

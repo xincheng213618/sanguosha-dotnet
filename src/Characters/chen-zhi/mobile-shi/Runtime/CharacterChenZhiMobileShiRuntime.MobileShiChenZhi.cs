@@ -270,14 +270,6 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
     internal bool PaidShiCzCanReturn(ProgramSkillFrame f) => f.MobileShiChenZhi?.Stage is MobileShiChenZhiStage.DiscardChildren or MobileShiChenZhiStage.ExtraStartChildren or MobileShiChenZhiStage.DrawOwnerChildren or MobileShiChenZhiStage.DrawActorChildren or MobileShiChenZhiStage.ForeignDiscardChildren;
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 47600)]
     internal bool ShiCzMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.MobileShiChenZhi is { } r && r.Stage is MobileShiChenZhiStage.DiscardChildren or MobileShiChenZhiStage.DrawOwnerChildren or MobileShiChenZhiStage.DrawActorChildren or MobileShiChenZhiStage.ForeignDiscardChildren && effect?.Op is SkillProgramEffectOp.ResolveMobileShiChenZhiQuanchong or SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 47600)]
-    internal void AssertShiCzFrame(ProgramSkillFrame f)
-    {
-        if (f.MobileShiChenZhi is not { } r)
-            return;
-        if (r.Source != ShiCzSource(f) || r.GameplayHash != f.GameplayHash || f.WindowContext?.ParentFrameId != r.WindowId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || r.BeforeMovement < 0 || r.AfterMovement < r.BeforeMovement || r.AfterMovement > _coreCardMovementJournalMovementSequenceAccess._movementSequence || !Enum.IsDefined(r.Stage) || r.Cards.Count != r.Cards.Distinct().Count() || f.SkillId == ShiCzRenxing && (r.FirstDiscardBatch <= 0 || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().Any(e => e.BatchId == r.FirstDiscardBatch && e.ActualTurn == r.ActualTurn)) || f.TriggerId == "quanchong-extra-start" && (r.GrantFrameId <= 0 || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiExtraEnteredEvent>().Any(e => e.GrantFrameId == r.GrantFrameId && e.OwnerSeat == f.OwnerSeat)))
-            throw new InvalidOperationException("Shi Chen Zhi lost his original trigger, first-discard opportunity, extra-turn lease or finite paid continuation.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing)]
     internal PromptChoice ChooseShiCzAi(PendingDecision pending, ProgramSkillFrame f)

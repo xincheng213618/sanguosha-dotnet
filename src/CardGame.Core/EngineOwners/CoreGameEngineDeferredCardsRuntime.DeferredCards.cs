@@ -83,14 +83,6 @@ internal sealed partial class CoreGameEngineDeferredCardsRuntime
             _coreRuntimeOperations.ReturnRuntimeProgramMovement(frame.Id);
     }
 
-    internal void AssertParticipantTopView(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.ParticipantTopView is not { } view)
-            return;
-        if (paused.Op != SkillProgramEffectOp.ViewTopCardsAndObtainMatchingCards || frame.SelectedTargetSeats is not [var seat] || seat != view.Seat || seat == frame.OwnerSeat || view.CardIds.Count == 0 || view.CardIds.Distinct().Count() != view.CardIds.Count || view.CardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != seat || !prompt.ValidCardIds.SequenceEqual(view.CardIds) || prompt.Choices is not [var choice] || !choice.Cards.SequenceEqual(view.CardIds) || choice.Parameters.GetValueOrDefault("program-action") != "participant-top-view" || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture))
-            throw new InvalidOperationException("A private top-card view lost its owning frame, participant, cards or private prompt.");
-    }
-
     internal SkillProgramStepOutcome DepositDeferredPile(ProgramSkillFrame frame, string bind)
     {
         var set = _coreProgramLifecycleOperations.GetProgramCardSet(frame, bind);

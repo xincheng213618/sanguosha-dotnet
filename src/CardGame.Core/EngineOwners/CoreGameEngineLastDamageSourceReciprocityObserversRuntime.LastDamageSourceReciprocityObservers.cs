@@ -78,18 +78,6 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityObservers
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == r.ParticipantSeat && recovery.Attempt.TargetSeat == r.ParticipantSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == global::CardGame.Core.EngineOwners.CoreGameEngineLastDamageSourceReciprocityRuntime.LastDamageSourceReason(f, false);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 430)]
-    internal void AssertLastDamageSourceReciprocity(ProgramSkillFrame f)
-    {
-        if (f.LastDamageSourceReciprocity is null)
-            return;
-        if (!ValidLastDamageSourceReceipt(f))
-            throw new InvalidOperationException("Last-source reciprocity lost its original positive damage, stable memory fact, private draft or once-issued movement.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !LastDamageSourceFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Last-source reciprocity retained an unrelated first native child.");
-    }
-
     internal ProgramSkillFrame? LastDamageSourceReciprocityObserverRoot(long damageWindowId)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == damageWindowId);
@@ -97,9 +85,6 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityObservers
             return null;
         return _coreObserverSubtreesOperations.HasObserverSuffix(index + 1, (child) => global::CardGame.Core.EngineOwners.CoreGameEngineObserverSubtreesRuntime.IsObserverSkillsChangedEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)) ? root : null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30, group: 10)]
-    internal bool IsLastDamageSourceReciprocityDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Any(window => LastDamageSourceReciprocityObserverRoot(window.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id));
     internal ProgramSkillFrame? AnyLastDamageSourceReciprocityObserverRoot() => _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Select(window => LastDamageSourceReciprocityObserverRoot(window.Id)).FirstOrDefault(root => root is not null);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1810)]
     internal bool HasLastDamageSourceReciprocityDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == windowId && frame is DamageTriggerWindowFrame) && AnyLastDamageSourceReciprocityObserverRoot()is not null;

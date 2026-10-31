@@ -3,15 +3,12 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhuJunOlEntries
 {
     internal bool AdvanceZhuJunSubtree() => _resolve().AdvanceZhuJunSubtree();
-    internal void AssertZhuJunCuipo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhuJunCuipo(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhuJunCuipo(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginZhuJunCuipo(input);
     internal bool CanOfferZhuJun(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferZhuJun(candidate, trigger, context);
     internal bool ContinuePaidZhuJun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidZhuJun(f);
     internal void ContinueZhuJunCuipo(long id) => _resolve().ContinueZhuJunCuipo(id);
     internal bool HasZhuJunDamageObserver(long id) => _resolve().HasZhuJunDamageObserver(id);
     internal bool IsZhuJunDrawMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsZhuJunDrawMovement(f, m);
-    internal bool IsZhuJunDying() => _resolve().IsZhuJunDying();
-    internal bool IsZhuJunLegacyAlcoholPreRecoveryRide() => _resolve().IsZhuJunLegacyAlcoholPreRecoveryRide();
     internal bool IsZhuJunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhuJunMovement(f, effect, p);
     internal void ObserveZhuJunActualUse(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveZhuJunActualUse(payload);
     internal bool ResumeZhuJunCuipo(long id) => _resolve().ResumeZhuJunCuipo(id);

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRoundGainedEquipmentDrawsEntries
 {
-    internal void AssertRoundGainedEquipmentDraw(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRoundGainedEquipmentDraw(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginRoundGainedEquipmentDraw(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginRoundGainedEquipmentDraw(supplied);
     internal bool CanOfferRoundGainedEquipmentDraw(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferRoundGainedEquipmentDraw(candidate, trigger, context);
     internal global::CardGame.Core.RoundGainedUseQualification? ExactRoundGainedEquipmentDrawParent(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExactRoundGainedEquipmentDrawParent(frame);

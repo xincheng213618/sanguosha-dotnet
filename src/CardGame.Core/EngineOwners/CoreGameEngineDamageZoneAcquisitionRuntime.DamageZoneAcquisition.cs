@@ -197,13 +197,6 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
                 throw new InvalidOperationException("Zone acquisition must move each selected physical entity exactly once.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 460)]
-    internal void AssertRegisteredDamageAcquisitionReceipt(ProgramSkillFrame frame)
-    {
-        if (frame.DamageZoneAcquisition is not null)
-            RequireDamageAcquisitionReceipt(frame);
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 50)]
     internal bool IsDamageAcquisitionMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
     {

@@ -45,7 +45,6 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
     internal bool HasWuZglDamageObserver(long id) => WuZglObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30300)]
     internal bool HasWuZglBeforeDamageObserver(long id) => WuZglObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30300)]
     internal bool IsWuZglDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WuZglObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30300)]
@@ -59,13 +58,6 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var child = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == r.Id);
         return i >= 0 && child > i + 1 && WuZglFirstChild(f, _resolutionStackOperations._resolutionStack[i + 1]) && WuZglObserverSuffix(i) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(r, _resolutionStackOperations._resolutionStack[child - 1]);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30300)]
-    internal void AssertWuZgl(ProgramSkillFrame f)
-    {
-        if (f.WuZhugeLiang is not null && !ValidWuZgl(f))
-            throw new InvalidOperationException("Wu Zhuge Liang changed an owning native receipt.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30300)]
@@ -84,35 +76,4 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
     internal bool ReturnWuZglMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeWuZgl(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 30300)]
     internal bool AdvanceWuZglChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuZglObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    internal bool HasWuZglUseContinuation(long nativeId)
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.WuZhugeLiang?.Operation == SkillProgramEffectOp.ResolveWuZhugeLiangQingshi))
-        {
-            if (!ValidWuZgl(f) || f.WuZhugeLiang is not { } r || _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == r.WindowId)is not ProgramCardTriggerWindowFrame window || window.ParentFrameId != nativeId || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCommitted || window.Action.ActionId != r.ActionId || window.Action.ActorSeat != f.OwnerSeat || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex), f.WindowContext!, window))
-                continue;
-            var i = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-            var native = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == nativeId);
-            if (native < 0 || i != native + 2 || _resolutionStackOperations._resolutionStack[native + 1].Id != window.Id)
-                continue;
-            if (i == _resolutionStackOperations._resolutionStack.Count - 1)
-            {
-                if (r.Stage is WuZhugeLiangStage.Choice or WuZhugeLiangStage.DrawTargets && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == f.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, WuZglChoices(f)))
-                    return true;
-                if (r.Stage == WuZhugeLiangStage.DrawChildren && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
-                    return true;
-            }
-            else if (WuZglFirstChild(f, _resolutionStackOperations._resolutionStack[i + 1]) && WuZglObserverSuffix(i))
-                return true;
-        }
-
-        return false;
-    }
-
-    internal bool HasWuZglRescueContinuation(long dyingId)
-    {
-        if (_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.DyingResponse?.ResolutionId == dyingId).ToArray()is not [var rescue] || rescue.DyingResponse is not { } response || rescue.Action is not { Type: CardActionType.Use } action || rescue.CardKind is not (CardKind.Peach or CardKind.Alcohol) || action.ActorSeat != response.ResponderSeat || rescue.SourceSeat != response.ResponderSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == dyingId)is not DyingFrame dying || !rescue.TargetSeats.SequenceEqual([dying.VictimSeat]) || !HasWuZglUseContinuation(rescue.Id))
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == rescue.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == dyingId && (rescue.CardKind == CardKind.Peach ? response.UsedPeach : response.UsedAlcohol && dying.VictimSeat == rescue.SourceSeat);
-    }
 }

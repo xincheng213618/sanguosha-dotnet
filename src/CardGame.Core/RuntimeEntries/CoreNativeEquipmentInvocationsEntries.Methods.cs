@@ -2,16 +2,12 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreNativeEquipmentInvocationsEntries
 {
-    internal void AssertNativeEquipmentInvocations() => _resolve().AssertNativeEquipmentInvocations();
     internal void CancelNativeEquipmentContinuation(global::CardGame.Core.NativeEquipmentInvocationReceipt r, global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().CancelNativeEquipmentContinuation(r, attack);
     internal global::CardGame.Core.NativeEquipmentInvocationReceipt CaptureNativeEquipmentInvocation(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::CardGame.Core.NativeEquipmentInvocationKind kind, int actorSeat, int targetSeat) => _resolve().CaptureNativeEquipmentInvocation(attack, kind, actorSeat, targetSeat);
     internal void ContinueInvokedQilinBow(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::CardGame.Core.Card? mount) => _resolve().ContinueInvokedQilinBow(attack, mount);
     internal void ContinueInvokedQinglong(global::CardGame.Core.NativeEquipmentInvocationReceipt r, global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().ContinueInvokedQinglong(r, attack);
     internal void ContinueNativeEquipmentInvocation(global::CardGame.Core.SkillInvocationFrame frame) => _resolve().ContinueNativeEquipmentInvocation(frame);
     internal global::CardGame.Core.GameEngine.NativeEquipmentSuspensionProjection? FindNativeEquipmentInvocation(long attackId) => _resolve().FindNativeEquipmentInvocation(attackId);
-    internal bool HasFactionDefenseEquipmentInvocation(global::CardGame.Core.NativeOwners.FactionDefenseHandle defense) => _resolve().HasFactionDefenseEquipmentInvocation(defense);
-    internal bool HasNativeEquipmentInvocation(long attackId) => _resolve().HasNativeEquipmentInvocation(attackId);
-    internal bool HasQinglongFactionEquipmentInvocation(global::CardGame.Core.NativeOwners.FactionCardRequestHandle request) => _resolve().HasQinglongFactionEquipmentInvocation(request);
     internal bool NativeEquipmentHostMatches(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.CardUseFrame root, global::CardGame.Core.NativeEquipmentInvocationReceipt r) => _resolve().NativeEquipmentHostMatches(parent, root, r);
     internal global::CardGame.Core.ResolutionFrame? NativeEquipmentInvariantTop(global::CardGame.Core.ResolutionFrame? actualTop) => _resolve().NativeEquipmentInvariantTop(actualTop);
     internal bool NativeEquipmentObserverEdge(int index) => _resolve().NativeEquipmentObserverEdge(index);

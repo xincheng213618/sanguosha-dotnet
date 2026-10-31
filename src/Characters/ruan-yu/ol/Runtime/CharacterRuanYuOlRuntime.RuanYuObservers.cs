@@ -57,13 +57,6 @@ internal sealed partial class CharacterRuanYuOlRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27430)]
-    internal void AssertRuanYu(ProgramSkillFrame f)
-    {
-        if (f.RuanYu is not null && !ValidRuanYu(f))
-            throw new InvalidOperationException("Ruan Yu lost his exact original source, native parent, private physical sets or once-paid stage.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 380)]
     internal bool IsRuanYuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.RuanYu is { Paid: true } r && r.Stage is RuanYuStage.FrontChildren or RuanYuStage.EndingChildren or RuanYuStage.RedChildren && effect?.Op == r.Op && pending == f.PendingMovementContinuation && pending.SubjectSeat == r.Recipient && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool RuanYuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -85,8 +78,6 @@ internal sealed partial class CharacterRuanYuOlRuntime
     internal bool HasRuanYuDamageObserver(long id) => RuanYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1030)]
     internal bool HasRuanYuBeforeDamageObserver(long id) => HasRuanYuDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 860)]
-    internal bool IsRuanYuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && RuanYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27430)]
     internal bool AdvanceRuanYuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && RuanYuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

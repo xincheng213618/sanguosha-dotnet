@@ -34,17 +34,4 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
         var choices = history.OfType<ZhangXunSuizhengTargetChosenEvent>().Where(e => e.FrameId == f.Id).ToArray();
         return r.SelectedTarget is { } target ? r.Victims.Any(v => v.TargetSeat == target) && f.SelectedTargetSeats.SequenceEqual([target]) && choices is [var chosen] && chosen == new ZhangXunSuizhengTargetChosenEvent(f.Id, r.LeaseId, target) : f.InstructionIndex == 1 && f.SelectedTargetSeats.Count == 0 && choices.Length == 0;
     }
-
-    internal bool HasExactAnniversaryZhangXunFollowupSelection(ProgramSkillFrame f) => f.ZhangXunSuizheng is { SelectedTarget: not null } && ValidZhangXunFollowup(f);
-    internal bool HasAnniversaryZhangXunPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ZhangXunSuizheng: { SelectedTarget: null } } f && f.Step == ResolutionFrameStep.AwaitingResponse && p.PlayerSeat == f.OwnerSeat && ValidZhangXunFollowup(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhangXunFollowupChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 45200)]
-    internal void AssertZhangXunFollowup(ProgramSkillFrame f)
-    {
-        if (f.ZhangXunSuizheng is not { } r)
-            return;
-        if (!ValidZhangXunFollowup(f))
-            throw new InvalidOperationException("Suizheng lost its original lease, next actual turn/Play, actual damage witnesses or native Slash target.");
-        if (r.SelectedTarget is null && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && (p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhangXunFollowupChoices(f))))
-            throw new InvalidOperationException("Suizheng's original issuer menu changed.");
-    }
 }

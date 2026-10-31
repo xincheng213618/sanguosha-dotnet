@@ -60,7 +60,6 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Guqu: { } r } f || f.Id != id)
             return;
-        AssertMouGuqu(f);
         if (r.Stage == GuquStage.Drawing)
         {
             if (f.NativeDraw is null)

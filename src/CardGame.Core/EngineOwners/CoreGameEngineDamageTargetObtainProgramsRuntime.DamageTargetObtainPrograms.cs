@@ -196,15 +196,6 @@ internal sealed partial class CoreGameEngineDamageTargetObtainProgramsRuntime
 
     internal bool IsDamageTargetDuelUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { DamageTargetDuelOrigin: not null, SelectedActorDuelOrigin: null, CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0 };
     internal bool IsIssuedZeroEntityDuel(long id) => _characterDongChengMouOperations.IsMouDcZeroUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind == CardKind.Duel || _coreDamageColorDuelProgramsOperations.IsSelectedActorDuelUse(id) || IsDamageTargetDuelUse(id) || _coreDualColorDuelProgramsOperations.IsDualColorDuelUse(id) || _coreConditionalDiscardDuelReturnsOperations.IsConditionalDiscardDuelUse(id) || _characterHuangQuanMobileShiOperations.IsShiQuanDuelUse(id) || _coreFriendEventsOperations.IsFriendRecastDuelUse(id) || _characterHaoPuOlOperations.IsZhenyingDuelUse(id) || _characterHeJinOlOperations.IsHeJinMouzhuDuelUse(id) || _characterWuAnGuoOlOperations.IsWuAnGuoLiyongDuelUse(id) || _characterFanJiangZhangDaOlOperations.IsJueshengDuelUse(id) || _characterXuHuangMouMobileOperations.IsMouXuHuangZeroUse(id) || _characterWenChouMouOlOperations.IsMouWenChouZeroDuel(id);
-    internal IReadOnlyList<int> DamageTargetDuelOuterProcessing(long useId)
-    {
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(useId);
-        if (use?.DamageTargetDuelOrigin is { } mobile && global::CardGame.Core.EngineOwners.CharacterLuBuMouMobileRuntime.IsMouLbDuelOrigin(mobile))
-            return _characterLuBuMouMobileOperations.MouLbDuelOuterProcessing(use);
-        if (use?.DamageTargetDuelOrigin is not { } o || !IsDamageTargetDuelUse(useId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == o.ParentProgramFrameId)is not { } parent || !IsValidDamageTargetObtain(parent) || parent.DamageTargetObtain is not { Stage: ProgramDamageTargetObtainStage.DuelIssued } d || global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetRegionObtainRuntime.DamageTargetObtainAnchor(d) != o.ReceiptSequence || !_coreDamageTargetRegionObtainOperations.DamageTargetDuelBaseMatches(d, o) || d.OuterCardUseFrameId != o.OuterCardUseFrameId || _coreCardUseLifecycleOperations.LifecycleCardUse(o.OuterCardUseFrameId)is not { CardAttack.Active: false } outer)
-            throw new InvalidOperationException("Nested Duel processing lost its exact suspended outer Use.");
-        return (outer.PhysicalCardIds ?? []).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray();
-    }
 
     [NativeUseReturn(230)]
     internal void ReturnDamageTargetDuel(CardUseFrame use)
@@ -234,34 +225,6 @@ internal sealed partial class CoreGameEngineDamageTargetObtainProgramsRuntime
             throw new InvalidOperationException("Completed Duel lost its suspended outer attack.");
         _coreCardAttackStateOperations.UpdateCardAttackState(d.OuterCardUseFrameId, s => s!with { Active = true });
         FinishDamageTargetObtain(f);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 520)]
-    internal void AssertDamageTargetObtainState(ProgramSkillFrame f)
-    {
-        if (f.DamageTargetObtain is not { } d)
-            return;
-        if (!IsValidDamageTargetObtain(f))
-            throw new InvalidOperationException("Obtain state lost its actual producer or receipt.");
-        if (d.Stage is ProgramDamageTargetObtainStage.SelectingCard or ProgramDamageTargetObtainStage.SelectingDuelTarget && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != (d.Stage == ProgramDamageTargetObtainStage.SelectingCard ? d.OwnerSeat : d.VictimSeat)))
-            throw new InvalidOperationException("Obtain selection lost its actual chooser.");
-    }
-
-    internal void AssertDamageTargetDuels()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.DamageTargetDuelOrigin is not null))
-        {
-            var o = use.DamageTargetDuelOrigin!;
-            if (global::CardGame.Core.EngineOwners.CharacterLuBuMouMobileRuntime.IsMouLbDuelOrigin(o))
-            {
-                _characterLuBuMouMobileOperations.AssertMouLbDuelUse(use);
-                continue;
-            }
-
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame f || !IsValidDamageTargetObtain(f) || f.DamageTargetObtain is not { Stage: ProgramDamageTargetObtainStage.DuelIssued } d || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetRegionObtainRuntime.DamageTargetObtainedEquipment(d) || o.ParentProgramFrameId != f.Id || o.InstructionIndex != f.InstructionIndex || o.ReceiptSequence != global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetRegionObtainRuntime.DamageTargetObtainAnchor(d) || !_coreDamageTargetRegionObtainOperations.DamageTargetDuelBaseMatches(d, o) || o.OuterCardUseFrameId != d.OuterCardUseFrameId || o.DamageWindowId != d.DamageWindowId || o.DamageFrameId != d.DamageFrameId || o.OuterActionId != d.OuterActionId || o.InitialActorSeat != d.OwnerSeat || o.VictimChooserSeat != d.VictimSeat || o.InitialTargetSeat == d.OwnerSeat || o.InitialTargetSeat == d.VictimSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(o.InitialTargetSeat) || o.SkillId != f.SkillId || o.BindingId != d.BindingId || o.SkillInstanceId != f.SkillInstanceId || o.GameplayHash != f.GameplayHash || o.TurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber || use.SelectedActorDuelOrigin is not null || use.CardId != 0 || use.CardKind != CardKind.Duel || use.PhysicalCardIds?.Count != 0 || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveIsRed: false } || _coreCardUseLifecycleOperations.LifecycleCardUse(d.OuterCardUseFrameId)?.CardAttack is not { Active: false })
-                throw new InvalidOperationException("Issued damage-target Duel lost its exact paid origin.");
-        }
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ObtainDamageTargetCardAndResolveCategory)]

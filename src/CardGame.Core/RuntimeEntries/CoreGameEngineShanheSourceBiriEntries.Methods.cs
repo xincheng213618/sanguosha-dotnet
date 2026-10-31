@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheSourceBiriEntries
 {
-    internal void AssertShanheSourceBiri(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShanheSourceBiri(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheSourceBiri(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheSourceBiri(supplied);
     internal bool CanFinishShanheSourceBiri(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanFinishShanheSourceBiri(frame);
     internal bool CanOfferShanheSourceBiri(global::CardGame.Core.ProgramTriggerLegalityContext context) => _resolve().CanOfferShanheSourceBiri(context);

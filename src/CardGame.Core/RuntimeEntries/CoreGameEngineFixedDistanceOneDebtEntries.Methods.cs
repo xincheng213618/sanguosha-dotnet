@@ -4,8 +4,6 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtEntries
 {
     internal void AppendFixedDistanceOneEndingItems(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendFixedDistanceOneEndingItems(items);
     internal global::CardGame.Core.RuleQueryEvaluation ApplyFixedDistanceOne(global::CardGame.Core.CharacterState source, global::CardGame.Core.CharacterState target, global::CardGame.Core.RuleQueryEvaluation original) => _resolve().ApplyFixedDistanceOne(source, target, original);
-    internal void AssertFixedDistanceDebtPayment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertFixedDistanceDebtPayment(f);
-    internal void AssertFixedDistanceOnePolicies() => _resolve().AssertFixedDistanceOnePolicies();
     internal bool CanContinueIssuedFixedDistanceEnding(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIssuedFixedDistanceEnding(f);
     internal void ConsumeFixedDistanceDebt(global::CardGame.Core.FixedDistanceOneTurnGrant g, bool required) => _resolve().ConsumeFixedDistanceDebt(g, required);
     internal void ConsumeFixedDistanceDebtAtBegin(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ConsumeFixedDistanceDebtAtBegin(c, context);

@@ -70,11 +70,4 @@ internal sealed partial class CoreGameEngineWenheChaosRuntime
     }
 
     internal bool WenheChaosFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => child is ProgramSkillFrame { WenheChaos: { } r } frame && r.ParentFrameId == parent.Id && IsExactWenheChaos(frame);
-    internal bool HasWenheChaosPrompt() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.WenheChaos is not null && IsExactWenheChaos(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 41001)]
-    internal void AssertWenheChaosFrame(ProgramSkillFrame f)
-    {
-        if (f.WenheChaos is not null && !IsExactWenheChaos(f))
-            throw new InvalidOperationException("Chaos actor queue lost its native parent or frozen issuance.");
-    }
 }

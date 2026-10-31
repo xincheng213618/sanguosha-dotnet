@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineHpDamageShieldsEntries
 {
-    internal void AssertHpDamageShieldState(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertHpDamageShieldState(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHpDamageShieldPayment(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.PlayerMarkerKind marker) => _resolve().BeginHpDamageShieldPayment(frame, marker);
     internal bool CanContinuePaidHpDamageShield(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinuePaidHpDamageShield(frame);
     internal double GetHpDamageShieldAiTargetValue(global::CardGame.Core.CharacterState owner) => _resolve().GetHpDamageShieldAiTargetValue(owner);

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLvKaiOlEntries
 {
     internal bool AdvanceBijingPaidChildren() => _resolve().AdvanceBijingPaidChildren();
-    internal void AssertBijingUnpaidSelection(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBijingUnpaidSelection(frame);
     internal bool BijingFirstPaidChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().BijingFirstPaidChild(frame, child);
     internal bool BijingLionChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().BijingLionChild(frame, child);
     internal global::CardGame.Core.ProgramSkillFrame? BijingPaidObserverRoot() => _resolve().BijingPaidObserverRoot();

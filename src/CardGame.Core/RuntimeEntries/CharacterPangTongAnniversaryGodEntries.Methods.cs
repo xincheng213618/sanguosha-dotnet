@@ -11,7 +11,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodEntries
     internal void FinishShenPt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShenPt(f);
     internal bool IsShenPangTongHandDiscardForbidden(int actor, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.OwnedCardMoveIntent intent) => _resolve().IsShenPangTongHandDiscardForbidden(actor, card, from, intent);
     internal bool KeepPaidShenPt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidShenPt(f);
-    internal void RequireShenPt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShenPt(f);
     internal void RequireShenPtRevival(global::CardGame.Core.DeathFrame death, global::CardGame.Core.ShenPangTongRevivalReceipt r) => _resolve().RequireShenPtRevival(death, r);
     internal bool ResumeShenPt(long id) => _resolve().ResumeShenPt(id);
     internal void ReturnShenPtDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome o) => _resolve().ReturnShenPtDraw(supplied, o);

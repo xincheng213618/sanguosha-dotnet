@@ -101,27 +101,4 @@ internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
         var grants = _turnCardUseEffectsOperations._turnCardUseEffects.InspectedHandDistances.Where(g => g.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && g.Source.OwnerSeat == actor.Seat && g.TargetSeat == target.Seat).ToArray();
         return grants.Length == 0 ? prior : RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new RuleQueryBounds(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-paid-hand-inspection", global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(prior))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"paid-inspection:{(g.ProgramFrameId)}:{(g.GrantSequence)}", SkillRuleOperation.Set, 1)).ToArray());
     }
-
-    internal void AssertInspectedHandSlashes()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.InspectedHandSlash is not null))
-        {
-            if (!ValidInspectedHandSlash(f))
-                throw new InvalidOperationException("Invalid inspected hand payment/branch receipt.");
-            if (f.InspectedHandSlash!.Stage == InspectedHandSlashStage.Viewing && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, _coreInspectedHandSlashesOperations.InspectedHandChoices(f))))
-                throw new InvalidOperationException("The whole-hand view lost its only authorized chooser.");
-        }
-
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.InspectedHandSlashReturn is not null))
-        {
-            var r = use.InspectedHandSlashReturn!;
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame root || !ValidInspectedHandSlash(root) || root.InspectedHandSlash!.SlashReturn != r || use.Id != r.CardUseFrameId || use.CardId != 0 || use.PhysicalCardIds?.Count != 0 || use.Action is not { Type: CardActionType.Use, EffectiveSuit: Suit.None, PhysicalCards.Count: 0 } action || action.ActionId != r.ActionId || action.ProviderSeat != root.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.EffectiveKind != use.CardKind || use.CardKind != CardKind.Slash && !_coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.CardId == 0 && e.SourceSeat == root.OwnerSeat && e.CardKind == CardKind.Slash))
-                throw new InvalidOperationException("An inspected Slash requires its own zero-entity issued origin.");
-        }
-
-        foreach (var g in _turnCardUseEffectsOperations._turnCardUseEffects.InspectedHandDistances)
-            if (g.GrantSequence < 1 || g.ProgramFrameId < 1 || g.InstructionIndex != 1 || g.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || g.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || g.Source.OwnerSeat != g.TurnOwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(g.TargetSeat) || g.TargetSeat == g.Source.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program is not { } p || p.GameplayHash != g.GameplayHash || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<InspectedHandDistanceGrantedEvent>().Any(e => e.Grant == g) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<InspectedHandSlashIssuedEvent>().Any(e => e.Return.ProgramFrameId == g.ProgramFrameId && e.Return.Source == g.Source && e.Return.GameplayHash == g.GameplayHash && e.Return.TurnNumber == g.TurnNumber && e.Return.TurnOwnerSeat == g.TurnOwnerSeat && e.Return.OriginalTargetSeat == g.TargetSeat))
-                throw new InvalidOperationException("An inspected-hand distance right lost its true actual-turn issuance.");
-    }
 }

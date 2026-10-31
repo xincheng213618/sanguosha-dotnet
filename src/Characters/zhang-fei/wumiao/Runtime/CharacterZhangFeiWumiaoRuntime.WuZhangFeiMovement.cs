@@ -242,21 +242,10 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal bool HasWuZhangFeiMovementDamageObserver(long id) => WuZhangFeiMovementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1520)]
     internal bool HasWuZhangFeiMovementBeforeDamageObserver(long id) => WuZhangFeiMovementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1350)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 770)]
     internal bool IsWuZhangFeiMovementDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuZhangFeiMovementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 29062)]
     internal bool AdvanceWuZhangFeiObserverChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuZhangFeiMovementObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 29062)]
-    internal void AssertWuZishengMovementReceipt(ProgramSkillFrame f)
-    {
-        if (f.WuZishengMovement is not { } r)
-            return;
-        if (!ExactWuZishengMovementParent(f, out var q) || q.Source != r.Qualification.Source || q.BatchId != r.Qualification.BatchId || q.VictimSeat != r.Qualification.VictimSeat || !q.Materials.SequenceEqual(r.Qualification.Materials) || r.ParentWindowId != f.WindowContext!.ParentFrameId || r.RequestedDamage != (r.Issued ? Math.Min(q.Materials.Count, Math.Max(0, r.VictimHpBefore)) : 0) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengMovementDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.ParentWindowId == r.ParentWindowId && e.BatchId == q.BatchId && e.Source == q.Source.Source && e.GameplayHash == q.Source.GameplayHash && e.VictimSeat == q.VictimSeat && e.CardCount == q.Materials.Count && e.HpBefore == r.VictimHpBefore && e.RequestedDamage == r.RequestedDamage) != 1)
-            throw new InvalidOperationException("Zisheng lost its frozen causal movement damage invoice.");
-        if (r.SuspendedDying is { } suspended && !WuZishengSuspendsDying(f, suspended))
-            throw new InvalidOperationException("Zisheng's exact suspended ancestor dying token or native cursor changed.");
-    }
 
     internal static string WuZishengCursorHash(ResolutionFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement.WuZishengCursorHash(frame);
     internal WuZishengSuspendedDying? CaptureWuZishengAncestorDying(ProgramSkillFrame f)

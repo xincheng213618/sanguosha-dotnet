@@ -18,7 +18,6 @@ internal sealed class NativeDrawProducerServices(global::System.Func<global::Car
 
     public ProgramExecutionPlan ResolvePlan(ProgramSkillFrame frame) => ProgramInstructionResolver.Default.Resolve(frame, getContentRegistry().GetSkill(frame.SkillId).Program!);
     public bool HasOperationReturn(SkillProgramEffectOp operation) => global::CardGame.Core.EngineOwners.CoreProgramNativeDrawReturnsDefinitions.ProgramNativeDrawReturns.Value.ContainsKey(operation);
-    public IEnumerable<NativeDrawAttemptDecidedEvent> DecidedEvents() => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<NativeDrawAttemptDecidedEvent>();
     public int? ResolveDrawCount(ProgramSkillFrame frame, int targetSeat, int amount, SkillProgramNumberExpression? expression) => getCoreGameEngineProgramLifecycleRuntime().ResolveProgramDrawCount(frame, targetSeat, amount, expression);
     public void DrawSelectedTargets(long id, int count, CardMoveReason reason) => getCoreGameEngineProgramLifecycleRuntime().DrawProgramSelectedTargets(id, count, reason);
     public void DrawProgramCards(long id, int seat, int count, string? resultBind, SkillProgramCardSetVisibility visibility, CardMoveReason reason) => getCoreGameEngineProgramLifecycleRuntime().DrawProgramCards(id, seat, count, null, resultBind, visibility, reason);

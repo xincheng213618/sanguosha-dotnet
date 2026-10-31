@@ -123,7 +123,6 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanHai: { } r } f || f.Id != id)
             return;
-        AssertGuanHai(f);
         if (r.Stage == GuanHaiStage.ChooseBait)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

@@ -4,7 +4,6 @@ internal sealed partial class CharacterMaYuanYiOlEntries
 {
     internal bool AdvanceMaYuanYiSubtree() => _resolve().AdvanceMaYuanYiSubtree();
     internal void AnswerMaYuanYiTarget(global::CardGame.Core.PromptChoice supplied) => _resolve().AnswerMaYuanYiTarget(supplied);
-    internal void AssertMaYuanYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMaYuanYi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMaYuanYi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMaYuanYi(supplied, op);
     internal bool CanBeginBinghuoJudgment(global::CardGame.Core.ProgramSkillFrame f, int targetSeat, string reason, string bind, global::CardGame.Core.SkillProgramCardSetVisibility visibility) => _resolve().CanBeginBinghuoJudgment(f, targetSeat, reason, bind, visibility);
     internal bool CanOfferMaYuanYi(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMaYuanYi(c, t, context);
@@ -20,8 +19,6 @@ internal sealed partial class CharacterMaYuanYiOlEntries
     internal bool IsBinghuoCleanupMovement(global::CardGame.Core.MaYuanYiReceipt r, global::CardGame.Core.CardMovementRecord m) => _resolve().IsBinghuoCleanupMovement(r, m);
     internal bool IsBinghuoHandoffMovement(global::CardGame.Core.MaYuanYiReceipt r, global::CardGame.Core.CardMovementRecord m) => _resolve().IsBinghuoHandoffMovement(r, m);
     internal bool IsBinghuoJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsBinghuoJudgment(j, f);
-    internal bool IsExactBinghuoFinalizedChildSubtree(global::CardGame.Core.ProgramJudgmentTriggerWindowFrame frame, global::CardGame.Core.JudgmentFrame? judgment, int frameIndex) => _resolve().IsExactBinghuoFinalizedChildSubtree(frame, judgment, frameIndex);
-    internal bool IsMaYuanYiDying() => _resolve().IsMaYuanYiDying();
     internal bool IsMaYuanYiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMaYuanYiMovement(f, e, p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> JibingPileCards(global::CardGame.Core.CharacterState owner) => _resolve().JibingPileCards(owner);
     internal bool MaYuanYiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MaYuanYiFirstChild(f, child);

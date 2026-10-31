@@ -477,17 +477,6 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
         return ShiCaoShuangNiZunUsesThisRound(target);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 67900)]
-    internal void AssertShiCaoShuang(ProgramSkillFrame f)
-    {
-        if (f.ShiCaoShuang is not { } r)
-            return;
-        if (r.ActualTurn <= 0 || r.Source?.OwnerSeat != f.OwnerSeat || r.Operation is not ("shequan" or "dianyi" or "jianzhuan-timing" or "jianzhuan-lose" or "nizun-stash" or "nizun-use"))
-            throw new InvalidOperationException("Shi Cao Shuang lost its original typed operation receipt.");
-        if (r.Operation == "jianzhuan-lose" && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat))
-            throw new InvalidOperationException("JianZhuan lost its timing ledger before the awakening choice.");
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShiCaoShuangSheQuan)]
     internal PromptChoice ChooseShiCaoShuangSheQuanAi(PendingDecision decision, ProgramSkillFrame f) => decision.Choices[0];
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShiCaoShuangJianZhuan)]

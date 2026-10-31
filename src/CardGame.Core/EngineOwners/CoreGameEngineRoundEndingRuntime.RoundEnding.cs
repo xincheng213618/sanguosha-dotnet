@@ -106,20 +106,4 @@ internal sealed partial class CoreGameEngineRoundEndingRuntime
         _coreProgramLifecycleOperations.AdvanceProgramLifecycleCursor(child);
         _coreRuntimeOperations.AdvanceRuntimeFrame(child.Id);
     }
-
-    internal bool HasRoundEndingBoundaryFrame()
-    {
-        if (_resolutionStackOperations._resolutionStack.FirstOrDefault()is not RoundEndingBoundaryFrame root)
-            return false;
-        if (!TracksRoundEnding || root.RoundNumber != _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber || root.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || root.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || root.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Finished || root.OriginalActualTurnKind != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.Kind || root.NormalResumeSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.NormalResumeSeat || !Enum.IsDefined(root.Stage) || root.InheritedMovementBatchIds is not System.Collections.IList { IsReadOnly: true } || _coreProgramEventHistoryOperations.ProgramEventHistory<RoundEndingStartedEvent>().Count(e => e == new RoundEndingStartedEvent(root.Id, root.RoundNumber, root.ActualTurnNumber, root.OwnerSeat, root.NextNormalSeat)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<RoundEndedEvent>().Any(e => e.RoundNumber == root.RoundNumber))
-            throw new InvalidOperationException("A round-end root lost its old round, actual turn or once-only issuance.");
-        if (root.ActiveWindowFrameId is { } id)
-        {
-            if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[1].Id != id || (_resolutionStackOperations._resolutionStack[1] is not ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.RoundEnding } lifecycle || lifecycle.RoundEndingBoundaryId != root.Id || root.Stage != RoundEndingBoundaryStage.Completing) && (_resolutionStackOperations._resolutionStack[1] is not CardsMovedTriggerWindowFrame movement || movement.ResumeRoundEndingBoundaryId != root.Id || !IsRoundEndingMovement(root, movement.Batch)))
-                throw new InvalidOperationException("A round end retained an unissued first child.");
-        }
-        else if (_resolutionStackOperations._resolutionStack.Count != 1)
-            throw new InvalidOperationException("A round end has an unowned child.");
-        return true;
-    }
 }

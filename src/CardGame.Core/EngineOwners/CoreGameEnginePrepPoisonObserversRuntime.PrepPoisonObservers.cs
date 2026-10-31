@@ -36,14 +36,4 @@ internal sealed partial class CoreGameEnginePrepPoisonObserversRuntime
 
         return _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 1248)]
-    internal void AssertPrepPoisonChildren(ProgramSkillFrame root)
-    {
-        if (root.PrepPoisonOutcome is null)
-            return;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && PrepPoisonObserverRoot(root.Id)is null)
-            throw new InvalidOperationException("Preparation poison lost its exact paid HP/skill-loss child and continuous native return subtree.");
-    }
 }

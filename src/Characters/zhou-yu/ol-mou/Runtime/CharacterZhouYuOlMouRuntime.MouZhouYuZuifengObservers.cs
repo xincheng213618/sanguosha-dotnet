@@ -44,8 +44,6 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     internal bool HasMouZuifengDamageObserver(long id) => MouZuifengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1540)]
     internal bool HasMouZuifengBeforeDamageObserver(long id) => MouZuifengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1370)]
-    internal bool IsMouZuifengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouZuifengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 620)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 560)]
     internal bool IsMouZuifengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

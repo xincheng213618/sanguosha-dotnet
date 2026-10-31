@@ -73,9 +73,6 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
     {
         while (frames.Top is DrawPhaseObligationFrame frame && frame.Id == frameId)
         {
-            if (frame.OwnerSeat != turn.CurrentSeat || frame.ActualTurnNumber != turn.TurnNumber || phase.Phase != TurnPhase.Draw ||
-                frame.ActiveWindowFrameId is not null)
-                throw new InvalidOperationException("An actual draw phase lost its owner, turn or exact active child.");
             if (frame.Stage == DrawPhaseObligationStage.RequestingDraw)
             {
                 if (ContinueOwnedDrawAttempt(frame)) return;

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOriginalTargetAdditionsEntries
 {
-    internal void AssertOriginalTargetAdditionDraft(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertOriginalTargetAdditionDraft(frame, paused);
     internal bool CanAddIssuedOriginalTarget(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.OriginalTargetAdditionGrant grant) => _resolve().CanAddIssuedOriginalTarget(use, grant);
     internal bool CanContinueIssuedOriginalTargetAddition(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueIssuedOriginalTargetAddition(frame);
     internal bool CanOfferOriginalTargetAddition(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferOriginalTargetAddition(candidate, trigger, context);

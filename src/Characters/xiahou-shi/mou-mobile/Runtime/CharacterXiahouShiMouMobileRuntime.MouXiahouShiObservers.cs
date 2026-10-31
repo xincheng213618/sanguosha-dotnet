@@ -53,7 +53,6 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
     internal bool HasMouXiahouShiDamageObserver(long id) => MouXiahouShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1500)]
     internal bool HasMouXiahouShiBeforeDamageObserver(long id) => MouXiahouShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1330)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 760)]
     internal bool IsMouXiahouShiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouXiahouShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 540)]
@@ -127,9 +126,6 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
         if ((f.MouXiahouShiYanyu is not null || f.MouXiahouShiQiaoshi is not null) && !ValidMouXiahouShi(f))
             throw new InvalidOperationException("Mou Xiahou Shi lost its exact source, actual boundary or paid native receipt.");
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29800)]
-    internal void AssertMouXiahouShiFrame(ProgramSkillFrame f) => AssertMouXiahouShi(f);
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 29800)]
     internal void AssertMouXiahouShiFrames()
     {

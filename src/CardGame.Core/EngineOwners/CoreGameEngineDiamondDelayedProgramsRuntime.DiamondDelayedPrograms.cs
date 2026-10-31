@@ -171,15 +171,5 @@ internal sealed partial class CoreGameEngineDiamondDelayedProgramsRuntime
         return true;
     }
 
-    internal void AssertDiamondDelayed(ProgramSkillFrame frame, SkillProgramEffect? paused)
-    {
-        if (frame.DiamondDelayed is not { } d)
-            return;
-        if (paused?.Op != SkillProgramEffectOp.UseDiamondDelayedOrDiscard || frame.TriggerId is not null || frame.SelectedCardIds.Count != 1 || frame.SelectedCardIds[0] != d.CardId || d.Source.OwnerSeat != frame.OwnerSeat || d.Source.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || d.EffectiveSuit != Suit.Diamond || d.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !Enum.IsDefined(d.Stage) || d.Stage == ProgramDiamondDelayedStage.Using && (d.UseFrameId is null || !_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(c => c.Id == d.UseFrameId && c.SourceSeat == frame.OwnerSeat && c.CardId == d.CardId && c.CardKind == CardKind.Indulgence && _resolutionStackOperations._resolutionStack.IndexOf(frame) + 1 == _resolutionStackOperations._resolutionStack.IndexOf(c) && c.Action is { } a && a.PhysicalCards.Count == 1 && a.PhysicalCards[0].CardId == d.CardId && a.PhysicalCards[0].From == d.Source && a.ActorSeat == frame.OwnerSeat && a.EffectiveSuit == d.EffectiveSuit && a.ConversionChain.SequenceEqual([new CardConversionSource(frame.SkillId, frame.ActivationId, frame.OwnerSeat, frame.SkillInstanceId)]))))
-            throw new InvalidOperationException("Diamond delayed draft lost its exact owning operation or child.");
-        if (d.Stage == ProgramDiamondDelayedStage.Choosing && ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.Choices.Count == 0 || prompt.Choices.Any(c => !IsDiamondDelayedChoiceLegal(c))))
-            throw new InvalidOperationException("Diamond delayed draft lost its exact choice.");
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IDiamondDelayedProgramHost.UseDiamondDelayedOrDiscard(ProgramSkillFrame frame) => BeginDiamondDelayed(frame);
 }

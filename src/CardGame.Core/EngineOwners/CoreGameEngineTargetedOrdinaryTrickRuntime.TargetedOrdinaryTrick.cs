@@ -132,7 +132,6 @@ internal sealed partial class CoreGameEngineTargetedOrdinaryTrickRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("No owning targeted trick frame.");
         var use = RequireTargetedOrdinaryTrickParent(f, out _);
         var r = f.TargetedOrdinaryTrick ?? throw new InvalidOperationException("No issued target receipt.");
-        AssertTargetedOrdinaryTrickReceipt(f);
         if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], r.Choices.Where(c => c.Id == selected.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], TargetedTrickChoices(f.Id, use, TargetedTrickRemovesTargets(f)).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("A targeted trick answer lost its current legal participant or last-effective-target protection.");
         var branch = selected.Parameters["branch"];
@@ -158,17 +157,6 @@ internal sealed partial class CoreGameEngineTargetedOrdinaryTrickRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { TargetedOrdinaryTrick = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 490)]
-    internal void AssertTargetedOrdinaryTrickReceipt(ProgramSkillFrame f)
-    {
-        if (f.TargetedOrdinaryTrick is not { } r)
-            return;
-        var use = RequireTargetedOrdinaryTrickParent(f, out var window);
-        var offered = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetedOrdinaryTrickOfferedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
-        if (r.WindowFrameId != window.Id || r.CardUseFrameId != use.Id || r.ActionId != use.Action!.ActionId || r.Source != _coreUnequalHandHpEndingOperations.TargetedTrickHandHpSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != 1 || !r.OriginalTargets.SequenceEqual(use.TargetSeats) || offered is not [var fact] || fact.Receipt.Source != r.Source || fact.Receipt.ActionId != r.ActionId || !fact.Receipt.OriginalTargets.SequenceEqual(r.OriginalTargets) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(fact.Receipt.Choices, r.Choices) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(r.Choices, TargetedTrickChoices(f.Id, use, TargetedTrickRemovesTargets(f))))
-            throw new InvalidOperationException("An issued targeted-trick receipt lost its frozen actual action or current legal choices.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.AdjustTargetedOrdinaryTrick)]

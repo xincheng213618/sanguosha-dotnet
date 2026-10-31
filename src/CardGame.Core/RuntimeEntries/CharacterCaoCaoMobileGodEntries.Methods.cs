@@ -10,7 +10,6 @@ internal sealed partial class CharacterCaoCaoMobileGodEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileGuixinChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileGuixinChoices(f);
     internal bool MobileGuixinMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().MobileGuixinMovementProof(f, effect, pending);
     internal bool MobileGuixinPaymentTail(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.MobileGuixinPayment payment, global::CardGame.Core.CardMovementRecord gain) => _resolve().MobileGuixinPaymentTail(frame, payment, gain);
-    internal void RequireMobileGuixin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireMobileGuixin(f);
     internal bool ResumeMobileGuixin(long id) => _resolve().ResumeMobileGuixin(id);
     internal bool RetainMobileGuixinPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainMobileGuixinPaid(f);
     internal bool ReturnMobileGuixinMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMobileGuixinMovement(f);

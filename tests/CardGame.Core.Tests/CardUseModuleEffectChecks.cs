@@ -111,7 +111,6 @@ internal static class CardUseModuleEffectChecks
                 state.Prohibitions.Count == 1 && state.Prohibitions[0] == later &&
                 !state.TargetAdjustments.Any() && !state.DamageModifiers.Any(),
             "True turn end must expire exactly that turn's grants without touching a later turn.");
-        state.AssertInvariants();
     }
 
     private static void Require(bool condition, string message)

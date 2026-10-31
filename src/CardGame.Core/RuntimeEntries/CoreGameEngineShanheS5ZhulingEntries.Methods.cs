@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheS5ZhulingEntries
 {
-    internal void AssertShanheS5JixianFrozen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShanheS5JixianFrozen(f);
     internal bool CanContinueIssuedShanheS5Jixian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIssuedShanheS5Jixian(f);
     internal bool CanOfferShanheS5Jixian(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferShanheS5Jixian(c);
     internal bool IsShanheS5JixianTarget(int owner, global::CardGame.Core.CharacterState target) => _resolve().IsShanheS5JixianTarget(owner, target);

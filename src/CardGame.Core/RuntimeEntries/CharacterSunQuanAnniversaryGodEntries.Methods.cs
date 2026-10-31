@@ -40,7 +40,6 @@ internal sealed partial class CharacterSunQuanAnniversaryGodEntries
     internal bool KeepPaidAnniversarySunQuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidAnniversarySunQuan(f);
     internal void MoveAnniversaryMing(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> cards, bool deposit) => _resolve().MoveAnniversaryMing(f, cards, deposit);
     internal void PublishAnniversarySunQuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishAnniversarySunQuan(f);
-    internal void RequireAnniversarySunQuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireAnniversarySunQuan(f);
     internal bool ResumeAnniversarySunQuan(long id) => _resolve().ResumeAnniversarySunQuan(id);
     internal void ReturnAnniversarySunQuanColors(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnAnniversarySunQuanColors(f, outcome);
     internal bool ReturnAnniversarySunQuanMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnAnniversarySunQuanMovement(f);

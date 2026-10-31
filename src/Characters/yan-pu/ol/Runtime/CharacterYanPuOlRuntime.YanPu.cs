@@ -101,7 +101,6 @@ internal sealed partial class CharacterYanPuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YanPu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], YanPuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("YanPu lost its exact private chooser or current owned physical payment.");
-        AssertYanPu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Stage != YanPuStage.EndingChoice && !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive)
         {
@@ -193,7 +192,6 @@ internal sealed partial class CharacterYanPuOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { YanPu: { } r } f && f.Id == id)
         {
-            AssertYanPu(f);
             if (r.Stage is YanPuStage.GiftChoice or YanPuStage.EndingChoice or YanPuStage.EndingGiftChoice)
             {
                 if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Stage != YanPuStage.EndingChoice && !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive)

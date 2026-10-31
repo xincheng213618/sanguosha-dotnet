@@ -7,9 +7,6 @@ internal sealed partial class CharacterLuXunWumiaoEntries
     internal bool AdvanceWuXiongmuChildren() => _resolve().AdvanceWuXiongmuChildren();
     internal global::CardGame.Core.PromptChoice AiWuXiongmu(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiWuXiongmu(pending, f);
     internal void AnswerWuXiongmu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWuXiongmu(choice);
-    internal void AssertWuLuXunZhangcai(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuLuXunZhangcai(f);
-    internal void AssertWuXiongmu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuXiongmu(f);
-    internal void AssertWuXiongmuDamageStates() => _resolve().AssertWuXiongmuDamageStates();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuLuXunZhangcai(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginWuLuXunZhangcai(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuXiongmu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginWuXiongmu(supplied);
     internal bool CanActivateWuLuXunRuxian(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().CanActivateWuLuXunRuxian(gate);
@@ -30,10 +27,8 @@ internal sealed partial class CharacterLuXunWumiaoEntries
     internal bool HasWuLuXunZhangcaiDamageObserver(long id) => _resolve().HasWuLuXunZhangcaiDamageObserver(id);
     internal bool HasWuXiongmuBeforeDamageObserver(long id) => _resolve().HasWuXiongmuBeforeDamageObserver(id);
     internal bool HasWuXiongmuDamageObserver(long id) => _resolve().HasWuXiongmuDamageObserver(id);
-    internal bool IsWuLuXunZhangcaiDying() => _resolve().IsWuLuXunZhangcaiDying();
     internal bool IsWuLuXunZhangcaiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWuLuXunZhangcaiMovement(f, effect, p);
     internal bool IsWuLuXunZhangcaiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWuLuXunZhangcaiRecoveryParent(f, recovery);
-    internal bool IsWuXiongmuDying() => _resolve().IsWuXiongmuDying();
     internal bool IsWuXiongmuHandLimitExempt(global::CardGame.Core.CharacterState owner, int cardId) => _resolve().IsWuXiongmuHandLimitExempt(owner, cardId);
     internal bool IsWuXiongmuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWuXiongmuMovement(f, effect, pending);
     internal bool IsWuXiongmuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWuXiongmuRecoveryParent(f, recovery);

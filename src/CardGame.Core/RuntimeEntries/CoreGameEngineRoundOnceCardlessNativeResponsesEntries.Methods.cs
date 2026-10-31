@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesEntries
 {
-    internal void AssertRoundOnceCardlessNativeResponses() => _resolve().AssertRoundOnceCardlessNativeResponses();
     internal void ClearRoundOnceCardlessDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().ClearRoundOnceCardlessDodgeResponse(attack);
     internal void ClearRoundOnceCardlessResponse(global::CardGame.Core.ResolutionFrame owner) => _resolve().ClearRoundOnceCardlessResponse(owner);
     internal bool IsIssuedRoundOnceCardlessResponse(global::CardGame.Core.ResolutionFrame owner, global::CardGame.Core.CardActionContext action) => _resolve().IsIssuedRoundOnceCardlessResponse(owner, action);

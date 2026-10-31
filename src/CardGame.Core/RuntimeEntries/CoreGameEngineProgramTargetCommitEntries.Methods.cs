@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramTargetCommitEntries
 {
-    internal void AssertProgramTargetDraft(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertProgramTargetDraft(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginRelativeZoneDemand(global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginRelativeZoneDemand(effect, frame);
     internal global::CardGame.Core.SkillProgramStepOutcome DrawFirstProgramTargetReward(global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DrawFirstProgramTargetReward(effect, frame);
     internal bool IsProgramTargetContextValid(global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsProgramTargetContextValid(context);

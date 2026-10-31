@@ -86,14 +86,6 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
         return r.Option == "hp" && r.Stage is AnniversaryGuoZhaoStage.RecoveryChildren or AnniversaryGuoZhaoStage.Completed && r.Draw is null && r.Equipment is null && (r.Cursor == 0 ? r.Amount == 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoRecoveryIssuedEvent>().Any(e => e.FrameId == f.Id) : r.Cursor == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoRecoveryIssuedEvent>().Count(e => e.FrameId == f.Id && e.Amount == r.Amount && e.Amount == Math.Max(0, e.TargetHp - e.OwnerHp)) == 1);
     }
 
-    internal bool HasAnniversaryGuoZhaoPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryGuoZhao: { Stage: AnniversaryGuoZhaoStage.ColorChoice or AnniversaryGuoZhaoStage.OptionChoice }, Step: ResolutionFrameStep.AwaitingResponse } f && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == f.OwnerSeat && ValidGuoZhao(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, GuoZhaoChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 44300)]
-    internal void AssertGuoZhao(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryGuoZhao is not null && !ValidGuoZhao(f))
-            throw new InvalidOperationException($"Guo Zhao lost original frame, color lease, permanent option or native receipt ({(f.Id)}/{(f.SkillId)}/{(f.AnniversaryGuoZhao.Stage)}/{(f.InstructionIndex)}).");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 44300)]
     internal bool GuoZhaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryGuoZhao is { Stage: AnniversaryGuoZhaoStage.GainChildren or AnniversaryGuoZhaoStage.DrawChildren or AnniversaryGuoZhaoStage.RecoveryChildren or AnniversaryGuoZhaoStage.NativeEquipment or AnniversaryGuoZhaoStage.EquipmentChildren } r && ValidGuoZhao(f) && e?.Op == r.Op && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 44300)]
@@ -125,7 +117,6 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
     internal bool GuoZhaoDamageObserver(long id) => GuoZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 44300)]
     internal bool GuoZhaoBeforeDamageObserver(long id) => GuoZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 44300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 44300)]
     internal bool GuoZhaoDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GuoZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 44300)]

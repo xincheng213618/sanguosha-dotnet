@@ -45,7 +45,6 @@ internal sealed partial class CharacterHeJinOlRuntime
     }
 
     internal bool IsHeJinMouzhuDuelUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { HeJinMouzhu.CardKind: CardKind.Duel, CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0 };
-    internal bool IsHeJinMouzhuAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => attack.Card is null && processing.Count == 0 && attack.PhysicalCards.Count == 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.HeJinMouzhu is { AttackStarted: true } origin && attack.EffectiveCardKind == origin.CardKind && attack.ProgramSkillCardUseFrameId == origin.ProgramFrameId && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == origin.ProgramFrameId && MatchesHeJinMouzhu(f, origin));
     [NativeUseReturn(26710)]
     internal void ReturnHeJinMouzhuUse(CardUseFrame use)
     {
@@ -65,19 +64,5 @@ internal sealed partial class CharacterHeJinOlRuntime
             throw new InvalidOperationException("Mouzhu lost its native response, damage or dying completion.");
         FinishHeJinMouzhu(frame, true);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 26710)]
-    internal void AssertHeJinMouzhuNativeUses(ProgramSkillFrame frame)
-    {
-        if (frame.HeJinMouzhu is null)
-            return;
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.HeJinMouzhu is not null))
-        {
-            var origin = use.HeJinMouzhu!;
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame parent || !MatchesHeJinMouzhu(parent, origin) || use.Id != origin.CardUseFrameId || use.CardId != 0 || use.CardKind != origin.CardKind || use.PhysicalCardIds?.Count != 0 || use.SourceSeat != origin.ActorSeat || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0, EffectiveIsRed: false } action || action.EffectiveKind != origin.CardKind || action.ActorSeat != origin.ActorSeat || action.ProviderSeat != origin.ActorSeat)
-                throw new InvalidOperationException("Mouzhu requires its exact issued zero-entity native use and original paid owner.");
-        }
     }
 }

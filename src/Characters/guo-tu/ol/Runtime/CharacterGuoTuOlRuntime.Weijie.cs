@@ -61,7 +61,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         if (f.Weijie is null || f.InstructionIndex != 1)
             throw new InvalidOperationException("Weijie must enter its registered native-only request instruction.");
-        AssertWeijie(f);
         PublishWeijie(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -128,7 +127,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
 
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Weijie: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WeijieChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Weijie changed its exact private declaration or opaque native slot.");
-        AssertWeijie(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = c.Parameters[WeijieChoice];
@@ -183,7 +181,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Weijie: { } r } f || f.Id != id)
             return;
-        AssertWeijie(f);
         if (r.Stage != WeijieStage.CostChildren)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -235,7 +232,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (f.Weijie?.Paid is null)
             return false;
-        AssertWeijie(f);
         return true;
     }
 

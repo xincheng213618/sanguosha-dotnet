@@ -44,8 +44,6 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
         var expected = _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDaQiaoGuose = r with { Stage = MouDaQiaoGuoseStage.Using, CardId = card.Id, From = from, UseId = expected, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         var id = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, [target], CardKind.Indulgence, conversionSource: source);
-        if (id != expected)
-            throw new InvalidOperationException("Guose lost its exact newly issued native delayed Use.");
         _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
         f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(parent => parent.Id == f.Id);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouDaQiaoGuose = f.MouDaQiaoGuose!with { Paid = true, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

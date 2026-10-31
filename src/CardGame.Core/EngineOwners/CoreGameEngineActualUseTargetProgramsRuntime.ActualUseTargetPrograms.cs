@@ -140,8 +140,6 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
             if (parent.ReturnKind != ActualUseTargetReturnKind.OrdinaryTrick)
             {
                 var finishedAttack = _coreActiveNativeAttackQueriesOperations.ActiveCardAttack;
-                if (finishedAttack is null || finishedAttack.ResolutionId != use.Id)
-                    throw new InvalidOperationException("Winner cleanup lost its exact Slash.");
                 _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.ResolvingEffect);
                 _coreNativeAttackCompletionOperations.CompleteAttack(finishedAttack);
                 return;

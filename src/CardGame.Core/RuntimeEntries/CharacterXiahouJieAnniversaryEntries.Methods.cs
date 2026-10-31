@@ -17,7 +17,6 @@ internal sealed partial class CharacterXiahouJieAnniversaryEntries
     internal bool IsAnniversaryXiahouJieGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsAnniversaryXiahouJieGrantQualified(owner, grant);
     internal bool IsAnniversaryXiahouJieUniqueHand(int owner) => _resolve().IsAnniversaryXiahouJieUniqueHand(owner);
     internal bool KeepPaidAnniversaryXiahouJie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidAnniversaryXiahouJie(f);
-    internal void RequireAnniversaryXiahouJie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireAnniversaryXiahouJie(f);
     internal bool ResumeAnniversaryXiahouJie(long id) => _resolve().ResumeAnniversaryXiahouJie(id);
     internal void ReturnAnniversaryXiahouJieDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnAnniversaryXiahouJieDraw(supplied, draw);
     internal bool ReturnAnniversaryXiahouJieMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnAnniversaryXiahouJieMovement(f);

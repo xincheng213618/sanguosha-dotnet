@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhangFeiBoundaryMobileEntries
 {
     internal bool AdmitBoundaryZhangFeiSuppression(global::CardGame.Core.ProgramSkillFrame frame, int target) => _resolve().AdmitBoundaryZhangFeiSuppression(frame, target);
-    internal void AssertBoundaryZhangFeiPenalty(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryZhangFeiPenalty(frame);
     internal void AssertBoundaryZhangFeiUses() => _resolve().AssertBoundaryZhangFeiUses();
     internal int BoundaryZhangFeiLiyongCardDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().BoundaryZhangFeiLiyongCardDamage(attack);
     internal bool BoundaryZhangFeiOwnPlay(int owner) => _resolve().BoundaryZhangFeiOwnPlay(owner);

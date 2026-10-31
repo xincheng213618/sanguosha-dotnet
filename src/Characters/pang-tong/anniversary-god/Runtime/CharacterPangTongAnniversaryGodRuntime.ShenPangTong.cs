@@ -114,7 +114,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenPangTong: { } r } f || f.Id != id)
             return;
-        RequireShenPt(f);
         if (DrainShenPt(id))
             return;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -124,8 +123,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
         if (r.Stage == ShenPangTongStage.RemovalChildren)
         {
             var death = _coreDeathProgramsOperations.GetCurrentDeathFrame(r.DeathId);
-            if (!death.ShenPangTongOutcomeDeferred || death.VictimSeat != f.OwnerSeat || death.ShenPangTongRevival is not null || r.RemovedCardId <= 0 || r.After <= r.Before)
-                throw new InvalidOperationException("Kunyu lost its original paid death-return grant.");
             _coreDeathProgramsOperations.UpdateDeathFrame(death.Id, d => d with { ShenPangTongRevival = new(f.Id, r.Source, r.GameplayHash, r.ParentId, r.RemovedCardId, r.Before, r.After, r.BatchId) });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenPangTongRevivalGrantedEvent(f.Id, death.Id, f.OwnerSeat));
         }
@@ -143,10 +140,7 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
     internal void ReturnShenPtDraw(ProgramSkillFrame supplied, NativeDrawOutcome o)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        RequireShenPt(f);
         var r = f.ShenPangTong!;
-        if (r.Stage != ShenPangTongStage.DrawAttempt || r.DrawReturned || f.NativeDraw is not null || o.RequestedCount != 1 || o.RecipientSeat != r.TargetSeat)
-            throw new InvalidOperationException("Fengliao lost its exact typed target draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenPangTong = r with { Stage = ShenPangTongStage.DrawChildren, DrawReturned = true, ActualDraw = o.ActualDrawIds.Count, Before = o.SequenceBefore, After = o.SequenceAfter } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenPangTongDrawReturnedEvent(f.Id, r.TargetSeat, o.ActualDrawIds.Count, o.AttemptFrameId, o.SequenceBefore, o.SequenceAfter));
         ContinueShenPt(f.Id);

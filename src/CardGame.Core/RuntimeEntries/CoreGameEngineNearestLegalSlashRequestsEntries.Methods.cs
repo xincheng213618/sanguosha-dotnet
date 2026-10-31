@@ -2,10 +2,8 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineNearestLegalSlashRequestsEntries
 {
-    internal void AssertNearestLegalSlashState(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertNearestLegalSlashState(frame, paused);
     internal bool IsNearestFactionChoiceResult(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramChoiceResultBinding binding) => _resolve().IsNearestFactionChoiceResult(frame, binding);
     internal bool IsNearestLegalFactionOrigin(global::CardGame.Core.ProgramSkillFrame frame, int actor, int target, string? bind) => _resolve().IsNearestLegalFactionOrigin(frame, actor, target, bind);
-    internal bool IsValidNearestSlashProgramSelection(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.SkillProgramEffect> instructions) => _resolve().IsValidNearestSlashProgramSelection(frame, effect, instructions);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> NearestLegalSlashChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().NearestLegalSlashChoices(frame);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> NearestPhysicalSlashChoices(global::CardGame.Core.ProgramSkillFrame view) => _resolve().NearestPhysicalSlashChoices(view);
     internal bool NearestSlashPaymentHasRange(global::CardGame.Core.CharacterState actor, int target, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards, global::CardGame.Core.CardConversionSource? conversion, global::CardGame.Core.CardKind kind) => _resolve().NearestSlashPaymentHasRange(actor, target, cards, conversion, kind);

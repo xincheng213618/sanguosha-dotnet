@@ -115,14 +115,4 @@ internal sealed partial class CoreGameEngineFactionRequestCostRecoveriesRuntime
 
         _coreNativeAttackCompletionOperations.CompleteAttack(responseAttack!);
     }
-
-    internal void AssertPaidFactionRequestCostRecoveries()
-    {
-        foreach (var producer in _resolutionStackOperations._resolutionStack.Where(frame => frame.PaidFactionRequestCostRecovery is not null))
-        {
-            var receipt = producer.PaidFactionRequestCostRecovery!;
-            if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not { } request || !PaidFactionRequestMatches(request, receipt) || receipt.CostLocation != CardLocation.Equipment(receipt.RequestOwnerSeat) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(move => move.CardId == receipt.CostCardId && move.From == receipt.CostLocation && move.To == CardLocation.DiscardPile && move.Reason.Value == "program.faction-request.cost") || !HasPaidFactionRequestCostRecovery(request))
-                throw new InvalidOperationException("Paid faction request recovery changed its committed cost or exact descendant chain.");
-        }
-    }
 }

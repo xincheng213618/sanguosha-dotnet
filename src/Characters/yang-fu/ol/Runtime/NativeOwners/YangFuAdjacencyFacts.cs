@@ -12,7 +12,6 @@ internal sealed class YangFuAdjacencyFacts(global::System.Func<global::CardGame.
     public bool HasDesignatedExtraTargetTail(CardUseFrame use) => getCoreGameEngineDesignatedExtraTargetsRuntime().HasDesignatedExtraTargetTail(use);
     public bool HasRecipientCategorySlashTargetTail(CardUseFrame use) => getCoreGameEngineRecipientCategorySlashTargetsRuntime().HasRecipientCategorySlashTargetTail(use);
     public bool HasZhangYanLangdaoTargetTail(CardUseFrame use) => getCharacterZhangYanOlRuntime().HasZhangYanLangdaoTargetTail(use);
-    public bool MountObserverCandidateMatches(ProgramSkillFrame frame, ProgramTriggerCandidate candidate) => global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate);
     public DyingFrame? ActiveDying => getCoreDyingCursorRuntimeRuntime().ActiveDying;
 
     public bool MovementObserverEdge(long childId) => getCoreGameEngineObserverSubtreesRuntime().IsMovementObserverEdge(getFrameStore().FindIndex(frame => frame.Id == childId));

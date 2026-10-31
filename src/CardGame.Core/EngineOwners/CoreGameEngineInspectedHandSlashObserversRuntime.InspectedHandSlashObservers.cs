@@ -50,8 +50,6 @@ internal sealed partial class CoreGameEngineInspectedHandSlashObserversRuntime
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 250, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 360)]
     internal bool IsInspectedHandProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && InspectedHandPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 50)]

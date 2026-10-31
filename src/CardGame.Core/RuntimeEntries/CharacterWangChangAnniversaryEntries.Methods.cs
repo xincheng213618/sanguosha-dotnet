@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterWangChangAnniversaryEntries
 {
     internal void AnswerWangChang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWangChang(choice);
-    internal void AssertWangChang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWangChang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWangChang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginWangChang(supplied, operation);
     internal void BindWangChangSlash(global::CardGame.Core.IGameEvent fact) => _resolve().BindWangChangSlash(fact);
     internal bool CanActivateWangChang(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateWangChang(c);
@@ -11,7 +10,6 @@ internal sealed partial class CharacterWangChangAnniversaryEntries
     internal void CompleteWangChangSlash(long id) => _resolve().CompleteWangChangSlash(id);
     internal void ContinueWangChang(long id) => _resolve().ContinueWangChang(id);
     internal void FinishWangChang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWangChang(f);
-    internal bool HasAnniversaryWangChangPrompt() => _resolve().HasAnniversaryWangChangPrompt();
     internal bool IsWangChangSlash(global::CardGame.Core.CardUseFrame use) => _resolve().IsWangChangSlash(use);
     internal bool KeepWangChangPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepWangChangPaid(f);
     internal void PayWangChangDiscard(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> ids, int subject) => _resolve().PayWangChangDiscard(f, ids, subject);

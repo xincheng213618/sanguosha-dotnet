@@ -5,7 +5,6 @@ internal sealed partial class CharacterLeiBoAnniversaryEntries
     internal bool AdvanceLeiBoChildren() => _resolve().AdvanceLeiBoChildren();
     internal global::CardGame.Core.PromptChoice AiLeiBo(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiLeiBo(p, f);
     internal void AnswerLeiBo(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerLeiBo(answer);
-    internal void AssertLeiBo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLeiBo(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLeiBoShuaijie(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginLeiBoShuaijie(supplied);
     internal bool CanActivateLeiBo(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateLeiBo(c);
     internal bool CanLeiBoShuaijie(int owner) => _resolve().CanLeiBoShuaijie(owner);
@@ -14,9 +13,7 @@ internal sealed partial class CharacterLeiBoAnniversaryEntries
     internal void ContinueLeiBo(long id) => _resolve().ContinueLeiBo(id);
     internal bool DrainLeiBo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainLeiBo(f);
     internal global::CardGame.Core.SkillProgramStepOutcome FinishLeiBoShuaijie(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().FinishLeiBoShuaijie(supplied);
-    internal bool HasAnniversaryLeiBoPrompt() => _resolve().HasAnniversaryLeiBoPrompt();
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeLeiBo(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeLeiBo(supplied);
-    internal bool IsAnniversaryLeiBoFactionChoiceResult(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramChoiceResultBinding b) => _resolve().IsAnniversaryLeiBoFactionChoiceResult(f, b);
     internal bool IsAnniversaryLeiBoFixedSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsAnniversaryLeiBoFixedSlash(f);
     internal bool IsAnniversaryLeiBoSelfLoot(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect e) => _resolve().IsAnniversaryLeiBoSelfLoot(f, e);
     internal void IssueLeiBoMovement(global::CardGame.Core.ProgramSkillFrame f, bool discard) => _resolve().IssueLeiBoMovement(f, discard);

@@ -64,7 +64,6 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
     {
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShenZhangFei: { } r } f && f.Id == id)
         {
-            RequireShenZf(f);
             if (r.Stage == ShenZhangFeiStage.Judging)
                 return;
             if (DrainShenZf(id))
@@ -184,7 +183,6 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
     internal void AnswerShenZfTake(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Shencai lost its card-choice parent.");
-        RequireShenZf(f);
         var r = f.ShenZhangFei!;
         if (r.Stage != ShenZhangFeiStage.TakeChoice || !ShenZfTakeChoices(f).Any(c => c.Id == chosen.Id && c.Cards.SequenceEqual(chosen.Cards) && c.Targets.SequenceEqual(chosen.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(chosen.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Shencai requires the exact currently published public card or hidden hand slot.");

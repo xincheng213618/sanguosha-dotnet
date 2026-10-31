@@ -8,14 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramDiscardTopPlacementRuntime
 {
     SkillProgramStepOutcome global::CardGame.Core.IProgramDiscardTopPlacementHost.PutDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame) => PutProgramDiscardedCardsOnDrawPileTop(frame);
-    internal void AssertProgramDiscardTopPlacement(ProgramSkillFrame frame)
-    {
-        if (frame.DiscardTopPlacement is not { } state)
-            return;
-        var paused = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry!.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (paused.Op is not (SkillProgramEffectOp.PutDiscardedCardsOnDrawPileTop or SkillProgramEffectOp.PutOwnOrPreviousFirstDiscardOnTop) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } || state.CandidateCardIds.Count == 0 || state.CandidateCardIds.Distinct().Count() != state.CandidateCardIds.Count || state.SelectedCardIds.Distinct().Count() != state.SelectedCardIds.Count || state.SelectedCardIds.Any(id => !state.CandidateCardIds.Contains(id)) || state.CandidateCardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile || !batch.Movements.Any(move => move.CardId == id && _coreNeighborDiscardOpportunitiesOperations.IsProgramDiscardTopMovement(frame, move))) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action")is not ("discard-top-select" or "discard-top-finish")))
-            throw new InvalidOperationException("An active discard-top draft has invalid frozen cards or choices.");
-    }
 
     internal static bool IsDiscardMovementReason(CardMoveReason reason) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.IsDiscardMovementReason(reason);
     internal SkillProgramStepOutcome PutProgramDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame)

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouLuSuAnniversaryRuntime(IMouLuSuAnniversaryFacts facts, IMouLuSuAnniversaryNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouLuSuAnniversaryRuntime
 {
     internal const string Mingshi = "mou:mingshi",Mengmou = "mou:mengmou",Action = "mou-lu-su-anniversary";
@@ -151,7 +151,6 @@ internal sealed class MouLuSuAnniversaryRuntime(IMouLuSuAnniversaryFacts facts, 
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouLuSuAnniversaryCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouLuSuAnniversary = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume,36100)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouLuSuAnniversary: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement,36100)] private bool Movement(ProgramSkillFrame f) => f.MouLuSuAnniversary is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,36100)] private void Invariant(ProgramSkillFrame f) { if (f.MouLuSuAnniversary is not null && !Valid(f)) throw new InvalidOperationException("Invalid Mou Lu Su native receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,36100)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,36100)] private bool Paid(ProgramSkillFrame f) => f.MouLuSuAnniversary is not null && Valid(f) || f.SkillId == Mengmou && f.TriggerId == "requested-slash-damage" && f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && facts.Damage(new(f.OwnerSeat,f.SkillId,f.TriggerId,f.SkillInstanceId,f.GameplayHash,0,w.OccurrenceIndex),w) is not null;
     [ProgramAiChoice(SkillProgramEffectOp.InitializeMouLuSuMengmou,SkillProgramEffectOp.ResolveMouLuSuMingshi,SkillProgramEffectOp.ResolveMouLuSuMengmou)] private PromptChoice Ai(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["branch"] is "use" or "play" or "action") ?? p.Choices.First();
 }

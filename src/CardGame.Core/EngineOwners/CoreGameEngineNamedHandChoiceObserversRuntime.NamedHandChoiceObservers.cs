@@ -60,8 +60,6 @@ internal sealed partial class CoreGameEngineNamedHandChoiceObserversRuntime
     internal ProgramSkillFrame? NamedHandChoiceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreNamedHandChoiceObserversOperations.NamedHandChoiceFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1620)]
     internal bool HasNamedHandChoiceDamageObserver(long id) => NamedHandChoiceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 120)]
-    internal bool IsNamedHandChoiceDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && NamedHandChoiceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 80)]
     internal bool TryAdvanceNamedHandChoiceSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && NamedHandChoiceObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

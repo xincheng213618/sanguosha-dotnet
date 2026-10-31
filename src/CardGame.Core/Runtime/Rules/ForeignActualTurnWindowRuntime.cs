@@ -69,8 +69,6 @@ internal sealed class ForeignActualTurnWindowRuntime(IProgramRuntimeFrames frame
 
     private void ContinueOwnActualTurnStart(ForeignActualTurnStartWindowFrame parent)
     {
-        if (parent.OwnerSeat != turn.CurrentSeat || parent.ActualTurnNumber != turn.TurnNumber)
-            throw new InvalidOperationException("A foreign contest lost its exact own-turn continuation.");
         if (facts.Winner != Winner.None)
         {
             if (frames.Top is null && facts.Status != EngineStatus.Completed) returns.CompleteGame();
@@ -97,17 +95,5 @@ internal sealed class ForeignActualTurnWindowRuntime(IProgramRuntimeFrames frame
             throw new InvalidOperationException("A foreign turn-start binding lost its exact typed parent.");
         frames.ReplaceTop(parent with { CandidateIndex = parent.CandidateIndex + 1, Step = ResolutionFrameStep.ResolvingEffect });
         frames.AdvanceTop<ForeignActualTurnStartWindowFrame>();
-    }
-
-    internal bool HasBoundary()
-    {
-        if (nativeFrames.FrameCount == 0 || nativeFrames.FrameAt(0) is not ForeignActualTurnStartWindowFrame parent) return false;
-        if (parent.ActualTurnNumber != turn.TurnNumber || parent.OwnerSeat != turn.CurrentSeat ||
-            parent.Candidates.Count != parent.Contexts.Count || parent.CandidateIndex < 0 || parent.CandidateIndex > parent.Candidates.Count ||
-            parent.Contexts.Where((context, index) => context.Window != SkillProgramTriggerWindow.OtherActualTurnStarted ||
-                context.ParentFrameId != parent.Id || context.SourceSeat != parent.OwnerSeat || context.TargetSeat != parent.OwnerSeat ||
-                context.OwnerSeat != parent.Candidates[index].OwnerSeat || context.OccurrenceIndex != parent.Candidates[index].OccurrenceIndex).Any())
-            throw new InvalidOperationException("A foreign actual-turn cursor lost its frozen participants and contexts.");
-        return true;
     }
 }

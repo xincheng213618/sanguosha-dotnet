@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFactionRequestPaymentsRuntime
 {
-    internal bool IsFactionRequestCostPrompt(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => pending.PolicySource?.DiscardCost == 1 && !pending.CostPaid && !pending.ProviderRewarded && pending.AwaitingProviders && pending.CandidateIndex == 0 && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.RespondSlash, IsPrivate: true } prompt && prompt.PlayerSeat == pending.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, FactionRequestCostChoices(pending));
     internal IReadOnlyList<PromptChoice> FactionRequestCostChoices(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];

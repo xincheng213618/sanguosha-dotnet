@@ -235,8 +235,6 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             _ => false
         });
     }
-
-    internal bool HasMouXqJueyanResponseContinuation(long parentId) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.MouXiaoQiaoJueyanResponse?.ParentFrameId == parentId && IsMouXqJueyanResponseRequest(f) && f.MouXiaoQiaoOl is { Paid: true });
     internal bool HasMouXqJueyanDyingResponse(CharacterState actor) => MouXqJueyanResponseChoices(actor, CardKind.Peach, true).Count > 0 || MouXqJueyanResponseChoices(actor, CardKind.Alcohol, true).Count > 0;
     internal bool TryMouXqJueyanAiResponse(CardKind kind, bool dying = false)
     {

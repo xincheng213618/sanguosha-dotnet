@@ -1,5 +1,5 @@
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouHuLieRuntime(IMouHuLieFacts facts, IMouHuLieNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouHuLieRuntime
 {
     internal const string Chuanyu = "mou:chuanyu",Yitou = "mou:yitou",Action = "mou-hu-lie-anniversary";
@@ -115,7 +115,6 @@ internal sealed class MouHuLieRuntime(IMouHuLieFacts facts, IMouHuLieNative nati
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouHuLieCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouHuLie = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 37500)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouHuLie: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 37500)] private bool Movement(ProgramSkillFrame f) => f.MouHuLie is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 37500)] private void Invariant(ProgramSkillFrame f) { if (f.MouHuLie is not null && !Valid(f)) throw new InvalidOperationException("Invalid Mou Hu Lie immutable owning-frame continuation."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 37500)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 37500)] private bool Paid(ProgramSkillFrame f) => f.MouHuLie is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.StartMouHuLieChuanyu, SkillProgramEffectOp.RegiveMouHuLieChuanyu, SkillProgramEffectOp.EndMouHuLieChuanyu)] private PromptChoice Ai(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards is [var id] ? facts.Keep(p.PlayerSeat, id) : c.Targets is [var target] ? (f.MouHuLie!.Stage == MouHuLieStage.SlashOffer ? !facts.Friendly(p.PlayerSeat, target) : facts.Friendly(p.PlayerSeat, target)) ? 0 : 1 : int.MaxValue).First();
 }

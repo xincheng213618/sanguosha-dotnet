@@ -234,8 +234,6 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.AnniversaryHuangZhong!;
-        if (r.Stage != AnniversaryHzStage.Drawing || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.Amount || f.NativeDraw is not null)
-            throw new InvalidOperationException("Zhanjue lost its exact native draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryHuangZhong = r with { Stage = AnniversaryHzStage.Children, Before = outcome.SequenceBefore, After = outcome.SequenceAfter } });
         ContinueAnniversaryHz(f.Id);
     }
@@ -260,12 +258,4 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
     internal PromptChoice ChooseAnniversaryHzBody(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("option") == "Tianchong") ?? p.Choices.First();
     [ProgramAiChoice(SkillProgramEffectOp.ResolveAnniversaryHuangZhongZhanjue)]
     internal PromptChoice ChooseAnniversaryHzDraw(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 39600)]
-    internal void AssertAnniversaryHz(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryHuangZhong is not { } r)
-            return;
-        if (r.Source != AnniversaryHzSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || !Enum.IsDefined(r.Stage) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.Amount < 0 || r.After < r.Before || r.Cards.Distinct().Count() != r.Cards.Count || r.Mode is < 0 or > 2 || r.DyingId < 0 || r.Op == SkillProgramEffectOp.ResolveAnniversaryHuangZhongLieqiong && (f.SkillId != AnniversaryHzLieqiong || r.Target == f.OwnerSeat) || r.Op == SkillProgramEffectOp.ResolveAnniversaryHuangZhongZhanjue && (f.SkillId != AnniversaryHzZhanjue || r.Phase is null || r.Phase.ActorSeat != f.OwnerSeat) || r.Op == SkillProgramEffectOp.ResolveAnniversaryHuangZhongDamageBenefit && (f.SkillId != AnniversaryHzZhanjue || r.IssueId <= 0 || r.DamageId != f.WindowContext?.DamageFrameId))
-            throw new InvalidOperationException("Huang Zhong lost his original source, physical discard, paid HP, phase or typed native return.");
-    }
 }

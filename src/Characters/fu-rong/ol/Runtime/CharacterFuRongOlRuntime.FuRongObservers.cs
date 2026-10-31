@@ -14,7 +14,6 @@ internal sealed partial class CharacterFuRongOlRuntime
             return false;
         if (r.Stage == FuRongPairStage.NativeUse && r.NativeReturn is null)
             return false;
-        AssertFuRongPair(f);
         if (child is CardUseFrame use)
             return r.Stage == FuRongPairStage.NativeUse && r.NativeReturn is { } ret && ret.ProgramFrameId == f.Id && ret.CardUseFrameId == use.Id && use.FuRongReturn == ret && use.SourceSeat == f.OwnerSeat && use.CardId == ret.CardId && use.Action?.ActionId == ret.ActionId && use.PhysicalCardIds is [var physical] && physical == ret.CardId;
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -36,8 +35,6 @@ internal sealed partial class CharacterFuRongOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 520)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 550)]
     internal bool HasFuRongDamageObserver(long id) => FuRongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 380)]
-    internal bool IsFuRongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FuRongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26310)]
     internal bool AdvanceFuRongSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FuRongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

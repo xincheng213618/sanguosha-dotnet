@@ -420,12 +420,5 @@ internal sealed partial class CharacterCaoChunOlRuntime
             throw new InvalidOperationException("Shanjia native Slash lost its issued receipt.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 310)]
-    internal void AssertRegisteredCaoChun(ProgramSkillFrame frame)
-    {
-        if (frame.CaoChun is not null)
-            RequireCaoChun(frame);
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.ICaoChunProgramHost.ExecuteCaoChun(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteCaoChun(f, op);
 }

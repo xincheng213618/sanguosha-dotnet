@@ -4,7 +4,6 @@ internal sealed partial class CharacterMaMiaoAnniversaryEntries
 {
     internal bool AdvanceMaMiaoChildren() => _resolve().AdvanceMaMiaoChildren();
     internal void AnswerMaMiao(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMaMiao(choice);
-    internal void AssertMaMiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMaMiao(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMaMiao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMaMiao(supplied, op);
     internal bool CanOfferMaMiao(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferMaMiao(c, t, w);
     internal void CaptureAnniversaryMaMiaoGainBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureAnniversaryMaMiaoGainBatch(batch);
@@ -18,7 +17,6 @@ internal sealed partial class CharacterMaMiaoAnniversaryEntries
     internal bool DrainMaMiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMaMiao(f);
     internal bool ExcludeOrdinaryMovement_IsAnniversaryMaMiaoCongfengTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsAnniversaryMaMiaoCongfengTrigger(candidate, trigger);
     internal void FinishMaMiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMaMiao(f);
-    internal bool HasAnniversaryMaMiaoPrompt() => _resolve().HasAnniversaryMaMiaoPrompt();
     internal bool MaMiaoBeforeDamageObserver(long id) => _resolve().MaMiaoBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MaMiaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MaMiaoChoices(f);
     internal int MaMiaoChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MaMiaoChooser(f);

@@ -60,7 +60,6 @@ internal sealed partial class CharacterMengDaOlRuntime
 
     internal void PublishGoude(ProgramSkillFrame f)
     {
-        AssertMengDa(f);
         var choices = GoudeChoices(f);
         if (choices.Count == 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
         {
@@ -88,7 +87,6 @@ internal sealed partial class CharacterMengDaOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Goude: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !GoudeChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Goude requires its exact published option, target, faction or opaque Hand slot.");
-        AssertMengDa(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
@@ -183,7 +181,6 @@ internal sealed partial class CharacterMengDaOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Goude: { } r } f || f.Id != id)
             return;
-        AssertMengDa(f);
         if (r.Stage is not (GoudeStage.MovementChildren or GoudeStage.NativeChildren))
         {
             if (r.Stage != GoudeStage.NativeSlash && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

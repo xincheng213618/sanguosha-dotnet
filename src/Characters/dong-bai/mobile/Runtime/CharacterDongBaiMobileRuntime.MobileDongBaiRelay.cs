@@ -211,20 +211,11 @@ internal sealed partial class CharacterDongBaiMobileRuntime
             throw new InvalidOperationException("Mobile Lianzhu cannot repeat or replace its paid original entity movement.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 79100)]
-    internal void AssertMobileLianzhuReceipt(ProgramSkillFrame f)
-    {
-        if (f.MobileLianzhu is not null)
-            RequireMobileLianzhuReceipt(f);
-    }
-
     internal bool MobileLianzhuFirstChild(ProgramSkillFrame root, ResolutionFrame child) => root.MobileLianzhu is { } r && r.Stage is MobileLianzhuStage.GiftChildren or MobileLianzhuStage.PassChildren or MobileLianzhuStage.DrawChildren or MobileLianzhuStage.RecoverChildren or MobileLianzhuStage.InitialGiftChildren && child is CardsMovedTriggerWindowFrame moved && moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
     internal ProgramSkillFrame? MobileLianzhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterDongBaiMobileOperations.MobileLianzhuFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 79100)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 79100)]
     internal bool MobileLianzhuDamageObserver(long id) => MobileLianzhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 79100)]
-    internal bool MobileLianzhuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MobileLianzhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 79100)]
     internal bool AdvanceMobileLianzhuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MobileLianzhuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

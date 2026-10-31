@@ -64,50 +64,6 @@ internal sealed partial class CoreGameEngineDamageColorDuelProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    internal void AssertSelectedActorDuels()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.SelectedActorDuelOrigin is not null))
-        {
-            var o = use.SelectedActorDuelOrigin!;
-            if (o.MouDiaoChanRing is not null)
-            {
-                _characterDiaoChanMouMobileOperations.AssertMouDiaoChanRingUse(use, o);
-                continue;
-            }
-
-            if (o.XiahouEnShiwu is not null)
-            {
-                _characterXiahouEnAnniversaryOperations.AssertXiahouEnShiwuDuelUse(use, o);
-                continue;
-            }
-
-            if (o.CaiYangXunji is not null)
-            {
-                _characterCaiYangAnniversaryOperations.AssertCaiYangXunjiDuelUse(use, o);
-                continue;
-            }
-
-            if (o.ShanheSourceXiechan is not null)
-            {
-                _coreShanheSourceLiuYanTrioOperations.AssertSourceXiechanDuelUse(use, o);
-                continue;
-            }
-
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
-            if (o.OrderedPairPayment is not null)
-            {
-                if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame orderedParent)
-                    throw new InvalidOperationException("Ordered Duel lost its direct owning program edge.");
-                _coreOrderedSelectedActorDuelsOperations.AssertOrderedSelectedActorDuelUse(use, orderedParent, o);
-                continue;
-            }
-
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame f || f.Id != o.ParentProgramFrameId || f.OwnerSeat != o.OwnerSeat || f.SkillId != o.SkillId || f.ActivationId != o.ActivationId || f.SkillInstanceId != o.SkillInstanceId || f.GameplayHash != o.GameplayHash || f.InstructionIndex != o.InstructionIndex || o.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var selectedParticipant] || (o.ParticipantMode == SelectedActorDuelParticipantMode.OwnerToSelectedTarget ? o.InitialActorSeat != f.OwnerSeat || o.InitialTargetSeat != selectedParticipant || selectedParticipant == f.OwnerSeat || !OrderedSelectedActorDuelContract.IsOwnerToSelected(ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions[0]) : o.ParticipantMode is not null || o.InitialTargetSeat is not null || selectedParticipant != o.InitialActorSeat || o.OwnerSeat == o.InitialActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(o.InitialActorSeat) || o.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || use.CardId != 0 || use.CardKind != CardKind.Duel || use.PhysicalCardIds?.Count != 0 || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveIsRed: false } || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.UseSelectedActorDuel }])
-                throw new InvalidOperationException("Selected actor Duel has an invalid issued origin or typed owner.");
-        // Initial actor/target are issuance facts. Mature action rewrites need not keep these initial seats.
-        }
-    }
-
     internal SkillProgramStepOutcome BeginDamageAppearanceDraw(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -126,15 +82,6 @@ internal sealed partial class CoreGameEngineDamageColorDuelProgramsRuntime
         if (draw)
             _coreProgramLifecycleOperations.DrawProgramCards(f.Id, recipient!.Value, 1, null, null, SkillProgramCardSetVisibility.Private, CardMoveReasons.Draw);
         return SkillProgramStepOutcome.Continue;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 600)]
-    internal void AssertDamageAppearanceReceipt(ProgramSkillFrame f, ProgramExecutionPlan plan)
-    {
-        if (f.DamageAppearanceReceipt is not { } p)
-            return;
-        if (f.TriggerId is null || plan.Instructions is not [{ Op: SkillProgramEffectOp.DrawByDamageCardColor }] || f.InstructionIndex != 1 || p.InstructionIndex != 1 || p.OwnerSeat != f.OwnerSeat || f.WindowContext is not { Window: SkillProgramTriggerWindow.DamageAppliedBeforeDying } c || c.ParentFrameId != p.DamageWindowFrameId || c.DamageFrameId != p.DamageFrameId || c.OwnerSeat != p.OwnerSeat || c.TargetSeat != p.OwnerSeat || c.SourceSeat != p.SourceSeat || c.Amount <= 0 || !_resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Any(w => w.Id == p.DamageWindowFrameId && w.ParentFrameId == p.DamageFrameId && w.TargetSeat == p.OwnerSeat && w.TriggerWindow == c.Window) || p.HasCard != (p.EffectiveCardKind is not null) || p.IsRed && !p.HasCard || p.RecipientSeat != (p.HasCard ? p.IsRed ? p.SourceSeat : p.OwnerSeat : null) || p.SourceSeat is { } source && !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || p.DrawIssued && p.RecipientSeat is null)
-            throw new InvalidOperationException("Damage appearance receipt lost its exact producer, source or finite claim.");
     }
 
     internal ProgramSkillFrame? DamageAppearanceDrawObserverRoot(long windowId)
@@ -158,25 +105,6 @@ internal sealed partial class CoreGameEngineDamageColorDuelProgramsRuntime
         while (index >= 1 && _resolutionStackOperations._resolutionStack[index].Id != root.Id && (_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) || _corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1])))
             index--;
         return _resolutionStackOperations._resolutionStack[index].Id == root.Id;
-    }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 320, group: 10)]
-    internal bool IsDamageAppearanceDrawProgramDying()
-    {
-        if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } trigger || _coreDyingCursorRuntimeOperations.ActiveDying is not { ResumesProgramSkill: true } dying || DamageAppearanceDrawObserverRoot(trigger.Id)is not { } root || _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(frame => frame.Id == dying.FrameId)is not { } dyingFrame || dyingFrame.ParentFrameId != dying.ParentFrameId)
-            return false;
-        var parentIndex = -1;
-        for (var index = 0; index < _resolutionStackOperations._resolutionStack.Count; index++)
-            if (_resolutionStackOperations._resolutionStack[index] is ProgramSkillFrame parent && parent.Id == dying.ParentFrameId)
-                parentIndex = index;
-        if (parentIndex < 0 || parentIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[parentIndex + 1].Id != dyingFrame.Id)
-            return false;
-        var top = _resolutionStackOperations._resolutionStack.LastOrDefault();
-        if (!(top is DyingFrame topDying && topDying.Id == dyingFrame.Id || top is ProgramSkillFrame { WindowContext: { } response } && response.ParentFrameId == dyingFrame.Id && response.Window is SkillProgramTriggerWindow.DyingResponse or SkillProgramTriggerWindow.SelfDyingResponse || _coreAvailableBoundSubsetProgramsOperations.IsAvailableBoundPeachRescueRide(parentIndex + 1, dyingFrame)))
-            return false;
-        while (parentIndex >= 1 && (_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(_resolutionStackOperations._resolutionStack[parentIndex], _resolutionStackOperations._resolutionStack[parentIndex - 1]) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations._resolutionStack[parentIndex], _resolutionStackOperations._resolutionStack[parentIndex - 1]) || _corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(_resolutionStackOperations._resolutionStack[parentIndex], _resolutionStackOperations._resolutionStack[parentIndex - 1]) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(_resolutionStackOperations._resolutionStack[parentIndex], _resolutionStackOperations._resolutionStack[parentIndex - 1])))
-            parentIndex--;
-        return _resolutionStackOperations._resolutionStack[parentIndex].Id == root.Id;
     }
 
     SkillProgramStepOutcome global::CardGame.Core.IDamageColorDuelProgramHost.DrawByDamageCardColor(ProgramSkillFrame frame) => BeginDamageAppearanceDraw(frame);

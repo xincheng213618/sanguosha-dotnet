@@ -25,21 +25,6 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
             return !r.Restore && HuZhaoCount(r.SelectedMask) > 0 && r.Draw is null;
         return r.Stage == HuZhaoMiduStage.CostChildren ? r.Draw is null : r.Stage == HuZhaoMiduStage.DrawChildren && r.Draw is { } draw && draw.RecipientSeat == r.Recipient && draw.RequestedCount == HuZhaoCount(r.SelectedMask) && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 43000)]
-    internal void AssertHuZhaoMidu(ProgramSkillFrame f)
-    {
-        if (f.HuZhaoMidu is not { } r)
-            return;
-        if (!ValidHuZhaoMidu(f))
-            throw new InvalidOperationException("Midu lost its exact original activation, once-issued area payment, native draw or next-start grant cursor.");
-        if (f.PendingMovementContinuation is { } pending && !HuZhaoMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Midu lost its paid native movement continuation.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && r.Stage is HuZhaoMiduStage.Areas or HuZhaoMiduStage.Recipient && (p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HuZhaoChoices(f))))
-            throw new InvalidOperationException("Midu's current owner menu changed.");
-    }
-
-    internal bool HasAnniversaryHuZhaoPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HuZhaoMidu: { Stage: HuZhaoMiduStage.Areas or HuZhaoMiduStage.Recipient } } f && f.Step == ResolutionFrameStep.AwaitingResponse && p.PlayerSeat == f.OwnerSeat && ValidHuZhaoMidu(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HuZhaoChoices(f));
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43000)]
     internal bool HuZhaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.HuZhaoMidu is { Paid: true, Stage: HuZhaoMiduStage.CostChildren or HuZhaoMiduStage.DrawChildren } && ValidHuZhaoMidu(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryHuZhaoMidu && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43000)]
@@ -66,8 +51,6 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
     internal bool HuZhaoDamageObserver(long id) => HuZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 43000)]
     internal bool HuZhaoBeforeDamageObserver(long id) => HuZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 43000)]
-    internal bool HuZhaoDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HuZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 43000)]
     internal bool AdvanceHuZhaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuZhaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

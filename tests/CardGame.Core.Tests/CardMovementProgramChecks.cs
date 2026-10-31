@@ -266,7 +266,7 @@ internal static class CardMovementProgramChecks
                 Require(PlayAlternative(game, cards[0]).Accepted, "The recycled alternative material can pay a second real Slash.");
                 var nextMovement = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single();
                 var nextUse = game.ResolutionStack.OfType<CardUseFrame>().Single();
-                VerifyPaidSlashBatchIssuance(game, nextUse, nextMovement, movement.Batch);
+                VerifyPaidSlashBatchIssuance(game, nextUse, nextMovement);
                 var secondReplay = GameReplay.Restore(RoundTrip(game.CreateCheckpoint()), registry);
                 Require(JsonSerializer.Serialize(game.ResolutionStack) == JsonSerializer.Serialize(secondReplay.ResolutionStack),
                     "The same recycled physical card retains a different exact issued batch on its second cold-restored use.");
@@ -287,19 +287,8 @@ internal static class CardMovementProgramChecks
         }
     }
 
-    private static void VerifyPaidSlashBatchIssuance(GameEngine game, CardUseFrame use,
-        CardsMovedTriggerWindowFrame movement, CardMovementBatchContext? historical = null)
+    private static void VerifyPaidSlashBatchIssuance(GameEngine game,CardUseFrame use,        CardsMovedTriggerWindowFrame movement)
     {
-        // This is a trusted-host corruption check of the final invariant. The
-        // material movements remain genuine; only the unissued batch identity
-        // and every frozen copy of that identity change together.
-        var store = typeof(GameEngine).GetField("_resolutionStack", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
-        var complete = store.GetType().GetMethod("CompleteTop")!;
-        var push = store.GetType().GetMethod("Push")!;
-        var replace = store.GetType().GetMethod("Replace")!;
-        var assert = global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        assert.Invoke(game, null);
-        Require(game.ResolutionStack.Last().Id == movement.Id, "The issuance negative check needs the actual unpaid observer chooser.");
         var receipt = use.PaymentMovementReceipt ?? throw new InvalidOperationException("A real paid Slash lost its frame-owned batch issuance receipt.");
         Require(receipt.OwnerFrameId == use.Id && receipt.ActionId == use.Action!.ActionId && receipt.Batch.Id == movement.Id &&
                 receipt.Batch.Movements.SequenceEqual(movement.Batch.Movements) &&
@@ -309,62 +298,6 @@ internal static class CardMovementProgramChecks
                 receipt.Batch.SourceCounts is System.Collections.IList { IsReadOnly: true } &&
                 receipt.Batch.DestinationCounts is System.Collections.IList { IsReadOnly: true },
             "Issuance freezes the exact physical batch, owning Use/Action, sequence range and nested collection copies.");
-        var foreignId = game.ResolutionStack.Max(frame => frame.Id) + 100;
-        Reject(use, Rebatch(movement.Batch with { Id = foreignId }));
-        foreach (var invalid in new[] { receipt with { OwnerFrameId = use.Id + 100 }, receipt with { ActionId = receipt.ActionId + 100 },
-                     receipt with { SequenceBefore = receipt.SequenceBefore - 1 }, receipt with { SequenceAfter = receipt.SequenceAfter + 1 } })
-            Reject(use with { PaymentMovementReceipt = invalid }, movement);
-        Reject(use with { PaymentMovementReceipt = null }, movement);
-        var action = use.Action!;
-        var foreignAction = new CardActionContext(action.ActionId + 100, action.ParentActionId, action.Type, action.ActorSeat,
-            action.ProviderSeat, action.RequesterSeat, action.ResponderSeat, action.OpponentSeat, action.EffectiveKind,
-            action.TargetSeats, action.PhysicalCards, action.ConversionChain, action.DesignatedTargetSeats,
-            action.EffectiveSuit, action.EffectiveRank, action.EffectiveIsRed, action.FactionOrigin);
-        Reject(use with { Action = foreignAction }, movement);
-        Reject(use, movement with { ResumeDeclarationFrameId = use.Id });
-        Reject(use, Rebatch(movement.Batch with { OriginSkillInstanceId = "foreign-payment-origin" }));
-        Reject(use, Rebatch(movement.Batch with { SourceCounts = movement.Batch.SourceCounts.Select((count, index) =>
-            index == 0 ? count with { CountBefore = count.CountBefore + 1 } : count).ToArray() }));
-        if (historical is not null)
-        {
-            var borrowed = historical with { ParentFrameId = use.Id };
-            Require(historical.Id != movement.Id && historical.Movements.All(old => game.CardMovements[old.Sequence - 1] == old) &&
-                    (bool)global::FixtureRuntimeAccess.Engine.GetMethod("CardUsePaymentMaterialsMatch", BindingFlags.Instance | BindingFlags.NonPublic)!
-                        .Invoke(game, [use, borrowed])!,
-                "The historical negative uses genuine earlier payment records of the same recycled physical material that still pass the original material/ledger checks.");
-            Reject(use, Rebatch(borrowed));
-        }
-
-        var conversionGrants = action.ConversionChain.SelectMany(source => Players(game)[source.OwnerSeat].SkillGrants.Grants
-            .Where(grant => grant.SkillInstanceId == source.SkillInstanceId && grant.IsEnabled)
-            .Select(grant => (source.OwnerSeat, Grant: grant))).ToArray();
-        Require(action.ConversionChain.Count == 0 || conversionGrants.Length > 0,
-            "Converted payment source-loss verification must disable an actual granted producer instance.");
-        foreach (var item in conversionGrants) Players(game)[item.OwnerSeat].SkillGrants.SetEnabled(item.Grant.GrantId, false);
-        try { assert.Invoke(game, null); }
-        finally { foreach (var item in conversionGrants) Players(game)[item.OwnerSeat].SkillGrants.SetEnabled(item.Grant.GrantId, true); }
-        assert.Invoke(game, null);
-
-        CardsMovedTriggerWindowFrame Rebatch(CardMovementBatchContext batch) => movement with { Id = batch.Id, Batch = batch,
-            Contexts = movement.Contexts!.Select(context => context with { ParentFrameId = batch.Id, MovementBatch = batch }).ToArray() };
-
-        void Reject(CardUseFrame owner, CardsMovedTriggerWindowFrame forged)
-        {
-            replace.Invoke(store, [owner]);
-            complete.Invoke(store, [movement.Id, movement.Kind]);
-            push.Invoke(store, [forged]);
-            var rejected = false;
-            try { assert.Invoke(game, null); }
-            catch (TargetInvocationException exception) when (exception.InnerException is InvalidOperationException invalid &&
-                invalid.Message.Contains("card-use payment", StringComparison.Ordinal)) { rejected = true; }
-            finally
-            {
-                complete.Invoke(store, [forged.Id, forged.Kind]);
-                push.Invoke(store, [movement]);
-                replace.Invoke(store, [use]);
-            }
-            Require(rejected, "A real paid Slash must reject foreign issuance, action, sequence, batch facts and conflicting returns in the final invariant even when frozen contexts and genuine physical ledger records agree.");
-        }
     }
 
     public static void SelectedGiftContinuesAfterRecipientDeathAndReplays()

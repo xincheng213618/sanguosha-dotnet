@@ -111,7 +111,6 @@ internal sealed partial class CharacterSunQuanHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappySunQuan: not null } f || f.Id != id)
             return false;
-        RequireHappySunQuan(f);
         var r = f.HappySunQuan!;
         if (r.Stage == HappySunQuanStage.Drawing)
             return true;
@@ -176,7 +175,6 @@ internal sealed partial class CharacterSunQuanHappyGodRuntime
     internal void AnswerHappySunQuan(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Sun Quan lost his choice parent.");
-        RequireHappySunQuan(f);
         if (!HappySunQuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Happy Sun Quan requires his exact current choice.");
         var r = f.HappySunQuan!;

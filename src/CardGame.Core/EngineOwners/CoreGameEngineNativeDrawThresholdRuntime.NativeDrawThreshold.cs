@@ -11,5 +11,4 @@ internal sealed partial class CoreGameEngineNativeDrawThresholdRuntime
 
     internal NativeDrawThresholdProgress? MatchingNativeDrawThresholdProgress(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _nativeDrawThresholdOperations.Get().MatchingNativeDrawThresholdProgress(batch, candidate);
     internal int[] MatchingNativeDrawThresholdIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _nativeDrawThresholdOperations.Get().MatchingNativeDrawThresholdIndexes(batch, candidate);
-    internal bool HasExactNativeDrawThresholdSelection(ProgramSkillFrame frame) => _nativeDrawThresholdOperations.Get().HasExactNativeDrawThresholdSelection(frame);
 }

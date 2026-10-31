@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineShanheMarketEntries
 {
     internal bool AllowsShanheMarketAcquisition(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsShanheMarketAcquisition(gate);
     internal void ContinueShanheMarketPurchase(long id) => _resolve().ContinueShanheMarketPurchase(id);
-    internal bool HasShanheMarketBoundary() => _resolve().HasShanheMarketBoundary();
     internal void InitializeShanheBattleMarket() => _resolve().InitializeShanheBattleMarket();
     internal bool IsExactShanheMarketExecution(global::CardGame.Core.ProgramSkillFrame program) => _resolve().IsExactShanheMarketExecution(program);
     internal bool IsIssuedShanheMarketCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedShanheMarketCandidate(candidate, context);

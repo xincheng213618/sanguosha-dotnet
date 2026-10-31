@@ -1045,8 +1045,6 @@ public sealed partial class GameEngine
 
     internal global::CardGame.Core.RuntimeEntries.CoreNativeCardUseEntries NativeCardUseEntries => GetDeferredRuntimeEntry<global::CardGame.Core.RuntimeEntries.CoreNativeCardUseEntries, global::CardGame.Core.EngineOwners.CoreNativeCardUseRuntime>(global::CardGame.Core.RuntimeEntries.CoreNativeCardUseEntries.Create);
 
-    internal global::CardGame.Core.RuntimeEntries.CoreNativeCoreInvariantsEntries NativeCoreInvariantsEntries => GetDeferredRuntimeEntry<global::CardGame.Core.RuntimeEntries.CoreNativeCoreInvariantsEntries, global::CardGame.Core.EngineOwners.CoreNativeCoreInvariantsRuntime>(global::CardGame.Core.RuntimeEntries.CoreNativeCoreInvariantsEntries.Create);
-
     internal global::CardGame.Core.RuntimeEntries.CoreNativeDamageApplicationEntries NativeDamageApplicationEntries => GetDeferredRuntimeEntry<global::CardGame.Core.RuntimeEntries.CoreNativeDamageApplicationEntries, global::CardGame.Core.EngineOwners.CoreNativeDamageApplicationRuntime>(global::CardGame.Core.RuntimeEntries.CoreNativeDamageApplicationEntries.Create);
 
     internal global::CardGame.Core.RuntimeEntries.CoreNativeDamageCompletionEntries NativeDamageCompletionEntries => GetDeferredRuntimeEntry<global::CardGame.Core.RuntimeEntries.CoreNativeDamageCompletionEntries, global::CardGame.Core.EngineOwners.CoreNativeDamageCompletionRuntime>(global::CardGame.Core.RuntimeEntries.CoreNativeDamageCompletionEntries.Create);

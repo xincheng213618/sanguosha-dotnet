@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoEntries
 {
     internal global::CardGame.Core.PromptChoice AiSourceTiepao(global::CardGame.Core.PendingDecision p) => _resolve().AiSourceTiepao(p);
     internal void AnswerSourceTiepao(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerSourceTiepao(selected);
-    internal void AssertSourceTiepaoReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSourceTiepaoReceipt(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheSourceTiepao(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheSourceTiepao(supplied);
     internal void BindSourceTiepaoUse(global::CardGame.Core.CardUseDeclaredEvent fact) => _resolve().BindSourceTiepaoUse(fact);
     internal bool CanOfferSourceTiepao(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferSourceTiepao(c, t, w);

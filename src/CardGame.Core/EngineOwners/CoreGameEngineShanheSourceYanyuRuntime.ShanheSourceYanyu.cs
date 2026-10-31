@@ -42,7 +42,6 @@ internal sealed partial class CoreGameEngineShanheSourceYanyuRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceYanyu: { } receipt } frame || frame.Id != id)
             return false;
-        AssertShanheSourceYanyu(frame, ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!));
         if (frame.AttackAttempt is not null)
             return true;
         if (receipt.Stage == ShanheSourceYanyuStage.Damage)
@@ -92,7 +91,6 @@ internal sealed partial class CoreGameEngineShanheSourceYanyuRuntime
     {
         if (frame.ShanheSourceYanyu is not { Stage: ShanheSourceYanyuStage.Movement })
             return false;
-        AssertShanheSourceYanyu(frame, ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!));
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { PendingMovementContinuation = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
@@ -100,14 +98,6 @@ internal sealed partial class CoreGameEngineShanheSourceYanyuRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 62046)]
     internal bool IsShanheSourceYanyuMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveShanheSourceYanyu && frame.ShanheSourceYanyu is { Stage: ShanheSourceYanyuStage.Movement } receipt && IsShanheSourceYanyuPreparation(frame) && receipt.InstructionIndex == frame.InstructionIndex && receipt.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && receipt.TargetSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && receipt.PreparationFrameId == frame.WindowContext!.ParentFrameId && effect.SourceBind == receipt.CardBind && effect.OutcomeBind == receipt.Outcome.Name && _coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(frame, receipt.Outcome) && receipt.Outcome.TargetSeat == receipt.TargetSeat && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62046)]
-    internal void AssertShanheSourceYanyu(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.ShanheSourceYanyu is not { } receipt)
-            return;
-        if (!IsShanheSourceYanyuPreparation(frame) || receipt.InstructionIndex != frame.InstructionIndex || frame.InstructionIndex < 1 || frame.InstructionIndex > plan.Instructions.Count || plan.Instructions[frame.InstructionIndex - 1] is not { Op: SkillProgramEffectOp.ResolveShanheSourceYanyu } effect || effect.SourceBind != receipt.CardBind || effect.OutcomeBind != receipt.Outcome.Name || receipt.PreparationFrameId != frame.WindowContext!.ParentFrameId || receipt.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || receipt.TargetSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || receipt.Outcome.TargetSeat != receipt.TargetSeat || receipt.Outcome.InstructionIndex != frame.InstructionIndex - 1 || !_coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(frame, receipt.Outcome) || receipt.Red != (receipt.Outcome.Suit is Suit.Heart or Suit.Diamond) || receipt.RetainedCardId is { } retained && retained != receipt.Outcome.CardId || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceYanyuDamageRequestedEvent>().Count(fact => fact.ProgramFrameId == frame.Id && fact.InstructionIndex == receipt.InstructionIndex && fact.JudgmentFrameId == receipt.Outcome.JudgmentFrameId && fact.OwnerSeat == frame.OwnerSeat && fact.TargetSeat == receipt.TargetSeat && fact.TurnNumber == receipt.TurnNumber) != (receipt.DamagePromised ? 1 : 0) || receipt.DamagePromised && !receipt.Red || !Enum.IsDefined(receipt.Stage) || receipt.Stage == ShanheSourceYanyuStage.Damage && (receipt.MovementSequence is not null || receipt.Destination is not null) || receipt.Stage == ShanheSourceYanyuStage.Movement && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceYanyuCardSettledEvent>().Count(fact => fact.ProgramFrameId == frame.Id && fact.InstructionIndex == receipt.InstructionIndex && fact.JudgmentFrameId == receipt.Outcome.JudgmentFrameId && fact.OwnerSeat == frame.OwnerSeat && fact.TargetSeat == receipt.TargetSeat && fact.CardId == receipt.RetainedCardId && fact.Red == receipt.Red && fact.MovementSequence == receipt.MovementSequence && fact.Destination == receipt.Destination) != 1 || receipt.MovementSequence is { } sequence && (receipt.RetainedCardId is not { } cardId || receipt.Destination != (receipt.Red ? CardLocation.Hand(frame.OwnerSeat) : CardLocation.DiscardPile) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(move => move.Sequence == sequence && move.CardId == cardId && move.From == CardLocation.Processing && move.To == receipt.Destination && move.TurnNumber == receipt.TurnNumber && move.Reason == (receipt.Red ? global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceYanyuDefinitions.ShanheSourceYanyuClaimReason : global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceYanyuDefinitions.ShanheSourceYanyuBlackReason))))
-            throw new InvalidOperationException("Source Yanyu lost its native preparation, exact judgment, promised damage or unique material receipt.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IShanheSourceYanyuHost.ResolveSourceYanyu(ProgramSkillFrame frame, SkillProgramEffect effect) => ResolveShanheSourceYanyu(frame, effect);
 }

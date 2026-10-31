@@ -102,22 +102,4 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         ContinueMouBingcaiLegacyAlcohol(window.ParentFrameId);
         return true;
     }
-
-    internal bool IsMouBingcaiLegacyDyingParent(ProgramSkillFrame root)
-    {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || root.WindowContext is not { } context)
-            return false;
-        var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (rootIndex < 2 || _resolutionStackOperations._resolutionStack[rootIndex - 1] is not ProgramCardTriggerWindowFrame window || window.Id != context.ParentFrameId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _resolutionStackOperations._resolutionStack[rootIndex - 2] is not CardUseFrame use || window.ParentFrameId != use.Id || use.Action?.ActionId != window.Action.ActionId)
-            return false;
-        return use.MouBingcaiLegacyAlcohol is { } own && own.DyingId == dying.FrameId && own.Stage != MouBingcaiLegacyAlcoholStage.Recovery && IsMouBingcaiLegacyAlcoholUse(use.Id) || use.LiuYanLegacyAlcohol is { } liu && liu.DyingId == dying.FrameId && liu.Stage != LiuYanLegacyAlcoholStage.Recovery && _characterLiuYanOlOperations.IsLiuYanLegacyAlcoholUse(use.Id) || use.CuiYanLegacyAlcohol is { } cui && cui.DyingId == dying.FrameId && cui.Stage != CuiYanLegacyAlcoholStage.Recovery && _characterCuiYanOlOperations.IsCuiYanLegacyAlcoholUse(use.Id) || use.ZhuJunLegacyAlcohol is { Returned: false } zhu && zhu.DyingId == dying.FrameId && _coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(use) && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhuJunLegacyAlcoholWindowIssuedEvent>().Count(e => e.Return == zhu) == 1;
-    }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 670)]
-    internal bool IsMouBingcaiLegacyDyingWindow()
-    {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramCardTriggerWindowFrame window || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { } use || use.Action?.ActionId != window.Action.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !_coreProgramLifecycleOperations.GetProgramTrigger2(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])).Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouHuangYueyingBingcai) || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) >= _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id))
-            return false;
-        return use.MouBingcaiLegacyAlcohol is { } own && own.DyingId == dying.FrameId && own.Stage != MouBingcaiLegacyAlcoholStage.Recovery && IsMouBingcaiLegacyAlcoholUse(use.Id) || use.LiuYanLegacyAlcohol is { } liu && liu.DyingId == dying.FrameId && liu.Stage != LiuYanLegacyAlcoholStage.Recovery && _characterLiuYanOlOperations.IsLiuYanLegacyAlcoholUse(use.Id) || use.CuiYanLegacyAlcohol is { } cui && cui.DyingId == dying.FrameId && cui.Stage != CuiYanLegacyAlcoholStage.Recovery && _characterCuiYanOlOperations.IsCuiYanLegacyAlcoholUse(use.Id) || use.ZhuJunLegacyAlcohol is { Returned: false } zhu && zhu.DyingId == dying.FrameId && _coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(use) && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhuJunLegacyAlcoholWindowIssuedEvent>().Count(e => e.Return == zhu) == 1;
-    }
 }

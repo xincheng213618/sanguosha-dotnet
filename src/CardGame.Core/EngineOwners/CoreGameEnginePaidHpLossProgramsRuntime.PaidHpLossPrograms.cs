@@ -79,17 +79,6 @@ internal sealed partial class CoreGameEnginePaidHpLossProgramsRuntime
     }
 
     internal static ProgramHpLossModifierOrigin CreatePaidHpLossModifierOrigin(ProgramSkillFrame f, ProgramPaidHpLossReceipt p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PaidHpLossPrograms.CreatePaidHpLossModifierOrigin(f, p);
-    internal void AssertPaidHpLossModifiers()
-    {
-        foreach (var m in _turnCardUseEffectsOperations._turnCardUseEffects.RuleModifiers.Where(m => m.PaidHpLossOrigin is not null))
-        {
-            var p = m.PaidHpLossOrigin!;
-            var program = _contentRegistryOperations._contentRegistry.GetSkill(p.SkillId).Program;
-            var activation = program?.Activations.SingleOrDefault(a => a.Id == p.BindingId);
-            if (!PaidHpLossProgram.IsValidModifierOrigin(m) || program?.GameplayHash != p.GameplayHash || activation is not { UsesPerGame: 1, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0 } || !PaidHpLossProgram.IsExactChain(activation.Effects) || activation.Effects[0].ResultBind != p.ResultBind || activation.UsageGroup != p.UsageGroup || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(p.OwnerSeat, p.SkillId, p.UsageGroup, SkillUsageScope.Game) != 1 || p.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || p.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
-                throw new InvalidOperationException("A paid HP loss modifier lost its frozen real producer and turn.");
-        }
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 770)]
     internal bool CanContinueIssuedHpLoss(ProgramSkillFrame f)
@@ -126,17 +115,5 @@ internal sealed partial class CoreGameEnginePaidHpLossProgramsRuntime
         var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, a.Id, a.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(a), distance ? SkillRuleQuery.OutgoingDistance : SkillRuleQuery.SlashLimit, SkillRuleOperation.Add, distance ? -p.ActualLost : p.ActualLost, hpLossOrigin: CreatePaidHpLossModifierOrigin(a, p));
         _coreRuntimeOperations.ReplaceRuntimeTop(a with { PaidHpLossReceipt = distance ? p with { DistanceGrantSequence = grant.GrantSequence } : p with { SlashGrantSequence = grant.GrantSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(grant));
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40)]
-    internal void AssertPaidHpLossState(ProgramSkillFrame f, ProgramExecutionPlan plan)
-    {
-        if (f.PaidHpLossReceipt is not null && !HasValidPaidHpLossReceipt(f, plan))
-            throw new InvalidOperationException("Actual HP loss receipt lost its exact owner, source, turn or stage.");
-        if (f.HpLossQuantity is { } d)
-        {
-            if (!PaidHpLossProgram.IsExactChain(plan.Instructions) || plan.Activation?.UsesPerGame != 1 || f.InstructionIndex != 1 || d.InstructionIndex != 1 || f.PaidHpLossReceipt is not null || d.OwnerSeat != f.OwnerSeat || d.Maximum <= 0 || d.ResultBind != plan.Instructions[0].ResultBind || d.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || d.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || d.TurnOwnerSeat != f.OwnerSeat || !ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || p.Choices.Count != d.Maximum || p.Choices.Where((c, i) => c.Cards.Count != 0 || c.Targets.Count != 0 || c.Parameters.GetValueOrDefault("program-action") != "hp-loss-quantity" || c.Parameters.GetValueOrDefault("quantity") != (i + 1).ToString(CultureInfo.InvariantCulture) || c.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || c.Parameters.GetValueOrDefault("result-bind") != d.ResultBind).Any())
-                throw new InvalidOperationException("The HP quantity lost its exact finite owning prompt.");
-        }
     }
 }

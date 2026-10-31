@@ -32,8 +32,6 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
             return r.IronChainReturn is null && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } group && group.ResolutionId == r.UseId && group.Effect == effect && group.TargetIndex == r.TargetIndex && group.TargetSeats.ElementAtOrDefault(r.TargetIndex) == r.TargetSeat;
         return r.IronChainReturn is { ActionKind: LegalActionKind.IronChain } pending && pending.ParentFrameId == r.UseId && use.NativeIronChainTargets is not null && pending.TargetSeats.ElementAtOrDefault(r.TargetIndex) == r.TargetSeat;
     }
-
-    internal bool HasNativeGroupEffectAttackObserver(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolutionStackOperations._resolutionStack.OfType<CardEffectBeforeApplyFrame>().Any(window => window.NativeTargetReturn is { GroupEffect: GroupCardEffect.ResponseAttack } r && r.UseId == attack.ResolutionId && r.TargetSeat == attack.TargetSeat && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.CurrentAttack is { } original && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(original, attack) && ValidNativeTrickTargetEffect(window));
     internal void ReturnNativeTrickTargetEffect(CardEffectBeforeApplyFrame window)
     {
         if (!ValidNativeTrickTargetEffect(window))

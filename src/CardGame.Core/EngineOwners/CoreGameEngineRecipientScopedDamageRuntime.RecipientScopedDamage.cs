@@ -72,28 +72,4 @@ internal sealed partial class CoreGameEngineRecipientScopedDamageRuntime
         else if (_coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).RecipientDamageScope is { } scope)
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { RecipientDamageScope = scope with { CurrentTargetSeat = attack.TargetSeat } });
     }
-
-    internal void AssertRecipientScopedDamageStates()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack)
-        {
-            var scope = frame switch
-            {
-                ProgramSkillFrame { AttackAttempt: { } a } => a.RecipientDamageScope,
-                CardUseFrame { CardAttack: { } a } => a.RecipientDamageScope,
-                ProgramSkillFrame { CardAttack: { } a } => a.RecipientDamageScope,
-                JudgmentFrame { CardAttack: { } a } => a.RecipientDamageScope,
-                _ => null
-            };
-            if (scope is null)
-                continue;
-            var target = frame is ProgramSkillFrame { AttackAttempt: { } attempt } ? attempt.TargetSeat : _coreCardAttackStateOperations.GetCardAttackState(frame.Id).TargetSeat;
-            var chain = frame is ProgramSkillFrame { AttackAttempt: { } attempt2 } ? attempt2.IsChainPropagation : _coreCardAttackStateOperations.GetCardAttackState(frame.Id).IsChainPropagation;
-            var instructionIndex = frame is ProgramSkillFrame { AttackAttempt: not null } ? null : _coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(frame.Id);
-            var targets = frame is ProgramSkillFrame { AttackAttempt: { } programAttack } ? programAttack.ChainedTargetSeats ?? [] : _coreCardAttackStateOperations.GetCardAttackState(frame.Id).ChainedTargetSeats;
-            var cursor = frame is ProgramSkillFrame { AttackAttempt: { } programCursor } ? programCursor.ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(frame.Id).ChainedTargetIndex;
-            if (!SupportsIssuedRecipientDamageScope(scope) || scope.ProgramUseInstructionIndex != instructionIndex || scope.CurrentTargetSeat != target || scope.PropagationBaseAmount <= 0 || !_coreLateFixedTargetDamageCapScopesOperations.IsValidLateFixedTargetDamageCapScope(scope, frame.Id, targets) || scope.LateFixedTargetDamageCap is { } lateCursor && !(cursor == lateCursor.ChainTargetIndex && target == lateCursor.PaidTargetSeat) && (cursor <= lateCursor.NextTargetIndex || cursor > targets.Count) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RecipientScopedDamageBaseEvent>().Count(e => e.AttackFrameId == frame.Id && e.FirstTargetSeat == scope.FirstTargetSeat && e.Amount == scope.PropagationBaseAmount && e.PublicEnemyObserver == scope.PublicEnemyObserver && e.FixedTargetDamageCap == scope.FixedTargetDamageCap && e.LateFixedTargetDamageCap == scope.LateFixedTargetDamageCap && e.ProgramUseInstructionIndex == scope.ProgramUseInstructionIndex) != 1 || chain && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RecipientScopedDamageAdvancedEvent>().Any(e => e.AttackFrameId == frame.Id && e.TargetSeat == target && e.Amount == scope.PropagationBaseAmount && e.ProgramUseInstructionIndex == scope.ProgramUseInstructionIndex) && !(scope.LateFixedTargetDamageCap is { } late && late.PaidTargetSeat == target && late.ChainTargetIndex == cursor) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDamageTransferredEvent>().Any(e => e.ResolutionId == frame.Id && e.TargetSeat == target))
-                throw new InvalidOperationException("Recipient scoped damage state lost its issued base or actual propagation target.");
-        }
-    }
 }

@@ -7,7 +7,6 @@ internal sealed partial class CharacterZhangShiPingOlEntries
     internal global::CardGame.Core.PromptChoice AiXingGu(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiXingGu(p, f);
     internal void AnswerHongji(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHongji(choice);
     internal void AnswerXingGu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerXingGu(choice);
-    internal void AssertZhangShiPing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhangShiPing(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHongjiExtraPhase(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHongjiExtraPhase(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHongjiPromise(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHongjiPromise(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginXingGu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginXingGu(supplied, operation);
@@ -26,7 +25,6 @@ internal sealed partial class CharacterZhangShiPingOlEntries
     internal bool HongjiPromiseReservedByPhaseParent(global::CardGame.Core.ZhangShiPingHongjiGrantedEvent promise) => _resolve().HongjiPromiseReservedByPhaseParent(promise);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> IncludeHongjiPhaseCandidates(global::CardGame.Core.CharacterState turnOwner, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> candidates) => _resolve().IncludeHongjiPhaseCandidates(turnOwner, window, candidates);
     internal bool IsHongjiPhaseCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsHongjiPhaseCandidate(c);
-    internal bool IsZhangShiPingDying() => _resolve().IsZhangShiPingDying();
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ZhangShiPingHongjiGrantedEvent> OutstandingHongjiPromises(int recipient, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().OutstandingHongjiPromises(recipient, window);
     internal void PlaceZhangShiPingMount(global::CardGame.Core.ProgramSkillFrame frame, int target, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from) => _resolve().PlaceZhangShiPingMount(frame, target, card, from);
     internal void PublishHongji(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishHongji(f);

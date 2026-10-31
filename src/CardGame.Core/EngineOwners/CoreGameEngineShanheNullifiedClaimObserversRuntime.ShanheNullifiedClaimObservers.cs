@@ -9,7 +9,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
 {
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 62033)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 62033)]
     internal bool IsShanheNullifiedClaimProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } window && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(frame => frame.Id == dying.FrameId && frame.ParentFrameId == dying.ParentFrameId) && TryGetShanheNullifiedClaimRide(window, out _);
     internal bool TryGetShanheNullifiedClaimRide(NullificationWindowFrame window, out int[] childProcessingCosts)
     {

@@ -4,8 +4,6 @@ internal sealed partial class CharacterCaoPiBoundaryMobileEntries
 {
     internal bool AdvanceBoundaryFangzhuObservers() => _resolve().AdvanceBoundaryFangzhuObservers();
     internal void AnswerBoundaryCaoPi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryCaoPi(choice);
-    internal void AssertBoundaryCaoPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryCaoPi(f);
-    internal void AssertBoundaryCaoPiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryCaoPiChoice(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryFangzhu(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffect e) => _resolve().BeginBoundaryFangzhu(input, e);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryXingshang(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffect e) => _resolve().BeginBoundaryXingshang(input, e);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryCaoPiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryCaoPiChoices(f);
@@ -19,7 +17,6 @@ internal sealed partial class CharacterCaoPiBoundaryMobileEntries
     internal bool BoundaryFangzhuRecovery(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().BoundaryFangzhuRecovery(f, recovery);
     internal void CommitBoundaryCaoPiResult(global::CardGame.Core.ProgramSkillFrame input, string bind, string outcome, int chooser, int subject, int count) => _resolve().CommitBoundaryCaoPiResult(input, bind, outcome, chooser, subject, count);
     internal void ContinueBoundaryFangzhu(long id) => _resolve().ContinueBoundaryFangzhu(id);
-    internal bool IsBoundaryCaoPiChoiceResult(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramChoiceResultBinding b) => _resolve().IsBoundaryCaoPiChoiceResult(f, b);
     internal bool KeepBoundaryFangzhuPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepBoundaryFangzhuPaid(f);
     internal void PublishBoundaryCaoPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishBoundaryCaoPi(f);
     internal bool QualifyBoundaryCaoPi(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().QualifyBoundaryCaoPi(c, context);

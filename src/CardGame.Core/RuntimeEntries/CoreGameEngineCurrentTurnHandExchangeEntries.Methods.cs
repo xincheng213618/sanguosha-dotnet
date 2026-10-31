@@ -2,11 +2,9 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineCurrentTurnHandExchangeEntries
 {
-    internal void AssertCurrentTurnHandExchange(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertCurrentTurnHandExchange(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCurrentTurnHandExchange(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginCurrentTurnHandExchange(supplied);
     internal void CompleteCurrentTurnHandExchange(global::CardGame.Core.ProgramSkillFrame frame, string outcome) => _resolve().CompleteCurrentTurnHandExchange(frame, outcome);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CurrentTurnHandExchangeChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CurrentTurnHandExchangeChoices(frame);
-    internal bool CurrentTurnHandExchangeFirstChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().CurrentTurnHandExchangeFirstChild(frame, child);
     internal global::CardGame.Core.Card[] CurrentTurnHandExchangeReturnCards(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CurrentTurnHandExchangeReturnCards(frame);
     internal void DrainCurrentTurnHandExchangeMovement(long frameId) => _resolve().DrainCurrentTurnHandExchangeMovement(frameId);
     internal bool IsCurrentTurnHandExchangeMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsCurrentTurnHandExchangeMovement(frame, effect, pending);

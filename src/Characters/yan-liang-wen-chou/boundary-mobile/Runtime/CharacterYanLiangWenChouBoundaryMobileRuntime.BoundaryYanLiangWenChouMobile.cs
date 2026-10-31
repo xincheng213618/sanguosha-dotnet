@@ -101,13 +101,6 @@ internal sealed partial class CharacterYanLiangWenChouBoundaryMobileRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 65710)]
-    internal void AssertBoundaryYanLiangWenChouClaim(ProgramSkillFrame f)
-    {
-        if (f.BoundaryYanLiangWenChouClaim is not null && !ValidBoundaryYanLiangWenChouClaim(f))
-            throw new InvalidOperationException("Shuangxiong's paid gain changed its original native Duel identity.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 65710)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 65710)]
     internal bool KeepPaidBoundaryYanLiangWenChouClaim(ProgramSkillFrame f) => f.BoundaryYanLiangWenChouClaim is not null && ValidBoundaryYanLiangWenChouClaim(f);

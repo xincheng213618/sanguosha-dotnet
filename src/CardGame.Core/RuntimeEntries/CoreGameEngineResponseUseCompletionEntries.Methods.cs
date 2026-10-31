@@ -10,5 +10,4 @@ internal sealed partial class CoreGameEngineResponseUseCompletionEntries
     internal bool IsCompletedResponseUse(global::CardGame.Core.CardActionContext action, global::CardGame.Core.ProgramCardContinuation continuation) => _resolve().IsCompletedResponseUse(action, continuation);
     internal bool IsCompletedResponseUse2(global::CardGame.Core.CardActionContext action, global::CardGame.Core.ProgramCompletedResponseKind kind) => _resolve().IsCompletedResponseUse(action, kind);
     internal bool TryBeginCompletedResponseUsePrograms(global::CardGame.Core.NativeOwners.CardAttackHandle? attack, global::CardGame.Core.CardActionContext action, global::CardGame.Core.ProgramCardContinuation continuation) => _resolve().TryBeginCompletedResponseUsePrograms(attack, action, continuation);
-    internal bool TryGetCompletedNullificationDyingCosts(global::CardGame.Core.ProgramCardTriggerWindowFrame? window, scoped out int[] costs) => _resolve().TryGetCompletedNullificationDyingCosts(window, out costs);
 }

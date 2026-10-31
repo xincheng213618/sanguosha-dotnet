@@ -4,7 +4,6 @@ internal sealed partial class CharacterLuMengMouEntries
 {
     internal void AddGetHengyeGrowthAttackRangeContribution(global::CardGame.Core.CharacterState player, global::System.Collections.Generic.List<global::CardGame.Core.RuleQueryContribution> contributions) => _resolve().AddGetHengyeGrowthAttackRangeContribution(player, contributions);
     internal void ApplyHengyeGrowth(long damageFrameId, global::CardGame.Core.CharacterState source, global::CardGame.Core.CharacterState target, int amount) => _resolve().ApplyHengyeGrowth(damageFrameId, source, target, amount);
-    internal void AssertYingboInvariant() => _resolve().AssertYingboInvariant();
     internal int GetHengyeGrowth(global::CardGame.Core.CharacterState player) => _resolve().GetHengyeGrowth(player);
     internal void HumanYingboCore(global::CardGame.Core.PromptChoice selected, bool advanceToHumanBoundary) => _resolve().HumanYingboCore(selected, advanceToHumanBoundary);
     internal bool IsAiYingboPending() => _resolve().IsAiYingboPending();

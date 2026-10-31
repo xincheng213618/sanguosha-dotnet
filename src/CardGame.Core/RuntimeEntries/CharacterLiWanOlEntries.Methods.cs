@@ -6,7 +6,6 @@ internal sealed partial class CharacterLiWanOlEntries
     internal global::CardGame.Core.PromptChoice AiLiWan(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiLiWan(prompt, f);
     internal void AnswerLiWan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerLiWan(choice);
     internal void AppendLianjuEndingItems(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendLianjuEndingItems(items);
-    internal void AssertLiWan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLiWan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLiWan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginLiWan(supplied, op);
     internal bool CanOfferLiWan(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferLiWan(c, t, context);
     internal bool CanRunIssuedLiWanCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunIssuedLiWanCandidate(c, context);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterLiWanOlEntries
     internal bool HasLiWanDamageObserver(long id) => _resolve().HasLiWanDamageObserver(id);
     internal bool HasSilvEntityMark(int cardId) => _resolve().HasSilvEntityMark(cardId);
     internal bool IsIssuedLiWanCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedLiWanCandidate(c);
-    internal bool IsLiWanDying() => _resolve().IsLiWanDying();
     internal bool IsLiWanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLiWanMovement(f, effect, pending);
     internal bool IsLiWanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiWanRecoveryParent(f, recovery);
     internal bool IsRefundableSilvMovement(global::CardGame.Core.CardMovementRecord m) => _resolve().IsRefundableSilvMovement(m);

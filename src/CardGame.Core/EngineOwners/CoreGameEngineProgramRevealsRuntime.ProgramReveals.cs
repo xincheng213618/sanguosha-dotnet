@@ -110,25 +110,4 @@ internal sealed partial class CoreGameEngineProgramRevealsRuntime
         _coreProgramCategoryChallengesOperations.RevealProgramBoundCards(frame, resultBind);
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)} 展示了 {(_coreMatchParticipantsPlayersAccess._players[holderSeat].Name)} 的一张手牌。", frame.OwnerSeat, holderSeat);
     }
-
-    internal void AssertProgramRevealCardSelection(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (paused.Op != SkillProgramEffectOp.RevealTargetHandCard)
-        {
-            if (frame.RevealCardSelection is not null)
-                throw new InvalidOperationException("A reveal draft outlived its suspended instruction.");
-            return;
-        }
-
-        if (frame.RevealCardSelection is not { } draft)
-            throw new InvalidOperationException("A suspended reveal lost its private draft.");
-        var expectedChoices = draft.EligibleCardIds.Count + (draft.AllowDecline ? 1 : 0);
-        if (draft.ResultBind != paused.ResultBind || draft.ChooserSeat != frame.OwnerSeat || (draft.HolderSeat == frame.OwnerSeat && paused.RevealMode != SkillProgramRevealMode.SelfChoiceOtherwiseRandom && !(paused.RevealMode == SkillProgramRevealMode.Chooser && _characterLuMengHappyGodOperations.IsExactHappyGongxinSelfReveal(frame))) || draft.AllowDecline != paused.AllowDecline || draft.CandidateCardIds.Count == 0 || draft.CandidateCardIds.Distinct().Count() != draft.CandidateCardIds.Count || draft.EligibleCardIds.Count == 0 && !draft.AllowDecline || draft.EligibleCardIds.Any(cardId => !draft.CandidateCardIds.Contains(cardId)) || draft.EligibleCardIds.Distinct().Count() != draft.EligibleCardIds.Count || draft.CandidateCardIds.Any(cardId => _cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Hand(draft.HolderSeat)) || frame.CardSetBindings.Any(binding => binding.Name == draft.ResultBind) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != draft.ChooserSeat || decision.Choices.Count != expectedChoices || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("result-bind") != draft.ResultBind || choice.Parameters.GetValueOrDefault("program-action") switch
-        {
-            "reveal-target-hand-card" => choice.Cards.Count != 1 || !draft.EligibleCardIds.Contains(choice.Cards[0]),
-            "reveal-target-hand-card-decline" => !draft.AllowDecline || choice.Cards.Count != 0,
-            _ => true
-        }))
-            throw new InvalidOperationException("A private reveal draft lost its exact instruction or prompt.");
-    }
 }

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsEntries
 {
-    internal void AssertBoundDiscardSlashReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundDiscardSlashReceipt(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundDiscardSlashBenefits(long id, string bind) => _resolve().BeginBoundDiscardSlashBenefits(id, bind);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.FirstRoundGameUsageRefund>? GetFirstRoundGameUsageRefundsSnapshot(int owner) => _resolve().GetFirstRoundGameUsageRefundsSnapshot(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnSlashSuitAllowance>? GetTurnSlashSuitAllowancesSnapshot(int owner) => _resolve().GetTurnSlashSuitAllowancesSnapshot(owner);

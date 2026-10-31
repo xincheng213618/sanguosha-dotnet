@@ -2,8 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSharedSlashOffersEntries
 {
-    internal void AssertSharedSlashOffer(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSharedSlashOffer(f);
-    internal void AssertSharedSlashUseReturns() => _resolve().AssertSharedSlashUseReturns();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSharedSlashGift(long frameId, int actorSeat, string bind) => _resolve().BeginSharedSlashGift(frameId, actorSeat, bind);
     internal void BeginSharedSlashUse(global::CardGame.Core.ProgramSkillFrame f, int targetSeat) => _resolve().BeginSharedSlashUse(f, targetSeat);
     internal void CompleteSharedSlashBenefit(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().CompleteSharedSlashBenefit(completion);
@@ -19,7 +17,6 @@ internal sealed partial class CoreGameEngineSharedSlashOffersEntries
     internal bool SharedSlashGiftKindStillValid(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from) => _resolve().SharedSlashGiftKindStillValid(f, card, from);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.IGameEvent> SharedSlashHistory() => _resolve().SharedSlashHistory();
     internal int[] SharedSlashLegalTargets(int actorSeat) => _resolve().SharedSlashLegalTargets(actorSeat);
-    internal global::CardGame.Core.SkillProgramEffect SharedSlashPaused(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SharedSlashPaused(f);
     internal global::CardGame.Core.CardConversionSource SharedSlashSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SharedSlashSource(f);
     internal bool SharedSlashUnchosenSourceValid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SharedSlashUnchosenSourceValid(f);
 }

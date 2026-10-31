@@ -17,12 +17,9 @@ internal sealed partial class CharacterXunYuMobileGodEntries
     internal void FinishQizhengWithoutDamage(global::CardGame.Core.CardUseFrame supplied) => _resolve().FinishQizhengWithoutDamage(supplied);
     internal bool FinishVirtualQizhengAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishVirtualQizhengAttack(attack, out paused);
     internal bool HasDinghanCancellation(global::CardGame.Core.CardUseFrame use) => _resolve().HasDinghanCancellation(use);
-    internal bool HasQizhengProcessing(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().HasQizhengProcessing(processing);
     internal bool HasQizhengPrompt() => _resolve().HasQizhengPrompt();
-    internal bool HasQizhengResponseContinuation(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().HasQizhengResponseContinuation(attack);
     internal bool IsDinghanCancellationFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.DinghanTargetCanceledEvent e, global::System.Collections.Generic.IReadOnlyList<int> before) => _resolve().IsDinghanCancellationFact(use, e, before);
     internal bool IsTianzuoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsTianzuoMovement(f, effect, pending);
-    internal bool IsVirtualQizhengAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsVirtualQizhengAttackConsistent(attack, processing);
     internal void PayQizhengSingleResponse(long id, global::CardGame.Core.CharacterState responder, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind) => _resolve().PayQizhengSingleResponse(id, responder, card, kind);
     internal void PublishDinghanEdit(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishDinghanEdit(f);
     internal void PublishQizheng(global::CardGame.Core.CardUseFrame use) => _resolve().PublishQizheng(use);

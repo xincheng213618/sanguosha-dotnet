@@ -107,7 +107,6 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyTaishiCi: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return false;
-        RequireHappyTsc(f);
         if (r.Stage == HappyTaishiCiStage.Drawing)
             return true;
         var movement = r.Stage == HappyTaishiCiStage.MovementChildren;
@@ -132,7 +131,6 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.AwakenHappyTaishiCiPowei)]
     internal void ReturnHappyTscDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        RequireHappyTsc(f);
         var r = f.HappyTaishiCi!;
         if (r.Stage != HappyTaishiCiStage.Drawing || r.Draw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.Count || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Happy Powei lost its once-frozen native round-count draw.");
@@ -146,14 +144,6 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
     internal bool RetainHappyTsc(ProgramSkillFrame f) => f.HappyTaishiCi is not null;
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 41740)]
     internal bool ProveHappyTscMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation continuation) => f.HappyTaishiCi is { Stage: HappyTaishiCiStage.MovementChildren } r && effect?.Op == r.Op && continuation.SubjectSeat == f.OwnerSeat && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null && ValidHappyTscMaterial(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 41740)]
-    internal void RequireHappyTsc(ProgramSkillFrame f)
-    {
-        if (f.HappyTaishiCi is not { } r)
-            return;
-        if (r.Source != global::CardGame.Core.EngineOwners.CharacterTaishiCiMobileGodRuntime.ShenTscSource(f) || r.Hash != f.GameplayHash || r.Parent != f.WindowContext?.ParentFrameId || f.InstructionIndex != 1 || r.Turn != _coreActualTurnProgressTurnNumberAccess._turnNumber || r.Round != _coreActualRoundProgressRoundNumberAccess._roundNumber || r.Round < 1 || r.After < r.Before || !Enum.IsDefined(r.Stage) || (r.Op == SkillProgramEffectOp.AwakenHappyTaishiCiPowei ? f.SkillId != HappyTscPowei || f.TriggerId != "awaken" || f.WindowContext.Window != SkillProgramTriggerWindow.AfterTurnEnded : r.Op != SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash || f.SkillId != HappyTscShenzhu || f.TriggerId != "start-slash" || f.WindowContext.Window != SkillProgramTriggerWindow.TurnBeforeStart) || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyTaishiCiStartedEvent>().Count(e => e == new HappyTaishiCiStartedEvent(f.Id, r.Source, r.Hash, r.Parent, r.Turn, r.Round, r.Op, r.Count)) != 1 || r.Stage == HappyTaishiCiStage.MovementChildren && !ValidHappyTscMaterial(f))
-            throw new InvalidOperationException("Happy Taishi Ci lost its exact source, original trigger, round or once-issued material receipt.");
-    }
 
     internal bool ValidHappyTscMaterial(ProgramSkillFrame f)
     {

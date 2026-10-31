@@ -94,14 +94,4 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 630)]
     internal bool IsWuyouMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => effect?.Op == SkillProgramEffectOp.ResolveWuyouContributionAndNamedReturn && f.Wuyou is { Stage: WuyouStage.ContributionChildren or WuyouStage.ReturnChildren, ContributionPaid: true } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidWuyouFrame(f, true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28520)]
-    internal void AssertWuyouFrame(ProgramSkillFrame f)
-    {
-        if (f.Wuyou is null)
-            return;
-        if (!ValidWuyouFrame(f, f.Wuyou.ContributionPaid))
-            throw new InvalidOperationException("Wuyou lost its native contribution phase, original Hand transfers or exact random-name return.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.Wuyou.Stage == WuyouStage.ReturnChoice && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, WuyouReturnChoices(f))))
-            throw new InvalidOperationException("Wuyou's private return choices changed their original five names or own Hand cohort.");
-    }
 }

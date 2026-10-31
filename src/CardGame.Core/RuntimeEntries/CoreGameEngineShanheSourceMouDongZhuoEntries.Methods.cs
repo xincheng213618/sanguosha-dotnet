@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoEntries
 {
     internal void AnswerSourceMou(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerSourceMou(choice);
-    internal void AssertSourceMou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSourceMou(f);
     internal void ContinueSourceMou(long id) => _resolve().ContinueSourceMou(id);
     internal bool DrainSourceMou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainSourceMou(f);
     internal void FinishSourceMou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSourceMou(f);

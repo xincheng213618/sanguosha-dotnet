@@ -6,7 +6,6 @@ internal sealed partial class CharacterCaoSongOlEntries
     internal void AnswerCaoSongLilu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerCaoSongLilu(choice);
     internal bool ApplyCaoSongDamageSupport() => _resolve().ApplyCaoSongDamageSupport();
     internal bool ApplyCaoSongRecoverySupport() => _resolve().ApplyCaoSongRecoverySupport();
-    internal void AssertCaoSongLilu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertCaoSongLilu(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCaoSongLilu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginCaoSongLilu(supplied);
     internal bool CanContinuePaidCaoSongLilu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinuePaidCaoSongLilu(frame);
     internal bool CanOfferCaoSongLilu(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferCaoSongLilu(candidate, trigger, context);
@@ -24,7 +23,6 @@ internal sealed partial class CharacterCaoSongOlEntries
     internal bool HasDamageAmountSupport(int sourceSeat, int targetSeat) => _resolve().HasDamageAmountSupport(sourceSeat, targetSeat);
     internal bool HasRecoveryAmountSupport(int targetSeat) => _resolve().HasRecoveryAmountSupport(targetSeat);
     internal bool IsAmountSupportHealthChild(global::CardGame.Core.ResolutionFrame? parent, global::CardGame.Core.HpChangedTriggerWindowFrame hp) => _resolve().IsAmountSupportHealthChild(parent, hp);
-    internal bool IsCaoSongLiluDying() => _resolve().IsCaoSongLiluDying();
     internal bool IsCaoSongLiluRecoveryParent(global::CardGame.Core.ProgramSkillFrame producer, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsCaoSongLiluRecoveryParent(producer, recovery);
     internal void IssueCaoSongYizheng(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().IssueCaoSongYizheng(supplied);
     internal void PayCaoSongYizhengMaximum(long parentId, global::CardGame.Core.CaoSongYizhengGrantedEvent grant, int beneficiary, bool recovery) => _resolve().PayCaoSongYizhengMaximum(parentId, grant, beneficiary, recovery);

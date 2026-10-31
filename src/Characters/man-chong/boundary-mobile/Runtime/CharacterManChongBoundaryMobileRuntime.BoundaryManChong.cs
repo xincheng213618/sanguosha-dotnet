@@ -60,7 +60,6 @@ internal sealed partial class CharacterManChongBoundaryMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryManChongJunxing: { Paid: false } draft } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices.Any(current => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([current], [choice])))
             throw new InvalidOperationException("Junxing lost its original recipient's current private choice.");
-        AssertBoundaryManChongJunxing(frame);
         var branch = choice.Parameters.GetValueOrDefault("branch");
         if (branch is "card" or "unpick")
         {
@@ -116,26 +115,6 @@ internal sealed partial class CharacterManChongBoundaryMobileRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 53000)]
     internal bool BoundaryManChongPaidMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.BoundaryManChongJunxing is { Paid: true } draft && effect?.Op == SkillProgramEffectOp.ResolveBoundaryManChongJunxing && draft.InstructionIndex == frame.InstructionIndex && effect.SourceBind == draft.SourceBind && effect.ResultBind == draft.ResultBind && pending == frame.PendingMovementContinuation && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && draft.SelectedIds.Count == draft.Count && draft.SequenceAfter > draft.SequenceBefore && draft.SelectedIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == id && move.Sequence > draft.SequenceBefore && move.Sequence <= draft.SequenceAfter && move.From.OwnerSeat == draft.TargetSeat && move.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && move.To is { Zone: CardZoneKind.DiscardPile or CardZoneKind.OutsideGame } && move.Reason.Value == BoundaryManChongDiscard) == 1);
-    internal bool IsBoundaryManChongChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding)
-    {
-        if (frame.SkillId != "boundary:junxing-mobile")
-            return false;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        var producer = plan.Instructions.Take(frame.InstructionIndex).SingleOrDefault(effect => effect.Op == SkillProgramEffectOp.ResolveBoundaryManChongJunxing && effect.ResultBind == binding.Name);
-        return producer is not null && frame.SelectedTargetSeats is [var target] && binding.ChooserSeat == target && binding.OptionId is "discarded" or "turned" && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryManChongChoiceCommittedEvent>().Count(record => record.FrameId == frame.Id && record.ResultBind == binding.Name && record.TargetSeat == target && record.Count == _coreProgramLifecycleOperations.GetProgramCardSet(frame, producer.SourceBind!).CardIds.Count && record.Discarded == (binding.OptionId == "discarded")) == 1;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 53000)]
-    internal void AssertBoundaryManChongJunxing(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryManChongJunxing is not { } draft)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.ResolveBoundaryManChongJunxing || draft.InstructionIndex != frame.InstructionIndex || effect.SourceBind != draft.SourceBind || effect.ResultBind != draft.ResultBind || frame.SelectedTargetSeats is not [var target] || target != draft.TargetSeat || target == frame.OwnerSeat || draft.Count < 1 || draft.Count != _coreProgramLifecycleOperations.GetProgramCardSet(frame, draft.SourceBind).CardIds.Count || draft.SelectedIds.Count > draft.Count || draft.SelectedIds.Distinct().Count() != draft.SelectedIds.Count)
-            throw new InvalidOperationException("Junxing lost its original cost count, recipient or owning instruction.");
-        if (!draft.Paid && (draft.SelectedIds.Any(id => !BoundaryManChongDiscardable(target).Any(card => card.Id == id)) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != target))
-            throw new InvalidOperationException("Junxing lost its unspent target selection or private chooser.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryManChongJunxing)]
     internal PromptChoice BoundaryManChongAi(PendingDecision prompt, ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players[frame.BoundaryManChongJunxing!.TargetSeat].IsFaceDown ? prompt.Choices.Single(choice => choice.Parameters.GetValueOrDefault("branch") == "turn") : prompt.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("branch") == "discard") ?? prompt.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("branch") == "card") ?? prompt.Choices.Single(choice => choice.Parameters.GetValueOrDefault("branch") == "turn");

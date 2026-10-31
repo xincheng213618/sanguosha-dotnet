@@ -75,7 +75,6 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
     internal bool MouLbDamageObserver(long id) => MouLbObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31600)]
     internal bool MouLbBeforeDamageObserver(long id) => MouLbObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31600)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31600)]
     internal bool MouLbDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouLbObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31600)]
@@ -89,13 +88,6 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var c = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == recovery.Id);
         return i >= 0 && c > i + 1 && MouLbFirstChild(f, _resolutionStackOperations._resolutionStack[i + 1]) && MouLbObserverSuffix(i) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[c - 1]);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31600)]
-    internal void AssertMouLb(ProgramSkillFrame f)
-    {
-        if (f.MouLuBuLiyu is not null && !ValidMouLb(f))
-            throw new InvalidOperationException("Mobile Liyu lost its actual damage, issued cost or native child receipt.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31600)]

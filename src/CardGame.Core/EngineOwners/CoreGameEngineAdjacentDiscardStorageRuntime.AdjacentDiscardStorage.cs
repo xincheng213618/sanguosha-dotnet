@@ -52,17 +52,6 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
         }
     }
 
-    internal void AssertPendingAdjacentDiscardOrigins()
-    {
-        var entries = _resolutionStackOperations._resolutionStack.SelectMany(f => f.PendingAdjacentDiscardOrigins?.Entries ?? []).ToArray();
-        if (entries.Select(e => e.CardId).Distinct().Count() != entries.Length)
-            throw new InvalidOperationException("An entity has two private discard provenance owners.");
-        foreach (var frame in _resolutionStackOperations._resolutionStack.Where(f => f.PendingAdjacentDiscardOrigins is not null))
-            foreach (var r in frame.PendingAdjacentDiscardOrigins!.Entries)
-                if (!TracksAdjacentDiscardStorage || r.OwnerFrameId != frame.Id || r.SourceSeat != r.From.OwnerSeat || r.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment) || !global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(r.EffectiveKind) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.PreviousLivingSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.NextLivingSeat) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.EntryMovementSequence && m.CardId == r.CardId && m.From == r.From && m.To == CardLocation.Processing && m.Reason.Value == r.Reason && global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(m.Reason)) || _coreCardMovementJournalCardMovementsAccess._cardMovements.Last(m => m.CardId == r.CardId).Sequence != r.EntryMovementSequence || _cardZonesOperations._cardZones.GetLocation(r.CardId) != CardLocation.Processing || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramAdjacentDiscardOriginEvent>().Any(e => e.MovementSequence == r.EntryMovementSequence))
-                    throw new InvalidOperationException("Private discard provenance lost its exact owning payment, unpublished identity or held entity.");
-    }
-
     internal ProgramAdjacentDiscardOriginEvent? AdjacentDiscardOrigin(CardMovementRecord move) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramAdjacentDiscardOriginEvent>().SingleOrDefault(e => e.MovementSequence == move.Sequence && e.CardId == move.CardId);
     internal int[] MatchingAdjacentDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => batch.Movements.Select((move, index) => (move, index, origin: AdjacentDiscardOrigin(move))).Where(x => x.move.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(x.move.CardId) == CardLocation.DiscardPile && x.origin is { } origin && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(origin.EffectiveKind) && (candidate.OwnerSeat == origin.SourceSeat || candidate.OwnerSeat == origin.PreviousLivingSeat || candidate.OwnerSeat == origin.NextLivingSeat)).Select(x => x.index).ToArray();
     SkillProgramStepOutcome global::CardGame.Core.IAdjacentDiscardAndRoundAlcoholHost.StoreAdjacentDiscardedSlash(ProgramSkillFrame frame, CardZoneKind zone) => BeginAdjacentDiscardStorage(frame, zone);

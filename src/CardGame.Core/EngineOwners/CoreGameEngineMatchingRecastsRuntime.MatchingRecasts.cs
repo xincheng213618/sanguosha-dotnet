@@ -135,7 +135,6 @@ internal sealed partial class CoreGameEngineMatchingRecastsRuntime
     internal void ResolveMatchingRecastChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Matching recast lost its choice owner.");
-        _coreMatchingRecastObserversOperations.AssertMatchingRecast(f);
         var r = f.MatchingRecast!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_coreMatchingRecastObserversOperations.IsMatchingRecastChoice(f, prompt) || !MatchingRecastChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, choice)))
             throw new InvalidOperationException("Matching recast changed its exact participant-only private choice.");
@@ -183,7 +182,6 @@ internal sealed partial class CoreGameEngineMatchingRecastsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MatchingRecast: { } r } f || f.Id != id)
             return false;
-        _coreMatchingRecastObserversOperations.AssertMatchingRecast(f);
         if (r.Stage is MatchingRecastStage.ChoosingPeer or MatchingRecastStage.ChoosingPeerCards)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -229,9 +227,6 @@ internal sealed partial class CoreGameEngineMatchingRecastsRuntime
     {
         if (f.MatchingRecast is not { Stage: MatchingRecastStage.OwnerCostChildren or MatchingRecastStage.OwnerDrawChildren or MatchingRecastStage.PeerCostChildren or MatchingRecastStage.PeerDrawChildren })
             return false;
-        _coreMatchingRecastObserversOperations.AssertMatchingRecast(f);
-        if (f.PendingMovementContinuation is null)
-            throw new InvalidOperationException("A matching recast child lost its exact movement return.");
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

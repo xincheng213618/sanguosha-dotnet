@@ -38,8 +38,6 @@ internal sealed partial class CharacterKeBiNengOlRuntime
     internal bool HasKeBiNengDamageObserver(long id) => KeBiNengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1610)]
     internal bool HasKeBiNengBeforeDamageObserver(long id) => HasKeBiNengDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1440)]
-    internal bool IsKeBiNengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && KeBiNengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27040)]
     internal bool AdvanceKeBiNengSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && KeBiNengObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

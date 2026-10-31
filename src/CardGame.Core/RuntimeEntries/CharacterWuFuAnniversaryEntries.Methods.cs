@@ -4,7 +4,6 @@ internal sealed partial class CharacterWuFuAnniversaryEntries
 {
     internal bool AdvanceWuFuChildren() => _resolve().AdvanceWuFuChildren();
     internal void AnswerWuFu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWuFu(choice);
-    internal void AssertWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuFu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuFu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginWuFu(supplied, op);
     internal void BindWuFuSlash(global::CardGame.Core.IGameEvent fact) => _resolve().BindWuFuSlash(fact);
     internal bool CanWuFuSlash(int actor, int target) => _resolve().CanWuFuSlash(actor, target);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterWuFuAnniversaryEntries
     internal bool DrainWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainWuFu(f);
     internal void FinishWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWuFu(f);
     internal bool FinishWuFuAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishWuFuAttack(attack, out paused);
-    internal bool HasAnniversaryWuFuPrompt() => _resolve().HasAnniversaryWuFuPrompt();
     internal bool IsAnniversaryWuFuHandUseForbidden(int seat, global::System.Collections.Generic.IReadOnlyList<int> ids) => _resolve().IsAnniversaryWuFuHandUseForbidden(seat, ids);
     internal bool IsAnniversaryWuFuSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsAnniversaryWuFuSettlementBatch(f, b);
     internal bool IsWuFuUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsWuFuUse(use);

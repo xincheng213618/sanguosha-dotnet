@@ -246,15 +246,6 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         return decision.Choices.Where(c => c.Targets.Count > 0).FirstOrDefault(c => helpful == global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? decision.Choices.Single(c => c.Targets.Count == 0);
     }
 
-    internal void AssertOriginalTargetAdditionDraft(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.OriginalTargetAdditionDraft is not { } draft)
-            return;
-        var use = _coreCurrentCardEnhancementsOperations.EnhancementCardUse(frame);
-        if (paused.Op != SkillProgramEffectOp.OfferOriginalTargetAddition || draft.CardUseFrameId != use.Id || draft.ActionId != use.Action!.ActionId || !CanContinueIssuedOriginalTargetAddition(frame) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.Last()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, OriginalTargetAdditionChoices(frame)))
-            throw new InvalidOperationException("An original-target offer lost its exact owning action, issued source or prompt.");
-    }
-
     internal void ExpireOriginalTargetAdditionGrants(int turn, int seat) => _coreGameEngineOriginalTargetAdditionsOriginalTargetAdditionGrantsAccess._originalTargetAdditionGrants.RemoveAll(g => g.TurnNumber == turn && g.TurnSeat == seat);
     void global::CardGame.Core.IOriginalTargetAdditionProgramHost.GrantOriginalTargetAddition(ProgramSkillFrame frame, int targetSeat) => GrantOriginalTargetAddition(frame, targetSeat);
     SkillProgramStepOutcome global::CardGame.Core.IOriginalTargetAdditionProgramHost.OfferOriginalTargetAddition(ProgramSkillFrame frame) => OfferOriginalTargetAddition(frame);

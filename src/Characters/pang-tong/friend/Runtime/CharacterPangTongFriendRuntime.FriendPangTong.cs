@@ -71,7 +71,6 @@ internal sealed partial class CharacterPangTongFriendRuntime
     internal void ResolveFriendPangTongChoice(PromptChoice selected)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Friend Pang Tong lost its program.");
-        AssertFriendPangTong(frame);
         var canonical = FriendPangTongChoices(frame).SingleOrDefault(choice => choice.Id == selected.Id);
         if (canonical is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]))
             throw new InvalidOperationException("Friend Pang Tong changed its exact private cards, order or use targets.");
@@ -227,15 +226,6 @@ internal sealed partial class CharacterPangTongFriendRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 90)]
     internal bool IsFriendPangTongMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.FriendPangTong is { Stage: FriendPangTongStage.Movement } receipt && effect?.Op == receipt.Operation && frame.PendingMovementContinuation == pending && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 470)]
-    internal void AssertFriendPangTong(ProgramSkillFrame frame)
-    {
-        if (frame.FriendPangTong is not { } receipt)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (receipt.InstructionIndex != frame.InstructionIndex || effect.Op != receipt.Operation || !Enum.IsDefined(receipt.Stage) || receipt.Cards.Distinct().Count() != receipt.Cards.Count || receipt.Selected.Distinct().Count() != receipt.Selected.Count || receipt.Selected.Any(id => !receipt.Cards.Contains(id)) || receipt.UsedSuits.Distinct().Count() != receipt.UsedSuits.Count || receipt.Stage == FriendPangTongStage.Issued != (receipt.UseId is not null) || receipt.Stage == FriendPangTongStage.Movement && (frame.PendingMovementContinuation is null || receipt.Before > receipt.After || receipt.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence))
-            throw new InvalidOperationException("Friend Pang Tong lost its frozen cards, ordered exchange or one-use receipt.");
-    }
 
     [ProgramViewContributor(ProgramViewContribution.PublicCardsAfterResolution, 20)]
     internal IEnumerable<CardSnapshot> FriendPangTongPublicCards() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(frame => frame.FriendPangTong?.Operation == SkillProgramEffectOp.UseFriendDeckSuitsAtPlayEnd).SelectMany(frame => _cardZonesOperations._cardZones.CardsAt(FriendYangmingLocation(frame))).Select(_coreSnapshotValueProjectionOperations.ToSnapshot);

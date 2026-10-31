@@ -137,7 +137,6 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
     internal void ResolvePublicPilePreparationChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A preparation choice lost its owning frame.");
-        _corePublicPilePreparationReceiptsOperations.AssertPublicPilePreparation(f);
         var r = f.PublicPilePreparation!;
         if (r.Stage != PublicPilePreparationStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [PublicPilePreparationChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("A preparation choice must name its exact current entity or beneficiary.");
@@ -206,7 +205,6 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.PublicPilePreparation is not { } r)
             return false;
-        _corePublicPilePreparationReceiptsOperations.AssertPublicPilePreparation(f);
         if (PreparationGameEnded())
             return true;
         if (r.Stage == PublicPilePreparationStage.Choosing)
@@ -264,7 +262,6 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
     {
         if (f.PublicPilePreparation is null || f.PendingMovementContinuation is null)
             return false;
-        _corePublicPilePreparationReceiptsOperations.AssertPublicPilePreparation(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

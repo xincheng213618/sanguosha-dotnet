@@ -9,8 +9,6 @@ internal sealed partial class CoreGameEngineDeferredHandAlignmentsEntries
     internal void ContinueDeferredTurnEnd() => _resolve().ContinueDeferredTurnEnd();
     internal void ContinueDeferredTurnEndCore() => _resolve().ContinueDeferredTurnEndCore();
     internal global::CardGame.Core.SkillProgramEffect DeferredOwnedSelectionEffect(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect original) => _resolve().DeferredOwnedSelectionEffect(frame, original);
-    internal bool HasDeferredTurnEndBoundaryFrame() => _resolve().HasDeferredTurnEndBoundaryFrame();
-    internal bool IsExactDeferredChild(global::CardGame.Core.ProgramSkillFrame child) => _resolve().IsExactDeferredChild(child);
     internal global::CardGame.Core.DeferredHandAlignment RequireDeferredAlignmentParent(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().RequireDeferredAlignmentParent(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome ResolveDeferredHandAlignment(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ResolveDeferredHandAlignment(frame);
     internal void ScheduleDeferredHandAlignment(global::CardGame.Core.ProgramSkillFrame frame, string continuationId) => _resolve().ScheduleDeferredHandAlignment(frame, continuationId);

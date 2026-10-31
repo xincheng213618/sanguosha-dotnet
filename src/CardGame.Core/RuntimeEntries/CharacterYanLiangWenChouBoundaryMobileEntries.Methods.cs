@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterYanLiangWenChouBoundaryMobileEntries
 {
-    internal void AssertBoundaryYanLiangWenChouClaim(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryYanLiangWenChouClaim(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryYanLiangWenChouClaim(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryYanLiangWenChouClaim(supplied);
     internal bool BoundaryYanLiangWenChouOriginalDuel(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext context, scoped out global::CardGame.Core.CardUseFrame use) => _resolve().BoundaryYanLiangWenChouOriginalDuel(owner, instance, context, out use);
     internal global::System.Collections.Generic.IReadOnlyList<int> BoundaryYanLiangWenChouResponseEntities(global::CardGame.Core.CardUseFrame use, int owner) => _resolve().BoundaryYanLiangWenChouResponseEntities(use, owner);

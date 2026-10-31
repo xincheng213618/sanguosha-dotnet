@@ -67,13 +67,4 @@ internal sealed partial class CoreGameEngineKunlunMirrorRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KunlunMirrorPreventionIssuedEvent(frame.Id, receipt));
     // The next ordinary PreventCurrentDamage instruction owns actual prevention.
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62056)]
-    internal void AssertKunlunMirrorReceipt(ProgramSkillFrame frame)
-    {
-        if (frame.KunlunMirror is not { } receipt)
-            return;
-        if (receipt.InstructionIndex != 1 || frame.InstructionIndex < 1 || frame.InstructionIndex > (receipt.Learning ? 1 : 2) || receipt.Source != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || receipt.WindowFrameId != frame.WindowContext?.ParentFrameId || receipt.Origin.TargetSeat != frame.OwnerSeat || receipt.Amount <= 0 || CardUseCategoryCatalog.Get(receipt.Origin.EffectiveKind)is not (CardUseCategories.InstantTrick or CardUseCategories.DelayedTrick) || string.IsNullOrWhiteSpace(receipt.Origin.CardName))
-            throw new InvalidOperationException("Kunlun Mirror lost its frozen treasure/damage/name receipt.");
-    }
 }

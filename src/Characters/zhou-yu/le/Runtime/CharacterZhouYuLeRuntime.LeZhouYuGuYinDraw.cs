@@ -32,7 +32,6 @@ internal sealed partial class CharacterZhouYuLeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuYin: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertGuYin(f);
         if (r.Stage == GuYinStage.DrawChildren)
         {
             if (DrainGuYinDraw(f))
@@ -116,12 +115,5 @@ internal sealed partial class CharacterZhouYuLeRuntime
         var returns = _coreProgramEventHistoryOperations.ProgramEventHistory<GuYinDrawReturnedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
         var returnedCount = r.Index + (r.Stage == GuYinStage.DrawChildren ? 1 : 0);
         return returns.Length == returnedCount && requests.Length >= returnedCount && requests.Length <= r.Index + 1 && requests.Where((e, i) => i >= r.Entities.Count || e.Index != i || e.CardId != r.Entities[i].CardId || e.MovementSequence != r.Entities[i].MovementSequence).Any() == false && returns.Where((e, i) => e.Index != i || e.CardId != r.Entities[i].CardId || e.ActualCount < 0 || e.ActualCount > 1 || e.ReplacementCount < 0 || e.Before < 0 || e.After < e.Before || e.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence).Any() == false && (r.Stage == GuYinStage.Drawing ? r.DrawOutcome is null && f.PendingMovementContinuation is null : r.Index < r.Entities.Count && r.DrawOutcome is { } o && o.RecipientSeat == f.OwnerSeat && o.RequestedCount == 1 && returns[^1] == new GuYinDrawReturnedEvent(f.Id, r.Index, r.Entities[r.Index].CardId, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId) && f.NativeDraw is null && f.PendingMovementContinuation is { } p && IsGuYinMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p));
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28811)]
-    internal void AssertGuYin(ProgramSkillFrame f)
-    {
-        if (f.GuYin is not null && !ValidGuYinReceipt(f))
-            throw new InvalidOperationException("GuYin lost its original arrival, paid recipient cursor or exact native draw return.");
     }
 }

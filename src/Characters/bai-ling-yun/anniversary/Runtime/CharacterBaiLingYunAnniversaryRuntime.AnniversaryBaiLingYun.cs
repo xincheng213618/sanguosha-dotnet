@@ -74,7 +74,6 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryBly.Stage: AnniversaryBlyStage.Choice } f || !AnniversaryBlyChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Linghui rejects a stale private entity or target choice.");
-        RequireAnniversaryBly(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (choice.Parameters["index"] == "skip")
@@ -101,7 +100,6 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryBly: { } r } f || f.Id != id)
             return false;
-        RequireAnniversaryBly(f);
         if (r.Stage is AnniversaryBlyStage.IssuingUse or AnniversaryBlyStage.NativeUse)
             return true;
         if (DrainAnniversaryBly(f))

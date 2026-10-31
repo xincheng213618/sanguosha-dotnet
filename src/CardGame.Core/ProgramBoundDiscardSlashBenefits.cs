@@ -130,9 +130,4 @@ internal sealed partial class TurnCardUseEffectStore
         _slashSuitAllowances.RemoveAll(p => expired.Contains(p.GrantSequence));
         _firstRoundGameUsageRefunds.RemoveAll(p => expired.Contains(p.GrantSequence));
     }
-    private static bool BoundSlashSourceIsInvalid(CardUseEffectSource source, int turnSeat) =>
-        source.OwnerSeat != turnSeat || string.IsNullOrWhiteSpace(source.SkillId) ||
-        string.IsNullOrWhiteSpace(source.BindingId) || string.IsNullOrWhiteSpace(source.SkillInstanceId);
-    private bool BoundSlashBenefitsAreInvalid() => _slashSuitAllowances.Any(p => !Enum.IsDefined(p.Suit) || p.TurnNumber <= 0 || p.TurnSeat < 0 || p.ParentFrameId <= 0 || p.EffectIndex < 0 || BoundSlashSourceIsInvalid(p.Source, p.TurnSeat)) ||
-        _firstRoundGameUsageRefunds.Any(p => p.RoundNumber != 1 || p.TurnNumber <= 0 || p.TurnSeat < 0 || p.ParentFrameId <= 0 || p.EffectIndex < 0 || BoundSlashSourceIsInvalid(p.Source, p.TurnSeat) || string.IsNullOrWhiteSpace(p.UsageId));
 }

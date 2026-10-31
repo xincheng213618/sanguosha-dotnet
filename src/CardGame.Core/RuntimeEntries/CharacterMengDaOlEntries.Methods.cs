@@ -4,7 +4,6 @@ internal sealed partial class CharacterMengDaOlEntries
 {
     internal bool AdvanceMengDaSubtree() => _resolve().AdvanceMengDaSubtree();
     internal void AnswerGoude(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerGoude(choice);
-    internal void AssertMengDa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMengDa(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGoude(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginGoude(input);
     internal global::CardGame.Core.PromptChoice ChooseGoudeAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseGoudeAi(p, f);
     internal void ContinueMengDa(long id) => _resolve().ContinueMengDa(id);
@@ -20,11 +19,9 @@ internal sealed partial class CharacterMengDaOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<int> GoudeFactionSeats(int owner) => _resolve().GoudeFactionSeats(owner);
     internal global::System.Collections.Generic.IReadOnlyList<int> GoudeSlashTargets(int owner) => _resolve().GoudeSlashTargets(owner);
     internal int GoudeZeroSlashActor(global::CardGame.Core.GoudeZeroSlashDeclaredEvent observed, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.IGameEvent> history) => _resolve().GoudeZeroSlashActor(observed, history);
-    internal bool HasGoudeCompletedSlashChild(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().HasGoudeCompletedSlashChild(window);
     internal bool HasMengDaBeforeDamageObserver(long id) => _resolve().HasMengDaBeforeDamageObserver(id);
     internal bool HasMengDaDamageObserver(long id) => _resolve().HasMengDaDamageObserver(id);
     internal bool IsGoudeSlashUse(long useId) => _resolve().IsGoudeSlashUse(useId);
-    internal bool IsMengDaDying() => _resolve().IsMengDaDying();
     internal bool IsMengDaMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMengDaMovement(f, e, p);
     internal void IssueGoudeSlashUse(long useId, global::CardGame.Core.ProgramSkillFrame parent, global::CardGame.Core.CardActionContext action) => _resolve().IssueGoudeSlashUse(useId, parent, action);
     internal bool MengDaFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MengDaFirstChild(f, child);

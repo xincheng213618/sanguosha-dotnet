@@ -141,8 +141,6 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
         ContinueShanheMarketPurchase(market.Id);
         return true;
     }
-
-    internal bool HasShanheMarketBoundary() => _resolutionStackOperations._resolutionStack.FirstOrDefault()is ShanheMarketPurchaseFrame market && market.SuspendedStackDepth == 0 && market.SuspendedFrameId is null && ValidShanheMarketPurchase(market);
     internal int ShanheMarketRuleBonus(int seat, SkillRuleQuery query) => seat != 0 || _shanheMarketOperations._shanheMarket is null || _coreMatchDefinitionOptionsAccess._options.ShanheBattle?.MarketSetup is not { } setup ? 0 : query switch
     {
         SkillRuleQuery.DrawCount => _shanheMarketOperations._shanheMarket.Snapshot.Bonuses.Draw - setup.State.Bonuses.Draw,

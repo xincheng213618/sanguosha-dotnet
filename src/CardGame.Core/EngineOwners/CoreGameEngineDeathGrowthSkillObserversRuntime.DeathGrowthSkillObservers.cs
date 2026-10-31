@@ -31,13 +31,6 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillObserversRuntime
             throw new InvalidOperationException("Death growth lost its exact deceased victim, candidate, source, draw invoice or instruction.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 90)]
-    internal void AssertRegisteredDeathGrowthSkill(ProgramSkillFrame frame)
-    {
-        if (frame.DeathGrowthSkill is not null)
-            RequireDeathGrowthSkill(frame);
-    }
-
     internal static string DeathGrowthCursorHash(ResolutionFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DeathGrowthSkillObservers.DeathGrowthCursorHash(frame);
     internal bool ExactDeathGrowthOriginalCursor(ProgramSkillFrame f, DeathFrame death)
     {
@@ -76,8 +69,6 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1570)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1690)]
     internal bool HasDeathGrowthDamageObserver(long id) => DeathGrowthObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 160)]
-    internal bool IsDeathGrowthDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DeathGrowthObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 440)]
     internal bool TryAdvanceDeathGrowthSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DeathGrowthObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

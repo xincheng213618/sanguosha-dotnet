@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePindianHandReturnsEntries
 {
-    internal void AssertPindianHandReturn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertPindianHandReturn(f);
     internal long? BeginPindianWholeHandAcquisition(global::CardGame.Core.ProgramSkillFrame f, string bind, global::CardGame.Core.SkillProgramCardDestination destination) => _resolve().BeginPindianWholeHandAcquisition(f, bind, destination);
     internal void CommitPindianWholeHandAcquisition(long frameId, string bind, long before) => _resolve().CommitPindianWholeHandAcquisition(frameId, bind, before);
     internal bool ContinuePaidPindianHandReturn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidPindianHandReturn(f);

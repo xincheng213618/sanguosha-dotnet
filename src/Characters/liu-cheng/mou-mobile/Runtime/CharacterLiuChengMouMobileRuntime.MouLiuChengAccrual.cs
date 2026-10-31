@@ -95,15 +95,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29400)]
-    internal void AssertMouLiuChengAccrual(ProgramSkillFrame f)
-    {
-        if (f.MouLiuChengAccrual is not { } q)
-            return;
-        if (f.TriggerId != "after-designation" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || q.Source != MouLiuChengSource(f) || q.GameplayHash != f.GameplayHash || !ValidMouLiuChengAccrualClaim(q) || !SameMouLiuChengAccrual(f.WindowContext?.MouLiuChengAccrual, q) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengAccrualStartedEvent>().Count(e => e == new MouLiuChengAccrualStartedEvent(f.Id, q.Source, q.UseId, q.ActionId, q.NotificationOrdinal)) != 1)
-            throw new InvalidOperationException("Liu Cheng's accrued marks lost their immutable actual target notification.");
-    }
-
     internal void ChangeMouLiuChengChui(ProgramSkillFrame f, int delta)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];

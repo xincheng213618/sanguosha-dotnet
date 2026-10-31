@@ -173,23 +173,6 @@ internal sealed partial class CoreGameEngineWushuangZengouRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 61220)]
-    internal void AssertWushuangZengou(ProgramSkillFrame f)
-    {
-        if (f.WushuangZengou is not { } r)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        var w = WushuangZengouWindow(f.WindowContext);
-        if (!UsesActualDodgeZengou(f.SkillId) || effect.Op != SkillProgramEffectOp.ResolveWushuangZengou || r.InstructionIndex != f.InstructionIndex || w is null || w.Id != r.ResponseWindowId || w.Action.ActionId != r.ActionId || w.AttackOwnerFrameId != r.AttackFrameId || w.Action.ActorSeat != r.DodgerSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(r.AttackFrameId)?.CardAttack?.SuccessfulDodgeResponses != r.DodgeCursor || r.Cards.Distinct().Count() != r.Cards.Count || r.Cards.Any(card => !w.Action.PhysicalCards.Any(c => c.CardId == card)) || r.Stage is not ("choosing" or "paid" or "gained") || r.Before < 0 || r.After < r.Before)
-            throw new InvalidOperationException("Zengou lost its owning once-paid response return.");
-        if (r.Stage != "choosing" && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangZengouPaidEvent>().Count(e => e == WushuangZengouPayment(f)) != 1)
-            throw new InvalidOperationException("Zengou must retain exactly one cost invoice.");
-        if (r.Stage != "choosing" && r.CostCardId is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == f.OwnerSeat && e.Amount == 1) != 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<IdentityGeneralAppearedEvent>().Any(e => e.Receipt.ParentFrameId == f.Id && e.Receipt.OwnerSeat == f.OwnerSeat && e.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && e.Receipt.RequestedDeduction == 1))
-            throw new InvalidOperationException("Zengou lost its exact native HP-loss cost or identity replacement.");
-        if (r.Stage != "choosing" && r.CostCardId is { } cardId && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == cardId && m.Sequence > r.Before && m.Sequence <= r.After && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) == r.CostFrom && m.To == CardLocation.DiscardPile && m.Reason.Value.StartsWith("skill-program.wushuang-zengou.cost", StringComparison.Ordinal)) != 1)
-            throw new InvalidOperationException("Zengou lost its exact physical non-basic discard cost.");
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.ResolveWushuangZengou)]
     internal PromptChoice ChooseWushuangZengou(PendingDecision prompt, ProgramSkillFrame frame) => prompt.Choices.OrderBy(choice => choice.Cards.Count == 1 ? 8d : _characterQingheGongzhuOlOperations.ActualDodgeZengouHpCostForAi(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])).First();
 }

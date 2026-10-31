@@ -16,13 +16,6 @@ internal sealed partial class CharacterWuTuGuOlRuntime
         return r.Stage == WuTuGuRanshangStage.Issuing ? native.Length == 0 && paid.Length == 0 : native is [var hp] && hp.SkillId == f.SkillId && hp.TargetSeat == f.OwnerSeat && hp.Amount == r.Amount && paid is [var receipt] && receipt.Amount == r.Amount && receipt.RemainingHp == hp.RemainingHp;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27320)]
-    internal void AssertWuTuGuRanshang(ProgramSkillFrame f)
-    {
-        if (f.WuTuGuRanshang is not null && !ValidWuTuGuRanshang(f))
-            throw new InvalidOperationException("Ranshang lost its once-issued actual-ending total, exact source or native equal-amount HP loss.");
-    }
-
     internal bool WuTuGuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.WuTuGuRanshang is not { Stage: WuTuGuRanshangStage.HpChildren } r || !ValidWuTuGuRanshang(f))
@@ -40,8 +33,6 @@ internal sealed partial class CharacterWuTuGuOlRuntime
     internal bool HasWuTuGuDamageObserver(long id) => WuTuGuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 920)]
     internal bool HasWuTuGuBeforeDamageObserver(long id) => HasWuTuGuDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 750)]
-    internal bool IsWuTuGuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuTuGuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27320)]
     internal bool AdvanceWuTuGuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuTuGuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

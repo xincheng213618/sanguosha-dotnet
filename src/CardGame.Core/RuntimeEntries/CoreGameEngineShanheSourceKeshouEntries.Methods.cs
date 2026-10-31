@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheSourceKeshouEntries
 {
     internal void AnswerSourceKeshou(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerSourceKeshou(selected);
-    internal void AssertSourceKeshou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSourceKeshou(f);
     internal bool CanOfferSourceKeshou(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferSourceKeshou(c);
     internal bool HasSourceKeshouPair(int owner) => _resolve().HasSourceKeshouPair(owner);
     internal bool KeepPaidSourceKeshou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidSourceKeshou(f);

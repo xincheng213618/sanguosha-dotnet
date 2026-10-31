@@ -17,36 +17,6 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicReturnsRuntim
         return true;
     }
 
-    internal bool IsDrawFundedDistinctBasicAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !_coreDrawFundedDistinctBasicUsesOperations.IsIssuedDrawFundedDistinctBasicUse(use) || attack.Card is not null || attack.PhysicalCards.Count != 0 || attack.EffectiveCardKind != use.CardKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.SourceSeat != use.SourceSeat)
-            return false;
-        var p = use.DrawFundedDistinctBasicUse!.Payment;
-        var exactParentIds = Array.Empty<int>();
-        if (p.Intent == DrawFundedDistinctBasicIntent.BorrowedSword)
-        {
-            if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not { ActiveAttack: { } child } b || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(child, attack) || b.ResolutionId != p.ParentFrameId || b.WeaponOwnerSeat != p.Source.OwnerSeat || b.SlashTargetSeat != p.TargetSeat || use.Action?.ParentActionId != _coreCardUseLifecycleOperations.LifecycleCardUse(b.ResolutionId)?.Action?.ActionId)
-                return false;
-            exactParentIds = _coreNativeTrickUseOperations.GetCardUsePhysicalCards(b.ResolutionId).Select(c => c.Id).ToArray();
-        }
-        else if (p.Intent == DrawFundedDistinctBasicIntent.Qinglong)
-        {
-            if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongFollowup is not { } q || q.OuterResolutionId != p.ParentFrameId || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QinglongCrescentBladeResolvedEvent>().LastOrDefault(e => e.ResolutionId == p.ParentFrameId)is not { Used: true, SlashCardIds.Count: 0 } fact || fact.SourceSeat != p.Source.OwnerSeat || fact.TargetSeat != p.TargetSeat || fact.EffectiveSlashKind != p.EffectiveKind)
-                return false;
-        // Suspended Qinglong ancestor materials are checked and excluded by the native attack boundary.
-        }
-        else if (p.Intent is DrawFundedDistinctBasicIntent.ProgramSlash or DrawFundedDistinctBasicIntent.ProgramNearestSlash or DrawFundedDistinctBasicIntent.AssistedSlash or DrawFundedDistinctBasicIntent.NearestLegalSlash)
-        {
-            if (attack.ProgramSkillCardUseFrameId != p.ParentFrameId || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.ParentFrameId)is not ProgramSkillFrame parent || !DrawFundedDistinctBasicProgramActor(parent, p))
-                return false;
-            var parentIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == parent.Id);
-            exactParentIds = _resolutionStackOperations._resolutionStack.Take(parentIndex).OfType<CardUseFrame>().SelectMany(f => f.PhysicalCardIds ?? []).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Distinct().ToArray();
-        }
-        else if (p.Intent != DrawFundedDistinctBasicIntent.Play || attack.ProgramSkillCardUseFrameId is not null)
-            return false;
-        return exactParentIds.All(id => processing.Any(c => c.Id == id)) && processing.Select(c => c.Id).Order().SequenceEqual(exactParentIds.Order());
-    }
-
     [NativeUseValidation(20)]
     internal void AssertDrawFundedDistinctBasicUseCompletion(CardUseFrame use)
     {

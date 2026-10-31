@@ -13,14 +13,12 @@ internal sealed partial class CharacterKanZeOlEntries
     internal bool HasKanZeBeforeDamageObserver(long id) => _resolve().HasKanZeBeforeDamageObserver(id);
     internal bool HasKanZeDamageObserver(long id) => _resolve().HasKanZeDamageObserver(id);
     internal global::CardGame.Core.ProgramDamageInterception InterceptKuanshiDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, global::CardGame.Core.DamageNature nature) => _resolve().InterceptKuanshiDamage(attack, amount, nature);
-    internal bool IsKanZeDying() => _resolve().IsKanZeDying();
     internal bool IsXiashuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXiashuMovement(f, effect, p);
     internal bool KanZeFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().KanZeFirstChild(root, child);
     internal global::CardGame.Core.ProgramSkillFrame? KanZeObserverRoot() => _resolve().KanZeObserverRoot();
     internal global::CardGame.Core.CardConversionSource KanZeSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KanZeSource(f);
     internal void ObserveKuanshiExpiry(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveKuanshiExpiry(payload);
     internal void PublishXiashuDecision(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishXiashuDecision(f);
-    internal void RequireIssuedKanZe(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireIssuedKanZe(f);
     internal void ResolveXiashuChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveXiashuChoice(choice);
     internal bool ResumeXiashu(long id) => _resolve().ResumeXiashu(id);
     internal bool ReturnXiashuMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnXiashuMovement(f);

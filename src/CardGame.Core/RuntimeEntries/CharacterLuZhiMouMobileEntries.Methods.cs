@@ -6,7 +6,6 @@ internal sealed partial class CharacterLuZhiMouMobileEntries
     internal global::CardGame.Core.PromptChoice AiMouLuZhi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouLuZhi(p, f);
     internal void AnswerMouLuZhi(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouLuZhi(selected);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PrivateWhirlPileSnapshot>? AppendMouLuZhiRenPiles(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PrivateWhirlPileSnapshot>? existing, int owner, int viewer, bool revealAll) => _resolve().AppendMouLuZhiRenPiles(existing, owner, viewer, revealAll);
-    internal void AssertMouLuZhi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouLuZhi(f);
     internal bool CanOfferMouLuZhi(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferMouLuZhi(gate);
     internal bool CanStartMouLuZhiYang(global::CardGame.Core.CharacterState owner) => _resolve().CanStartMouLuZhiYang(owner);
     internal void CleanupMouLuZhiRen() => _resolve().CleanupMouLuZhiRen();

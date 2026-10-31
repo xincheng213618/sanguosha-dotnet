@@ -82,7 +82,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qushi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QushiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Qushi requires its exact private original Hand/holder choice.");
-        AssertQushi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage == QushiStage.SealCard)
@@ -146,7 +145,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qushi: { } r } f || f.Id != id)
             return;
-        AssertQushi(f);
         if (r.Stage is QushiStage.SealCard or QushiStage.SealTarget)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

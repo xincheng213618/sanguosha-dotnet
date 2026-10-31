@@ -24,8 +24,6 @@ internal sealed partial class CharacterHaoPuOlRuntime
     internal bool HasZhenyingDamageObserver(long id) => ZhenyingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 570)]
     internal bool HasZhenyingBeforeDamageObserver(long id) => ZhenyingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 400)]
-    internal bool IsZhenyingDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ZhenyingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26500)]
     internal bool AdvanceZhenyingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhenyingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

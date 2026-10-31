@@ -10,7 +10,6 @@ internal interface ISpPangTongNativeFacts : IProgramSelectionQuery
     bool IsRuleWounded(CharacterState player);
     int EffectiveOwnedCardRank(CharacterState owner, Card card);
     bool IsSourceEquipment(int owner, string skillId, string instanceId, Card card);
-    bool IsDiouCarrier(int cardId);
     CardLocation NormalizeEphemeralDestination(Card card, CardLocation from, CardLocation to);
     bool RecoveryRidesOn(ResolutionFrame child, ResolutionFrame parent);
     bool SameNameObserverSuffix(long rootFrameId);

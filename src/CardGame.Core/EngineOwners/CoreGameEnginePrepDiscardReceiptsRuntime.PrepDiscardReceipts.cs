@@ -45,12 +45,6 @@ internal sealed partial class CoreGameEnginePrepDiscardReceiptsRuntime
         return f.PendingMovementContinuation is not { } pending || pending.BeforeCount == 0 && pending.CoverageResultBind is null && (payment is not null && pending.SubjectSeat == payment.PayerSeat || d.Stage == PrepDiscardStage.ImmediateDrawChildren && d.ImmediateDraw?.TargetSeat == pending.SubjectSeat);
     }
 
-    internal void AssertPrepDiscardReceipts(ProgramSkillFrame f)
-    {
-        if (f.PrepDiscard is not null && !ValidPrepDiscard(f) || f.PrepDiscardEndingDraw is not null && !_corePrepDiscardEndingPromisesOperations.ValidPrepDiscardEndingDraw(f))
-            throw new InvalidOperationException("A preparation discard or its promised draw changed original identity, actual turn or real paid ledger.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 80)]
     internal bool IsPrepDiscardMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && (effect?.Op is (SkillProgramEffectOp.ResolvePrepDiscardOrEnding or SkillProgramEffectOp.ResolvePrepDiscardOrImmediateDraw) && f.PrepDiscard is { } d && (d.Stage == PrepDiscardStage.TargetChildren && d.TargetPayment?.PayerSeat == pending.SubjectSeat || d.Stage == PrepDiscardStage.OwnerChildren && d.OwnerPayment?.PayerSeat == pending.SubjectSeat || d.Stage == PrepDiscardStage.ImmediateDrawChildren && d.ImmediateDraw?.TargetSeat == pending.SubjectSeat) || effect?.Op == SkillProgramEffectOp.DrawPrepDiscardEnding && f.PrepDiscardEndingDraw?.Promise.TargetSeat == pending.SubjectSeat);
 }

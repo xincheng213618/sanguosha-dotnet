@@ -66,23 +66,6 @@ internal sealed partial class CharacterYuJinMobileRuntime
         return draft.Stage == MobileYuJinChoiceStage.Branch ? !frame.ChoiceBindings.Any(b => b.Name == "jieyue-answer") && !history.OfType<MobileYuJinBranchChosenEvent>().Any(e => e.FrameId == frame.Id) : frame.ChoiceBindings.SingleOrDefault(b => b.Name == "jieyue-answer")is { OptionId: "store" } branch && branch.ChooserSeat == target && history.OfType<MobileYuJinBranchChosenEvent>().Count(e => e.FrameId == frame.Id && e.TargetSeat == target && e.Store) == 1;
     }
 
-    internal bool MatchesMobileYuJinChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding)
-    {
-        if (frame.SkillId != MobileYuJinJieyue.Skill || frame.TriggerId != MobileYuJinJieyue.Ending || frame.InstructionIndex is < 3 or > 4 || binding.Name != "jieyue-answer" || binding.OptionId is not ("store" or "discard") || frame.SelectedTargetSeats is not [var target] || target == frame.OwnerSeat || binding.ChooserSeat != target || !ExactMobileYuJinParent(frame, true) || frame.WindowContext is not { } context)
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-        if (history.OfType<MobileYuJinChoiceOpenedEvent>().Count(e => e == new MobileYuJinChoiceOpenedEvent(frame.Id, target, source, frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, context.ParentFrameId)) != 1 || history.OfType<MobileYuJinBranchChosenEvent>().Where(e => e.FrameId == frame.Id).ToArray()is not [var chosen] || chosen.TargetSeat != target || chosen.Store != (binding.OptionId == "store"))
-            return false;
-        if (!chosen.Store)
-            return frame.MobileYuJinChoice is null && frame.MobileYuJinTransfer is null && !history.OfType<MobileYuJinTransferStartedEvent>().Any(e => e.FrameId == frame.Id);
-        if (frame.MobileYuJinChoice is { Stage: MobileYuJinChoiceStage.Store })
-            return ValidMobileYuJinChoice(frame);
-        if (frame.MobileYuJinTransfer is { Operation: SkillProgramEffectOp.ResolveMobileYuJinJieyue })
-            return ValidMobileYuJinTransfer(frame);
-        return history.OfType<MobileYuJinTransferStartedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [{ Operation: SkillProgramEffectOp.ResolveMobileYuJinJieyue, Count: 1 } started] && started.Source == source && started.GameplayHash == frame.GameplayHash && started.ParentId == context.ParentFrameId && history.OfType<MobileYuJinTransferReturnedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [{ Count: 1 }];
-    }
-
     internal void PublishMobileYuJinChoice(ProgramSkillFrame frame)
     {
         if (!ValidMobileYuJinChoice(frame))

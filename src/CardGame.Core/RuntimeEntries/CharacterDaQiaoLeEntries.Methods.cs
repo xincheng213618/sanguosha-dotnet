@@ -5,9 +5,6 @@ internal sealed partial class CharacterDaQiaoLeEntries
     internal bool AdvanceZixiEffectsChildren() => _resolve().AdvanceZixiEffectsChildren();
     internal bool AdvanceZixiPlacementChildren() => _resolve().AdvanceZixiPlacementChildren();
     internal void AnswerZixiPlacement(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerZixiPlacement(choice);
-    internal void AssertZixiEffects(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZixiEffects(f);
-    internal void AssertZixiExtraEffectRounds() => _resolve().AssertZixiExtraEffectRounds();
-    internal void AssertZixiPlacement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZixiPlacement(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZixiEffects(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginZixiEffects(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZixiPlacement(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginZixiPlacement(supplied);
     internal bool CanOfferZixiEffects(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferZixiEffects(candidate, trigger, context);
@@ -31,12 +28,9 @@ internal sealed partial class CharacterDaQiaoLeEntries
     internal bool HasZixiPlacementBeforeDamageObserver(long id) => _resolve().HasZixiPlacementBeforeDamageObserver(id);
     internal bool HasZixiPlacementDamageObserver(long id) => _resolve().HasZixiPlacementDamageObserver(id);
     internal bool IsTargetScopedZixiEffectRound(long id) => _resolve().IsTargetScopedZixiEffectRound(id);
-    internal bool IsZixiEffectsDying() => _resolve().IsZixiEffectsDying();
     internal bool IsZixiEffectsMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsZixiEffectsMovement(f, effect, pending);
     internal bool IsZixiEffectsRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZixiEffectsRecoveryParent(f, recovery);
     internal bool IsZixiExtraEffectRound(long id) => _resolve().IsZixiExtraEffectRound(id);
-    internal bool IsZixiExtraEffectTargetSubset(global::CardGame.Core.CardUseFrame use, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().IsZixiExtraEffectTargetSubset(use, targets);
-    internal bool IsZixiPlacementDying() => _resolve().IsZixiPlacementDying();
     internal bool IsZixiPlacementMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsZixiPlacementMovement(f, effect, pending);
     internal bool IsZixiPlacementRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZixiPlacementRecoveryParent(f, recovery);
     internal bool IsZixiQinJudgmentCard(int id) => _resolve().IsZixiQinJudgmentCard(id);
@@ -52,7 +46,6 @@ internal sealed partial class CharacterDaQiaoLeEntries
     internal bool TryBeginZixiExtraEffectRound(long id, bool afterAttack) => _resolve().TryBeginZixiExtraEffectRound(id, afterAttack);
     internal bool TryGetZixiEffectsUse(int actor, global::CardGame.Core.ProgramSkillWindowContext context, scoped out global::CardGame.Core.CardUseFrame use, scoped out global::CardGame.Core.ProgramCardTriggerWindowFrame window, scoped out int target) => _resolve().TryGetZixiEffectsUse(actor, context, out use, out window, out target);
     internal bool ValidZixiEffectsStarted(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidZixiEffectsStarted(f);
-    internal bool ValidZixiGrantTarget(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ZixiExtraEffectGrant grant) => _resolve().ValidZixiGrantTarget(use, grant);
     internal bool ZixiEffectsFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ZixiEffectsFirstChild(f, child);
     internal bool ZixiEffectsLifecycleEdge(int index) => _resolve().ZixiEffectsLifecycleEdge(index);
     internal global::CardGame.Core.ProgramSkillFrame? ZixiEffectsObserverRoot() => _resolve().ZixiEffectsObserverRoot();

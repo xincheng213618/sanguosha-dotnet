@@ -66,13 +66,6 @@ internal sealed partial class CharacterLiuYouAnniversaryRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuYouBonusIssuedEvent(f.Id, r.Source, r.Hash, pairId, winner));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 50000)]
-    internal void AssertLiuYou(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryLiuYou is not null && !ValidLiuYou(f))
-            throw new InvalidOperationException("Kannan lost its actual-Play issue or original paid native Pindian.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 50000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 50000)]
     internal bool KeepLiuYouPaid(ProgramSkillFrame f) => f.AnniversaryLiuYou is not null && ValidLiuYou(f);

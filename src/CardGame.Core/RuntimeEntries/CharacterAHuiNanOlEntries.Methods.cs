@@ -13,7 +13,6 @@ internal sealed partial class CharacterAHuiNanOlEntries
     internal bool AdvanceAHuiNanChildren() => _resolve().AdvanceAHuiNanChildren();
     internal global::CardGame.Core.PromptChoice AiAHuiNan(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiAHuiNan(p, f);
     internal void AnswerAHuiNan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerAHuiNan(choice);
-    internal void AssertAHuiNan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertAHuiNan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAHuiNan(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginAHuiNan(input);
     internal void BeginAHuiNanJuemanUse(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.AHuiNanJuemanUseOrigin o, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().BeginAHuiNanJuemanUse(f, o, targets);
     internal void ContinueAHuiNan(long id) => _resolve().ContinueAHuiNan(id);
@@ -26,8 +25,6 @@ internal sealed partial class CharacterAHuiNanOlEntries
     internal bool HasAHuiNanBeforeDamageObserver(long id) => _resolve().HasAHuiNanBeforeDamageObserver(id);
     internal bool HasAHuiNanDamageObserver(long id) => _resolve().HasAHuiNanDamageObserver(id);
     internal bool HasIssuedAHuiNanJuemanUse(long id) => _resolve().HasIssuedAHuiNanJuemanUse(id);
-    internal bool IsAHuiNanDying() => _resolve().IsAHuiNanDying();
-    internal bool IsAHuiNanJuemanAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsAHuiNanJuemanAttackConsistent(attack, processing);
     internal bool IsAHuiNanJuemanEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsAHuiNanJuemanEndingCandidate(c, context);
     internal bool IsAHuiNanJuemanSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsAHuiNanJuemanSlashQuery(actor);
     internal bool IsAHuiNanJuemanUse(long id) => _resolve().IsAHuiNanJuemanUse(id);

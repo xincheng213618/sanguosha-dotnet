@@ -21,7 +21,6 @@ internal sealed partial class CharacterHuaManOlRuntime
     }
 
     internal bool HasHuaManSouyingCancellation(CardUseFrame use) => use.HuaManSouyingMutation is { Cancelled: true } r && use.TargetSeats.Count == 0 && ValidSouyingMutation(use, r);
-    internal bool IsHuaManSouyingEmptyTargetWindow(ProgramCardTriggerWindowFrame window) => _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { } use && HasHuaManSouyingCancellation(use) && window.Action.ActionId == use.Action?.ActionId && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == SkillProgramTriggerWindow.CardUseTargetsFinalized;
     internal bool ValidSouyingMutation(CardUseFrame use, SouyingNativeMutation r)
     {
         var q = r.Qualification;

@@ -107,7 +107,6 @@ internal sealed partial class CharacterHuaManOlRuntime
     internal void ResolveHuaManChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        AssertHuaManFrame(f);
         var r = f.HuaMan!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HuaManChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Hua Man choice lost the actual owner and current physical payment.");
@@ -163,7 +162,6 @@ internal sealed partial class CharacterHuaManOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuaMan: { } r } f || f.Id != id || r.Stage is HuaManStage.DiscardChoice or HuaManStage.MaleChoice)
             return false;
-        AssertHuaManFrame(f);
         if (DrainHuaMan(f))
             return true;
         if (r.Stage == HuaManStage.DiscardChildren)

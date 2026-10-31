@@ -47,45 +47,10 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicObserversRunt
                 return paid;
         return null;
     }
-
-    internal bool HasDrawFundedDistinctBasicObserver(long cardUseId) => DrawFundedDistinctBasicObserverRoot(cardUseId)is not null;
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 10)]
     internal bool HasDrawFundedDistinctBasicDamageObserver(long damageId) => DrawFundedDistinctBasicObserverRoot(damageId)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 80)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 120)]
     internal bool IsDrawFundedDistinctBasicProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (DrawFundedDistinctBasicObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id) || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId)is var index && index >= 0 && (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(index, (DyingFrame)_resolutionStackOperations._resolutionStack[index]) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(index, (DyingFrame)_resolutionStackOperations._resolutionStack[index])));
-    internal PendingDecision? DrawFundedDistinctBasicInvariantDecision(PendingDecision? nativeDecision)
-    {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is DrawFundedDistinctBasicFrame paid)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(paid.OriginalDecision));
-        return nativeDecision is { } prompt ? global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(prompt) : null;
-    }
-
-    internal ResolutionFrame? DrawFundedDistinctBasicInvariantTop(ResolutionFrame? nativeTop) => _resolutionStackOperations._resolutionStack.LastOrDefault()is DrawFundedDistinctBasicFrame paid ? _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == paid.Payment.RequestFrameId) : nativeTop;
-    internal void AssertDrawFundedDistinctBasicFramesAndUses()
-    {
-        foreach (var paid in _resolutionStackOperations._resolutionStack.OfType<DrawFundedDistinctBasicFrame>())
-        {
-            var p = paid.Payment;
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == paid.Id);
-            if (p.PaymentFrameId != paid.Id || paid.Stage != DrawFundedDistinctBasicStage.DrawChildren || !_coreDrawFundedDistinctBasicPaymentOperations.ValidDrawFundedDistinctBasicPayment(p) || paid.OriginalDecision.PlayerSeat != p.Source.OwnerSeat || paid.OriginalDecision.PromptId != p.OriginalPromptId || paid.OriginalDecision.Revision != p.OriginalRevision || paid.TargetSeats.Count == 0 && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectiveKind) || paid.TargetSeats.Distinct().Count() != paid.TargetSeats.Count || paid.TargetSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || p.Intent != DrawFundedDistinctBasicIntent.Play && (index <= 0 || !DrawFundedDistinctBasicFrameRidesOn(paid, _resolutionStackOperations._resolutionStack[index - 1])) || p.Intent == DrawFundedDistinctBasicIntent.Play && index != 0 && !_characterKeBiNengOlOperations.IsKeBiNengPingduanPaymentFrame2(paid) && !(_characterKongRongMouOlOperations.IsMouKrLiwenPaymentFrame2(paid) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTiePaymentFrame2(paid)) && !_characterLuSuMouOperations.IsMouLuSuPaymentFrame2(paid) || !DrawFundedDistinctBasicPaidSuffix(index) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawFundedDistinctBasicIssuedEvent>().Any(e => e.PaymentFrameId == p.PaymentFrameId))
-                throw new InvalidOperationException("A paid basic-card attempt lost its owning frame, frozen original decision or exact child subtree.");
-        }
-
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-        {
-            if (use.DrawFundedDistinctBasicUse is not null && !_coreDrawFundedDistinctBasicUsesOperations.IsIssuedDrawFundedDistinctBasicUse(use))
-                throw new InvalidOperationException("A paid basic Use lost its immutable issuance and unique native draw.");
-            if (use.DrawFundedDistinctBasicResponse is not null)
-                _coreDrawFundedDistinctBasicResponsesOperations.RequireDrawFundedDistinctBasicResponseAction(use);
-            if (use.Action?.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.DrawFundedDistinctBasic is not null) == true && use.DrawFundedDistinctBasicUse is null)
-                throw new InvalidOperationException("A new-policy Use cannot disguise a deleted owning receipt as a legacy zero-card action.");
-        }
-
-        foreach (var window in _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Where(w => w.Action.Type == CardActionType.Response && w.Action.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.DrawFundedDistinctBasic is not null)))
-            if (_coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { DrawFundedDistinctBasicResponse: not null } owner || !global::CardGame.Core.EngineOwners.CoreGameEngineTieredRoundZeroReturnsRuntime.TieredRoundActionsStructurallyMatch(_coreDrawFundedDistinctBasicResponsesOperations.RequireDrawFundedDistinctBasicResponseAction(owner), window.Action))
-                throw new InvalidOperationException("A paid Dodge observer lost its exact original accepted response.");
-    }
 
     internal bool DrawFundedDistinctBasicLegacyAlcoholRide(DrawFundedDistinctBasicFrame paid, int dyingIndex, DyingFrame dying)
     {

@@ -22,7 +22,7 @@ WPF 的开局、选将、出牌、技能、响应、弃牌和推进通过 `Submi
 一次已接受操作的边界由 [CommandSession](../src/CardGame.Core/Session/CommandSession.cs) 管理，规则状态通过 [CommandSessionRuntime](../src/CardGame.Core/NativeOwners/CommandSessionRuntime.cs) 接入：
 
 1. 执行规则，累计待提交的事实与通知。
-2. 同步技能投影，检查状态和牌区不变量。
+2. 同步派生技能投影。
 3. 为新 Revision 准备玩家快照、返回结果和冻结后的事件载荷，并预留追加容量。
 4. 提交命令记录与事件历史。
 5. 派发提交后的通知，返回同一份已准备结果。

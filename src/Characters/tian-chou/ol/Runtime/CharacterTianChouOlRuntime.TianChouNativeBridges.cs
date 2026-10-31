@@ -35,7 +35,6 @@ internal sealed partial class CharacterTianChouOlRuntime
     }
 
     internal bool MatchesTianChouShandaoUseAction(long id, CardActionContext action, int cardId) => cardId == 0 && IsTianChouShandaoUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && issued.ActionId == action.ActionId && action.Type == CardActionType.Use && issued.ActorSeat == action.ActorSeat && issued.ProviderSeat == action.ProviderSeat && issued.EffectiveKind == action.EffectiveKind && action.PhysicalCards.Count == 0 && action.ConversionChain.Count == 0 && issued.TargetSeats.SequenceEqual(action.TargetSeats) && action.EffectiveSuit == Suit.None && action.EffectiveRank == 0 && action.EffectiveIsRed == false && action.RequesterSeat is null && action.ResponderSeat is null && action.OpponentSeat is null;
-    internal bool IsTianChouShandaoAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => IsTianChouShandaoUse(attack.ResolutionId) && attack.Card is null && attack.PhysicalCards.Count == 0 && attack.EffectiveCardKind == CardKind.ArrowBarrage && processing.Count == 0 && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } group && group.ResolutionId == attack.ResolutionId && group.DamageSourceSeat == attack.SourceSeat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack);
     [NativeUseValidation(27090)]
     internal void ValidateTianChouShandaoUse(CardUseFrame use)
     {
@@ -51,11 +50,5 @@ internal sealed partial class CharacterTianChouOlRuntime
         if (use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame)
             throw new InvalidOperationException("Shandao requires its actual completed global trick before returning to its program.");
         CompleteTianChouShandaoTrick(frame, origin);
-    }
-
-    internal void AssertTianChouNativeUses()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.TianChouShandao is not null))
-            ValidateTianChouShandaoUse(use);
     }
 }

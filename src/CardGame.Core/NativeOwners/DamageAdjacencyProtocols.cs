@@ -21,11 +21,5 @@ internal sealed class DamageAdjacencyProtocols(global::System.Func<global::CardG
     public bool IsWenyiDamageHealthReturn(DamageFrame damage, HpChangedTriggerWindowFrame health) => getCoreGameEngineWenyiDamageHealthRuntime().IsWenyiDamageHealthReturn(damage, health);
     public bool IsHappyQiaoDamageHealthReturn(DamageFrame damage, HpChangedTriggerWindowFrame health) => getCharacterDaQiaoXiaoQiaoHappyGodRuntime().IsHappyQiaoDamageHealthReturn(damage, health);
     public bool IsAmountSupportHealthChild(ResolutionFrame parent, HpChangedTriggerWindowFrame health) => getCharacterCaoSongOlRuntime().IsAmountSupportHealthChild(parent, health);
-    public TypedRecoveryDamageCursorProjection ProjectTypedRecoveryDamageCursor(long windowId) => getCoreGameEngineTypedRecoveryDamageCursorRuntime().ProjectTypedRecoveryDamageCursor(windowId);
-    public ProgramSkillFrame? MouLixianDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId) => getCharacterHuangYueyingOlMouRuntime().MouLixianDamageCursorRoot(window, out dyingId);
-    public ProgramSkillFrame? AlcoholSlashReplacementDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId) => getCoreGameEngineAlcoholSlashSkillReplacementsRuntime().AlcoholSlashReplacementDamageCursorRoot(window, out dyingId);
-    public ProgramSkillFrame? RandomDamageTargetSkillDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId) => getCoreGameEngineRandomDamageTargetSkillsRuntime().RandomDamageTargetSkillDamageCursorRoot(window, out dyingId);
-    public ProgramSkillFrame? DamageTargetSkillRoundDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId) => getCoreGameEngineDamageTargetSkillRoundDrawRuntime().DamageTargetSkillRoundDamageCursorRoot(window, out dyingId);
-    public bool MatchesObserver(ProgramObserverProofPhase phase, long windowId) => getProgramRuntimeHooks().MatchesObserver(phase, windowId);
     public bool HasPaidFactionRequestCostRecovery(PaidFactionRequestCostRecovery receipt) => getCoreNativeCardContinuationCursorsRuntime().ActiveFactionCardRequest is { } request && global::CardGame.Core.EngineOwners.CoreGameEngineFactionRequestCostRecoveriesRuntime.PaidFactionRequestMatches(request, receipt) && getCoreGameEngineFactionRequestCostRecoveriesRuntime().HasPaidFactionRequestCostRecovery(request);
 }

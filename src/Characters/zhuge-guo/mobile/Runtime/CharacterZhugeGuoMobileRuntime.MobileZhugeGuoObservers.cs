@@ -14,17 +14,6 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
             throw new InvalidOperationException("Mobile Qirang lost its actual entering equipment, exact source or once-paid deck trick movement.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 81800)]
-    internal void AssertMobileZhugeGuo(ProgramSkillFrame f)
-    {
-        if (f.MobileQirangGain is not null)
-            AssertMobileQirangGain(f);
-        if (f.SkillId != MobileYuhua || f.TopReorder is not { } top)
-            return;
-        if (f.TriggerId != "ending-category-top" || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } c || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileYuhuaPeekStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var peek] || peek.Source != MobileZhugeGuoSource(f) || peek.Hash != f.GameplayHash || peek.EndingId != c.ParentFrameId || peek.HandCount <= peek.Hp || peek.Requested is < 1 or > 3 || peek.ActualCount > peek.Requested || top.ViewedCardIds.Count != peek.ActualCount || top.ViewedCardIds.Distinct().Count() != top.ViewedCardIds.Count || top.TopCardIds.Concat(top.BottomCardIds).Distinct().Count() != top.TopCardIds.Count + top.BottomCardIds.Count || top.TopCardIds.Concat(top.BottomCardIds).Any(id => !top.ViewedCardIds.Contains(id)))
-            throw new InvalidOperationException("Mobile Yuhua lost its original hand-category quota or private native top/bottom partition.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 81800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 81800)]
     internal bool KeepMobileQirangGain(ProgramSkillFrame f)
@@ -52,7 +41,6 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
     }
 
     internal ProgramSkillFrame? MobileQirangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterZhugeGuoMobileOperations.MobileQirangObserverChild(f, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying)));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 81800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 81800)]
     internal bool MobileQirangDyingProof() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MobileQirangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 81800)]

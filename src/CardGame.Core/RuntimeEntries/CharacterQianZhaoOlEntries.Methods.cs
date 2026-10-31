@@ -5,7 +5,6 @@ internal sealed partial class CharacterQianZhaoOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.WeifuGrantedEvent> ActiveWeifuGrants(int actor, global::CardGame.Core.CardKind kind) => _resolve().ActiveWeifuGrants(actor, kind);
     internal bool AdvanceQianZhaoSubtree() => _resolve().AdvanceQianZhaoSubtree();
     internal void AnswerQianZhao(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerQianZhao(selected);
-    internal void AssertQianZhao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertQianZhao(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginKuansai(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginKuansai(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWeifu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginWeifu(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWeifuTargets(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginWeifuTargets(supplied);
@@ -24,12 +23,10 @@ internal sealed partial class CharacterQianZhaoOlEntries
     internal void FreezeWeifuActorChange(global::CardGame.Core.IGameEvent fact) => _resolve().FreezeWeifuActorChange(fact);
     internal void FreezeWeifuJudgmentResult(global::CardGame.Core.IGameEvent payload) => _resolve().FreezeWeifuJudgmentResult(payload);
     internal bool HasIssuedWeifuCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedWeifuCandidate(c, context);
-    internal bool HasPaidWeifuInitialSelection(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPaidWeifuInitialSelection(f);
     internal bool HasQianZhaoBeforeDamageObserver(long id) => _resolve().HasQianZhaoBeforeDamageObserver(id);
     internal bool HasQianZhaoDamageObserver(long id) => _resolve().HasQianZhaoDamageObserver(id);
     internal bool HasWeifuTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasWeifuTargetTail(use);
     internal bool HasWeifuUseDistance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, long? cardUseFrameId) => _resolve().HasWeifuUseDistance(actor, kind, cardUseFrameId);
-    internal bool IsQianZhaoDying() => _resolve().IsQianZhaoDying();
     internal bool IsQianZhaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsQianZhaoMovement(f, e, p);
     internal bool IsQianZhaoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsQianZhaoRecoveryParent(f, recovery);
     internal bool IsWeifuJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsWeifuJudgment(j, f);

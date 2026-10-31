@@ -5,7 +5,6 @@ internal sealed partial class CharacterCaiYongLeEntries
     internal global::CardGame.Core.JiaoweiProtectionArmedEvent? ActiveJiaoweiProtection(int owner) => _resolve().ActiveJiaoweiProtection(owner);
     internal bool AdvanceFeibaiChildren() => _resolve().AdvanceFeibaiChildren();
     internal void AnswerFeibaiSample(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerFeibaiSample(choice);
-    internal void AssertLeCaiYongFeibai(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLeCaiYongFeibai(f);
     internal bool AwaitFeibaiChildren(long id) => _resolve().AwaitFeibaiChildren(id);
     internal void BeginFeibaiFallback(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginFeibaiFallback(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLeCaiYongFeibai(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginLeCaiYongFeibai(supplied);
@@ -37,8 +36,6 @@ internal sealed partial class CharacterCaiYongLeEntries
     internal bool FeibaiWindowMatches(global::CardGame.Core.ProgramCardTriggerWindowFrame window, global::CardGame.Core.FeibaiQualification q) => _resolve().FeibaiWindowMatches(window, q);
     internal bool HasFeibaiBeforeDamageObserver(long id) => _resolve().HasFeibaiBeforeDamageObserver(id);
     internal bool HasFeibaiDamageObserver(long id) => _resolve().HasFeibaiDamageObserver(id);
-    internal bool HasLeCaiYongFeibaiRescueContinuation(long dyingId) => _resolve().HasLeCaiYongFeibaiRescueContinuation(dyingId);
-    internal bool HasLeCaiYongFeibaiUseContinuation(long nativeId) => _resolve().HasLeCaiYongFeibaiUseContinuation(nativeId);
     internal bool HasXianEntityMark(int cardId) => _resolve().HasXianEntityMark(cardId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeJiaowei(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeJiaowei(supplied);
     internal global::CardGame.Core.ProgramDamageInterception InterceptJiaoweiProtection(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, global::CardGame.Core.DamageNature nature) => _resolve().InterceptJiaoweiProtection(attack, amount, nature);

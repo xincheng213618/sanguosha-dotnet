@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXuShuMobileEntries
 {
     internal void AnswerMobileSpXuShuJianyan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMobileSpXuShuJianyan(choice);
-    internal void AssertMobileSpXuShuJianyan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileSpXuShuJianyan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileSpXuShuJianyan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMobileSpXuShuJianyan(f);
     internal void BeginMobileSpXuShuJianyanCleanup(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMobileSpXuShuJianyanCleanup(f);
     internal void CaptureMobileSpXuShuJianyanNativeBatch(long id) => _resolve().CaptureMobileSpXuShuJianyanNativeBatch(id);

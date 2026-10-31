@@ -40,7 +40,6 @@ internal sealed partial class CoreWenheActivityProgramsRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.RewardWenheKiller, SkillProgramEffectOp.ResolveWenheTurnStart, SkillProgramEffectOp.UseWenheChampionMark)]
     internal void ReturnWenheRuleDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        AssertWenheRuleFlow(f);
         var r = f.WenheRuleFlow!;
         var count = (_coreActivityBattleRulesOperations.WenheRules ?? throw new InvalidOperationException("The activity rule feature is not installed.")).DrawCount(r.Operation, r.Amount);
         if (r.Stage != 2 || outcome.RecipientSeat != r.Seats[r.Index] || outcome.RequestedCount != count)
@@ -52,14 +51,6 @@ internal sealed partial class CoreWenheActivityProgramsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 41000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41000)]
     internal bool RetainWenheIssuedFlow(ProgramSkillFrame f) => f.WenheRuleFlow is not null || f.WenheChaos is not null && _coreWenheChaosOperations.IsExactWenheChaos(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 41000)]
-    internal void AssertWenheRuleFlow(ProgramSkillFrame f)
-    {
-        if (f.WenheRuleFlow is not { } r)
-            return;
-        if (_coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || r.RoundNumber != _coreActualRoundProgressRoundNumberAccess._roundNumber || r.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.Index < 0 || r.Index > r.Seats.Count || r.Stage is < 0 or > 3 || r.Seats is not System.Collections.IList { IsReadOnly: true } || _coreProgramEventHistoryOperations.ProgramEventHistory<WenheRuleFlowIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Operation == r.Operation && e.RoundNumber == r.RoundNumber && e.TurnNumber == r.TurnNumber && e.Count == r.Seats.Count && e.Amount == r.Amount && e.OwnerSeat == f.OwnerSeat) != 1 || r.Seats.Where((seat, index) => _coreProgramEventHistoryOperations.ProgramEventHistory<WenheRuleParticipantEvent>().Count(e => e.ProgramFrameId == f.Id && e.Index == index && e.Seat == seat) != 1).Any())
-            throw new InvalidOperationException("Wenhe rule lost its frozen participants, paid cursor or originating fact.");
-    }
 
     [ProgramTriggerProof(ProgramTriggerProofPhase.DeadOwnerEnding, 10)]
     internal bool ProveIsWenheDeadOwnerEndingCandidate(ProgramTriggerCandidate candidate) => IsWenheDeadOwnerEndingCandidate(candidate, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);

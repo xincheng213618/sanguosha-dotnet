@@ -99,7 +99,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
 
     internal void PublishZhaohuo(ProgramSkillFrame f)
     {
-        AssertZhaohuo(f);
         var choices = ZhaohuoChoices(f);
         if (choices.Count == 0)
         {
@@ -126,7 +125,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zhaohuo: { Stage: ZhaohuoStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.VictimSeat || !ZhaohuoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zhaohuo requires the damaged donor's exact private original Hand choice.");
-        AssertZhaohuo(f);
         var card = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.VictimSeat]).Single(c => c.Id == choice.Cards.Single());
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         r = r with
@@ -167,7 +165,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zhaohuo: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertZhaohuo(f);
         if (r.Stage == ZhaohuoStage.Choosing)
         {
             PublishZhaohuo(f);
@@ -181,7 +178,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
 
     internal void FinishZhaohuo(ProgramSkillFrame f)
     {
-        AssertZhaohuo(f);
         var r = f.Zhaohuo!;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhaohuoCompletedEvent(f.Id, r.DamageFrameId, r.Paid));

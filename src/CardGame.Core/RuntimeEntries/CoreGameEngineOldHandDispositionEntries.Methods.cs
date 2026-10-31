@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOldHandDispositionEntries
 {
-    internal void AssertOldHandDisposition(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertOldHandDisposition(f);
     internal void FinishOldHandDisposition(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishOldHandDisposition(f);
     internal bool IsOldHandDispositionMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsOldHandDispositionMovement(f, e, p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> OldHandChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().OldHandChoices(f);

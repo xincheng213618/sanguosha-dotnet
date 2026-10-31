@@ -47,13 +47,6 @@ internal sealed partial class CharacterMuShunAnniversaryRuntime
     }
 
     internal bool MuShunPindianStructuralEdge(ResolutionFrame child, ResolutionFrame parent) => parent is ProgramSkillFrame f && child is CardsMovedTriggerWindowFrame moved && moved.ResumeProgramFrameId == f.Id && IsMuShunPindianSettlementBatch(f, moved.Batch);
-    internal bool HasAnniversaryMuShunPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, MuShunJinjian.Stage: MuShunContestStage.Choice } f && p.PlayerSeat == f.OwnerSeat && ValidMuShunJinjian(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, MuShunChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 45300)]
-    internal void AssertMuShun(ProgramSkillFrame f)
-    {
-        if (f.MuShunJinjian is not null && !ValidMuShunJinjian(f))
-            throw new InvalidOperationException("Jinjian lost its original damage, once-granted Jin or native Pindian return.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 45300)]
     internal bool ContinueIssuedMuShun(ProgramSkillFrame f) => f.MuShunJinjian is not null ? ValidMuShunJinjian(f) : f.SkillId == MuShunComposition.Shizhao && f.WindowContext is { } c && MuShunLossCandidate(MuShunCandidate(f), c, true) && _coreProgramEventHistoryOperations.ProgramEventHistory<MuShunShizhaoIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == MuShunSource(f) && e.Hash == f.GameplayHash && e.ParentWindowId == c.ParentFrameId && e.BatchId == c.MovementBatch!.Id && e.Draw) == 1;

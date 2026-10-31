@@ -288,18 +288,4 @@ internal sealed partial class CoreGameEngineDeckProgramsRuntime
         if (frame.DeckSlashSequence is { Shuffled: false })
             ShuffleDeckSequence(frame);
     }
-
-    internal void AssertDeckProgramDrafts(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.DeckEndExchange is { } d)
-        {
-            if (paused.Op != SkillProgramEffectOp.ExchangeOwnedCardThroughDeckEnd || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.ProviderSeat) || frame.SelectedCardIds is not [var id] || id != d.CardId || d.OriginalLocation.OwnerSeat != d.ProviderSeat || d.OriginalLocation.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || d.Stage is not ("choice" or "draw") || d.DrawIndex < 0 || d.DrawIndex > (d.ProviderSeat == frame.OwnerSeat ? 1 : 2) || (d.Stage == "choice" ? d.PlacedOnTop is not null || d.DrawIndex != 0 : d.PlacedOnTop is null))
-                throw new InvalidOperationException("Deck exchange draft lost its frozen entity, owner or ordered stage.");
-            if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && d.Stage == "choice" && frame.PendingMovementContinuation is null && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, DeckEndChoices(frame))))
-                throw new InvalidOperationException("Deck exchange lost its private matching prompt.");
-        }
-
-        if (frame.DeckSlashSequence is { } s && (paused.Op != SkillProgramEffectOp.UseDeckSlashesThenShuffle || frame.WindowContext?.TargetSeat != s.TargetSeat || s.TargetSeat == frame.OwnerSeat || s.Limit != _coreMatchDefinitionPlayerCountAccess._playerCount || s.DeclaredIds.Distinct().Count() != s.DeclaredIds.Count || s.UsedCount > s.Limit || s.ActiveCardId is { } active && s.DeclaredIds.LastOrDefault() != active))
-            throw new InvalidOperationException("Deck Slash sequence lost its physical membership or declaration cap.");
-    }
 }

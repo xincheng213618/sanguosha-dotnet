@@ -213,20 +213,9 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal bool IsWumiaoFloodMovement(CardUseFrame use, CardMovementBatchContext batch) => use.WumiaoFlood is { } r && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == r.AwaitingProgramFrameId && batch.Movements.Count > 0 && (r.Stage == WumiaoFloodStage.DrawingChildren && r.DrawOutcome is { } draw && batch.Movements.All(m => m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && (draw.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == CardMoveReasons.Draw || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle)) || r.Stage == WumiaoFloodStage.DiscardChildren && r.DiscardInvoiceSealed && r.DiscardBatches.Any(b => b.BatchId == batch.Id && b.ParentBatchId == batch.ParentBatchId && b.MovementCount == batch.Movements.Count) && batch.Movements.All(m => r.DiscardMovements.Any(e => WumiaoFloodDiscardEntryMatches(e, m))));
     internal bool IsWumiaoFloodMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame frame) => frame.ResumeWumiaoFloodFrameId == use.Id && frame.Id == frame.Batch.Id && frame.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(frame with { ResumeWumiaoFloodFrameId = null }) && IsWumiaoFloodMovement(use, frame.Batch);
-    internal bool IsWumiaoFloodStateReturn(CardUseFrame use, ProgramLifecycleTriggerWindowFrame frame) => use.WumiaoFlood is { Stage: WumiaoFloodStage.DiscardChildren or WumiaoFloodStage.DrawingChildren } && frame.ResumeProgramFrameId == use.Id && frame.CharacterStateContinuation == CharacterStateContinuation.WumiaoFlood && frame.ResumeCardId is null && frame.ResumeCardKind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.Id == frame.Id && e.Change.ParentFrameId == use.Id) == 1;
     internal bool IsWumiaoFloodHpReturn(CardUseFrame use, HpChangedTriggerWindowFrame frame) => use.WumiaoFlood is { Stage: WumiaoFloodStage.DiscardChildren or WumiaoFloodStage.DrawingChildren } && frame.Continuation == PostEventContinuation.WumiaoFlood && frame.ResumeFrameId == use.Id && frame.Change.ParentFrameId == use.Id && frame.CardId is null && frame.CardKind is null;
     internal bool IsWumiaoFloodRecoveryReturn(CardUseFrame use, RecoveryReplacementFrame frame) => frame.ParentFrameId == use.Id && frame.Return == new RecoveryReplacementReturn(PostEventContinuation.WumiaoFlood, use.Id) && IsWumiaoFloodRecoveryAttempt(use, frame.Attempt);
     internal bool IsWumiaoFloodRecoveryAttempt(CardUseFrame use, RecoveryAttempt attempt) => use.WumiaoFlood is { Stage: WumiaoFloodStage.DiscardChildren, DiscardCardId: { } card, DiscardFrom: { Zone: CardZoneKind.Equipment } from, DiscardSequence: > 0 } r && from.OwnerSeat == r.TargetSeat && r.DiscardInvoiceSealed && attempt.SourceSeat == r.TargetSeat && attempt.TargetSeat == r.TargetSeat && attempt.Amount == 1 && attempt.Completion == new RecoveryAttemptCompletion(RecoveryAttemptProducer.SilverLion, MoveReason: global::CardGame.Core.EngineOwners.CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == r.DiscardSequence && m.CardId == card && m.CardKind == CardKind.SilverLion && m.From == from && IsWumiaoFloodPrimaryDiscardMovement(r, m));
-    internal bool HasWumiaoFloodProcessing(IReadOnlyList<Card> processing)
-    {
-        var uses = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray();
-        if (!uses.Any(use => use.WumiaoFlood is not null))
-            return false;
-        foreach (var use in uses)
-            AssertWumiaoFlood(use);
-        var ids = uses.SelectMany(use => use.Action?.PhysicalCards.Select(card => card.CardId) ?? []).ToHashSet();
-        return processing.All(card => ids.Contains(card.Id));
-    }
 
     internal void AssertWumiaoFlood(CardUseFrame use)
     {

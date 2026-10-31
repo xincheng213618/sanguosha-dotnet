@@ -58,18 +58,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         };
     }
 
-    internal bool HasBeiMiHuTurnPreludeBoundary()
-    {
-        if (_resolutionStackOperations._resolutionStack.FirstOrDefault()is not BeiMiHuTurnPreludeFrame parent)
-            return false;
-        if (!ValidBeiMiHuBeforeTurnPrelude(parent.Proof))
-            throw new InvalidOperationException("The before-turn parent lost its upcoming turn and actual round receipt.");
-        var windows = _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Where(window => window.BeforeTurnPreludeProof is not null).ToArray();
-        if (windows.Length > 1 || windows.Length == 1 && !ValidBeiMiHuPreludeLifecycleWindow(windows[0]))
-            throw new InvalidOperationException("The before-turn child lost its exact typed parent return.");
-        return true;
-    }
-
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.AfterOpening, 30, NativeFrameAutomaticPending.RequireNoneBeforeFrame, NativeFrameAutomaticPublish.AfterAdvance)]
     [NativeFrameRoute(typeof(BeiMiHuTurnPreludeFrame), 70)]
     internal void ContinueBeiMiHuTurnPrelude()

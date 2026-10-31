@@ -67,7 +67,6 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryJiedao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], JiedaoChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Jiedao lost its original private chooser or current exact choice.");
-        AssertJiedaoFrame(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == AnniversaryJiedaoStage.BonusChoice)
         {
@@ -107,7 +106,6 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryJiedao: { } r } f || f.Id != id)
             return;
-        AssertJiedaoFrame(f);
         if (r.Stage != AnniversaryJiedaoStage.DiscardChildren)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineEquipmentDonationObserversEntries
 {
     internal bool AllowsDonateAllEquipmentAndOfferRecipientBenefitsActivation(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsDonateAllEquipmentAndOfferRecipientBenefitsActivation(gate);
-    internal void AssertEquipmentDonationPrograms() => _resolve().AssertEquipmentDonationPrograms();
     internal bool EquipmentDonationInitialObserverEdge(int rootIndex, global::CardGame.Core.ProgramSkillFrame root) => _resolve().EquipmentDonationInitialObserverEdge(rootIndex, root);
     internal global::CardGame.Core.ProgramSkillFrame? EquipmentDonationObserverRoot(long rootId) => _resolve().EquipmentDonationObserverRoot(rootId);
     internal bool HasEquipmentDonationDamageObserver(long? damageWindowId = default) => _resolve().HasEquipmentDonationDamageObserver(damageWindowId);

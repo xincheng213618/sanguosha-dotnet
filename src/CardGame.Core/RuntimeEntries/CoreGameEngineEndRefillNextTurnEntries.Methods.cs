@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineEndRefillNextTurnEntries
 {
-    internal void AssertRegisteredEndRefillNextTurnReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredEndRefillNextTurnReceipt(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginEndRefillNextTurn(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginEndRefillNextTurn(supplied);
     internal bool CanContinueEndRefillNextTurn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueEndRefillNextTurn(f);
     internal void CompleteEndRefillNextTurn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompleteEndRefillNextTurn(f);

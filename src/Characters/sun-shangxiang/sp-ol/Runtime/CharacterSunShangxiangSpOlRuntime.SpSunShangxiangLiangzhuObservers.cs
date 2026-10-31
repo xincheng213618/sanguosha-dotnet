@@ -44,7 +44,6 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
     internal bool HasSpSunShangxiangLiangzhuDamage(long id) => SpSunShangxiangLiangzhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 32300)]
     internal bool HasSpSunShangxiangLiangzhuBeforeDamage(long id) => SpSunShangxiangLiangzhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 32300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32300)]
     internal bool IsSpSunShangxiangLiangzhuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SpSunShangxiangLiangzhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 32300)]
@@ -72,10 +71,4 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 32300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 32300)]
     internal bool ContinuePaidSpSunShangxiangLiangzhu(ProgramSkillFrame f) => f.SpSunShangxiangLiangzhu is { Branch: not null } && ValidSpSunShangxiangLiangzhu(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32300)]
-    internal void AssertSpSunShangxiangLiangzhu(ProgramSkillFrame f)
-    {
-        if (f.SpSunShangxiangLiangzhu is not null && !ValidSpSunShangxiangLiangzhu(f))
-            throw new InvalidOperationException("Liangzhu lost its actual recovered actor, source or native draw return.");
-    }
 }

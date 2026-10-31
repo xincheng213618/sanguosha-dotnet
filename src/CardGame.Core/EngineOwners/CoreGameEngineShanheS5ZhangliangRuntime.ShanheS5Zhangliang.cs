@@ -81,17 +81,6 @@ internal sealed partial class CoreGameEngineShanheS5ZhangliangRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { SelectedTargetSeats = Array.AsReadOnly(new[] { context.TargetSeat!.Value }) });
     }
 
-    internal bool HasExactOwnTurnEnemyHandGainSelection(ProgramSkillFrame frame)
-    {
-        if (frame.TriggerId is null || frame.InstructionIndex < 1 || frame.SelectedTargetSeats is not [var target] || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, MovementBatch: { } batch } context || context.OwnerSeat != frame.OwnerSeat || context.TargetSeat != target || context.ParentFrameId != batch.Id || context.SourceSeat != batch.OriginOwnerSeat || batch.MovementTiming?.ActualTurnOwnerSeat != target || batch.DestinationCounts?.SingleOrDefault(c => c.Location == CardLocation.Hand(target))is not { } count || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == batch.Id)is not CardsMovedTriggerWindowFrame parent || parent.Batch != batch || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count)
-            return false;
-        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(frame);
-        if (!IsOwnTurnEnemyHandGainTrigger(trigger) || count.CountAfter <= trigger.Effects[0].Amount)
-            return false;
-        var indexes = OwnTurnEnemyHandGainIndexes(batch, target);
-        return indexes.Length > 0 && context.OccurrenceIndex == indexes[0] && context.MovementIndex == indexes[0] && indexes.All(i => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(batch.Movements[i])) && parent.Candidates[parent.CandidateIndex] == new ProgramTriggerCandidate(frame.OwnerSeat, frame.SkillId, frame.TriggerId, frame.SkillInstanceId, frame.GameplayHash, trigger.Priority, indexes[0]);
-    }
-
     void global::CardGame.Core.IOwnTurnEnemyHandGainProgramHost.BindOwnTurnEnemyHandGain(ProgramSkillFrame frame) => BindOwnTurnEnemyHandGain(frame);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 200)]
     internal void CollectWindow_CollectOwnTurnEnemyHandGainCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => result.AddRange(CollectOwnTurnEnemyHandGainCandidates(batch));

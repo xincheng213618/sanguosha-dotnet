@@ -18,7 +18,6 @@ internal sealed partial class CharacterJiangJiMouRuntime
     internal bool HasUnstartedMouJjEffect(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouJiangJiRounds: { } r, Action: { } a } u && a.ActionId == r.ActionId && r.Started < r.Grants.Count && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(u) && _coreMatchOutcomeWinnerAccess._winner == Winner.None;
     internal bool IsMouJjEffectRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MouJiangJiRounds is { Started: > 0 };
     internal bool IsTargetScopedMouJjEffect(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouJiangJiRounds: { Active: true, Started: > 0 } r, Action: { } a } && r.ActionId == a.ActionId;
-    internal bool IsMouJjEffectSubset(CardUseFrame use, IReadOnlyList<int> targets) => use is { MouJiangJiRounds: { Active: true, Started: > 0 } r, Action: { } a } && a.ActionId == r.ActionId && r.ActiveIndex >= 0 && r.ActiveIndex < use.TargetSeats.Count && use.TargetSeats[r.ActiveIndex] == r.ActiveTarget && targets.SequenceEqual(use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(r.ActiveIndex).Take(2) : [r.ActiveTarget]) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangJiEffectStartedEvent>().Count(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.FrameId == r.Grants[r.Started - 1].FrameId && e.Round == r.Started && e.Target == r.ActiveTarget) == 1;
     internal void CompleteMouJjEffect(long id)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { MouJiangJiRounds: { Active: true } } use)
@@ -58,12 +57,5 @@ internal sealed partial class CharacterJiangJiMouRuntime
         IReadOnlyList<int> targets = use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(state.ActiveIndex).Take(2).ToArray() : [state.ActiveTarget];
         _coreNativeNullificationOperations.BeginNullificationWindow(id, card, use.SourceSeat, targets, trick.ActionKind, null, trick.RequiredCardKind, use.CardKind);
         return true;
-    }
-
-    internal void AssertMouJjEffects()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.MouJiangJiRounds is not null))
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || !MouJiangJi.ValidEffects(use))
-                throw new InvalidOperationException("Yingshi lost its original Use, once-issued selected target or ordered native effect return.");
     }
 }

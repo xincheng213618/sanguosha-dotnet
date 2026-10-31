@@ -5,7 +5,6 @@ internal sealed partial class CharacterLiuPanOlEntries
     internal bool AdvanceLiuPanSubtree() => _resolve().AdvanceLiuPanSubtree();
     internal void AnswerPijing(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerPijing(selected);
     internal void ApplyPijingTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ApplyPijingTargets(f);
-    internal void AssertPijing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertPijing(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPijing(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginPijing(supplied, op);
     internal global::CardGame.Core.PromptChoice ChoosePijing(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChoosePijing(p, f);
     internal void CollectIssuedPijingNextUseCandidates(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.ProgramCardTriggerCandidate> result) => _resolve().CollectIssuedPijingNextUseCandidates(action, window, result);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterLiuPanOlEntries
     internal bool HasPijingTargetTail2(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardActionContext action) => _resolve().HasPijingTargetTail(use, action);
     internal bool HasPijingZeroTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasPijingZeroTargetTail(use);
     internal bool IsIssuedPijingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedPijingCandidate(c, context);
-    internal bool IsLiuPanDying() => _resolve().IsLiuPanDying();
     internal bool IsLiuPanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLiuPanMovement(f, effect, pending);
     internal bool IsLiuPanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiuPanRecoveryParent(f, recovery);
     internal bool IsPijingAppliedTargetFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.PijingTargetsAppliedEvent fact, global::System.Collections.Generic.IReadOnlyList<int> precedingTargets, scoped out global::System.Collections.Generic.IReadOnlyList<int> resultTargets) => _resolve().IsPijingAppliedTargetFact(use, fact, precedingTargets, out resultTargets);

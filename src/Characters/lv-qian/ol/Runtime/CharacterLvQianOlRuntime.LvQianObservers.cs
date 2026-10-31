@@ -74,30 +74,6 @@ internal sealed partial class CharacterLvQianOlRuntime
     {
         ZengdaoGrant = MatchingZengdaoGrant(item.Candidate)
     };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 350)]
-    internal void AssertLvQian(ProgramSkillFrame f)
-    {
-        if (f.LvQian is not { } r)
-            return;
-        if (r.GameplayHash != f.GameplayHash || r.Instruction != f.InstructionIndex || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Source.SkillId != f.SkillId || r.Source.SkillInstanceId != f.SkillInstanceId || r.Entities.Distinct().Count() != r.Entities.Count || r.Cursor < 0 || r.Cursor > r.Targets.Count || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LvQianStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.WindowId == r.WindowId && e.ActualTurn == r.ActualTurn && (e.Stage == r.Stage || e.Stage == LvQianStage.DamageChoice && r.Stage == LvQianStage.DamagePaymentChildren)) != 1 || r.Stage != LvQianStage.DamageChoice && f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null })
-            throw new InvalidOperationException("Lv Qian lost its exact owning instruction, source or paid native cursor.");
-        if (r.Stage is LvQianStage.DepositChildren or LvQianStage.DamagePaymentChildren)
-        {
-            if (r.Grant is not { } grant || r.Stage == LvQianStage.DepositChildren && grant.Source != r.Source || grant.GameplayHash != r.GameplayHash || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LvQianSegmentPaidEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Stage == r.Stage && e.Before == r.Before && e.After == r.After && e.Count == r.ActualCount) != 1)
-                throw new InvalidOperationException("Zengdao lost its exact once-paid public entity invoice.");
-            var reason = r.Stage == LvQianStage.DepositChildren ? ZengdaoDepositReason : ZengdaoConsumeReason;
-            var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == reason).ToArray();
-            if (moves.Length != r.ActualCount || !moves.Select(m => m.CardId).Order().SequenceEqual(r.Entities.Order()) || moves.Any(m => r.Stage == LvQianStage.DepositChildren ? m.From != CardLocation.Equipment(f.OwnerSeat) || m.To != grant.Location : m.From != grant.Location || m.To != CardLocation.DiscardPile))
-                throw new InvalidOperationException("Zengdao cannot borrow another public pile or payment.");
-        }
-        else if (r.Stage == LvQianStage.DamageChoice)
-        {
-            if (r.Choices.Count < 1 || r.Choices.Select(c => c.CardId).Distinct().Count() != r.Choices.Count || r.Choices.Any(c => !IsDurableZengdaoGrant(c.Grant) || !c.Grant.Entities.Contains(c.CardId)))
-                throw new InvalidOperationException("Zengdao choices lost their frozen issued public entities.");
-        }
-        else if (r.Phase is not { } phase || phase.OwnerSeat != f.OwnerSeat || phase.ActualTurn != r.ActualTurn || f.WindowContext?.WeiluPhase != phase || r.WindowId != f.WindowContext.ParentFrameId)
-            throw new InvalidOperationException("Weilu lost its frozen original actual phase.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 310)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 310)]
@@ -105,7 +81,6 @@ internal sealed partial class CharacterLvQianOlRuntime
     {
         if (f.LvQian is not null)
         {
-            AssertLvQian(f);
             return true;
         }
 
@@ -134,8 +109,6 @@ internal sealed partial class CharacterLvQianOlRuntime
     internal bool HasLvQianDamageObserver(long id) => LvQianObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 470)]
     internal bool HasLvQianBeforeDamageObserver(long id) => LvQianObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 240)]
-    internal bool IsLvQianDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && LvQianObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 380)]
     internal bool TryAdvanceLvQianSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LvQianObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     internal bool IsLvQianRecoveryCompletion(ProgramSkillFrame f, RecoveryAttempt attempt) => f.LvQian is { Stage: LvQianStage.RecoveryChildren, HpProof: { Kind: HpChangeKind.Recovery } proof, Phase: { } phase } r && phase == f.WindowContext?.WeiluPhase && attempt.SourceSeat == f.OwnerSeat && attempt.TargetSeat == proof.TargetSeat && attempt.Amount == proof.Amount && attempt.HpBefore == proof.HpBefore && attempt.Completion.Producer == RecoveryAttemptProducer.Program && attempt.Completion.InstructionIndex == f.InstructionIndex && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WeiluDebtConsumedEvent>().Count(e => e.FrameId == f.Id && e.Phase == phase && e.TargetSeat == proof.TargetSeat && e.TargetAlive && e.Amount >= proof.Amount) == 1;

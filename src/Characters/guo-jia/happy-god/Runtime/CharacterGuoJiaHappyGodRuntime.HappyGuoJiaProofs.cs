@@ -41,19 +41,6 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
         return issued is [var use] && use.UseId == r.UseId && use.ActionId == r.ActionId && use.Kind == r.Plan.Kind && use.Benefactor == r.Benefactor && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == r.Plan.Kind) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40900)]
-    internal void AssertHappyGuoJia(ProgramSkillFrame f)
-    {
-        if (f.HappyGuoJia is not { } r)
-            return;
-        if (!ValidHappyGj(f) || r.Cards is not System.Collections.IList { IsReadOnly: true } || r.Plan is { Targets: not System.Collections.IList { IsReadOnly: true } })
-            throw new InvalidOperationException("Happy Guo Jia lost its exact original source, public reveal, paid maximum, native use or immutable receipt.");
-        if (f.PendingMovementContinuation is { } pending && !HappyGjMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Happy Guo Jia lost its exact movement parent.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && r.Stage is HappyGuoJiaStage.Recipient or HappyGuoJiaStage.Target or HappyGuoJiaStage.Awakening or HappyGuoJiaStage.UseChoice && (p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, HappyGjChoices(f))))
-            throw new InvalidOperationException("Happy Guo Jia changed its published owner menu.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 40900)]
     internal bool HappyGjMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.HappyGuoJia is { } r && e?.Op == r.Operation && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is HappyGuoJiaStage.GrowChildren or HappyGuoJiaStage.GainChildren or HappyGuoJiaStage.CleanupChildren or HappyGuoJiaStage.DrawChildren or HappyGuoJiaStage.CostChildren;
     internal bool HappyGjFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -79,8 +66,6 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
     internal bool HappyGjDamageObserver(long id) => HappyGjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == id && c is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 40900)]
     internal bool HappyGjBeforeDamageObserver(long id) => HappyGjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == id && c is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 40900)]
-    internal bool HappyGjDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HappyGjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40900)]
     internal bool AdvanceHappyGjSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HappyGjObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

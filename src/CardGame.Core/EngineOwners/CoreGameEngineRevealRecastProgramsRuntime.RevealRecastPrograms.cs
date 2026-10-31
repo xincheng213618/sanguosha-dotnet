@@ -107,14 +107,6 @@ internal sealed partial class CoreGameEngineRevealRecastProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal void AssertPairedHandRevealChoice(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (paused.Op != SkillProgramEffectOp.RevealSelectedHandAgainstTarget || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || frame.ChoiceBindings.Any(binding => binding.Name == paused.ResultBind))
-            return;
-        if (frame.TriggerId is not null || frame.SelectedCardIds is not [var ownerCard] || frame.SelectedTargetSeats is not [var target] || _cardZonesOperations._cardZones.GetLocation(ownerCard) != CardLocation.Hand(frame.OwnerSeat) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != target || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, PairedHandRevealChoices(frame, paused)))
-            throw new InvalidOperationException("Paired reveal lost its private physical hand choice.");
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IRevealRecastProgramHost.RecastSelectedCards(ProgramSkillFrame frame, string stateId, int threshold) => RecastProgramSelectedCards(frame, stateId, threshold);
     void global::CardGame.Core.IRevealRecastProgramHost.DrawCompletedCardParticipants(ProgramSkillFrame frame, string stateId, int threshold) => DrawProgramCompletedCardParticipants(frame, stateId, threshold);
     SkillProgramStepOutcome global::CardGame.Core.IRevealRecastProgramHost.RevealSelectedHandAgainstTarget(ProgramSkillFrame frame, string resultBind) => RevealProgramSelectedHandAgainstTarget(frame, resultBind);

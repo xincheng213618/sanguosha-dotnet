@@ -4,7 +4,6 @@ internal sealed partial class CharacterLiuHongOlEntries
 {
     internal void AbolishYujueSlot(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.EquipmentSlot slot) => _resolve().AbolishYujueSlot(frame, slot);
     internal void ArmProgramGameDamageBonus(global::CardGame.Core.ProgramSkillFrame frame, string skillId, int ownerSeat, int amount) => _resolve().ArmProgramGameDamageBonus(frame, skillId, ownerSeat, amount);
-    internal void AssertYujuePending(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertYujuePending(frame, paused);
     internal bool CanRunYujueResolve(int ownerSeat) => _resolve().CanRunYujueResolve(ownerSeat);
     internal void CompleteYujueInvocation(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.YujuePendingState pending, bool given, int? targetSeat, int? givenCardId) => _resolve().CompleteYujueInvocation(frame, pending, given, targetSeat, givenCardId);
     internal global::System.Collections.Generic.IReadOnlyList<(global::CardGame.Core.CardUseEffectSource Source, int Amount)> GetArmedGameDamageBonuses(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().GetArmedGameDamageBonuses(attack);

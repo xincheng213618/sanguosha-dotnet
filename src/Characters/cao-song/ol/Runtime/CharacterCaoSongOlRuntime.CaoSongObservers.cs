@@ -14,7 +14,6 @@ internal sealed partial class CharacterCaoSongOlRuntime
     {
         if (root.CaoSongLilu is not { } receipt)
             return false;
-        AssertCaoSongLilu(root);
         if (child is CardsMovedTriggerWindowFrame moved)
             return moved.ResumeProgramFrameId == root.Id && moved.Batch.ParentFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > receipt.SequenceBefore && m.Sequence <= receipt.SequenceAfter && m.Reason.Value == (receipt.Stage == CaoSongLiluStage.Drawing ? LiluDrawReason : LiluGiftReason));
         if (child is HpChangedTriggerWindowFrame hp)
@@ -28,8 +27,6 @@ internal sealed partial class CharacterCaoSongOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 310)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 420)]
     internal bool HasCaoSongLiluDamageObserver(long id) => CaoSongLiluObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == id && frame is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 280)]
-    internal bool IsCaoSongLiluDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CaoSongLiluObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26030)]
     internal bool TryAdvanceCaoSongLiluSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoSongLiluObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

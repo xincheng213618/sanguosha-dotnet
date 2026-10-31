@@ -163,24 +163,6 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         return true;
     }
 
-    internal bool IsMouXqJueyanAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (!IsMouXqJueyanUse(attack.ResolutionId) || attack.Card is not null || attack.PhysicalCards.Count != 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || attack.SourceSeat != use.SourceSeat || attack.EffectiveCardKind != use.CardKind || attack.ProgramSkillCardUseFrameId is { } parent && parent != (use.MouXiaoQiaoOlOrigin?.ProgramFrameId ?? use.MouXiaoQiaoJueyanRescueOrigin?.Request.ParentFrameId))
-            return false;
-        var ancestors = MouXqNativeAncestorProcessing(use.Id);
-        return ancestors is not null && processing.Select(c => c.Id).Order().SequenceEqual(ancestors.Order());
-    }
-
-    internal IReadOnlyList<int>? MouXqNativeAncestorProcessing(long id)
-    {
-        if (!IsMouXqJueyanUse(id))
-            return null;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id);
-        if (index < 0)
-            return null;
-        return Array.AsReadOnly(_resolutionStackOperations._resolutionStack.Take(index).OfType<CardUseFrame>().SelectMany(use => use.Action?.PhysicalCards.Select(m => m.CardId) ?? use.PhysicalCardIds ?? []).Where(card => card > 0 && _cardZonesOperations._cardZones.GetLocation(card) == CardLocation.Processing).Distinct().ToArray());
-    }
-
     internal void SignMouXqNativeBatches(ProgramSkillFrame f, CardUseFrame use)
     {
         foreach (var b in _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Where(b => b.ParentFrameId == use.Id && b.AwaitingProgramFrameId is null && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.OriginOwnerSeat == f.OwnerSeat))

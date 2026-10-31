@@ -7,7 +7,6 @@ internal sealed partial class CharacterZhangYiOlEntries
     internal void AnswerZhangYi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerZhangYi(choice);
     internal void ApplyZhangYiChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ApplyZhangYiChainedDamageBonus(attack);
     internal global::CardGame.Core.RuleQueryEvaluation ApplyZhangYiKangruiHandLimit(global::CardGame.Core.CharacterState player, global::CardGame.Core.RuleQueryEvaluation ordinary) => _resolve().ApplyZhangYiKangruiHandLimit(player, ordinary);
-    internal void AssertZhangYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhangYi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginZhangYi(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginZhangYi(input, op);
     internal bool CanOfferZhangYi(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferZhangYi(candidate, trigger, context);
     internal bool ContinuePaidZhangYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidZhangYi(f);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterZhangYiOlEntries
     internal void FinishZhangYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhangYi(f);
     internal bool HasZhangYiDamageObserver(long id) => _resolve().HasZhangYiDamageObserver(id);
     internal bool IsFirstZhangYiOwnTurnDamage(global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsFirstZhangYiOwnTurnDamage(c);
-    internal bool IsZhangYiDying() => _resolve().IsZhangYiDying();
     internal bool IsZhangYiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZhangYiRecoveryParent(f, recovery);
     internal void ObserveZhangYiActualDamage(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveZhangYiActualDamage(payload);
     internal void PrepareZhangYiChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().PrepareZhangYiChainAdvance(attack);

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDualColorDuelProgramsEntries
 {
-    internal void AssertDualColorDuels() => _resolve().AssertDualColorDuels();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDualColorDuel(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginDualColorDuel(input);
     internal void CancelDualColorDuel(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CancelDualColorDuel(frame);
     internal void CompleteDualColorDuelAttackReturn(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().CompleteDualColorDuelAttackReturn(frame, completion);

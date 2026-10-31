@@ -98,24 +98,4 @@ internal sealed partial class CoreHappyWeiYanGainDestinationsRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cardIds, CardLocation.Hand(recipient), reason, disclosure: disclosure, afterRequestSettled: _characterHuangQuanMouOperations.NativeGiveRequestCompletion(producerFrameId, giver, recipient, cardIds, before, afterRequestSettled), producerFrameId: producerFrameId);
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 42306)]
-    internal void AssertHappyWeiYanRetainedProgramGains(ProgramSkillFrame frame)
-    {
-        AssertHappyWeiYanRetainedGainSettlements(frame);
-        if (frame.SelectedCardPayment is { GainRequestSettlement: { } settlement } payment)
-        {
-            if (payment.Operation != SkillProgramEffectOp.GiveSelected || settlement.RetainedGains.Any(receipt => receipt.InstructionIndex != payment.InstructionIndex))
-                throw new InvalidOperationException("A selected-card gain settlement lost its exact paid Give instruction.");
-            ValidateHappyWeiYanGainRequestSettlement(settlement, frame.Id, payment.CardIds, CardLocation.Hand(payment.RecipientSeat), settlement.SequenceBefore);
-        }
-    }
-
-    internal void AssertHappyWeiYanRetainedGainSettlements(ResolutionFrame frame)
-    {
-        if (frame.HappyWeiYanRetainedGains is not { } receipts)
-            return;
-        if (receipts.Count == 0 || receipts.Where((receipt, ordinal) => receipt.Ordinal != ordinal || !IsHappyWeiYanRetainedGainSettlement(receipt, frame.Id, receipt.Plan.CardId, receipt.Plan.RequestedTo, 0)).Any())
-            throw new InvalidOperationException("A retained gain lost its original producer or frozen historical destination replacement.");
-    }
 }

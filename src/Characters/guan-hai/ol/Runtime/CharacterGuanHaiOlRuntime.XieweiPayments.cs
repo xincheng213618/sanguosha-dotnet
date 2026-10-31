@@ -191,11 +191,6 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     internal bool IsXieweiResponseRemovedMaterial(ProgramMultiCardViewAsSelection selection, int cardId) => IsXieweiSelection(selection) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SelectMany(u => u.XieweiPayments ?? []).Any(p => p.ResponseUse && p.Paid && p.ActionId > 0 && p.Source == selection.Source && p.Materials.Select(c => c.CardId).Order().SequenceEqual(selection.Cards.Select(c => c.Id).Order()) && p.Materials.Any(c => c.CardId == cardId) && ValidXieweiPayment(p));
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 30)]
     internal bool IsXieweiPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => use.XieweiPayments?.Any(p => !p.ResponseUse && p.Paid && p.UseId == use.Id && p.ActionId == use.Action?.ActionId && batch.ParentFrameId == use.Id && batch.Movements.SequenceEqual(p.Movements) && ValidXieweiPayment(p)) == true;
-    internal void AssertXieweiPayments(CardUseFrame use)
-    {
-        if (use.XieweiPayments is not null && (use.XieweiPayments is not System.Collections.IList { IsReadOnly: true } || use.XieweiPayments.Any(p => p.UseId != use.Id || p.Materials is not System.Collections.IList { IsReadOnly: true } || p.Movements is not System.Collections.IList { IsReadOnly: true } || !ValidXieweiPayment(p))))
-            throw new InvalidOperationException("Xiewei lost its immutable native cost/virtual-output separation.");
-    }
 
     internal bool IsXieweiMultiTargetUse(CardUseFrame use) => use.XieweiTargetMaximum is >= 2 && use.XieweiOriginalTargets is { Count: >= 2 } targets && targets is System.Collections.IList { IsReadOnly: true } && targets.Count <= use.XieweiTargetMaximum && targets.Distinct().Count() == targets.Count && use.XieweiPayments?.Any(p => !p.ResponseUse && p.Paid && p.ActionId == use.Action?.ActionId && ValidXieweiPayment(p)) == true && _coreProgramEventHistoryOperations.ProgramEventHistory<XieweiTargetFrozenEvent>().Where(e => e.UseId == use.Id).OrderBy(e => e.Index).Select(e => (e.Index, e.TargetSeat, e.Maximum, e.ActionId)).SequenceEqual(targets.Select((t, i) => (i, t, use.XieweiTargetMaximum.Value, use.Action!.ActionId)));
 }

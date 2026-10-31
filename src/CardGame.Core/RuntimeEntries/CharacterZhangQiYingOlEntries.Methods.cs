@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhangQiYingOlEntries
 {
-    internal void AssertRegisteredZhangQiYing(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredZhangQiYing(frame);
     internal void AssertZhangQiYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhangQiYing(f);
     internal void AssertZhenyiJudgment(global::CardGame.Core.JudgmentFrame frame) => _resolve().AssertZhenyiJudgment(frame);
     internal bool CanContinueZhangQiYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueZhangQiYing(f);
@@ -15,7 +14,6 @@ internal sealed partial class CharacterZhangQiYingOlEntries
     internal int FaluTokenCount(int owner) => _resolve().FaluTokenCount(owner);
     internal bool HasZhangQiYingBeforeDamageObserver(long id) => _resolve().HasZhangQiYingBeforeDamageObserver(id);
     internal bool HasZhangQiYingDamageObserver(long id) => _resolve().HasZhangQiYingDamageObserver(id);
-    internal bool IsZhangQiYingDying() => _resolve().IsZhangQiYingDying();
     internal bool IsZhangQiYingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhangQiYingMovement(f, e, p);
     internal bool IsZhenyiHoutu(global::CardGame.Core.CardConversionSource source) => _resolve().IsZhenyiHoutu(source);
     internal void ObserveAcceptedZhenyiHoutu(global::CardGame.Core.CardActionAcceptedEvent accepted) => _resolve().ObserveAcceptedZhenyiHoutu(accepted);

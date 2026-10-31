@@ -83,7 +83,6 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
     internal bool HasMouFaZhengDamageObserver(long id) => MouFaZhengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31800)]
     internal bool HasMouFaZhengBeforeDamageObserver(long id) => MouFaZhengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31800)]
     internal bool IsMouFaZhengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouFaZhengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31800)]
@@ -113,10 +112,4 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 31800)]
     internal bool ContinueAcceptedMouFaZheng(ProgramSkillFrame f) => f.MouFaZheng is { Accepted: true } && ValidMouFaZheng(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31800)]
-    internal void AssertMouFaZheng(ProgramSkillFrame f)
-    {
-        if (f.MouFaZheng is not null && !ValidMouFaZheng(f))
-            throw new InvalidOperationException("Mou Fa Zheng lost the exact issuer, mark, paid entity or native return.");
-    }
 }

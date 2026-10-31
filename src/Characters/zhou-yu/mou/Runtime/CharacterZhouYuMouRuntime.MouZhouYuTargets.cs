@@ -60,7 +60,6 @@ internal sealed partial class CharacterZhouYuMouRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 36000)]
     internal bool MouZyBeforeDamage(long id) => MouZyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36000)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 36000)]
     internal bool MouZyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouZyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 36000)]

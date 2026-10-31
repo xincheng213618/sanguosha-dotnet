@@ -103,7 +103,6 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuAnGuoLiyong: { } r } f || f.Id != id)
             return;
-        AssertWuAnGuoLiyong(f);
         if (r.Stage != WuAnGuoLiyongStage.GainChildren)
             throw new InvalidOperationException("An issued Liyong Duel must return through its native typed completion.");
         if (_coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))

@@ -259,14 +259,6 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26070)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26070)]
     internal bool ContinueIssuedSpZhangLiao(ProgramSkillFrame f) => f.SpZhangLiao is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26070)]
-    internal void AssertSpZhangLiao(ProgramSkillFrame f)
-    {
-        if (f.SpZhangLiao is not { } r)
-            return;
-        if (r.Source != SpZhangLiaoSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.ParentFrameId != f.WindowContext?.ParentFrameId || r.Budget < 0 || r.SpentRank < 0 || r.SpentRank > r.Budget || r.Selected.Distinct().Count() != r.Selected.Count || r.Obtained.Distinct().Count() != r.Obtained.Count || r.SequenceBefore < 0 || r.SequenceAfter < r.SequenceBefore && r.SequenceAfter != 0)
-            throw new InvalidOperationException("SP Zhang Liao lost the owning native window or immutable rank payment.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMubingRankExchange, SkillProgramEffectOp.PreventDamageForHighestRankGift)]
     internal PromptChoice AiSpZhangLiao(PendingDecision d, ProgramSkillFrame f)

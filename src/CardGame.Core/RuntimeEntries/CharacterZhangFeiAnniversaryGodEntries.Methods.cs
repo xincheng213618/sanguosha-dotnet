@@ -21,7 +21,6 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodEntries
     internal bool HasUnclaimedShenZfJudgmentResult(global::CardGame.Core.ProgramSkillFrame f, int cardId, long before) => _resolve().HasUnclaimedShenZfJudgmentResult(f, cardId, before);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> IncludeShenZfAfterTurnEndedItems(global::CardGame.Core.DeferredTurnEndFrame p, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().IncludeShenZfAfterTurnEndedItems(p, items);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> IncludeShenZfPenalties(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> candidates) => _resolve().IncludeShenZfPenalties(owner, window, candidates);
-    internal bool IsExactShenZfJudgmentGainSubtree(global::CardGame.Core.ProgramJudgmentTriggerWindowFrame window, global::CardGame.Core.JudgmentFrame? judgment, int index) => _resolve().IsExactShenZfJudgmentGainSubtree(window, judgment, index);
     internal bool IsShenZfAdjustmentAction(global::CardGame.Core.CharacterState actor, global::CardGame.Core.LegalAction action) => _resolve().IsShenZfAdjustmentAction(actor, action);
     internal bool IsShenZfGainCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsShenZfGainCandidate(c, w);
     internal bool IsShenZfIdentitySource(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource? source) => _resolve().IsShenZfIdentitySource(owner, card, source);
@@ -32,7 +31,6 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodEntries
     internal global::CardGame.Core.ProgramJudgmentTriggerCandidate[] PrependShenZfJudgmentGain(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramJudgmentTriggerCandidate[] candidates) => _resolve().PrependShenZfJudgmentGain(j, candidates);
     internal global::CardGame.Core.CardSnapshot ProjectShenZfHandCard(global::CardGame.Core.CharacterState p, global::CardGame.Core.Card c, global::CardGame.Core.CardSnapshot snapshot) => _resolve().ProjectShenZfHandCard(p, c, snapshot);
     internal void PublishShenZfTake(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> choices) => _resolve().PublishShenZfTake(f, choices);
-    internal void RequireShenZf(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShenZf(f);
     internal bool ResumeShenZf(long id) => _resolve().ResumeShenZf(id);
     internal bool ReturnShenZfMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShenZfMovement(f);
     internal void SentenceShenZf(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SentenceShenZf(f);

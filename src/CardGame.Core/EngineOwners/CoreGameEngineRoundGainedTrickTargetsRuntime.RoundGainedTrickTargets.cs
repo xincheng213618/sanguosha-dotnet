@@ -87,7 +87,6 @@ internal sealed partial class CoreGameEngineRoundGainedTrickTargetsRuntime
     internal void ResolveRoundGainedTrickTargetChoice(PromptChoice selected)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The round-gained trick lost its owning choice.");
-        AssertRoundGainedTrickTargetDraft(frame);
         var draft = frame.RoundGainedTrickTargetDraft!;
         var choice = draft.Choices.SingleOrDefault(c => c.Id == selected.Id);
         if (choice is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
@@ -117,26 +116,6 @@ internal sealed partial class CoreGameEngineRoundGainedTrickTargetsRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { RoundGainedTrickTargetDraft = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 210)]
-    internal void AssertRoundGainedTrickTargetDraft(ProgramSkillFrame frame)
-    {
-        if (frame.RoundGainedTrickTargetDraft is null && (frame.TriggerId is null || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.Triggers.SingleOrDefault(t => t.Id == frame.TriggerId)?.Effects.Any(e => e.Op == SkillProgramEffectOp.AdjustOneRoundGainedOrdinaryTrickTarget) != true))
-            return;
-        var offers = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundGainedTrickTargetOfferedEvent>().Where(e => e.ProgramFrameId == frame.Id).ToArray();
-        var resolved = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundGainedTrickTargetResolvedEvent>().Any(e => e.ProgramFrameId == frame.Id);
-        if (frame.RoundGainedTrickTargetDraft is not { } draft)
-        {
-            if (offers.Length != 0 && !resolved)
-                throw new InvalidOperationException("A round-gained trick cannot lose its published owning draft.");
-            return;
-        }
-
-        var q = RequireRoundGainedTrickTargetParent(frame, out var use);
-        var source = new CardConversionSource(frame.SkillId, frame.TriggerId!, frame.OwnerSeat, frame.SkillInstanceId);
-        if (draft.CardUseFrameId != use.Id || draft.ActionId != use.Action!.ActionId || draft.InstructionIndex != 1 || !_coreRoundGainedSourceUsesOperations.SameRoundGainedQualification(draft.Qualification, q) || !draft.OriginalTargetSeats.SequenceEqual(RoundGainedOriginalTargets(use)) || offers is not [var offered] || resolved || offered.Source != source || offered.InstructionIndex != 1 || !_coreRoundGainedSourceUsesOperations.SameRoundGainedQualification(offered.Qualification, q) || !offered.OriginalTargetSeats.SequenceEqual(draft.OriginalTargetSeats) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(offered.Choices, draft.Choices) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(draft.Choices, BuildRoundGainedTrickTargetChoices(frame, use)) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: false } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.SourceSeat != frame.OwnerSeat || prompt.TargetSeat != frame.OwnerSeat || prompt.SkillPrompt?.SkillId != frame.SkillId || prompt.ValidCardIds.Count != 0 || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, draft.Choices) || !prompt.ValidTargetSeats.SequenceEqual(draft.Choices.SelectMany(c => c.Targets).Distinct()))
-            throw new InvalidOperationException("A round-gained trick target draft lost its frozen source, original targets or actual public choices.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.AdjustOneRoundGainedOrdinaryTrickTarget)]

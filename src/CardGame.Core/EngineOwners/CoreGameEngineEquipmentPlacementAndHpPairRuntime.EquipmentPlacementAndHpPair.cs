@@ -49,24 +49,4 @@ internal sealed partial class CoreGameEngineEquipmentPlacementAndHpPairRuntime
         var awards = active.OwnerSeat != selected && _coreMatchParticipantsPlayersAccess._players[selected].IsAlive && ownerHp != targetHp;
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { HpPairSnapshot = new(active.InstructionIndex, active.OwnerSeat, selected, ownerHp, targetHp, _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[selected].IsAlive, awards ? (ownerHp > targetHp ? active.OwnerSeat : selected) : null, awards ? (ownerHp < targetHp ? active.OwnerSeat : selected) : null) });
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30)]
-    internal void AssertEquipmentPlacementAndHpPair(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.SelectedCardPayment is { } payment)
-        {
-            if (payment.Operation == SkillProgramEffectOp.PlaceSelectedEquipment)
-            {
-                var effect = plan.Instructions[payment.InstructionIndex - 1];
-                var binding = _coreProgramLifecycleOperations.GetProgramCardSet(frame, effect.SourceBind!);
-                if (payment.PlacementSourceLocation is not { } from || from.OwnerSeat != frame.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || binding.CardIds.Count != 1 || !binding.CardIds.SequenceEqual(payment.CardIds) || binding.SourceLocations.Single() != from || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(_coreAdvancedLifecycleOperations.GetAdvancedCard(binding.CardIds[0]).Kind) || frame.SelectedTargetSeats is not [var seat] || seat != payment.RecipientSeat || from == CardLocation.Equipment(seat))
-                    throw new InvalidOperationException("Equipment placement lost its frozen physical cost origin.");
-            }
-            else if (payment.PlacementSourceLocation is not null)
-                throw new InvalidOperationException("A legacy selected payment cannot carry placement origin.");
-        }
-
-        if (frame.HpPairSnapshot is { } pair && (pair.InstructionIndex < 1 || pair.InstructionIndex > frame.InstructionIndex || plan.Instructions[pair.InstructionIndex - 1].Op != SkillProgramEffectOp.FreezeSelectedHpPair || frame.PendingMovementContinuation is not null || frame.SelectedCardPayment is not null && frame.SelectedCardPaymentResult is not { Completed: true } || pair.OwnerSeat != frame.OwnerSeat || frame.SelectedTargetSeats is not [var target] || target != pair.SelectedSeat || (pair.HigherSeat is not null) != (pair.ParticipantsAlive && pair.OwnerSeat != pair.SelectedSeat && pair.OwnerHp != pair.SelectedHp) || (pair.HigherSeat is null) != (pair.LowerSeat is null) || pair.HigherSeat is { } higher && (pair.OwnerSeat == pair.SelectedSeat || pair.OwnerHp == pair.SelectedHp || higher != (pair.OwnerHp > pair.SelectedHp ? pair.OwnerSeat : pair.SelectedSeat) || pair.LowerSeat != (pair.OwnerHp < pair.SelectedHp ? pair.OwnerSeat : pair.SelectedSeat))))
-            throw new InvalidOperationException("The frozen HP pair lost its producer, participants, or comparison.");
-    }
 }

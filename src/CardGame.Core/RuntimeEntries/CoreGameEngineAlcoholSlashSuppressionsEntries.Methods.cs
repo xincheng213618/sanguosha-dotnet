@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineAlcoholSlashSuppressionsEntries
 {
-    internal void AssertCurrentTurnOwnSkillSuppressions() => _resolve().AssertCurrentTurnOwnSkillSuppressions();
     internal bool CanRunAlcoholSlashSuppression(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context, int ownerSeat) => _resolve().CanRunAlcoholSlashSuppression(trigger, context, ownerSeat);
     internal void CaptureProgramAlcoholConsumption(long cardUseFrameId, global::CardGame.Core.CharacterState actor) => _resolve().CaptureProgramAlcoholConsumption(cardUseFrameId, actor);
     internal void ExpireCurrentTurnOwnSkillSuppressions(int turnNumber, int turnOwnerSeat) => _resolve().ExpireCurrentTurnOwnSkillSuppressions(turnNumber, turnOwnerSeat);

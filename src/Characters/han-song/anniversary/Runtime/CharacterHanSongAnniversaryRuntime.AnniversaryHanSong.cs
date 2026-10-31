@@ -171,7 +171,6 @@ internal sealed partial class CharacterHanSongAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHanSong: { } r } f || f.Id != id)
             return;
-        AssertHanSong(f);
         if (r.Stage is AnniversaryHanSongStage.BenefitChoice or AnniversaryHanSongStage.CardChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

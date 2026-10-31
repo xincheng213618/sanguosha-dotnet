@@ -126,7 +126,6 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
     {
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShenXuChu: { } r } f && f.Id == id)
         {
-            RequireShenXuChu(f);
             if (r.Stage == ShenXuChuStage.DrawAttempt)
                 return;
             if (DrainShenXuChu(id))
@@ -239,7 +238,6 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenXuChu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ShenXuChuStage.MarkChoice ? f.OwnerSeat : r.TargetSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], ShenXuChuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Zhuangpo requires the current participant's exact private answer.");
-        RequireShenXuChu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == ShenXuChuStage.MarkChoice)
         {

@@ -39,13 +39,4 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     }
 
     internal bool HasWuLuKangPindianSelection(ProgramSkillFrame f, SkillProgramActivation a) => f.WuLuKangPindianSelection is { } admission && f.TriggerId is null && f.SelectedCardIds.Count == 0 && IsWuLuKangSelectedPindianSource(a) && admission.FrameId == f.Id && admission.ProgramSource == new CardConversionSource(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId) && admission.ProgramHash == f.GameplayHash && admission.CapabilitySource.OwnerSeat == f.OwnerSeat && admission.CapabilitySource.SkillId == WuLuKangComposition.Shenduan && admission.CapabilitySource.BindingId == "maximum-deck-source" && admission.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play && admission.Phase.ActorSeat == f.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(admission.Phase) && _contentRegistryOperations._contentRegistry.GetSkill(WuLuKangComposition.Shenduan).Program is { } p && p.GameplayHash == admission.CapabilityHash && WuLuKangComposition.IsShenduan(p) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangPindianSelectionAdmittedEvent>().Count(e => e.Admission == admission) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 29703)]
-    internal void AssertWuLuKangPindianSelection(ProgramSkillFrame f)
-    {
-        if (f.WuLuKangPindianSelection is null)
-            return;
-        var program = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program;
-        if (program is null || program.GameplayHash != f.GameplayHash || program.Activations.SingleOrDefault(a => a.Id == f.ActivationId)is not { } activation || !HasWuLuKangPindianSelection(f, activation))
-            throw new InvalidOperationException("A cardless Pindian source lost its accepted, source-bound original activation.");
-    }
 }

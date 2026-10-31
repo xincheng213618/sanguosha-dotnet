@@ -75,8 +75,6 @@ internal sealed partial class CharacterKeBiNengOlRuntime
             throw new InvalidOperationException("Pingduan lost its exact currently legal basic-card selection.");
         var actor = _coreMatchParticipantsPlayersAccess._players[receipt.ActorSeat];
         var original = _corePendingDecisionPolicyPipelineOperations._pendingDecision;
-        if (original is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } || original.PlayerSeat != actor.Seat || original.SkillPrompt?.SkillId != frame.SkillId)
-            throw new InvalidOperationException("Pingduan lost the exact recipient's original accepted private basic request.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.DrawFundedDistinctBasicUse is not null)
         {

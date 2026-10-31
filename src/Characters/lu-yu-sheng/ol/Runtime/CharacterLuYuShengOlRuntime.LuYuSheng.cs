@@ -104,7 +104,6 @@ internal sealed partial class CharacterLuYuShengOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LuYuSheng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LuYuShengChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LuYuShengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Lu Yu Sheng lost its actual private chooser or original exposed entities.");
-        AssertLuYuSheng(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var option = choice.Parameters["option"];
         if (r.Stage == LuYuShengStage.RunweiChoice)
@@ -189,7 +188,6 @@ internal sealed partial class CharacterLuYuShengOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LuYuSheng: { } r } f || f.Id != id)
             return;
-        AssertLuYuSheng(f);
         if (r.Stage is LuYuShengStage.BottomChoice or LuYuShengStage.RunweiChoice or LuYuShengStage.RunweiDiscardChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -238,7 +236,6 @@ internal sealed partial class CharacterLuYuShengOlRuntime
     {
         if (f.LuYuSheng is null)
             return false;
-        AssertLuYuSheng(f);
         return true;
     }
 

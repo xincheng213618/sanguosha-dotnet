@@ -104,7 +104,6 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FrozenHandRoster: not null } f || !FrozenHandRosterCurrent(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != FrozenHandRosterChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], FrozenHandRosterChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Frozen roster choice lost its real chooser and exact current frozen-set candidates.");
-        AssertFrozenHandRoster(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.FrozenHandRoster!;
         var branch = selected.Parameters["branch"];
@@ -164,7 +163,6 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
             return false;
         if (f.PendingMovementContinuation is not { } p || !IsFrozenHandRosterMovement(f, FrozenHandRosterPausedEffect(f), p))
             throw new InvalidOperationException("Frozen roster consumed another instruction's movement return.");
-        AssertFrozenHandRoster(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd() || _coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, FrozenHandRoster = r with { Stage = r.ReturnStage } });
@@ -180,7 +178,6 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FrozenHandRoster: not null } f || f.Id != id)
             return false;
-        AssertFrozenHandRoster(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd())
             return true;
         if (f.PendingMovementContinuation is not null)
@@ -233,18 +230,6 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
             return false;
         var damage = events.OfType<FrozenHandRosterDamageIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         return r.DamageIssued ? r.DamageTarget is { } d && r.Seats.Contains(d) && damage is [var paid] && paid.SourceSeat == f.OwnerSeat && paid.TargetSeat == d && paid.Amount == 1 : r.DamageTarget is null && damage.Length == 0;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 530)]
-    internal void AssertFrozenHandRoster(ProgramSkillFrame f)
-    {
-        if (f.FrozenHandRoster is null)
-            return;
-        if (!ValidFrozenHandRoster(f))
-            throw new InvalidOperationException("Frozen hand roster lost its original seats, actual chooser cursor or once-paid receipt.");
-        var r = f.FrozenHandRoster!;
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && r.Stage is "participant" or "damage" or "reward" && (p.PlayerSeat != FrozenHandRosterChooser(f) || !p.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, FrozenHandRosterChoices(f))))
-            throw new InvalidOperationException("Frozen roster private prompt has an invalid actual chooser.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveFrozenHandRosterEndingExchange)]

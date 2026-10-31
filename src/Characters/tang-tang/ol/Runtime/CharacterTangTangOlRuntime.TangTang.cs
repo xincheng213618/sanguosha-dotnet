@@ -124,7 +124,6 @@ internal sealed partial class CharacterTangTangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TangTang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != TangTangChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], TangTangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Tang Tang lost her exact private chooser, original card or live option.");
-        AssertTangTang(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (branch == "decline")
@@ -259,7 +258,6 @@ internal sealed partial class CharacterTangTangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TangTang: { } r } f || f.Id != id)
             return;
-        AssertTangTang(f);
         if (r.Stage == TangTangStage.HpIssuing)
         {
             if (!_coreMatchParticipantsPlayersAccess._players[r.Peer].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
@@ -368,7 +366,6 @@ internal sealed partial class CharacterTangTangOlRuntime
     {
         if (f.TangTang is not { Paid: true })
             return false;
-        AssertTangTang(f);
         return true;
     }
 

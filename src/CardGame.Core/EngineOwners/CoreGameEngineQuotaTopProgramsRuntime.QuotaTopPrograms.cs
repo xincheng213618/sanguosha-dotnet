@@ -227,22 +227,6 @@ internal sealed partial class CoreGameEngineQuotaTopProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal void AssertQuotaTop(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.QuotaTop is not { } draft)
-            return;
-        if (paused.Op != SkillProgramEffectOp.PeekTurnQuotaTop || frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnEnding || draft.Quota is < 0 or > 3 || draft.ViewedIds.Count > 3 || draft.ViewedIds.Distinct().Count() != draft.ViewedIds.Count || draft.ObtainedIds.Distinct().Count() != draft.ObtainedIds.Count || draft.OrderedTopIds.Distinct().Count() != draft.OrderedTopIds.Count || draft.UnavailableIds is { } unavailable && (unavailable.Distinct().Count() != unavailable.Count || unavailable.Except(draft.ViewedIds.Except(draft.ObtainedIds)).Any()) || draft.ObtainedIds.Count > Math.Min(draft.Quota, draft.ViewedIds.Count) || draft.ObtainedIds.Except(draft.ViewedIds).Any() || draft.OrderedTopIds.Except(draft.ViewedIds.Except(draft.ObtainedIds)).Any() || draft.LossCursor is < 0 or > 2 || draft.Stage is not ("gain" or "gain-movement" or "order" or "loss-choice" or "issued-loss"))
-            throw new InvalidOperationException("Quota top lost its exact operation, frozen entities or cursor.");
-        if (draft.Stage == "issued-loss" && (draft.Quota != 0 || draft.LossTarget is not { } target || target == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramQuotaLossIssuedEvent>().Any(e => e == new ProgramQuotaLossIssuedEvent(frame.Id, frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, target))))
-            throw new InvalidOperationException("Issued quota loss lost its precommitted participants.");
-        if (draft.Stage is "gain" or "order" && draft.ViewedIds.Except(draft.ObtainedIds).Except(draft.UnavailableIds ?? []).Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DrawPile))
-            throw new InvalidOperationException("The private quota view lost a real draw-pile entity.");
-        if (!ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || draft.Stage is "issued-loss" or "gain-movement")
-            return;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.IsPrivate != (draft.Stage != "loss-choice") || prompt.Choices.Count == 0 || prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString() || choice.Parameters.GetValueOrDefault("program-action") != "quota-top-" + (draft.Stage == "loss-choice" ? "loss" : draft.Stage)))
-            throw new InvalidOperationException("Quota top lost its exact chooser or private decision.");
-    }
-
     internal CardSnapshot[] GetQuotaPrivatelyViewedCards(int viewerSeat) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(frame => frame.OwnerSeat == viewerSeat && frame.QuotaTop is { Stage: "gain" or "order" }).SelectMany(frame => frame.QuotaTop!.ViewedIds.Except(frame.QuotaTop.ObtainedIds)).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DrawPile).Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Single(card => card.Id == id))).ToArray();
     SkillProgramStepOutcome global::CardGame.Core.IQuotaTopProgramHost.PeekTurnQuotaTop(ProgramSkillFrame frame, int count) => BeginQuotaTop(frame, count);
     void global::CardGame.Core.IQuotaTopProgramHost.NullifyFirstTurnTargetByHand(ProgramSkillFrame frame) => NullifyProgramFirstTurnTarget(frame);

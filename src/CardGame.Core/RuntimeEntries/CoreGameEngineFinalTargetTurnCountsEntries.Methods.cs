@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineFinalTargetTurnCountsEntries
 {
-    internal void AssertNamedTurnFlow(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().AssertNamedTurnFlow(frame, effect);
     internal bool CanOfferNonFinalTargetPayment(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferNonFinalTargetPayment(candidate, context);
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteFinalTargetTurnCount(global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExecuteFinalTargetTurnCount(effect, frame);
     internal int GetNamedTurnSkillCount(int seat, string skill) => _resolve().GetNamedTurnSkillCount(seat, skill);

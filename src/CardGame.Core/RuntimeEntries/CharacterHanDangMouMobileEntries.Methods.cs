@@ -5,7 +5,6 @@ internal sealed partial class CharacterHanDangMouMobileEntries
     internal bool AdvanceMouHanDangChildren() => _resolve().AdvanceMouHanDangChildren();
     internal global::CardGame.Core.PromptChoice AiMouHanDang(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouHanDang(p, f);
     internal void AnswerMouHanDang(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouHanDang(selected);
-    internal void AssertMouHanDang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouHanDang(f);
     internal bool CanOfferMouHanDangGongqi(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferMouHanDangGongqi(gate);
     internal bool CanStartMouHanDangJiefan(global::CardGame.Core.CharacterState owner) => _resolve().CanStartMouHanDangJiefan(owner);
     internal bool ContinueAcceptedMouHanDang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueAcceptedMouHanDang(f);

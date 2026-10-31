@@ -12,7 +12,6 @@ internal sealed partial class CoreGameEngineSimultaneousPindianObserversRuntime
     {
         if (e?.Op != SkillProgramEffectOp.StartSimultaneousPindian || f.SimultaneousPindian is not { } r || r.Stage is not (SimultaneousPindianStage.MovementChildren or SimultaneousPindianStage.RevealChildren or SimultaneousPindianStage.Cleanup or SimultaneousPindianStage.DeathCleanup or SimultaneousPindianStage.ClaimMovementChildren or SimultaneousPindianStage.TopRefillChildren) || p.BeforeCount != 0 || p.CoverageResultBind is not null || p.SubjectSeat != (r.Stage is SimultaneousPindianStage.MovementChildren or SimultaneousPindianStage.ClaimMovementChildren ? r.PaymentSeat : f.OwnerSeat))
             return false;
-        _coreSimultaneousPindianOperations.AssertSimultaneousPindian(f);
         if (r.Stage == SimultaneousPindianStage.TopRefillChildren)
         {
             var movements = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter).ToArray();
@@ -75,7 +74,5 @@ internal sealed partial class CoreGameEngineSimultaneousPindianObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 10)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1700)]
     internal bool HasSimultaneousDamageObserver(long id) => SimultaneousObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 150)]
-    internal bool IsSimultaneousProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SimultaneousObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     internal IReadOnlyList<int> SimultaneousHeldProcessingCards() => Array.AsReadOnly(_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.SimultaneousPindian is not null && _coreSimultaneousPindianOperations.IsSimultaneousReceiptSource(f)).SelectMany(f => f.SimultaneousPindian!.Cards.Where(c => f.SimultaneousPindian.Revealed || f.SimultaneousPindian.TopReceipts.Any(t => t.CardId == c.CardId))).Select(c => c.CardId).Concat(_resolutionStackOperations._resolutionStack.Where(f => f.WuLuKangContest is not null).SelectMany(f => _characterLuKangWumiaoOperations.WuLuKangHeldProcessing(f))).Where(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Distinct().Order().ToArray());
 }

@@ -15,12 +15,6 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramSkillFrame { AnniversaryXiahouEn: { } receipt } parent && parent.Id == issued.FrameId && parent.InstructionIndex == issued.InstructionIndex && parent.OwnerSeat == issued.Source.OwnerSeat && parent.SkillId == issued.Source.SkillId && parent.SkillInstanceId == issued.Source.SkillInstanceId && parent.GameplayHash == issued.Hash && receipt.Operation == SkillProgramEffectOp.ResolveAnniversaryXiahouEnShiwu && receipt.Stage == AnniversaryXiahouEnStage.NativeUse && receipt.Origin == issued && receipt.Source == issued.Source && receipt.Hash == issued.Hash && receipt.ParentId == issued.ParentWindowId && _coreForeignTurnContestsOperations.IsForeignActualTurnPindian(parent);
     }
 
-    internal void AssertXiahouEnShiwuDuelUse(CardUseFrame use, ProgramSelectedActorDuelOrigin origin)
-    {
-        if (!ValidXiahouEnShiwuUse(use, origin))
-            throw new InvalidOperationException("Shiwu Duel lost its exact original actual-turn candidate, native zero-entity Action or owning frame.");
-    }
-
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 45000)]
     internal bool ReturnXiahouEnShiwuAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
     {

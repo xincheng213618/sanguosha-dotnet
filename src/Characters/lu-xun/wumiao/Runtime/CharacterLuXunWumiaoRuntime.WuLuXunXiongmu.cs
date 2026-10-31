@@ -102,7 +102,6 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xiongmu: { Stage: XiongmuStage.Selection } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuXiongmuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xiongmu cannot substitute a foreign, moved or replayed private material choice.");
-        AssertWuXiongmu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (branch != "finish")
@@ -179,7 +178,6 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xiongmu: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || f.NativeDraw is not null)
             return;
-        AssertWuXiongmu(f);
         if (r.Stage == XiongmuStage.Selection)
         {
             PublishWuXiongmu(f);

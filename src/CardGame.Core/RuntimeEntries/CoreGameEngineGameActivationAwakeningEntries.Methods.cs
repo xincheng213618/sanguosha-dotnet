@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineGameActivationAwakeningEntries
 {
-    internal void AssertGameActivationAwakeningReceipt(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().AssertGameActivationAwakeningReceipt(f, plan);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGameActivationAwakening(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginGameActivationAwakening(supplied, effect);
     internal bool CanContinueGameActivationAwakening(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueGameActivationAwakening(f);
     internal bool CanOfferGameActivationAwakening(int ownerSeat, string skillId, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().CanOfferGameActivationAwakening(ownerSeat, skillId, trigger);

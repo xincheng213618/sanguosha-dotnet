@@ -6,7 +6,6 @@ internal sealed partial class CharacterXiangChongOlEntries
     internal global::CardGame.Core.PromptChoice AiXiang(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiXiang(p, f);
     internal bool AllowsMuzhen(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsMuzhen(gate);
     internal void AnswerXiang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerXiang(choice);
-    internal void AssertXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertXiang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginXiangChong(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffect e) => _resolve().BeginXiangChong(input, e);
     internal void BeginXiangChongGuyingEquipment(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.XiangChongEquipmentOrigin origin) => _resolve().BeginXiangChongGuyingEquipment(frame, origin);
     internal bool CanIssueXiangChongGuyingEquipment(global::CardGame.Core.ProgramSkillFrame frame, int cardId, global::CardGame.Core.CardLocation from) => _resolve().CanIssueXiangChongGuyingEquipment(frame, cardId, from);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterXiangChongOlEntries
     internal bool HasXiangChongBeforeDamageObserver(long id) => _resolve().HasXiangChongBeforeDamageObserver(id);
     internal bool HasXiangChongDamageObserver(long id) => _resolve().HasXiangChongDamageObserver(id);
     internal bool IsXiangChongClaimedUseMaterial(long useId, int cardId) => _resolve().IsXiangChongClaimedUseMaterial(useId, cardId);
-    internal bool IsXiangChongDying() => _resolve().IsXiangChongDying();
     internal bool IsXiangChongEquipmentMaterialClaim(long useId, int cardId, global::CardGame.Core.CardActionContext action) => _resolve().IsXiangChongEquipmentMaterialClaim(useId, cardId, action);
     internal bool IsXiangChongGuyingEquipmentRide(global::CardGame.Core.ResolutionFrame ride, global::CardGame.Core.ResolutionFrame beneath) => _resolve().IsXiangChongGuyingEquipmentRide(ride, beneath);
     internal bool IsXiangChongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsXiangChongRecoveryParent(f, recovery);

@@ -15,7 +15,6 @@ internal sealed partial class CharacterXiaoQiaoMobileShiEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiXiaoQiaoPublicStates(global::CardGame.Core.CharacterState owner, string id) => _resolve().MobileShiXiaoQiaoPublicStates(owner, id);
     internal void PublishShiXq(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShiXq(f);
     internal void PublishShiXqSkillMutation(long id) => _resolve().PublishShiXqSkillMutation(id);
-    internal void RequireShiXq(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShiXq(f);
     internal bool ResumeShiXq(long id) => _resolve().ResumeShiXq(id);
     internal void ReturnShiXqDraw(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiXqDraw(input, outcome);
     internal bool ReturnShiXqMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiXqMovement(f);

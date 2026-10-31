@@ -11,7 +11,6 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
     {
         if (root.SpZhangLiao is not { } r)
             return false;
-        AssertSpZhangLiao(root);
         if (child is CardsMovedTriggerWindowFrame moved)
             return moved.ResumeProgramFrameId == root.Id && moved.Batch.ParentFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.Reason.Value == SpZhangLiaoMovementReason(root));
         if (r.Stage == SpZhangLiaoStage.HighestChildren && r.VictimSeat is { } victim && r.Selected is [var card] && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.CardId == card && m.From == CardLocation.Equipment(victim) && m.To == CardLocation.Hand(root.OwnerSeat) && m.CardKind == CardKind.SilverLion))
@@ -39,8 +38,6 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 330)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 440)]
     internal bool HasSpZhangLiaoDamageObserver(long id) => SpZhangLiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && (id == root.WindowContext?.ParentFrameId || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 300)]
-    internal bool IsSpZhangLiaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SpZhangLiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26070)]
     internal bool TryAdvanceSpZhangLiaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SpZhangLiaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

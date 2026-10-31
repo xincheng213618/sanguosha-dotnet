@@ -93,8 +93,6 @@ internal sealed partial class CoreNativeNullificationRuntime
             return;
         if (pending.IssuedNoResponseNode is { } issuedNode)
         {
-            if (issuedNode.ChainDepth != pending.ChainDepth || issuedNode.Policy.ParentFrameId != pending.Id || issuedNode.Policy.CardActionId != issuedNode.ActionId)
-                throw new InvalidOperationException("Issued counterspell node lost its exact typed parent.");
             FinishNullificationWindow(pending);
             return;
         }

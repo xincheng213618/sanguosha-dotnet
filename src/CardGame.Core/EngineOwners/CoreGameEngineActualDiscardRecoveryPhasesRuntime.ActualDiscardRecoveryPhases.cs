@@ -15,7 +15,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveryPhasesRuntime
     internal void RestoreActualDiscardRecoveryPhase(DrawPhaseObligationFrame parent) => _actualDiscardRecoveryPhaseOperations.Get().Restore(parent);
     internal IReadOnlyList<DiscardRecoveryEntity> ActualDiscardRecoveryEntities(CardMovementBatchContext batch, int source) => _actualDiscardRecoveryPhaseOperations.Get().Entities(batch, source);
     internal bool ActualDiscardEntityStillAvailable(DiscardRecoveryEntity entity) => _actualDiscardRecoveryPhaseOperations.Get().StillAvailable(entity);
-    internal ActualDiscardRecoveryBatchQualifiedEvent? ActualDiscardRecoveryQualification(CardMovementBatchContext batch, int source) => _actualDiscardRecoveryPhaseOperations.Get().Qualification(batch, source);
     internal bool ActualDiscardRecoveryPhaseUsed(int owner, string skill, string stateId, ActualDiscardRecoveryPhaseKey phase) => _actualDiscardRecoveryPhaseOperations.Get().PhaseUsed(owner, skill, stateId, phase);
     internal int[] MatchingActualDiscardRecoveryIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _actualDiscardRecoveryPhaseOperations.Get().MatchingIndexes(batch, candidate);
 }

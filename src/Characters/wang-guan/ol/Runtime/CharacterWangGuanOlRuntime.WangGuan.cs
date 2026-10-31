@@ -109,7 +109,6 @@ internal sealed partial class CharacterWangGuanOlRuntime
 
     internal void PublishWangGuan(ProgramSkillFrame f)
     {
-        AssertWangGuan(f);
         var choices = WangGuanChoices(f);
         if (choices.Count == 0)
         {
@@ -136,7 +135,6 @@ internal sealed partial class CharacterWangGuanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WangGuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WangGuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shilu requires its exact private opaque hand selection.");
-        AssertWangGuan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
@@ -173,7 +171,6 @@ internal sealed partial class CharacterWangGuanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WangGuan: { } r } f || f.Id != id)
             return;
-        AssertWangGuan(f);
         if (r.Stage is WangGuanStage.ShiluTarget or WangGuanStage.ShiluCard)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

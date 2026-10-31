@@ -4,7 +4,6 @@ internal sealed partial class CharacterGuoZhaoAnniversaryEntries
 {
     internal bool AdvanceGuoZhaoSubtree() => _resolve().AdvanceGuoZhaoSubtree();
     internal void AnswerGuoZhao(global::CardGame.Core.PromptChoice c) => _resolve().AnswerGuoZhao(c);
-    internal void AssertGuoZhao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertGuoZhao(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGuoZhao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginGuoZhao(supplied, op);
     internal void BeginGuoZhaoColorBenefit(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginGuoZhaoColorBenefit(f);
     internal void BeginGuoZhaoEquipment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginGuoZhaoEquipment(f);
@@ -38,7 +37,6 @@ internal sealed partial class CharacterGuoZhaoAnniversaryEntries
     internal int GuoZhaoOwnerStart(int owner) => _resolve().GuoZhaoOwnerStart(owner);
     internal bool GuoZhaoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().GuoZhaoRecoveryParent(f, recovery);
     internal global::CardGame.Core.CardConversionSource GuoZhaoSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GuoZhaoSource(f);
-    internal bool HasAnniversaryGuoZhaoPrompt() => _resolve().HasAnniversaryGuoZhaoPrompt();
     internal bool IsAnniversaryGuoZhaoNativeEquipment(global::CardGame.Core.ResolutionFrame child, global::CardGame.Core.ResolutionFrame parent) => _resolve().IsAnniversaryGuoZhaoNativeEquipment(child, parent);
     internal bool IsIssuedAnniversaryGuoZhaoCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedAnniversaryGuoZhaoCandidate(c);
     internal bool KeepGuoZhaoPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepGuoZhaoPaid(f);

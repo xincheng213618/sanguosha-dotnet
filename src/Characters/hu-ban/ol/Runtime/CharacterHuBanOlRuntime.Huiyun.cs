@@ -81,7 +81,6 @@ internal sealed partial class CharacterHuBanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Huiyun: { } r } f || r.Stage is not (HuiyunStage.OptionChoice or HuiyunStage.HandUseChoice) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == HuiyunStage.OptionChoice ? f.OwnerSeat : HuiyunCurrent(r).TargetSeat) || !HuiyunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
             throw new InvalidOperationException("Huiyun requires its current published original option or actual target's private natural-card choice.");
-        AssertHuiyun(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage == HuiyunStage.OptionChoice)
@@ -168,7 +167,6 @@ internal sealed partial class CharacterHuBanOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Huiyun: { } r } f && f.Id == id)
         {
-            AssertHuiyun(f);
             if (r.Index == r.Opportunities.Count)
             {
                 FinishHuiyun(f);
@@ -251,7 +249,6 @@ internal sealed partial class CharacterHuBanOlRuntime
     {
         if (f.Huiyun is null)
             return false;
-        AssertHuiyun(f);
         return true;
     }
 

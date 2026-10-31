@@ -104,7 +104,6 @@ internal sealed partial class CharacterQianZhaoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Kuansai: { } r } f || f.Id != id)
             return false;
-        AssertQianZhao(f);
         if (r.Stage == KuansaiStage.Children)
         {
             if (DrainQianZhaoChildren(id))
@@ -129,7 +128,6 @@ internal sealed partial class CharacterQianZhaoOlRuntime
     internal void AnswerQianZhao(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Qian Zhao lost its owning choice frame.");
-        AssertQianZhao(f);
         var choices = f.WeifuTargets is not null ? WeifuTargetChoices(f) : KuansaiChoices(f);
         var chooser = f.Kuansai is { Stage: KuansaiStage.Benefit, ChooserSeat: { } seat } ? seat : f.OwnerSeat;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))

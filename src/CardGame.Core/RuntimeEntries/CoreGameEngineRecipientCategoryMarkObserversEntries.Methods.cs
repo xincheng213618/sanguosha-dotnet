@@ -2,8 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRecipientCategoryMarkObserversEntries
 {
-    internal void AssertRecipientCategoryMark(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertRecipientCategoryMark(f);
-    internal void AssertRecipientCategoryMarkState() => _resolve().AssertRecipientCategoryMarkState();
     internal bool ExactRecipientCategoryParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactRecipientCategoryParent(f);
     internal bool IsRecipientCategoryGiftDrawContext(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsRecipientCategoryGiftDrawContext(candidate, c);
     internal bool IsRecipientCategoryMarkChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision p) => _resolve().IsRecipientCategoryMarkChoice(f, p);

@@ -257,17 +257,6 @@ internal sealed partial class CoreGameEngineCurrentCardEnhancementsRuntime
 
     internal bool HasCurrentCardEnhancement(long frameId, CurrentCardEnhancement flag) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } use && (use.Enhancements & flag) != 0;
     internal bool HasRemainingEnhancedSlashTargets(long frameId) => !_characterDaQiaoLeOperations.IsTargetScopedZixiEffectRound(frameId) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Count > 1 && use.TargetSeats.Skip(use.TargetIndex + 1).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive);
-    internal void AssertCurrentCardEnhancementDraft(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.CardEnhancementDraft is not { } draft)
-            return;
-        var use = EnhancementCardUse(frame);
-        var flags = draft.Selected.Aggregate(CurrentCardEnhancement.None, (value, item) => value | item);
-        if (paused.Op is not (SkillProgramEffectOp.ApplyCurrentCardEnhancements or SkillProgramEffectOp.ApplyMobileWuYiBenxi) || use.Id != draft.CardUseFrameId || draft.Selected.Count >= paused.Amount || draft.Selected.Distinct().Count() != draft.Selected.Count || draft.Selected.Any(flag => flag is not (CurrentCardEnhancement.ExtraTarget or CurrentCardEnhancement.IgnoreArmor or CurrentCardEnhancement.Uncancelable or CurrentCardEnhancement.DrawAfterDamage)) || (use.Enhancements & flags) != flags || flags != CurrentCardEnhancement.None && use.EnhancementOwnerSeat != frame.OwnerSeat || draft.ChoosingExtraTarget && draft.Selected.Contains(CurrentCardEnhancement.ExtraTarget) || draft.FinishAfterExtraTarget && !draft.ChoosingExtraTarget)
-            throw new InvalidOperationException("A current-card enhancement lost its paid action, unique option set or selection bounds.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, CardEnhancementChoices(frame))))
-            throw new InvalidOperationException("A current-card enhancement prompt changed its frozen choices or targets.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.ICurrentCardEnhancementProgramHost.ApplyCurrentCardEnhancements(ProgramSkillFrame frame, int maximum) => ApplyProgramCurrentCardEnhancements(frame, maximum);
 }

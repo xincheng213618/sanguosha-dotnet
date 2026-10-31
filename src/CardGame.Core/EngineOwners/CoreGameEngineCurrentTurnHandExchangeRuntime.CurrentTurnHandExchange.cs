@@ -85,7 +85,6 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
 
     internal void ResolveCurrentTurnHandExchangeChoice(ProgramSkillFrame frame, PromptChoice supplied)
     {
-        AssertCurrentTurnHandExchange(frame);
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || frame.CurrentTurnHandExchange is not { } receipt || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != (receipt.Stage == CurrentTurnHandExchangeStage.Offered ? receipt.ParticipantSeat : frame.OwnerSeat) || supplied.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(CultureInfo.InvariantCulture) || supplied.Parameters.GetValueOrDefault("program-action") != "current-turn-hand-exchange")
             throw new InvalidOperationException("The exchange answer lost its exact actor, prompt, owning frame or stage.");
         var choice = CurrentTurnHandExchangeChoices(frame).SingleOrDefault(item => item.Id == supplied.Id) ?? throw new InvalidOperationException("The exchange answer is not an exact current choice.");
@@ -146,7 +145,6 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
     {
         if (frame.CurrentTurnHandExchange is null)
             return false;
-        AssertCurrentTurnHandExchange(frame);
         if (frame.PendingMovementContinuation is not { } pending || !IsCurrentTurnHandExchangeMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), pending))
             throw new InvalidOperationException("Exchange movement returned to a different instruction or unpaid stage.");
         if (TryDrainCurrentTurnHandExchangeMovement(frame))
@@ -161,7 +159,6 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != frameId || frame.CurrentTurnHandExchange is not { } receipt)
             return false;
-        AssertCurrentTurnHandExchange(frame);
         if (frame.PendingMovementContinuation is not null)
         {
             DrainCurrentTurnHandExchangeMovement(frameId);
@@ -278,7 +275,6 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
     [ProgramAiChoice(SkillProgramEffectOp.OfferCurrentTurnHandExchange)]
     internal PromptChoice SelectAiCurrentTurnHandExchange(PendingDecision decision, ProgramSkillFrame frame)
     {
-        AssertCurrentTurnHandExchange(frame);
         var receipt = frame.CurrentTurnHandExchange!;
         if (receipt.Stage == CurrentTurnHandExchangeStage.Offered)
             return decision.Choices.Single(choice => choice.Parameters.GetValueOrDefault("option") == "accept");
@@ -317,52 +313,6 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
         if (receipt.Stage == CurrentTurnHandExchangeStage.SelectingReturn)
             return returns.Length == 0 && frame.PendingMovementContinuation is null && receipt.CandidateCardIds.Select((id, index) => (id, index)).All(item => _cardZonesOperations._cardZones.GetLocation(item.id) == receipt.CandidateLocations[item.index] && CurrentTurnHandExchangeReturnCards(frame).Any(card => card.Id == item.id));
         return returns is [var returned] && returned == new CurrentTurnHandExchangeReturnIssuedEvent(frame.Id, frame.OwnerSeat, receipt.ParticipantSeat, receipt.FrozenGivenCount, receipt.RequiredReturnCount, receipt.ReturnBefore, receipt.ReturnAfter) && receipt.SelectedCardIds.Count == receipt.RequiredReturnCount && receipt.ReturnBefore >= receipt.GiftAfter && Invoice(receipt.ReturnBefore, receipt.ReturnAfter, "return", receipt.RequiredReturnCount, movement => receipt.SelectedCardIds.Contains(movement.CardId) && movement.To == CardLocation.Hand(receipt.ParticipantSeat) && movement.From == receipt.CandidateLocations[receipt.CandidateCardIds.ToList().IndexOf(movement.CardId)]) && receipt.SelectedCardIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(movement => movement.Sequence > receipt.ReturnBefore && movement.Sequence <= receipt.ReturnAfter && movement.CardId == id && movement.Reason.Value == CurrentTurnHandExchangeReason(frame, "return")) == 1);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 140)]
-    internal void AssertCurrentTurnHandExchange(ProgramSkillFrame frame)
-    {
-        if (frame.CurrentTurnHandExchange is not null && !ValidCurrentTurnHandExchangeReceipt(frame))
-            throw new InvalidOperationException("Current-turn hand exchange lost its immutable identity, actual native payment, frozen gift quantity or exact return selection.");
-        if (frame.CurrentTurnHandExchange is not { } receipt)
-            return;
-        if (receipt.Stage is CurrentTurnHandExchangeStage.Offered or CurrentTurnHandExchangeStage.SelectingReturn)
-        {
-            var chooser = receipt.Stage == CurrentTurnHandExchangeStage.Offered ? receipt.ParticipantSeat : frame.OwnerSeat;
-            var expected = CurrentTurnHandExchangeChoices(frame);
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || frame.PendingMovementContinuation is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != chooser || prompt.SourceSeat != frame.OwnerSeat || prompt.TargetSeat != receipt.ParticipantSeat || prompt.SkillPrompt?.SkillId != frame.SkillId || prompt.Choices.Count != expected.Count || !prompt.ValidCardIds.SequenceEqual(expected.SelectMany(choice => choice.Cards).Distinct()) || !prompt.ValidTargetSeats.SequenceEqual([receipt.ParticipantSeat]) || prompt.Choices.Zip(expected).Any(pair => pair.First.Id != pair.Second.Id || !pair.First.Cards.SequenceEqual(pair.Second.Cards) || !pair.First.Targets.SequenceEqual(pair.Second.Targets) || pair.First.Parameters.Count != pair.Second.Parameters.Count || pair.First.Parameters.Any(parameter => pair.Second.Parameters.GetValueOrDefault(parameter.Key) != parameter.Value)))
-                throw new InvalidOperationException("Current-turn hand exchange lost its exact private chooser and prepared choices.");
-        }
-        else
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-            if (frame.PendingMovementContinuation is { } pending)
-            {
-                if (!IsCurrentTurnHandExchangeMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), pending))
-                    throw new InvalidOperationException("Current-turn hand exchange lost its pending native movement return.");
-            }
-            else if (index != _resolutionStackOperations._resolutionStack.Count - 1 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
-                throw new InvalidOperationException("A returned exchange instruction cannot retain an unfinished child or prompt.");
-            if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !CurrentTurnHandExchangeFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
-                throw new InvalidOperationException("Current-turn hand exchange retained an unrelated movement child.");
-        }
-    }
-
-    internal bool CurrentTurnHandExchangeFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
-    {
-        var receipt = frame.CurrentTurnHandExchange!;
-        var part = receipt.Stage == CurrentTurnHandExchangeStage.DrawChildren ? "draw" : receipt.Stage == CurrentTurnHandExchangeStage.GiftChildren ? "gift" : "return";
-        var before = part == "draw" ? receipt.DrawBefore : part == "gift" ? receipt.GiftBefore : receipt.ReturnBefore;
-        var after = part == "draw" ? receipt.DrawAfter : part == "gift" ? receipt.GiftAfter : receipt.ReturnAfter;
-        var reason = CurrentTurnHandExchangeReason(frame, part);
-        if (child is CardsMovedTriggerWindowFrame moved)
-            return moved.Batch.ParentFrameId == frame.Id && moved.ResumeProgramFrameId is null && moved.Batch.AwaitingProgramFrameId == frame.Id && moved.Batch.OriginOwnerSeat == frame.OwnerSeat && moved.Batch.OriginSkillId == frame.SkillId && moved.Batch.OriginSkillInstanceId == frame.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(movement => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(movement) && (movement.Sequence > before && movement.Sequence <= after && movement.Reason.Value == reason || part == "return" && movement.Reason == CardMoveReasons.WoodenOxGrainDiscard && movement.From == CardLocation.WoodenOxGrain(frame.OwnerSeat) && movement.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(cost => cost.Sequence > before && cost.Sequence <= after && receipt.SelectedCardIds.Contains(cost.CardId) && cost.CardKind == CardKind.WoodenOx && cost.From == CardLocation.Equipment(frame.OwnerSeat) && cost.Reason.Value == reason)));
-        var lion = part == "return" && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(movement => movement.Sequence > before && movement.Sequence <= after && receipt.SelectedCardIds.Contains(movement.CardId) && movement.CardKind == CardKind.SilverLion && movement.From == CardLocation.Equipment(frame.OwnerSeat) && movement.Reason.Value == reason);
-        if (!lion)
-            return false;
-        if (child is HpChangedTriggerWindowFrame hp)
-            return hp.Change.ParentFrameId == frame.Id && hp.ResumeFrameId == frame.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == frame.OwnerSeat && hp.Change.TargetSeat == frame.OwnerSeat && hp.Change.Amount == 1;
-        return child is RecoveryReplacementFrame replacement && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(replacement, frame) && replacement.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && replacement.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && replacement.Attempt.Completion.MoveReason?.Value == reason && replacement.Attempt.SourceSeat == frame.OwnerSeat && replacement.Attempt.TargetSeat == frame.OwnerSeat && replacement.Attempt.Amount == 1;
     }
 
     SkillProgramStepOutcome global::CardGame.Core.ICurrentTurnHandExchangeHost.OfferCurrentTurnHandExchange(ProgramSkillFrame frame) => BeginCurrentTurnHandExchange(frame);

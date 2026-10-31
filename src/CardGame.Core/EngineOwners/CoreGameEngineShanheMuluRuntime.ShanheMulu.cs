@@ -96,14 +96,6 @@ internal sealed partial class CoreGameEngineShanheMuluRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5420)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5420)]
     internal bool CanCompleteShanheMuluRevival(ProgramSkillFrame frame) => frame.ShanheMuluRevival is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 5420)]
-    internal void AssertShanheMuluRevival(ProgramSkillFrame frame)
-    {
-        if (frame.ShanheMuluRevival is not { } receipt)
-            return;
-        if (frame.SkillId != MuluSummonSkill || frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || receipt.InstructionIndex != frame.InstructionIndex || receipt.TargetSeats.Count > 4 || receipt.TargetSeats.Distinct().Count() != receipt.TargetSeats.Count || receipt.TargetIndex < 0 || receipt.TargetIndex > receipt.TargetSeats.Count || !Enum.IsDefined(receipt.Stage) || receipt.TargetSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || !IsShanheMuluFollower(_coreMatchParticipantsPlayersAccess._players[seat])) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheMuluRevivalIssuedEvent>().Where(item => item.FrameId == frame.Id).ToArray()is not [var issued] || issued.InstructionIndex != receipt.InstructionIndex || issued.Source != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || issued.TargetSeatsKey != string.Join(",", receipt.TargetSeats))
-            throw new InvalidOperationException("Mulu revival lost its issued follower roster or owning continuation.");
-    }
 
     internal void FreezeShanheElephantRoundDamage(ProgramSkillFrame supplied)
     {

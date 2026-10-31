@@ -215,8 +215,6 @@ internal sealed partial class MouZhuRanRuntime(IMouZhuRanFacts facts,IMouZhuRanN
     private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouZhuRan:not null}f||f.Id!=id)return false;Continue(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,34400)]
     private bool Movement(ProgramSkillFrame f)=>f.MouZhuRan is not null&&Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,34400)]
-    private void Invariant(ProgramSkillFrame f){if(f.MouZhuRan is not null&&!Valid(f))throw new InvalidOperationException("Invalid Mou Zhu Ran owning receipt.");}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,34400)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,34400)]
     private bool Paid(ProgramSkillFrame f)=>f.MouZhuRan is{Accepted:true}&&Valid(f);

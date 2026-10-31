@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsEntries
 {
-    internal void AssertRecipientConsequences(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertRecipientConsequences(f);
     internal bool BlackGiftGameIssued(int owner, string skill) => _resolve().BlackGiftGameIssued(owner, skill);
     internal bool CanRunRecipientConsequences(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().CanRunRecipientConsequences(c, trigger);
     internal bool IsRecipientConsequencesMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsRecipientConsequencesMovement(f, e, pending);

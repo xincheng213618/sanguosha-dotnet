@@ -38,13 +38,6 @@ internal sealed partial class CoreGameEngineShenwuExpandedPoliciesRuntime
     }
 
     internal bool ShenwuJuyuanExtraTarget(CharacterState player, CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == player.Seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ShenwuPreviousEndHealthSlashTarget) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShenwuTurnEndHealthEvent>().LastOrDefault(fact => fact.OwnerSeat == player.Seat)is { } previous && player.Hp < previous.Hp;
-    internal bool HasExactShenwuYanyuParticipant(ProgramSkillFrame frame)
-    {
-        if (frame.WindowContext is not { TargetSeat: { } seat } context || seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || seat == frame.OwnerSeat || !frame.SelectedTargetSeats.SequenceEqual([seat]) || frame.InstructionIndex < 1)
-            return false;
-        var first = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Instructions[0].Op;
-        return frame.SkillId == "shenwu:yanyu" && context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && first == SkillProgramEffectOp.BindShenwuTurnOwner || frame.SkillId == "shenwu:bingxian" && context.Window == SkillProgramTriggerWindow.AfterTurnEnded && first == SkillProgramEffectOp.BindShenwuEndedTurnOwner && _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().Any(parent => parent.Id == context.ParentFrameId && parent.OwnerSeat == seat && _coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent));
-    }
 
     internal bool IsShenwuHonglianHandExempt(CharacterState owner, Card card) => _contentRegistryOperations._contentRegistry.Skills.ContainsKey("shenwu:honglian") && _coreShenwuNpcProgramsOperations.ShenwuEnabled(owner, "shenwu:honglian") && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeTurnUseBan, 80)]

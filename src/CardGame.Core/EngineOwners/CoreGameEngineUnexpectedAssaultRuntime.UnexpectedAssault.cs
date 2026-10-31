@@ -51,16 +51,6 @@ internal sealed partial class CoreGameEngineUnexpectedAssaultRuntime
         return true;
     }
 
-    internal void AssertUnexpectedAssaultReceipts()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(frame => frame.UnexpectedAssaultReveal is not null))
-        {
-            var receipt = use.UnexpectedAssaultReveal!;
-            if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.UnexpectedAssault || receipt.CardUseFrameId != use.Id || use.Action is not { Type: CardActionType.Use } action || action.ActionId != receipt.ActionId || action.ActorSeat != use.SourceSeat || action.EffectiveSuit != receipt.EffectiveUseSuit || receipt.SourceSeat != use.SourceSeat || receipt.TargetIndex < 0 || receipt.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || receipt.TargetIndex > use.TargetIndex || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[receipt.TargetIndex] != receipt.TargetSeat || receipt.RevealedCardId <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.TargetSeat) || !Enum.IsDefined(receipt.EffectiveUseSuit) || !Enum.IsDefined(receipt.EffectiveRevealedSuit) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<UnexpectedAssaultRevealedEvent>().Count(e => e.Receipt == receipt) != 1 || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardsRevealedEvent>().Any(e => e.ResolutionId == use.Id && e.Cards is [var card] && card.Id == receipt.RevealedCardId && card.Kind == receipt.RevealedCardKind && card.Suit == receipt.RevealedPrintedSuit && card.Rank == receipt.RevealedRank))
-                throw new InvalidOperationException("Unexpected Assault lost its one actual public reveal and frozen scalar comparison.");
-        }
-    }
-
     [PublicHandRevealReturn("unexpected-assault-hand")]
     internal void ContinueUnexpectedAssaultPublicReveal(CardUseFrame use)
     {

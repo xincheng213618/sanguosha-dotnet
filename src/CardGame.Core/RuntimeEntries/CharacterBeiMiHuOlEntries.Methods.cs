@@ -4,7 +4,6 @@ internal sealed partial class CharacterBeiMiHuOlEntries
 {
     internal void ApplyBeiMiHuTargetMutation(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramCardTriggerWindowFrame window, global::System.Collections.Generic.IReadOnlyList<int> targets, global::System.Collections.Generic.IReadOnlyList<int> paid, string kind) => _resolve().ApplyBeiMiHuTargetMutation(f, use, window, targets, paid, kind);
     internal void AssertBeiMiHu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBeiMiHu(f);
-    internal void AssertRegisteredBeiMiHu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredBeiMiHu(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBeiMiHuAwakening(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginBeiMiHuAwakening(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBeiMiHuCardTargets(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginBeiMiHuCardTargets(f, op);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBeiMiHuGuju(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginBeiMiHuGuju(f);
@@ -33,8 +32,6 @@ internal sealed partial class CharacterBeiMiHuOlEntries
     internal bool HasBeiMiHuBeforeDamageObserver(long id) => _resolve().HasBeiMiHuBeforeDamageObserver(id);
     internal bool HasBeiMiHuDamageObserver(long id) => _resolve().HasBeiMiHuDamageObserver(id);
     internal bool HasBeiMiHuPreludeBindings(global::CardGame.Core.CharacterState player, global::CardGame.Core.SkillProgramTriggerWindow window, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().HasBeiMiHuPreludeBindings(player, window, operation);
-    internal bool HasBeiMiHuTurnPreludeBoundary() => _resolve().HasBeiMiHuTurnPreludeBoundary();
-    internal bool IsBeiMiHuDying() => _resolve().IsBeiMiHuDying();
     internal bool IsBeiMiHuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBeiMiHuMovement(f, effect, pending);
     internal bool KuiAppendTargetFinalizedInstantTrickRequirementTargetWindow(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().KuiAppendTargetFinalizedInstantTrickRequirementTargetWindow(query);
     internal bool KuiAppendTargetNormalizeImplicitDrawTwoTargetWindow(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().KuiAppendTargetNormalizeImplicitDrawTwoTargetWindow(query);

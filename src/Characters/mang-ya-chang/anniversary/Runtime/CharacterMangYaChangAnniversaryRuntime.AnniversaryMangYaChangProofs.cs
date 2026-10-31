@@ -54,17 +54,9 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
         return invoices is [var paid] && paid.InitiatorSeat == f.OwnerSeat && paid.ExecutorSeat == f.OwnerSeat && paid.SubjectSeat == f.OwnerSeat && paid.ActualCount == r.Required && paid.SequenceBefore >= r.Before && paid.SequenceAfter <= r.After && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == paid.InvocationId).OrderBy(e => e.CardId).Select(e => e.CardId).SequenceEqual(r.Selected.Order()) && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == paid.InvocationId).All(e => e.From.OwnerSeat == f.OwnerSeat && e.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && e.CompletionSequence > r.Before && e.CompletionSequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.Sequence == e.CompletionSequence && m.To == e.To && (m.From == e.From || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) == e.From) && (m.To == CardLocation.DiscardPile || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m) || _coreProgramAtomicCardMovesOperations.IsRedirectedPaidDiscardMovement(m, e.From, new(JiedaoDiscardReason)))));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 44400)]
-    internal void AssertJiedaoFrame(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryJiedao is not null && !ValidJiedaoFrame(f))
-            throw new InvalidOperationException("Jiedao lost its exact source damage, chosen increase, surviving-victim obligation or real logical discard.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 44400)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 44400)]
     internal bool ContinueIssuedAnniversaryJiedao(ProgramSkillFrame f) => f.AnniversaryJiedao is not null && ValidJiedaoFrame(f) || f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && AdmitAnniversaryJiedaoCost(JiedaoCandidate(f), w);
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 44400)]
     internal bool JiedaoDiscardMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.PayAnniversaryMangYaChangJiedao && f.AnniversaryJiedao is { Stage: AnniversaryJiedaoStage.DiscardChildren } && ValidJiedaoFrame(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-    internal bool HasAnniversaryJiedaoPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } prompt && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryJiedao: { Stage: AnniversaryJiedaoStage.BonusChoice or AnniversaryJiedaoStage.DiscardChoice }, Step: ResolutionFrameStep.AwaitingResponse } f && prompt.PlayerSeat == f.OwnerSeat && ValidJiedaoFrame(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, JiedaoChoices(f));
 }

@@ -12,7 +12,6 @@ internal sealed class QuHuangFacts(global::CardGame.Core.EngineStates.CoreActual
 
     public Card Card(int id) => getCoreGameEngineAdvancedLifecycleRuntime().GetAdvancedCard(id);
     public SkillProgramTrigger Trigger(ProgramSkillFrame frame) => getCoreGameEngineProgramLifecycleRuntime().GetProgramTrigger(frame);
-    public SkillProgramEffect? PausedEffect(ProgramSkillFrame frame) => getCoreGameEnginePrivateOfferReturnsRuntime().GetPausedPrivateOfferEffect(frame);
     public bool HasRuntimeSkill(int seat, string skill) => getCoreGameEngineNationalSkillsRuntime().HasRuntimeSkill(matchParticipantsState.ReferenceToPlayers[seat], skill);
     public SkillProgramTriggerFacts MovementFacts(int owner, CardMovementSourceCount count, CardMovementTiming? timing) => getCoreGameEngineCardMovementProgramsRuntime().CaptureCardsMovedTriggerFacts(matchParticipantsState.ReferenceToPlayers[owner], 1, count, SkillProgramTriggerWindow.CardsMoved, timing);
     public bool IsActiveSourceEquipment(int owner, string skill, string instance, Card card) => getCoreGameEngineEquipmentSkillsRuntime().IsActiveProgramSourceEquipmentCard(owner, skill, instance, card);

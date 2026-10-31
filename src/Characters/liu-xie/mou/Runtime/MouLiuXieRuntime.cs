@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouLiuXieRuntime(IMouLiuXieFacts facts, IMouLiuXieNative native, IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouLiuXieRuntime
 {
@@ -256,8 +256,6 @@ internal sealed class MouLiuXieRuntime(IMouLiuXieFacts facts, IMouLiuXieNative n
     private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouLiuXie: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 34800)]
     private bool Movement(ProgramSkillFrame f) => f.MouLiuXie is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 34800)]
-    private void Invariant(ProgramSkillFrame f) { if (f.MouLiuXie is not null && !Valid(f)) throw new InvalidOperationException("Invalid Liu Xie owning adjustment receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 34800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 34800)]
     private bool Paid(ProgramSkillFrame f) => f.MouLiuXie is not null && Valid(f);

@@ -44,8 +44,6 @@ internal sealed partial class CharacterDuanJiongOlRuntime
     internal bool HasDuanJiongDamageObserver(long id) => SaoguObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 780)]
     internal bool HasDuanJiongBeforeDamageObserver(long id) => HasDuanJiongDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 600)]
-    internal bool IsDuanJiongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SaoguObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27060)]
     internal bool AdvanceSaoguSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SaoguObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -92,12 +92,4 @@ internal sealed partial class CharacterLuMengMobileRuntime
         else
             _coreActualDiscardPhaseOperations.BeginDiscardPhase(beforeEntryPolicyCompleted: true);
     }
-
-    internal bool HasNativeDiscardEntryBoundary()
-    {
-        if (_resolutionStackOperations._resolutionStack.FirstOrDefault()is not NativeDiscardEntryFrame frame)
-            return false;
-        AssertNativeDiscardEntry(frame);
-        return true;
-    }
 }

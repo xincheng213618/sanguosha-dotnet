@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsEntries
 {
-    internal void AssertSimultaneousSelectionPolicies(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSimultaneousSelectionPolicies(f);
     internal bool CanOfferSimultaneousTop(global::CardGame.Core.ProgramSkillFrame f, int seat) => _resolve().CanOfferSimultaneousTop(f, seat);
     internal void CommitSimultaneousSelection(global::CardGame.Core.ProgramSkillFrame f, int seat, global::CardGame.Core.PromptChoice choice) => _resolve().CommitSimultaneousSelection(f, seat, choice);
     internal void ContinueSimultaneousRandomPolicies(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueSimultaneousRandomPolicies(f);

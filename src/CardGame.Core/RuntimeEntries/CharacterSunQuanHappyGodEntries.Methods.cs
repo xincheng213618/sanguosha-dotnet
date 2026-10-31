@@ -28,7 +28,6 @@ internal sealed partial class CharacterSunQuanHappyGodEntries
     internal bool IsHappyLearningStart(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame p) => _resolve().IsHappyLearningStart(p);
     internal bool IsIssuedHappyLearning(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedHappyLearning(c, w);
     internal void RecordHappySunQuanMovement(long id, long before) => _resolve().RecordHappySunQuanMovement(id, before);
-    internal void RequireHappySunQuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireHappySunQuan(f);
     internal bool RetainHappySunQuanPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainHappySunQuanPaid(f);
     internal void ReturnHappyDingliDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnHappyDingliDraw(f, outcome);
     internal bool ReturnHappySunQuanMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnHappySunQuanMovement(f);

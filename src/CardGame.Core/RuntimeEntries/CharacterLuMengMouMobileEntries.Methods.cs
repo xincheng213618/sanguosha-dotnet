@@ -5,7 +5,6 @@ internal sealed partial class CharacterLuMengMouMobileEntries
     internal bool AdvanceMouLuMengChildren() => _resolve().AdvanceMouLuMengChildren();
     internal void AnswerMouDuojing(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouDuojing(selected);
     internal void AnswerMouDuojingTake(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouDuojingTake(selected);
-    internal void AssertMouLuMeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouLuMeng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouDuojing(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouDuojing(supplied);
     internal bool CanActivateMouKeji(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateMouKeji(c);
     internal bool CanAwakenMouDujiang(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanAwakenMouDujiang(c);

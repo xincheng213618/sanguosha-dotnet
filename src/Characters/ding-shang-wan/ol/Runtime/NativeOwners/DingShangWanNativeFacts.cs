@@ -10,7 +10,6 @@ internal sealed class DingShangWanNativeFacts(global::CardGame.Core.EngineStates
     public bool ValidSeat(int seat) => getCoreTableSeatQueriesRuntime().IsValidPlayerSeat(seat);
     public bool HasSkillInstance(int seat, string skill, string instance) => getCoreGameEngineNationalSkillsRuntime().HasRuntimeSkillInstance(matchParticipantsState.ReferenceToPlayers[seat], skill, instance);
     public SkillProgramTrigger Trigger(ProgramSkillFrame frame) => getCoreGameEngineProgramLifecycleRuntime().GetProgramTrigger(frame);
-    public SkillProgramEffect? PausedEffect(ProgramSkillFrame frame) => getCoreGameEnginePrivateOfferReturnsRuntime().GetPausedPrivateOfferEffect(frame);
     public bool IsActualAfterTurnEndedParent(DeferredTurnEndFrame frame) => getCoreGameEngineAfterTurnEndedProgramsRuntime().IsActualAfterTurnEndedParent(frame);
     public ProgramTriggerCandidate AfterTurnEndedCandidate(DeferredTurnEndFrame frame) => getCoreGameEngineAfterTurnEndedProgramsRuntime().AfterTurnEndedCandidate(frame);
     public bool ValidResponseCompletionWindow(ProgramCardTriggerWindowFrame frame) => getCoreGameEngineResponseCompletionRuntime().ValidResponseCompletionWindow(frame);

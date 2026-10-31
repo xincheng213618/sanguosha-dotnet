@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSunZiLiuFangMobileEntries
 {
-    internal void AssertMobileJiyuOriginalSelection(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertMobileJiyuOriginalSelection(frame);
     internal void CaptureMobileJiyuInvocation(global::CardGame.Core.ProgramSkillStartedEvent started) => _resolve().CaptureMobileJiyuInvocation(started);
     internal void CompleteMobileJiyuInvocation(global::CardGame.Core.ProgramSkillResolvedEvent resolved) => _resolve().CompleteMobileJiyuInvocation(resolved);
     internal bool HasMobileJiyuOriginalSelection(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasMobileJiyuOriginalSelection(frame);

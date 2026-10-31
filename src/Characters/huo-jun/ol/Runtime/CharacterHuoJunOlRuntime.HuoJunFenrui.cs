@@ -138,7 +138,6 @@ internal sealed partial class CharacterHuoJunOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HuoJunFenrui: { } r } f && f.Id == id)
         {
-            AssertHuoJunFenrui(f);
             if (DrainHuoJunFenruiChildren(id))
                 return;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

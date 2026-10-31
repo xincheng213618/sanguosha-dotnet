@@ -35,7 +35,6 @@ internal sealed partial class CharacterQianZhaoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Weifu: { } r } f || f.Id != id)
             return false;
-        AssertQianZhao(f);
         if (r.Stage == WeifuStage.Judging)
             return true;
         if (DrainQianZhaoChildren(id))

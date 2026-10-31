@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhuHuanBoundaryMobileEntries
 {
     internal void AnswerBoundaryPingkou(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerBoundaryPingkou(answer);
-    internal void AssertBoundaryPingkou(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryPingkou(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryPingkou(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryPingkou(supplied);
     internal global::CardGame.Core.PromptChoice BoundaryPingkouAi(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryPingkouAi(pending, frame);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryPingkouChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryPingkouChoices(frame);

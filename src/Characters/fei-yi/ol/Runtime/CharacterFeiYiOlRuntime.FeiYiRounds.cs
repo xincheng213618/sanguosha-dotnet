@@ -82,14 +82,4 @@ internal sealed partial class CharacterFeiYiOlRuntime
         _coreNativeNullificationOperations.BeginNullificationWindow(id, card, use.SourceSeat, use.TargetSeats, r.Trick.ActionKind, null, r.Trick.RequiredCardKind, use.CardKind);
         return true;
     }
-
-    internal void AssertFeiYiEffectRounds()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.FeiYiRounds is not null))
-        {
-            var r = use.FeiYiRounds!;
-            if (use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || use.CardKind == CardKind.Nullification || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.AcceptedActorSeat != FeiYiAcceptedActor(use) || r.Started < 0 || r.Started > r.Grants.Count || r.Grants.Count < 1 || r.Grants.Distinct().Count() != r.Grants.Count || r.Native.ActionId != r.ActionId || r.Native.Trick != r.Trick || r.Native.WholeGroupRepeated != (r.Started > 0) || r.Grants.Any(g => _coreProgramEventHistoryOperations.ProgramEventHistory<FeiYiRankEffectBoundEvent>().Count(e => e.GrantId == g && e.UseFrameId == use.Id && e.ActionId == a.ActionId && e.AcceptedActorSeat == r.AcceptedActorSeat && e.EffectiveRank == a.EffectiveRank) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<FeiYiRankEffectIssuedEvent>().Count(e => e.FrameId == g && e.Source.OwnerSeat == r.AcceptedActorSeat && e.Turn == r.Turn && e.TurnOwner == r.TurnOwner && a.EffectiveRank is { } rank && (e.Greater ? rank > e.Rank : rank < e.Rank)) != 1) || !Enumerable.Range(1, r.Started).SequenceEqual(_coreProgramEventHistoryOperations.ProgramEventHistory<FeiYiEffectRoundStartedEvent>().Where(e => e.UseFrameId == use.Id && e.ActionId == r.ActionId).Select(e => e.Round)))
-                throw new InvalidOperationException("Hezhong lost its real accepted ordinary trick, exact grant invoices or ordered additional native rounds.");
-        }
-    }
 }

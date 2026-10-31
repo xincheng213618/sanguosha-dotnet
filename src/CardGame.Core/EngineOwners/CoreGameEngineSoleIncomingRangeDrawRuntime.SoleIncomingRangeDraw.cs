@@ -110,17 +110,6 @@ internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
 
     internal bool IsSoleIncomingRangeDrawMovement(CardUseFrame use, CardMovementBatchContext batch) => use.SoleIncomingRangeDraw is { Stage: SoleIncomingRangeDrawStage.Children, Outcome: { } result } receipt && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == receipt.AwaitingProgramFrameId && batch.Movements.Count > 0 && batch.Movements.All(m => m.Sequence > result.SequenceBefore && m.Sequence <= result.SequenceAfter && (result.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(result.RecipientSeat) && m.Reason == SoleIncomingRangeDrawReason(receipt.Grant) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle));
     internal bool IsSoleIncomingRangeDrawMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame window) => window.ResumeSoleIncomingRangeDrawFrameId == use.Id && window.Id == window.Batch.Id && window.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(window with { ResumeSoleIncomingRangeDrawFrameId = null }) && IsSoleIncomingRangeDrawMovement(use, window.Batch);
-    internal bool IsSoleIncomingRangeDrawStateReturn(CardUseFrame use, ProgramLifecycleTriggerWindowFrame window) => use.SoleIncomingRangeDraw is { Stage: SoleIncomingRangeDrawStage.Children } && window.ResumeProgramFrameId == use.Id && window.CharacterStateContinuation == CharacterStateContinuation.SoleIncomingRangeDraw && window.ResumeCardId is null && window.ResumeCardKind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.Id == window.Id && e.Change.ParentFrameId == use.Id) == 1;
-    internal bool HasSoleIncomingRangeDrawProcessing(IReadOnlyList<Card> processing)
-    {
-        var uses = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray();
-        if (!uses.Any(u => u.SoleIncomingRangeDraw is not null))
-            return false;
-        foreach (var use in uses)
-            AssertSoleIncomingEffectRounds(use);
-        var materials = uses.SelectMany(u => u.PhysicalCardIds ?? [u.CardId]).ToHashSet();
-        return processing.All(c => materials.Contains(c.Id));
-    }
 
     internal void AssertSoleIncomingEffectRounds(CardUseFrame use)
     {

@@ -2,9 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardObserversEntries
 {
-    internal void AssertOutsidePhaseDrawDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertOutsidePhaseDrawDiscard(f);
     internal bool HasOutsidePhaseDrawDiscardDamageObserver(long windowId) => _resolve().HasOutsidePhaseDrawDiscardDamageObserver(windowId);
-    internal bool IsOutsidePhaseDrawDiscardChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision decision) => _resolve().IsOutsidePhaseDrawDiscardChoice(f, decision);
     internal bool IsOutsidePhaseDrawDiscardDying() => _resolve().IsOutsidePhaseDrawDiscardDying();
     internal bool OutsidePhaseDrawDiscardFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().OutsidePhaseDrawDiscardFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? OutsidePhaseDrawDiscardObserverRoot() => _resolve().OutsidePhaseDrawDiscardObserverRoot();

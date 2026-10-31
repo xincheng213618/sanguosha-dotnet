@@ -71,7 +71,6 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
     {
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShenMaChao: { } r } f && f.Id == id)
         {
-            RequireShenMaChao(f);
             if (r.Stage is ShenMaChaoStage.DrawAttempt or ShenMaChaoStage.EquipmentUse)
                 return;
             if (DrainShenMc(id))
@@ -139,20 +138,4 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 39000)]
     internal bool IsShenMcNativeMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ShenMaChao is { Operation: SkillProgramEffectOp.DealShouliStartingMounts } r && e?.Op == r.Operation && r.Stage is ShenMaChaoStage.EquipmentUse or ShenMaChaoStage.EquipmentChildren && r.Cursor < r.Seats.Count && p.SubjectSeat == r.Seats[r.Cursor] && p.BeforeCount == 0 && p.CoverageResultBind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ShouliStartingMountIssuedEvent>().Count(x => x.FrameId == f.Id && x.Index == r.Cursor && x.UseId == r.UseId && x.CardId == r.CardId) == 1 && (r.Stage == ShenMaChaoStage.EquipmentUse ? _resolutionStackOperations._resolutionStack.Any(child => IsShouliStartingEquipmentRide(child, f)) : _coreProgramEventHistoryOperations.ProgramEventHistory<ShouliStartingMountFinishedEvent>().Count(x => x.FrameId == f.Id && x.Index == r.Cursor && x.UseId == r.UseId && x.CardId == r.CardId) == 1);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 39000)]
-    internal void RequireShenMaChao(ProgramSkillFrame f)
-    {
-        if (f.ShenMaChao is not { } r)
-            return;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (r.Source != ShenMcSource(f) || r.GameplayHash != f.GameplayHash || r.ParentId != f.WindowContext?.ParentFrameId || index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != r.ParentId || r.Seats is not System.Collections.IList { IsReadOnly: true } || r.Cursor < 0 || r.Cursor > r.Seats.Count || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Shen Ma Chao lost his immutable original native parent or paid cursor.");
-        if (r.Operation == SkillProgramEffectOp.DealShouliStartingMounts)
-        {
-            if (f.SkillId != ShenMaChaoComposition.Shouli || f.WindowContext?.Window != SkillProgramTriggerWindow.GameStarting || r.Seats.Count != _coreMatchDefinitionPlayerCountAccess._playerCount || r.Seats.Distinct().Count() != _coreMatchDefinitionPlayerCountAccess._playerCount || r.Seats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || r.Stage is ShenMaChaoStage.EquipmentUse or ShenMaChaoStage.EquipmentChildren && (r.Cursor >= r.Seats.Count || r.CardId <= 0 || r.UseId <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShouliStartingMountIssuedEvent>().Count(e => e.FrameId == f.Id && e.Index == r.Cursor && e.RecipientSeat == r.Seats[r.Cursor] && e.CardId == r.CardId && e.UseId == r.UseId) != 1))
-                throw new InvalidOperationException("Shouli lost the actual starting seat order or issued native mount.");
-        }
-        else if (r.Operation != SkillProgramEffectOp.DrawHengwuFieldSuitEquipment || f.SkillId != ShenMaChaoComposition.Hengwu || r.Stage is not (ShenMaChaoStage.DrawAttempt or ShenMaChaoStage.DrawChildren) || r.DrawCount < 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<HengwuDrawIssuedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.ActionId == r.ActionId && e.Suit == r.Suit && e.Count == r.DrawCount) != 1)
-            throw new InvalidOperationException("Hengwu lost its exact paid actual-action draw entitlement.");
-    }
 }

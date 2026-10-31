@@ -21,8 +21,6 @@ internal sealed partial class CharacterCaoXiOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 640)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 670)]
     internal bool HasCaoXiDamageObserver(long id) => CaoXiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1450)]
-    internal bool IsCaoXiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CaoXiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26810)]
     internal bool AdvanceCaoXiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoXiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

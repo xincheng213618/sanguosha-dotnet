@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheSourceShennuEntries
 {
-    internal void AssertShanheShennuReceived(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShanheShennuReceived(frame);
     internal bool CanReceiveShanheSourceShennuDamage(global::CardGame.Core.ProgramTriggerLegalityContext context) => _resolve().CanReceiveShanheSourceShennuDamage(context);
     internal bool CaptureShanheShennuOutgoing(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId) => _resolve().CaptureShanheShennuOutgoing(attack, damageId);
     internal void CompleteShanheShennuOutgoing(global::CardGame.Core.AfterDamageEvent completed) => _resolve().CompleteShanheShennuOutgoing(completed);

@@ -137,16 +137,4 @@ internal sealed partial class CoreGameEngineProgramTargetCommitRuntime
         _coreProgramLifecycleOperations.DrawProgramCards(frame.Id, frame.OwnerSeat, effect.Amount, null, null, SkillProgramCardSetVisibility.Private, new("program.first-target.reward"));
         return _coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat);
     }
-
-    internal void AssertProgramTargetDraft(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.WindowContext?.Window == SkillProgramTriggerWindow.ProgramTargetCommitted && !IsProgramTargetContextValid(frame.WindowContext))
-            throw new InvalidOperationException("Program-target trigger lost its exact declaration parent.");
-        if (frame.RelativeZoneDemand is not { } draft)
-            return;
-        if (paused.Op != SkillProgramEffectOp.SelectRelativeZoneDemandTarget || frame.InstructionIndex != 3 || paused.ResultBind != draft.ResultBind || draft.Candidates.Count == 0 || draft.Candidates.Distinct().Count() != draft.Candidates.Count || draft.Candidates.Any(item => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(item.TargetSeat) || item.TargetSeat == frame.OwnerSeat || item.Mode is not ("hand" or "equipment")) || draft.Commit is { } commit && (commit.ParentProgramFrameId != frame.Id || commit.OwnerSeat != frame.OwnerSeat || !draft.Candidates.Contains(new(commit.TargetSeat, commit.Mode)) || !frame.SelectedTargetSeats.SequenceEqual([commit.TargetSeat]) || !frame.ChoiceBindings.Contains(new(draft.ResultBind, commit.Mode, frame.OwnerSeat))))
-            throw new InvalidOperationException("Relative-zone demand lost its frozen candidates or declared binding.");
-        if (draft.Commit is null && ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(decision.Choices, RelativeZoneChoices(frame))))
-            throw new InvalidOperationException("Relative-zone demand lost its matching public choice.");
-    }
 }

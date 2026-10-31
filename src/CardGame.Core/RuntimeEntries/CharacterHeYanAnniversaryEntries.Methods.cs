@@ -10,7 +10,6 @@ internal sealed partial class CharacterHeYanAnniversaryEntries
     internal bool ContinueHeYan(long id) => _resolve().ContinueHeYan(id);
     internal bool DrainHeYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainHeYan(f);
     internal void FinishHeYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHeYan(f);
-    internal bool HasAnniversaryHeYanPrompt() => _resolve().HasAnniversaryHeYanPrompt();
     internal bool HeYanBeforeDamageObserver(long id) => _resolve().HeYanBeforeDamageObserver(id);
     internal global::CardGame.Core.PromptChoice HeYanChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default) => _resolve().HeYanChoice(f, branch, label, cards);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HeYanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HeYanChoices(f);
@@ -32,7 +31,6 @@ internal sealed partial class CharacterHeYanAnniversaryEntries
     internal bool IsAnniversaryHeYanHandUseForbidden(int seat, global::System.Collections.Generic.IReadOnlyList<int> ids) => _resolve().IsAnniversaryHeYanHandUseForbidden(seat, ids);
     internal void PayHeYan(global::CardGame.Core.ProgramSkillFrame supplied, string kind, int executor, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardLocation destination, global::CardGame.Core.AnniversaryHeYanStage following, bool discard) => _resolve().PayHeYan(supplied, kind, executor, ids, destination, following, discard);
     internal void PublishHeYan(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().PublishHeYan(supplied);
-    internal void RequireHeYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireHeYan(f);
     internal bool RetainIssuedHeYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainIssuedHeYan(f);
     internal void ReturnHeYanDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnHeYanDraw(f, draw);
     internal bool ReturnHeYanMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnHeYanMovement(f);

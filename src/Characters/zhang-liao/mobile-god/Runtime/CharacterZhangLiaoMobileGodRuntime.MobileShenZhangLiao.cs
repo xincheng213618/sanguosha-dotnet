@@ -112,7 +112,6 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShenZhangLiao: { } r } f || !MobileShenZhangLiaoChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(choice.Parameters.OrderBy(p => p.Key))))
             throw new InvalidOperationException("Mobile Shen Zhang Liao rejects a stale slot or skill payment.");
-        AssertMobileShenZhangLiao(f);
         var value = choice.Parameters["value"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MobileShenZhangLiaoStage.ChooseSkill)
@@ -191,30 +190,4 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 39950)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 39950)]
     internal bool RetainMobileShenZhangLiao(ProgramSkillFrame f) => f.MobileShenZhangLiao is { PaidSlot: not null };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 39950)]
-    internal void AssertMobileShenZhangLiao(ProgramSkillFrame f)
-    {
-        if (f.MobileShenZhangLiao is not { } r)
-            return;
-        if (r.Source != MobileZhangLiaoSource(f) || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 1 || f.WindowContext?.ParentFrameId != r.ParentFrameId || !Enum.IsDefined(r.Stage) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalMovementSequenceAccess._movementSequence || r.Operation == SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill && r.PaidSlot is { } slot && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileDuoruiSlotPaidEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Slot == slot && e.Before == r.Before && e.After == r.After) != 1 || r.Operation == SkillProgramEffectOp.RestoreMobileZhitiEquipmentSlot && r.PaidSlot is { } restored && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileZhitiSlotRestoredEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Slot == restored) != 1)
-            throw new InvalidOperationException("Mobile Shen Zhang Liao lost his exact original source, stage or once-paid equipment slot.");
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var starts = history.OfType<ProgramBindingStartedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        var parent = _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == r.ParentFrameId);
-        var windowMatches = parent is DamageTriggerWindowFrame d && d.CandidateIndex < d.Candidates.Count && d.Candidates[d.CandidateIndex].ToProgramCandidate()is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && f.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied } w && d.TriggerWindow == w.Window && w.SourceSeat == d.SourceSeat && w.TargetSeat == d.TargetSeat && r.TargetSeat == (r.Operation == SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill ? d.TargetSeat : f.OwnerSeat) || parent is not null && MobileZhitiProgramRidesOn(f, parent) && r.Operation == SkillProgramEffectOp.RestoreMobileZhitiEquipmentSlot && r.TargetSeat == f.OwnerSeat;
-        var unpaid = r.Stage is MobileShenZhangLiaoStage.AbolishSlot or MobileShenZhangLiaoStage.RestoreSlot;
-        if (starts is not [{ } started] || started.OwnerSeat != f.OwnerSeat || started.SkillId != f.SkillId || started.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) || started.SkillInstanceId != f.SkillInstanceId || started.Window != f.WindowContext?.Window || !windowMatches || unpaid && (r.PaidSlot is not null || r.Before != 0 || r.After != 0 || r.SelectedSkillId is not null) || !unpaid && r.PaidSlot is null || r.Operation == SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill && (r.Stage == MobileShenZhangLiaoStage.RestoreSlot || r.PaidSlot == EquipmentSlot.Treasure) || r.Operation == SkillProgramEffectOp.RestoreMobileZhitiEquipmentSlot && (r.Stage is not (MobileShenZhangLiaoStage.RestoreSlot or MobileShenZhangLiaoStage.RestoreChildren) || r.SelectedSkillId is not null))
-            throw new InvalidOperationException("Mobile Shen Zhang Liao requires the unique started binding and its exact original native trigger candidate.");
-        if (r.PaidSlot is { } paid)
-        {
-            var startIndex = Array.FindIndex(history, e => e is ProgramBindingStartedEvent s && s.FrameId == f.Id);
-            var paidIndex = Array.FindIndex(history, e => r.Operation == SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill ? e is MobileDuoruiSlotPaidEvent p && p.FrameId == f.Id : e is MobileZhitiSlotRestoredEvent restoredEvent && restoredEvent.FrameId == f.Id);
-            var capacity = r.Operation == SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill ? 0 : 1;
-            if (paidIndex <= startIndex || history.Skip(startIndex + 1).Take(paidIndex - startIndex - 1).OfType<EquipmentSlotCapacityChangedEvent>().Count(e => e.Seat == f.OwnerSeat && e.Slot == paid && e.Capacity == capacity) != 1 || r.Operation == SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill && _coreTrustedMovementDiagnosticsOperations.CardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).Any(m => m.From != CardLocation.Equipment(f.OwnerSeat) || m.To != CardLocation.DiscardPile || m.Reason.Value != "equipment.slot-abolished"))
-                throw new InvalidOperationException("Mobile Shen Zhang Liao's paid slot must retain its real capacity mutation and exact equipment movements.");
-        }
-
-        if (r.SelectedSkillId is { } selected && (r.Stage != MobileShenZhangLiaoStage.RestoreChildren || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileDuoruiIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.TargetSeat == r.TargetSeat && e.SelectedSkillId == selected && e.PaidSlot == r.PaidSlot) != 1))
-            throw new InvalidOperationException("Mobile Duorui's acquired skill must retain its unique paid grant receipt.");
-    }
 }

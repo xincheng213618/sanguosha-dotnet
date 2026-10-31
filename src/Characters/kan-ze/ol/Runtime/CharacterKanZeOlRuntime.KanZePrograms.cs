@@ -73,7 +73,6 @@ internal sealed partial class CharacterKanZeOlRuntime
     internal void ResolveXiashuChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        RequireIssuedKanZe(f);
         var r = f.XiashuPaid!;
         var seat = r.Stage == XiashuStage.OwnerClaim ? f.OwnerSeat : r.Invoice.RecipientSeat;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XiashuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
@@ -124,7 +123,6 @@ internal sealed partial class CharacterKanZeOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XiashuPaid: { } r } f || f.Id != id || r.Stage is XiashuStage.RecipientReveal or XiashuStage.OwnerClaim)
             return false;
-        RequireIssuedKanZe(f);
         if (DrainXiashu(f))
             return true;
         if (r.Stage == XiashuStage.GiftChildren && _coreMatchParticipantsPlayersAccess._players[r.Invoice.RecipientSeat].IsAlive)

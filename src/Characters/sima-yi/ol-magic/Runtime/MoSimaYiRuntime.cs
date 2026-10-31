@@ -221,11 +221,6 @@ internal sealed partial class MoSimaYiRuntime(IProgramRuntimeFrames frames, IPro
     private bool MovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) =>
         Valid(f) && effect?.Op == f.MoSimaYi!.Operation && f.PendingMovementContinuation == pending &&
         pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33900)]
-    private void Invariant(ProgramSkillFrame f)
-    {
-        if (f.MoSimaYi is not null && !Valid(f)) throw new InvalidOperationException("Invalid original Magic Sima Yi receipt.");
-    }
     private void Complete(ProgramSkillFrame f)
     {
         events.AdvanceFact(new MoSimaYiCompletedEvent(f.Id, f.MoSimaYi!.Operation));

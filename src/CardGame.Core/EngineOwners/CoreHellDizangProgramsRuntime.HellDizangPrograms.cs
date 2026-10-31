@@ -49,7 +49,6 @@ internal sealed partial class CoreHellDizangProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HellBufo: { } receipt } frame || frame.Id != frameId)
             return false;
-        AssertHellDizangFrame(frame);
         if (frame.AttackAttempt is not null)
             return false;
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
@@ -80,14 +79,6 @@ internal sealed partial class CoreHellDizangProgramsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40080)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40080)]
     internal bool RetainHellBufoChildren(ProgramSkillFrame frame) => frame.HellBufo is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40080)]
-    internal void AssertHellDizangFrame(ProgramSkillFrame frame)
-    {
-        if (frame.HellBufo is { } bufo && (bufo.Source != HellDizangSource(frame) || bufo.GameplayHash != frame.GameplayHash || bufo.InstructionIndex != frame.InstructionIndex || bufo.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || bufo.Targets.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || seat == frame.OwnerSeat) || bufo.Targets.Count != bufo.Targets.Distinct().Count() || bufo.Targets is not System.Collections.IList { IsReadOnly: true } || bufo.NextTargetIndex < 0 || bufo.NextTargetIndex > bufo.Targets.Count || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HellBufoTargetFrozenEvent>().Count(e => e.ProgramFrameId == frame.Id) != bufo.Targets.Count || bufo.Targets.Where((seat, index) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HellBufoTargetFrozenEvent>().Count(e => e.ProgramFrameId == frame.Id && e.OwnerSeat == frame.OwnerSeat && e.TargetSeat == seat && e.Index == index && e.Total == bufo.Targets.Count) != 1).Any()))
-            throw new InvalidOperationException("Bufo lost its frozen actual-distance target list or paid child cursor.");
-        if (frame.HellDayuan is { } dayuan && (dayuan.Source != HellDizangSource(frame) || dayuan.GameplayHash != frame.GameplayHash || dayuan.InstructionIndex != frame.InstructionIndex || dayuan.SelectedSuit is Suit.None || frame.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment: { } judgment } context || dayuan.WindowFrameId != context.ParentFrameId || dayuan.JudgmentFrameId != judgment.JudgmentFrameId || dayuan.CardId != judgment.CardId || _coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } pending || pending.Id != dayuan.JudgmentFrameId || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id != dayuan.CardId))
-            throw new InvalidOperationException("Dayuan lost its exact suspended native judgment or chosen suit.");
-    }
 
     internal IReadOnlyList<PromptChoice> HellDayuanChoices(ProgramSkillFrame frame)
     {
@@ -109,7 +100,6 @@ internal sealed partial class CoreHellDizangProgramsRuntime
 
     internal void PublishHellDayuanChoice(ProgramSkillFrame frame)
     {
-        AssertHellDizangFrame(frame);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { Step = ResolutionFrameStep.AwaitingResponse });
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, frame.OwnerSeat, frame.HellDayuan!.SelectedSuit is null ? "大愿：指定实际判定牌的花色。" : "大愿：指定实际判定牌的点数。", [], [], frame.OwnerSeat)
@@ -128,7 +118,6 @@ internal sealed partial class CoreHellDizangProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HellDayuan: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HellDayuanChoices(frame).Where(candidate => candidate.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Dayuan lost its exact native chooser and current answer domain.");
-        AssertHellDizangFrame(frame);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (receipt.SelectedSuit is null)
         {

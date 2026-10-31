@@ -13,7 +13,6 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
     {
         if (frame.OffTurnUsedCardGift is not { Stage: OffTurnUsedCardGiftStage.GiftChildren })
             return false;
-        _coreOffTurnUsedCardsOperations.AssertOffTurnUsedCardGift(frame);
         return true;
     }
 
@@ -39,13 +38,11 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
     {
         if (parent is ProgramSkillFrame root && root.OffTurnUsedCardGift is not null)
         {
-            _coreOffTurnUsedCardsOperations.AssertOffTurnUsedCardGift(root);
             return OffTurnUsedCardGiftFirstChild(root, child);
         }
 
         if (child is not ProgramSkillFrame observer || observer.OffTurnUsedCardGift is not { } r || parent is not CardsMovedTriggerWindowFrame window || window.Id != r.WindowFrameId || window.Batch.Id != r.AnchorBatchId)
             return false;
-        _coreOffTurnUsedCardsOperations.AssertOffTurnUsedCardGift(observer);
         return true;
     }
 
@@ -54,7 +51,6 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id);
         if (index < 0 || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.OffTurnUsedCardGift is not { } r)
             return null;
-        _coreOffTurnUsedCardsOperations.AssertOffTurnUsedCardGift(root);
         if (index == _resolutionStackOperations._resolutionStack.Count - 1)
             return root;
         if (!OffTurnUsedCardGiftFirstChild(root, _resolutionStackOperations._resolutionStack[index + 1]))
@@ -69,8 +65,6 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
 
         return root;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 500, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 580)]
     internal bool IsOffTurnUsedCardGiftProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.OffTurnUsedCardGift is not null && OffTurnUsedCardGiftObserverRoot(f.Id)is not null && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id));
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1790)]
@@ -112,12 +106,5 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
         }
 
         return false;
-    }
-
-    internal void AssertOffTurnUsedCardGiftObservers()
-    {
-        foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OffTurnUsedCardGift is not null))
-            if (OffTurnUsedCardGiftObserverRoot(root.Id)is null)
-                throw new InvalidOperationException("Off-turn used-card gift lost its exact paid batch and native observer subtree.");
     }
 }

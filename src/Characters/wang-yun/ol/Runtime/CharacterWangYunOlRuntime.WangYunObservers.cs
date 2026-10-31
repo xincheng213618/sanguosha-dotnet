@@ -211,15 +211,6 @@ internal sealed partial class CharacterWangYunOlRuntime
         return events.OfType<WangYunNativeUseReturnedEvent>().Count(e => e.ProgramFrameId == f.Id && e.UseId == origin.UseId && e.ActionId == origin.ActionId && e.Kind == origin.Kind) == (returned ? 1 : 0);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 180)]
-    internal void AssertWangYun(ProgramSkillFrame f)
-    {
-        if (f.WangYunPlan is null && f.WangYunTrick is null && f.WangYunAwakening is null)
-            return;
-        if (!ValidWangYun(f))
-            throw new InvalidOperationException("Wang Yun lost the exact hand cost, native actor/material use, private three samples or causal awakening receipt.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 150)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 150)]
     internal bool CanContinueWangYun(ProgramSkillFrame f) => ValidWangYun(f) && (f.WangYunPlan is { CostPaid: true } || f.WangYunTrick?.NativeUse is not null || f.WangYunAwakening is not null);
@@ -239,8 +230,6 @@ internal sealed partial class CharacterWangYunOlRuntime
     }
 
     internal ProgramSkillFrame? WangYunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterWangYunOlOperations.WangYunFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 90)]
-    internal bool IsWangYunDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WangYunObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1540)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1650)]
     internal bool HasWangYunDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && WangYunObserverRoot()is not null;

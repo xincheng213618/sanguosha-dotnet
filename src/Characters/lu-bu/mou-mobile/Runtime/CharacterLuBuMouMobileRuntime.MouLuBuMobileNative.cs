@@ -30,20 +30,6 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
     internal long MouLbOriginAnchor(ProgramSkillFrame f) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuLiyuObtainedEvent>().First(e => e.FrameId == f.Id).Sequence;
     internal static bool IsMouLbDuelOrigin(ProgramDamageTargetDuelOrigin o) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_bu_mou_mobile_MouLuBuMobileNative.IsMouLbDuelOrigin(o);
     internal bool MatchesMouLbDuelParent(ProgramSkillFrame f, ProgramDamageTargetDuelOrigin o) => IsMouLbDuelOrigin(o) && ValidMouLb(f) && f.MouLuBuLiyu is { Stage: MouLuBuLiyuStage.DuelIssued, Paid: true, CategoryMask: 7, DuelTarget: { } target } r && o.ParentProgramFrameId == f.Id && o.InstructionIndex == f.InstructionIndex && o.ReceiptSequence == MouLbOriginAnchor(f) && o.OuterCardUseFrameId == r.OuterUseId && o.DamageWindowId == r.WindowId && o.DamageFrameId == r.DamageFrameId && o.OuterActionId == r.OuterActionId && o.InitialActorSeat == f.OwnerSeat && o.VictimChooserSeat == r.VictimSeat && o.InitialTargetSeat == target && o.SkillId == f.SkillId && o.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && o.SkillInstanceId == f.SkillInstanceId && o.GameplayHash == f.GameplayHash && o.TurnNumber == r.ActualTurn && o.BaseDamage is null && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuLiyuBranchEvent>().Count(e => e.FrameId == f.Id && e.ChooserSeat == r.VictimSeat && e.Branch == "duel" && e.TargetSeat == target && e.CategoryMask == 7) == 1;
-    internal IReadOnlyList<int> MouLbDuelOuterProcessing(CardUseFrame use)
-    {
-        if (use.DamageTargetDuelOrigin is not { } o || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ParentProgramFrameId)is not ProgramSkillFrame f || !MatchesMouLbDuelParent(f, o) || _coreCardUseLifecycleOperations.LifecycleCardUse(o.OuterCardUseFrameId)is not { CardAttack.Active: false } outer)
-            throw new InvalidOperationException("Mobile Liyu lost the original suspended physical Slash.");
-        return (outer.PhysicalCardIds ?? []).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray();
-    }
-
-    internal void AssertMouLbDuelUse(CardUseFrame use)
-    {
-        var o = use.DamageTargetDuelOrigin!;
-        var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
-        if (i < 1 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramSkillFrame f || !MatchesMouLbDuelParent(f, o) || use.CardId != 0 || use.CardKind != CardKind.Duel || use.PhysicalCardIds?.Count != 0 || use.SelectedActorDuelOrigin is not null || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveIsRed: false } || _coreCardUseLifecycleOperations.LifecycleCardUse(o.OuterCardUseFrameId)?.CardAttack is not { Active: false })
-            throw new InvalidOperationException("Mobile Liyu Duel requires its real exact paid parent and neutral empty-material use.");
-    }
 
     [NativeUseReturn(229)]
     internal void ReturnMouLbNullifiedDuel(CardUseFrame use)

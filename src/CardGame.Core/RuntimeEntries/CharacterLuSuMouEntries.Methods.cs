@@ -15,7 +15,6 @@ internal sealed partial class CharacterLuSuMouEntries
     internal bool IsIssuedMouLuSuDamageCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedMouLuSuDamageCandidate(candidate, context);
     internal bool IsMouLuSuPaymentFrame(global::CardGame.Core.ChainedStateBasicFrame p) => _resolve().IsMouLuSuPaymentFrame(p);
     internal bool IsMouLuSuPaymentFrame2(global::CardGame.Core.DrawFundedDistinctBasicFrame p) => _resolve().IsMouLuSuPaymentFrame(p);
-    internal bool IsMouLuSuPlayedCostFinished(global::CardGame.Core.ProgramCardTriggerWindowFrame w, global::CardGame.Core.CardActionCost cost) => _resolve().IsMouLuSuPlayedCostFinished(w, cost);
     internal bool IsMouLuSuPlayedWindow(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().IsMouLuSuPlayedWindow(action, window);
     internal bool IsMouLuSuUseQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsMouLuSuUseQuery(actor);
     internal void IssueMouLuSuPlayed(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouLuSuPlayed(f);
@@ -55,7 +54,6 @@ internal sealed partial class CharacterLuSuMouEntries
     internal bool TryCancelMouLuSuPayment(long id) => _resolve().TryCancelMouLuSuPayment(id);
     internal global::CardGame.Core.ProgramSkillWindowContext? TryCreateMouLuSuGainContext(global::CardGame.Core.CardsMovedTriggerWindowFrame frame, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().TryCreateMouLuSuGainContext(frame, candidate);
     internal bool TryReturnMouLuSuPlayedWindow(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().TryReturnMouLuSuPlayedWindow(window);
-    internal bool ValidMouLuSuPlayedWindow(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().ValidMouLuSuPlayedWindow(window);
     internal void ValidateMouLuSuUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateMouLuSuUse(use);
     internal bool HasMouLuSuAnniversary { get => _resolve().HasMouLuSuAnniversary; }
     internal global::CardGame.Core.MouLuSuAnniversaryRuntime MouLuSuAnniversary { get => _resolve().MouLuSuAnniversary; }

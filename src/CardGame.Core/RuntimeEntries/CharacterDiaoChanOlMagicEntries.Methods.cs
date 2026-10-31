@@ -5,7 +5,6 @@ internal sealed partial class CharacterDiaoChanOlMagicEntries
     internal global::CardGame.Core.MoDiaoChanPromiseEvent[] ActiveMoDcPromises(int actor) => _resolve().ActiveMoDcPromises(actor);
     internal bool AdvanceMoDcChildren() => _resolve().AdvanceMoDcChildren();
     internal void AnswerMoDc(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMoDc(choice);
-    internal void AssertMoDc(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMoDc(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMoDc(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMoDc(supplied, op);
     internal bool BeginNextMoDcLegacyClaim(global::CardGame.Core.ProgramSkillFrame parent) => _resolve().BeginNextMoDcLegacyClaim(parent);
     internal bool CanOfferMoDc(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMoDc(c, t, context);

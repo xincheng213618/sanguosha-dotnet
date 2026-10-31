@@ -25,7 +25,6 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
             return false;
         if (r.Stage == XiongmuStage.Drawing && f.NativeDraw is not null)
             return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
-        AssertWuXiongmu(f);
         if (child is RecoveryReplacementFrame recovery)
             return IsWuXiongmuRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
@@ -45,8 +44,6 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     internal bool HasWuXiongmuDamageObserver(long id) => WuXiongmuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1350)]
     internal bool HasWuXiongmuBeforeDamageObserver(long id) => WuXiongmuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1180)]
-    internal bool IsWuXiongmuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuXiongmuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 440)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 430)]
     internal bool IsWuXiongmuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

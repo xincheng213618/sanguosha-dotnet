@@ -4,7 +4,6 @@ internal sealed partial class CharacterHuanJieMobileShiEntries
 {
     internal bool AdvanceShiHjChildren() => _resolve().AdvanceShiHjChildren();
     internal void AnswerShiHj(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiHj(choice);
-    internal void AssertShiHj(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiHj(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiHj(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiHj(input, op);
     internal bool CanOfferShiHj(global::CardGame.Core.ProgramTriggerLegalityContext q) => _resolve().CanOfferShiHj(q);
     internal global::CardGame.Core.PromptChoice ChooseShiHjAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseShiHjAi(p, f);

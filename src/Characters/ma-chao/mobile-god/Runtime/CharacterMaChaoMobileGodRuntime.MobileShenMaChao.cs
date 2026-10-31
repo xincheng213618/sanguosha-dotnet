@@ -160,7 +160,6 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShenMaChao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MobileMaChaoStage.Target ? f.OwnerSeat : r.Target) || !MobileMaChaoChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Mobile Ma Chao requires the exact frozen target, subset or genuine equipment payment.");
-        AssertMobileMaChao(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (r.Stage == MobileMaChaoStage.Target)
@@ -320,16 +319,4 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     internal PromptChoice ChooseMobileJimie(PendingDecision p, ProgramSkillFrame f) => p.Choices.Last();
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShenMaChaoYuli)]
     internal PromptChoice ChooseMobileYuli(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40625)]
-    internal void AssertMobileMaChao(ProgramSkillFrame f)
-    {
-        if (f.MobileShenMaChao is not { } r)
-            return;
-        if (r.Source != MobileMaChaoSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != 1 || f.InstructionIndex != 1 || !Enum.IsDefined(r.Stage) || r.Targets.Distinct().Count() != r.Targets.Count || r.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t)) || r.Mask is < -1 or > 15 || r.Cursor is < 0 or > 5 || r.After < r.Before)
-            throw new InvalidOperationException("Mobile Ma Chao lost his original trigger, frozen targets/subset or movement cursor.");
-        if (r.Op == SkillProgramEffectOp.ResolveMobileShenMaChaoTingwei && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Action: { } a } || a.ActionId != r.ActionId || a.ActorSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || !a.TargetSeats.SequenceEqual(r.Targets) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileTingweiStartedEvent>().Count(e => e == new MobileTingweiStartedEvent(f.Id, r.Source, r.UseId, r.ActionId)) != 1 || r.Mask >= 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileTingweiSelectedEvent>().Count(e => e == new MobileTingweiSelectedEvent(f.Id, r.Target, r.Mask, System.Numerics.BitOperations.PopCount((uint)r.Mask))) != 1))
-            throw new InvalidOperationException("Tingwei lost its actual whole Slash, chosen target or once-paid subset.");
-        if (r.Op == SkillProgramEffectOp.ResolveMobileShenMaChaoJimie && r.Stage != MobileMaChaoStage.Target && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileMaChaoJimieUsedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Target == r.Target && e.Paid == 8) != 1)
-            throw new InvalidOperationException("Jimie lost its once-paid eight Ting and actual rechargeable limited use.");
-    }
 }

@@ -255,8 +255,6 @@ internal sealed partial class CoreGameEngineCurrentSlashFireOffersRuntime
             {
                 if (_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(f => f.ProgramFrameId == redirected.ProgramFrameId && f.CardUseFrameId == use.Id && f.ActionId == redirected.ActionId && f.Source == redirected.Source && f.TargetIndex == redirected.TargetIndex && f.PreviousTargetSeat == redirected.OriginalTargetSeat && f.NewTargetSeat == redirected.NewTargetSeat))
                     continue;
-                if (!after || redirected.ActionId != p.OriginalAction.ActionId || redirected.Source.OwnerSeat != redirected.OriginalTargetSeat || redirected.TargetIndex < 0 || redirected.TargetIndex >= actual.Count || actual[redirected.TargetIndex] != redirected.OriginalTargetSeat)
-                    throw new InvalidOperationException("A converted Slash redirection lost its exact original target.");
                 actual[redirected.TargetIndex] = redirected.NewTargetSeat;
             }
 

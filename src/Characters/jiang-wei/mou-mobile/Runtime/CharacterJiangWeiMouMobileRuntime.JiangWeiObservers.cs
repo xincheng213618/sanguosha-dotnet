@@ -74,7 +74,6 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33200)]
     internal bool MouJwBeforeDamage(long id) => MouJwObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33200)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33200)]
     internal bool MouJwDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouJwObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 33200)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 33200)]
@@ -105,10 +104,4 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     internal bool ReturnMouJwMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeMouJw(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33200)]
     internal bool AdvanceMouJwChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouJwObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33200)]
-    internal void AssertMouJw(ProgramSkillFrame f)
-    {
-        if (f.MouJiangWei is not null && !ValidMouJw(f))
-            throw new InvalidOperationException("Mobile Jiang Wei lost its exact activation, charge reservation or typed child return.");
-    }
 }

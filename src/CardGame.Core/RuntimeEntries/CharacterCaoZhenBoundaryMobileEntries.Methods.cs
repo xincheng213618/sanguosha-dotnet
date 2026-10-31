@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoZhenBoundaryMobileEntries
 {
     internal void AnswerBoundarySidi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundarySidi(choice);
-    internal void AssertBoundarySidi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundarySidi(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundarySidi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginBoundarySidi(supplied, effect);
     internal global::System.Collections.Generic.IReadOnlyList<int> BoundarySidiActualTargets(global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().BoundarySidiActualTargets(window);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundarySidiChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundarySidiChoices(frame);
@@ -13,7 +12,6 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileEntries
     internal void CommitBoundarySidiResult(global::CardGame.Core.ProgramSkillFrame supplied, string bind, long action, string outcome) => _resolve().CommitBoundarySidiResult(supplied, bind, action, outcome);
     internal bool ContinueBoundarySidiIneffectiveSimple(long id, global::CardGame.Core.ProgramSimpleCardContinuation continuation) => _resolve().ContinueBoundarySidiIneffectiveSimple(id, continuation);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.BoundarySidiPredictionView>? GetBoundarySidiPredictionViews(int viewer) => _resolve().GetBoundarySidiPredictionViews(viewer);
-    internal bool IsBoundarySidiChoiceResult(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramChoiceResultBinding binding) => _resolve().IsBoundarySidiChoiceResult(frame, binding);
     internal bool IsBoundarySidiUseIneffective(global::CardGame.Core.CardUseFrame use) => _resolve().IsBoundarySidiUseIneffective(use);
     internal bool ObservesBoundarySidiResponse(global::CardGame.Core.CardActionContext action) => _resolve().ObservesBoundarySidiResponse(action);
     internal void PublishBoundarySidi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishBoundarySidi(frame);

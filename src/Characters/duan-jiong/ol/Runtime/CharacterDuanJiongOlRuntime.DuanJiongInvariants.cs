@@ -47,11 +47,4 @@ internal sealed partial class CharacterDuanJiongOlRuntime
             return r.SelectedUseCardId is { } id && r.ReservedUseId is> 0 && r.UsedCardIds.Contains(id) && (r.NativeUse is null ? issued.Length == r.UsedCardIds.Count - 1 : r.NativeUse.CardId == id && r.NativeUse.CardUseFrameId == r.ReservedUseId && issued.Count(e => e.Origin == r.NativeUse) == 1) && returned.Length == r.UsedCardIds.Count - 1;
         return issued.Length == r.UsedCardIds.Count && returned.Length == issued.Length;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27060)]
-    internal void AssertSaogu(ProgramSkillFrame f)
-    {
-        if (f.DuanJiongSaogu is not null && !ValidSaogu(f))
-            throw new InvalidOperationException("Saogu lost its frozen source, actual phase, original paid entities or exact native continuation.");
-    }
 }

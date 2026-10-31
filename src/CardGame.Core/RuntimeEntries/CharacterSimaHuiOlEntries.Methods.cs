@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSimaHuiOlEntries
 {
     internal bool AllowsDistributeTopCardsAfterElementalChainOriginTrigger(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsDistributeTopCardsAfterElementalChainOriginTrigger(gate);
-    internal void AssertRegisteredSimaHui(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredSimaHui(frame);
     internal void AssertSimaHui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSimaHui(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSimaHuiDistribution(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginSimaHuiDistribution(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSimaHuiOperation(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginSimaHuiOperation(supplied, op);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterSimaHuiOlEntries
     internal void FinishSimaHui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSimaHui(f);
     internal bool HasSimaHuiBeforeDamageObserver(long id) => _resolve().HasSimaHuiBeforeDamageObserver(id);
     internal bool HasSimaHuiDamageObserver(long id) => _resolve().HasSimaHuiDamageObserver(id);
-    internal bool IsSimaHuiDying() => _resolve().IsSimaHuiDying();
     internal bool IsSimaHuiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSimaHuiMovement(f, effect, pending);
     internal bool IsSimaHuiYeyanSelectedPayment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsSimaHuiYeyanSelectedPayment(f);
     internal void IssueSimaHuiGift(global::CardGame.Core.ProgramSkillFrame f, int recipient) => _resolve().IssueSimaHuiGift(f, recipient);

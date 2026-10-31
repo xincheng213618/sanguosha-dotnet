@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineSuitPreventionBenefitObserversEntrie
 {
     internal bool HasSuitPreventionBenefitObserver(long beforeDamageId) => _resolve().HasSuitPreventionBenefitObserver(beforeDamageId);
     internal bool IsSuitPlacementProgramDying() => _resolve().IsSuitPlacementProgramDying();
-    internal bool IsSuitPreventionInsideDamageProgramDying() => _resolve().IsSuitPreventionInsideDamageProgramDying();
     internal bool MatchedJudgmentOriginalCandidate(global::CardGame.Core.ProgramSkillFrame root) => _resolve().MatchedJudgmentOriginalCandidate(root);
     internal bool SuitBenefitOriginalCandidate(global::CardGame.Core.ProgramSkillFrame root) => _resolve().SuitBenefitOriginalCandidate(root);
     internal bool SuitPlacementDamageEdge(global::CardGame.Core.DamageFrame damage, global::CardGame.Core.ProgramSkillFrame root) => _resolve().SuitPlacementDamageEdge(damage, root);

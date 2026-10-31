@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSunJianBoundaryMobileEntries
 {
-    internal void AssertMobileSunJianPolu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertMobileSunJianPolu(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileSunJianPolu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMobileSunJianPolu(supplied);
     internal void ContinueMobileSunJianPolu(long id) => _resolve().ContinueMobileSunJianPolu(id);
     internal bool KeepMobileSunJianPolu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepMobileSunJianPolu(frame);

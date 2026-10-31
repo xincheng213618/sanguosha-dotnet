@@ -115,12 +115,4 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
             _coreNativeDuelOperations.BeginDuelResponse(_coreNativeCardContinuationCursorsOperations.ActiveDuel ?? throw new InvalidOperationException("Sibing lost its still-unresolved direct Duel."));
         return true;
     }
-
-    internal bool HasMouLzDirectUseContinuation(long id)
-    {
-        var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is ProgramSkillFrame { MouLuZhiOlDirectDuel: { Returned: false } });
-        if (n < 0 || n + 2 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[n + 1] is not MouLuZhiOlDirectWindowFrame { Completed: false } w || w.ParentFrameId != id || !ExactMouLzDirectWindow(w) || _resolutionStackOperations._resolutionStack[n + 2] is not ProgramSkillFrame f || f.WindowContext != w.Context || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidate))
-            return false;
-        return n + 2 == _resolutionStackOperations._resolutionStack.Count - 1 && ValidMouLz(f) || MouLzSuffix(n + 2);
-    }
 }

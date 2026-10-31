@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterMaChaoMobileGodEntries
 {
     internal void AnswerMobileMaChao(global::CardGame.Core.PromptChoice c) => _resolve().AnswerMobileMaChao(c);
-    internal void AssertMobileMaChao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileMaChao(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileMaChao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMobileMaChao(supplied, op);
     internal bool CanMobileJimie(int owner) => _resolve().CanMobileJimie(owner);
     internal global::CardGame.Core.PromptChoice ChooseMobileJimie(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseMobileJimie(p, f);

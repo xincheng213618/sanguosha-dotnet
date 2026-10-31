@@ -40,59 +40,6 @@ internal sealed partial class CoreProgramShanheSourceWarElephantRuntime
         return _coreTriggeredCardProgramsOperations.UseTriggeredProgramVirtualSlash(frame, source);
     }
 
-    internal IReadOnlyList<Card> SeparateShanheWarElephantCounterParentProcessing(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (!IsShanheWarElephantMode || processing.Count == 0)
-            return processing;
-        var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.ShanheWarElephantCounterSlash?.ChildUseId == attack.ResolutionId);
-        if (parent?.ShanheWarElephantCounterSlash is not { } receipt)
-            return processing;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == parent.Id);
-        if (parent.SkillId != ShanheSourceXiongshou1136 || receipt.InstructionIndex != parent.InstructionIndex || parent.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 1 } context || context.TargetSeat != parent.OwnerSeat || context.SourceSeat != receipt.SourceSeat || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.Id != receipt.DamageWindowId || window.Id != context.ParentFrameId || window.TriggerWindow != context.Window || !_coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(parent, window) || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not CardUseFrame { CardId: 0, CardKind: CardKind.Slash, Action: { } action } child || child.Id != receipt.ChildUseId || child.SourceSeat != parent.OwnerSeat || attack.ProgramSkillCardUseFrameId != parent.Id || attack.SourceSeat != parent.OwnerSeat || attack.TargetSeat != receipt.SourceSeat || attack.PhysicalCards.Count != 0 || action.Type != CardActionType.Use || action.ActorSeat != parent.OwnerSeat || action.ProviderSeat != parent.OwnerSeat || action.PhysicalCards.Count != 0 || action.EffectiveKind != CardKind.Slash || !action.TargetSeats.SequenceEqual([receipt.SourceSeat]) || !action.ConversionChain.SequenceEqual([new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId)]) || action.ParentActionId != _resolutionStackOperations._resolutionStack.Take(index).OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId)
-            throw new InvalidOperationException("Source Xiongshou counter lost its exact damaged-owner window or issued native child chain.");
-        if (index < 2 || _resolutionStackOperations._resolutionStack[index - 2] is not DamageFrame damage || damage.Id != window.ParentFrameId || context.DamageFrameId != damage.Id || damage.SourceSeat != receipt.SourceSeat || damage.TargetSeat != parent.OwnerSeat || damage.Amount != context.Amount)
-            throw new InvalidOperationException("Source Xiongshou counter lost its exact already-applied parent damage entity.");
-        // This original is deliberately inactive while its counter owns the
-        // response window. Read the exact stored owner, never the active cursor.
-        global::CardGame.Core.GameEngine.IDamageAttempt original = _resolutionStackOperations._resolutionStack.FirstOrDefault(frame => frame.Id == damage.ParentFrameId) switch
-        {
-            ProgramSkillFrame { AttackAttempt: not null } program => _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(program.Id),
-            CardUseFrame { CardAttack: not null } use => _kernelCoreMainOperations.CreateCardAttackHandle(use.Id),
-            ProgramSkillFrame { CardAttack: not null } program => _kernelCoreMainOperations.CreateCardAttackHandle(program.Id),
-            JudgmentFrame { CardAttack: not null } judgment => _kernelCoreMainOperations.CreateCardAttackHandle(judgment.Id),
-            _ => throw new InvalidOperationException("Source Xiongshou counter lost its original stored damage-attempt owner.")};
-        if (!original.DamageWasApplied || original.TargetSeat != parent.OwnerSeat || original.IsSourceLess || original.SourceSeat != receipt.SourceSeat || original.DamageAmount != context.Amount)
-            throw new InvalidOperationException("Source Xiongshou counter cannot claim another damage window's retained materials.");
-        var held = new HashSet<int>();
-        if (receipt.SuspendedAttackId is { } attackId)
-        {
-            var ownerIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == attackId);
-            if (ownerIndex < 0 || ownerIndex >= index - 1 || _coreCardAttackStateOperations.GetCardAttackState(attackId)is not { Active: false } state)
-                throw new InvalidOperationException("Source Xiongshou retained material requires its actual inactive ancestor attack.");
-            foreach (var id in state.PhysicalCardIds)
-                Hold(id);
-        }
-
-        if (receipt.SuspendedDuelId is { } duelId)
-        {
-            var ownerIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == duelId);
-            if (ownerIndex < 0 || ownerIndex >= index - 1 || _coreCardAttackStateOperations.GetCardContinuations(duelId).Duel is not { Active: false } || _resolutionStackOperations._resolutionStack[ownerIndex] is not CardUseFrame duel)
-                throw new InvalidOperationException("Source Xiongshou retained material requires its actual inactive ancestor Duel.");
-            foreach (var id in duel.Action?.PhysicalCards.Select(card => card.CardId) ?? duel.PhysicalCardIds ?? [])
-                Hold(id);
-        }
-
-        return held.Count == 0 ? processing : processing.Where(card => !held.Contains(card.Id)).ToArray();
-        void Hold(int cardId)
-        {
-            if (_cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Processing)
-                return;
-            if (_coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault(move => move.CardId == cardId)is not { To: var destination } || destination != CardLocation.Processing || attack.PhysicalCards.Any(card => card.Id == cardId))
-                throw new InvalidOperationException("Source Xiongshou retained material lost its real paid ancestor ownership.");
-            held.Add(cardId);
-        }
-    }
-
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 24530)]
     internal bool RestoreShanheWarElephantCounterSlashParent(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
     {

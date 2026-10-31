@@ -104,7 +104,6 @@ internal sealed partial class CharacterYuanHuanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YuanHuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == YuanHuanStage.Guess ? f.OwnerSeat : r.TargetSeat) || !YuanHuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("YuanHuan requires the exact chooser's published private guess or owned hand discard.");
-        AssertYuanHuan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == YuanHuanStage.Guess)
         {
@@ -153,7 +152,6 @@ internal sealed partial class CharacterYuanHuanOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { YuanHuan: { } r } f && f.Id == id)
         {
-            AssertYuanHuan(f);
             if (r.Stage is YuanHuanStage.Guess or YuanHuanStage.SourceDiscard)
             {
                 if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

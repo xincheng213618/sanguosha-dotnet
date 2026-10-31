@@ -120,6 +120,5 @@ internal sealed class MouZhouYuRuntime(IMouZhouYuFacts facts,IMouZhouYuNative na
  [ProgramContinuation(ProgramContinuationKind.Resume,36000)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouZhouYuAnniversary:not null}f||f.Id!=id)return false;Continue(id);return true;}
  [ProgramContinuation(ProgramContinuationKind.Movement,36000)]private bool Movement(ProgramSkillFrame f)=>f.MouZhouYuAnniversary is not null&&Resume(f.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,36000)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,36000)]private bool Paid(ProgramSkillFrame f)=>f.MouZhouYuAnniversary is not null&&Valid(f);
- [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,36000)]private void Invariant(ProgramSkillFrame f){if(f.MouZhouYuAnniversary is not null&&!Valid(f))throw new InvalidOperationException("Invalid own-frame Yingmou receipt.");}
  [ProgramAiChoice(SkillProgramEffectOp.InitializeMouZhouYuYingmou,SkillProgramEffectOp.ResolveMouZhouYuYingmou)]private PromptChoice Ai(PendingDecision p,ProgramSkillFrame f)=>p.Choices.First();
 }

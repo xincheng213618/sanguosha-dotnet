@@ -5,8 +5,6 @@ internal sealed partial class CharacterZhugeGuoLeEntries
     internal bool AdvanceLeChengyanBorrowedAi() => _resolve().AdvanceLeChengyanBorrowedAi();
     internal bool AdvanceLeChengyanChildren() => _resolve().AdvanceLeChengyanChildren();
     internal void AnswerLeChengyanBorrowedVictim(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerLeChengyanBorrowedVictim(selected);
-    internal void AssertLeChengyan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLeChengyan(f);
-    internal void AssertLeChengyanEffects() => _resolve().AssertLeChengyanEffects();
     internal void BeginLeChengyanBorrowedWithAuxiliary(global::CardGame.Core.CardUseFrame supplied) => _resolve().BeginLeChengyanBorrowedWithAuxiliary(supplied);
     internal void BeginLeChengyanSlash(global::CardGame.Core.CardUseFrame u) => _resolve().BeginLeChengyanSlash(u);
     internal bool CanOfferLeChengyan(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferLeChengyan(gate);

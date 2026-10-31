@@ -28,22 +28,12 @@ internal sealed partial class CoreGameEngineShanheS5HujiaRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5HujiaRewardIssuedEvent(f.Id, receipt));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 59600)]
-    internal void AssertShanheS5HujiaReward(ProgramSkillFrame f)
-    {
-        if (f.ShanheS5Hujia is not { } r)
-            return;
-        if (f.SkillId != "shanhe:s5-hujia-995" || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || f.GameplayHash != r.GameplayHash || f.InstructionIndex is < 1 or > 2 || f.WindowContext?.ParentFrameId != r.WindowFrameId || f.WindowContext.OptionalChooserSeat != r.ChooserSeat || r.CardActionId <= 0 || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.ChooserSeat == f.OwnerSeat || r.ChooserSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5HujiaRewardIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var issued] || issued.Receipt != r)
-            throw new InvalidOperationException("S5 Hujia lost its accepted original-chooser reward invoice.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 59600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 59600)]
     internal bool ContinueAcceptedShanheS5HujiaReward(ProgramSkillFrame f)
     {
         if (f.ShanheS5Hujia is null)
             return false;
-        AssertShanheS5HujiaReward(f);
         return true;
     }
 

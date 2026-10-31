@@ -21,7 +21,6 @@ internal sealed partial class GameStartingDrawOriginRuntime
             receipt.Payer != program.OwnerSeat || receipt.Payer != issued.Payer || receipt.Recipient != issued.Recipient ||
             receipt.Recipient is not { } recipient || recipient == program.OwnerSeat ||
             program.PendingMovementContinuation != new ProgramMovementContinuation(program.OwnerSeat, 0, null)) return;
-        dingShangWan.AssertDingShangWan(program);
         var matchingBatches = Enumerable.Range(0, batches.PendingBatchCount).Select(index => (batch: batches.PendingBatchAt(index), index)).Where(entry =>
             entry.batch.ParentFrameId == program.Id && entry.batch.AwaitingProgramFrameId == program.Id && entry.batch.TurnNumber == 0 &&
             entry.batch.OriginSkillId == program.SkillId && entry.batch.OriginSkillInstanceId == program.SkillInstanceId &&

@@ -63,7 +63,6 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 68200)]
     internal int ShiZrYinXianDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.CardAttackHandle card && card.CardUserSeat is { } user && user >= 0 && attack.EffectiveCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat is { } target && target != user && ShiZrYinXianFarthest(user, target) ? 1 : 0;
     internal bool IsShiZrFuanStrikeUse(long useFrameId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanStrikeIssuedEvent>().Any(entry => entry.UseId == useFrameId);
-    internal bool HasExactShiZrFuanStrikeTarget(ProgramSkillFrame frame) => frame.TriggerId == ShiZhangRenComposition.FuanStrikeTrigger && frame.SelectedCardIds.Count == 0 && frame.SelectedTargetSeats is [var target] && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanStrikeIssuedEvent>().Any(entry => entry.FrameId == frame.Id && entry.TargetSeat == target);
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 68200)]
     internal bool ShiZrFuanUseDistance(ProgramCardDistanceQuery query) => query.CardUseFrameId is { } id && IsShiZrFuanStrikeUse(id);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 68200)]

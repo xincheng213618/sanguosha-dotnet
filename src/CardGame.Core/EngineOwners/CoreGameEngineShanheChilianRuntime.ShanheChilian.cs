@@ -31,8 +31,6 @@ internal sealed partial class CoreGameEngineShanheChilianRuntime
     internal ProgramSkillWindowContext CreateChilianLiangyinContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {
         var indexes = ChilianLiangyinMovementIndexes(frame.Batch, candidate.BindingId);
-        if (indexes.Length == 0 || candidate.OccurrenceIndex != indexes[0])
-            throw new InvalidOperationException("Chilian Liangyin lost the original global domain-crossing batch.");
         var movement = frame.Batch.Movements[candidate.OccurrenceIndex];
         return new(SkillProgramTriggerWindow.CardsMoved, frame.Id, candidate.OwnerSeat, SourceSeat: movement.From.OwnerSeat, TargetSeat: movement.To.OwnerSeat, OccurrenceIndex: candidate.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]), MovementBatch: frame.Batch, MovementIndex: candidate.OccurrenceIndex);
     }

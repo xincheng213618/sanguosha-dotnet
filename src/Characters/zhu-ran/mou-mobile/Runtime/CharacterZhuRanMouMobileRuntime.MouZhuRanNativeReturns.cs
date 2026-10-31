@@ -40,7 +40,6 @@ internal sealed partial class CharacterZhuRanMouMobileRuntime
     internal bool MouZhuRanDamageWindow(long id) => MouZhuRanNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 34400)]
     internal bool MouZhuRanBeforeDamage(long id) => MouZhuRanNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 34400)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 34400)]
     internal bool MouZhuRanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouZhuRanNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 34400)]

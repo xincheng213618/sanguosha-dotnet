@@ -95,29 +95,8 @@ internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
         return root;
     }
 
-    internal bool HasActualUseTargetObserver(long useId)
-    {
-        var window = _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().LastOrDefault(w => w.ParentFrameId == useId);
-        if (window is null)
-            return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == window.Id)
-            return window.Candidates.Count == window.Contexts.Count && window.CandidateIndex >= 0 && window.CandidateIndex <= window.Candidates.Count && (window.CandidateIndex == window.Candidates.Count || window.Contexts[window.CandidateIndex].ActualUseTarget is { } use && _coreActualUseTargetProgramsOperations.MatchesActualUseTarget(use));
-        return _coreRecipientContestObserversOperations.HasUniqueHpPeerActualTargetObserver(useId) || _coreForeignContestAidObserversOperations.HasSameTypeAidTargetObserver(useId) || ActualUseTargetObserverRoot(useId)is not null;
-    }
-
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 480)]
     internal bool IsPaidOwnTargetProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Any(w => ActualUseTargetObserverRoot(w.ParentFrameId)is { PaidOwnTarget: not null });
-    internal void AssertActualUseTargetPrograms()
-    {
-        foreach (var parent in _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>())
-        {
-            if (!HasActualUseTargetObserver(parent.ParentFrameId))
-                throw new InvalidOperationException("An actual target window lost its exact typed subtree.");
-            foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.WindowContext?.ParentFrameId == parent.Id))
-                if (root.OwnTrickDraw is not null && !_coreOwnTrickDrawTargetsOperations.OwnTrickDrawMatches(root, parent) || root.PaidOwnTarget is not null && !PaidOwnTargetMatches(root, parent, true))
-                    throw new InvalidOperationException("The paid target scalar cost receipt is not backed by its original HP fact.");
-        }
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IPaidTargetEndingProgramHost.PayHpThenNullifyOwnActualUseTarget(ProgramSkillFrame f) => PayOwnActualUseTarget(f);
     void global::CardGame.Core.IPaidTargetEndingProgramHost.ScheduleEarnedActualEndingBenefit(ProgramSkillFrame f, string skill, string binding) => _coreEarnedActualEndingBenefitsOperations.IssueEarnedActualEnding(f, skill, binding);

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterHeQiMobileEntries
 {
     internal void AnswerMobileHeQiView(global::CardGame.Core.PromptChoice c) => _resolve().AnswerMobileHeQiView(c);
-    internal void AssertMobileHeQiView(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileHeQiView(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileHeQiView(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMobileHeQiView(supplied);
     internal bool HasMobileHeQiPrompt() => _resolve().HasMobileHeQiPrompt();
     internal global::CardGame.Core.PromptChoice MobileHeQiAi(global::CardGame.Core.PendingDecision p) => _resolve().MobileHeQiAi(p);

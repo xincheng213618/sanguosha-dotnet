@@ -109,7 +109,6 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangFen: { } r } f || f.Id != id)
             return false;
-        RequireZhangFen(f);
         if (r.Stage == ZhangFenStage.NativeUse)
         {
             if (f.VirtualBasicDraft is not null)

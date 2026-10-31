@@ -16,7 +16,6 @@ internal sealed partial class CharacterSimaYiHappyGodEntries
     internal global::CardGame.Core.PlayerMarkerChangedEvent? HappySimaPaidRen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappySimaPaidRen(f);
     internal bool ProveHappySimaFirst(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation continuation) => _resolve().ProveHappySimaFirst(f, effect, continuation);
     internal void PublishHappySimaFirstDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishHappySimaFirstDraw(f);
-    internal void RequireHappySimaFirst(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireHappySimaFirst(f);
     internal bool ResumeHappySimaFirst(long id) => _resolve().ResumeHappySimaFirst(id);
     internal bool RetainHappySimaFirst(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainHappySimaFirst(f);
     internal void ReturnHappySimaFirstDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnHappySimaFirstDraw(f, outcome);

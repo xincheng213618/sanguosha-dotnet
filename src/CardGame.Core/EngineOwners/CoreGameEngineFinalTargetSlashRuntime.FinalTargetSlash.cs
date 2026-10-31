@@ -39,24 +39,6 @@ internal sealed partial class CoreGameEngineFinalTargetSlashRuntime
         return targetHp - damageWithoutEscalation;
     }
 
-    internal void AssertFinalTargetSlashReceipts()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.FinalTargetSlashReceipts is not null))
-        {
-            var entries = use.FinalTargetSlashReceipts!;
-            if (use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || entries.DistinctBy(item => (item.ProducerFrameId, item.EffectIndex)).Count() != entries.Count || entries.Any(item => item.ActionId != action.ActionId || item.CardUseFrameId != use.Id || !ReceiptProducerMatches(item) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(item.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(item.TargetSeat) || item.ActorSeat == item.TargetSeat || item.ProducerFrameId <= 0 || item.EffectIndex < 0 || item.DamageBonus is < 0 or > 20 || item.PreventCancellation && item.DamageBonus != 0 || !item.PreventCancellation && !item.EscalateToTargetHp && item.DamageBonus == 0))
-                throw new InvalidOperationException("A final target Slash receipt lost its owning use or producer identity.");
-        }
-    }
-
-    internal bool ReceiptProducerMatches(ProgramTargetSlashReceipt receipt)
-    {
-        if (string.IsNullOrEmpty(receipt.SkillInstanceId) || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(receipt.SkillId)?.Program is not { } program || program.GameplayHash != receipt.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == receipt.TriggerId)is not { } trigger || trigger.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || trigger.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor || receipt.EffectIndex < 0 || receipt.EffectIndex >= trigger.Effects.Count)
-            return false;
-        var effect = trigger.Effects[receipt.EffectIndex];
-        return receipt.PreventCancellation ? effect.Op is SkillProgramEffectOp.PreventCurrentTargetSlashCancellation or SkillProgramEffectOp.PreventCurrentTargetSlashCancellationByRule && receipt.DamageBonus == 0 : receipt.EscalateToTargetHp ? effect.Op == SkillProgramEffectOp.ZhuiLieEscalateTargetDamage && receipt.DamageBonus == 0 : effect.Op == SkillProgramEffectOp.AddCurrentTargetSlashDamage && effect.Amount == receipt.DamageBonus;
-    }
-
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 920)]
     internal bool CanOfferFinalTargetSlash(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext window)
     {

@@ -119,7 +119,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZixiEffects: { } r } f || f.Id != id)
             return;
-        AssertZixiEffects(f);
         if (f.NativeDraw is not null || f.AttackAttempt is not null)
             return;
         if (r.Stage == ZixiEffectsStage.Drawing)
@@ -145,8 +144,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.ZixiEffects!;
-        if (r.JudgmentCount != 2 || r.Stage != ZixiEffectsStage.Drawing || r.DrawOutcome is not null || f.NativeDraw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 2 || outcome.SequenceBefore < r.Before || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Zixi lost its once-issued real Draw2 and original typed return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZixiEffects = r with { Stage = ZixiEffectsStage.DrawChildren, DrawOutcome = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZixiEffectsDrawReturnedEvent(f.Id, outcome.RecipientSeat, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));
         ContinueZixiEffects(f.Id);

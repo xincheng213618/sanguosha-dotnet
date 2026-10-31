@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterGuoSiOlEntries
 {
     internal void AssertGuoSiNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertGuoSiNativeUse(use);
-    internal void AssertRegisteredIssuedGuoSi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredIssuedGuoSi(frame);
     internal void BindGuoSiAcceptedUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindGuoSiAcceptedUse(use);
     internal bool CanContinueIssuedGuoSi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIssuedGuoSi(f);
     internal bool CanOfferGuoSi(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferGuoSi(c, t, w);
@@ -31,7 +30,6 @@ internal sealed partial class CharacterGuoSiOlEntries
     internal bool HasGuoSiBeforeDamageObserver(long id) => _resolve().HasGuoSiBeforeDamageObserver(id);
     internal bool HasGuoSiDamageObserver(long id) => _resolve().HasGuoSiDamageObserver(id);
     internal bool HasGuoSiTargetEffect(int actor, int target, global::CardGame.Core.DirectedTurnCardPolicyEffect effect) => _resolve().HasGuoSiTargetEffect(actor, target, effect);
-    internal bool IsGuoSiDying() => _resolve().IsGuoSiDying();
     internal bool IsGuoSiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsGuoSiMovement(f, e, p);
     internal bool IsGuoSiNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsGuoSiNativeUse(use);
     internal bool IsSuspendedGuoSiCompletedParent(global::CardGame.Core.CardUseFrame original) => _resolve().IsSuspendedGuoSiCompletedParent(original);

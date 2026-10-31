@@ -5,7 +5,6 @@ internal sealed partial class CharacterZhugeLiangWumiaoEntries
     internal bool AdvanceWuZglChildren() => _resolve().AdvanceWuZglChildren();
     internal global::CardGame.Core.PromptChoice AiWuZgl(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiWuZgl(p, f);
     internal void AnswerWuZgl(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerWuZgl(selected);
-    internal void AssertWuZgl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuZgl(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuZgl(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginWuZgl(supplied, op);
     internal bool CanOfferWuZgl(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferWuZgl(candidate, t, c);
     internal bool CanWuZglQingshi(int owner, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanWuZglQingshi(owner, c);
@@ -15,8 +14,6 @@ internal sealed partial class CharacterZhugeLiangWumiaoEntries
     internal void FinishWuZgl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWuZgl(f);
     internal bool HasWuZglBeforeDamageObserver(long id) => _resolve().HasWuZglBeforeDamageObserver(id);
     internal bool HasWuZglDamageObserver(long id) => _resolve().HasWuZglDamageObserver(id);
-    internal bool HasWuZglRescueContinuation(long dyingId) => _resolve().HasWuZglRescueContinuation(dyingId);
-    internal bool HasWuZglUseContinuation(long nativeId) => _resolve().HasWuZglUseContinuation(nativeId);
     internal bool IsWuZglCopyBlocked(int actor, int id) => _resolve().IsWuZglCopyBlocked(actor, id);
     internal bool IsWuZglDying() => _resolve().IsWuZglDying();
     internal bool IsWuZglMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWuZglMovement(f, effect, pending);

@@ -10,6 +10,7 @@
 | `CardGame.Core/EngineOwners/`、`Runtime/Rules/` | 独立的共享规则、查询、投影及结算机制 |
 | `CardGame.Core/NativeOwners/`、人物的 `Runtime/NativeOwners/` | 原生宿主与执行器；依赖类型化状态、查询及延迟入口，不保存完整引擎 |
 | `CardGame.Core/EngineStates/`、`Runtime/StateContracts/` | 对局状态的唯一所有者及按职责提供的窄状态契约 |
+| `CardGame.Core/RuntimeEntries/` | 每个目标模块共用的延迟操作入口，不按消费方复制契约和适配器 |
 | `CardGame.Core/Runtime/Definitions/` | 不可变定义、注册元数据与未绑定工厂 |
 | `Session/`、`Resolution/`、`Runtime/Composition/` | 命令事务、帧生命周期及本局依赖装配 |
 
@@ -19,11 +20,11 @@
 
 [MatchRuntime](../src/CardGame.Core/Runtime/MatchRuntime.cs) 拥有本局模块、能力及处理器绑定。全局目录保存不可变定义和未绑定元数据；模块实例、实际状态及已绑定委托属于各自对局，不进入静态缓存或 Checkpoint。
 
-模块通过 `[ProgramRuntimeModule]` 显式注册。构造函数接收专用查询或操作接口并保存依赖，按第一次实际使用创建实例。授技、替换、升级及变身可能引入新的能力，因此目录不按开局上场名单裁掉处理器。
+模块通过 `[ProgramRuntimeModule]` 显式注册。构造函数接收共用的查询、操作接口或目标模块入口并保存依赖，按第一次实际使用创建实例。授技、替换、升级及变身可能引入新的能力，因此目录不按开局上场名单裁掉处理器。
 
 [模块目录](../src/CardGame.Core/ProgramRuntimeModules.cs) 拒绝嵌在 `GameEngine` 中的运行模块、非恒定静态状态和综合执行宿主。模块字段、非构造方法及注入接口的槽位都不能暴露 `GameEngine`；检查覆盖引用、数组、泛型和委托签名，不能把完整引擎藏进 `Func<GameEngine, ...>`。
 
-跨职责适配器可以用 `[ProgramCapability(typeof(TargetRuntime))]` 声明唯一的 `Func<TargetRuntime>` 依赖。构造只保存工厂，操作时才取得本局目标，避免相互依赖在构造期间形成循环。闭合的专用 `Get()` 工厂也只解析其指定类型，不向规则提供通用模块查询器或整个能力注册器。
+共享入口以 `[ProgramRuntimeEntry(typeof(TargetRuntime))]` 绑定唯一目标，构造只保存该目标的解析函数。`MatchRuntime` 缓存本局入口，核心装配和各消费方取得同一对象；调用入口时才创建目标模块，避免构造期间相互解析。相同目标不再为每个消费方生成一套 `Operations` 接口和转发类，规则也不获得通用模块查询器。
 
 核心装配适配器可以持有引擎，负责定位本局状态、绑定原语与处理器；规则只获得其窄接口。具名的延迟入口属性返回同一个缓存代理，不提前创建目标模块。调用参数、赋值右侧、空值短路、`ref/out/in` 和引用返回保持各自的求值位置；重复绑定保留同局入口身份，跨局不共享实例。首次构造失败不会缓存为成功，实际构造循环会被明确拒绝。
 
@@ -45,7 +46,7 @@
 
 ## 维护与验证
 
-新增人物优先复用现有内容与机制注册；规则专属资格、费用及阶段条件留在所属规则类。需要新共享能力时增加窄契约及机制行为检查，不把完整算法回调核心，也不为每个人物重复共享定义、隐私和冻结检查。
+新增人物优先组合现有内容操作：摸牌 `Draw`、掉血 `LoseHp`、伤害 `Damage`、翻面 `TurnOver`、盖牌 `SetFaceState`、指定目标 `SelectTarget` / `SelectTargets`、加伤 `GrantTurnCardDamageModifier`。规则专属资格、费用及阶段条件留在所属规则类；只有现有操作无法表达的效果才增加机制实现，不为普通效果复制人物专属执行、证明和事件体系。
 
 测试中的私有反射由 `tests/Shared/FixtureRuntimeAccess.cs` 路由到实际状态或本局入口。它只保存元数据，不缓存对局对象；逻辑成员名与当前实际类型绑定分别核对，不恢复旧引擎嵌套宿主作为反射占位。
 

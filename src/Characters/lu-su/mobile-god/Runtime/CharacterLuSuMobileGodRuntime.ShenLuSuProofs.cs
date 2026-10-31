@@ -24,37 +24,4 @@ internal sealed partial class CharacterLuSuMobileGodRuntime
         var division = r.Division;
         return r.Operation == SkillProgramEffectOp.ResolveShenLuSuZhimeng && division.Count == r.Cards.Count && division.Count(e => e.ToSeat == f.OwnerSeat) == (r.Amount + 1) / 2 && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenLuSuDivisionEvent>().Count(e => e == new ShenLuSuDivisionEvent(f.Id, r.Target, r.Amount, r.OwnerShare.Count)) == 1 && division.Select(e => e.CardId).Order().SequenceEqual(r.Cards.Order()) && division.All(e => e.FromSeat == f.OwnerSeat || e.FromSeat == r.Target) && division.All(e => e.ToSeat == (r.OwnerShare.Contains(e.CardId) ? f.OwnerSeat : r.Target)) && division.Where(e => e.FromSeat != e.ToSeat).All(e => paid.Count(p => p.CardId == e.CardId && p.From == CardLocation.Hand(e.FromSeat) && p.To == CardLocation.Hand(e.ToSeat)) == 1) && paid.Count == division.Count(e => e.FromSeat != e.ToSeat);
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 38900)]
-    internal void RequireShenLs(ProgramSkillFrame f)
-    {
-        if (f.ShenLuSu is not { } r)
-            return;
-        if (r.Source != ShenLsSource(f) || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 1 || !Enum.IsDefined(r.Stage) || r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cards.Count != r.Cards.Distinct().Count() || r.Order.Count != r.Order.Distinct().Count() || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenLuSuStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Operation == r.Operation && e.ParentId == r.ParentId) != 1)
-            throw new InvalidOperationException("Shen Lu Su lost his original source, content, native parent or immutable selected entities.");
-        if (r.ParentId != 0)
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != r.ParentId || _resolutionStackOperations._resolutionStack[index - 1] switch
-            {
-                ProgramLifecycleTriggerWindowFrame p => p.Window != SkillProgramTriggerWindow.GameStarting || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]),
-                DeferredTurnEndFrame p => !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(p) || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(p)),
-                _ => true
-            })
-                throw new InvalidOperationException("Shen Lu Su lost his exact suspended native setup or actual-turn-ended candidate.");
-        }
-
-        if (r.Operation == SkillProgramEffectOp.ResolveShenLuSuTamo)
-        {
-            if (r.Stage != ShenLuSuStage.SeatChoice || r.OriginalOrder.Count != _coreMatchDefinitionModeDefinitionPlayerCountAccess._playerCount || r.OriginalOrder.Distinct().Count() != _coreMatchDefinitionModeDefinitionPlayerCountAccess._playerCount || r.Order.Except(r.OriginalOrder).Any() || r.FixedSeat >= 0 && (r.Order.Count == 0 || r.Order[0] != r.FixedSeat) || r.Order.Skip(r.FixedSeat >= 0 ? 1 : 0).Select((s, i) => (s, i)).Any(x => _coreProgramEventHistoryOperations.ProgramEventHistory<ShenLuSuSeatChosenEvent>().Count(e => e.FrameId == f.Id && e.Index == x.i + (r.FixedSeat >= 0 ? 1 : 0) && e.Seat == x.s) != 1))
-                throw new InvalidOperationException("Tamo lost its original participants, fixed slot or issued permutation choices.");
-        }
-
-        if (r.Operation == SkillProgramEffectOp.ResolveShenLuSuDingzhou && (r.Target == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.Amount < 1 || r.Cards.Count > r.Amount || r.Stage is not (ShenLuSuStage.GiftChoice or ShenLuSuStage.GiftChildren or ShenLuSuStage.ObtainChildren) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenLuSuStartedEvent>().Count(e => e.FrameId == f.Id && e.Target == r.Target && e.Amount == r.Amount) != 1 || r.Cards.Select((id, i) => (id, i)).Any(x => _coreProgramEventHistoryOperations.ProgramEventHistory<ShenLuSuGiftChosenEvent>().Count(e => e.FrameId == f.Id && e.Index == x.i) != 1)))
-            throw new InvalidOperationException("Dingzhou lost its exact once-selected recipient, frozen exchange count or physical payment choices.");
-        if (r.Operation == SkillProgramEffectOp.ResolveShenLuSuZhimeng && (r.Stage is not (ShenLuSuStage.PeerChoice or ShenLuSuStage.DivideChildren) || r.Stage == ShenLuSuStage.DivideChildren && (r.Target == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.Amount != r.Cards.Count || r.OwnerShare.Count != (r.Amount + 1) / 2 || r.OwnerShare.Distinct().Count() != r.OwnerShare.Count || r.OwnerShare.Except(r.Cards).Any())))
-            throw new InvalidOperationException("Zhimeng lost its original two participants or exact random pooled partition.");
-        if (f.PendingMovementContinuation is { } pending && !ShenLsMovementProof(f, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions[0], pending))
-            throw new InvalidOperationException("Shen Lu Su lost his exact once-paid native movement invoice.");
-    }
 }

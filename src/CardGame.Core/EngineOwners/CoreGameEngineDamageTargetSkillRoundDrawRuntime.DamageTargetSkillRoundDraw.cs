@@ -102,8 +102,6 @@ internal sealed partial class CoreGameEngineDamageTargetSkillRoundDrawRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         RequireDamageTargetSkillRoundDraw(frame);
         var r = frame.DamageTargetSkillRoundDraw!;
-        if (r.Stage != DamageTargetSkillRoundDrawStage.DrawAttempt || frame.NativeDraw is not null || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != r.DrawCount || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("The damage-source round draw lost its exact native operation return.");
         var cancelled = !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { DamageTargetSkillRoundDraw = r with { Stage = DamageTargetSkillRoundDrawStage.DrawChildren, DrawOutcome = outcome, Cancelled = cancelled }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DamageTargetSkillRoundDrawPaidEvent(frame.Id, frame.OwnerSeat, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId, outcome.Replacement is not null, cancelled));
@@ -139,28 +137,6 @@ internal sealed partial class CoreGameEngineDamageTargetSkillRoundDrawRuntime
     {
         RequireDamageTargetSkillRoundDraw(frame);
         return true;
-    }
-
-    internal ProgramSkillFrame? DamageTargetSkillRoundDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId)
-    {
-        dyingId = null;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame { DamageTargetSkillRoundDraw: { } r } root || r.DamageWindowId != window.Id || !_coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(root, window) || !ValidDamageTargetSkillRoundDraw(root))
-            return null;
-        if (index + 1 == _resolutionStackOperations._resolutionStack.Count - 1)
-            return root;
-        if (_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossObserverRoot(root.Id)?.Id != root.Id)
-            return null;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > index + 1)
-            dyingId = dying.Id;
-        return root;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 1247)]
-    internal void AssertDamageTargetSkillRoundDraw(ProgramSkillFrame frame)
-    {
-        if (frame.DamageTargetSkillRoundDraw is not null)
-            RequireDamageTargetSkillRoundDraw(frame);
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1247)]

@@ -6,7 +6,6 @@ internal interface IForeignTurnContestFacts : IProgramSelectionQuery
     bool HasHpValue(int seat);
     bool IsRuleWounded(int seat);
     bool HasSkillInstance(int seat, string skillId, string instanceId);
-    bool HasAllowedSlashTargetTail(CardUseFrame use);
 }
 
 // Existing native windows, shared grant and binding completion remain the

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhaoXiangOlEntries
 {
-    internal void AssertZhaoXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZhaoXiang(f);
     internal bool CanContinueZhaoXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueZhaoXiang(f);
     internal bool CanGainMeiYingFromDamage(int owner, global::CardGame.Core.SkillProgramTrigger trigger, int source, int target, bool sourceLess) => _resolve().CanGainMeiYingFromDamage(owner, trigger, source, target, sourceLess);
     internal bool CanOfferMeiYingConversionDraw(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMeiYingConversionDraw(candidate, trigger, context);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterZhaoXiangOlEntries
     internal bool HasZhaoXiangBeforeDamageObserver(long id) => _resolve().HasZhaoXiangBeforeDamageObserver(id);
     internal bool HasZhaoXiangDamageObserver(long id) => _resolve().HasZhaoXiangDamageObserver(id);
     internal bool IsMeiYingConversion(global::CardGame.Core.CardConversionSource source) => _resolve().IsMeiYingConversion(source);
-    internal bool IsZhaoXiangDying() => _resolve().IsZhaoXiangDying();
     internal bool IsZhaoXiangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhaoXiangMovement(f, e, p);
     internal bool MeiYingConversionUnavailable(global::CardGame.Core.ProgramViewAsSourceQuery query) => _resolve().MeiYingConversionUnavailable(query);
     internal void ObserveAcceptedMeiYingConversion(global::CardGame.Core.CardActionAcceptedEvent accepted) => _resolve().ObserveAcceptedMeiYingConversion(accepted);

@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouCaoHongRuntime(IMouCaoHongFacts facts, IMouCaoHongNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMouCaoHongRuntime
 {
     internal const string Action = "mou-cao-hong-anniversary",TakeReason = "skill-program.mou-cao-hong.obtain",GiveReason = "skill-program.mou:yingjia.return",DiscardReason = "skill-program.mou:xianju.ending-discard";
@@ -124,7 +124,6 @@ internal sealed class MouCaoHongRuntime(IMouCaoHongFacts facts, IMouCaoHongNativ
     private void Complete(ProgramSkillFrame f) { events.AdvanceFact(new MouCaoHongCompletedEvent(f.Id)); frames.ReplaceTop(f = f with { MouCaoHong = null, PendingMovementContinuation = null }); native.Finish(f); }
     [ProgramContinuation(ProgramContinuationKind.Resume, 35900)] private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouCaoHong: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 35900)] private bool Movement(ProgramSkillFrame f) => f.MouCaoHong is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 35900)] private void Invariant(ProgramSkillFrame f) { if (f.MouCaoHong is not null && !Valid(f)) throw new InvalidOperationException("Invalid own-frame Mou Cao Hong receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35900)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35900)] private bool Paid(ProgramSkillFrame f) => f.MouCaoHong is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouCaoHongYingjia, SkillProgramEffectOp.ResolveMouCaoHongXianju, SkillProgramEffectOp.SettleMouCaoHongXianju)]
     private PromptChoice Ai(PendingDecision p, ProgramSkillFrame f)

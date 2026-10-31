@@ -43,11 +43,6 @@ internal interface ICoreProgramLifecycleProgramTriggerOperations : global::CardG
     global::CardGame.Core.ProgramTriggerRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramBoundaryInvariantOperations : global::CardGame.Core.IProgramRuntimeOperations
-{
-    global::CardGame.Core.ProgramBoundaryInvariantRuntime Get();
-}
-
 internal interface ICoreProgramLifecycleProgramRandomCardAcquisitionOperations : global::CardGame.Core.IProgramRuntimeOperations
 {
     global::CardGame.Core.ProgramRandomCardAcquisitionRuntime Get();

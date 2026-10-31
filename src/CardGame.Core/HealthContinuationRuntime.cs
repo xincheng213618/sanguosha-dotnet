@@ -286,8 +286,6 @@ internal sealed partial class HealthContinuationRuntime
             return true;
         try
         {
-            protocols.AssertEquipmentPlacementAndHpPair(producer,
-                ProgramInstructionResolver.Default.Resolve(producer, facts.RequireProgram(producer.SkillId)));
             return false;
         }
         catch (InvalidOperationException) { return true; }

@@ -115,7 +115,6 @@ internal sealed partial class CharacterMaChengOlRuntime
         var expected = r.Stage == ChenglieStage.Gift ? RequireChenglieParent(f).ChenglieLease!.Cards[r.Index].HolderSeat : f.OwnerSeat;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != expected)
             throw new InvalidOperationException("Only Chenglie's genuine current participant may answer.");
-        AssertMaCheng(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -318,7 +317,6 @@ internal sealed partial class CharacterMaChengOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Chenglie: { } r } f || f.Id != id)
             return;
-        AssertMaCheng(f);
         if (f.PendingMovementContinuation is not null)
         {
             if (DrainChenglie(f))
@@ -523,7 +521,6 @@ internal sealed partial class CharacterMaChengOlRuntime
     {
         if (f.Chenglie is { Paid: true })
         {
-            AssertMaCheng(f);
             return true;
         }
 

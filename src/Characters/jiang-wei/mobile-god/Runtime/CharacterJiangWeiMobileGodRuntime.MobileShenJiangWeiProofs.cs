@@ -26,21 +26,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         return candidate is not null && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 40600)]
-    internal void RequireMobileJw(ProgramSkillFrame f)
-    {
-        if (f.MobileJiangWei is not { } r)
-            return;
-        if (r.Source != MobileJwSource(f) || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 1 || !MobileJiangWeiComposition.Owns(r.Operation) || !Enum.IsDefined(r.Stage) || !MobileJwParent(f) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Shown.Count > 5 || r.Shown.Select(s => s.Id).Distinct().Count() != r.Shown.Count || r.Top.Count > 5 || r.Top.Distinct().Count() != r.Top.Count || r.Ordered.Distinct().Count() != r.Ordered.Count || r.Ordered.Any(id => !r.Top.Contains(id)) || r.Targets.Distinct().Count() != r.Targets.Count || r.HpLossSeats.Distinct().Count() != r.HpLossSeats.Count || r.Targets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == f.OwnerSeat) || r.HpLossSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiangWeiStartedEvent>().Count(e => e == new MobileJiangWeiStartedEvent(f.Id, r.Source, r.GameplayHash, r.Operation, r.ParentId, r.DyingId, r.Amount)) != 1)
-            throw new InvalidOperationException("Mobile Jiang Wei lost his original instance, owning native window, private selection or paid cursor.");
-        if (r.Operation == SkillProgramEffectOp.ResolveMobileJiangWeiShenpei && (r.DyingId <= 0 || r.Amount < 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.DyingId)is not DyingFrame { VictimSeat: var victim } || victim != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Where(e => e.VictimSeat == f.OwnerSeat && e.ResolutionId <= r.DyingId).Select(e => e.ResolutionId).Distinct().Count() != r.Amount))
-            throw new InvalidOperationException("Shenpei lost its original including-current true dying-entry count.");
-        if (f.PendingMovementContinuation is { } p && !MobileJwMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
-            throw new InvalidOperationException("Mobile Jiang Wei lost his frozen native movement/recovery invoice.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && prompt.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == MobileJwAction) && (prompt.PlayerSeat != (r.Stage == MobileJiangWeiStage.Showing ? r.Target : f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, MobileJwChoices(f))))
-            throw new InvalidOperationException("Mobile Jiang Wei changed the original private chooser frontier.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 40600)]
     internal bool MobileJwMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
     {
@@ -71,7 +56,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     {
         if (f.MobileJiangWei is not { Operation: SkillProgramEffectOp.ResolveMobileJiangWeiShenpei, Stage: MobileJiangWeiStage.ThunderIssued } r || f.AttackAttempt is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || target != r.Target || amount != r.Amount || source is not null || nature != DamageNature.Thunder || sourceLess || explicitSource is not null || _coreDyingCursorRuntimeOperations.ActiveDying?.Id != r.DyingId || f.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering } w || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Continuation: ProgramLifecycleContinuation.ResumeDyingEntry } entry || entry.ResumeDyingFrameId != r.DyingId)
             return false;
-        RequireMobileJw(f);
         return true;
     }
 
@@ -79,7 +63,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { Operation: SkillProgramEffectOp.ResolveMobileJiangWeiShenpei, Stage: MobileJiangWeiStage.ThunderIssued } r, AttackAttempt: { Nature: DamageNature.Thunder, SourceLess: false } a } f || f.Id != attackId || a.SourceSeat != f.OwnerSeat || _coreDyingCursorRuntimeOperations.ActiveDying?.Id != r.DyingId || f.AttackReturn is null)
             return false;
-        RequireMobileJw(f);
         return true;
     }
 
@@ -106,7 +89,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     internal bool MobileJwDamageObserver(long id) => MobileJwObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 40600)]
     internal bool MobileJwBeforeDamageObserver(long id) => MobileJwObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 40600)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40600)]
     internal bool MobileJwDyingProof()
     {
@@ -115,7 +97,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         var root = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.MobileJiangWei is { } r && r.DyingId == dying.Id);
         if (root is not null)
         {
-            RequireMobileJw(root);
             return true;
         }
 

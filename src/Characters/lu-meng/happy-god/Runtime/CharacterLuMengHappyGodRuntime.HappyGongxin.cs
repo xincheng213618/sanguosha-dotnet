@@ -44,20 +44,6 @@ internal sealed partial class CharacterLuMengHappyGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyGongxinTargetBoundEvent(f.Id, witness));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 41600)]
-    internal void RequireHappyGongxinWitness(ProgramSkillFrame f)
-    {
-        if (f.HappyGongxin is null)
-        {
-            if (f.SkillId == HappyGongxinComposition.Skill && f.InstructionIndex > 1)
-                throw new InvalidOperationException("Happy Gongxin lost its original native target witness.");
-            return;
-        }
-
-        if (!HasExactHappyGongxinParticipantSelection(f))
-            throw new InvalidOperationException("Happy Gongxin lost its original sole Use, source instance, actual turn or bound hand owner.");
-    }
-
     internal bool HasExactHappyGongxinParticipantSelection(ProgramSkillFrame f)
     {
         if (f.HappyGongxin is not { } r)

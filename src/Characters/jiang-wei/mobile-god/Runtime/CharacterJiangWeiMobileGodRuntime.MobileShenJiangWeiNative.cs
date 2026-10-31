@@ -15,7 +15,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == ret.ParentId);
         if (parent is not { MobileJiangWei: { Stage: MobileJiangWeiStage.SlashIssued } r } || r.Use != ret || provider != parent.OwnerSeat || ret.CardId != card.Id || ret.Kind != card.Kind || ret.UseId != use.Id || ret.ActionId != use.Action?.ActionId || ret.From != CardLocation.Processing || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Processing || !r.Shown.Any(s => s.Id == card.Id && s.Kind == card.Kind && s.From == CardLocation.DrawPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == s.ProcessingSequence && m.CardId == card.Id && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == "mobile.xinghun.show") == 1) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiangWeiUseIssuedEvent>().Count(e => e.Return == ret) != 1)
             throw new InvalidOperationException("Xinghun's shown deck Slash requires its already-paid original Processing entry and exact native Use.");
-        RequireMobileJw(parent);
         return true;
     }
 
@@ -47,7 +46,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     {
         if (parentId is not { } id || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { Stage: MobileJiangWeiStage.SlashIssued, Use: null } r } f || f.Id != id || r.Operation != SkillProgramEffectOp.ResolveMobileJiangWeiXinghun || actor != f.OwnerSeat || physicalOwner != actor || target != r.Target || countsTowardLimit || materials is not null || kind != card.Kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || r.Index < 1 || r.Index > r.Shown.Count || r.Shown[r.Index - 1] is not { } shown || shown.Id != card.Id || shown.Kind != kind || from != (shown.From == CardLocation.DrawPile ? CardLocation.Processing : shown.From) || _cardZonesOperations._cardZones.GetLocation(card.Id) != from)
             return false;
-        RequireMobileJw(f);
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], card, effectiveKind: kind, physicalCardIds: [card.Id]);
     }
 

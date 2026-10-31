@@ -6,14 +6,12 @@ internal sealed partial class CharacterMangYaChangAnniversaryEntries
     internal global::CardGame.Core.PromptChoice AiAnniversaryJiedao(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiAnniversaryJiedao(prompt, f);
     internal void AnswerAnniversaryJiedao(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerAnniversaryJiedao(choice);
     internal void AppendAnniversaryJiedaoDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, global::CardGame.Core.SkillProgramTriggerWindow timing, global::System.Collections.Generic.List<global::CardGame.Core.DamageTriggerCandidate> candidates) => _resolve().AppendAnniversaryJiedaoDamageCandidates(attack, timing, candidates);
-    internal void AssertJiedaoFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertJiedaoFrame(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAnniversaryJiedao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginAnniversaryJiedao(supplied, operation);
     internal bool CanOfferAnniversaryJiedao(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferAnniversaryJiedao(c, t, w);
     internal void ContinueAnniversaryJiedao(long id) => _resolve().ContinueAnniversaryJiedao(id);
     internal bool ContinueIssuedAnniversaryJiedao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueIssuedAnniversaryJiedao(f);
     internal void FinishAnniversaryJiedao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishAnniversaryJiedao(f);
     internal bool FirstActualJiedaoSourceDamage(int seat) => _resolve().FirstActualJiedaoSourceDamage(seat);
-    internal bool HasAnniversaryJiedaoPrompt() => _resolve().HasAnniversaryJiedaoPrompt();
     internal int JiedaoChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().JiedaoChainCursor(attack);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> JiedaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().JiedaoChoices(f);
     internal global::CardGame.Core.AnniversaryJiedaoFrame? JiedaoCostWitness(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().JiedaoCostWitness(c, w);

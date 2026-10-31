@@ -4,7 +4,6 @@ internal sealed partial class CharacterWuYiBoundaryMobileEntries
 {
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.BoundaryWuYiBenxiGrantedEvent> ActiveBoundaryWuYiGrants(int owner) => _resolve().ActiveBoundaryWuYiGrants(owner);
     internal bool AdmitIssuedBoundaryWuYi(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().AdmitIssuedBoundaryWuYi(c, context);
-    internal void AssertBoundaryWuYiFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryWuYiFrame(f);
     internal void AssertBoundaryWuYiTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryWuYiTargets(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryWuYiTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginBoundaryWuYiTargets(f);
     internal bool BoundaryWuYiCostPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryWuYiCostPaid(f);

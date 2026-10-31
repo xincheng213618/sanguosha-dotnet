@@ -46,7 +46,6 @@ internal sealed partial class CharacterZhugeJinMouRuntime
     internal bool MouZhugeJinDamageWindow(long id) => MouZhugeJinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35600)]
     internal bool MouZhugeJinBeforeDamage(long id) => MouZhugeJinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 35600)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35600)]
     internal bool MouZhugeJinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouZhugeJinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35600)]

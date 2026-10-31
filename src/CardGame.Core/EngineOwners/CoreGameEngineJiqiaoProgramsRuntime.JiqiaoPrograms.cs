@@ -51,7 +51,6 @@ internal sealed partial class CoreGameEngineJiqiaoProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { JiqiaoPaid: { } r } f || f.Id != id)
             return false;
-        _coreJiqiaoObserversOperations.RequireIssuedJiqiao(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id))
             return true;
         var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;

@@ -187,34 +187,6 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
             throw new InvalidOperationException("A virtual ordinary trick appearance lost its exact issued use.");
         return new Card(0, use.CardKind, Suit.None, 0);
     }
-
-    internal bool IsProgramVirtualAreaAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (IsProgramVirtualSingleAttackConsistent(attack, processing))
-            return true;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !ValidProgramVirtualOrdinaryTrickUse(use) || !UseVirtualOrdinaryTrickProgramOperationDescriptor.IsGroupOutput(use.CardKind) || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not { Effect: GroupCardEffect.ResponseAttack, CurrentAttack: { } current } group || group.ResolutionId != use.Id || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(current, attack) || group.SourceSeat != use.SourceSeat || group.DamageSourceSeat != attack.SourceSeat || group.TargetIndex < 0 || group.TargetIndex >= group.TargetSeats.Count || !group.TargetSeats.SequenceEqual(use.TargetSeats) && !_characterJiangJiMouOperations.IsMouJjEffectSubset(use, group.TargetSeats) && !_characterDaQiaoLeOperations.IsZixiExtraEffectTargetSubset(use, group.TargetSeats) || group.RequiredCardKind != (use.CardKind == CardKind.BarbarianAssault ? CardKind.Slash : CardKind.Dodge))
-            return false;
-        var originalTarget = group.TargetSeats[group.TargetIndex];
-        var targetMatches = !attack.DamageRedirected ? attack.TargetSeat == originalTarget : _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDamageTransferredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == group.DamageSourceSeat && e.OwnerSeat == originalTarget && e.TargetSeat == attack.TargetSeat && e.DamageAmount > 0 && e.Nature == _coreNativeCardClassificationsOperations.GetDamageNature(attack)) == 1;
-        return targetMatches && processing.Count == 0 && group.PhysicalCards.Count == 0 && attack.Card is null && attack.PhysicalCards.Count == 0 && attack.EffectiveCardKind == use.CardKind && attack.ProgramSkillFrameId is null && attack.ProgramSkillCardUseFrameId is null && attack.ProgramJudgmentFrameId is null && !attack.IsDelayedJudgmentDamage && !attack.IsSourceLess;
-    }
-
-    internal bool IsProgramVirtualSingleAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !ValidProgramVirtualOrdinaryTrickUse(use) || use.CardKind is not (CardKind.Duel or CardKind.FireAttack or CardKind.UnexpectedAssault or CardKind.QizhengXiangsheng) || attack.PhysicalCards.Count != 0 || processing.Count != 0 || attack.EffectiveCardKind != use.CardKind || attack.CardUserSeat != use.SourceSeat || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.ProgramSkillFrameId is not null || attack.ProgramJudgmentFrameId is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } current || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(current, attack) || attack.Card is { } card && (card.Id != 0 || card.Kind != use.CardKind || card.Suit != Suit.None || card.Rank != 0))
-            return false;
-        if (use.CardKind == CardKind.Duel)
-            return _coreNativeCardContinuationCursorsOperations.ActiveDuel is { } duel && duel.ResolutionId == use.Id && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(duel.Attack, attack) && use.TargetIndex >= 0 && use.TargetIndex < use.TargetSeats.Count && (attack.SourceSeat == use.SourceSeat && VirtualTrickDamageTargetMatches(use, attack, use.TargetSeats[use.TargetIndex]) || attack.SourceSeat == use.TargetSeats[use.TargetIndex] && VirtualTrickDamageTargetMatches(use, attack, use.SourceSeat));
-        if (attack.SourceSeat != use.SourceSeat)
-            return false;
-        if (use.CardKind == CardKind.FireAttack)
-            return _coreProgramEventHistoryOperations.ProgramEventHistory<FireAttackResolvedEvent>().LastOrDefault(e => e.ResolutionId == use.Id)is { CausedDamage: true, MatchingDiscardCardId: > 0 } paid && paid.SourceSeat == use.SourceSeat && use.TargetSeats.Contains(paid.TargetSeat) && VirtualTrickDamageTargetMatches(use, attack, paid.TargetSeat);
-        if (use.CardKind == CardKind.QizhengXiangsheng)
-            return use.Qizheng is { } qizheng && VirtualTrickDamageTargetMatches(use, attack, qizheng.Target);
-        return use.UnexpectedAssaultReveal is { CanCauseDamage: true } reveal && reveal.CardUseFrameId == use.Id && reveal.ActionId == use.Action!.ActionId && reveal.TargetIndex == use.TargetIndex && _coreProgramEventHistoryOperations.ProgramEventHistory<UnexpectedAssaultRevealedEvent>().Count(e => e.Receipt == reveal) == 1 && VirtualTrickDamageTargetMatches(use, attack, reveal.TargetSeat);
-    }
-
-    internal bool VirtualTrickDamageTargetMatches(CardUseFrame use, global::CardGame.Core.NativeOwners.CardAttackHandle attack, int original) => attack.TargetSeat == original && !attack.DamageRedirected || attack.DamageRedirected && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageTransferredEvent>().Any(e => e.ResolutionId == use.Id && e.SourceSeat == attack.SourceSeat && e.OwnerSeat == original && e.TargetSeat == attack.TargetSeat && e.DamageAmount > 0 && e.Nature == _coreNativeCardClassificationsOperations.GetDamageNature(attack)) || attack.IsChainPropagation && _coreProgramEventHistoryOperations.ProgramEventHistory<ChainedDamagePropagatedEvent>().Any(e => e.ResolutionId == use.Id && e.SourceSeat == attack.SourceSeat && e.TargetSeat == attack.TargetSeat && e.Nature == _coreNativeCardClassificationsOperations.GetDamageNature(attack));
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 160)]
     internal bool FinishProgramVirtualOrdinaryAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
     {
@@ -284,25 +256,5 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
             return false;
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
-    }
-
-    internal void AssertProgramVirtualOrdinaryTricks()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.VirtualOrdinaryTrickOrigin is not null))
-            if (!ValidProgramVirtualOrdinaryTrickUse(use))
-                throw new InvalidOperationException("A virtual ordinary trick lost its issued action, frozen branch or typed owner.");
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-        {
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || frame.InstructionIndex <= 0)
-                continue;
-            var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-            if (effect.Op != SkillProgramEffectOp.UseVirtualOrdinaryTrick)
-                continue;
-            ValidateVirtualOrdinaryTrickInstruction(frame);
-            var actor = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, effect.ActorReference!);
-            var options = VirtualOrdinaryTrickOptions(frame, effect);
-            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != actor || decision.SkillPrompt?.SkillId != frame.SkillId || options.Count < 2 || !decision.Choices.Select(choice => choice.Id).SequenceEqual(options.Select(option => option.Id)) || decision.Choices.Where((choice, index) => !choice.Targets.SequenceEqual(options[index].TargetSeats)).Any() || decision.Choices.Any(choice => choice.Cards.Count != 0 || choice.Parameters.GetValueOrDefault("program-action") != "use-virtual-ordinary-trick" || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(CultureInfo.InvariantCulture)))
-                throw new InvalidOperationException("A virtual ordinary trick lost its exact legal choice prompt.");
-        }
     }
 }

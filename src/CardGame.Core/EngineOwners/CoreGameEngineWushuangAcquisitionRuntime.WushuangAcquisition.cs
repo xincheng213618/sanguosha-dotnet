@@ -43,14 +43,4 @@ internal sealed partial class CoreGameEngineWushuangAcquisitionRuntime
             return true;
         return gate.Context.Window == SkillProgramTriggerWindow.SkillsChanged && _resolutionStackOperations._resolutionStack.OfType<WushuangIntermissionFrame>().LastOrDefault()is { Acquisition: { } receipt } parent && gate.Context.ParentFrameId == parent.Id && receipt.Seat == gate.Candidate.OwnerSeat && receipt.SkillId == gate.Candidate.SkillId && receipt.SkillInstanceId == gate.Candidate.SkillInstanceId && receipt.GameplayHash == gate.Candidate.GameplayHash;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62001)]
-    internal void AssertWushuangAcquisitionOwner(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.TriggerId != "acquired" || !frame.SkillId.StartsWith("wushuang:tactic-", StringComparison.Ordinal))
-            return;
-        var parent = _resolutionStackOperations._resolutionStack.OfType<WushuangIntermissionFrame>().SingleOrDefault(p => p.Id == frame.WindowContext?.ParentFrameId);
-        if (!_coreWushuangModeProjectionOperations.IsWushuangMode || parent?.Acquisition is not { } receipt || parent.SeatCursor != frame.OwnerSeat || receipt.Seat != frame.OwnerSeat || receipt.SkillId != frame.SkillId || receipt.SkillInstanceId != frame.SkillInstanceId || receipt.GameplayHash != frame.GameplayHash || !_coreWushuangOperations.RequireWushuangFeature.HasWushuangTactic(frame.OwnerSeat, receipt.TacticId) || !_coreWushuangOperations.RequireWushuangFeature.HasPurchasedOffer(frame.OwnerSeat, receipt.OfferId, receipt.TacticId))
-            throw new InvalidOperationException("The acquired tactic requires its exact committed purchase and owning shop frame.");
-    }
 }

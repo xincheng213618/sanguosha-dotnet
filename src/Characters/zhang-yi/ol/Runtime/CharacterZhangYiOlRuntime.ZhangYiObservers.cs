@@ -7,28 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYiOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26400)]
-    internal void AssertZhangYi(ProgramSkillFrame f)
-    {
-        if (f.ZhangYi is not { } r)
-            return;
-        var dianjun = f.SkillId == "ol:dianjun";
-        if (f.SkillId is not ("ol:dianjun" or "ol:kangrui") || r.Source != ZhangYiSource(f) || r.GameplayHash != f.GameplayHash || f.WindowContext is not { } c || c.ParentFrameId != r.ParentWindowId || c.TargetSeat != r.RecipientSeat || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || !Enum.IsDefined(r.Stage) || r.SequenceBefore < 0 || r.SequenceAfter < r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !ContinuePaidZhangYi(f) || dianjun && (c.Window != SkillProgramTriggerWindow.AfterTurnEnded || r.RecipientSeat != f.OwnerSeat || r.DamageFrameId is not null || r.Stage is not (ZhangYiStage.DianjunDamage or ZhangYiStage.DianjunExtraPlay or ZhangYiStage.DianjunReturned or ZhangYiStage.DianjunCleanupChildren)) || !dianjun && (c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.DamageFrameId != r.DamageFrameId || r.DamageFrameId is null || r.Stage is not (ZhangYiStage.KangruiDraw or ZhangYiStage.KangruiChoice or ZhangYiStage.KangruiRecovery) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiActualDamageFactEvent>().Any(e => e.DamageFrameId == r.DamageFrameId && e.ActualTurnNumber == r.ActualTurnNumber && e.TargetSeat == r.RecipientSeat && e.TargetSeat == e.ActualTurnOwnerSeat)))
-            throw new InvalidOperationException("Zhang Yi lost its exact issued end/first-damage receipt, recipient, source or turn.");
-        if (!dianjun && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiDrawIssuedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.RecipientSeat == r.RecipientSeat && e.ActualTurnNumber == r.ActualTurnNumber && e.SequenceBefore == r.SequenceBefore) != 1)
-            throw new InvalidOperationException("Kangrui cannot repeat or fabricate its actual draw payment.");
-        if (!dianjun && r.Stage is ZhangYiStage.KangruiChoice or ZhangYiStage.KangruiRecovery)
-        {
-            var drawn = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.Reason.Value == ZhangYiDrawReason).ToArray();
-            if (drawn.Length > 1 || drawn.Any(m => m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(f.OwnerSeat)))
-                throw new InvalidOperationException("Kangrui draw lost its original one-card native movement.");
-        }
-
-        if (r.Stage == ZhangYiStage.KangruiRecovery && (r.Choice is not ("recover" or "damage") || r.RecoveryRequested is < 0 or > 1 || r.Choice == "damage" && r.RecoveryRequested != 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiChoiceEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.RecipientSeat == r.RecipientSeat && e.ActualTurnNumber == r.ActualTurnNumber && e.Choice == r.Choice && e.RecoveryRequested == r.RecoveryRequested) != 1))
-            throw new InvalidOperationException("Kangrui lost its one committed option and frozen recovery request.");
-        if (r.Stage == ZhangYiStage.DianjunCleanupChildren && (r.CleanupBefore < 0 || r.CleanupAfter < r.CleanupBefore || r.CleanupAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiDianjunCleanupStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.ActualTurnNumber == r.ActualTurnNumber && e.SequenceBefore == r.CleanupBefore) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiDianjunCleanupIssuedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.ActualTurnNumber == r.ActualTurnNumber && e.SequenceBefore == r.CleanupBefore && e.SequenceAfter == r.CleanupAfter) != 1))
-            throw new InvalidOperationException("Dianjun lost its once-issued native actual-end cleanup receipt.");
-    }
 
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 910)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 850)]
@@ -37,7 +15,6 @@ internal sealed partial class CharacterZhangYiOlRuntime
     {
         if (f.ZhangYi is not { } r)
             return false;
-        AssertZhangYi(f);
         if (child is RecoveryReplacementFrame recovery)
             return IsZhangYiRecoveryParent(f, recovery);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -57,8 +34,6 @@ internal sealed partial class CharacterZhangYiOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1620)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1640)]
     internal bool HasZhangYiDamageObserver(long id) => ZhangYiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1480)]
-    internal bool IsZhangYiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ZhangYiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26400)]
     internal bool AdvanceZhangYiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangYiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

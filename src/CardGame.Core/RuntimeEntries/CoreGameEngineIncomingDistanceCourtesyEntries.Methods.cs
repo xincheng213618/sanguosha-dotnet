@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineIncomingDistanceCourtesyEntries
 {
-    internal void AssertRegisteredIncomingDistanceCourtesyReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredIncomingDistanceCourtesyReceipt(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginIncomingDistanceCourtesy(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.IncomingDistanceCourtesyKind kind) => _resolve().BeginIncomingDistanceCourtesy(supplied, kind);
     internal bool CanContinueIncomingDistanceCourtesy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIncomingDistanceCourtesy(f);
     internal bool CanOfferIncomingDistanceCourtesy(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferIncomingDistanceCourtesy(candidate, t, c);

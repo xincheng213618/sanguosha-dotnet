@@ -75,11 +75,4 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(frame, true);
         return true;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 58600)]
-    internal void AssertBoundaryZhangFeiPenalty(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryLiyongPenalty is not null && !ValidBoundaryZhangFeiLiyongPenalty(frame))
-            throw new InvalidOperationException("Liyong penalty lost original Use, actual damage or once-paid HP proof.");
-    }
 }

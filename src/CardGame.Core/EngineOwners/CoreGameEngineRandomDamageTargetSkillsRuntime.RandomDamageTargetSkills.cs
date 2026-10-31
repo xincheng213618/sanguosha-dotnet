@@ -111,7 +111,6 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.RandomDamageTargetSkill is null)
             return false;
-        AssertRandomDamageTargetSkill(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramRandomDamageTargetSkillCompletedEvent(id));
@@ -122,27 +121,6 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1242)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1242)]
     internal bool CanContinueRandomDamageTargetSkill(ProgramSkillFrame f) => f.RandomDamageTargetSkill is not null && ValidRandomDamageTargetSkillReceipt(f);
-    internal ProgramSkillFrame? RandomDamageTargetSkillDamageCursorRoot(DamageTriggerWindowFrame window, out long? dyingId)
-    {
-        dyingId = null;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == window.Id);
-        if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame { RandomDamageTargetSkill: { } receipt } root || receipt.DamageWindowId != window.Id || !_coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(root, window) || !ValidRandomDamageTargetSkillReceipt(root))
-            return null;
-        if (index + 1 == _resolutionStackOperations._resolutionStack.Count - 1)
-            return root;
-        if (_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossObserverRoot(root.Id)?.Id != root.Id)
-            return null;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > index + 1)
-            dyingId = dying.Id;
-        return root;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 1242)]
-    internal void AssertRandomDamageTargetSkill(ProgramSkillFrame f)
-    {
-        if (f.RandomDamageTargetSkill is not null && !ValidRandomDamageTargetSkillReceipt(f))
-            throw new InvalidOperationException("Random damage-target skill acquisition lost its exact native damage, frozen random choice or issued grant.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IRandomDamageTargetSkillHost.AcquireRandomDamageTargetSkill(ProgramSkillFrame frame) => AcquireRandomDamageTargetSkill(frame);
 }

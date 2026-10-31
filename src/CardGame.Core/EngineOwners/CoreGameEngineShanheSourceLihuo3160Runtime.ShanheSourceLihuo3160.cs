@@ -129,15 +129,6 @@ internal sealed partial class CoreGameEngineShanheSourceLihuo3160Runtime
         return false;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 24920)]
-    internal void AssertShanheSourceLihuoCost(ProgramSkillFrame f)
-    {
-        if (f.ShanheSourceLihuoCost is not { } r)
-            return;
-        if (f.SkillId != ShanheSourceJiangdongTrioIds.Lihuo || f.WindowContext?.ParentFrameId != r.DamageWindowId || f.WindowContext.DamageFrameId != r.DamageId || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is null || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceLihuoCostStartedEvent>().Any(e => e.ProgramFrameId == f.Id && e.UseId == r.UseId && e.DamageId == r.DamageId && e.OwnerSeat == f.OwnerSeat && e.SkillInstanceId == f.SkillInstanceId) || r.Paid && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceLihuoPaidEvent>().Any(e => e.ProgramFrameId == f.Id && e.UseId == r.UseId && e.LostHp == r.LostHp))
-            throw new InvalidOperationException("Source3160 lost its original first-damage cost receipt.");
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShanheSourceLihuoFirstDamage)]
     internal PromptChoice AiShanheSourceLihuoCost(PendingDecision p) => p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "discard") ?? p.Choices.Single();
 }

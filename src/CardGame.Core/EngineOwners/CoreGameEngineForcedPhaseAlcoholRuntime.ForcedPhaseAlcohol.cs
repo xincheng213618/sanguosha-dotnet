@@ -86,8 +86,6 @@ internal sealed partial class CoreGameEngineForcedPhaseAlcoholRuntime
         _coreCardUseLifecycleOperations.BeginSimpleCardUse(id, new(0, SimpleCardUseEffect.Alcohol));
         return SkillProgramStepOutcome.AwaitChild;
     }
-
-    internal bool IsExactPhaseAlcoholVirtualDraft(ProgramSkillFrame f, ProgramVirtualBasicDraft draft) => f.PhaseAlcohol is { Stage: ProgramPhaseAlcoholStage.WineIssued, WineFrameId: { } child } r && HasExactPhaseAlcoholReceipt(f) && draft.InstructionIndex == r.WineInstruction && draft.ChildFrameId == child;
     [ProgramContinuation(ProgramContinuationKind.Resume, 645)]
     internal bool ResumePhaseAlcohol(long id)
     {

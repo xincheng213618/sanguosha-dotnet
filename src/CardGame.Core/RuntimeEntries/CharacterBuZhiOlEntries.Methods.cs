@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterBuZhiOlEntries
 {
-    internal void AssertBuZhi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBuZhi(f);
     internal bool BuZhiActivationTargetAllowed(global::CardGame.Core.CharacterState target, global::CardGame.Core.SkillProgramActivation a) => _resolve().BuZhiActivationTargetAllowed(target, a);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BuZhiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BuZhiChoices(f);
     internal int BuZhiChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BuZhiChooser(f);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterBuZhiOlEntries
     internal bool HasBuZhiBeforeDamageObserver(long id) => _resolve().HasBuZhiBeforeDamageObserver(id);
     internal bool HasBuZhiDamageObserver(long id) => _resolve().HasBuZhiDamageObserver(id);
     internal bool IsBuZhiActivation(global::CardGame.Core.SkillProgramActivation a) => _resolve().IsBuZhiActivation(a);
-    internal bool IsBuZhiDying() => _resolve().IsBuZhiDying();
     internal bool IsBuZhiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsBuZhiMovement(f, e, p);
     internal void IssueBuZhiDamage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueBuZhiDamage(f);
     internal void PayBuZhiDraw(global::CardGame.Core.ProgramSkillFrame f, int target, string next) => _resolve().PayBuZhiDraw(f, target, next);

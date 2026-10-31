@@ -266,15 +266,6 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
         BeginNextActualUseMaterialSlash(owner, cards, CardKind.Slash, targets, null, CurrentNextActualUseAdjustment(owner.Seat) ?? throw new InvalidOperationException("Adjusted spear source expired before payment."), null);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 260)]
-    internal void AssertNextActualUseProgramSelection(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.NextActualUseAdjustment is not { } receipt)
-            return;
-        if (!HasExactNextActualUseProgramSelection(frame, plan) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.OriginalTargetSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.ChangedTargetSeat) || receipt.OriginalTargetSeat == receipt.ChangedTargetSeat || receipt.Stage == ProgramNextActualUseAdjustmentStage.Applied && (receipt.CardUseFrameId is null || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Any(e => e.ResolutionId == receipt.CardUseFrameId && e.SourceSeat == frame.OwnerSeat && e.CardKind == receipt.OutputKind)))
-            throw new InvalidOperationException("Next actual-use selection lost its exact issuance, producer or actual child.");
-    }
-
     internal void PrepareNextActualUseSelectedRecovery(ProgramSkillFrame frame, ProgramMultiCardViewAsSelection selection)
     {
         if (frame.NextActualUseAdjustment is not { Kind: ProgramNextActualUseAdjustmentKind.AddRecoveryTarget } receipt)
@@ -377,20 +368,5 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
         if (parent is null || typed.CardUseFrameId != use.Id || parent.OwnerSeat != use.SourceSeat || parent.GameplayHash != typed.ParentGameplayHash || parent.SkillInstanceId != typed.ParentSkillInstanceId || use.CardAttack?.AdjustedSlashReturn != typed || use.CardKind is not (CardKind.Slash or CardKind.FireSlash) || parent.NextActualUseAdjustment is not { Stage: ProgramNextActualUseAdjustmentStage.Applied } receipt || receipt.CardUseFrameId != use.Id || receipt.Grant.ProgramFrameId != typed.GrantProgramFrameId || !HasExactNextActualUseProgramSelection(parent, ProgramInstructionResolver.Default.Resolve(parent, _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program!)))
             throw new InvalidOperationException("The completed adjusted Slash cannot bypass the older return without its exact already-captured parent.");
         return true;
-    }
-
-    internal bool IsExactNextActualUseMaterialSlash(global::CardGame.Core.NativeOwners.FangtianHalberdHandle multi, global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { AdjustedSlashReturn: { } typed, Action: { Type: CardActionType.Use } action } use || typed.CardUseFrameId != use.Id || _coreCardAttackStateOperations.GetCardAttackState(use.Id).AdjustedSlashReturn != typed || multi.ResolutionId != use.Id || multi.SourceSeat != use.SourceSeat || action.ActorSeat != use.SourceSeat || action.ProviderSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || attack.EffectiveCardKind != use.CardKind || multi.ConversionSource != action.ConversionChain.SingleOrDefault() || use.PhysicalCardIds is not { Count: >= 2 } cards || !cards.SequenceEqual(attack.PhysicalCards.Select(c => c.Id)) || !cards.SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || cards[0] != multi.Card.Id || typed.PaidMovementFirstSequence <= 0 || typed.PaidMovementLastSequence < typed.PaidMovementFirstSequence || action.PhysicalCards.Any(cost => _coreTrustedMovementDiagnosticsOperations.CardMovements.Count(m => m.Sequence >= typed.PaidMovementFirstSequence && m.Sequence <= typed.PaidMovementLastSequence && m.CardId == cost.CardId && m.From == cost.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use && m.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber) != 1) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NextActualUseTargetAdjustmentConsumedEvent>().Any(e => e.GrantProgramFrameId == typed.GrantProgramFrameId && e.OriginFrameId == use.Id && e.CardActionId == action.ActionId && e.Source.OwnerSeat == action.ActorSeat && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && !e.IsNullificationUse))
-            return false;
-        if (typed.IsZhangba)
-        {
-            if (typed.ParentProgramFrameId is not null || typed.ParentGameplayHash is not null || typed.ParentSkillInstanceId is not null || cards.Count != 2 || action.ConversionChain.Count != 0 || action.EffectiveKind != CardKind.Slash || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Any(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual(multi.TargetSeats)) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangbaSerpentSpearConvertedEvent>().Any(e => e.ResolutionId == use.Id && e.UserSeat == action.ActorSeat && e.IsUse && e.PhysicalCardIds.SequenceEqual(cards)))
-                return false;
-        }
-        else if (NextActualUseAdjustedSlashParent(attack)is not { } parentId || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == parentId)is not { } parent || !cards.Order().SequenceEqual(parent.SelectedCardIds.Order()) || !multi.TargetSeats.SequenceEqual(new[] { parent.NextActualUseAdjustment!.OriginalTargetSeat, parent.NextActualUseAdjustment.ChangedTargetSeat }))
-            return false;
-        var retained = cards.Where(id => !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(use.Id, id)).ToHashSet();
-        return processing.All(c => retained.Contains(c.Id)) && retained.All(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile);
     }
 }

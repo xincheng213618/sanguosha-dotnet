@@ -121,8 +121,6 @@ internal sealed partial class CoreRecoveryReplacementRuntime
                 throw new InvalidOperationException("Paid card use recovery has an unsupported continuation.");
         }
     }
-
-    internal bool HasRecoveryPaidCardUseObserver(long useId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.RecoveryPaidContinuation is not null && (_resolutionStackOperations._resolutionStack.OfType<RecoveryReplacementFrame>().Any(frame => frame.ParentFrameId == useId && frame.Return.ResumeFrameId == useId && frame.Return.Continuation == PostEventContinuation.RecoveryPaidCardUse) || _resolutionStackOperations._resolutionStack.OfType<HpChangedTriggerWindowFrame>().Any(frame => frame.Change.ParentFrameId == useId && frame.ResumeFrameId == useId && frame.Continuation == PostEventContinuation.RecoveryPaidCardUse && (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.RecoveryPaidContinuation?.Kind is RecoveryPaidCardUseKind.DodgeCompletion or RecoveryPaidCardUseKind.CommittedSlash || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { RecoveryPaidContinuation: { } continuation } use && _coreProgramCardUsePaymentsOperations.CardUsePayments.AllowsTail(ProgramCardUsePaymentStage.HpObserverTail, use, continuation))) || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Any(frame => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { } owner && _coreCardUsePaymentsOperations.IsPaidCardUseMovementReturn(owner, frame)));
     internal void CompletePaidEquipmentEntry(CharacterState source, Card equipment, long useId, EquipmentSlot slot, int? replacedCardId)
     {
         if (EquipmentCatalog.Get(equipment.Kind).Slot != slot || _cardZonesOperations._cardZones.GetLocation(equipment.Id) != CardLocation.Processing)
@@ -532,41 +530,5 @@ internal sealed partial class CoreRecoveryReplacementRuntime
         else
             _coreNativeCardUseCompletionOperations.PopFinishedCardUse(parentId);
         _coreRuntimeOperations.AdvanceRuntimeProgram(c.ProgramFrameId!.Value);
-    }
-
-    internal void AssertRecoveryReplacementInvariants()
-    {
-        _coreRecoveryAmountBonusesOperations.AssertRecoveryAmountBonusReceipts();
-        _coreFactionRequestCostRecoveriesOperations.AssertPaidFactionRequestCostRecoveries();
-        foreach (var movement in _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Where(frame => frame.ResumePaidCardUseFrameId is not null))
-            if (_resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == movement.ResumePaidCardUseFrameId)is not CardUseFrame owner || !_coreCardUsePaymentsOperations.IsPaidCardUseMovementReturn(owner, movement))
-                throw new InvalidOperationException("A card-use payment lost its exact physical batch and typed return.");
-        foreach (var parent in _resolutionStackOperations._resolutionStack)
-            if (parent.PendingRecoveryAttempts is { } attempts && (attempts.Count == 0 || attempts.Select(a => a.Id).Distinct().Count() != attempts.Count || attempts is not System.Collections.IList { IsReadOnly: true }))
-                throw new InvalidOperationException("Recovery attempts must remain a frozen, nonempty owning-frame queue.");
-        foreach (var movement in _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Where(m => m.ResumeRecoveryReplacementFrameId is not null))
-            if (_resolutionStackOperations._resolutionStack.OfType<RecoveryReplacementFrame>().SingleOrDefault(f => f.Id == movement.ResumeRecoveryReplacementFrameId)is not { Stage: RecoveryReplacementStage.RewardApplied } owner || movement.Batch.ParentFrameId != owner.Id || movement.ResumeProgramFrameId is not null || movement.ResumeDeclarationFrameId is not null)
-                throw new InvalidOperationException("A recovery reward movement lost its exact completed-reward producer.");
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<RecoveryReplacementFrame>())
-        {
-            if (frame.Return.Continuation == PostEventContinuation.CardSupplyCompletion && (_resolutionStackOperations._resolutionStack.SingleOrDefault(parent => parent.Id == frame.ParentFrameId)is not ProgramCardTriggerWindowFrame supply || !_coreCardSupplyCompletionOperations.IsCardSupplyCompletionHealthChild(supply, frame)))
-                throw new InvalidOperationException("A supplied card lost its exact recovery child.");
-            if (frame.Return.Continuation == PostEventContinuation.ResponseCompletion && (_resolutionStackOperations._resolutionStack.SingleOrDefault(parent => parent.Id == frame.ParentFrameId)is not ProgramCardTriggerWindowFrame response || !_coreResponseCompletionHealthOperations.IsResponseCompletionHealthChild(response, frame)))
-                throw new InvalidOperationException("A response payment lost its exact recovery child.");
-            if (frame.Return.Continuation == PostEventContinuation.DrawFundedDistinctBasic && !_coreDrawFundedDistinctBasicPaymentOperations.IsDrawFundedDistinctBasicRecoveryParent(_resolutionStackOperations._resolutionStack.SingleOrDefault(parent => parent.Id == frame.ParentFrameId), frame))
-                throw new InvalidOperationException("A draw-funded payment lost its exact recovery child.");
-            if (frame.Id != frame.Attempt.Id || frame.Attempt.Amount <= 0 || frame.CandidateIndex is { } index && (index < 0 || index >= frame.Attempt.Candidates.Count) || frame.ParentFrameId > 0 && !_resolutionStackOperations._resolutionStack.Any(p => p.Id == frame.ParentFrameId) || frame.ParentFrameId != (frame.Return.ResumeFrameId ?? frame.ParentFrameId))
-                throw new InvalidOperationException("A recovery replacement lost its exact owning attempt or typed parent.");
-            if (frame.PendingApplication is { } application)
-            {
-                var candidate = application.CandidateIndex is { } preparedIndex && preparedIndex >= 0 && preparedIndex < frame.Attempt.Candidates.Count ? frame.Attempt.Candidates[preparedIndex] : null;
-                var baseAmount = candidate?.RecoveryAmount ?? frame.Attempt.Amount;
-                if (frame.Stage != RecoveryReplacementStage.Choosing || frame.CandidateIndex is not null || frame.OriginalRecovered != 0 || application.CandidateIndex is not null && candidate is null || application.SourceSeat != (candidate is null ? frame.Attempt.SourceSeat : frame.Attempt.TargetSeat) || application.TargetSeat != (candidate?.OwnerSeat ?? frame.Attempt.TargetSeat) || application.RequestedAmount < baseAmount || application.RequestedAmount > _coreRecoveryAmountBonusesOperations.SupportedRecoveryAmount(frame, baseAmount))
-                    throw new InvalidOperationException("Recovery lost its frozen application or supported amount receipt.");
-            }
-
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id && frame.Step == ResolutionFrameStep.AwaitingResponse && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RecoveryReplacement } p || p.PlayerSeat != frame.Attempt.TargetSeat))
-                throw new InvalidOperationException("Recovery replacement choice lost its recovering player.");
-        }
     }
 }

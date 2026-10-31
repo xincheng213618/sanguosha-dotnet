@@ -304,65 +304,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChainedStateBasicReturnedEvent(r));
     }
 
-    internal bool IsChainedStateBasicAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !IsIssuedChainedStateBasicUse(use) || attack.Card is not null || attack.PhysicalCards.Count != 0 || attack.EffectiveCardKind != use.CardKind || attack.SourceSeat != use.SourceSeat)
-            return false;
-        var p = use.ChainedStateBasicUse!.Payment;
-        int[] parentIds = [];
-        if (p.Intent == ChainedStateBasicIntent.BorrowedSword)
-        {
-            if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not { ActiveAttack: { } child } b || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(child, attack) || b.ResolutionId != p.ParentFrameId || b.WeaponOwnerSeat != p.Source.OwnerSeat || b.SlashTargetSeat != p.TargetSeat || use.Action?.ParentActionId != _coreCardUseLifecycleOperations.LifecycleCardUse(b.ResolutionId)?.Action?.ActionId)
-                return false;
-            parentIds = _coreNativeTrickUseOperations.GetCardUsePhysicalCards(b.ResolutionId).Select(c => c.Id).ToArray();
-        }
-        else if (p.Intent == ChainedStateBasicIntent.Qinglong)
-        {
-            if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongFollowup is not { } q || q.OuterResolutionId != p.ParentFrameId || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QinglongCrescentBladeResolvedEvent>().LastOrDefault(e => e.ResolutionId == p.ParentFrameId)is not { Used: true, SlashCardIds.Count: 0 } fact || fact.SourceSeat != p.Source.OwnerSeat || fact.TargetSeat != p.TargetSeat || fact.EffectiveSlashKind != p.EffectiveKind)
-                return false;
-        // Suspended Qinglong ancestor materials are checked and excluded by the native attack boundary.
-        }
-        else if (p.Intent is ChainedStateBasicIntent.ProgramSlash or ChainedStateBasicIntent.ProgramNearestSlash or ChainedStateBasicIntent.AssistedSlash or ChainedStateBasicIntent.NearestLegalSlash)
-        {
-            if (attack.ProgramSkillCardUseFrameId != p.ParentFrameId || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.ParentFrameId)is not ProgramSkillFrame parent || !ChainedStateBasicProgramActor(parent, p))
-                return false;
-            parentIds = _resolutionStackOperations._resolutionStack.Take(_resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == parent.Id)).OfType<CardUseFrame>().SelectMany(f => f.PhysicalCardIds ?? []).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Distinct().ToArray();
-        }
-        else if (p.Intent != ChainedStateBasicIntent.Play || attack.ProgramSkillCardUseFrameId is not null)
-            return false;
-        return parentIds.All(id => processing.Any(c => c.Id == id)) && processing.Select(c => c.Id).Order().SequenceEqual(parentIds.Order());
-    }
-
     internal bool ChainedStateBasicFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => child is ChainedStateBasicFrame paid && paid.Payment.RequestFrameId == parent.Id && paid.Payment.ParentFrameId is { } owner && _resolutionStackOperations._resolutionStack.Any(f => f.Id == owner) && paid.OriginalDecision.PlayerSeat == paid.Payment.Source.OwnerSeat && paid.OriginalDecision.PromptId == paid.Payment.OriginalPromptId && paid.OriginalDecision.Revision == paid.Payment.OriginalRevision && _coreChainedStateBasicConversionsOperations.ValidChainedStateBasicPayment(paid.Payment);
-    internal bool IsChainedStateQinglongCompletedWindowRide(ProgramCardTriggerWindowFrame window)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        if (index < 1 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index - 1] is not CardUseFrame original || window.Continuation != ProgramCardContinuation.CompletedSlash || window.ParentFrameId != original.Id || window.AttackOwnerFrameId != original.Id || original.Step != ResolutionFrameStep.Completed || original.Action is not { Type: CardActionType.Use } action || window.Action.ActionId != action.ActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(original.CardKind) || original.CardAttack is not { } attack || attack.SuccessfulDodgeResponses != attack.RequiredDodgeResponses || original.Continuations.QinglongFollowup is not { Active: true, Decision: { } saved } suspension || suspension.NextAttackOwnerId != original.Id || suspension.FangtianOwnerId is not null || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
-            return false;
-        var bound = _resolutionStackOperations._resolutionStack[index + 1] as ProgramSkillFrame;
-        var next = index + (bound is null ? 1 : 2);
-        if (next >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[next] is not CardUseFrame followup || window.Activated != (bound is not null) || !IsIssuedChainedStateBasicUse(followup) || followup.ChainedStateBasicUse!.Payment is not { Intent: ChainedStateBasicIntent.Qinglong, Cursor: 0 } p || p.ParentFrameId != original.Id || p.RequestFrameId != original.Id || p.ParentActionId != action.ActionId || p.Source.OwnerSeat != original.SourceSeat || p.TargetSeat != attack.TargetSeat || followup.SourceSeat != original.SourceSeat || followup.Action!.ParentActionId != action.ActionId || !followup.TargetSeats.SequenceEqual([attack.TargetSeat]) || !followup.Action.TargetSeats.SequenceEqual(followup.TargetSeats) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(followup.CardKind))
-            return false;
-        var candidate = window.Candidates[window.CandidateIndex];
-        var context = candidate.FrozenContext;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } cardUse } || context.ParentFrameId != window.Id || cardUse.ParentCardUseFrameId != original.Id || cardUse.CardActionId != action.ActionId || _coreCardActionsOperations.CreateCardActionProgramContext2(window, candidate) != context || saved.Kind != DecisionKind.ProgramTrigger || !saved.IsPrivate || saved.SkillPrompt?.SkillId != candidate.SkillId || saved.Choices.Count == 0)
-            return false;
-        if (bound is null)
-        {
-            if (!_coreProgramLifecycleOperations.GetProgramTrigger2(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)).Optional || saved.PlayerSeat != (context.OptionalChooserSeat ?? candidate.OwnerSeat) || saved.SourceSeat != (context.OptionalChooserSeat is not null ? candidate.OwnerSeat : context.SourceSeat) || saved.TargetSeat != (context.OptionalChooserSeat ?? context.TargetSeat ?? candidate.OwnerSeat) || saved.Choices.Count != 2 || !saved.Choices.Select(c => c.Parameters.GetValueOrDefault("program-action")).Order().SequenceEqual(["activate", "skip"]) || saved.Choices.Any(c => c.Cards.Count != 0 || c.Targets.Count != 0 || c.Parameters.GetValueOrDefault("skill-id") != candidate.SkillId || c.Parameters.GetValueOrDefault("binding-id") != candidate.TriggerId || c.Parameters.GetValueOrDefault("skill-instance-id") != candidate.SkillInstanceId))
-                return false;
-        }
-        else
-        {
-            if (bound.WindowContext != context || bound.OwnerSeat != candidate.OwnerSeat || bound.SkillId != candidate.SkillId || bound.SkillInstanceId != candidate.SkillInstanceId || bound.TriggerId != candidate.TriggerId || bound.GameplayHash != candidate.GameplayHash || bound.InstructionIndex < 1)
-                return false;
-            var effect = ProgramInstructionResolver.Default.Resolve(bound, _contentRegistryOperations._contentRegistry.GetSkill(bound.SkillId).Program!).GetPausedInstruction(bound.InstructionIndex).Effect;
-            if (effect.Op != SkillProgramEffectOp.ChooseOption || bound.ChoiceBindings.Any(b => b.Name == effect.ResultBind) || saved.PlayerSeat != (effect.ChooserRef is { } chooser ? _coreProgramCardPaymentsOperations.ResolveProgramParticipant(bound, chooser) : global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(bound, effect.Target)) || saved.SourceSeat != bound.OwnerSeat || saved.TargetSeat != saved.PlayerSeat || saved.Choices.Select(c => c.Id).Distinct().Count() != saved.Choices.Count || saved.Choices.Any(c => c.Cards.Count != 0 || c.Targets.Count != 0 || c.Parameters.GetValueOrDefault("program-action") != "choose-option" || c.Parameters.GetValueOrDefault("frame-id") != bound.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || c.Parameters.GetValueOrDefault("result-bind") != effect.ResultBind || !effect.Options.Any(o => o.Id == c.Parameters.GetValueOrDefault("option-id") && c.Id.Value == $"program-option.frame-{(bound.Id)}.{(effect.ResultBind)}.{(o.Id)}")))
-                return false;
-        }
-
-        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QinglongCrescentBladeResolvedEvent>().LastOrDefault(e => e.ResolutionId == original.Id)is { Used: true, SlashCardIds.Count: 0 } issued && issued.SourceSeat == p.Source.OwnerSeat && issued.TargetSeat == p.TargetSeat && issued.EffectiveSlashKind == p.EffectiveKind && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Where(e => e.ResolutionId == followup.Id).ToArray()is [var declared] && declared.SourceSeat == p.Source.OwnerSeat && declared.CardId == 0 && declared.CardKind == p.EffectiveKind;
-    }
 
     internal bool ChainedStateBasicLegacyAlcoholRide(ChainedStateBasicFrame paid, int dyingIndex, DyingFrame dying)
     {
@@ -442,38 +384,9 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
                 return paid;
         return null;
     }
-
-    internal bool HasChainedStateBasicObserver(long id) => ChainedStateBasicObserverRoot(id)is not null;
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1630)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 20)]
     internal bool HasChainedStateBasicDamageObserver(long id) => ChainedStateBasicObserverRoot(id)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 20, group: 80)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 130)]
     internal bool IsChainedStateBasicProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ChainedStateBasicObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    internal PendingDecision? ChainedStateBasicInvariantDecision(PendingDecision? native) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ChainedStateBasicFrame paid ? global::CardGame.Core.EngineOwners.CoreGameEngineChainedStateBasicConversionsRuntime.ChainedStateBasicNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(paid.OriginalDecision))) : native is { } prompt ? global::CardGame.Core.EngineOwners.CoreGameEngineChainedStateBasicConversionsRuntime.ChainedStateBasicNativeDecision(prompt) : null;
-    internal ResolutionFrame? ChainedStateBasicInvariantTop(ResolutionFrame? native) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ChainedStateBasicFrame paid ? _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == paid.Payment.RequestFrameId) : native;
-    internal void AssertChainedStateBasicFramesAndUses()
-    {
-        foreach (var paid in _resolutionStackOperations._resolutionStack.OfType<ChainedStateBasicFrame>())
-        {
-            var p = paid.Payment;
-            var i = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == paid.Id);
-            if (paid.Stage != ChainedStateBasicStage.StateChildren || p.PaymentFrameId != paid.Id || !_coreChainedStateBasicConversionsOperations.ValidChainedStateBasicPayment(p) || paid.OriginalDecision.PlayerSeat != p.Source.OwnerSeat || paid.OriginalDecision.PromptId != p.OriginalPromptId || paid.OriginalDecision.Revision != p.OriginalRevision || paid.TargetSeats.Count == 0 || paid.TargetSeats.Distinct().Count() != paid.TargetSeats.Count || paid.TargetSeats.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t)) || (p.Intent == ChainedStateBasicIntent.Play ? i != 0 && !_characterKeBiNengOlOperations.IsKeBiNengPingduanPaymentFrame(paid) && !(_characterKongRongMouOlOperations.IsMouKrLiwenPaymentFrame(paid) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTiePaymentFrame(paid)) && !_characterLuSuMouOperations.IsMouLuSuPaymentFrame(paid) : i <= 0 || !ChainedStateBasicFrameRidesOn(paid, _resolutionStackOperations._resolutionStack[i - 1])) || !ChainedStateBasicPaidSuffix(i) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChainedStateBasicIssuedEvent>().Any(e => e.Receipt.Payment.PaymentFrameId == p.PaymentFrameId))
-                throw new InvalidOperationException("A chained-state payment lost its frozen original need, real cost or exact child subtree.");
-        }
-
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-        {
-            if (use.ChainedStateBasicUse is not null && !IsIssuedChainedStateBasicUse(use))
-                throw new InvalidOperationException("A chained-state Slash lost its unique paid native issuance.");
-            if (use.ChainedStateBasicResponse is not null)
-                RequireChainedStateBasicResponseAction(use);
-            if (use.Action?.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.ChainedStateCost.HasValue == true) == true && use.ChainedStateBasicUse is null)
-                throw new InvalidOperationException("A chained-state Use cannot disguise a deleted receipt as a legacy zero card.");
-        }
-
-        foreach (var window in _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Where(w => w.Action.Type == CardActionType.Response && w.Action.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.ChainedStateCost.HasValue == true)))
-            if (_coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { ChainedStateBasicResponse: not null } owner || !global::CardGame.Core.EngineOwners.CoreGameEngineTieredRoundZeroReturnsRuntime.TieredRoundActionsStructurallyMatch(RequireChainedStateBasicResponseAction(owner), window.Action))
-                throw new InvalidOperationException("A chained-state Dodge child lost its exact accepted response owner.");
-    }
 }

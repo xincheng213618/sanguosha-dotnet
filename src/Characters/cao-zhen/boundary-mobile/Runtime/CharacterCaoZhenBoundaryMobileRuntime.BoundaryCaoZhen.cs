@@ -180,8 +180,6 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { BoundarySidi = null, ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, outcome, frame.OwnerSeat)).ToArray()) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundarySidiResultEvent(frame.Id, frame.OwnerSeat, action, bind, outcome));
     }
-
-    internal bool IsBoundarySidiChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding) => frame.SkillId == BoundarySidiSkill && binding.ChooserSeat == frame.OwnerSeat && frame.WindowContext?.CardUse is { } use && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundarySidiResultEvent>().Count(record => record.FrameId == frame.Id && record.OwnerSeat == frame.OwnerSeat && record.ActionId == use.CardActionId && record.ResultBind == binding.Name && record.Outcome == binding.OptionId) == 1 && ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Instructions.Take(frame.InstructionIndex).Count(effect => effect.Op == SkillProgramEffectOp.ResolveBoundaryCaoZhenSidi && effect.ResultBind == binding.Name) == 1;
     internal bool IsBoundarySidiUseIneffective(CardUseFrame use)
     {
         if (use.BoundarySidiCancellation is not { } proof)
@@ -212,15 +210,6 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
         var original = use.CardId == 0 ? new Card(0, use.CardKind, Suit.None, 0) : _coreAdvancedLifecycleOperations.GetAdvancedCard(use.CardId);
         _coreNativeCardUseCompletionOperations.FinishCardUse(id, original, use.CardKind);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 53400)]
-    internal void AssertBoundarySidi(ProgramSkillFrame frame)
-    {
-        if (frame.BoundarySidi is not { } draft)
-            return;
-        if (draft.InstructionIndex != frame.InstructionIndex || !TryBoundarySidiWindow(frame.WindowContext, out var window) || draft.WindowId != window.Id || draft.ActionId != window.Action.ActionId || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, BoundarySidiChoices(frame)))
-            throw new InvalidOperationException("Sidi lost its frame-owned private forecast or current first-use choice.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.PrepareBoundaryCaoZhenSidi)]

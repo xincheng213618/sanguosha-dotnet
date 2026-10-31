@@ -125,7 +125,6 @@ internal sealed partial class CoreGameEngineShenwuCardsRuntime
     }
 
     internal bool ShenwuTrickFrameRidesOn(ResolutionFrame ride, ResolutionFrame beneath) => ride is ProgramSkillFrame { ShenwuTransplantReturn: { } receipt } frame && receipt.CardUseFrameId == beneath.Id && IsShenwuTransplantProgram(frame);
-    internal bool HasShenwuTrickPrompt() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.ShenwuTransplantReturn is not null && IsShenwuTransplantProgram(frame));
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 27800)]
     internal bool TryAdvanceShenwuTransplantAi()
     {
@@ -143,35 +142,5 @@ internal sealed partial class CoreGameEngineShenwuCardsRuntime
         _coreProgramLifecycleOperations.ProgramInteractions.Resolve(selected);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
         return true;
-    }
-
-    internal bool IsShenwuTransplantAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        var frame = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.ShenwuTransplantReturn is not null && frame.Id == attack.ProgramSkillCardUseFrameId);
-        if (frame is null || !IsShenwuTransplantProgram(frame) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } child || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != frame.SelectedTargetSeats[0] || child.SourceSeat != action.ActorSeat || attack.CardUserSeat != action.ActorSeat || action.ParentActionId != _coreCardUseLifecycleOperations.LifecycleCardUse(frame.ShenwuTransplantReturn!.CardUseFrameId)!.Action!.ActionId)
-            return false;
-        var parent = _coreCardUseLifecycleOperations.LifecycleCardUse(frame.ShenwuTransplantReturn!.CardUseFrameId)!;
-        var parentIds = parent.Action!.PhysicalCards.Select(card => card.CardId).ToHashSet();
-        if (!processing.Any(card => parentIds.Contains(card.Id)))
-            return false;
-        // The pre-existing checker validates the same physical or zero-entity
-        // child against every native response/transfer path after removing only
-        // the exact retained parent trick entity from its expected Processing.
-        // Its absence is also the recursion sentinel; a previously claimed
-        // parent needs no adjustment and follows the unmodified native checker.
-        return _coreNativeCoreInvariantsOperations.IsActiveAttackCardConsistent(attack, processing.Where(card => !parentIds.Contains(card.Id)).ToArray());
-    }
-
-    internal void AssertShenwuCardState()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(frame => frame.ShenwuTransplantReturn is not null))
-            if (!IsShenwuTransplantProgram(frame))
-                throw new InvalidOperationException("Transplant wood changed its exact native program owner.");
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use => use.ShenwuTransplant is not null))
-        {
-            _ = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: true);
-            if (use.Action is null || use.Action.PhysicalCards.Any(card => !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, card.CardId) && !(_characterHuBanOlOperations.IsHuiyunOutsideGeneralWeaponMaterial(use.Id, card.CardId) || _characterMiHengLeOperations.IsSiruiOutsideGeneralWeaponMaterial(use.Id, card.CardId)) && !_coreGuanduEquipmentOperations.IsGuanduDestroyedChariotMaterial(use.Id, card.CardId) && _cardZonesOperations._cardZones.GetLocation(card.CardId) != CardLocation.Processing) || !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.Id == use.ShenwuTransplant!.ProgramFrameId && IsShenwuTransplantProgram(frame)))
-                throw new InvalidOperationException("Transplant wood lost its frozen native request child.");
-        }
     }
 }

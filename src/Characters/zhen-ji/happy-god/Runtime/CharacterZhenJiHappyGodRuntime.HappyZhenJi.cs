@@ -150,7 +150,6 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     internal void AnswerHappyZj(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Zhen Ji lost her choice owner.");
-        RequireHappyZj(f);
         var r = f.HappyZhenJi!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappyZjChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Happy Zhen Ji requires the exact current dynamic payment or branch.");
@@ -240,7 +239,6 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyZhenJi: { } r } f || f.Id != id)
             return false;
-        RequireHappyZj(f);
         if (r.Stage is HappyZjStage.TargetDraw or HappyZjStage.RewardDraw || f.AttackAttempt is not null)
             return true;
         if (r.Stage is HappyZjStage.Branch or HappyZjStage.Discard or HappyZjStage.SelectStore)

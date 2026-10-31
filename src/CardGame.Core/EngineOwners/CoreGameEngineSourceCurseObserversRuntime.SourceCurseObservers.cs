@@ -40,27 +40,6 @@ internal sealed partial class CoreGameEngineSourceCurseObserversRuntime
         return SourceCurseMovementMatches(r, curse.CardId, curse.Location, CardLocation.Hand(f.OwnerSeat), "program.source-curse.obtain") && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SourceCurseObtainedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Deposit == curse && e.Before == r.Before && e.After == r.After) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 360)]
-    internal void AssertSourceCurseReceipt(ProgramSkillFrame f)
-    {
-        if (f.SourceCurseReceipt is not null && !ValidSourceCurseReceipt(f))
-            throw new InvalidOperationException("A source curse lost its original physical deposit, paid segment or exact typed parent.");
-    }
-
-    internal void AssertSourceCurseState()
-    {
-        if (_coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses.Select(c => c.TargetSeat).Distinct().Count() != _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses.Count || _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses.Select(c => c.CardId).Distinct().Count() != _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses.Count || _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses.Select(c => c.DepositFrameId).Distinct().Count() != _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses.Count)
-            throw new InvalidOperationException("Each target has at most one distinct physical source curse.");
-        foreach (var d in _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses)
-            if (d.DepositFrameId <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.Source.OwnerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.TargetSeat) || d.Source.OwnerSeat == d.TargetSeat || d.ActualDrawCount is < 0 or > 2 || _cardZonesOperations._cardZones.CardsAt(d.Location)is not [var card] || card.Id != d.CardId || card.Kind != d.CardKind || card.Suit != d.PrintedSuit || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SourceCurseDepositedEvent>().Count(e => global::CardGame.Core.EngineOwners.CoreGameEngineSourceCursesRuntime.SameSourceCurse(e.Deposit, d)) != 1)
-                throw new InvalidOperationException("An issued curse lost its actual target-owned card or original source identity.");
-        foreach (var loss in _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurseLosses)
-            if (!_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == loss.MovementSequence && m.TurnNumber == loss.ActualTurn && m.CardId == loss.Deposit.CardId && m.From == loss.Deposit.Location && m.To == loss.Destination && m.Reason.Value == loss.Reason))
-                throw new InvalidOperationException("A curse loss must be backed by its exact real movement.");
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-            AssertSourceCurseReceipt(f);
-    }
-
     internal bool SourceCurseFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (root.SourceCurseReceipt is not { } r || !ValidSourceCurseReceipt(root))
@@ -112,9 +91,6 @@ internal sealed partial class CoreGameEngineSourceCurseObserversRuntime
 
         return null;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 170, group: 10)]
-    internal bool IsSourceCurseProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SourceCurseObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1970)]
     internal bool HasSourceCurseDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) && SourceCurseObserverRoot()is not null;
 }

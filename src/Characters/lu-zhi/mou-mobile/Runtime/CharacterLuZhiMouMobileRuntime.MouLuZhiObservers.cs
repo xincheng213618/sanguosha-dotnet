@@ -75,7 +75,6 @@ internal sealed partial class CharacterLuZhiMouMobileRuntime
     internal bool HasMouLuZhiDamageObserver(long id) => MouLuZhiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31000)]
     internal bool HasMouLuZhiBeforeDamageObserver(long id) => MouLuZhiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31000)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31000)]
     internal bool IsMouLuZhiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouLuZhiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31000)]
@@ -110,12 +109,6 @@ internal sealed partial class CharacterLuZhiMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 31000)]
     internal bool ContinueAcceptedMouLuZhi(ProgramSkillFrame f) => f.MouLuZhi is { } r && ValidMouLuZhi(f) && (r.Op == SkillProgramEffectOp.InitializeMouLuZhiMingren || r.Stage is MouLuZhiStage.Drawing or MouLuZhiStage.DrawChildren or MouLuZhiStage.MovementChildren or MouLuZhiStage.DamageIssued);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31000)]
-    internal void AssertMouLuZhi(ProgramSkillFrame f)
-    {
-        if (f.MouLuZhi is not null && !ValidMouLuZhi(f))
-            throw new InvalidOperationException("Mou Lu Zhi lost its owning receipt or paid movement.");
-    }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 31000)]
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 31000)]

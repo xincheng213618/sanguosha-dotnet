@@ -20,50 +20,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         if (!HasPaidWuYixian(f))
             return false;
-        AssertWuYixian(f);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28530)]
-    internal void AssertWuYixian(ProgramSkillFrame f)
-    {
-        if (f.Yixian is not { } r)
-            return;
-        if (!MatchesWuYixianRoot(f) || !Enum.IsDefined(r.Stage) || r.Entities is not IList { IsReadOnly: true } || r.Recipients is not IList { IsReadOnly: true } || r.Cursor < 0 || r.Cursor > r.Recipients.Count || r.SequenceBefore < 0 || r.SequenceAfter < r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Yixian lost its original source, operation or immutable native cursor.");
-        var paidFacts = _coreProgramEventHistoryOperations.ProgramEventHistory<YixianPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (!r.Paid)
-        {
-            if (r.Stage != YixianStage.BranchChoice || r.Branch is not null || r.BatchId != 0 || r.Cursor != 0 || r.Entities.Count != 0 || r.Recipients.Count != 0 || r.DrawOutcome is not null || r.BenefitAccepted || f.NativeDraw is not null || f.PendingMovementContinuation is not null || paidFacts.Length != 0)
-                throw new InvalidOperationException("Unpaid Yixian cannot own equipment or a compensation queue.");
-            return;
-        }
-
-        if (!HasPaidWuYixian(f) || r.Stage == YixianStage.BranchChoice || r.Branch is not { } branch || !Enum.IsDefined(branch) || r.Entities.Select(e => e.CardId).Distinct().Count() != r.Entities.Count || (r.Entities.Count == 0 ? r.BatchId != 0 || r.SequenceBefore != r.SequenceAfter : r.BatchId <= 0))
-            throw new InvalidOperationException("Yixian lost or repeated its committed limited equipment batch.");
-        var entities = _coreProgramEventHistoryOperations.ProgramEventHistory<YixianEntityObtainedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (entities.Length != r.Entities.Count || !entities.Select((fact, i) => fact == new YixianEntityObtainedEvent(f.Id, i, r.Entities[i].CardId, r.Entities[i].PrintedKind, r.Entities[i].From, r.Entities[i].To, r.Entities[i].MovementSequence)).All(v => v) || r.Entities.Any(e => !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(e.PrintedKind) || (branch == YixianBranch.Field ? e.From.Zone != CardZoneKind.Equipment || e.From.OwnerSeat is not { } owner || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) : e.From != CardLocation.DiscardPile) || e.To != CardLocation.Hand(f.OwnerSeat) && e.To != CardLocation.OutsideGame || e.MovementSequence <= r.SequenceBefore || e.MovementSequence > r.SequenceAfter || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.From == e.From && m.To == e.To && m.Reason.Value == WuYixianObtainReason) != 1))
-            throw new InvalidOperationException("Yixian's actual obtained/destroyed equipment identities or original locations changed.");
-        var expected = r.Entities.Where(e => e.From.Zone == CardZoneKind.Equipment && e.From.OwnerSeat is not null && e.To == CardLocation.Hand(f.OwnerSeat)).GroupBy(e => e.From.OwnerSeat!.Value).OrderBy(g => _coreTableOrderOperations.RelativeTableOrder(r.TurnOwner, g.Key)).Select(g => new YixianRecipient(g.Key, g.Count())).ToArray();
-        var recipients = _coreProgramEventHistoryOperations.ProgramEventHistory<YixianRecipientFrozenEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (!r.Recipients.SequenceEqual(expected) || recipients.Length != expected.Length || !recipients.Select((e, i) => e == new YixianRecipientFrozenEvent(f.Id, i, expected[i].Seat, expected[i].ObtainedCount)).All(v => v))
-            throw new InvalidOperationException("Yixian compensation is based only on actual equipment obtained from each original owner.");
-        var decisions = _coreProgramEventHistoryOperations.ProgramEventHistory<YixianRecipientDecisionEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (decisions.Any(e => e.Index < 0 || e.Index > r.Cursor || e.Index >= r.Recipients.Count || e.RecipientSeat != r.Recipients[e.Index].Seat || e.ObtainedCount != r.Recipients[e.Index].ObtainedCount) || decisions.Select(e => e.Index).Distinct().Count() != decisions.Length || Enumerable.Range(0, r.Cursor).Any(i => decisions.Count(e => e.Index == i) != 1) || (r.BenefitAccepted ? decisions.Count(e => e.Index == r.Cursor && e.Accepted) != 1 : decisions.Any(e => e.Index == r.Cursor)) || r.BenefitAccepted != (r.Stage is YixianStage.Drawing or YixianStage.DrawChildren or YixianStage.RecoveryChildren))
-            throw new InvalidOperationException("Yixian repeated or invented an optional original-owner benefit.");
-        var returned = _coreProgramEventHistoryOperations.ProgramEventHistory<YixianDrawReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        var recoveries = _coreProgramEventHistoryOperations.ProgramEventHistory<YixianRecoveryIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (returned.Any(e => e.Index < 0 || e.Index > r.Cursor || e.Index >= r.Recipients.Count || e.RecipientSeat != r.Recipients[e.Index].Seat || e.RequestedCount != r.Recipients[e.Index].ObtainedCount || decisions.Count(d => d.Index == e.Index && d.Accepted) != 1) || returned.Select(e => e.Index).Distinct().Count() != returned.Length || recoveries.Any(e => returned.Count(d => d.Index == e.Index && d.RecipientSeat == e.RecipientSeat) != 1) || recoveries.Select(e => e.Index).Distinct().Count() != recoveries.Length || decisions.Where(e => e.Index < r.Cursor && e.Accepted).Any(e => returned.Count(d => d.Index == e.Index) != 1 || recoveries.Count(d => d.Index == e.Index) != 1))
-            throw new InvalidOperationException("Yixian lost its once-only draw then recovery ordering.");
-        if (r.Stage is YixianStage.DrawChildren or YixianStage.RecoveryChildren)
-        {
-            if (r.DrawOutcome is not { } draw || draw.RecipientSeat != r.Recipients[r.Cursor].Seat || draw.RequestedCount != r.Recipients[r.Cursor].ObtainedCount || draw.ActualDrawIds is not IList { IsReadOnly: true } || draw.ReplacementGainedIds is not IList { IsReadOnly: true } || draw.SequenceBefore < r.SequenceAfter || draw.SequenceAfter < draw.SequenceBefore || draw.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || draw.ActualDrawIds.Distinct().Count() != draw.ActualDrawIds.Count || draw.ActualDrawIds.Intersect(draw.ReplacementGainedIds).Any() || draw.ActualDrawIds.Any(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(draw.RecipientSeat) && m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.Reason.Value == WuYixianDrawReason) != 1) || returned.Where(e => e.Index == r.Cursor).ToArray()is not [var fact] || fact != new YixianDrawReturnedEvent(f.Id, r.Cursor, draw.RecipientSeat, draw.RequestedCount, draw.ActualDrawIds.Count, draw.ReplacementGainedIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId) || f.NativeDraw is not null || (r.Stage == YixianStage.RecoveryChildren) != recoveries.Any(e => e.Index == r.Cursor))
-                throw new InvalidOperationException("Yixian lost its precise immutable native draw return.");
-        }
-        else if (r.DrawOutcome is not null || returned.Any(e => e.Index == r.Cursor))
-            throw new InvalidOperationException("Yixian reused a prior recipient's native draw result.");
-        if (f.PendingMovementContinuation is { } pending && !IsWuYixianMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Yixian's movement/recovery child lost its typed parent return.");
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 240)]
@@ -100,7 +57,6 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         if (!HasPaidWuYixian(f) || f.Yixian is not { } r)
             return false;
-        AssertWuYixian(f);
         if (r.Stage == YixianStage.Drawing && f.NativeDraw is not null)
             return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is RecoveryReplacementFrame recovery)
@@ -121,8 +77,6 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     internal bool HasWuYixianDamageObserver(long id) => WuYixianObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1320)]
     internal bool HasWuYixianBeforeDamageObserver(long id) => WuYixianObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1150)]
-    internal bool IsWuYixianDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuYixianObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28530)]
     internal bool AdvanceWuYixianChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuYixianObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

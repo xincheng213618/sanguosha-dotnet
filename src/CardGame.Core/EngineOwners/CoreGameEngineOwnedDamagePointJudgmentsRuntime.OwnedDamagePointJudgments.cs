@@ -108,16 +108,6 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 90)]
     internal bool HasOwnedDamagePointJudgmentObserver(long damageWindowId) => OwnedDamagePointJudgmentRoot(damageWindowId)is not null;
-    internal bool HasOwnedDamagePointJudgmentRide(long judgmentFrameId) => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && OwnedDamagePointJudgmentRoot(damage.Id)?.OwnedDamagePointJudgment?.JudgmentFrameId == judgmentFrameId;
-    internal bool IsExactOwnedDamagePointJudgmentFinalizedChildSubtree(ProgramJudgmentTriggerWindowFrame window, JudgmentFrame? judgment, int windowIndex)
-    {
-        if (judgment is null || !window.Activated || window.ParentFrameId != judgment.Id || windowIndex < 1 || _resolutionStackOperations._resolutionStack[windowIndex - 1] != judgment || windowIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[windowIndex + 1] is not ProgramSkillFrame child || child.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentFinalized } context || context.ParentFrameId != window.Id || context.Judgment != window.Judgment || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || OwnedDamagePointJudgmentRoot(damage.Id)is not { } root || root.OwnedDamagePointJudgment is not { } receipt || judgment.ParentFrameId != root.Id || receipt.JudgmentFrameId != judgment.Id || receipt.JudgmentFrameId != window.Judgment.JudgmentFrameId)
-            return false;
-        // The existing receipt proof walks every edge through this current
-        // finalized candidate and its exact HP/movement/rescue descendants.
-        // Preserve the frozen public result while only admitting this 3901 owner.
-        return window.Judgment.SubjectSeat == root.OwnerSeat && window.Judgment.SourceSeat == receipt.DamageSourceSeat && window.Judgment.Reason == receipt.Reason && window.Judgment.CardId == judgment.CardId && window.Judgment.CardKind == judgment.CardKind && window.Judgment.Suit == judgment.Suit && window.Judgment.Succeeded == judgment.Succeeded;
-    }
 
     internal bool IsOwnedDamagePointJudgmentResultClaimed(JudgmentFrame judgment)
     {
@@ -126,8 +116,6 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
         bool Claim(IGameEvent value) => value is ProgramJudgmentCardClaimedEvent claimed && claimed.JudgmentFrameId == judgment.Id && claimed.OwnerSeat == judgment.TargetSeat && claimed.CardId == cardId;
         return _coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents.Any(Claim) || _coreCommandJournalStorageEventsPendingEventsAccess._events.Any(e => Claim(e.Payload));
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 380, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 390)]
     internal bool IsOwnedDamagePointJudgmentProgramDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && OwnedDamagePointJudgmentRoot(damage.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId && f.ParentFrameId == dying.ParentFrameId);
 }

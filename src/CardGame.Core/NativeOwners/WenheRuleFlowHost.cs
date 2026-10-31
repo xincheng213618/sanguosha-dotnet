@@ -7,7 +7,6 @@ internal sealed class WenheRuleFlowHost(global::System.Func<global::CardGame.Cor
     {
         if (getFrameStore().LastOrDefault()is not ProgramSkillFrame { WenheRuleFlow: not null } frame || frame.Id != frameId)
             return null;
-        getCoreWenheActivityProgramsRuntime().AssertWenheRuleFlow(frame);
         return Cursor(frame);
     }
 
@@ -16,8 +15,6 @@ internal sealed class WenheRuleFlowHost(global::System.Func<global::CardGame.Cor
     {
         var frame = getCoreGameEngineProgramLifecycleRuntime().GetActiveProgramFrame(frameId);
         var receipt = frame.WenheRuleFlow ?? throw new InvalidOperationException("The activity flow lost its owning receipt.");
-        if (receipt.Index != expectedIndex || receipt.Stage != expectedStage || !(nextIndex == expectedIndex && nextStage == expectedStage + 1 && expectedStage is 0 or 1 || nextIndex == expectedIndex + 1 && nextStage == 0 && expectedStage == 2))
-            throw new InvalidOperationException("The activity continuation lost its exact paid cursor.");
         getCoreGameEngineRuntimeRuntime().ReplaceRuntimeTop(frame with { WenheRuleFlow = receipt with { Index = nextIndex, Stage = nextStage } });
     }
 

@@ -13,7 +13,6 @@ internal sealed partial class CharacterZhangRenMobileShiEntries
     internal bool DrainShiZr(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainShiZr(f);
     internal void ExpireShiZrFuanSeals(global::CardGame.Core.IGameEvent payload) => _resolve().ExpireShiZrFuanSeals(payload);
     internal void FinishShiZrOperation(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShiZrOperation(f);
-    internal bool HasExactShiZrFuanStrikeTarget(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasExactShiZrFuanStrikeTarget(frame);
     internal bool IsShiZrFuanStrikeUse(long useFrameId) => _resolve().IsShiZrFuanStrikeUse(useFrameId);
     internal void IssueShiZrFuanStrike(global::CardGame.Core.ProgramSkillFrame f, int targetSeat) => _resolve().IssueShiZrFuanStrike(f, targetSeat);
     internal global::CardGame.Core.PromptChoice MakeShiZrChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string? value, string label) => _resolve().MakeShiZrChoice(f, branch, value, label);

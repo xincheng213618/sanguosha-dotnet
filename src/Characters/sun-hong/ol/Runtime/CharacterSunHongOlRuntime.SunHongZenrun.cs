@@ -121,7 +121,6 @@ internal sealed partial class CharacterSunHongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zenrun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ZenrunStage.VictimChoice ? r.SourceSeat : f.OwnerSeat) || !ZenrunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zenrun lost the exact opaque chooser or original native choice.");
-        AssertZenrun(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -196,7 +195,6 @@ internal sealed partial class CharacterSunHongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zenrun: { } r } f || f.Id != id)
             return;
-        AssertZenrun(f);
         if (f.NativeDraw is not null || r.Stage == ZenrunStage.CompensationRequest)
             return;
         if (r.Stage is ZenrunStage.Target or ZenrunStage.Cards or ZenrunStage.VictimChoice)

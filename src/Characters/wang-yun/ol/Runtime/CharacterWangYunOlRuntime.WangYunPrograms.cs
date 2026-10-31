@@ -59,7 +59,6 @@ internal sealed partial class CharacterWangYunOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.WangYunPlan is null && f.WangYunTrick is null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != WangYunChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], (f.WangYunPlan is not null ? WangYunPlanChoices(f) : WangYunTrickChoices(f)).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Wang Yun lost the exact actual chooser or current material/target choice.");
-        AssertWangYun(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (f.WangYunTrick is not null)
         {
@@ -97,7 +96,6 @@ internal sealed partial class CharacterWangYunOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.WangYunPlan is null && f.WangYunTrick is null && f.WangYunAwakening is null)
             return false;
-        AssertWangYun(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd())
             return true;
         if (f.PendingMovementContinuation is not null)
@@ -154,7 +152,6 @@ internal sealed partial class CharacterWangYunOlRuntime
             return false;
         if (f.PendingMovementContinuation is not { } p || !IsWangYunMovement(f, WangYunPausedEffect(f), p))
             throw new InvalidOperationException("Lianji consumed a foreign movement return.");
-        AssertWangYun(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd() || _coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, WangYunPlan = r with { Stage = r.ReturnStage } });

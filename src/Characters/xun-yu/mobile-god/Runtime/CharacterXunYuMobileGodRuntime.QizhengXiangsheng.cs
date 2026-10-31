@@ -135,7 +135,6 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     }
 
     internal bool HasQizhengPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { Qizheng.Stage: QizhengStage.Designation or QizhengStage.Response or QizhengStage.Gain } && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IncomingCard: CardKind.QizhengXiangsheng };
-    internal bool HasQizhengResponseContinuation(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { Qizheng: { Stage: QizhengStage.Response } r, Step: ResolutionFrameStep.AwaitingResponse } use && use.Id == attack.ResolutionId && global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.QizhengXiangsheng && attack.EffectiveCardKind == CardKind.QizhengXiangsheng && attack.SourceSeat == use.SourceSeat && attack.CardUserSeat == use.SourceSeat && attack.TargetSeat == r.Target && !attack.DamageRedirected && !attack.IsChainPropagation && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IncomingCard: CardKind.QizhengXiangsheng, IsPrivate: true } prompt && prompt.PlayerSeat == r.Target && prompt.SourceSeat == use.SourceSeat && prompt.TargetSeat == r.Target && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, QizhengChoices(use));
     [ProgramAnswer("qizheng")]
     internal void AnswerQizheng(PromptChoice selected)
     {
@@ -325,27 +324,6 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         var choice = _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { Qizheng.Stage: QizhengStage.Designation } ? choices[_randomOperations._random.Next(choices.Count)] : choices.FirstOrDefault(c => c.Parameters["branch"] != "pass") ?? choices[0];
         AnswerQizheng(choice);
         return true;
-    }
-
-    internal bool HasQizhengProcessing(IReadOnlyList<Card> processing) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.Qizheng is not null && processing.All(c => use.PhysicalCardIds?.Contains(c.Id) == true || use.Action?.PhysicalCards.Any(p => p.CardId == c.Id) == true));
-    internal bool IsVirtualQizhengAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { CardId: 0, CardKind: CardKind.QizhengXiangsheng, PhysicalCardIds.Count: 0, Qizheng: { } receipt } use || !_coreVirtualOrdinaryTrickUsesOperations.ValidProgramVirtualOrdinaryTrickUse(use) || processing.Count != 0 || attack.PhysicalCards.Count != 0 || attack.EffectiveCardKind != CardKind.QizhengXiangsheng || attack.CardUserSeat != use.SourceSeat || attack.SourceSeat != use.SourceSeat || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.ProgramSkillFrameId is not null || attack.ProgramJudgmentFrameId is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } current || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(current, attack))
-            return false;
-        AssertQizheng(use);
-        var appearance = _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId);
-        if (appearance.CardId != 0 || appearance.AppearanceKind != CardKind.QizhengXiangsheng || appearance.AppearanceSuit != Suit.None || appearance.AppearanceRank != 0)
-            return false;
-        // The native designation creates the attack before publishing the
-        // secret response menu. It remains owned by this use during an actual
-        // response/declaration child, before damage has been determined.
-        return receipt.Stage switch
-        {
-            QizhengStage.Response => receipt.ResponseKind is null && receipt.ResponseActionId == 0 && attack.TargetSeat == receipt.Target && !attack.DamageRedirected && !attack.IsChainPropagation,
-            QizhengStage.PaidResponse => receipt.ResponseKind is not null && attack.TargetSeat == receipt.Target && !attack.DamageRedirected && !attack.IsChainPropagation,
-            QizhengStage.Damage => receipt.Ambush && (receipt.ResponseKind is not { } response || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(response)) && _coreVirtualOrdinaryTrickUsesOperations.VirtualTrickDamageTargetMatches(use, attack, receipt.Target),
-            _ => false
-        };
     }
 
     internal void AssertQizheng(CardUseFrame use)

@@ -12,7 +12,6 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureEntries
     internal bool HasCurrentIssuedPhaseHandDebt() => _resolve().HasCurrentIssuedPhaseHandDebt();
     internal bool IsPhaseHandDebtResolver(global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().IsPhaseHandDebtResolver(candidate);
     internal bool IsPhaseHandSeizureCost(int owner, string skill, global::CardGame.Core.Card card) => _resolve().IsPhaseHandSeizureCost(owner, skill, card);
-    internal bool IsTerminalPhaseHandDebtBoundary(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame parent) => _resolve().IsTerminalPhaseHandDebtBoundary(parent);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedPhaseHandDebtCandidates(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramTriggerWindow window, int occurrence) => _resolve().IssuedPhaseHandDebtCandidates(owner, window, occurrence);
     internal void ObservePhaseHandSeizureDeath(global::CardGame.Core.IGameEvent payload) => _resolve().ObservePhaseHandSeizureDeath(payload);
     internal global::CardGame.Core.Card[] PhaseHandDebtCards(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PhaseHandDebtCards(frame);

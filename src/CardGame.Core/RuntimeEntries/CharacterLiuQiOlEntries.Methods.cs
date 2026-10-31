@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiuQiOlEntries
 {
-    internal void AssertRegisteredLiuQi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredLiuQi(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLiuQi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect e) => _resolve().BeginLiuQi(supplied, e);
     internal bool CanContinueLiuQi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueLiuQi(f);
     internal bool CanOfferLiuQi(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferLiuQi(candidate, trigger, context);
@@ -10,7 +9,6 @@ internal sealed partial class CharacterLiuQiOlEntries
     internal bool HasLiuQiBeforeDamageObserver(long id) => _resolve().HasLiuQiBeforeDamageObserver(id);
     internal bool HasLiuQiDamageObserver(long id) => _resolve().HasLiuQiDamageObserver(id);
     internal bool HasUntargetedUnskippedLiuQiPlay(int owner) => _resolve().HasUntargetedUnskippedLiuQiPlay(owner);
-    internal bool IsLiuQiDying() => _resolve().IsLiuQiDying();
     internal bool IsLiuQiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiuQiMovement(f, effect, p);
     internal bool IsWenjiNullificationResponseForbidden(global::CardGame.Core.NullificationWindowFrame window, int responderSeat) => _resolve().IsWenjiNullificationResponseForbidden(window, responderSeat);
     internal bool IsWenjiResponseForbidden(global::CardGame.Core.CardActionContext originalUse, int responderSeat) => _resolve().IsWenjiResponseForbidden(originalUse, responderSeat);

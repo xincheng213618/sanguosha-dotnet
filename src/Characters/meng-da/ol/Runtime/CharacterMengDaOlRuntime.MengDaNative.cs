@@ -70,12 +70,4 @@ internal sealed partial class CharacterMengDaOlRuntime
         ContinueMengDa(f.Id);
         return true;
     }
-
-    internal bool HasGoudeCompletedSlashChild(ProgramCardTriggerWindowFrame window)
-    {
-        if (window.Continuation != ProgramCardContinuation.CompletedSlash || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { GoudeSlash: { } o } use || !IsGoudeSlashUse(use.Id) || window.Action.ActionId != o.ActionId)
-            return false;
-        var at = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        return at > 1 && _resolutionStackOperations._resolutionStack[at - 1].Id == use.Id && _resolutionStackOperations._resolutionStack[at - 2] is ProgramSkillFrame { Goude.NativeOrigin: { } origin } f && f.Id == o.ProgramFrameId && origin == o;
-    }
 }

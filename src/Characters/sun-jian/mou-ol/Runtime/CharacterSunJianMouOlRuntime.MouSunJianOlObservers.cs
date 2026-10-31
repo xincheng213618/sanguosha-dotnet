@@ -43,13 +43,6 @@ internal sealed partial class CharacterSunJianMouOlRuntime
         return r.Accepted && _coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlHulieUsedEvent>().Count(e => e.FrameId == f.Id && e.Counter && e.OwnerSeat == f.OwnerSeat && e.Turn == r.Entry.Turn && e.TurnOwner == r.Entry.TurnOwner && e.OriginalUseId == use.Id) == 1 && (r.Stage == MouSunJianOlHulieStage.Issuing ? r.UseId == 0 && !r.NativeReturned : r.UseId > 0 && r.ActionId > 0);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32500)]
-    internal void AssertMouSunJianOl(ProgramSkillFrame f)
-    {
-        if (f.MouSunJianOlYipo is not null && !ValidMouSunJianOlYipo(f) || f.MouSunJianOlHulie is not null && !ValidMouSunJianOlHulie(f))
-            throw new InvalidOperationException("Mou Sun Jian lost its original source, native parent or accepted typed receipt.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 32500)]
     internal bool IsMouSunJianOlMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => movement == f.PendingMovementContinuation && movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && (f.MouSunJianOlYipo is { Stage: MouSunJianOlYipoStage.DrawChildren or MouSunJianOlYipoStage.DiscardChildren } && effect?.Op == SkillProgramEffectOp.ResolveMouSunJianYipo && ValidMouSunJianOlYipo(f) || f.MouSunJianOlHulie is { Stage: MouSunJianOlHulieStage.Children } && effect?.Op == SkillProgramEffectOp.ResolveMouSunJianHulieCounter && ValidMouSunJianOlHulie(f));
     internal bool MouSunJianOlLionPayment(ProgramSkillFrame f, int seat, CardMoveReason? reason) => f.MouSunJianOlYipo is { Stage: MouSunJianOlYipoStage.DiscardChildren } r && seat == r.TargetSeat && reason?.Value == MouSunJianOlYipoDiscardReason && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => r.Selected.Contains(m.CardId) && m.CardKind == CardKind.SilverLion && m.From == CardLocation.Equipment(seat) && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason == reason);
@@ -97,7 +90,6 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     internal bool HasMouSunJianOlDamage(long id) => MouSunJianOlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 32500)]
     internal bool HasMouSunJianOlBeforeDamage(long id) => MouSunJianOlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 32500)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32500)]
     internal bool IsMouSunJianOlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouSunJianOlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 32500)]

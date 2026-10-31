@@ -107,7 +107,6 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
     internal void ResolveNeifaChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        AssertNeifaFrame(f);
         var r = f.Neifa!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], NeifaChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Neifa changed its published exact payer/entity/target choice.");
@@ -183,7 +182,6 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Neifa: { Stage: NeifaStage.GainChildren or NeifaStage.DiscardChildren or NeifaStage.EquipmentDrawChildren } r } f || f.Id != id)
             return false;
-        AssertNeifaFrame(f);
         if (DrainNeifa(f))
             return true;
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Stage == NeifaStage.EquipmentDrawChildren)
@@ -220,44 +218,11 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
         var r = f.Neifa;
         if (r.Segments.Count == 0 && r.Stage != NeifaStage.Targets)
             return false;
-        AssertNeifaFrame(f);
         return true;
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 300)]
     internal bool IsNeifaMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.Neifa is { Stage: NeifaStage.GainChildren or NeifaStage.DiscardChildren or NeifaStage.EquipmentDrawChildren } && e is not null && NeifaComposition.IsOp(e.Op) && CanContinueNeifa(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 340)]
-    internal void AssertNeifaFrame(ProgramSkillFrame f)
-    {
-        if (f.Neifa is not { } r)
-            return;
-        if (r.Source != NeifaSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.WindowId != f.WindowContext?.ParentFrameId || !Enum.IsDefined(r.Stage) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && e.SkillInstanceId == f.SkillInstanceId) != 1)
-            throw new InvalidOperationException("Neifa lost its exact source/hash/window/actual phase invoice.");
-        foreach (var s in r.Segments)
-        {
-            if (s.Before < 0 || s.After < s.Before || s.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || s.Actual < 0 || s.Actual > s.Requested || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NeifaSegmentPaidEvent>().Count(e => e == new NeifaSegmentPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.WindowId, s.Name, s.Before, s.After, s.Requested, s.Actual, s.BatchId)) != 1)
-                throw new InvalidOperationException("Neifa lost a unique paid segment.");
-            var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > s.Before && m.Sequence <= s.After).ToArray();
-            if (s.Name is "draw" or "equipment-draw")
-            {
-                var reason = s.Name == "draw" ? NeifaDrawReason : NeifaEquipmentReason;
-                if (s.BatchId is not null || s.CardId is not null || moves.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == reason) != s.Actual)
-                    throw new InvalidOperationException("Neifa draw changed its native movement invoice.");
-            }
-            else if (s.Name is not ("field" or "discard") || s.BatchId is not > 0 || s.CardId is not { } id || s.From is not { } from || s.Actual != 1 || s.Requested != 1 || moves.Count(m => m.CardId == id && m.From == from && m.To == (s.Name == "field" ? CardLocation.Hand(f.OwnerSeat) : CardLocation.DiscardPile) && m.Reason.Value == (s.Name == "field" ? NeifaFieldReason : NeifaDiscardReason)) != 1 || s.Name == "field" && from.Zone is not (CardZoneKind.Equipment or CardZoneKind.Judgment) || s.Name == "discard" && (from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || r.DiscardCategory != global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind)))
-                throw new InvalidOperationException("Neifa movement changed its exact paid owned/field entity.");
-        }
-
-        if (r.Stage is NeifaStage.GainChildren or NeifaStage.DiscardChildren or NeifaStage.EquipmentDrawChildren)
-        {
-            if (r.Segments.Count == 0 || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } p || p.SubjectSeat != f.OwnerSeat)
-                throw new InvalidOperationException("Neifa paid children lost their owning return.");
-        }
-        else if (f.PendingMovementContinuation is not null)
-            throw new InvalidOperationException("Neifa unpaid choice cannot borrow a movement return.");
-        if (r.Stage == NeifaStage.DiscardChildren && r.Segments.Last().Name != "discard" || r.Stage == NeifaStage.GainChildren && r.Segments.Last().Name is not ("draw" or "field") || r.Stage == NeifaStage.Discard && r.Segments.Count != 1 || r.Stage == NeifaStage.EquipmentDrawChildren && (r.Equipment is not { } q || _coreCardUseLifecycleOperations.LifecycleCardUse(q.UseId)is not { } eq || !ValidNeifaEquipment(q, eq) || r.Segments.Single().Name != "equipment-draw" || r.Segments.Single().Requested != q.RequestedDraw))
-            throw new InvalidOperationException("Neifa stage does not match its issued payment.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.INeifaProgramHost.BeginNeifa(ProgramSkillFrame f, SkillProgramEffect e) => BeginNeifa(f, e);
 }

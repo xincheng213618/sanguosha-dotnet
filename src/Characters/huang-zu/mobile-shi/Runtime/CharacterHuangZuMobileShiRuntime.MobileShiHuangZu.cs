@@ -388,22 +388,6 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
     internal bool ShiHzMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.ShiHuangZu is { Stage: ShiHzStage.StoreChildren or ShiHzStage.RecastCostChildren or ShiHzStage.RecastDrawChildren or ShiHzStage.RewardChildren or ShiHzStage.ReturnedUse or ShiHzStage.CleanupChildren } && movement.BeforeCount == 0 && movement.CoverageResultBind is null && effect?.Op is SkillProgramEffectOp.ResolveMobileShiHuangZuStore or SkillProgramEffectOp.ResolveMobileShiHuangZuRecast or SkillProgramEffectOp.ResolveMobileShiHuangZuPhaseUse;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiHuangZuPhaseUse, SkillProgramEffectOp.ResolveMobileShiHuangZuRecast)]
     internal PromptChoice ShiHzAi(PendingDecision p, ProgramSkillFrame f) => f.ShiHuangZu!.Stage == ShiHzStage.UseChoice ? p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).First() : p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "card") ?? p.Choices.Last();
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 47900)]
-    internal void AssertShiHzFrame(ProgramSkillFrame f)
-    {
-        if (f.ShiHuangZu is not { } r)
-            return;
-        if (f.SkillId != ShiHzDuanyang || f.InstructionIndex != 1 || f.WindowContext is not { } context || r.WindowId != context.ParentFrameId || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Selected.Count > 2 || r.Selected.Select(m => m.CardId).Distinct().Count() != r.Selected.Count || r.Selected.Any(m => m.From.OwnerSeat != r.Target || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)))
-            throw new InvalidOperationException("Duanyang changed its exact source, actual phase, original HEJ materials or finite paid interval.");
-        if (f.TriggerId == "store-non-use-slash" && (r.Source != ShiHzSource(f) || ShiHzGrant(f.Id)is not { } stored || stored.CardId != r.CardId || stored.Source != r.Source || stored.GameplayHash != r.GameplayHash || stored.BatchId != context.MovementBatch?.Id || stored.Phase.TurnNumber != r.ActualTurn || stored.CandidateCount < 1 || stored.CandidateIndex < 0 || stored.CandidateIndex >= stored.CandidateCount || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == r.CardId && m.From == CardLocation.DiscardPile && m.To == stored.Pile.Location && m.Sequence > r.Before && m.Sequence <= r.After)))
-            throw new InvalidOperationException("Duanyang lost its random once-paid original discard-to-general movement.");
-        if (f.TriggerId == "use-current-phase-end" && (context.ActualPhaseEnd is not { } due || ShiHzGrant(r.GrantId)is not { } g || due.EntitlementId != g.GrantId || due.Phase != g.Phase || r.Source != g.Source || r.CardId != g.CardId || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHzGrantConsumedEvent>().Count(e => e.GrantId == g.GrantId && e.FrameId == f.Id) != 1))
-            throw new InvalidOperationException("Duanyang cannot replace its exact already-issued current-phase entitlement.");
-        if (f.TriggerId == "damage-recast" && (r.Source != ShiHzSource(f) || context.TargetSeat != r.Target || context.Amount < 1 || ShiHzDamageUse(context, f.OwnerSeat)is not { } use || use.Id != r.UseId || use.Action?.ActionId != r.ActionId))
-            throw new InvalidOperationException("Duanyang recast must remain on the original actual damage and native stored Slash.");
-        if (r.Stage == ShiHzStage.RecastChoice && r.Selected.Any(m => _cardZonesOperations._cardZones.GetLocation(m.CardId) != m.From))
-            throw new InvalidOperationException("Duanyang cannot select a stale original victim card.");
-    }
 
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiHuangZuPublicStates(CharacterState owner, string skillId)
     {

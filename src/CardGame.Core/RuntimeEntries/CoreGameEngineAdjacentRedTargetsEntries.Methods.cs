@@ -7,7 +7,6 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsEntries
     internal bool AdjacentRedTargetEligible(global::CardGame.Core.CardUseFrame use, int owner) => _resolve().AdjacentRedTargetEligible(use, owner);
     internal bool AdjacentRedTargetFinalizedAfterCategoryTargetWindow(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().AdjacentRedTargetFinalizedAfterCategoryTargetWindow(query);
     internal void ApplyAdjacentRedTarget(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> added) => _resolve().ApplyAdjacentRedTarget(f, added);
-    internal void AssertAdjacentRedTargetDraft(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertAdjacentRedTargetDraft(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAdjacentRedTarget(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginAdjacentRedTarget(supplied);
     internal bool HasAdjacentRedTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasAdjacentRedTargetTail(use);
     internal bool IsAdjacentRedTargetFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.AdjacentRedTargetAddedEvent fact, global::System.Collections.Generic.IReadOnlyList<int> original, int? currentProofActor = default) => _resolve().IsAdjacentRedTargetFact(use, fact, original, currentProofActor);

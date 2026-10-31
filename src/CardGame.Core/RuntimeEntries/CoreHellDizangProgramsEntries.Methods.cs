@@ -5,7 +5,6 @@ internal sealed partial class CoreHellDizangProgramsEntries
     internal bool AllowsHellDizangTrigger(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsHellDizangTrigger(gate);
     internal void AnswerHellDayuan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHellDayuan(choice);
     internal void AssertEquipmentRecastNativeDraw() => _resolve().AssertEquipmentRecastNativeDraw();
-    internal void AssertHellDizangFrame(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertHellDizangFrame(frame);
     internal bool CanHellDitingMountRecast(global::CardGame.Core.CharacterState actor, global::CardGame.Core.Card card) => _resolve().CanHellDitingMountRecast(actor, card);
     internal global::CardGame.Core.HellDayuanJudgmentOverride? EffectiveHellDayuanOverride(global::CardGame.Core.JudgmentFrame frame) => _resolve().EffectiveHellDayuanOverride(frame);
     internal int EffectiveHellDayuanRank(global::CardGame.Core.JudgmentFrame frame, int fallback) => _resolve().EffectiveHellDayuanRank(frame, fallback);

@@ -112,7 +112,6 @@ internal sealed partial class CharacterZhangYanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhangYanChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhangYanChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Zhang Yan lost its exact native chooser or sealed legal choices.");
-        AssertZhangYan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var option = choice.Parameters["option"];
@@ -192,7 +191,6 @@ internal sealed partial class CharacterZhangYanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYan: { } r } f || f.Id != id)
             return;
-        AssertZhangYan(f);
         if (r.Stage is ZhangYanStage.NativeUse or ZhangYanStage.IssuingUse)
             return;
         if (r.Stage is ZhangYanStage.NativeChildren or ZhangYanStage.RewardChildren)

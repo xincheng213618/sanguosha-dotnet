@@ -7,32 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMiHengLeRuntime
 {
-    internal bool JiguRootMatches(ProgramSkillFrame f)
-    {
-        if (f.Jigu is not { Paid: true } r || f.SkillId != "le:jigu" || f.TriggerId != "damage-equipment-draw" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != JiguSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, OccurrenceIndex: 0 } c || c.OwnerSeat != f.OwnerSeat || c.ParentFrameId != r.DamageWindowId || c.DamageFrameId != r.DamageFrameId || c.Amount <= 0 || c.SourceSeat != f.OwnerSeat && c.TargetSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.DamageWindowId)is not DamageTriggerWindowFrame window || window.ParentFrameId != r.DamageFrameId || window.TriggerWindow != c.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.DamageFrameId)is not DamageFrame damage || damage.TargetSeat != c.TargetSeat || damage.Amount != c.Amount)
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == r.DamageWindowId && _coreProgramEventHistoryOperations.ProgramEventHistory<JiguActivationPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var paid] && paid == JiguPayment(f.Id, r) && _coreProgramEventHistoryOperations.ProgramEventHistory<JiguActivationPaidEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.DamageFrameId == r.DamageFrameId) == 1;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28211)]
-    internal void AssertJigu(ProgramSkillFrame f)
-    {
-        if (f.Jigu is not { } r)
-            return;
-        if (!JiguRootMatches(f) || !Enum.IsDefined(r.Stage) || r.RoundNumber < 0 || r.ActualTurn < 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TurnOwner) || r.MarkedHandCount < 0 || r.MarkedHandCount != r.EquipmentCount || r.EmptySlotCount < 0 || r.StartedSeatCount < 0 || r.StartedSeatCount > _coreMatchParticipantsPlayersAccess._players.Count || r.UseNumber < 1 || r.DisabledForRound != (r.UseNumber >= r.StartedSeatCount) || _coreProgramEventHistoryOperations.ProgramEventHistory<JiguActivationPaidEvent>().Where(e => e.Source.OwnerSeat == f.OwnerSeat && e.RoundNumber == r.RoundNumber).Count(e => e.UseNumber < r.UseNumber) != r.UseNumber - 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<JiguActivationPaidEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.RoundNumber == r.RoundNumber && e.UseNumber < r.UseNumber && e.DisabledForRound))
-            throw new InvalidOperationException("Jigu lost its exact damage mother, paid equipment sample or round latch.");
-        var returned = _coreProgramEventHistoryOperations.ProgramEventHistory<JiguDrawReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Stage == JiguStage.Drawing)
-        {
-            if (r.DrawOutcome is not null || returned.Length != 0 || f.PendingMovementContinuation is not null)
-                throw new InvalidOperationException("Jigu cannot reuse an earlier native draw as a new request.");
-            return;
-        }
-
-        if (r.DrawOutcome is not { } o || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.EmptySlotCount || o.SequenceBefore < 0 || o.SequenceAfter < o.SequenceBefore || o.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || returned is not [var actual] || actual != new JiguDrawReturnedEvent(f.Id, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId) || f.NativeDraw is not null || f.PendingMovementContinuation is not { } p || !IsLeMiHengMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
-            throw new InvalidOperationException("Jigu lost its native actual/replacement outcome or unfinished movement children.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28211)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28211)]
@@ -40,7 +14,6 @@ internal sealed partial class CharacterMiHengLeRuntime
     {
         if (f.Jigu is not { Paid: true })
             return false;
-        AssertJigu(f);
         return true;
     }
 
@@ -57,7 +30,6 @@ internal sealed partial class CharacterMiHengLeRuntime
     {
         if (f.Jigu is not { Paid: true } r)
             return false;
-        AssertJigu(f);
         if (r.Stage == JiguStage.Drawing && f.NativeDraw is not null)
             return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
@@ -87,8 +59,6 @@ internal sealed partial class CharacterMiHengLeRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1270)]
     internal bool HasLeMiHengBeforeDamageObserver(long id) => JiguObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1100)]
-    internal bool IsLeMiHengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && JiguObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 360)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 350)]
     internal bool IsLeMiHengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

@@ -132,7 +132,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
         var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
         if (at < 1 || _resolutionStackOperations._resolutionStack[at - 1] is not ProgramSkillFrame { ShenDengAi: { Stage: ShenDengAiStage.NativeUse, UseId: 0 } r } f)
             return;
-        AssertShenDa(f);
         if (use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0 } a || a.ActorSeat != f.OwnerSeat || a.ProviderSeat != f.OwnerSeat || a.RequesterSeat is not null || use.CardKind != r.OutputKind || use.CardId != r.CarrierId || use.PhysicalCardIds is not { Count: 0 } || use.TargetSeats.Count == 0 || use.TargetSeats[0] != r.TargetSeat)
             throw new InvalidOperationException("Cuixin must issue exactly its accepted neutral native card and opposite-neighbor target.");
         var origin = new ShenDengAiNativeOrigin(f.Id, r.Source, f.GameplayHash, r.OriginalUseId, r.OriginalActionId, use.Id, a.ActionId, f.OwnerSeat, r.TargetSeat, use.CardKind, r.CarrierId);
@@ -144,20 +143,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     internal bool IsShenDaCuixinUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ShenDengAiCuixin: { } o, Action: { } a } use && id == o.UseId && a.ActionId == o.ActionId && use.CardKind == o.Kind && use.CardId == o.CarrierId && use.PhysicalCardIds is { Count: 0 } && a.Type == CardActionType.Use && a.EffectiveKind == o.Kind && a.PhysicalCards.Count == 0 && a.ConversionChain.Count == 0 && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is ProgramSkillFrame { ShenDengAi: { Stage: ShenDengAiStage.NativeUse } r } f && r.UseId == id && r.ActionId == a.ActionId && r.Source == o.Source && r.GameplayHash == o.GameplayHash && global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.SkillId) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
     internal bool IsShenDaCuixinTrick(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.CardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && IsShenDaCuixinUse(id);
     internal Card ReadShenDaCuixinAppearance(long id, CardAppearanceReference a) => IsShenDaCuixinUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } u && a.Id == u.CardId && a.Kind == u.CardKind && a.Suit == Suit.None && a.Rank == 0 ? new(a.Id, a.Kind, Suit.None, 0) : throw new InvalidOperationException("Cuixin lost its exact native continuation appearance.");
-    internal IReadOnlyList<int>? ShenDaCuixinAncestorProcessing(long id)
-    {
-        if (!IsShenDaCuixinUse(id))
-            return null;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.ShenDengAiCuixin!.FrameId);
-        return _resolutionStackOperations._resolutionStack.Take(index).OfType<CardUseFrame>().SelectMany(u => u.PhysicalCardIds ?? []).Where(c => c > 0 && _cardZonesOperations._cardZones.GetLocation(c) == CardLocation.Processing).Distinct().ToArray();
-    }
-
-    internal bool IsShenDaCuixinAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle a, IReadOnlyList<Card> processing)
-    {
-        if (!IsShenDaCuixinUse(a.ResolutionId) || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { ShenDengAiCuixin: { } o } use || a.Card is not null || a.PhysicalCards.Count != 0 || a.EffectiveCardKind != use.CardKind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && a.ProgramSkillCardUseFrameId != o.FrameId || a.SourceSeat != use.SourceSeat && !(use.CardKind == CardKind.Duel && use.TargetSeats.Contains(a.SourceSeat)))
-            return false;
-        return processing.Select(c => c.Id).Order().SequenceEqual((ShenDaCuixinAncestorProcessing(use.Id) ?? []).Order());
-    }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 38500)]
     internal bool FinishShenDaCuixinAttack(global::CardGame.Core.NativeOwners.CardAttackHandle a, out bool paused)
@@ -210,13 +195,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     }
 
     internal bool IsShenDaCuixinSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.ShenDengAi is { Stage: ShenDengAiStage.NativeChildren, Returned: true } r && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.OriginOwnerSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == b.Id) == 1;
-    internal bool HasShenDaSuspendedCompletedParent(ProgramCardTriggerWindowFrame w)
-    {
-        var i = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == w.Id);
-        if (w.Continuation != ProgramCardContinuation.CompletedSlash || i < 1 || i + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[i - 1] is not CardUseFrame { Step: ResolutionFrameStep.Completed, Action: { } a } u || u.Id != w.ParentFrameId || a.ActionId != w.Action.ActionId || _resolutionStackOperations._resolutionStack[i + 1] is not ProgramSkillFrame { ShenDengAi: { OriginalAttackActive: true } r } f || !global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.SkillId) || f.WindowContext?.ParentFrameId != w.Id || r.OriginalUseId != u.Id || r.OriginalActionId != a.ActionId || u.CardAttack?.Active != false)
-            return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiCursorSuspendedEvent>().Count(e => e.FrameId == f.Id && e.OriginalUseId == u.Id && e.OriginalActionId == a.ActionId) == 1;
-    }
 
     internal void RestoreShenDaCuixinCursor(ProgramSkillFrame f)
     {

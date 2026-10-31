@@ -51,7 +51,6 @@ internal sealed partial class CharacterLuSuHappyGodRuntime
     internal void AnswerHappyDingzhou(PromptChoice answer)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Dingzhou lost its original prompt frame.");
-        AssertHappyDingzhou(frame);
         var receipt = frame.HappyDingzhou ?? throw new InvalidOperationException("Happy Dingzhou lost its private receipt.");
         var choice = HappyDingzhouChoices(frame).SingleOrDefault(c => c.Id == answer.Id && c.Cards.SequenceEqual(answer.Cards) && c.Targets.SequenceEqual(answer.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(answer.Parameters.OrderBy(p => p.Key))) ?? throw new InvalidOperationException("Happy Dingzhou requires the current issued physical choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

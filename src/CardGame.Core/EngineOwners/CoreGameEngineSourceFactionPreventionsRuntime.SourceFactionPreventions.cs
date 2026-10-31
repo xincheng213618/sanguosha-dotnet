@@ -121,34 +121,6 @@ internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime
     internal bool HasSourceFactionYieldDying(long beforeDamageId) => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && SourceFactionYieldObserverRoot(beforeDamageId)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 430)]
     internal bool IsSourceFactionYieldProgramDying() => _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().Any(f => HasSourceFactionYieldDying(f.Id));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 400, group: 10)]
-    internal bool IsSourceFactionYieldInsideDamageProgramDying()
-    {
-        if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage)
-            return false;
-        foreach (var before in _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>())
-        {
-            if (!HasSourceFactionYieldDying(before.Id))
-                continue;
-            var attackId = before.ContinuationAttackResolutionId ?? before.ParentFrameId;
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == attackId);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame { AttackAttempt: not null, AttackReturn: { } returned } attack || returned.ParentDamageWindowFrameId != damage.Id || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame parent || parent.Id != damage.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(attack, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()) || attack.WindowContext?.ParentFrameId != parent.Id)
-                continue;
-            return true;
-        }
-
-        return false;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 330)]
-    internal void AssertSourceFactionPrevention(ProgramSkillFrame frame)
-    {
-        if (frame.SourceFactionPrevention is not { } receipt)
-            return;
-        var parent = _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(f => f.Id == receipt.BeforeDamageFrameId);
-        if (parent is null || !IsValidSourceFactionPrevention(frame, parent))
-            throw new InvalidOperationException("An issued source-faction prevention lost its exact producer or consumed game usage.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.ISourceFactionPreventionProgramHost.PreventDamageAndConsumeSourceFaction(ProgramSkillFrame f, string stateId) => PreventDamageAndConsumeSourceFaction(f, stateId);
 }

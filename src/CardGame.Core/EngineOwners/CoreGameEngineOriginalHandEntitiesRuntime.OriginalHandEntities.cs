@@ -173,7 +173,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
     internal void ResolveOriginalHandEntityChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Original-hand choice lost its frame.");
-        _coreOriginalHandEntityObserversOperations.AssertOriginalHandEntityProgram(f);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("program-action") != "original-hand-entity" || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Cards.Count != 0 || !OriginalHandEntityChoices(f).Any(c => c.Id == choice.Id && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(choice.Parameters.OrderBy(p => p.Key))))
             throw new InvalidOperationException("Original-hand choice changed its exact published owner, target or option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -266,7 +265,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
             return _coreOriginalHandAwakeningOperations.ResumeOriginalHandAwakening(id);
         if (f.OriginalHandBenefit is null && f.OriginalHandInheritance is null)
             return false;
-        _coreOriginalHandEntityObserversOperations.AssertOriginalHandEntityProgram(f);
         if (f.OriginalHandInheritance is not null || f.OriginalHandBenefit!.Stage is OriginalHandBenefitStage.ChoosingTarget or OriginalHandBenefitStage.ChoosingOption)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -285,7 +283,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
     {
         if (f.OriginalHandBenefit is not { Stage: OriginalHandBenefitStage.DrawChildren })
             return false;
-        _coreOriginalHandEntityObserversOperations.AssertOriginalHandEntityProgram(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

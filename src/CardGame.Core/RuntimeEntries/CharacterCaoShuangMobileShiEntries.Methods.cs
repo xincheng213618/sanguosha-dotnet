@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoShuangMobileShiEntries
 {
     internal void AnswerShiCaoShuang(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerShiCaoShuang(selected);
-    internal void AssertShiCaoShuang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiCaoShuang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiCaoShuang(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginShiCaoShuang(input);
     internal bool CanOfferShiCaoShuang(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShiCaoShuang(candidate, trigger, context);
     internal bool CanStartShiCaoShuangNiZunUse(global::CardGame.Core.CharacterState owner, string skill) => _resolve().CanStartShiCaoShuangNiZunUse(owner, skill);

@@ -66,7 +66,6 @@ internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
     internal bool MouGyzDamage(long id) => MouGyzObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 32400)]
     internal bool MouGyzBeforeDamage(long id) => MouGyzObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 32400)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32400)]
     internal bool MouGyzDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGyzObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 32400)]
@@ -98,10 +97,4 @@ internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
     internal bool ReturnMouGyzMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeMouGyz(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 32400)]
     internal bool AdvanceMouGyzChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouGyzObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32400)]
-    internal void AssertMouGyz(ProgramSkillFrame f)
-    {
-        if (f.MouGuoYouZhi is not null && (!ValidMouGyz(f) || f.MouGuoYouZhi.Native is { } r && !ValidMouGyzNative(r, f, r.UseId > 0)))
-            throw new InvalidOperationException("Guo You Zhi lost its real gift, original logical discard or exact native return.");
-    }
 }

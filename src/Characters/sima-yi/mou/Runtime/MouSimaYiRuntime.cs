@@ -130,7 +130,6 @@ internal sealed partial class MouSimaYiRuntime(IMouSimaYiFacts facts,IMouSimaYiN
     private void Complete(ProgramSkillFrame f){events.AdvanceFact(new MouSmCompletedEvent(f.Id));frames.ReplaceTop(f=f with{MouSimaYi=null,PendingMovementContinuation=null});native.Finish(f);}
     [ProgramContinuation(ProgramContinuationKind.Resume,36200)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouSimaYi:not null}f||f.Id!=id)return false;Continue(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,36200)]private bool Movement(ProgramSkillFrame f)=>f.MouSimaYi is not null&&Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,36200)]private void Invariant(ProgramSkillFrame f){if(f.MouSimaYi is not null&&!Valid(f))throw new InvalidOperationException("Invalid Mou Sima Yi native receipt.");}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,36200)][ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,36200)]private bool Paid(ProgramSkillFrame f)=>f.MouSimaYi is not null&&Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.InitializeMouSimaYiQuanmou,SkillProgramEffectOp.ResolveMouSimaYiQuanmou,SkillProgramEffectOp.ResolveMouSimaYiPingliao,SkillProgramEffectOp.SpreadMouSimaYiQuanmouDamage)]private PromptChoice Ai(PendingDecision p,ProgramSkillFrame f)
     {

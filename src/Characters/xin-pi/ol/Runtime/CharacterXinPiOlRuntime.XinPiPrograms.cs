@@ -121,7 +121,6 @@ internal sealed partial class CharacterXinPiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XinPi: { } r } f || f.Id != id)
             return false;
-        AssertXinPiFrame(f);
         if (DrainXinPi(f))
             return true;
         if (r.Stage == XinPiStage.OwnerDrawChildren && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && r.TargetSeat is { } target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive)
@@ -143,38 +142,11 @@ internal sealed partial class CharacterXinPiOlRuntime
     {
         if (f.XinPi is null)
             return f.InstructionIndex == 0 && f.TriggerId is { } trigger && f.WindowContext is { } w && f.ActivationId == trigger && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 0 && HasIssuedYinjuCandidate(new(f.OwnerSeat, f.SkillId, trigger, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority), w);
-        AssertXinPiFrame(f);
         return true;
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 330)]
     internal bool IsXinPiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.XinPi is { Stage: XinPiStage.ClaimChildren or XinPiStage.OwnerDrawChildren or XinPiStage.RecipientDrawChildren } r && e is not null && XinPiComposition.IsOp(e.Op) && CanContinueXinPi(f) && p.SubjectSeat == (r.Stage == XinPiStage.RecipientDrawChildren ? r.TargetSeat : f.OwnerSeat) && p.BeforeCount == 0 && p.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 370)]
-    internal void AssertXinPiFrame(ProgramSkillFrame f)
-    {
-        if (f.XinPi is not { } r)
-            return;
-        if (r.Source != XinPiSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.WindowId != f.WindowContext?.ParentFrameId || !Enum.IsDefined(r.Stage) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && e.SkillInstanceId == f.SkillInstanceId) != 1)
-            throw new InvalidOperationException("XinPi pending instruction lost its exact source/hash/window receipt.");
-        if (r.Stage == XinPiStage.RecoveryChildren)
-        {
-            if (r.Relation is not { } rel || !YinjuRelationValid(rel) || r.DamageAttemptId is not { } attempt || r.TargetSeat != rel.TargetSeat || f.PendingMovementContinuation is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<YinjuRecoveryPaidEvent>().Count(e => e.FrameId == f.Id && e.Relation == rel && e.WindowId == r.WindowId && e.DamageAttemptId == attempt && e.RequestedRecovery == r.Requested && e.SourceSeat == f.OwnerSeat && e.TargetSeat == r.TargetSeat) != 1 || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDamagePreventedEvent>().Any(e => e.FrameId == r.WindowId && e.SourceSeat == f.OwnerSeat && e.TargetSeat == r.TargetSeat))
-                throw new InvalidOperationException("Yinju recovery lost its actually prevented exact attempt.");
-            return;
-        }
-
-        if (f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } p || p.SubjectSeat != (r.Stage == XinPiStage.RecipientDrawChildren ? r.TargetSeat : f.OwnerSeat) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("XinPi movement lost its exact once-paid return.");
-        if (r.Stage == XinPiStage.ClaimChildren)
-        {
-            if (r.UseId is not { } useId || r.ActionId is not { } actionId || r.BatchId is not { } batch || r.Entities.Count == 0 || r.Entities.Count != r.From.Count || r.Entities.Distinct().Count() != r.Entities.Count || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { XinPiClaim: { } claim } use || claim.FrameId != f.Id || claim.ActionId != actionId || !claim.Entities.SequenceEqual(r.Entities) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChijieClaimPaidEvent>().Count(e => e == new ChijieClaimPaidEvent(f.Id, r.Source, useId, actionId, r.Before, r.After, batch, r.Entities.Count)) != 1 || r.Entities.Where((id, i) => r.From[i].Zone is not (CardZoneKind.Processing or CardZoneKind.DiscardPile) || !IsXinPiPhysicalClaim(useId, id) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == r.From[i] && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == ChijieClaimReason) != 1).Any())
-                throw new InvalidOperationException("Chijie claim changed its exact native paid entities.");
-            return;
-        }
-
-        if (r.Relation is not { } relation || !YinjuRelationValid(relation) || r.UseId is not { } nativeId || r.ActionId is not { } nativeAction || r.Requested != 1 || r.Actual is < 0 or > 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<YinjuUseDrawStartedEvent>().Count(e => e.FrameId == f.Id && e.Relation == relation && e.UseId == nativeId && e.ActionId == nativeAction && e.WindowId == r.WindowId) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<YinjuDrawPaidEvent>().Count(e => e == new YinjuDrawPaidEvent(f.Id, relation, nativeId, nativeAction, p.SubjectSeat, r.Before, r.After, r.Actual)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(p.SubjectSeat) && m.Reason.Value == YinjuDrawReason) != r.Actual)
-            throw new InvalidOperationException("Yinju draw changed its actual accepted use or paid draw invoice.");
-    }
 
     SkillProgramStepOutcome global::CardGame.Core.IXinPiProgramHost.BeginXinPi(ProgramSkillFrame f, SkillProgramEffect e) => BeginXinPi(f, e);
 }

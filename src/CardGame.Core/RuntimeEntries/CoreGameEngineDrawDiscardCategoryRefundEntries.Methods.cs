@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundEntries
 {
-    internal void AssertDrawDiscardCategoryReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertDrawDiscardCategoryReceipt(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDrawDiscardCategoryRefund(global::CardGame.Core.ProgramSkillFrame supplied, int target, int amount, string stateId) => _resolve().BeginDrawDiscardCategoryRefund(supplied, target, amount, stateId);
     internal bool CanContinueDrawDiscardCategoryRefund(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueDrawDiscardCategoryRefund(f);
     internal global::CardGame.Core.ProgramSkillFrame? CategoryActivationObserverRoot(bool awakening) => _resolve().CategoryActivationObserverRoot(awakening);

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXiahouBaMobileShiEntries
 {
     internal void AnswerShiXb(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerShiXb(selected);
-    internal void AssertShiXb(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiXb(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiXb(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiXb(input, op);
     internal global::CardGame.Core.PromptChoice ChooseShiXbAi(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseShiXbAi(decision, f);
     internal bool ContinuePaidShiXb(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidShiXb(f);

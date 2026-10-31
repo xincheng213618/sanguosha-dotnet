@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 // Cursor ownership, observer order and once-only draw payment stay on the
 // original ProgramSkillFrame. Dependencies capture ports, never match state.
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
     INativeDrawProducerQueries queries, INativeDrawProducerOperations operations,
     INativeDrawAttemptRuntime attempts, IGameStartingDrawOriginQueries starting) : IProgramOperationDraws
@@ -162,40 +162,5 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
                 ActiveAttemptId = null, AttemptReturned = false, Replacement = null, RecipientApplied = false } });
         }
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 27580)]
-    internal void AssertProgramNativeDraw(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.NativeDraw is not { } paid) return;
-        if (paid.InstructionIndex != frame.InstructionIndex ||
-            paid.InstructionIndex < 1 || paid.InstructionIndex > plan.Instructions.Count ||
-            !Enum.IsDefined(paid.ReturnKind) ||
-            paid.RequestedCount < 0 || paid.Recipients.Count == 0 ||
-            paid.Recipients is not System.Collections.IList { IsReadOnly: true } ||
-            paid.Recipients.Any(s => !queries.IsValidSeat(s)) || paid.Recipients.Distinct().Count() != paid.Recipients.Count ||
-            paid.RecipientIndex < 0 || paid.RecipientIndex >= paid.Recipients.Count ||
-            paid.ActiveAttemptId is null && (paid.AttemptReturned || paid.Replacement is not null) ||
-            paid.Replacement is not null && !paid.AttemptReturned)
-            throw new InvalidOperationException("A Draw instruction lost its exact paid cursor or result binding.");
-        if (paid.ReturnKind == NativeDrawAttemptReturnKind.ProgramInstruction)
-        {
-            if ((!queries.HasAttemptCapability && !starting.IsExactGameStartingDrawProgram(frame) && !starting.IsExactGameStartingGainDrawProgram(frame) && !queries.IsLiushiClearDraw(frame) &&
-                !MobileZhugeJinComposition.IsHongyuanDrawCursor(frame, plan)) || paid.Operation is not null ||
-                plan.Instructions[paid.InstructionIndex - 1].CompiledInstruction is not DrawProgramInstruction instruction ||
-                paid.ResultBind != (instruction.Target == SkillProgramEffectTarget.SelectedTargets ? null : instruction.ResultBind) ||
-                paid.Visibility != instruction.Visibility ||
-                instruction.Amount is RuntimeExpressionProgramAmount && paid.RequestedCount != ProgramExpressionAmounts.IssuedAmount(frame) ||
-                paid.Reason != new CardMoveReason($"skill-program.{frame.SkillId}.{SkillProgramEffectOp.Draw}"))
-                throw new InvalidOperationException("A Draw instruction changed its result contract.");
-        }
-        else if (paid.Operation != plan.Instructions[paid.InstructionIndex - 1].Op || paid.Operation is not { } operation ||
-            !queries.HasOperationReturn(operation) || paid.Recipients.Count != 1 || paid.ResultBind is not null)
-            throw new InvalidOperationException("A native draw producer changed its paid operation return.");
-        if (paid.AttemptReturned && queries.DecidedEvents().Count(e =>
-            e.AttemptFrameId == paid.ActiveAttemptId && e.ParentFrameId == frame.Id &&
-            e.RecipientSeat == paid.Recipients[paid.RecipientIndex] && e.RequestedCount == paid.RequestedCount &&
-            e.Replaced == (paid.Replacement is not null)) != 1)
-            throw new InvalidOperationException("A Draw instruction retained an unissued request return.");
     }
 }

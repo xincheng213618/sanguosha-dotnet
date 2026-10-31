@@ -48,19 +48,4 @@ internal sealed partial class CharacterZhuZhiAnniversaryRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryZhuZhiBranchEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), bind, recipient, eligible));
         return SkillProgramStepOutcome.Continue;
     }
-
-    internal bool IsAnniversaryZhuZhiChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding binding)
-    {
-        if (f.SkillId != AnniversaryZhuZhiComposition.Skill || f.ActivationId != AnniversaryZhuZhiComposition.Activation || f.TriggerId is not null || f.SelectedTargetSeats is not [var selected] || selected == f.OwnerSeat || binding.ChooserSeat != f.OwnerSeat || binding.OptionId is not ("perform" or "skip") || !AnniversaryZhuZhiComposition.Branches.Contains(binding.Name))
-            return false;
-        var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
-        if (plan.Instructions.Take(f.InstructionIndex).Count(e => e.Op == SkillProgramEffectOp.ResolveAnniversaryZhuZhiAnguo && e.ResultBind == binding.Name) != 1)
-            return false;
-        var own = binding.Name.StartsWith("owner-", StringComparison.Ordinal);
-        var recipient = own ? f.OwnerSeat : selected;
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-        if (own && binding.OptionId == "perform" && f.ChoiceBindings.SingleOrDefault(b => b.Name == "target-" + binding.Name[6..])?.OptionId != "skip")
-            return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryZhuZhiBranchEvent>().Count(e => e == new AnniversaryZhuZhiBranchEvent(f.Id, source, binding.Name, recipient, binding.OptionId == "perform")) == 1;
-    }
 }

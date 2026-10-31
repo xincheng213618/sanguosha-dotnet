@@ -67,8 +67,6 @@ internal sealed partial class CharacterRuanHuiOlRuntime
             return actor;
         foreach (var change in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(c => c.CardUseFrameId == e.UseId))
         {
-            if (change.PreviousActorSeat != actor)
-                throw new InvalidOperationException("Jingzhong lost its original Use actor replacement chain.");
             actor = change.ActorSeat;
         }
 

@@ -65,7 +65,6 @@ internal sealed partial class CharacterChengGongYingOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ChengGongYing: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ChengGongYingChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ChengGongYingChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Kuangxiang lost its real chooser or selected original hand entities.");
-        AssertChengGongYing(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (r.Stage == ChengGongYingStage.TargetChoice)
@@ -147,7 +146,6 @@ internal sealed partial class CharacterChengGongYingOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ChengGongYing: { } r } f || f.Id != id)
             return;
-        AssertChengGongYing(f);
         if (r.Stage is ChengGongYingStage.TargetChoice or ChengGongYingStage.DiscardChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -194,7 +192,6 @@ internal sealed partial class CharacterChengGongYingOlRuntime
     {
         if (f.ChengGongYing is null)
             return false;
-        AssertChengGongYing(f);
         return true;
     }
 

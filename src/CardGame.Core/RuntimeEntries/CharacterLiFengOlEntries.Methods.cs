@@ -4,7 +4,6 @@ internal sealed partial class CharacterLiFengOlEntries
 {
     internal bool AdvanceLiFengChildren() => _resolve().AdvanceLiFengChildren();
     internal void AnswerLiFeng(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerLiFeng(selected);
-    internal void AssertLiFeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLiFeng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLiFeng(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginLiFeng(supplied, op);
     internal bool CanContinueIssuedLiFeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIssuedLiFeng(f);
     internal bool CanOfferLiFeng(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferLiFeng(candidate, trigger, context);
@@ -23,11 +22,8 @@ internal sealed partial class CharacterLiFengOlEntries
     internal bool HasLiveJiyunHandLease(global::CardGame.Core.JiyunLeaseIssuedEvent l) => _resolve().HasLiveJiyunHandLease(l);
     internal bool IsIssuedJiyunCompletedUseCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedJiyunCompletedUseCandidate(candidate, context);
     internal bool IsIssuedJiyunRetainedEntity(global::CardGame.Core.PublicPersistentPileSource pile, int cardId) => _resolve().IsIssuedJiyunRetainedEntity(pile, cardId);
-    internal bool IsJiyunClaimedResponseEntity(global::CardGame.Core.CardActionContext action, global::CardGame.Core.ProgramCompletedResponseKind kind, int cardId) => _resolve().IsJiyunClaimedResponseEntity(action, kind, cardId);
-    internal bool IsJiyunClaimedUseEntity(long nativeUseId, int cardId) => _resolve().IsJiyunClaimedUseEntity(nativeUseId, cardId);
     internal bool IsJiyunPile(global::CardGame.Core.PublicPersistentPileSource p) => _resolve().IsJiyunPile(p);
     internal bool IsLiFengCollectedEquipment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardKind kind) => _resolve().IsLiFengCollectedEquipment(f, kind);
-    internal bool IsLiFengDying() => _resolve().IsLiFengDying();
     internal bool IsLiFengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiFengMovement(f, effect, p);
     internal bool IsLiFengPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsLiFengPaidMovement(f, m);
     internal bool IsLiFengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiFengRecoveryParent(f, recovery);

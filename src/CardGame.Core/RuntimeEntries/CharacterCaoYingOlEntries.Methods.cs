@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoYingOlEntries
 {
     internal global::CardGame.Core.CaoYingGuessResolvedEvent[] ArmedCaoYingDamage(int source, int target, long? useId = default) => _resolve().ArmedCaoYingDamage(source, target, useId);
-    internal void AssertRegisteredCaoYing(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredCaoYing(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCaoYing(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginCaoYing(supplied, effect);
     internal bool CanContinueCaoYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueCaoYing(f);
     internal bool CanOfferCaoYing(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferCaoYing(candidate, trigger, c);
@@ -18,7 +17,6 @@ internal sealed partial class CharacterCaoYingOlEntries
     internal void FinishCaoYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCaoYing(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CardSnapshot> GetCaoYingPrivateCards(int viewer) => _resolve().GetCaoYingPrivateCards(viewer);
     internal bool HasCaoYingDamageObserver(long id) => _resolve().HasCaoYingDamageObserver(id);
-    internal bool IsCaoYingDying() => _resolve().IsCaoYingDying();
     internal bool IsCaoYingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsCaoYingMovement(f, e, p);
     internal bool IsMobileCaoYing(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsMobileCaoYing(frame);
     internal void ObserveCaoYingDamage(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveCaoYingDamage(payload);

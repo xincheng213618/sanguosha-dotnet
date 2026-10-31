@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiuYouAnniversaryEntries
 {
-    internal void AssertLiuYou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLiuYou(f);
     internal bool CanStartLiuYou(global::CardGame.Core.CharacterState owner) => _resolve().CanStartLiuYou(owner);
     internal void CaptureAnniversaryLiuYouNextSlash(long cardUseFrameId) => _resolve().CaptureAnniversaryLiuYouNextSlash(cardUseFrameId);
     internal void CaptureLiuYouPindian(global::CardGame.Core.PindianResultDeterminedEvent fact) => _resolve().CaptureLiuYouPindian(fact);

@@ -146,19 +146,10 @@ internal sealed partial class CharacterChenQunMobileShiRuntime
         if (receipt.Debt is null && (receipt.Effect == "draw" || actual > 0))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiChenQunFaenDebtIssuedEvent(frame.Id, receipt.Source, receipt.GameplayHash, receipt.ActualTurn, receipt.TurnOwner, receipt.UseSequence, receipt.Effect == "draw" ? "discard" : "draw"));
     }
-
-    internal bool IsMobileShiChenQunFaenChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding) => frame.MobileShiChenQunFaen is { Effect: { } effect } receipt && binding.Name == "faen-effect" && binding.OptionId == effect && binding.ChooserSeat == frame.OwnerSeat && receipt.Source == MobileShiChenQunSource(frame) && receipt.GameplayHash == frame.GameplayHash && receipt.Effect is "draw" or "discard" && frame.InstructionIndex >= 1;
     internal void RequireMobileShiChenQunFrame(ProgramSkillFrame frame)
     {
         if (frame.MobileShiChenQunFaen is not { } receipt || frame.WindowContext is not { } context || MobileShiChenQunCurrentUse(context)is not { } pair || receipt.Source != MobileShiChenQunSource(frame) || receipt.GameplayHash != frame.GameplayHash || receipt.WindowId != pair.Window.Id || receipt.NativeParentId != pair.Window.ParentFrameId || receipt.ActionId != pair.Window.Action.ActionId || receipt.UseSequence != pair.Use.Sequence || receipt.ActorSeat != pair.Use.ActorSeat || receipt.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || receipt.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || receipt.BeforeMovement > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || receipt.Debt is not null && (!_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenQunFaenDebtIssuedEvent>().Contains(receipt.Debt) || receipt.Debt.AfterUseSequence + 1 != receipt.UseSequence || receipt.Debt.Source.OwnerSeat != frame.OwnerSeat || receipt.Debt.Source.SkillInstanceId != frame.SkillInstanceId || receipt.Debt.GameplayHash != frame.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenQunFaenDebtClaimedEvent>().Count(claim => claim.IssuingFrameId == receipt.Debt.FrameId && claim.ClaimingFrameId == frame.Id && claim.UseSequence == receipt.UseSequence && claim.ActorSeat == receipt.ActorSeat) != 1))
             throw new InvalidOperationException("Faen lost its original source, native use, predecessor, turn or already-claimed obligation.");
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 47300)]
-    internal void AssertMobileShiChenQunFrame(ProgramSkillFrame frame)
-    {
-        if (frame.MobileShiChenQunFaen is not null)
-            RequireMobileShiChenQunFrame(frame);
     }
 
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiChenQunPublicStates(CharacterState owner, string skillId)

@@ -2,8 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreHappyWeiYanGainDestinationsEntries
 {
-    internal void AssertHappyWeiYanRetainedGainSettlements(global::CardGame.Core.ResolutionFrame frame) => _resolve().AssertHappyWeiYanRetainedGainSettlements(frame);
-    internal void AssertHappyWeiYanRetainedProgramGains(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertHappyWeiYanRetainedProgramGains(frame);
     internal bool IsHappyWeiYanGainDestinationPlan(global::CardGame.Core.HappyWeiYanGainDestinationPlan plan) => _resolve().IsHappyWeiYanGainDestinationPlan(plan);
     internal bool IsHappyWeiYanRedirectedGain(global::CardGame.Core.CardMovementRecord movement, global::CardGame.Core.CardLocation expectedTo) => _resolve().IsHappyWeiYanRedirectedGain(movement, expectedTo);
     internal bool IsHappyWeiYanRetainedGainSettlement(global::CardGame.Core.HappyWeiYanRetainedGainSettlement settlement, long producerFrameId, int cardId, global::CardGame.Core.CardLocation requestedTo, long before) => _resolve().IsHappyWeiYanRetainedGainSettlement(settlement, producerFrameId, cardId, requestedTo, before);

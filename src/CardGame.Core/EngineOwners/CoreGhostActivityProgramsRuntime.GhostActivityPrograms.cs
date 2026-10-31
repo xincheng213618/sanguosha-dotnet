@@ -93,16 +93,4 @@ internal sealed partial class CoreGhostActivityProgramsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { SelectedTargetSeats = Array.AsReadOnly(new[] { target }) });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    internal bool IsValidRedJudgmentFireSelection(ProgramSkillFrame frame, SkillProgramEffect effect, bool awaiting)
-    {
-        if (frame.WindowContext?.Window != SkillProgramTriggerWindow.CardsMoved || effect.SourceBind is null)
-            return false;
-        var red = _coreProgramLifecycleOperations.GetProgramCardSet(frame, effect.SourceBind);
-        if (red.CardIds.Count == 0)
-            return frame.SelectedTargetSeats.Count == 0;
-        if (red.CardIds.Count != 1)
-            return false;
-        return frame.SelectedTargetSeats is [var target] ? _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && target != frame.OwnerSeat : frame.SelectedTargetSeats.Count == 0 && (awaiting || !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.Seat != frame.OwnerSeat));
-    }
 }

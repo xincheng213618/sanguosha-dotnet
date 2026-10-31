@@ -254,8 +254,6 @@ internal sealed partial class CoreGameEnginePrepDiscardPaymentsRuntime
     {
         if (f.PrepDiscard is not { Stage: PrepDiscardStage.TargetChildren or PrepDiscardStage.OwnerChildren or PrepDiscardStage.ImmediateDrawChildren } && f.PrepDiscardEndingDraw is null)
             return false;
-        if (f.PendingMovementContinuation is null)
-            throw new InvalidOperationException("A preparation payment lost its exact movement return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;

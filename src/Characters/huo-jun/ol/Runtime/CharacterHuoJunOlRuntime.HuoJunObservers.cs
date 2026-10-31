@@ -14,7 +14,6 @@ internal sealed partial class CharacterHuoJunOlRuntime
     {
         if (f.HuoJunFenrui is not { CostCardId: not null } r)
             return false;
-        AssertHuoJunFenrui(f);
         if (child is CardUseFrame)
             return IsHuoJunFenruiNativeEquipment(child, f);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -33,8 +32,6 @@ internal sealed partial class CharacterHuoJunOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 370)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 480)]
     internal bool HasHuoJunFenruiDamageObserver(long id) => HuoJunFenruiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 340)]
-    internal bool IsHuoJunFenruiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HuoJunFenruiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26210)]
     internal bool AdvanceHuoJunFenruiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuoJunFenruiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -9,8 +9,6 @@ internal sealed partial class CharacterZhangFeiWumiaoEntries
     internal void AnswerWuZhangFeiObserved(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWuZhangFeiObserved(choice);
     internal void AnswerWuZhangFeiSample(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWuZhangFeiSample(choice);
     internal void AssertWuHaoxianFrames() => _resolve().AssertWuHaoxianFrames();
-    internal void AssertWuZhangFeiOperation(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuZhangFeiOperation(f);
-    internal void AssertWuZishengMovementReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuZishengMovementReceipt(f);
     internal bool AwaitWuHaoxianChildren(long id) => _resolve().AwaitWuHaoxianChildren(id);
     internal bool AwaitWuZhangFeiChildren(long id) => _resolve().AwaitWuZhangFeiChildren(id);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuHaoxian(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginWuHaoxian(supplied);
@@ -49,12 +47,10 @@ internal sealed partial class CharacterZhangFeiWumiaoEntries
     internal bool HasWuZhangFeiDamageObserver(long id) => _resolve().HasWuZhangFeiDamageObserver(id);
     internal bool HasWuZhangFeiMovementBeforeDamageObserver(long id) => _resolve().HasWuZhangFeiMovementBeforeDamageObserver(id);
     internal bool HasWuZhangFeiMovementDamageObserver(long id) => _resolve().HasWuZhangFeiMovementDamageObserver(id);
-    internal bool HasWuZhangFeiUseContinuation(long nativeUseId) => _resolve().HasWuZhangFeiUseContinuation(nativeUseId);
     internal bool IsIssuedWuZishengMovementCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWuZishengMovementCandidate(candidate, context);
     internal bool IsOriginalDyingSuspendedByWuZishengMovement(global::CardGame.Core.DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByWuZishengMovement(dying);
     internal bool IsWuHaoxianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWuHaoxianMovement(f, effect, pending);
     internal bool IsWuZhangFeiDeclaredResponsePayment(global::CardGame.Core.ResolutionFrame invoiceOwner, global::CardGame.Core.WuZhangFeiResponseRankPayment invoice, global::CardGame.Core.CardActionContext action, global::CardGame.Core.WuZhangFeiResponseMaterialRank material) => _resolve().IsWuZhangFeiDeclaredResponsePayment(invoiceOwner, invoice, action, material);
-    internal bool IsWuZhangFeiDying() => _resolve().IsWuZhangFeiDying();
     internal bool IsWuZhangFeiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWuZhangFeiMovement(f, effect, pending);
     internal bool IsWuZhangFeiMovementDying() => _resolve().IsWuZhangFeiMovementDying();
     internal bool IsWuZhangFeiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWuZhangFeiRecoveryParent(f, recovery);

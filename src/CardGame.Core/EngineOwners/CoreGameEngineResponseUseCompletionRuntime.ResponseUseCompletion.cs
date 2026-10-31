@@ -7,28 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineResponseUseCompletionRuntime
 {
-    internal bool TryGetCompletedNullificationDyingCosts(ProgramCardTriggerWindowFrame? window, out int[] costs)
-    {
-        costs = [];
-        if (window?.CompletedResponseReturn?.Kind != ProgramCompletedResponseKind.Nullification || _coreDyingCursorRuntimeOperations.ActiveDying is not { Continuation: DyingContinuationKind.ProgramSkill, KillerSeat: null } dying)
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == window.Id);
-        if (index < 0 || index + 2 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame program || program.WindowContext?.ParentFrameId != window.Id || program.Id != dying.ParentFrameId || _resolutionStackOperations._resolutionStack[index + 2] is not DyingFrame child || child.Id != dying.Id || child.ParentFrameId != program.Id || child.VictimSeat != dying.VictimSeat || child.KillerSeat != dying.KillerSeat || child.ResponderIndex != dying.ResponderIndex || !child.ResponderSeats.SequenceEqual(dying.ResponderSeats))
-            return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(program, _contentRegistryOperations._contentRegistry.GetSkill(program.SkillId).Program!).GetPausedInstruction(program.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.LoseHp || global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(program, effect.Target) != dying.VictimSeat)
-            return false;
-        if (index + 3 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[index + 3] is CardUseFrame rescue)
-        {
-            if (rescue.DyingResponse is not { } response || response.ResolutionId != dying.Id || response.ResponderSeat != dying.ResponderSeat || rescue.SourceSeat != response.ResponderSeat || rescue.Action is not { Type: CardActionType.Use } action || action.ActorSeat != rescue.SourceSeat || action.ProviderSeat != rescue.SourceSeat || !rescue.TargetSeats.SequenceEqual([dying.VictimSeat]) || rescue.CardKind is not (CardKind.Peach or CardKind.Alcohol) || action.EffectiveKind != rescue.CardKind || !action.EffectiveDesignatedTargetSeats.SequenceEqual(rescue.TargetSeats) || !action.PhysicalCards.Select(cost => cost.CardId).SequenceEqual(rescue.PhysicalCardIds ?? [rescue.CardId]) || (rescue.CardKind == CardKind.Peach ? !response.UsedPeach : !response.UsedAlcohol || rescue.SourceSeat != dying.VictimSeat))
-                return false;
-            costs = (rescue.PhysicalCardIds ?? [rescue.CardId]).Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone == CardZoneKind.Processing).ToArray();
-        }
-
-        return true;
-    }
-
-    internal static bool IsNullificationResponseProgramWindow(ProgramCardTriggerWindowFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ResponseUseCompletion.IsNullificationResponseProgramWindow(frame);
     internal bool IsCompletedResponseUse(CardActionContext action, ProgramCardContinuation continuation) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ResponseUseCompletion.IsCompletedResponseUse(action, continuation, _characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action));
     internal bool IsCompletedResponseParentConsistent(ProgramCardTriggerWindowFrame window)
     {

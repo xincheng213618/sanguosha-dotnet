@@ -102,7 +102,6 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
     }
 
     internal bool IsAnniversaryLeiBoFixedSlash(ProgramSkillFrame f) => f is { SkillId: AnniversaryLeiBoComposition.Silei, TriggerId: "marked-victim-reply", InstructionIndex: 1, FixedTargetSlash: { IgnoreDistance: false } slash, AnniversaryLeiBo: { Stage: AnniversaryLeiBoStage.SlashRequest } r } && r.DamageSource == slash.TargetSeat && slash.TargetSeat != f.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(slash.TargetSeat) && ValidLeiBo(f);
-    internal bool IsAnniversaryLeiBoFactionChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => IsAnniversaryLeiBoFixedSlash(f) && f.FixedTargetSlash is { Issued: true } && b.Name == "fixed-target-slash" && b.ChooserSeat == f.OwnerSeat && b.OptionId is "used-slash" or "declined" && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramOptionChosenEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.OwnerSeat == f.OwnerSeat && e.ResultBind == b.Name && e.OptionId == b.OptionId && e.ChooserSeat == b.ChooserSeat) == 1;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 49800)]
     internal void ObserveLeiBoSlash(CardUseDeclaredEvent fact)
     {

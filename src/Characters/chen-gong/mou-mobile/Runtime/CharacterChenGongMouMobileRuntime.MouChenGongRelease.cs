@@ -51,7 +51,6 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouChenGongRelease: { } r } f || f.Id != id)
             return;
-        AssertMouChenGong(f);
         if (r.Stage == MouChenGongReleaseStage.TargetChoice || f.AttackAttempt is not null)
             return;
         if (DrainMouChenGongChildren(f))

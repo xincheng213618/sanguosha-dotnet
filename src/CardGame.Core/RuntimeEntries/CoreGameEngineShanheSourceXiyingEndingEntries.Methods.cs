@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheSourceXiyingEndingEntries
 {
     internal void AppendSourceXiyingEnding(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendSourceXiyingEnding(items);
-    internal void AssertSourceXiyingFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSourceXiyingFrame(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSourceXiyingReward(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginSourceXiyingReward(f);
     internal bool CanOfferSourceXiying(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferSourceXiying(gate);
     internal bool CollectSourceXiying(global::CardGame.Core.SkillProgramTrigger t) => _resolve().CollectSourceXiying(t);

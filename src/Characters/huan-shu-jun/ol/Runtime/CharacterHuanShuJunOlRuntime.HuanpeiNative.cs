@@ -46,14 +46,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     internal bool IsHuanpeiUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedHuanpeiUse(use);
     internal Card HuanpeiRepresentation(long id) => IsHuanpeiUse(id) ? new(0, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind, Suit.None, 0) : throw new InvalidOperationException("Huanpei's neutral native representation lost its paid Use.");
     internal bool SkipHuanpeiFinishedMovement(long id, Card c) => c.Id == 0 && IsHuanpeiUse(id) && c.Kind == _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind;
-    internal bool IsHuanpeiAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { HuanpeiUse: { } r } use || !IsIssuedHuanpeiUse(use) || attack.Card is not null || attack.PhysicalCards.Count != 0 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.SourceSeat != use.SourceSeat || attack.EffectiveCardKind != use.CardKind)
-            return false;
-        var position = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        var ancestors = _resolutionStackOperations._resolutionStack.Take(position).OfType<CardUseFrame>().SelectMany(f => f.PhysicalCardIds ?? []).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Distinct().Order().ToArray();
-        return processing.Select(c => c.Id).Distinct().Order().SequenceEqual(ancestors) && (r.Payment.Request.ParentSkillId is null || attack.ProgramSkillCardUseFrameId == r.Payment.Request.ParentFrameId && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.Payment.Request.ParentFrameId)is ProgramSkillFrame p && HasHuanpeiProgramPayment(p, use));
-    }
 
     internal bool ContinueHuanpeiSimpleUse(long id, ProgramSimpleCardContinuation c)
     {

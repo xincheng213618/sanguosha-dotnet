@@ -327,9 +327,6 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
             _coreProgramLifecycleOperations.AdvanceTurnEndingBoundaryCursor(frame);
             return false;
         }
-
-        if (due.CreatedTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || item.RetentionOwnerSeat != due.Source.OwnerSeat)
-            throw new InvalidOperationException("Gift retention obligation lost its exact current Ending.");
         _coreGameEngineConvertingGiftsGiftHandRetentionObligationsGiftHandRetentionSequenceAccess._giftHandRetentionObligations.Remove(due);
         var applied = _coreMatchParticipantsPlayersAccess._players[due.Source.OwnerSeat].IsAlive && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > due.GiftOrdinal && m.CardId == due.CardId && m.From == CardLocation.Hand(due.RecipientSeat) && m.To != m.From);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GiftHandRetentionConsumedEvent(due.Id, due.Source.OwnerSeat, applied));
@@ -351,15 +348,5 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
             _coreGameEngineConvertingGiftsGiftHandRetentionObligationsGiftHandRetentionSequenceAccess._giftHandRetentionObligations.Remove(due);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GiftHandRetentionConsumedEvent(due.Id, due.Source.OwnerSeat, false));
         }
-    }
-
-    internal void AssertConvertingGift(ProgramSkillFrame f, SkillProgramEffect paused)
-    {
-        if (f.ConvertingGift is not { } d)
-            return;
-        if (paused.Op != (d.Observe ? SkillProgramEffectOp.ObserveDamageSourceHandAndGive : SkillProgramEffectOp.GiveSelectedOwnedCardAndDamage) || d.HandLimit != paused.Amount || d.RecipientSeat == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.RecipientSeat) || d.ObservedHandIds.Distinct().Count() != d.ObservedHandIds.Count || d.Stage is not ("observe" or "give-choice" or "gift-movement" or "damage" or "reward-choice" or "reward-movement"))
-            throw new InvalidOperationException("Converting gift has invalid instruction-owned draft.");
-        if (d.ObservedHandIds.Count > 0 && (!d.Observe || d.Stage != "observe"))
-            throw new InvalidOperationException("Private hand observation escaped its viewer-owned cursor.");
     }
 }

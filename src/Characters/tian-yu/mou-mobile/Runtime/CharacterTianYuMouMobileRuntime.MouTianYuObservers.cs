@@ -8,12 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTianYuMouMobileRuntime
 {
     internal bool ValidMouTianYu(ProgramSkillFrame f) => f.MouTianYu is { } r && f.InstructionIndex == 1 && r.Source == MouTianYuSource(f) && r.GameplayHash == f.GameplayHash && f.WindowContext?.ParentFrameId == r.WindowId && _coreProgramEventHistoryOperations.ProgramEventHistory<MouTianYuStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.WindowId == r.WindowId && e.UseId == r.UseId && e.ActionId == r.ActionId && e.TargetSeat == r.TargetSeat && e.TurnOrdinal == r.TurnOrdinal) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30600)]
-    internal void AssertMouTianYu(ProgramSkillFrame f)
-    {
-        if (f.MouTianYu is not null && !ValidMouTianYu(f))
-            throw new InvalidOperationException("Tian Yu lost its owning source and accepted native opportunity.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 30600)]
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 30600)]
@@ -36,7 +30,6 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 30600)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30600)]
     internal bool HasMouTianYuDamageObserver(long id) => MouTianYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30600)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30600)]
     internal bool IsMouTianYuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouTianYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30600)]

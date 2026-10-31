@@ -16,7 +16,6 @@ internal sealed partial class CharacterXunXuAnniversaryEntries
     internal bool ExecuteXunXuPlay(global::CardGame.Core.CharacterState owner, global::CardGame.Core.LegalAction action, global::System.Collections.Generic.IReadOnlyList<int> ids, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().ExecuteXunXuPlay(owner, action, ids, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> FilterXunXuNativeDuplicates(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> actions) => _resolve().FilterXunXuNativeDuplicates(actor, actions);
     internal void FinishXunXu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishXunXu(f);
-    internal bool HasAnniversaryXunXuPrompt() => _resolve().HasAnniversaryXunXuPrompt();
     internal bool HasXunXuNativeFinishOwner(global::CardGame.Core.ProgramSkillFrame f, scoped out global::CardGame.Core.CardUseFrame? use) => _resolve().HasXunXuNativeFinishOwner(f, out use);
     internal bool IsAnniversaryXunXuBoqiaSource(global::CardGame.Core.CardConversionSource? s) => _resolve().IsAnniversaryXunXuBoqiaSource(s);
     internal bool IsAnniversaryXunXuSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsAnniversaryXunXuSettlementBatch(f, b);
@@ -24,7 +23,6 @@ internal sealed partial class CharacterXunXuAnniversaryEntries
     internal void PublishXunXu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishXunXu(f);
     internal void RecordActualXunXuUse(global::CardGame.Core.IGameEvent payload) => _resolve().RecordActualXunXuUse(payload);
     internal void RecordXunXuMovement(long id, string mode, int target, int count, long before) => _resolve().RecordXunXuMovement(id, mode, target, count, before);
-    internal void RequireXunXu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireXunXu(f);
     internal bool RetainXunXu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainXunXu(f);
     internal void ReturnXunXuDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnXunXuDraw(f, outcome);
     internal bool ReturnXunXuMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnXunXuMovement(f);

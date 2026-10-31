@@ -7,8 +7,6 @@ internal sealed partial class CharacterLiuChengMouMobileEntries
     internal global::CardGame.Core.PromptChoice AiMouLiuChengUse(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouLiuChengUse(p, f);
     internal void AnswerMouLiuCheng(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouLiuCheng(choice);
     internal global::CardGame.Core.ProgramCardTriggerWindowFrame AppendMouLiuChengAccrual(global::CardGame.Core.ProgramCardTriggerWindowFrame frame) => _resolve().AppendMouLiuChengAccrual(frame);
-    internal void AssertMouLiuChengAccrual(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouLiuChengAccrual(f);
-    internal void AssertMouLiuChengCompletion(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouLiuChengCompletion(f);
     internal global::CardGame.Core.ProgramSkillWindowContext? AttachMouLiuChengAccrual(global::CardGame.Core.CardActionContext action, string skill, string instance, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().AttachMouLiuChengAccrual(action, skill, instance, context);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouLiuChengCompletion(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouLiuChengCompletion(supplied);
     internal void BindMouLiuChengIssuedCard(global::CardGame.Core.IGameEvent fact) => _resolve().BindMouLiuChengIssuedCard(fact);
@@ -27,8 +25,6 @@ internal sealed partial class CharacterLiuChengMouMobileEntries
     internal bool HasMouLiuChengBeforeDamageObserver(long id) => _resolve().HasMouLiuChengBeforeDamageObserver(id);
     internal bool HasMouLiuChengDamageObserver(long id) => _resolve().HasMouLiuChengDamageObserver(id);
     internal bool IsIssuedMouLiuChengUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedMouLiuChengUse(use);
-    internal bool IsMouLiuChengAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouLiuChengAttackConsistent(attack, processing);
-    internal bool IsMouLiuChengDying() => _resolve().IsMouLiuChengDying();
     internal bool IsMouLiuChengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouLiuChengMovement(f, e, p);
     internal bool IsMouLiuChengNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsMouLiuChengNativeSettlementBatch(f, b);
     internal bool IsMouLiuChengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouLiuChengRecoveryParent(f, recovery);
@@ -45,7 +41,6 @@ internal sealed partial class CharacterLiuChengMouMobileEntries
     internal bool MouLiuChengFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouLiuChengFirstChild(f, child);
     internal bool MouLiuChengImplicitSelfDrawTwoTargetWindow(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().MouLiuChengImplicitSelfDrawTwoTargetWindow(query);
     internal bool MouLiuChengKind(string skill, global::CardGame.Core.CardKind kind) => _resolve().MouLiuChengKind(skill, kind);
-    internal global::System.Collections.Generic.IReadOnlyList<int>? MouLiuChengNativeAncestorProcessing(long useId) => _resolve().MouLiuChengNativeAncestorProcessing(useId);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.MouLiuChengUsePlan> MouLiuChengNativePlans(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardConversionSource source) => _resolve().MouLiuChengNativePlans(actor, kind, source);
     internal bool MouLiuChengNativeWindowEdge(int index) => _resolve().MouLiuChengNativeWindowEdge(index);
     internal global::CardGame.Core.ProgramSkillFrame? MouLiuChengObserverRoot() => _resolve().MouLiuChengObserverRoot();

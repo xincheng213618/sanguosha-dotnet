@@ -184,27 +184,4 @@ internal sealed partial class CoreGameEngineProgramOwnedCardsRuntime
         _coreOwnedExactCountAndNamedTargetsOperations.FreezeExactOwnedSelectionSuits(frame.Id, effect, ids, locations);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    internal void AssertProgramOwnedCardSelection(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (paused.Op == SkillProgramEffectOp.ResolveDeferredHandAlignment && frame.OwnedCardSelection is not null)
-            paused = _coreDeferredHandAlignmentsOperations.DeferredOwnedSelectionEffect(frame, paused);
-        if (paused.Op == SkillProgramEffectOp.SelectTurnDamageUseDebtPayment && frame.OwnedCardSelection is not null)
-            paused = _coreTurnDrawDebtsOperations.TurnDrawDebtOwnedSelectionEffect(frame, paused);
-        if (paused.Op == SkillProgramEffectOp.SelectFrozenHandExchangeDebtPayment && frame.OwnedCardSelection is not null)
-            paused = _coreHalfHandPhaseDebtProgramsOperations.PhaseHandDebtOwnedSelectionEffect(frame, paused);
-        if (paused.Op == SkillProgramEffectOp.SelectEquipmentPairAndPayment && frame.OwnedCardSelection is not null)
-            paused = _coreEquipmentPairPaymentsOperations.EquipmentPairOwnedSelectionEffect(frame, paused);
-        if (paused.Op != SkillProgramEffectOp.SelectOwnedCards)
-        {
-            if (frame.OwnedCardSelection is not null)
-                throw new InvalidOperationException("An owned-card draft outlived its suspended instruction.");
-            return;
-        }
-
-        if (frame.OwnedCardSelection is not { } draft)
-            throw new InvalidOperationException("A suspended owned-card selection lost its private draft.");
-        if (draft.ResultBind != paused.ResultBind || draft.CardOwnerSeat != (paused.TargetReference is { } cardOwner ? _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, cardOwner) : global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(frame, paused.Target)) || draft.RequiredCount <= 0 || draft.RequiredCount > draft.CandidateCardIds.Count || draft.SelectedCardIds.Count >= draft.RequiredCount || draft.MinimumCount != paused.MinimumCards || draft.MinimumCount < 0 || draft.AllowEarlyFinish != (paused.MaximumCards > 0) || draft.MinimumCount > draft.RequiredCount || draft.CandidateCardIds.Count != draft.CandidateLocations.Count || draft.CandidateCardIds.Distinct().Count() != draft.CandidateCardIds.Count || draft.SelectedCardIds.Distinct().Count() != draft.SelectedCardIds.Count || draft.SelectedCardIds.Any(id => !draft.CandidateCardIds.Contains(id)) || draft.CandidateLocations.Any(location => location.OwnerSeat != draft.CardOwnerSeat || !paused.Zones.Contains(location.Zone)) || frame.CardSetBindings.Any(binding => binding.Name == draft.ResultBind) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != draft.CardOwnerSeat || decision.Choices.Count != draft.CandidateCardIds.Count - draft.SelectedCardIds.Count + ((draft.AllowEarlyFinish && draft.SelectedCardIds.Count >= draft.MinimumCount || paused.AllowDecline) ? 1 : 0) || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("result-bind") != draft.ResultBind || (choice.Parameters.GetValueOrDefault("program-action") == "finish-owned-cards" ? !draft.AllowEarlyFinish && !paused.AllowDecline || draft.SelectedCardIds.Count < draft.MinimumCount && !paused.AllowDecline || choice.Cards.Count != 0 : choice.Parameters.GetValueOrDefault("program-action") != "select-owned-cards" || choice.Cards.Count != 1 || !draft.CandidateCardIds.Contains(choice.Cards[0]) || draft.SelectedCardIds.Contains(choice.Cards[0]))))
-            throw new InvalidOperationException("A private owned-card draft lost its exact instruction, sources or prompt.");
-    }
 }

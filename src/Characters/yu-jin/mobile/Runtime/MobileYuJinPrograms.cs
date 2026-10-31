@@ -33,7 +33,6 @@ internal static class MobileYuJinJieyue
 internal interface IMobileYuJinHost
 {
     SkillProgramStepOutcome Transfer(ProgramSkillFrame frame, SkillProgramEffect effect);
-    bool MatchesChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding);
 }
 internal abstract class MobileYuJinDescriptor : ProgramOperationDescriptorBase, IProgramChoiceResultProof
 {
@@ -52,10 +51,6 @@ internal abstract class MobileYuJinDescriptor : ProgramOperationDescriptorBase, 
             ? [new RequireTriggerWindow(SkillProgramTriggerWindow.TurnStartBeforeNormalFlow)]
             : [new RequireTriggerWindow(SkillProgramTriggerWindow.TurnEnding), new ReadSelectedTarget(),
                 new CreateChoiceResult(effect.ResultBind!, ["store", "discard"])];
-    public bool MatchesChoiceResult(SkillProgramEffect effect, ProgramSkillFrame frame,
-        ProgramChoiceResultBinding binding, ISkillProgramEffectHost host) =>
-        Op == SkillProgramEffectOp.ResolveMobileYuJinJieyue && effect.Op == Op && effect.ResultBind == binding.Name &&
-        host.GetCapability<IMobileYuJinHost>().MatchesChoiceResult(frame, binding);
 }
 internal sealed class ResolveMobileYuJinJieyueDescriptor : MobileYuJinDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMobileYuJinJieyue; }
 internal sealed class CollectMobileYuJinJieyueDescriptor : MobileYuJinDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.CollectMobileYuJinJieyue; }

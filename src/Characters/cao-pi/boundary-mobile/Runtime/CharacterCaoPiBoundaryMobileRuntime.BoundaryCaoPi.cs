@@ -106,7 +106,6 @@ internal sealed partial class CharacterCaoPiBoundaryMobileRuntime
     internal void AnswerBoundaryCaoPi(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Cao Pi choice lost its original trigger frame.");
-        AssertBoundaryCaoPi(f);
         if (!BoundaryCaoPiChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets)))
             throw new InvalidOperationException("Cao Pi rejects an unrelated strategy or stale payment entity.");
         var branch = choice.Parameters["branch"];
@@ -206,5 +205,4 @@ internal sealed partial class CharacterCaoPiBoundaryMobileRuntime
     internal bool KeepBoundaryFangzhuPaid(ProgramSkillFrame f) => f.BoundaryFangzhu is { Stage: not BoundaryFangzhuStage.Choice };
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryCaoPiFangzhu, SkillProgramEffectOp.ChooseBoundaryCaoPiXingshang)]
     internal static PromptChoice BoundaryCaoPiAi(PendingDecision p) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "discard") ?? p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "card") ?? p.Choices.First();
-    internal bool IsBoundaryCaoPiChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => f.SkillId is BoundaryCaoPiComposition.Xingshang or BoundaryCaoPiComposition.Fangzhu && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryCaoPiChoiceResultEvent>().Where(e => e.FrameId == f.Id && e.Bind == b.Name).ToArray()is [var e] && e.SkillId == f.SkillId && b == new ProgramChoiceResultBinding(e.Bind, e.Outcome, e.Chooser) && (f.SkillId == BoundaryCaoPiComposition.Xingshang ? b.Name == "xingshang-result" && b.OptionId is "claim" or "recover" && b.ChooserSeat == f.OwnerSeat && f.WindowContext is { } c && BoundaryCaoPiDeath(c)?.VictimSeat == e.Subject : f.BoundaryFangzhu is { Stage: BoundaryFangzhuStage.Complete } r && b.Name == r.ResultBind && b.OptionId == r.Outcome && b.ChooserSeat == r.Target && e.Subject == r.Target && e.Count == r.X);
 }

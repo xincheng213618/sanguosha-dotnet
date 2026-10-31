@@ -103,7 +103,6 @@ internal sealed partial class CharacterYaDanOlRuntime
 
     internal void PublishYaDan(ProgramSkillFrame f)
     {
-        AssertYaDan(f);
         var r = f.YaDan!;
         var choices = YaDanChoices(f);
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
@@ -133,7 +132,6 @@ internal sealed partial class CharacterYaDanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YaDan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YaDanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Qingya requires its exact original private slot, side or native card action.");
-        AssertYaDan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
@@ -179,7 +177,6 @@ internal sealed partial class CharacterYaDanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YaDan: { } r } f || f.Id != id)
             return;
-        AssertYaDan(f);
         if (r.Stage is QingyaStage.DiscardChildren or QingyaStage.NativeChildren)
         {
             if (_coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))

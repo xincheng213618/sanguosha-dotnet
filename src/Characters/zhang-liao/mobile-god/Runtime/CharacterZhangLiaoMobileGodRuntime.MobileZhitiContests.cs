@@ -149,9 +149,6 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
         AssertMobileZhitiContest(parent);
         return true;
     }
-
-    internal bool HasMobileZhitiDuelContinuation(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MobileZhitiContest.Kind: MobileZhitiContestKind.Duel } parent && IsMobileZhitiContestSubtree(parent);
-    internal bool HasMobileZhitiContestPrompt() => _resolutionStackOperations._resolutionStack.Any(f => f.MobileZhitiContest is { Finished: false } && IsMobileZhitiContestSubtree(f));
     internal void AssertMobileZhitiContest(ResolutionFrame parent)
     {
         var r = parent.MobileZhitiContest ?? throw new InvalidOperationException("Zhiti lost its original contest receipt.");

@@ -6,7 +6,6 @@ internal sealed partial class CharacterHanSongAnniversaryEntries
     internal void AnswerHanSong(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHanSong(choice);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> AppendAnniversaryHanSongDrawEndedCandidates(global::CardGame.Core.CharacterState phaseOwner, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> existing) => _resolve().AppendAnniversaryHanSongDrawEndedCandidates(phaseOwner, existing);
     internal global::CardGame.Core.RuleQueryEvaluation ApplyAnniversaryHanSongHandLimit(global::CardGame.Core.CharacterState owner, global::CardGame.Core.RuleQueryEvaluation ordinary) => _resolve().ApplyAnniversaryHanSongHandLimit(owner, ordinary);
-    internal void AssertHanSong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHanSong(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAnniversaryHanSong(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginAnniversaryHanSong(supplied);
     internal bool CanOfferAnniversaryHanSong(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferAnniversaryHanSong(candidate, trigger, c);
     internal void ContinueHanSong(long id) => _resolve().ContinueHanSong(id);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterHanSongAnniversaryEntries
     internal global::System.Collections.Generic.IEnumerable<(global::CardGame.Core.Card Card, global::CardGame.Core.CardLocation From, int Slot, bool Hidden)> HanSongDiscardOptions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HanSongDiscardOptions(f);
     internal bool HanSongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().HanSongMovement(f, e, p);
     internal bool HanSongSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().HanSongSlashDistance(q);
-    internal bool HasAnniversaryHanSongPrompt() => _resolve().HasAnniversaryHanSongPrompt();
     internal bool HasAnniversaryHanSongUniqueHand(global::CardGame.Core.CharacterState owner) => _resolve().HasAnniversaryHanSongUniqueHand(owner);
     internal bool IsAnniversaryHanSongForeignDrawContext(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsAnniversaryHanSongForeignDrawContext(candidate, c);
     internal void IssueHanSongDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueHanSongDraw(f);

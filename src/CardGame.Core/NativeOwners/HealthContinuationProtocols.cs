@@ -9,7 +9,6 @@ internal sealed class HealthContinuationProtocols(global::System.Func<global::Ca
     public bool IsWenhePoisonDyingChild(ResolutionFrame? parent, DyingFrame child) => getCoreGameEngineWenhePoisonRuntime().IsWenhePoisonDyingChild(parent, child);
     public bool TypedDamagePostEventEdge(ResolutionFrame parent, ResolutionFrame child) => getCoreDamageObserverCursorQueriesRuntime().TypedDamagePostEventEdge(parent, child);
     public bool TypedDamageObserverCandidateMatches(ProgramSkillFrame observer, ProgramTriggerCandidate candidate) => getCoreDamageObserverCursorQueriesRuntime().TypedDamageObserverCandidateMatches(observer, candidate);
-    public void AssertEquipmentPlacementAndHpPair(ProgramSkillFrame producer, ProgramExecutionPlan plan) => getCoreGameEngineEquipmentPlacementAndHpPairRuntime().AssertEquipmentPlacementAndHpPair(producer, plan);
     public int SupportedRecoveryAmount(RecoveryReplacementFrame recovery, int baseAmount) => getCoreGameEngineRecoveryAmountBonusesRuntime().SupportedRecoveryAmount(recovery, baseAmount);
     public int SupportedRecoveryHpBefore(RecoveryReplacementFrame recovery, int fallback) => getCharacterCaoSongOlRuntime().SupportedRecoveryHpBefore(recovery, fallback);
     public bool IsRecoveryParent(ProgramRecoveryParentPhase phase, ProgramSkillFrame parent, RecoveryReplacementFrame child) => getProgramRuntimeHooks().IsRecoveryParent(phase, parent, child);

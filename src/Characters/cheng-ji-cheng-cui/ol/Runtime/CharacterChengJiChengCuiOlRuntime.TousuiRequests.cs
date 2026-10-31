@@ -360,27 +360,6 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     }
 
     internal bool HasTousuiRequestPrompt() => CurrentTousuiRequest()is { } r && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == r.ActorSeat && p.SkillPrompt?.SkillId == r.Source.SkillId && p.Choices.All(c => c.Parameters.GetValueOrDefault("program-action") == TousuiRequestPick) && ValidTousuiRequest(r);
-    internal PendingDecision? TousuiNativeOriginalDecision(long ownerId) => HasTousuiRequestPrompt() && CurrentTousuiRequest()is { RequestOp: null } r && r.OwnerFrameId == ownerId ? r.OriginalDecision : null;
-    internal PendingDecision TousuiProgramNativeDecision(PendingDecision p) => global::CardGame.Core.EngineOwners.CharacterLiuZhangOlRuntime.ZonghuNativeDecision(HasTousuiRequestPrompt() && CurrentTousuiRequest()is { RequestOp: not null } r && p.PlayerSeat == r.ActorSeat ? r.OriginalDecision : p);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32203)]
-    internal void AssertTousuiRequestState(ProgramSkillFrame f)
-    {
-        if (f.TousuiRequest is { } r && (!ValidTousuiRequest(r) || !HasTousuiRequestPrompt() || r.OwnerFrameId != f.Id))
-            throw new InvalidOperationException("Tousui program request lost its owning instruction, original private frontier or ordered private selections.");
-    }
-
-    internal void AssertTousuiRequests()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-            AssertTousuiRequestState(f);
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-        {
-            if (f.TousuiRequest is { } r && (!ValidTousuiRequest(r) || !HasTousuiRequestPrompt() || r.OwnerFrameId != f.Id || r.RequestOp is not null))
-                throw new InvalidOperationException("Tousui native request lost its exact Borrowed Sword/Qinglong owner, original frontier or selected entity invoices.");
-            if (f.Tousui is not null && !TousuiUseProof(f))
-                throw new InvalidOperationException("Tousui native use lost its original material count, conversion source or final actor chain.");
-        }
-    }
 
     internal bool HasAcceptedTousuiKeAction(ProgramSkillFrame f, LegalAction action)
     {

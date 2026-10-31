@@ -15,12 +15,10 @@ internal sealed partial class CharacterZhangFenAnniversaryEntries
     internal bool ExactDagongCheUse(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactDagongCheUse(use, f);
     internal void FinishZhangFen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhangFen(f);
     internal bool HasBoundDagongCheDiscardOrigin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasBoundDagongCheDiscardOrigin(f);
-    internal bool HasZhangFenPrompt() => _resolve().HasZhangFenPrompt();
     internal global::CardGame.Core.Card? HeldDagongChe(int owner) => _resolve().HeldDagongChe(owner);
     internal bool IsDagongCheDestroyedMaterial(global::CardGame.Core.CardMovementRecord m) => _resolve().IsDagongCheDestroyedMaterial(m);
     internal bool IsDagongCheDestroyedMaterial2(int cardId, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to) => _resolve().IsDagongCheDestroyedMaterial(cardId, from, to);
     internal bool IsDagongCheDestroyedMaterial3(long useId, int cardId) => _resolve().IsDagongCheDestroyedMaterial(useId, cardId);
-    internal bool IsExactDagongCheBasicDraft(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramVirtualBasicDraft d) => _resolve().IsExactDagongCheBasicDraft(f, d);
     internal bool IsIssuedDagongCheDamageCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedDagongCheDamageCandidate(c, w);
     internal bool IsRealDagongChe(int id) => _resolve().IsRealDagongChe(id);
     internal bool IsUnbegunIssuedDagongCheDamage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsUnbegunIssuedDagongCheDamage(f);
@@ -30,7 +28,6 @@ internal sealed partial class CharacterZhangFenAnniversaryEntries
     internal global::CardGame.Core.CardLocation NormalizeDagongCheDestination(global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to) => _resolve().NormalizeDagongCheDestination(card, from, to);
     internal void ObserveDagongCheMovement(global::CardGame.Core.CardMovedEvent moved) => _resolve().ObserveDagongCheMovement(moved);
     internal void PublishZhangFen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishZhangFen(f);
-    internal void RequireZhangFen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireZhangFen(f);
     internal bool ReturnDagongCheAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnDagongCheAttack(completion);
     internal void ReturnZhangFenDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnZhangFenDraw(supplied, draw);
     internal bool ReturnZhangFenMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnZhangFenMovement(f);

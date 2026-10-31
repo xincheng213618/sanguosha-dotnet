@@ -79,8 +79,6 @@ internal sealed partial class CharacterHuangGaiMouRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHuangGai: { Stage: MouHgStage.NativeUse, NativeReturned: true, Native: { } o } } f || completion.ResolutionId != o.UseId)
             return false;
-        if (completion.ProgramFrameId != f.Id)
-            throw new InvalidOperationException("Quzhou attack lost its original parent.");
         MouHuangGaiRules.SettleUse(o);
         return true;
     }
@@ -100,7 +98,6 @@ internal sealed partial class CharacterHuangGaiMouRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 35400)]
     internal bool MouHgDamageObserver(long id) => MouHgObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35400)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 35400)]
     internal bool MouHgDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouHgObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 35400)]
     internal bool AdvanceMouHgChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouHgObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);

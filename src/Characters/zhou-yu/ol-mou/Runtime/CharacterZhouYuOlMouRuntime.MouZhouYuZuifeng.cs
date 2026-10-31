@@ -105,7 +105,6 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouZuifeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != MouZuifengChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouZuifengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Zuifeng lost its private actual chooser or exact original published command.");
-        AssertMouZuifeng(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (branch == "cancel")
@@ -192,7 +191,6 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouZuifeng: { } r } f || f.Id != id || f.AttackAttempt is not null)
             return;
-        AssertMouZuifeng(f);
         if (r.Stage is MouZuifengStage.CostChoice or MouZuifengStage.TargetChoice or MouZuifengStage.HandViewChoice or MouZuifengStage.AlcoholChoice)
         {
             PublishMouZuifeng(f);

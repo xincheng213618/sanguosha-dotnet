@@ -148,7 +148,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuanShuJun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HuanShuJunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Huan Shu Jun requires her exact current private decision.");
-        AssertHuanShuJun(f);
         if (r.Stage == HuanShuJunStage.WenyiPeachRequest && !choice.Parameters.ContainsKey(HuanShuJunChoice))
         {
             if (!_coreWenyiPeachSuppliesOperations.TryResolveWenyiPeachSupply(choice))
@@ -221,7 +220,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HuanShuJun: { } r } f && f.Id == id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
-            AssertHuanShuJun(f);
             if (f.NativeDraw is not null)
                 return;
             if (r.Stage is HuanShuJunStage.AdjustmentChildren or HuanShuJunStage.DrawChildren or HuanShuJunStage.EquipmentGiftChildren or HuanShuJunStage.NativeChildren or HuanShuJunStage.FaceChildren or HuanShuJunStage.ChainChildren)

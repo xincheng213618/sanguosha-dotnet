@@ -112,7 +112,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qiqin: not null } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertQiqin(f);
         if (_kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().TryStartPostInstructionWindow(id))
             return;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

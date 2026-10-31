@@ -66,15 +66,6 @@ internal sealed partial class CoreGameEngineShanheSourceChunlao3161Runtime
         return false;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 24921)]
-    internal void AssertShanheSourceChunlaoStorage(ProgramSkillFrame f)
-    {
-        if (f.ShanheSourceChunlaoStorage is not { } r)
-            return;
-        if (f.SkillId != ShanheSourceJiangdongTrioIds.Chunlao || f.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || batch.Movements[index].CardId != r.CardId || batch.Movements[index].Sequence != r.DiscardSequence || _coreAdjacentDiscardStorageOperations.AdjacentDiscardOrigin(batch.Movements[index])?.SourceSeat != r.SourceSeat || r.Paid && !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.StoreSequence && m.CardId == r.CardId && m.From == CardLocation.DiscardPile && m.To == new CardLocation(CardZoneKind.Chunlao, f.OwnerSeat) && m.Reason.Value == "shanhe.source-chunlao-3161.store"))
-            throw new InvalidOperationException("Source3161 storage lost its original discard or exact committed pile transfer.");
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.OfferShanheSourceChunlaoStorage)]
     internal PromptChoice AiShanheSourceChunlaoStorage(PendingDecision p, ProgramSkillFrame f) => p.Choices.Single(c => c.Parameters["branch"] == (f.ShanheSourceChunlaoStorage!.SourceSeat == f.OwnerSeat || global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.ShanheSourceChunlaoStorage.SourceSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) ? "store" : "decline"));
     [ProgramPipelineHook(ProgramPipelinePhase.SelectLegacyDiscardIndexes, 1100)]

@@ -285,13 +285,6 @@ internal sealed partial class CharacterFanChouOlRuntime
             throw new InvalidOperationException("Xingluan payment lost its exact real entity and original legal zone.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 280)]
-    internal void AssertRegisteredFanChou(ProgramSkillFrame frame)
-    {
-        if (frame.FanChou is not null)
-            RequireFanChou(frame);
-    }
-
     internal IReadOnlyList<CardSnapshot> FanChouPrivateDeckCards(int viewer) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { OwnerSeat: var owner, FanChou: { Stage: FanChouStage.Deck } r } && owner == viewer ? Array.AsReadOnly(r.DeckCandidates.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DrawPile).Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray()) : [];
     SkillProgramStepOutcome global::CardGame.Core.IFanChouProgramHost.BeginFanChou(ProgramSkillFrame f, SkillProgramEffect e) => BeginFanChou(f, e);
 }

@@ -88,17 +88,4 @@ internal sealed partial class CoreGameEngineFriendDuelResponsesRuntime
     }
 
     internal bool IsFriendDuelResponseMovementReturn(FriendDuelResponseFrame parent, CardsMovedTriggerWindowFrame movement) => movement.ResumeFriendDuelResponseFrameId == parent.Id && movement.Batch.ParentFrameId == parent.Id && movement.Batch.AwaitingProgramFrameId is null && IsFriendResponseParent(parent);
-    internal bool HasFriendDuelResponseObserver(long useId) => _resolutionStackOperations._resolutionStack.OfType<FriendDuelResponseFrame>().Any(f => f.CardUseFrameId == useId && IsFriendResponseParent(f));
-    internal void AssertFriendEventFrames()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(f => f.FriendRecastDuel is not null))
-            if (!_coreFriendEventsOperations.IsFriendRecastDuelUse(use.Id) || use.FriendRecastDuelResponses < 0 || use.FriendRecastDuelResponses > use.FriendRecastDuel!.RecastCount)
-                throw new InvalidOperationException("Recast Duel lost its budget or exact paid parent.");
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<FriendDuelResponseFrame>())
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not CardUseFrame use || use.Id != f.CardUseFrameId || !IsFriendResponseParent(f))
-                throw new InvalidOperationException("Recast Duel response lost its original Use frame.");
-        }
-    }
 }

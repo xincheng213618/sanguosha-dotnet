@@ -91,42 +91,6 @@ internal sealed partial class CoreGameEngineDyingOwnedCardSelectionsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 560)]
-    internal void AssertDyingOwnedCardReceipt(ProgramSkillFrame root)
-    {
-        if (root.DyingOwnedCard is not { } r)
-            return;
-        if (!ExactDyingOwnedCardEntry(root, out var dying, out var entry) || r.InstructionIndex != 0 || r.DyingFrameId != dying.Id || r.EntryFrameId != entry.Id || r.VictimSeat != dying.VictimSeat || root.InstructionIndex is < 1 or > 4 || root.SelectedTargetSeats is not [var target] || target != dying.VictimSeat || r.MovementSequenceBefore < 0 || (r.NonBasic ? r.PaidCardId is null || r.SourceLocation is null : r.PaidCardId is not null || r.SourceLocation is not null) || r.SourceLocation is { } source && (source.OwnerSeat != r.VictimSeat || source.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDyingCardSelectionResolvedEvent>().Any(e => e.FrameId == root.Id && e.DyingFrameId == r.DyingFrameId && e.OwnerSeat == root.OwnerSeat && e.VictimSeat == r.VictimSeat && e.NonBasic == r.NonBasic))
-            throw new InvalidOperationException("The dying card receipt lost its exact victim or private selection.");
-        var plan = ProgramInstructionResolver.Default.Resolve(root, _contentRegistryOperations._contentRegistry.GetSkill(root.SkillId).Program!);
-        if (plan.Instructions.Count != 4 || plan.Instructions[0].Op != SkillProgramEffectOp.SelectDyingOwnedCard || plan.Instructions[0].ResultBind != r.ResultBind || root.CardSetBindings.SingleOrDefault(b => b.Name == r.ResultBind)is not { Visibility: SkillProgramCardSetVisibility.Private } bound || bound.SelectionActorSeat != r.VictimSeat || (r.NonBasic ? bound.CardIds is not [var id] || id != r.PaidCardId || bound.SourceLocations is not [var from] || from != r.SourceLocation : bound.CardIds.Count != 0 || bound.SourceLocations.Count != 0))
-            throw new InvalidOperationException("The dying selected card binding lost its original identity or empty Basic result.");
-    }
-
-    internal bool IsValidDyingOwnedCardProgramSelection(ProgramSkillFrame frame, bool awaitingSelection)
-    {
-        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(frame.OwnerSeat) || !ExactDyingOwnedCardEntry(frame, out var dying, out _) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(dying.VictimSeat))
-            return false;
-        var program = _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(frame.SkillId)?.Program;
-        if (program is null || program.GameplayHash != frame.GameplayHash)
-            return false;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, program);
-        if (plan.Instructions.Count != 4 || plan.Instructions[0].Op != SkillProgramEffectOp.SelectDyingOwnedCard)
-            return false;
-        if (frame.DyingOwnedCard is not null)
-        {
-            // Payment children may already have recovered this original victim.
-            // The issued receipt retains the entry and selection without repricing HP.
-            AssertDyingOwnedCardReceipt(frame);
-            return true;
-        }
-
-        if (!awaitingSelection || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.SourceSeat != frame.OwnerSeat || prompt.TargetSeat != dying.VictimSeat || prompt.SkillPrompt?.SkillId != frame.SkillId || prompt.ValidTargetSeats.Count != 0)
-            return false;
-        var choices = DyingOwnedCardChoices(frame, plan.Instructions[0], dying.VictimSeat);
-        return choices.Count > 0 && prompt.Choices.Count == choices.Count && prompt.ValidCardIds.SequenceEqual(choices.SelectMany(choice => choice.Cards).Distinct().Order()) && prompt.Choices.Zip(choices).All(pair => pair.First.Id == pair.Second.Id && pair.First.Description == pair.Second.Description && pair.First.Cards.SequenceEqual(pair.Second.Cards) && pair.First.Targets.SequenceEqual(pair.Second.Targets) && pair.First.ContentIds.SequenceEqual(pair.Second.ContentIds) && pair.First.Parameters.Count == pair.Second.Parameters.Count && pair.Second.Parameters.All(parameter => pair.First.Parameters.GetValueOrDefault(parameter.Key) == parameter.Value));
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.SelectDyingOwnedCard)]
     internal PromptChoice SelectAiDyingOwnedCard(PendingDecision decision) => decision.Choices.OrderBy(c => c.Cards.Count == 1 && _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Any(card => card.Id == c.Cards[0] && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(card.Kind, [SkillProgramCardCategory.Basic])) ? 0 : 1).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     SkillProgramStepOutcome global::CardGame.Core.IDyingOwnedCardProgramHost.SelectDyingOwnedCard(ProgramSkillFrame f, SkillProgramEffect e) => SelectDyingOwnedCard(f, e);

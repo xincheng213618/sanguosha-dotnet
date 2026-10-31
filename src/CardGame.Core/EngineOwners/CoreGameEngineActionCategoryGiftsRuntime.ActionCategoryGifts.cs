@@ -77,12 +77,4 @@ internal sealed partial class CoreGameEngineActionCategoryGiftsRuntime
 
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    internal void AssertDifferentActionCategoryGift(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (paused.Op != SkillProgramEffectOp.ChooseDifferentActionCategoryGift || frame.ChoiceBindings.Any(binding => binding.Name == paused.ResultBind) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()))
-            return;
-        if (frame.SelectedTargetSeats.Count != 1 || frame.SelectedTargetSeats[0] == frame.OwnerSeat || frame.WindowContext?.CardUse is null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.SelectedTargetSeats[0] || prompt.Choices.Count == 0 || prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action")is not ("different-action-category-gift" or "different-action-category-decline") || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString() || choice.Parameters.GetValueOrDefault("result-bind") != paused.ResultBind))
-            throw new InvalidOperationException("The private category gift lost its source, entity prompt or participants.");
-    }
 }

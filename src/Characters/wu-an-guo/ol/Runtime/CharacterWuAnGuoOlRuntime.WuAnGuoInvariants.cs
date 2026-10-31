@@ -31,10 +31,4 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
     }
 
     );
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27010)]
-    internal void AssertWuAnGuoLiyong(ProgramSkillFrame f)
-    {
-        if (f.WuAnGuoLiyong is not null && !ValidWuAnGuoLiyong(f))
-            throw new InvalidOperationException("Liyong lost its exact paid deck entity, frozen source/actor/actual Play or native Duel origin.");
-    }
 }

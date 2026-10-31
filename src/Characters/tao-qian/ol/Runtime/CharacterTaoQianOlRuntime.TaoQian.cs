@@ -125,7 +125,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TaoQian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != TaoQianChooser(f) || !TaoQianChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Tao Qian requires the actual chooser's exact published private input.");
-        AssertTaoQian(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         switch (choice.Parameters[TaoQianAction])
@@ -177,7 +176,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { TaoQian: { } r } f && f.Id == id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
-            AssertTaoQian(f);
             if (f.NativeDraw is not null || r.Stage == TaoQianStage.NativeSlash)
                 return;
             if (r.Stage is TaoQianStage.NativeChildren or TaoQianStage.DiscardChildren or TaoQianStage.DrawChildren)

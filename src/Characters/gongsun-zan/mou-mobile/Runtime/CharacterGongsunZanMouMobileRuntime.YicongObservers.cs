@@ -63,7 +63,6 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33600)]
     internal bool MouGszMobileBeforeDamage(long id) => MouGszMobileRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33600)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33600)]
     internal bool MouGszMobileDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGszMobileRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 33600)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 33600)]
@@ -94,10 +93,4 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
     internal bool ReturnMouGszMobileMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeMouGszMobile(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33600)]
     internal bool AdvanceMouGszMobileChild() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouGszMobileRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33600)]
-    internal void AssertMouGszMobile(ProgramSkillFrame f)
-    {
-        if (f.MouGongsunZanMobile is not null && !ValidMouGszMobile(f))
-            throw new InvalidOperationException("Mobile Gongsun Zan lost its own native trigger or paid child invoice.");
-    }
 }

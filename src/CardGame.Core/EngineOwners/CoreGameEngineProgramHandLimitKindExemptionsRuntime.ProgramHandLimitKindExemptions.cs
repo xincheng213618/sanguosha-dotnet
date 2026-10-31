@@ -12,8 +12,6 @@ internal sealed partial class CoreGameEngineProgramHandLimitKindExemptionsRuntim
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.DiscardCards, PlayerSeat: 0 } || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ManualDiscardFrame frame)
             return null;
-        if (frame.OwnerSeat != 0 || frame.ActualTurnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || frame.QuotaMultiplier <= 0)
-            throw new InvalidOperationException("A market discard quote lost its original actual-turn owner.");
         return new(frame.Id, frame.OwnerSeat, frame.ActualTurnNumber, frame.QuotaMultiplier, frame.PaidCount);
     }
 

@@ -4,7 +4,6 @@ internal sealed partial class CharacterYuanHuanOlEntries
 {
     internal bool AdvanceYuanHuanSubtree() => _resolve().AdvanceYuanHuanSubtree();
     internal void AnswerYuanHuan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerYuanHuan(choice);
-    internal void AssertYuanHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertYuanHuan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginYuanHuan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginYuanHuan(supplied, op);
     internal global::CardGame.Core.PromptChoice ChooseYuanHuan(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseYuanHuan(p, f);
     internal bool ContinueIssuedYuanHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueIssuedYuanHuan(f);
@@ -14,7 +13,6 @@ internal sealed partial class CharacterYuanHuanOlEntries
     internal void FinishYuanHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishYuanHuan(f);
     internal bool HasYuanHuanBeforeDamageObserver(long id) => _resolve().HasYuanHuanBeforeDamageObserver(id);
     internal bool HasYuanHuanDamageObserver(long id) => _resolve().HasYuanHuanDamageObserver(id);
-    internal bool IsYuanHuanDying() => _resolve().IsYuanHuanDying();
     internal bool IsYuanHuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsYuanHuanMovement(f, e, p);
     internal bool IsYuanHuanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsYuanHuanRecoveryParent(f, recovery);
     internal void IssueDeruTake(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueDeruTake(f);

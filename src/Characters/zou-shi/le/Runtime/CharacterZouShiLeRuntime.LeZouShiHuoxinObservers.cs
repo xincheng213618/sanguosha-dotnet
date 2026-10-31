@@ -27,8 +27,6 @@ internal sealed partial class CharacterZouShiLeRuntime
     internal bool HasHuoxinDamageObserver(long id) => HuoxinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1360)]
     internal bool HasHuoxinBeforeDamageObserver(long id) => HuoxinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1190)]
-    internal bool IsHuoxinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HuoxinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 450)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 440)]
     internal bool IsHuoxinRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

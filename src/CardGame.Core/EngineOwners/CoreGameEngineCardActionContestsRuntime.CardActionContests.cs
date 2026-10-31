@@ -7,14 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCardActionContestsRuntime
 {
-    internal bool HasCardActionPindianContinuation()
-    {
-        if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || _resolutionStackOperations._resolutionStack.LastOrDefault()is not PindianFrame child || _resolutionStackOperations._resolutionStack.Count < 3 || _resolutionStackOperations._resolutionStack[^2] is not ProgramSkillFrame parent || child.ParentFrameId != parent.Id || parent.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects or SkillProgramTriggerWindow.SlashBeforeResponse or SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } use } context || _resolutionStackOperations._resolutionStack[^3] is not ProgramCardTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != attack.ResolutionId || window.Action.ActionId != use.CardActionId || window.AttackOwnerFrameId != attack.ResolutionId)
-            return false;
-        var program = _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program!;
-        var plan = ProgramInstructionResolver.Default.Resolve(parent, program);
-        return parent.InstructionIndex > 0 && plan.Instructions[parent.InstructionIndex - 1].Op == SkillProgramEffectOp.StartCardActionPindian && child.ProgramResultBind == plan.Instructions[parent.InstructionIndex - 1].ResultBind;
-    }
 
     void global::CardGame.Core.ICardActionContestProgramHost.ReplaceAllSlashTargets(ProgramSkillFrame f, string bind) => ReplaceAllProgramSlashTargets(f, bind);
     SkillProgramStepOutcome global::CardGame.Core.ICardActionContestProgramHost.StartCardActionPindian(ProgramSkillFrame f, SkillProgramEffect e) => StartProgramCardActionPindian(f, e);
@@ -62,8 +54,6 @@ internal sealed partial class CoreGameEngineCardActionContestsRuntime
         var targets = Array.AsReadOnly(action.EffectiveSuit is Suit.Spade or Suit.Club ? Array.Empty<int>() : new[] { frame.OwnerSeat });
         var updated = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(action.ActionId, action.ParentActionId, action.Type, action.ActorSeat, action.ProviderSeat, action.RequesterSeat, action.ResponderSeat, action.OpponentSeat, action.EffectiveKind, targets, action.PhysicalCards, action.ConversionChain, targets, action.EffectiveSuit, action.EffectiveRank, action.EffectiveIsRed, action.FactionOrigin));
         var attack = _coreCardActionsOperations.ProgramCardAttack ?? throw new InvalidOperationException("Replacement lost Slash continuation.");
-        if (attack.ResolutionId != use.Id)
-            throw new InvalidOperationException("Replacement lost its exact Slash owner.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { TargetSeats = targets, TargetIndex = 0, Action = updated, SlashTargetsCancelled = use.SlashTargetsCancelled || targets.Count == 0, Continuations = use.Continuations with { FangtianHalberd = use.Continuations.FangtianHalberd is { Active: true } multi ? multi with { TargetSeats = targets } : use.Continuations.FangtianHalberd } });
         if (targets.Count > 0)
         {

@@ -10,11 +10,9 @@ internal sealed partial class CharacterSimaYiMouEntries
     internal void DiscloseMouSmTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DiscloseMouSmTargets(f);
     internal void FinishMouSmPlayedAccepted(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouSmPlayedAccepted(f);
     internal void FinishMouSmPlayedCompleted(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouSmPlayedCompleted(f);
-    internal bool HasMouSmPrivateContinuation(long useId) => _resolve().HasMouSmPrivateContinuation(useId);
     internal bool HoldMouSmAiAttack(int source, int target) => _resolve().HoldMouSmAiAttack(source, target);
     internal bool IsIssuedMouSmPrivateCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedMouSmPrivateCandidate(candidate, context);
     internal bool IsMouSmPlayedActor(global::CardGame.Core.CharacterState actor) => _resolve().IsMouSmPlayedActor(actor);
-    internal bool IsMouSmPlayedCostFinished(global::CardGame.Core.ProgramCardTriggerWindowFrame w, global::CardGame.Core.CardActionCost cost) => _resolve().IsMouSmPlayedCostFinished(w, cost);
     internal bool IsMouSmPlayedWindow(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().IsMouSmPlayedWindow(action, window);
     internal bool IsMouSmShopEquipmentGivePayment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.MouSmReceipt receipt, global::CardGame.Core.MouSmEntity material, global::CardGame.Core.CardMovementRecord movement) => _resolve().IsMouSmShopEquipmentGivePayment(f, receipt, material, movement);
     internal void IssueMouSmPlayed(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouSmPlayed(f);

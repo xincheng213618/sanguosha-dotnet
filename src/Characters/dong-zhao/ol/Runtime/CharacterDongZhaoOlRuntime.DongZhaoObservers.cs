@@ -11,8 +11,6 @@ internal sealed partial class CharacterDongZhaoOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1560)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1670)]
     internal bool HasDongZhaoDamageObserver(long id) => DongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 220)]
-    internal bool IsDongZhaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 430)]
     internal bool TryAdvanceDongZhaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DongZhaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     internal bool ValidIssuedZaowang(ProgramSkillFrame f)
@@ -37,18 +35,5 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         if (child is RecoveryReplacementFrame recovery && _coreTypedRecoveryDamageCursorOperations.TypedRecoveryPausedEffect(root)is { } effect && effect.CompiledInstruction is RecoverProgramInstruction instruction)
             return recovery.Attempt.Amount == 1 && recovery.Attempt.TargetSeat == target && _coreTypedRecoveryDamageCursorOperations.DirectProgramRecoveryReturnMatches(root, effect, instruction, recovery);
         return false;
-    }
-
-    internal void RequireDongZhao(ProgramSkillFrame f)
-    {
-        if (f.ZaowangPaidTargetSeat is not null && !ValidIssuedZaowang(f) || f.XianluePending is { } r && (r.SkillId.Length > 0 ? !ValidIssuedXianlue(f) : r.Stage != XianlueStage.Record || f.TriggerId is null || f.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ Op: SkillProgramEffectOp.XianlueRecord }]))
-            throw new InvalidOperationException("Dong Zhao lost its native source, exact boundary or once-paid invoice.");
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 440)]
-    internal void AssertRegisteredDongZhao(ProgramSkillFrame frame)
-    {
-        if (frame.XianluePending is not null || frame.ZaowangPaidTargetSeat is not null)
-            RequireDongZhao(frame);
     }
 }

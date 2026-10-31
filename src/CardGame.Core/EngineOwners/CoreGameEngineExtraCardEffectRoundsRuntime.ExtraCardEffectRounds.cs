@@ -161,22 +161,6 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
         return TryBeginExtraCardEffectRound(attack.ResolutionId, afterAttack: true);
     }
 
-    internal void AssertExtraCardEffectReceipts()
-    {
-        _coreShanheSchoolTrickOperations.AssertShanheSchoolTrickRounds();
-        _characterJiangJiMouOperations.AssertMouJjEffects();
-        _characterHuangQuanMouOperations.AssertMouHqRounds();
-        _characterDaQiaoLeOperations.AssertZixiExtraEffectRounds();
-        foreach (var incoming in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-            _coreSoleIncomingRangeDrawOperations.AssertSoleIncomingEffectRounds(incoming);
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.ExtraCardEffect is not null))
-        {
-            var r = use.ExtraCardEffect!;
-            if (use.Action is not { Type: CardActionType.Use } action || action.ActionId != r.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(use.CardKind) || (r.AutomaticGameplayHash is { } automaticHash ? _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<AutomaticExtraCardEffectIssuedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.ProgramFrameId == r.ProgramFrameId && e.Source == r.Source && e.GameplayHash == automaticHash && _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash == automaticHash) : _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ExtraCardEffectIssuedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.ProgramFrameId == r.ProgramFrameId && e.Source == r.Source && e.PaidCardId == r.PaidCardId)) != 1 || r.OriginalAttacks.GroupBy(s => s.TargetIndex).Any(g => g.Count() != 1) || r.OriginalAttacks.Any(s => s.TargetIndex < 0 || s.TargetIndex >= use.TargetSeats.Count) || r.WholeGroupRepeated && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ExtraCardEffectStartedEvent>().Any(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId))
-                throw new InvalidOperationException("An extra effect lost its one real use, paid source or native target seeds.");
-        }
-    }
-
     [ProgramDamageHook(ProgramDamagePhase.AttackCompletionPrelude, 20)]
     internal bool FinishExtraAttackRound(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
     {

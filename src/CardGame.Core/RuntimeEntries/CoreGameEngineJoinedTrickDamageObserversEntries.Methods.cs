@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineJoinedTrickDamageObserversEntries
 {
     internal bool HasJoinedTrickDamageRewardBeforeDamageObserver(long id) => _resolve().HasJoinedTrickDamageRewardBeforeDamageObserver(id);
-    internal bool HasJoinedTrickDamageRewardCardObserver(long useId) => _resolve().HasJoinedTrickDamageRewardCardObserver(useId);
     internal bool HasJoinedTrickDamageRewardDamageObserver(long id) => _resolve().HasJoinedTrickDamageRewardDamageObserver(id);
     internal bool HasJoinedTrickDamageRewardObserver(long id, bool before) => _resolve().HasJoinedTrickDamageRewardObserver(id, before);
     internal bool IsJoinedTrickDamageRewardDying() => _resolve().IsJoinedTrickDamageRewardDying();

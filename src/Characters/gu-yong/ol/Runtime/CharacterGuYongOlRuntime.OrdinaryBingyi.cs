@@ -59,7 +59,6 @@ internal sealed partial class CharacterGuYongOlRuntime
 
     internal void PublishOrdinaryBingyi(ProgramSkillFrame f)
     {
-        AssertOrdinaryBingyi(f);
         var choices = OrdinaryBingyiChoices(f);
         if (choices.Count == 0)
         {
@@ -86,7 +85,6 @@ internal sealed partial class CharacterGuYongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OrdinaryBingyi: { Stage: OrdinaryBingyiStage.SelectingRecipients } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OrdinaryBingyiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Ordinary Bingyi requires a current original recipient choice.");
-        AssertOrdinaryBingyi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters["branch"] == "toggle")
         {
@@ -122,7 +120,6 @@ internal sealed partial class CharacterGuYongOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { OrdinaryBingyi: { } r } f && f.Id == id)
         {
-            AssertOrdinaryBingyi(f);
             if (r.Stage == OrdinaryBingyiStage.SelectingRecipients)
             {
                 if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)

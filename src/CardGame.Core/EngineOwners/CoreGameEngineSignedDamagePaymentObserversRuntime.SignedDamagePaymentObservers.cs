@@ -53,8 +53,6 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 2000)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 100)]
     internal bool HasSignedDamagePaymentObserver(long exactWindowId) => SignedDamagePaymentObserverRoot(exactWindowId)is not null;
-    internal bool HasSignedDamagePaymentAttackObserver(global::CardGame.Core.GameEngine.IDamageAttempt attack) => SignedDamagePaymentObserverRoot()is { } root && root.SignedDamagePayment!.OriginalAttackFrameId == attack.ResolutionId && root.SignedDamagePayment.SourceSeat == attack.SourceSeat && root.SignedDamagePayment.TargetSeat == attack.TargetSeat && root.SignedDamagePayment.Nature == _coreNativeCardClassificationsOperations.GetDamageNature(attack);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 460, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 540)]
     internal bool IsSignedDamagePaymentProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SignedDamagePaymentObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 570)]

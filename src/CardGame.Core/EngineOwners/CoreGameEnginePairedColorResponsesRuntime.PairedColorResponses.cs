@@ -141,7 +141,6 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
     internal void ResolvePairedColorDisposition(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The paired-color chooser lost its owning frame.");
-        _corePairedColorResponseObserversOperations.AssertPairedColorDisposition(f);
         if (f.PairedColorDisposition is not { Stage: PairedColorDispositionStage.ChoosingCard } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_corePairedColorResponseObserversOperations.IsPairedColorDispositionChoice(f, prompt) || !PairedColorDispositionChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, selected)) || !Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !int.TryParse(selected.Parameters.GetValueOrDefault("slot-index"), out var slot))
             throw new InvalidOperationException("Paired-color disposition requires its current exact owner-only published card slot.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.CounterpartSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -184,7 +183,6 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { PairedColorDisposition: { } r } f || f.Id != frameId)
             return false;
-        _corePairedColorResponseObserversOperations.AssertPairedColorDisposition(f);
         if (r.Stage == PairedColorDispositionStage.ChoosingCard)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
@@ -218,7 +216,6 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
     {
         if (f.PairedColorDisposition is not { Stage: PairedColorDispositionStage.MovementChildren })
             return false;
-        _corePairedColorResponseObserversOperations.AssertPairedColorDisposition(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

@@ -4,9 +4,7 @@ internal sealed partial class CoreGameEngineMantianGuohaiEntries
 {
     internal void AddMantianGuohaiActions(global::System.Collections.Generic.List<global::CardGame.Core.LegalAction> actions, global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IEnumerable<global::CardGame.Core.Card> playableCards) => _resolve().AddMantianGuohaiActions(actions, actor, playableCards);
     internal bool AllowsMantianGuohaiGiftActivation(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsMantianGuohaiGiftActivation(gate);
-    internal void AssertMantianGuohaiState() => _resolve().AssertMantianGuohaiState();
     internal global::System.Collections.Generic.IReadOnlyList<int> CreateMobileShiMantianGuohaiCards(int seat) => _resolve().CreateMobileShiMantianGuohaiCards(seat);
-    internal bool HasMantianGuohaiPrompt() => _resolve().HasMantianGuohaiPrompt();
     internal bool IsMantianGuohaiGiftProgram(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsMantianGuohaiGiftProgram(frame);
     internal bool IsMantianGuohaiUse(long id) => _resolve().IsMantianGuohaiUse(id);
     internal bool KeepMantianGuohaiMaterial(long id) => _resolve().KeepMantianGuohaiMaterial(id);

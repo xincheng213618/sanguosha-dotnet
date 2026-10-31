@@ -7,82 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanJiOlRuntime
 {
-    internal bool YuanJiParent(ProgramSkillFrame f)
-    {
-        if (f.YuanJi is not { } r || f.WindowContext is not { } c || c.ParentFrameId != r.ParentId || c.Window != r.Window)
-            return false;
-        var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (i < 1 || _resolutionStackOperations._resolutionStack[i - 1].Id != r.ParentId)
-            return false;
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex);
-        if (!YuanJiWindowCandidate(candidate, c, out var parent))
-            return false;
-        if (r.Op == SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair)
-            return parent is CardsMovedTriggerWindowFrame moved && JieyanOpportunity(candidate)is { } loss && loss.Index == r.OpportunityIndex && loss.LoserSeat == r.LoserSeat && ValidJieyanOpportunity(loss, moved.Batch) && CreateJieyanContext(moved, candidate) == c;
-        if (r.Op == SkillProgramEffectOp.ResolveShuiyueTurnDraw)
-            return parent is DeferredTurnEndFrame end && end.OwnerSeat == f.OwnerSeat && _coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(end, f, c);
-        if (parent is not ProgramLifecycleTriggerWindowFrame window || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]))
-            return false;
-        if (r.Op == SkillProgramEffectOp.ResolveShuiyueRoundReturn)
-            return window is { Window: SkillProgramTriggerWindow.RoundEnding, RoundEndingBoundaryId: { } id } && i >= 2 && _resolutionStackOperations._resolutionStack[i - 2] is RoundEndingBoundaryFrame root && root.Id == id && r.Round == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber;
-        return r.Op == SkillProgramEffectOp.ResolveJinghuaTurnReturn ? window.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && f.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat : window.Window == SkillProgramTriggerWindow.RoundStarting && _coreProgramEventHistoryOperations.ProgramEventHistory<RoundStartedEvent>().Any(e => e.RoundNumber == r.Round && e.ActorSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27540)]
-    internal void AssertYuanJi(ProgramSkillFrame f)
-    {
-        if (f.YuanJi is not { } r)
-            return;
-        if (f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.CardSetBindings.Count != 0 || f.ChoiceBindings.Count != 0 || f.NumberBindings.Count != 0 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || !YuanJiComposition.IsOp(r.Op) || r.Source != YuanJiSource(f) || r.GameplayHash != f.GameplayHash || !YuanJiParent(f) || r.Round != _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Count(e => e == new YuanJiStartedEvent(f.Id, r.Source, r.GameplayHash, r.Op, r.ParentId, r.Window, r.ActualTurn, r.TurnOwner, r.Round, r.LoserSeat, r.OpportunityIndex)) != 1)
-            throw new InvalidOperationException("YuanJi lost its native mother, exact original source/hash, committed instruction or scalar start.");
-        var pair = r.Op == SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair;
-        if (r.Cursor < 0 || r.Cursor > (pair ? 2 : 1) || r.Draws.Count != (r.Stage == YuanJiStage.DrawChildren ? r.Cursor + 1 : r.Cursor) || r.Draws.Select(d => d.Index).Where((n, i) => n != i).Any())
-            throw new InvalidOperationException("YuanJi cannot repeat a draw or merge the two references to the same participant.");
-        foreach (var d in r.Draws)
-        {
-            var recipient = pair && d.Index == 1 ? r.LoserSeat : f.OwnerSeat;
-            var reason = pair ? YuanJiPairReason : r.Op == SkillProgramEffectOp.ResolveJinghuaRoundDraw ? YuanJiJinghuaReason : YuanJiShuiyueReason;
-            var movements = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > d.Before && m.Sequence <= d.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(recipient) && m.Reason.Value == reason).ToArray();
-            if (d.RecipientSeat != recipient || d.Requested != (pair ? 1 : 2) || d.Actual < 0 || d.Actual > d.Requested || d.Before < 0 || d.After < d.Before || movements.Length != d.Actual || movements.Select(m => m.CardId).Distinct().Count() != d.Actual || _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiDrawCompletedEvent>().Count(e => e == new YuanJiDrawCompletedEvent(f.Id, d.Index, recipient, d.Top, d.Requested, d.Actual, d.Before, d.After)) != 1 || d.Actual > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Count(e => e.ParentFrameId == f.Id && e.OwnerSeat == recipient && e.Requested == d.Requested && e.ActualCount == d.Actual && e.SequenceBefore == d.Before && e.SequenceAfter == d.After && e.DirectProducer == r.Source && e.Reason.Value == reason) != 1)
-                throw new InvalidOperationException("YuanJi lost the exact independent native whole-draw payment.");
-            if (pair)
-            {
-                var shown = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiShownEvent>().Where(e => e.FrameId == f.Id && e.Index == d.Index).ToArray();
-                if (d.Top != (d.Index == 0) || (d.Actual == 0 ? (shown.Length != 0 || d.CardId is not null || d.Suit is not null) : (shown is not [var s] || s.RecipientSeat != recipient || s.CardId != d.CardId || s.Suit != d.Suit || s.MovementSequence != movements[0].Sequence || s.CardId != movements[0].CardId)))
-                    throw new InvalidOperationException("Jieyan lost its exact publicly shown opposite-end physical card.");
-            }
-            else
-            {
-                var marks = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiAcquiredEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
-                if (marks.Length != d.Actual || marks.Where((e, i) => e.Index != i || e.CardId != movements[i].CardId || e.MovementSequence != movements[i].Sequence).Any())
-                    throw new InvalidOperationException("YuanJi marks must be the exact real two-card draw entities.");
-            }
-        }
-
-        if (IsYuanJiReturnOp(r.Op))
-        {
-            if (r.Claims.Count == 0 || r.Claims.Select(c => (c.DrawFrameId, c.Index, c.CardId)).Distinct().Count() != r.Claims.Count || r.Eligible.Distinct().Count() != r.Eligible.Count || r.Eligible.Any(id => !r.Claims.Any(c => c.CardId == id)) || r.Ordered.Distinct().Count() != r.Ordered.Count || r.Ordered.Any(id => !r.Eligible.Contains(id)))
-                throw new InvalidOperationException("YuanJi return cannot invent, duplicate or adopt a foreign mark.");
-            foreach (var claim in r.Claims)
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Count(e => e.FrameId == claim.DrawFrameId && e.Source == claim.Source && e.GameplayHash == claim.GameplayHash && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId && IsYuanJiMarkDraw(e.Op)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiAcquiredEvent>().Count(a => a == new YuanJiAcquiredEvent(claim.DrawFrameId, claim.Index, claim.CardId, claim.MovementSequence)) != 1)
-                    throw new InvalidOperationException("YuanJi lost its original draw-source lifetime invoice.");
-            if (!r.Ordered.Select((id, i) => new YuanJiReturnSelectedEvent(f.Id, i, id)).SequenceEqual(_coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiReturnSelectedEvent>().Where(e => e.FrameId == f.Id)))
-                throw new InvalidOperationException("YuanJi changed the privately selected exact return order.");
-            if (r.Stage == YuanJiStage.ReturnChildren && (r.Ordered.Count != r.Eligible.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiReturnPaidEvent>().Count(e => e == new YuanJiReturnPaidEvent(f.Id, r.Ordered.Count, r.Op == SkillProgramEffectOp.ResolveShuiyueRoundReturn, r.Before, r.After)) != 1 || r.Claims.Any(c => _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiMarkClosedEvent>().Count(e => e.DrawFrameId == c.DrawFrameId && e.Index == c.Index && e.CardId == c.CardId) != 1)))
-                throw new InvalidOperationException("YuanJi cannot expire or return a mark twice.");
-        }
-        else if (r.Claims.Count != 0 || r.Eligible.Count != 0 || r.Ordered.Count != 0)
-            throw new InvalidOperationException("A YuanJi draw cannot claim a previous marked hand.");
-        if (r.Stage is YuanJiStage.DrawChildren or YuanJiStage.ReturnChildren)
-        {
-            if (f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).Any(m => !IsYuanJiOwnMovement(f, m)))
-                throw new InvalidOperationException("YuanJi lost its exact native movement range.");
-        }
-        else if (f.PendingMovementContinuation is not null || r.Before != 0 || r.After != 0)
-            throw new InvalidOperationException("An unpaid YuanJi choice cannot claim movement.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (r.Stage != YuanJiStage.ReturnOrder || prompt.PlayerSeat != f.OwnerSeat || !prompt.IsPrivate || prompt.SkillPrompt?.SkillId != f.SkillId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, YuanJiOrderChoices(f))))
-            throw new InvalidOperationException("YuanJi lost its private exact original-card ordering menu.");
-    }
 
     internal bool IsYuanJiOwnMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
@@ -101,7 +25,6 @@ internal sealed partial class CharacterYuanJiOlRuntime
     {
         if (f.YuanJi is not { Stage: YuanJiStage.DrawChildren or YuanJiStage.ReturnChildren })
             return false;
-        AssertYuanJi(f);
         if (child is CardsMovedTriggerWindowFrame moved)
             return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsYuanJiOwnMovement(f, m));
         if (child is HpChangedTriggerWindowFrame hp)
@@ -120,8 +43,6 @@ internal sealed partial class CharacterYuanJiOlRuntime
     internal bool HasYuanJiDamageObserver(long id) => YuanJiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1130)]
     internal bool HasYuanJiBeforeDamageObserver(long id) => YuanJiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 960)]
-    internal bool IsYuanJiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && YuanJiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 230)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 220)]
     internal bool IsYuanJiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.YuanJi is { Stage: YuanJiStage.DrawChildren } r && r.Draws.Count > 0 && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;

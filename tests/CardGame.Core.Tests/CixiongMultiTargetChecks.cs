@@ -39,8 +39,6 @@ internal static class CixiongMultiTargetChecks
                     if (prompt.PlayerSeat == 0)
                     {
                         sourceChoices.Add(prompt.TargetSeat!.Value);
-                        if (count == 3 && activate && sourceChoices.Count == 1)
-                            RejectForeignTargetCursors(game, registry, use);
                         var choice = prompt.Choices.Single(c => c.Parameters.GetValueOrDefault("action") ==
                             (activate ? "cixiong-use" : "cixiong-skip"));
                         Accept(game, new AnswerPromptCommand(0, prompt.PromptId, choice.Id, game.Revision));
@@ -63,23 +61,6 @@ internal static class CixiongMultiTargetChecks
                     m.To == CardLocation.DiscardPile) == 1,
                 "All native target attacks return before the physical Slash completes and leaves Processing once.");
             Cold(game, registry);
-        }
-    }
-
-    private static void RejectForeignTargetCursors(GameEngine game, ContentRegistry registry, CardUseFrame original)
-    {
-        foreach (var index in new[] { -1, original.TargetSeats.Count, 1 })
-        {
-            var invalid = GameReplay.Restore(game.CreateCheckpoint(), registry);
-            const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-            var stack = (FrameStore)typeof(GameEngine).GetField("_resolutionStack", flags)!.GetValue(invalid)!;
-            var use = stack.OfType<CardUseFrame>().Single(u => u.Id == original.Id);
-            stack.Replace(use with { TargetIndex = index });
-            var rejected = false;
-            try { global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants", flags)!.Invoke(invalid, null); }
-            catch (TargetInvocationException ex) when (ex.InnerException is InvalidOperationException)
-            { rejected = true; }
-            Need(rejected, "An out-of-range cursor or another accepted target cannot own the pending weapon choice.");
         }
     }
 

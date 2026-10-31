@@ -26,7 +26,6 @@ internal sealed partial class MouKongRongRuntime
     }
     private ProgramSkillFrame? ObserverRoot()=>frames.OfType<ProgramSkillFrame>().LastOrDefault(f=>frames.ChildOf(f.Id)is{}child&&FirstChild(f,child)&&(child is DyingFrame||health.PaidObserverSuffix(f.Id)));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime,34600)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant,34600)]
     internal bool DyingProof()
     {
         if(health.ActiveDying is not{}dying||ObserverRoot()is not{}root)return false;

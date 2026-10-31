@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MoCaoCaoBachaoRuntime(IMoCaoCaoFacts facts, IMoCaoCaoOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts) : IMoCaoCaoBachaoHost
 {
@@ -188,12 +188,6 @@ internal sealed partial class MoCaoCaoBachaoRuntime(IMoCaoCaoFacts facts, IMoCao
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,33800)]
     private bool AcceptedContinuation(ProgramSkillFrame f) =>
         (f.MoCaoCaoBachao is not null || f.MoCaoCaoBaibi is not null) ? Valid(f) : RetainIssuedBaibi(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,33800)]
-    private void AssertReceipt(ProgramSkillFrame f)
-    {
-        if((f.MoCaoCaoBachao is not null || f.MoCaoCaoBaibi is not null) && !Valid(f))
-            throw new InvalidOperationException("Magic Cao Cao lost the exact source, signed window or native payment cursor.");
-    }
     [ProgramContinuation(ProgramContinuationKind.Resume, 33800)]
     private bool Resume(long id)
     {

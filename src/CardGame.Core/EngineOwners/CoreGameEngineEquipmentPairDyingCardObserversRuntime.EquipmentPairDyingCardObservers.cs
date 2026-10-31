@@ -71,7 +71,6 @@ internal sealed partial class CoreGameEngineEquipmentPairDyingCardObserversRunti
     {
         if (root.DyingOwnedCard is not { NonBasic: true, PaidCardId: { } cardId, SourceLocation: { } source } r)
             return false;
-        _coreDyingOwnedCardSelectionsOperations.AssertDyingOwnedCardReceipt(root);
         return _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.MovementSequenceBefore && m.CardId == cardId && m.From == source && m.To == _coreEquipmentPairPaymentsOperations.OwnedPaymentDiscardDestination(cardId) && m.Reason.Value == $"skill-program.{(root.SkillId)}.{(SkillProgramEffectOp.MoveBoundCards)}") == 1;
     }
 
@@ -81,7 +80,6 @@ internal sealed partial class CoreGameEngineEquipmentPairDyingCardObserversRunti
         {
             if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.DyingOwnedCard is not { } r || originalDyingId is { } wanted && r.DyingFrameId != wanted || !_coreDyingOwnedCardSelectionsOperations.ExactDyingOwnedCardEntry(root, out _, out _) || root.InstructionIndex is < 1 or > 4)
                 continue;
-            _coreDyingOwnedCardSelectionsOperations.AssertDyingOwnedCardReceipt(root);
             if (index + 1 == _resolutionStackOperations._resolutionStack.Count)
                 return root;
             if (!DyingOwnedCardCostIsPaid(root))
@@ -111,8 +109,6 @@ internal sealed partial class CoreGameEngineEquipmentPairDyingCardObserversRunti
 
         return null;
     }
-
-    internal bool IsExactDyingOwnedCardRide(long dyingId) => DyingOwnedCardObserverRoot(dyingId)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 470)]
     internal bool IsEquipmentPairOrDyingCardProgramDying()
     {

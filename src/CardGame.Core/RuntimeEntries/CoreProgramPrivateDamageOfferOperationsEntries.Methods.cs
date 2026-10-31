@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreProgramPrivateDamageOfferOperationsEntries
 {
-    internal void AssertPrivateOfferDrafts(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertPrivateOfferDrafts(frame, paused);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> DamageCardOfferChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DamageCardOfferChoices(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome DiscardProgramSelectedParticipantCards(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DiscardProgramSelectedParticipantCards(frame);
     internal global::CardGame.Core.CardSnapshot[] GetOfferedPrivatelyViewedCards(int viewerSeat) => _resolve().GetOfferedPrivatelyViewedCards(viewerSeat);

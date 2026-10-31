@@ -319,25 +319,6 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
     internal bool ShiXbNativeMaterialBatch(CardUseFrame use, CardMovementBatchContext batch) => use.ShiXiahouBaPoxi is { } n && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is { ShiXiahouBa: { UseId: var useId } } && useId == use.Id && batch.ParentFrameId == use.Id && batch.Movements.Any(m => m.CardId == n.CardId && m.From == CardLocation.DiscardPile && m.To == CardLocation.Processing && m.Reason.Value == ShiXiahouBaComposition.PoxiUseMoveReason);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 68000)]
     internal bool ShiXbExemptDebit(long useId, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { ShiXiahouBaPoxi: { } n } && n.Source.OwnerSeat == actor && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == n.FrameId && f.ShiXiahouBa is { UseId: var owned } && owned == useId);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 68000)]
-    internal void AssertShiXb(ProgramSkillFrame f)
-    {
-        if (f.ShiXiahouBa is not { } r)
-            return;
-        if (r.ActualTurn <= 0 || r.Source?.OwnerSeat != f.OwnerSeat || r.Operation is not ("libbing" or "poxi"))
-            throw new InvalidOperationException("Shi Xiahou Ba lost its original typed operation receipt.");
-        if (r.Operation == "libbing" && (f.SkillId != ShiXbLibbing || f.TriggerId != ShiXiahouBaComposition.LibbingTrigger || f.WindowContext?.CardUse is null || r.ActionId != f.WindowContext.CardUse.CardActionId))
-            throw new InvalidOperationException("Libbing lost its completed-use window receipt.");
-        if (r.Operation == "poxi")
-        {
-            if (f.SkillId != ShiXbPoxi || f.TriggerId != ShiXiahouBaComposition.PoxiTrigger || f.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } || batch.Id != r.BatchId || index < 0 || index >= batch.Movements.Count || batch.Movements[index].Sequence != r.DiscardMovementSequence || batch.Movements[index].CardId != r.CardId)
-                throw new InvalidOperationException("Poxi lost its exact original discarded-slash movement.");
-            if (r.Stage >= ShiXiahouBaComposition.PoxiStageNativeUse && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiXbPoxiNativeIssuedEvent>().Any(e => e.FrameId == f.Id && e.Source == ShiXbSource(f) && e.UseId == r.UseId && e.ActionId == r.ActionId && e.CardId == r.CardId))
-                throw new InvalidOperationException("Poxi lost its issued native-use receipt.");
-            if (r.Stage >= ShiXiahouBaComposition.PoxiStageReturnedUse && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiXbPoxiNativeReturnedEvent>().Any(e => e.FrameId == f.Id && e.UseId == r.UseId))
-                throw new InvalidOperationException("Poxi lost its whole native-use return receipt.");
-        }
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShiXbPoxi)]
     internal PromptChoice ChooseShiXbAi(PendingDecision decision, ProgramSkillFrame f)

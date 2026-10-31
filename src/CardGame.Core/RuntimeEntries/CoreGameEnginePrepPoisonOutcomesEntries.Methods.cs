@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePrepPoisonOutcomesEntries
 {
     internal global::CardGame.Core.SkillProgramStepOutcome ApplyProgramHpLoss(long frameId, string skillId, int targetSeat, int amount, global::System.Action<int, int, int>? afterPayment = default) => _resolve().ApplyProgramHpLoss(frameId, skillId, targetSeat, amount, afterPayment);
-    internal void AssertPrepPoisonOutcome(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertPrepPoisonOutcome(f);
     internal bool ContinuePaidPrepPoison(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidPrepPoison(f);
     internal bool HasPrepPoisonParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPrepPoisonParent(f);
     internal bool IsFirstPrepPoisonCandidate(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().IsFirstPrepPoisonCandidate(c);

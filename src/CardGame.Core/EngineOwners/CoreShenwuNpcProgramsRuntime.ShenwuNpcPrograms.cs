@@ -120,38 +120,6 @@ internal sealed partial class CoreShenwuNpcProgramsRuntime
     }
 
     internal void BindShenwuParticipant(ProgramSkillFrame frame, SkillProgramEffect effect, int? seat, string choice) => _coreRuntimeOperations.ReplaceRuntimeTop(frame with { SelectedTargetSeats = seat is { } actual ? Array.AsReadOnly(new[] { actual }) : [], ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(effect.ResultBind!, choice, frame.OwnerSeat)).ToArray()) });
-    internal bool IsShenwuChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding)
-    {
-        if (binding.ChooserSeat != frame.OwnerSeat || frame.WindowContext is not { } context)
-            return false;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        var producer = plan.Instructions.Take(frame.InstructionIndex).SingleOrDefault(effect => effect.ResultBind == binding.Name && effect.Op is SkillProgramEffectOp.BindShenwuOtherDamageSource or SkillProgramEffectOp.BindShenwuUndamagingTurnOwner or SkillProgramEffectOp.BindShenwuRecoveryBeneficiary or SkillProgramEffectOp.BindShenwuDeathBenefit);
-        if (producer is null)
-            return false;
-        int? participant = producer.Op switch
-        {
-            SkillProgramEffectOp.BindShenwuOtherDamageSource when context.Window == SkillProgramTriggerWindow.AfterDamageApplied => context.SourceSeat,
-            SkillProgramEffectOp.BindShenwuUndamagingTurnOwner when context.Window == SkillProgramTriggerWindow.AfterTurnEnded => context.TargetSeat,
-            SkillProgramEffectOp.BindShenwuRecoveryBeneficiary when context is { Window: SkillProgramTriggerWindow.AfterHpRecovered, HpChange: { Kind: HpChangeKind.Recovery, Amount: > 0 } hp } => hp.TargetSeat,
-            _ => null
-        };
-        if (producer.Op == SkillProgramEffectOp.BindShenwuDeathBenefit)
-            return context.Window == SkillProgramTriggerWindow.CharacterDied && frame.SelectedTargetSeats.Count == 0 && binding.OptionId is "kill-minion" or "fallen-god" or "fallen-player" or "none";
-        return participant is { } seat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && (binding.OptionId == "eligible" && frame.SelectedTargetSeats.SequenceEqual([seat]) || binding.OptionId == "other" && frame.SelectedTargetSeats.Count == 0);
-    }
-
-    internal bool HasExactShenwuBoundParticipantSelection(ProgramSkillFrame frame)
-    {
-        if (frame.SelectedTargetSeats is not [var participant] || frame.WindowContext is not { } context || !frame.ChoiceBindings.Any(binding => binding.OptionId == "eligible" && IsShenwuChoiceResult(frame, binding)))
-            return false;
-        if (context.Window == SkillProgramTriggerWindow.AfterTurnEnded)
-            return _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().LastOrDefault(p => p.Id == context.ParentFrameId)is { } ending && context.SourceSeat == participant && context.TargetSeat == participant && ending.OwnerSeat == participant && _coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(ending, frame, context);
-        if (context.Window == SkillProgramTriggerWindow.AfterDamageApplied)
-            return _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().LastOrDefault(p => p.Id == context.ParentFrameId)is { } damage && _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage)is { IsSourceLess: false } attack && attack.SourceSeat == participant && context.SourceSeat == participant;
-        if (context is { Window: SkillProgramTriggerWindow.AfterHpRecovered, HpChange: { } hp })
-            return participant == hp.TargetSeat && _resolutionStackOperations._resolutionStack.OfType<HpChangedTriggerWindowFrame>().LastOrDefault(p => p.Id == hp.Id)is { } parent && parent.Change == hp && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] is { } candidate && candidate.OwnerSeat == frame.OwnerSeat && candidate.SkillId == frame.SkillId && candidate.SkillInstanceId == frame.SkillInstanceId && candidate.BindingId == frame.TriggerId && IsShenwuRecoveryCandidate(candidate, context);
-        return false;
-    }
 
     internal bool ShenwuEnabled(CharacterState player, string skillId) => player.IsAlive && _contentRegistryOperations._contentRegistry.Skills.ContainsKey(skillId) && _coreSkillProgramsOperations.EnabledSkillPrograms(player).Any(p => p.Id == skillId);
     internal bool ShenwuOwnActualTurn(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase is not (TurnPhase.NotStarted or TurnPhase.Finished);

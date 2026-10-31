@@ -4,7 +4,6 @@ internal sealed partial class CharacterXieLingYuOlEntries
 {
     internal bool AdvanceXieLingYuChildren() => _resolve().AdvanceXieLingYuChildren();
     internal void AnswerXieLingYu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerXieLingYu(choice);
-    internal void AssertXieLingYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertXieLingYu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginXieLingYu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginXieLingYu(supplied, op);
     internal bool CanActivateXinyou(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateXinyou(c);
     internal bool CanContinueIssuedXieLingYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueIssuedXieLingYu(f);
@@ -22,7 +21,6 @@ internal sealed partial class CharacterXieLingYuOlEntries
     internal bool HasXieLingYuDamageObserver(long id) => _resolve().HasXieLingYuDamageObserver(id);
     internal bool HasXinyouCardMark(int ownerSeat, int cardId) => _resolve().HasXinyouCardMark(ownerSeat, cardId);
     internal bool IsIssuedYuandiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedYuandiCandidate(c, context);
-    internal bool IsXieLingYuDying() => _resolve().IsXieLingYuDying();
     internal bool IsXieLingYuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXieLingYuMovement(f, e, p);
     internal bool IsXieLingYuPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsXieLingYuPaidMovement(f, m);
     internal bool IsXieLingYuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsXieLingYuRecoveryParent(f, recovery);

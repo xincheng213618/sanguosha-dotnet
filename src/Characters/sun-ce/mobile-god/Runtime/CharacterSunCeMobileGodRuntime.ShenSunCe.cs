@@ -80,7 +80,6 @@ internal sealed partial class CharacterSunCeMobileGodRuntime
     {
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShenSunCe: { } r } f && f.Id == id)
         {
-            RequireShenSunCe(f);
             if (r.Stage == ShenSunCeStage.DrawAttempt)
                 return;
             if (DrainShenSunCe(id))
@@ -154,7 +153,6 @@ internal sealed partial class CharacterSunCeMobileGodRuntime
     internal void ReturnShenSunCeDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        RequireShenSunCe(f);
         var r = f.ShenSunCe!;
         if (r.Stage != ShenSunCeStage.DrawAttempt || r.DrawReturned || f.NativeDraw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.RequestedDraw || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Fuhai requires its exact typed native draw return.");
@@ -192,7 +190,6 @@ internal sealed partial class CharacterSunCeMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenSunCe: { Stage: ShenSunCeStage.GiftChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenSunCeGiftChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
             throw new InvalidOperationException("Fenghe requires its owner's exact current private hand gift and recipient.");
-        RequireShenSunCe(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var card = choice.Cards.Single();
         var target = choice.Targets.Single();
@@ -222,7 +219,6 @@ internal sealed partial class CharacterSunCeMobileGodRuntime
     {
         if (f.ShenSunCe is not { Operation: SkillProgramEffectOp.ResolveShenSunCeFenghe, Stage: ShenSunCeStage.GiftChildren, CardId: > 0 } r || effect?.Op != r.Operation || f.PendingMovementContinuation != pending || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.RecipientSeat) || r.RecipientSeat == f.OwnerSeat || r.SequenceAfter <= r.SequenceBefore)
             return false;
-        RequireShenSunCe(f);
         return _coreProgramEventHistoryOperations.ProgramEventHistory<ShenSunCeGiftPaidEvent>().Count(e => e == new ShenSunCeGiftPaidEvent(f.Id, r.CardId, r.RecipientSeat, r.SequenceAfter)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence == r.SequenceAfter && m.CardId == r.CardId && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(r.RecipientSeat) && m.Reason.Value == ShenSunCeGiftReason) == 1;
     }
 
@@ -231,32 +227,6 @@ internal sealed partial class CharacterSunCeMobileGodRuntime
     internal bool KeepPaidShenSunCe(ProgramSkillFrame f) => f.ShenSunCe is not null;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShenSunCeFenghe)]
     internal PromptChoice AiShenSunCeGift(PendingDecision d, ProgramSkillFrame f) => d.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 38100)]
-    internal void RequireShenSunCe(ProgramSkillFrame f)
-    {
-        if (f.ShenSunCe is not { } r)
-            return;
-        if (r.Source != ShenSunCeSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || !Enum.IsDefined(r.Stage) || r.Amount < 1 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.SequenceBefore < 0 || r.SequenceAfter < r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenSunCeStartedEvent>().Count(e => e == new ShenSunCeStartedEvent(f.Id, r.Source, r.GameplayHash, r.Operation, r.ParentId, r.ActualTurn, r.SubjectSeat, r.Amount, r.DeathId)) != 1)
-            throw new InvalidOperationException("Shen Sun Ce lost the owning program, source, turn or original payment receipt.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-        if (r.ParentId != 0 && (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != r.ParentId || f.WindowContext is not { } context || _resolutionStackOperations._resolutionStack[index - 1] switch
-        {
-            ProgramCardTriggerWindowFrame w => w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])),
-            ProgramKillTriggerWindowFrame w => w.DeathFrameId != r.DeathId || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]),
-            BeforeDamageProgramWindowFrame w => w.SourceSeat != r.SubjectSeat || w.TargetSeat != f.OwnerSeat || !w.Prevented || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].Candidate),
-            _ => true
-        }))
-            throw new InvalidOperationException("Shen Sun Ce lost his exact suspended native parent and candidate.");
-        if (r.CardId > 0 && (r.Stage is ShenSunCeStage.GiftChildren or ShenSunCeStage.MarkerChildren) && (!_coreProgramEventHistoryOperations.ProgramEventHistory<ShenSunCeGiftPaidEvent>().Any(e => e == new ShenSunCeGiftPaidEvent(f.Id, r.CardId, r.RecipientSeat, r.SequenceAfter)) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == r.SequenceAfter && m.CardId == r.CardId && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(r.RecipientSeat) && m.Reason.Value == ShenSunCeGiftReason)))
-            throw new InvalidOperationException("Fenghe lost its actual hand-to-recipient physical payment.");
-        if (r.DrawReturned)
-        {
-            var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<ShenSunCeDrawReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-            var reason = $"skill-program.mobile:fuhai.{((r.Operation == SkillProgramEffectOp.ResolveShenSunCeFuhaiDeath ? "death" : "target"))}-draw";
-            if (paid is not [var draw] || r.Stage != ShenSunCeStage.DrawChildren || draw.Source != r.Source || draw.Operation != r.Operation || draw.ActualTurn != r.ActualTurn || draw.Requested != r.RequestedDraw || draw.SequenceBefore != r.SequenceBefore || draw.SequenceAfter != r.SequenceAfter || draw.Actual < 0 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == reason) != draw.Actual)
-                throw new InvalidOperationException("Fuhai lost its typed native request and actual draw movement invoice.");
-        }
-    }
 
     internal bool ShenSunCeCannotRespond(int source, int responder, CardKind kind, IReadOnlyList<int> targets) => source != responder && (kind == CardKind.BorrowedSword ? targets.Where((_, index) => index % 2 == 0).Contains(responder) : targets.Contains(responder)) && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && _coreMatchParticipantsPlayersAccess._players[responder].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[source], ShenSunCeFuhai) && Pingding(responder) > 0;
     internal bool ShenSunCeDistance(CharacterState actor, CharacterState target) => actor.IsAlive && target.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(actor, ShenSunCeYingba) && Pingding(target.Seat) > 0;

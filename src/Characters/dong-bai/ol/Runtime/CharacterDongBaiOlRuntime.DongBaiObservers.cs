@@ -64,8 +64,6 @@ internal sealed partial class CharacterDongBaiOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 60)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 170)]
     internal bool HasLianZhuDamageObserver(long id) => LianZhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 20)]
-    internal bool IsLianZhuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LianZhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 140)]
     internal bool TryAdvanceLianZhuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LianZhuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramPipelineHook(ProgramPipelinePhase.ObserveCommittedMovement, 100)]

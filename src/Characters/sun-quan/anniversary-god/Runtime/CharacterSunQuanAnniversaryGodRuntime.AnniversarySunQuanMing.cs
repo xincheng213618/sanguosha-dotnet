@@ -132,13 +132,6 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
         return records.Length > 0 && records.All(m => m.From.OwnerSeat is not null && (r.Operation != SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingSetup || m.From.Zone == CardZoneKind.Hand) && (r.Operation != SkillProgramEffectOp.ResolveAnniversarySunQuanJichao || m.From.OwnerSeat != f.OwnerSeat && (r.Branch == 2 || m.From.OwnerSeat == r.Target)) && (m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), m.From, m.To)) || locations.Contains(m.To) && m.To.OwnerSeat == m.From.OwnerSeat));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 40500)]
-    internal void RequireAnniversarySunQuan(ProgramSkillFrame f)
-    {
-        if (f.AnniversarySunQuan is not null && !ValidAnniversarySunQuan(f))
-            throw new InvalidOperationException("Anniversary Sun Quan lost his exact source, original native parent, private paid allocation or once-only movement receipt.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 40500)]
     internal bool AnniversarySunQuanMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.AnniversarySunQuan is { Stage: AnniversarySunQuanStage.MovementChildren } r && effect?.Op == r.Operation && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidAnniversarySunQuan(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40500)]

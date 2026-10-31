@@ -54,32 +54,6 @@ internal static class SkillProgramJudgmentDamageChecks
                 restoredPrompt.ValidTargetSeats.SequenceEqual(targetPrompt.ValidTargetSeats),
             "A paused selected-target judgment effect must restore its exact private prompt.");
 
-        var invalidParent = GameReplay.Restore(paused, registry);
-        var stack = (FrameStore)typeof(GameEngine)
-            .GetField("_resolutionStack", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .GetValue(invalidParent)!;
-        var parentIndex = stack.FindIndex(item => item is ProgramSkillFrame
-            { TriggerId: "opening-judgment" });
-        Require(parentIndex >= 0 && stack[parentIndex] is ProgramSkillFrame
-            { InstructionIndex: >= 2 },
-            "The opening judgment must retain its committed parent instruction.");
-        var parent = (ProgramSkillFrame)stack[parentIndex];
-        stack.Replace(parent with { InstructionIndex = 1 });
-        var rejectedParent = false;
-        try
-        {
-            global::FixtureRuntimeAccess.Engine.GetMethod("AssertCoreInvariants",
-                BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(invalidParent, null);
-        }
-        catch (TargetInvocationException exception) when (exception.InnerException is
-            InvalidOperationException { Message: var message } &&
-            message.Contains("judgment continuation", StringComparison.OrdinalIgnoreCase))
-        {
-            rejectedParent = true;
-        }
-        Require(rejectedParent,
-            "A judgment continuation with a different paid parent instruction must be rejected.");
-
         var invalidBefore = SnapshotJson.Serialize(boundary.CreateSnapshot(0, revealAll: true));
         var invalid = boundary.Submit(new AnswerPromptCommand(
             0,

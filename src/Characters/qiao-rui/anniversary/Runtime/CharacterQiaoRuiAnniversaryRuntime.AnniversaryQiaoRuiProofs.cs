@@ -68,26 +68,6 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         return true;
     }
 
-    internal bool HasAnniversaryQiaoRuiPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, AnniversaryQiaoRui.Stage: AnniversaryQiaoRuiStage.SlashChoice } f && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && p.SourceSeat == f.OwnerSeat && ValidQiaoRui(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, QiaoRuiChoices(f));
-    internal bool HasQiaoRuiCompletedUseObserver(long parentUseId)
-    {
-        var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == parentUseId);
-        if (at < 0 || at + 2 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[at] is not CardUseFrame { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } original } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _resolutionStackOperations._resolutionStack[at + 1] is not ProgramCardTriggerWindowFrame { Continuation: ProgramCardContinuation.CompletedSlash } window || window.ParentFrameId != use.Id || window.AttackOwnerFrameId != use.Id || window.Action.ActionId != original.ActionId || _resolutionStackOperations._resolutionStack[at + 2] is not ProgramSkillFrame { AnniversaryQiaoRui: { Operation: SkillProgramEffectOp.ResolveAnniversaryQiaoRuiSaowei } r, WindowContext.CardUse: { } identity } root || !ValidQiaoRui(root) || r.ParentId != window.Id || root.WindowContext.ParentFrameId != window.Id || identity.ParentCardUseFrameId != use.Id || identity.CardActionId != original.ActionId || original.ActorSeat == root.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == use.CardId) != 1)
-            return false;
-        if (at + 3 < _resolutionStackOperations._resolutionStack.Count)
-            return QiaoRuiFirstChild(root, _resolutionStackOperations._resolutionStack[at + 3]) && QiaoRuiObserverSuffix(at + 2);
-        if (r.Stage == AnniversaryQiaoRuiStage.SlashChoice)
-            return HasAnniversaryQiaoRuiPrompt();
-        return r.Returned && r.Stage is AnniversaryQiaoRuiStage.NativeSlash or AnniversaryQiaoRuiStage.NativeTail or AnniversaryQiaoRuiStage.ClaimChildren && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is null && r.Plan is { } plan && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiUseReturnedEvent>().Count(e => e == new AnniversaryQiaoRuiUseReturnedEvent(root.Id, r.UseId, r.ActionId)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == plan.CardId) == 1;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 49400)]
-    internal void AssertQiaoRui(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryQiaoRui is not null && (!ValidQiaoRui(f) || f.PendingMovementContinuation is { } p && !QiaoRuiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p)))
-            throw new InvalidOperationException("Qiao Rui lost his original trigger, marked entity acquisition, paid native movement or whole Slash return.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49400)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49400)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49400)]
@@ -127,7 +107,6 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
     internal bool QiaoRuiDamageObserver(long id) => QiaoRuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49400)]
     internal bool QiaoRuiBeforeDamage(long id) => QiaoRuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 49400)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49400)]
     internal bool QiaoRuiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && QiaoRuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49400)]

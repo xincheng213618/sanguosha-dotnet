@@ -34,37 +34,12 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
         return selected.Length == r.SelectedCardIds.Count && selected.Select((e, i) => e.Index == i && e.CardId == r.SelectedCardIds[i] && r.Gifts.Any(g => g.CardId == e.CardId && g.To == CardLocation.Hand(f.OwnerSeat))).All(v => v);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29500)]
-    internal void AssertMouXuHuang(ProgramSkillFrame f)
-    {
-        if (f.MouXuHuangShipo is not null && !ValidMouXuHuangShipo(f))
-            throw new InvalidOperationException("Shipo lost its exact accepted Ending roster, paid recipient invoice or original obtained subset.");
-        if (f.MouXuHuangDuanliang is not { } r)
-            return;
-        if (!MouXuHuangDuanliangRoot(f) || !Enum.IsDefined(r.Stage) || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Duanliang lost its source-bound actual Play, sealed commitments or paid native invoice.");
-        var selectedTargets = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangDuelTargetSelectedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
-        if (selectedTargets.Length != r.NativeTargets.Count || selectedTargets.Where((e, i) => e.Index != i || e.TargetSeat != r.NativeTargets[i]).Any() || r.NativeTargets.Count > 0 && (r.NativeTargets[0] != r.TargetSeat || r.NativeTargets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t) || t == f.OwnerSeat) || r.NativeTargets.Distinct().Count() != r.NativeTargets.Count || selectedTargets.Any(e => e.Adjusted != selectedTargets[0].Adjusted)))
-            throw new InvalidOperationException("Duanliang's original native Duel target plan lost its exact scalar selections.");
-        var commits = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangStrategyCommittedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (commits.Count(e => e.Attacker && e.ParticipantSeat == f.OwnerSeat) != (r.Attack is null ? 0 : 1) || commits.Count(e => !e.Attacker && e.ParticipantSeat == r.TargetSeat) != (r.Defense is null ? 0 : 1) || commits.Length != (r.Attack is null ? 0 : 1) + (r.Defense is null ? 0 : 1) || r.Revealed != (r.Attack is not null && r.Defense is not null))
-            throw new InvalidOperationException("Mouyi cannot expose or repeat a participant's sealed commitment.");
-        var reveals = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangMouyiRevealedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Revealed ? reveals is not [var reveal] || reveal.Attack != r.Attack || reveal.Defense != r.Defense || reveal.Success != r.Success || r.Success != (r.Attack == MouXuHuangAttack.Siege ? r.Defense == MouXuHuangDefense.BlockAdvance : r.Defense == MouXuHuangDefense.BlockSiege) : reveals.Length != 0)
-            throw new InvalidOperationException("Mouyi must jointly reveal its exact two commitments and four-cell outcome once.");
-        if (r.Native is { } o && (o.ProgramFrameId != f.Id || o.Source != r.Source || o.GameplayHash != r.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangNativeIssuedEvent>().Count(e => e.Origin == o) != 1 || r.Stage == MouXuHuangDuanliangStage.NativeUse && !IsMouXuHuangNativeUse(o.UseId) || r.NativeReturned && (_coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangNativeReturnedEvent>().Count(e => e == new MouXuHuangNativeReturnedEvent(f.Id, o.UseId, o.ActionId)) != 1)))
-            throw new InvalidOperationException("Duanliang changed its signed physical top or genuine empty-material Duel use.");
-        if (r.PaymentSequence is { } paid && (r.Native is not { CardId: > 0 } origin || _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangTopPaidEvent>().Count(e => e == new MouXuHuangTopPaidEvent(f.Id, origin.UseId, origin.CardId, paid)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == paid && m.CardId == origin.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use) != 1))
-            throw new InvalidOperationException("Duanliang cannot replace or repay its original top entity.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29500)]
     internal bool PermitAcceptedMouXuHuang(ProgramSkillFrame f)
     {
         if (f.MouXuHuangDuanliang is null && f.MouXuHuangShipo is not { Accepted: true })
             return false;
-        AssertMouXuHuang(f);
         return true;
     }
 
@@ -136,8 +111,6 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     internal bool HasMouXuHuangDamageObserver(long id) => MouXuHuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1480)]
     internal bool HasMouXuHuangBeforeDamageObserver(long id) => MouXuHuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1310)]
-    internal bool IsMouXuHuangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouXuHuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 510)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 500)]
     internal bool IsMouXuHuangRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

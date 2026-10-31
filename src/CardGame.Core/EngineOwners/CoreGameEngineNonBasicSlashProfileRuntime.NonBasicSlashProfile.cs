@@ -40,13 +40,6 @@ internal sealed partial class CoreGameEngineNonBasicSlashProfileRuntime
         return policy.CardUseFrameId == id && action.ActionId == policy.ActionId && action.EffectiveKind == CardKind.Slash && action.PhysicalCards is [var cost] && cost == policy.Material && cost.From.OwnerSeat == policy.Source.OwnerSeat && cost.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && CardUseCategoryCatalog.Get(cost.CardKind) != CardUseCategories.Basic && action.ConversionChain.Contains(policy.Source) && _corePlayCardHistoryOperations.ViewAsRule(policy.Source)?.NonBasicUnrespondableSlash == true && _contentRegistryOperations._contentRegistry.GetSkill(policy.Source.SkillId).Program?.GameplayHash == policy.GameplayHash && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ConvertedNonBasicSlashIssuedEvent>().Count(e => e.CardUseFrameId == id && e.ActionId == policy.ActionId && e.Source == policy.Source && e.GameplayHash == policy.GameplayHash && e.MaterialId == cost.CardId && e.MaterialKind == cost.CardKind && e.From == cost.From) == 1;
     }
 
-    internal void AssertNonBasicSlashPolicies()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.NonBasicSlashPolicy is not null))
-            if (!HasIssuedNonBasicSlashDistance(use.Id))
-                throw new InvalidOperationException("A non-basic Slash lost its separate exact issued material/source invoice.");
-    }
-
     internal bool IgnoresNonBasicSlashDistance(CharacterState owner, CardConversionSource source) => source.OwnerSeat == owner.Seat && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, source.SkillId, source.SkillInstanceId) && _corePlayCardHistoryOperations.ViewAsRule(source)?.NonBasicUnrespondableSlash == true;
     [ProgramDistanceRule(ProgramDistanceStage.ConvertedSlashExemption, 20)]
     internal bool IgnoresNonBasicSlashDistanceQuery(ProgramSlashConversionDistanceQuery q) => IgnoresNonBasicSlashDistance(q.Owner, q.Source);

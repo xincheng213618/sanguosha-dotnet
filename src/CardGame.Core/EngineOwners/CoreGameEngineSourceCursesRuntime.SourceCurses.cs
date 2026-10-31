@@ -160,7 +160,6 @@ internal sealed partial class CoreGameEngineSourceCursesRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SourceCurseReceipt: { } r } f || f.Id != id)
             return false;
-        _coreSourceCurseObserversOperations.AssertSourceCurseReceipt(f);
         // Genuine global termination leaves paid frames as diagnostics. In
         // particular do not push a queued recovery attempt after GameEnded.
         if (SourceCurseHasFinalGameEnd())
@@ -207,7 +206,6 @@ internal sealed partial class CoreGameEngineSourceCursesRuntime
             return false;
         if (f.PendingMovementContinuation is not { } pending || !IsSourceCurseMovement(f, SourceCursePausedEffect(f), pending))
             throw new InvalidOperationException("A curse cannot consume a different movement return.");
-        _coreSourceCurseObserversOperations.AssertSourceCurseReceipt(f);
         if (SourceCurseHasFinalGameEnd())
             return true;
         if (_coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))

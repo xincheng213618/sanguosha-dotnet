@@ -26,7 +26,6 @@ internal sealed partial class CharacterChengYuMouRuntime
     internal bool MouCyDamageWindow(long id) => MouCyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 36800)]
     internal bool MouCyBeforeDamage(long id) => MouCyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 36800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36800)]
     internal bool MouCyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouCyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36800)]

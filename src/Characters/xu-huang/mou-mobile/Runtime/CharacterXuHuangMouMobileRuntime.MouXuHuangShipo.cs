@@ -177,7 +177,6 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouXuHuangShipo: { } r } f || f.Id != id)
             return;
-        AssertMouXuHuang(f);
         if (r.Stage == MouXuHuangShipoStage.Damage && f.AttackAttempt is not null)
             return;
         if (DrainMouXuHuangChildren(f))

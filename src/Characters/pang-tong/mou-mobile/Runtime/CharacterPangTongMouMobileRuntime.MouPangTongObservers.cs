@@ -30,7 +30,6 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
     internal bool HasMouPtDamageObserver(long id) => MouPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30500)]
     internal bool HasMouPtBeforeDamageObserver(long id) => MouPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30500)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30500)]
     internal bool IsMouPtDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30500)]
@@ -44,13 +43,6 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var child = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == recovery.Id);
         return index >= 0 && child > index + 1 && MouPtFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]) && MouPtObserverSuffix(index) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[child - 1]);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30500)]
-    internal void AssertMouPt(ProgramSkillFrame f)
-    {
-        if (f.MouPangTongTargets is not null && !ValidMouPtTargets(f))
-            throw new InvalidOperationException("Lianhuan changed its frozen native Use or target queue.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30500)]

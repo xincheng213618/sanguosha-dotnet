@@ -48,7 +48,6 @@ internal sealed partial class CharacterDianWeiMouRuntime
     internal bool MouDianWeiDamageWindow(long id) => MouDianWeiRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35300)]
     internal bool MouDianWeiBeforeDamage(long id) => MouDianWeiRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 35300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35300)]
     internal bool MouDianWeiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouDianWeiRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35300)]

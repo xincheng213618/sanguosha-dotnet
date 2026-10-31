@@ -79,7 +79,6 @@ internal sealed partial class CharacterYangFengOlRuntime
 
     internal void PublishYangFeng(ProgramSkillFrame f)
     {
-        AssertYangFeng(f);
         var r = f.YangFeng!;
         var choices = YangFengChoices(f);
         if (choices.Count == 0)
@@ -103,7 +102,6 @@ internal sealed partial class CharacterYangFengOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YangFeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YangFengChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Yang Feng requires his exact published private selection.");
-        AssertYangFeng(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -180,7 +178,6 @@ internal sealed partial class CharacterYangFengOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { YangFeng: { } r } f && f.Id == id)
         {
-            AssertYangFeng(f);
             if (r.Stage is YangFengStage.DiscardChoice or YangFengStage.QujiaChoice)
             {
                 if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

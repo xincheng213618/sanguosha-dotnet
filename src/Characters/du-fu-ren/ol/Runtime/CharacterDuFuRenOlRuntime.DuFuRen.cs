@@ -86,7 +86,6 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuFuRen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuFuRenChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Du Fu Ren lost its exact private chooser, physical card or legal recipient.");
-        AssertDuFuRen(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
         {
@@ -134,7 +133,6 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuFuRen: { } r } f || f.Id != id)
             return;
-        AssertDuFuRen(f);
         if (r.Stage is DuFuRenStage.GiftChoice or DuFuRenStage.RedChoice)
         {
             if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)

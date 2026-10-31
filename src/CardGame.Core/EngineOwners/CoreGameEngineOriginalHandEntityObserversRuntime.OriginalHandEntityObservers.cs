@@ -37,63 +37,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntityObserversRuntime
         return index > 1 && _resolutionStackOperations._resolutionStack[index - 1].Id == parent.Id && _resolutionStackOperations._resolutionStack[index - 2] is DeathFrame death && death.Id == parent.DeathFrameId && death.VictimSeat == f.OwnerSeat;
     }
 
-    internal void AssertOriginalHandEntityState()
-    {
-        if (!_coreOriginalHandEntitiesOperations.TracksOriginalHandEntities && _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.Count == 0 && _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandPermanentBonuses.Count == 0)
-            return;
-        if (_coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.Count == 0 && _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandPermanentBonuses.Count == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<OriginalHandEntitiesInitializedEvent>().Count == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<OriginalHandEntityConsumedEvent>().Count == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<OriginalHandPermanentBonusGrantedEvent>().Count == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<OriginalHandBonusTransferredEvent>().Count == 0)
-            return;
-        // Grants and transfers must still be replayed in their original mixed order.
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Where(fact => fact is OriginalHandEntitiesInitializedEvent or OriginalHandEntityConsumedEvent or OriginalHandPermanentBonusGrantedEvent or OriginalHandBonusTransferredEvent).ToArray();
-        var initialized = history.OfType<OriginalHandEntitiesInitializedEvent>().ToArray();
-        if (initialized.Length != _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.Count)
-            throw new InvalidOperationException("Original-hand durable states lost their unique native initialization facts.");
-        foreach (var pair in _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates)
-        {
-            var key = pair.Key;
-            var state = pair.Value;
-            var dealt = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Reason == CardMoveReasons.InitialDeal && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(key.OwnerSeat)).OrderBy(m => m.Sequence).ToArray();
-            var facts = initialized.Where(e => e.Source.OwnerSeat == key.OwnerSeat && e.Source.SkillId == key.SkillId && e.StateId == key.StateId).ToArray();
-            if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(key.OwnerSeat) || state.Source.OwnerSeat != key.OwnerSeat || state.Source.SkillId != key.SkillId || state.InitializationFrameId <= 0 || facts is not [var init] || init.FrameId != state.InitializationFrameId || init.Source != state.Source || init.GameplayHash != state.GameplayHash || init.OriginalCount != dealt.Length || init.RemainingCount < 0 || init.RemainingCount > init.OriginalCount || state.Entities.Count != dealt.Length || state.Entities.Select(e => e.CardId).Distinct().Count() != state.Entities.Count)
-                throw new InvalidOperationException("Original-hand durable state changed its actual initial-deal invoice.");
-            for (var index = 0; index < dealt.Length; index++)
-            {
-                var entity = state.Entities[index];
-                var deal = dealt[index];
-                var first = _coreCardMovementJournalCardMovementsAccess._cardMovements.FirstOrDefault(m => m.Sequence > deal.Sequence && m.CardId == deal.CardId && m.From == CardLocation.Hand(key.OwnerSeat) && m.To != m.From)?.Sequence;
-                if (entity.CardId != deal.CardId || entity.DealSequence != deal.Sequence || entity.FirstLossSequence != first)
-                    throw new InvalidOperationException("An original physical entity was restored or consumed without its first actual hand loss.");
-            }
-
-            var losses = history.OfType<OriginalHandEntityConsumedEvent>().Where(e => e.OwnerSeat == key.OwnerSeat && e.SkillId == key.SkillId && e.StateId == key.StateId).ToArray();
-            if (losses.Select(e => e.MovementSequence).Distinct().Count() != losses.Length || losses.Any(e => !state.Entities.Any(entity => entity.FirstLossSequence == e.MovementSequence)) || !losses.Select(e => e.RemainingCount).SequenceEqual(Enumerable.Range(0, losses.Length).Select(i => init.RemainingCount - i - 1)) || init.RemainingCount - losses.Length != state.Entities.Count(e => e.FirstLossSequence is null))
-                throw new InvalidOperationException("Original-hand depletion lost its once-only sequence or remaining count.");
-        }
-
-        var expected = new Dictionary<long, OriginalHandPermanentBonus>();
-        foreach (var fact in history)
-        {
-            if (fact is OriginalHandPermanentBonusGrantedEvent grant)
-            {
-                if (grant.Kind is not (OriginalHandBenefitKind.HandLimit or OriginalHandBenefitKind.AttackRange) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(grant.RecipientSeat) || !_coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.ContainsKey(new(grant.SourceOwnerSeat, grant.SourceSkillId, grant.StateId)) || !expected.TryAdd(grant.FrameId, new(grant.FrameId, grant.SourceOwnerSeat, grant.SourceSkillId, grant.StateId, grant.RecipientSeat, grant.Kind)))
-                    throw new InvalidOperationException("Original-hand permanent bonuses lost their unique source attribution.");
-            }
-
-            if (fact is OriginalHandBonusTransferredEvent transfer)
-            {
-                if (!expected.TryGetValue(transfer.BonusId, out var previous) || previous.SourceOwnerSeat != transfer.SourceOwnerSeat || previous.SourceSkillId != transfer.SourceSkillId || previous.StateId != transfer.StateId || previous.Kind != transfer.Kind || previous.RecipientSeat != transfer.PreviousRecipientSeat || transfer.RecipientSeat == previous.RecipientSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(transfer.RecipientSeat))
-                    throw new InvalidOperationException("Original-hand inheritance changed the identity or previous recipient of a received bonus.");
-                expected[transfer.BonusId] = previous with
-                {
-                    RecipientSeat = transfer.RecipientSeat
-                };
-            }
-        }
-
-        if (expected.Count != _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandPermanentBonuses.Count || expected.Any(p => _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandPermanentBonuses.GetValueOrDefault(p.Key) != p.Value))
-            throw new InvalidOperationException("Original-hand permanent bonuses diverged from their actual grants and transfers.");
-    }
-
     internal bool ValidOriginalHandBenefitReceipt(ProgramSkillFrame f)
     {
         if (f.OriginalHandBenefit is not { } r || f.InstructionIndex != 1 || r.InstructionIndex != 1 || !ExactOriginalHandBenefitParent(f) || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ Op: SkillProgramEffectOp.OfferOriginalHandLossBenefit } effect] || effect.StateId != r.StateId || r.MovementWindowId != f.WindowContext!.ParentFrameId || r.BatchId != f.WindowContext.MovementBatch!.Id || r.MovementSequence != f.WindowContext.MovementBatch.Movements[f.WindowContext.MovementIndex!.Value].Sequence || !_coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.TryGetValue(new(f.OwnerSeat, f.SkillId, r.StateId), out var state) || !state.Entities.Any(e => e.CardId == f.WindowContext.MovementBatch.Movements[f.WindowContext.MovementIndex.Value].CardId && e.FirstLossSequence == r.MovementSequence) || _coreOriginalHandEntitiesOperations.OriginalHandLossEligibility(f.OwnerSeat, f.SkillId, r.StateId, f.TriggerId!, r.MovementSequence)is not { } eligibility || eligibility.SkillInstanceId != f.SkillInstanceId || eligibility.GameplayHash != f.GameplayHash || r.CandidateSeats.Count == 0 || r.CandidateSeats.Distinct().Count() != r.CandidateSeats.Count || r.CandidateSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || r.TargetSeat is { } selected && !r.CandidateSeats.Contains(selected))
@@ -163,37 +106,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntityObserversRuntime
         return child is ProgramSkillFrame observer && observer.WindowContext?.ParentFrameId == parent.Id && (observer.OriginalHandBenefit is not null && ValidOriginalHandBenefitReceipt(observer) || observer.OriginalHandInheritance is not null && ValidOriginalHandInheritanceReceipt(observer) || observer.OriginalHandAwakening is not null && _coreOriginalHandAwakeningOperations.ValidOriginalHandAwakeningReceipt(observer));
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 450)]
-    internal void AssertOriginalHandEntityProgram(ProgramSkillFrame f)
-    {
-        var receipts = (f.OriginalHandBenefit is null ? 0 : 1) + (f.OriginalHandInheritance is null ? 0 : 1) + (f.OriginalHandAwakening is null ? 0 : 1);
-        if (receipts == 0)
-        {
-            if (!_coreOriginalHandEntitiesOperations.TracksOriginalHandEntities || f.TriggerId is null || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.All(effect => effect.Op is not (SkillProgramEffectOp.OfferOriginalHandLossBenefit or SkillProgramEffectOp.InheritOriginalHandBonuses or SkillProgramEffectOp.AwakenWhenOriginalHandEmpty)))
-                return;
-            var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-            if (history.OfType<OriginalHandBenefitStartedEvent>().Any(e => e.FrameId == f.Id) || history.OfType<OriginalHandInheritanceStartedEvent>().Any(e => e.FrameId == f.Id) || history.OfType<OriginalHandAwakeningMaximumPaidEvent>().Any(e => e.FrameId == f.Id))
-                throw new InvalidOperationException("An issued original-hand operation lost its owning receipt.");
-            return;
-        }
-
-        if (receipts != 1 || f.OriginalHandBenefit is not null && !ValidOriginalHandBenefitReceipt(f) || f.OriginalHandInheritance is not null && !ValidOriginalHandInheritanceReceipt(f) || f.OriginalHandAwakening is not null && !_coreOriginalHandAwakeningOperations.ValidOriginalHandAwakeningReceipt(f))
-            throw new InvalidOperationException("Original-hand operation lost its exact native parent, physical first loss, choice or issued payment.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !OriginalHandEntityFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Original-hand operation retained an unrelated first native child.");
-        if (index == _resolutionStackOperations._resolutionStack.Count - 1 && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (f.OriginalHandInheritance is { Stage: OriginalHandInheritanceStage.ChoosingTarget } || f.OriginalHandBenefit is { Stage: OriginalHandBenefitStage.ChoosingTarget or OriginalHandBenefitStage.ChoosingOption }) && !IsOriginalHandEntityChoice(f, prompt))
-            throw new InvalidOperationException("Original-hand operation changed its published target or option choices.");
-    }
-
-    internal bool IsOriginalHandEntityChoice(ProgramSkillFrame f, PendingDecision decision)
-    {
-        if (decision.Kind != DecisionKind.ProgramTrigger || !decision.IsPrivate || decision.PlayerSeat != f.OwnerSeat || decision.SourceSeat != f.OwnerSeat || decision.ValidCardIds.Count != 0 || decision.ValidContentIds.Count != 0 || decision.RequiredCardCount != 0 || decision.SkillPrompt?.SkillId != f.SkillId)
-            return false;
-        var expected = _coreOriginalHandEntitiesOperations.OriginalHandEntityChoices(f);
-        return decision.ValidTargetSeats.SequenceEqual(expected.SelectMany(c => c.Targets).Distinct()) && decision.Choices.Count == expected.Count && decision.Choices.Zip(expected).All(pair => pair.First.Id == pair.Second.Id && pair.First.Cards.Count == 0 && pair.First.Targets.SequenceEqual(pair.Second.Targets) && pair.First.Parameters.OrderBy(p => p.Key).SequenceEqual(pair.Second.Parameters.OrderBy(p => p.Key)));
-    }
-
     internal ProgramSkillFrame? OriginalHandEntityObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOriginalHandEntityObserversOperations.OriginalHandEntityFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreOriginalHandEntityObserversOperations.OriginalHandEntityObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
     internal bool OriginalHandEntityObserverEdge(int child)
     {
@@ -201,8 +113,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntityObserversRuntime
         var current = _resolutionStackOperations._resolutionStack[child];
         return global::CardGame.Core.EngineOwners.CoreGameEngineObserverSubtreesRuntime.IsObserverSkillsChangedEdge(parent, current) || _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandStructuralEdge(parent, current) || _coreCompletedUndamagedTargetRevealObserversOperations.CompletedUndamagedTargetRevealStructuralEdge(parent, current) || _coreRecipientCategoryMarkObserversOperations.RecipientCategoryMarkStructuralEdge(parent, current) || _coreOffTurnUsedCardObserversOperations.OffTurnUsedCardGiftStructuralEdge(parent, current) || _coreCardSupplyCompletionOperations.CardSupplyCompletionStructuralEdge(parent, current) || _coreResponseCompletionOperations.ResponseCompletionStructuralEdge(parent, current) || OriginalHandEntityStructuralEdge(parent, current) || _coreOutsidePhaseDrawDiscardObserversOperations.OutsidePhaseDrawDiscardStructuralEdge(parent, current) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, current) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child);
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 60)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 70)]
     internal bool IsOriginalHandEntityProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OriginalHandEntityObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1850)]

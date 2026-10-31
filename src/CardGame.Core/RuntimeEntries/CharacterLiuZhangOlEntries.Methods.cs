@@ -2,18 +2,13 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiuZhangOlEntries
 {
-    internal global::CardGame.Core.ProgramSkillFrame? ActiveZonghuDraft() => _resolve().ActiveZonghuDraft();
     internal global::CardGame.Core.PendingDecision? AddZonghuRequestChoices(global::CardGame.Core.PendingDecision? p) => _resolve().AddZonghuRequestChoices(p);
     internal bool AdvanceZonghuChildren() => _resolve().AdvanceZonghuChildren();
     internal global::CardGame.Core.PromptChoice AiFengwei(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiFengwei(p, f);
     internal void AnswerFengwei(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerFengwei(choice);
     internal void AnswerZonghu(global::CardGame.Core.PromptChoice c) => _resolve().AnswerZonghu(c);
     internal void ApplyFengweiChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ApplyFengweiChainedDamageBonus(attack);
-    internal void AssertFengwei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertFengwei(f);
     internal void AssertFengweiDamageReceipts() => _resolve().AssertFengweiDamageReceipts();
-    internal void AssertZonghu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZonghu(f);
-    internal void AssertZonghuCaller(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertZonghuCaller(f);
-    internal void AssertZonghuRequests() => _resolve().AssertZonghuRequests();
     internal void BeginZonghuSlash(global::CardGame.Core.ZonghuPaidOrigin p, global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowed, bool counts, long? parent, global::CardGame.Core.NativeOwners.FactionCardRequestHandle? faction = default) => _resolve().BeginZonghuSlash(p, borrowed, counts, parent, faction);
     internal global::CardGame.Core.ZonghuNeed? CaptureZonghuNeed(global::CardGame.Core.PendingDecision original, global::CardGame.Core.ResolutionFrame? suppliedNativeTop = default) => _resolve().CaptureZonghuNeed(original, suppliedNativeTop);
     internal void ContinueFengwei(long id) => _resolve().ContinueFengwei(id);
@@ -45,21 +40,17 @@ internal sealed partial class CharacterLiuZhangOlEntries
     internal bool HasZonghuForcedSlash2(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().HasZonghuForcedSlash(actor, target, pending);
     internal bool HasZonghuForcedSlash3(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, bool qinglong) => _resolve().HasZonghuForcedSlash(actor, target, qinglong);
     internal bool HasZonghuGenericBasic(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasZonghuGenericBasic(f);
-    internal bool HasZonghuNativeRequestContinuation(long owner) => _resolve().HasZonghuNativeRequestContinuation(owner);
     internal bool HasZonghuProgramSlash(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IEnumerable<int> targets) => _resolve().HasZonghuProgramSlash(actor, targets);
-    internal bool HasZonghuQinglongPaymentRide(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().HasZonghuQinglongPaymentRide(attack);
     internal bool HasZonghuRequiredBasic(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind required) => _resolve().HasZonghuRequiredBasic(actor, required);
     internal bool HasZonghuSpecializedPayment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame? use = default) => _resolve().HasZonghuSpecializedPayment(f, use);
     internal bool IsFengweiCardDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().IsFengweiCardDamage(attack);
     internal bool IsFengweiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsFengweiMovement(f, m);
     internal bool IsIssuedZonghuUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedZonghuUse(use);
-    internal bool IsLiuZhangDying() => _resolve().IsLiuZhangDying();
     internal bool IsLiuZhangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiuZhangMovement(f, effect, p);
     internal bool IsLiuZhangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiuZhangRecoveryParent(f, recovery);
     internal bool IsZonghuAnswer(global::CardGame.Core.ChoiceId id) => _resolve().IsZonghuAnswer(id);
     internal bool IsZonghuGiftMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsZonghuGiftMovement(f, m);
     internal bool IsZonghuOrdinaryActivation(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().IsZonghuOrdinaryActivation(c);
-    internal bool IsZonghuProgramRequestAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsZonghuProgramRequestAttackConsistent(attack, processing);
     internal bool IsZonghuUse(long id) => _resolve().IsZonghuUse(id);
     internal bool IsZonghuZeroResponse(global::CardGame.Core.CardActionContext a, global::CardGame.Core.ProgramCardContinuation c) => _resolve().IsZonghuZeroResponse(a, c);
     internal bool IsZonghuZeroSupply(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.NativeOwners.FactionCardRequestHandle request) => _resolve().IsZonghuZeroSupply(use, request);
@@ -95,8 +86,6 @@ internal sealed partial class CharacterLiuZhangOlEntries
     internal bool ZonghuExcludedSource(global::CardGame.Core.ResolutionFrame? top) => _resolve().ZonghuExcludedSource(top);
     internal bool ZonghuFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ZonghuFirstChild(f, child);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> ZonghuGiftCards(int seat) => _resolve().ZonghuGiftCards(seat);
-    internal global::CardGame.Core.PendingDecision? ZonghuInvariantDecision(global::CardGame.Core.PendingDecision? ordinary) => _resolve().ZonghuInvariantDecision(ordinary);
-    internal global::CardGame.Core.ResolutionFrame? ZonghuInvariantTop(global::CardGame.Core.ResolutionFrame? ordinary) => _resolve().ZonghuInvariantTop(ordinary);
     internal bool ZonghuIssuedActorMatches(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ZonghuPaidOrigin p) => _resolve().ZonghuIssuedActorMatches(use, p);
     internal bool ZonghuNativeLegal(global::CardGame.Core.ZonghuNeed n, global::CardGame.Core.CardKind kind, int target) => _resolve().ZonghuNativeLegal(n, kind, target);
     internal bool ZonghuNativeNeedCurrent(global::CardGame.Core.ZonghuReceipt r) => _resolve().ZonghuNativeNeedCurrent(r);

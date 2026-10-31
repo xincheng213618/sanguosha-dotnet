@@ -96,23 +96,4 @@ internal sealed partial class CoreGameEngineCardDamageMaximumHpReplacementRuntim
             return false;
         return receipt.MaximumHpAfter == 0 && receipt.TargetSeat == death.VictimSeat && death.KillerSeat is null && state.SourceSeat == receipt.SourceSeat && state.TargetSeat == receipt.TargetSeat && !state.DamageWasApplied && !state.DamageAmountFinalized && !state.IsChainPropagation && _coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].MaxHp == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<CardDamageReplacedWithMaximumHpLossEvent>().Count(e => e.ParentResolutionId == parent.Id && e.Receipt == receipt) == 1;
     }
-
-    internal void AssertMaximumHpDamageReplacementReceipts()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack)
-        {
-            var state = frame switch
-            {
-                CardUseFrame use => use.CardAttack,
-                ProgramSkillFrame program => program.CardAttack,
-                JudgmentFrame judgment => judgment.CardAttack,
-                _ => null
-            };
-            if (state?.MaximumHpReplacement is not { } receipt)
-                continue;
-            var policy = _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(receipt.Source.SkillId)?.Program?.CardPolicies.SingleOrDefault(p => p.Id == receipt.Source.BindingId);
-            if (policy is not { Kind: SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss } || !ProgramCardKindMatch.Contains(policy.CardKinds, receipt.CardKind) || receipt.Source.OwnerSeat != receipt.SourceSeat || string.IsNullOrWhiteSpace(receipt.Source.SkillInstanceId) || receipt.RoundNumber != _coreActualRoundProgressRoundNumberAccess._roundNumber || receipt.SourceSeat != state.SourceSeat || receipt.TargetSeat != state.TargetSeat || receipt.CardKind != state.EffectiveCardKind || receipt.Amount <= 0 || receipt.Amount != state.CardDamageLayerAmount || receipt.MaximumHpBefore <= 0 || receipt.MaximumHpAfter != Math.Max(0, receipt.MaximumHpBefore - receipt.Amount) || (receipt.HappyQiaoMaximumProof is not null ? !_characterDaQiaoXiaoQiaoHappyGodOperations.MatchesHappyQiaoCardMaximumHp(receipt) : receipt.HpBefore is not { } before || receipt.HpAfter is not { } after || after != Math.Min(before, receipt.MaximumHpAfter)) || state.DamageWasApplied || state.DamageAmountFinalized || state.IsChainPropagation || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(receipt.SourceSeat, receipt.Source.SkillId, MaximumHpReplacementUsage(receipt.Source.BindingId), SkillUsageScope.Round) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardDamageReplacedWithMaximumHpLossEvent>().Count(e => e.ParentResolutionId == frame.Id && e.Receipt == receipt) != 1)
-                throw new InvalidOperationException("Maximum-HP replacement lost its exact card-layer, round usage or issued source receipt.");
-        }
-    }
 }

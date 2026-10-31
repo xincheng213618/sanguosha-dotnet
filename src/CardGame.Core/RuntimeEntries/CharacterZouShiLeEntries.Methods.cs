@@ -4,7 +4,6 @@ internal sealed partial class CharacterZouShiLeEntries
 {
     internal bool AdvanceHuoxinChildren() => _resolve().AdvanceHuoxinChildren();
     internal void AnswerHuoxin(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHuoxin(choice);
-    internal void AssertHuoxin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHuoxin(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHuoxin(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHuoxin(supplied);
     internal bool CanOfferHuoxin(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferHuoxin(candidate, trigger, context);
     internal bool CanOfferYunzheng(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferYunzheng(gate);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterZouShiLeEntries
     internal global::CardGame.Core.ProgramSkillFrame? HuoxinObserverRoot() => _resolve().HuoxinObserverRoot();
     internal bool HuoxinObserverSuffix(int index) => _resolve().HuoxinObserverSuffix(index);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeYunzheng(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeYunzheng(supplied);
-    internal bool IsHuoxinDying() => _resolve().IsHuoxinDying();
     internal bool IsHuoxinMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsHuoxinMovement(f, effect, p);
     internal bool IsHuoxinRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsHuoxinRecoveryParent(f, recovery);
     internal bool IsIssuedYunzhengCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedYunzhengCandidate(candidate, context);

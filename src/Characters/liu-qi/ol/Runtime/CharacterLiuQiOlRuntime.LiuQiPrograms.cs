@@ -119,12 +119,5 @@ internal sealed partial class CharacterLiuQiOlRuntime
             throw new InvalidOperationException("Tunjiang draw lacks its exact native payment interval.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 200)]
-    internal void AssertRegisteredLiuQi(ProgramSkillFrame frame)
-    {
-        if (frame.LiuQi is not null)
-            RequireLiuQi(frame);
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.ILiuQiProgramHost.BeginLiuQi(ProgramSkillFrame f, SkillProgramEffect e) => BeginLiuQi(f, e);
 }

@@ -113,15 +113,6 @@ internal sealed partial class CharacterDongChengMouRuntime
         return new(0, kind, Suit.None, 0);
     }
 
-    internal bool IsMouDcZeroAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (!IsMouDcZeroUse(attack.ResolutionId) || attack.Card is not null || attack.PhysicalCards.Count != 0 || processing.Count != 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || attack.EffectiveCardKind != use.CardKind)
-            return false;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } g && g.ResolutionId == use.Id)
-            return g.DamageSourceSeat == attack.SourceSeat && g.CurrentAttack?.ResolutionId == use.Id;
-        return attack.SourceSeat == use.SourceSeat && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind is CardKind.Duel or CardKind.FireAttack or CardKind.UnexpectedAssault);
-    }
-
     internal bool ContinueMouDcSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
     {
         if (!IsMouDcZeroUse(attack.ResolutionId) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } u)

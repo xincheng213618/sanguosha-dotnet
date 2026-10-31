@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiJueOlEntries
 {
-    internal void AssertRegisteredLiJue(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredLiJue(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLiJue(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginLiJue(supplied, effect);
     internal bool CanContinueLiJue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueLiJue(f);
     internal bool CanOfferLiJue(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferLiJue(candidate, trigger, context);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterLiJueOlEntries
     internal void FinishLiJue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLiJue(f);
     internal bool HasLiJueBeforeDamageObserver(long id) => _resolve().HasLiJueBeforeDamageObserver(id);
     internal bool HasLiJueDamageObserver(long id) => _resolve().HasLiJueDamageObserver(id);
-    internal bool IsLiJueDying() => _resolve().IsLiJueDying();
     internal bool IsLiJueMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiJueMovement(f, effect, p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> LangxiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LangxiChoices(f);
     internal int[] LangxiTargets(int owner) => _resolve().LangxiTargets(owner);

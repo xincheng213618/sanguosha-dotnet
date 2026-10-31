@@ -48,13 +48,6 @@ internal sealed partial class CharacterWenYangOlRuntime
         return r.Entities.All(c => _coreProgramEventHistoryOperations.ProgramEventHistory<WenYangEntityMovedEvent>().Where(e => e.FrameId == f.Id && e.Step == r.MovementStep && e.CardId == c.CardId).ToArray()is [var e] && e.Kind == c.Kind && e.From == c.From && e.Sequence > r.Before && e.Sequence <= r.After && e.To == (r.Stage == WenYangStage.GainChildren ? CardLocation.Hand(f.OwnerSeat) : c.From.Zone == CardZoneKind.Equipment && _coreCardAttackStateOperations.GetAttackCard(c.CardId).IsGeneralWeapon ? CardLocation.OutsideGame : CardLocation.DiscardPile) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == e.From && m.To == e.To && m.Reason.Value == reason) == 1);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27360)]
-    internal void AssertWenYang(ProgramSkillFrame f)
-    {
-        if (f.WenYang is not null && !ValidWenYang(f))
-            throw new InvalidOperationException("Wen Yang lost his exact native parent, frozen numeric request, once-paid awakening, physical movement or issued Ending debt.");
-    }
-
     internal bool WenYangMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.WenYang!;
@@ -97,8 +90,6 @@ internal sealed partial class CharacterWenYangOlRuntime
     internal bool HasWenYangDamageObserver(long id) => WenYangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 960)]
     internal bool HasWenYangBeforeDamageObserver(long id) => HasWenYangDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 790)]
-    internal bool IsWenYangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WenYangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27360)]
     internal bool AdvanceWenYangChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WenYangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

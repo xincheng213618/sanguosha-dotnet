@@ -99,8 +99,6 @@ internal readonly record struct ProgramEffectContinuationContext(
 
 internal interface IProgramChoiceResultProof
 {
-    bool MatchesChoiceResult(SkillProgramEffect effect, ProgramSkillFrame frame,
-        ProgramChoiceResultBinding binding, ISkillProgramEffectHost host);
 }
 
 /// <summary>Which program dependency kinds an operation relies on for a given engine fact emission.</summary>

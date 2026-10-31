@@ -164,12 +164,5 @@ internal sealed partial class CharacterSuFeiOlRuntime
             throw new InvalidOperationException("Lianpian cannot repeat or substitute its actual paid gift.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 260)]
-    internal void AssertRegisteredSuFei(ProgramSkillFrame frame)
-    {
-        if (frame.SuFei is not null)
-            RequireSuFei(frame);
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.ISuFeiProgramHost.BeginSuFei(ProgramSkillFrame f, SkillProgramEffect e) => BeginSuFei(f, e);
 }

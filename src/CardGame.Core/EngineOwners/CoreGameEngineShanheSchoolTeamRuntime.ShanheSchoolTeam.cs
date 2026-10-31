@@ -112,16 +112,6 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 62025)]
     internal bool MatchesShanheTeamRankMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ApplyShanheSchoolTeamRank && frame.ShanheTeamRank is { EntryApplied: false, Stage: ShanheTeamRankStage.Next } && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62025)]
-    internal void AssertShanheTeamRankApplication(ProgramSkillFrame frame)
-    {
-        if (frame.ShanheTeamRank is not { } state)
-            return;
-        _ = RequireShanheTeamOpening(frame, ShanheSchoolEffects.TeamRankSkillId, "opening-team-rank", requireActive: false);
-        var setup = _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle!;
-        if (state.Rank != ShanheTeamRankPrograms.EffectiveRank(setup) || state.EntryApplied != (ShanheTeamRankPrograms.EntryBonuses(setup) != new ShanheTacticBonuses()) || state.Index < 0 || state.Index > state.Seats.Count || !Enum.IsDefined(state.Stage) || !state.Seats.SequenceEqual(state.Seats.Distinct().Order()) || state.Seats.Any(seat => seat < 1 || seat > setup.AllyRoster.Count) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheTeamRankActivatedEvent>().Count(e => e.FrameId == frame.Id && e.Rank == state.Rank && e.EntryApplied == state.EntryApplied) != 1)
-            throw new InvalidOperationException("A team rank lost its original entry, rank or frozen recipient cursor.");
-    }
 
     internal void ContinueShanheSchoolTeamRank(long id)
     {

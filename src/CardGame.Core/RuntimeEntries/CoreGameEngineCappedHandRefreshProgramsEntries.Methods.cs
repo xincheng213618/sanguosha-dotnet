@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineCappedHandRefreshProgramsEntries
 {
-    internal void AssertCappedHandRefresh(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertCappedHandRefresh(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCappedHandRefresh(global::CardGame.Core.ProgramSkillFrame frame, int targetSeat, int cap) => _resolve().BeginCappedHandRefresh(frame, targetSeat, cap);
     internal void BeginCappedHandRefreshMovement(long frameId) => _resolve().BeginCappedHandRefreshMovement(frameId);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CappedHandRefreshChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CappedHandRefreshChoices(frame);

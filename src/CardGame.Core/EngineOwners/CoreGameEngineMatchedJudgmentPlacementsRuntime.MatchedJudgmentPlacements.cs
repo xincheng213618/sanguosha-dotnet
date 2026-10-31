@@ -82,7 +82,6 @@ internal sealed partial class CoreGameEngineMatchedJudgmentPlacementsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.MatchedJudgmentPlacement is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [MatchedJudgmentPlacementChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Judgment placement answer differs from its exact frozen result.");
-        AssertMatchedJudgmentPlacement(f);
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || r.Stage == MatchedJudgmentPlacementStage.ChoosingDestination && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -136,7 +135,6 @@ internal sealed partial class CoreGameEngineMatchedJudgmentPlacementsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.MatchedJudgmentPlacement is not { } r)
             return false;
-        AssertMatchedJudgmentPlacement(f);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null && r.Stage is MatchedJudgmentPlacementStage.ChoosingDestination or MatchedJudgmentPlacementStage.ChoosingSelfDiscard)
             return true;
         if (_coreSuitDamagePreventionBenefitsOperations.DrainSuitPlacementChildren(f))
@@ -176,20 +174,5 @@ internal sealed partial class CoreGameEngineMatchedJudgmentPlacementsRuntime
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(decision.PlayerSeat);
         var hint = new SkillProgramAiHint(0, 0, 0, 1, 0, 0, true, false);
         return decision.Choices.Where(c => c.Targets.Count == 1).OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(view, c.Targets[0], hint) - (c.Targets[0] == f.OwnerSeat ? 12d : 0d)).ThenBy(c => c.Targets[0]).FirstOrDefault() ?? decision.Choices.Single(c => c.Targets.Count == 0);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 580)]
-    internal void AssertMatchedJudgmentPlacement(ProgramSkillFrame f)
-    {
-        if (f.MatchedJudgmentPlacement is not { } r)
-            return;
-        var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
-        var set = _coreProgramLifecycleOperations.GetProgramCardSet(f, r.SourceBind);
-        if (!Enum.IsDefined(r.Stage) || !_coreSuitPreventionBenefitObserversOperations.MatchedJudgmentOriginalCandidate(f) || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } || f.InstructionIndex != 2 || r.InstructionIndex != f.InstructionIndex || plan.Instructions.Count != 2 || plan.Instructions[0].Op != SkillProgramEffectOp.StartJudgment || plan.Instructions[0].ResultBind != r.SourceBind || plan.Instructions[1].Op != SkillProgramEffectOp.PlaceMatchedJudgmentCard || !plan.Instructions[1].Suits.Contains(r.EffectiveSuit) || set.CardIds.Count != 1 || set.CardIds[0] != r.CardId || set.FrozenRevealedSuit != r.EffectiveSuit || set.SourceLocations.Count != 1 || set.SourceLocations[0] != r.ResultFrom || r.ResultFrom != CardLocation.Processing || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JudgmentResolvedEvent>().Any(e => e.ResolutionId == r.JudgmentFrameId && e.ParentResolutionId == f.Id && e.TargetSeat == f.OwnerSeat && e.Reason == plan.Instructions[0].JudgmentReason && e.CardId == r.CardId && e.Suit == r.EffectiveSuit) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.ResultMovementSequence && m.CardId == r.CardId && m.From == CardLocation.Judgment(f.OwnerSeat) && m.To == r.ResultFrom && m.Reason.Value == "skill-program.judgment.result"))
-            throw new InvalidOperationException("Judgment placement lost its actual original result producer.");
-        if (r.Stage == MatchedJudgmentPlacementStage.ChoosingDestination && (r.PlacementMovementSequence != 0 || r.RecipientSeat is not null || r.OnTop || r.SelfDiscardCardId is not null) || r.Stage != MatchedJudgmentPlacementStage.ChoosingDestination && (r.OnTop ? r.RecipientSeat is not null : r.RecipientSeat is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.RecipientSeat.Value)) || r.Stage != MatchedJudgmentPlacementStage.ChoosingDestination && (!_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.PlacementMovementSequence && m.CardId == r.CardId && m.From == r.ResultFrom && m.To == (r.OnTop ? CardLocation.DrawPile : CardLocation.Hand(r.RecipientSeat!.Value)) && m.Reason.Value == $"skill-program.{(f.SkillId)}.matched-judgment-place") || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramMatchedJudgmentPlacedEvent>().Count(e => e.ProgramFrameId == f.Id && e.JudgmentFrameId == r.JudgmentFrameId && e.CardId == r.CardId && e.OnTop == r.OnTop && e.RecipientSeat == r.RecipientSeat && e.MovementSequence == r.PlacementMovementSequence) != 1) || r.Stage is MatchedJudgmentPlacementStage.ChoosingSelfDiscard or MatchedJudgmentPlacementStage.SelfDiscarded && (r.OnTop || r.RecipientSeat != f.OwnerSeat) || r.Stage == MatchedJudgmentPlacementStage.SelfDiscarded && (r.SelfDiscardCardId is not { } id || r.SelfDiscardFrom is not { } from || from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.SelfDiscardMovementSequence && m.CardId == id && m.From == from && m.To == CardLocation.DiscardPile && m.Reason.Value == $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.PlaceMatchedJudgmentCard)}") || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramMatchedJudgmentSelfDiscardedEvent>().Count(e => e.ProgramFrameId == f.Id && e.JudgmentFrameId == r.JudgmentFrameId && e.CardId == id && e.From == from && e.MovementSequence == r.SelfDiscardMovementSequence) != 1))
-            throw new InvalidOperationException("Judgment placement changed its once-only destination or self-discard payment.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && r.Stage is MatchedJudgmentPlacementStage.ChoosingDestination or MatchedJudgmentPlacementStage.ChoosingSelfDiscard && (prompt.PlayerSeat != f.OwnerSeat || !prompt.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, MatchedJudgmentPlacementChoices(f))))
-            throw new InvalidOperationException("Judgment placement changed its owning private choice.");
     }
 }

@@ -4,7 +4,6 @@ internal sealed partial class CharacterCaoShuangOlEntries
 {
     internal void AnswerCaoShuangShanzhuan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerCaoShuangShanzhuan(choice);
     internal void AnswerCaoShuangTuogu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerCaoShuangTuogu(choice);
-    internal void AssertCaoShuangProgram(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertCaoShuangProgram(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCaoShuangShanzhuan(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginCaoShuangShanzhuan(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCaoShuangTuogu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginCaoShuangTuogu(supplied);
     internal bool CanContinuePaidCaoShuang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinuePaidCaoShuang(f);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterCaoShuangOlEntries
     internal void ContinueCaoShuangProgram(long id) => _resolve().ContinueCaoShuangProgram(id);
     internal bool DrainCaoShuangChildren(long id) => _resolve().DrainCaoShuangChildren(id);
     internal bool HasCaoShuangDamageObserver(long id) => _resolve().HasCaoShuangDamageObserver(id);
-    internal bool IsCaoShuangDying() => _resolve().IsCaoShuangDying();
     internal void PublishCaoShuangShanzhuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCaoShuangShanzhuan(f);
     internal void PublishCaoShuangTuogu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCaoShuangTuogu(f);
     internal bool ResumeCaoShuang(long id) => _resolve().ResumeCaoShuang(id);

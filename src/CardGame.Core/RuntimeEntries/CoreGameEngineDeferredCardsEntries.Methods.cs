@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDeferredCardsEntries
 {
-    internal void AssertParticipantTopView(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertParticipantTopView(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginParticipantTopView(global::CardGame.Core.ProgramSkillFrame frame, int seat, int amount) => _resolve().BeginParticipantTopView(frame, seat, amount);
     internal void CleanupLostDeferredPileSources() => _resolve().CleanupLostDeferredPileSources();
     internal void ConsumeSkippedNextTurnDrawBenefits(global::CardGame.Core.CharacterState current) => _resolve().ConsumeSkippedNextTurnDrawBenefits(current);

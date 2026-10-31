@@ -47,7 +47,6 @@ internal sealed partial class CoreGameEngineOriginalHandAwakeningRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.OriginalHandAwakening is not { } r)
             return false;
-        _coreOriginalHandEntityObserversOperations.AssertOriginalHandEntityProgram(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

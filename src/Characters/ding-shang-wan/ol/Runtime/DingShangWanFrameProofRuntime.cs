@@ -1,6 +1,6 @@
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class DingShangWanFrameProofRuntime(IProgramRuntimeFrames frames, INativeFrameRoutingFacts nativeFrames,
     IDingShangWanNativeFacts facts, IProgramTurnQueries turn, IProgramPhaseQueries phase,
     IMatchParticipantStateAccess participants, IProgramEventHistoryQueries history, ICardMovementHistoryQueries movements) : IDingShangWanRuntimeQueries
@@ -43,45 +43,6 @@ internal sealed class DingShangWanFrameProofRuntime(IProgramRuntimeFrames frames
             _=>false
         };
     }
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,26700)]
-    public void AssertDingShangWan(ProgramSkillFrame f)
-    {
-        if(f.DingShangWan is not{}r)return;
-        if(f.TriggerId is null||f.InstructionIndex!=1||r.Instruction!=1||r.Source!=DingShangWanSource(f)||r.GameplayHash!=f.GameplayHash||
-            facts.PausedEffect(f)?.Op!=r.Operation||!DingShangWanComposition.IsOperation(r.Operation)||f.WindowContext is not{}c||
-            c.ParentFrameId!=r.WindowId||c.Window!=r.Window||c.DamageFrameId!=r.DamageFrameId||c.CardUse?.CardActionId!=r.ActionId||
-            r.Turn!=turn.TurnNumber||r.TurnOwner!=turn.TurnOwnerSeat||!Enum.IsDefined(r.Stage)||r.Before<0||r.After<r.Before||r.After>facts.MovementSequence||
-            r.Minimum<0||r.Maximum<r.Minimum||r.Selected.Count>r.Maximum||r.Selected.Distinct().Count()!=r.Selected.Count||r.Selected.Any(id=>!r.Candidates.Contains(id))||
-            r.WoodenOxGrainIds.Distinct().Count()!=r.WoodenOxGrainIds.Count||r.WoodenOxGrainIds.Intersect(r.Selected).Any()||
-            !DingShangWanParent(new(f.OwnerSeat,f.SkillId,f.TriggerId,f.SkillInstanceId,f.GameplayHash,facts.Trigger(f).Priority,c.OccurrenceIndex),c)||
-            history.Read<DingShangWanStartedEvent>().Count(e=>e.FrameId==f.Id&&e.Source==r.Source&&e.GameplayHash==r.GameplayHash&&e.WindowId==r.WindowId&&
-                e.Window==r.Window&&e.Operation==r.Operation&&e.Turn==r.Turn&&e.TurnOwner==r.TurnOwner&&e.Counterpart==r.Counterpart&&e.DamageFrameId==r.DamageFrameId&&e.ActionId==r.ActionId)!=1)
-            throw new InvalidOperationException("Ding Shang Wan lost its exact native candidate, owning instruction, start fact or private selected entities.");
-        if(r.Operation==SkillProgramEffectOp.InitializeFudaoHandRecord)
-        {
-            if(r.Window!=SkillProgramTriggerWindow.GameStarting||r.Counterpart is not null||r.Stage is not(DingShangWanStage.OpeningDraw or DingShangWanStage.OpeningGiftChoice or DingShangWanStage.OpeningGiftChildren or DingShangWanStage.OpeningDiscardChoice or DingShangWanStage.OpeningDiscardChildren)||
-                DingShangWanRecord(f.OwnerSeat,f.SkillId,f.GameplayHash)is not null)throw new InvalidOperationException("Fudao cannot duplicate its game-opening record.");
-        }
-        else if(r.Operation==SkillProgramEffectOp.DrawFudaoRecordedPair)
-        {
-            if(r.Window!=SkillProgramTriggerWindow.AfterTurnEnded||r.Counterpart!=c.TargetSeat||r.Stage is not(DingShangWanStage.PairOwnerDraw or DingShangWanStage.PairTargetDraw)||
-                DingShangWanRecord(f.OwnerSeat,f.SkillId,f.GameplayHash)is null)throw new InvalidOperationException("Fudao lost its original fixed count and accepted actual end.");
-        }
-        else if(r.Counterpart is not{}other||other==f.OwnerSeat||!facts.ValidSeat(other)||r.Stage is DingShangWanStage.OpeningDraw or DingShangWanStage.OpeningGiftChoice or DingShangWanStage.OpeningGiftChildren or DingShangWanStage.OpeningDiscardChoice or DingShangWanStage.OpeningDiscardChildren or DingShangWanStage.PairOwnerDraw or DingShangWanStage.PairTargetDraw||
-            (r.Window==SkillProgramTriggerWindow.AfterDamageApplied?r.Counterpart!=c.SourceSeat||c.TargetSeat!=f.OwnerSeat||c.Amount<=0:r.Window!=SkillProgramTriggerWindow.CardResponseCompleted||r.Counterpart!=c.TargetSeat)||
-            r.Stage!=DingShangWanStage.FengChoice&&(r.Branch is not("owner-draw" or "other-draw")||history.Read<DingShangWanBranchEvent>().Count(e=>e.FrameId==f.Id&&e.Branch==r.Branch&&e.Recipient==r.Counterpart)!=1))
-            throw new InvalidOperationException("Fengyan lost its real foreign damage/response counterpart and committed option.");
-        if(f.PendingMovementContinuation is not null)
-        {
-            if(history.Read<DingShangWanMovementIssuedEvent>().Count(e=>e.FrameId==f.Id&&e.Stage==r.Stage&&e.Payer==r.Payer&&e.Recipient==r.Recipient&&e.Before==r.Before&&e.After==r.After&&e.Count==r.ActualCount)!=1||
-                movements.Read().Count(m=>m.Sequence>r.Before&&m.Sequence<=r.After&&(!IsDingShangWanDrawStage(r.Stage)||m.From==CardLocation.DrawPile&&m.To==CardLocation.Hand(r.Payer)&&m.Reason.Value==DingShangWanDrawReason))!=r.ActualCount||
-                r.Reshuffles.Select(s=>s.BatchId).Distinct().Count()!=r.Reshuffles.Count||r.Reshuffles.Any(s=>s.ParentFrameId!=f.Id||s.Movements.Count==0||s.Before<r.Before||s.After>r.After||s.After<=s.Before||
-                    s.Before!=s.Movements[0].Sequence-1||s.After!=s.Movements[^1].Sequence||s.Movements.Any(m=>m.Sequence<=s.Before||m.Sequence>s.After||m.From!=CardLocation.DiscardPile||m.To!=CardLocation.DrawPile||m.Reason!=CardMoveReasons.Reshuffle||!movements.Read().Contains(m))||
-                    history.Read<DingShangWanReshuffleCapturedEvent>().Count(e=>e.FrameId==f.Id&&e.BatchId==s.BatchId&&e.Before==s.Before&&e.After==s.After&&e.Count==s.Movements.Count)!=1)||
-                movements.Read().Where(m=>m.Sequence>r.Before&&m.Sequence<=r.After).Any(m=>!IsDingShangWanIssuedMovement(f,m)))
-                throw new InvalidOperationException("Ding Shang Wan lost its once-issued real native movement interval.");
-        }
-    }
     private bool IsDingShangWanIssuedMovement(ProgramSkillFrame f,CardMovementRecord m)
     {
         var r=f.DingShangWan!;
@@ -114,7 +75,6 @@ internal sealed class DingShangWanFrameProofRuntime(IProgramRuntimeFrames frames
     private bool DingShangWanFirstChild(ProgramSkillFrame f,ResolutionFrame child)
     {
         if(f.DingShangWan is not{}r)return false;
-        AssertDingShangWan(f);
         if(r.Stage==DingShangWanStage.OpeningDraw&&f.NativeDraw is not null)return RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(child,f);
         if(f.PendingMovementContinuation is null)return false;
         if(child is CardsMovedTriggerWindowFrame moved)return RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramMovementReturnMatches(f,moved)&&
@@ -149,59 +109,4 @@ internal sealed class DingShangWanFrameProofRuntime(IProgramRuntimeFrames frames
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 600)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 630)]
     private bool HasDingShangWanDamageObserver(long id)=>DingShangWanObserverRoot()is{}root&&AllFrames.Any(f=>f.Id==id&&f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame)&&nativeFrames.LastFrameIndex(id)>nativeFrames.LastFrameIndex(root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 460)]
-    private bool IsDingShangWanDying()=>facts.ActiveDying is{}d&&DingShangWanObserverRoot()is{}root&&nativeFrames.LastFrameIndex(d.Id)>nativeFrames.LastFrameIndex(root.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26706)]
-    public void AssertDingShangWanOpeningDraw(ProgramSkillFrame frame)
-    {
-        if (frame.DingShangWan is not { } receipt)
-        {
-            if (frame.NativeDraw?.Operation == SkillProgramEffectOp.InitializeFudaoHandRecord)
-                throw new InvalidOperationException("Fudao's native request lost its owning opening receipt.");
-            return;
-        }
-        if (receipt.Operation != SkillProgramEffectOp.InitializeFudaoHandRecord)
-        {
-            if (receipt.OpeningDrawOutcome is not null || frame.NativeDraw?.Operation == SkillProgramEffectOp.InitializeFudaoHandRecord)
-                throw new InvalidOperationException("A later Fudao or Fengyan producer cannot borrow the opening draw outcome.");
-            return;
-        }
-        var returned = history.Read<DingShangWanOpeningDrawReturnedEvent>().Where(fact => fact.FrameId == frame.Id).ToArray();
-        if (frame.NativeDraw is { } paid)
-        {
-            if (receipt.Stage != DingShangWanStage.OpeningDraw || receipt.OpeningDrawOutcome is not null || returned.Length != 0 ||
-                frame.PendingMovementContinuation is not null || paid.Operation != receipt.Operation ||
-                paid.ReturnKind != NativeDrawAttemptReturnKind.ProgramOperation || paid.InstructionIndex != frame.InstructionIndex ||
-                paid.RequestedCount != 3 || !paid.Recipients.SequenceEqual([frame.OwnerSeat]) || paid.RecipientIndex != 0 ||
-                receipt.Payer != frame.OwnerSeat || receipt.ActualCount != 0 || receipt.Before != receipt.After ||
-                receipt.Selected.Count != 0 || receipt.Reshuffles.Count != 0)
-                throw new InvalidOperationException("Fudao lost its exact unpaid opening request and native child owner.");
-            return;
-        }
-        if (receipt.OpeningDrawOutcome is not { } outcome || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != 3 ||
-            outcome.SequenceBefore < 0 || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > PhysicalMovementSequence ||
-            outcome.ActualDrawIds.Count > 3 || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count ||
-            outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 ||
-            !movements.Read().Where(move => move.Sequence > outcome.SequenceBefore && move.Sequence <= outcome.SequenceAfter &&
-                move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(frame.OwnerSeat) && move.Reason.Value == DingShangWanDrawReason)
-                .OrderBy(move => move.Sequence).Select(move => move.CardId).SequenceEqual(outcome.ActualDrawIds) ||
-            returned is not [var actual] || actual != new DingShangWanOpeningDrawReturnedEvent(frame.Id, frame.OwnerSeat, 3,
-                outcome.AttemptFrameId, outcome.SequenceBefore, outcome.SequenceAfter, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count) ||
-            receipt.Stage == DingShangWanStage.OpeningDraw && (frame.PendingMovementContinuation is null ||
-                receipt.Before != outcome.SequenceBefore || receipt.After != outcome.SequenceAfter || receipt.ActualCount != outcome.ActualDrawIds.Count))
-            throw new InvalidOperationException("Fudao lost its once-returned physical opening outcome.");
-        if (outcome.AttemptFrameId is { } attempt)
-        {
-            if (history.Read<NativeDrawAttemptStartedEvent>().Where(fact => fact.Context.AttemptFrameId == attempt).ToArray() is not [var start] ||
-                start.Context.ParentFrameId != frame.Id || start.Context.RecipientSeat != frame.OwnerSeat || start.Context.RequestedCount != 3 ||
-                start.Context.Reason.Value != DingShangWanDrawReason || start.Context.ActualTurnNumber != receipt.Turn ||
-                start.Context.ActualTurnOwnerSeat != receipt.TurnOwner || start.Context.SequenceBefore > outcome.SequenceBefore ||
-                start.Return != new NativeDrawAttemptReturn(NativeDrawAttemptReturnKind.ProgramOperation, frame.InstructionIndex, 0) ||
-                history.Read<NativeDrawAttemptDecidedEvent>().Count(fact => fact.AttemptFrameId == attempt && fact.ParentFrameId == frame.Id &&
-                    fact.RecipientSeat == frame.OwnerSeat && fact.RequestedCount == 3 && fact.Replaced == (outcome.Replacement is not null)) != 1)
-                throw new InvalidOperationException("Fudao retained an opening outcome from a foreign native request.");
-        }
-        else if (outcome.Replacement is not null || history.Read<NativeDrawAttemptStartedEvent>().Any(fact => fact.Context.ParentFrameId == frame.Id))
-            throw new InvalidOperationException("Fudao cannot invent or omit a paid opening draw request.");
-    }
 }

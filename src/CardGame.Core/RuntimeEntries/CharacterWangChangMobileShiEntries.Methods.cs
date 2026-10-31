@@ -4,11 +4,9 @@ internal sealed partial class CharacterWangChangMobileShiEntries
 {
     internal bool AdvanceShiKaijiChildren() => _resolve().AdvanceShiKaijiChildren();
     internal void AnswerShiWangChang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiWangChang(choice);
-    internal void AssertShiWangChang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiWangChang(f);
     internal bool CanOfferShiWangChang(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShiWangChang(candidate, trigger, context);
     internal global::CardGame.Core.PromptChoice ChooseShiWangChangAi(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseShiWangChangAi(decision, f);
     internal void ContinueShiKaiji(long id) => _resolve().ContinueShiKaiji(id);
-    internal bool IsMobileShiWangChangChoiceResult(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramChoiceResultBinding b) => _resolve().IsMobileShiWangChangChoiceResult(f, b);
     internal bool IsShiKaijiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsShiKaijiMovement(f, e, movement);
     internal bool KeepPaidShiWangChang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidShiWangChang(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiWangChangPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().MobileShiWangChangPublicStates(owner, skillId);

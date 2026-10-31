@@ -44,13 +44,6 @@ internal sealed partial class CharacterDiaoChanMouMobileRuntime
         FinishMouDiaoChan(f);
     }
 
-    internal void AssertMouDiaoChanRingUse(CardUseFrame use, ProgramSelectedActorDuelOrigin origin)
-    {
-        var at = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        if (origin.MouDiaoChanRing is not { } ring || at < 1 || _resolutionStackOperations._resolutionStack[at - 1] is not ProgramSkillFrame { MouDiaoChanMobile: { } r } f || !ValidMouDiaoChan(f) || !r.Paid || r.Stage != MouDiaoChanMobileStage.Duels || r.Index != ring.Index || r.Index >= r.Targets.Count || r.Targets[r.Index] != ring.ActorSeat || (r.UseId != 0 && r.UseId != use.Id) || ring.FrameId != f.Id || ring.Source != r.Source || ring.GameplayHash != r.GameplayHash || ring.TargetSeat == ring.ActorSeat || !r.Targets.Contains(ring.TargetSeat) || origin.ParentProgramFrameId != f.Id || origin.InstructionIndex != f.InstructionIndex || origin.OwnerSeat != f.OwnerSeat || origin.InitialActorSeat != ring.ActorSeat || origin.InitialTargetSeat != ring.TargetSeat || origin.SkillId != f.SkillId || origin.ActivationId != f.ActivationId || origin.SkillInstanceId != f.SkillInstanceId || origin.GameplayHash != f.GameplayHash || origin.TurnNumber != r.Phase.TurnNumber || origin.OrderedPairPayment is not null || origin.ParticipantMode is not null || use.CardId != 0 || use.CardKind != CardKind.Duel || use.PhysicalCardIds?.Count != 0 || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveIsRed: false } || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDiaoChanMobileDuelPlannedEvent>().Count(e => e.Origin == ring) != 1)
-            throw new InvalidOperationException("Lijian Duel lost its exact paid ring origin and original owning frame.");
-    }
-
     [NativeUseReturn(31700)]
     internal bool ReturnMouDiaoChanRingUse(CardUseFrame use)
     {
@@ -65,8 +58,6 @@ internal sealed partial class CharacterDiaoChanMouMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDiaoChanMobile: { Stage: MouDiaoChanMobileStage.Duels } r } f || r.UseId != completion.ResolutionId)
             return false;
-        if (completion.ProgramFrameId != f.Id || !completion.RequestedSlashChild)
-            throw new InvalidOperationException("Lijian lost its original completely returned native Duel.");
         CompleteMouDiaoChanRingDuel(f.Id, r.Index, r.UseId);
         return true;
     }

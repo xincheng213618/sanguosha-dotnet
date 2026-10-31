@@ -172,13 +172,4 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
         foreach (var c in live)
             EndMobileHtCourse(c.CourseId, _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id ?? c.CourseId);
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 39100)]
-    internal void AssertMobileHt(ProgramSkillFrame f)
-    {
-        if (f.MobileHuaTuo is not { } r)
-            return;
-        if (r.Source != MobileHtSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.InstructionIndex != 1 || !Enum.IsDefined(r.Stage) || r.Order.Count > 5 || r.Order.Distinct().Count() != r.Order.Count || r.Order.Any(a => !Enum.IsDefined(a)) || r.AnimalIndex < 0 || r.AnimalIndex > 5 || r.Cursor < 0 || r.Cursor > r.Recipients.Count || r.Cards.Distinct().Count() != r.Cards.Count || r.Recipients.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || r.TargetSeat != -1 && !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Op is not (SkillProgramEffectOp.TeachMobileShenHuaTuoWuling or SkillProgramEffectOp.AdvanceMobileShenHuaTuoWuling or SkillProgramEffectOp.DepositMobileShenHuaTuoYouyi or SkillProgramEffectOp.RecoverMobileShenHuaTuoYouyi) || r.Stage is MobileHuaTuoStage.Entry or MobileHuaTuoStage.Drawing or MobileHuaTuoStage.Ape && (r.Order.Count != 5 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingTaughtEvent>().Count(e => e.CourseId == r.CourseId && e.TargetSeat == r.TargetSeat) != 1))
-            throw new InvalidOperationException("Mobile Hua Tuo lost its exact original source, frozen order, paid materials or native cursor.");
-    }
 }

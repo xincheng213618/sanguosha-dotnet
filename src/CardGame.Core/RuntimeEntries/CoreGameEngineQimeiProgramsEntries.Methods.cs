@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineQimeiProgramsEntries
 {
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.QimeiPairGrant> ActiveQimeiGrants() => _resolve().ActiveQimeiGrants();
     internal global::CardGame.Core.SkillProgramStepOutcome ArmQimeiPair(global::CardGame.Core.ProgramSkillFrame input) => _resolve().ArmQimeiPair(input);
-    internal void AssertRegisteredQimeiDraw(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredQimeiDraw(frame);
     internal bool CanRunQimeiEquality(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunQimeiEquality(c, context);
     internal void CaptureQimeiHpQualification(global::CardGame.Core.HpChangeContext change) => _resolve().CaptureQimeiHpQualification(change);
     internal void CaptureQimeiMovementQualification(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureQimeiMovementQualification(batch);

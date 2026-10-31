@@ -127,15 +127,6 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
         return r.Stage == AnniversaryYangBiaoStage.NativeUse ? returned.Length == r.Cursor : r.HadAttack == (p.Kind == CardKind.Slash) && returned.Length == r.Cursor + 1 && returned.Count(e => e == new AnniversaryYangBiaoNativeReturnedEvent(f.Id, r.Cursor, r.UseId, r.HadAttack)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == p.Kind) == 1;
     }
 
-    internal bool HasExactAnniversaryYangBiaoParticipantSelection(ProgramSkillFrame f) => f.AnniversaryYangBiao is { Op: SkillProgramEffectOp.ResolveAnniversaryYangBiaoJinjie, Stage: AnniversaryYangBiaoStage.Completed } && ValidYangBiao(f);
-    internal bool HasAnniversaryYangBiaoPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryYangBiao: not null } f && f.Step == ResolutionFrameStep.AwaitingResponse && p.PlayerSeat == f.OwnerSeat && ValidYangBiao(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, YangBiaoChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 43700)]
-    internal void AssertYangBiao(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryYangBiao is not null && !ValidYangBiao(f))
-            throw new InvalidOperationException($"Yang Biao lost original candidate, actual native cost/draw or whole Use ordinal ({(f.Id)}/{(f.SkillId)}/{(f.AnniversaryYangBiao.Stage)}/{(f.InstructionIndex)}).");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43700)]
     internal bool YangBiaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryYangBiao is { Stage: AnniversaryYangBiaoStage.CostChildren or AnniversaryYangBiaoStage.DrawChildren } r && ValidYangBiao(f) && e?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43700)]
@@ -160,8 +151,6 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
     internal bool YangBiaoDamageObserver(long id) => YangBiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 43700)]
     internal bool YangBiaoBeforeDamageObserver(long id) => YangBiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 43700)]
-    internal bool YangBiaoDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && YangBiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 43700)]
     internal bool AdvanceYangBiaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && YangBiaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43700)]

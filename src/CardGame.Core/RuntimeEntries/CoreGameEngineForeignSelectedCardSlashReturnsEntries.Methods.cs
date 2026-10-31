@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsEntries
 {
-    internal void AssertSelectedForeignCardSlashes() => _resolve().AssertSelectedForeignCardSlashes();
     internal bool CanContinueSelectedForeignCardSlash(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueSelectedForeignCardSlash(frame);
     internal bool DistancePhysicalSlash120HasIssuedSelectedForeignCardSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash120HasIssuedSelectedForeignCardSlashDistance(q);
     internal bool ForeignSelectedCardSlashStructuralEdge(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.ResolutionFrame child) => _resolve().ForeignSelectedCardSlashStructuralEdge(parent, child);

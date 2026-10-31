@@ -22,8 +22,6 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
     internal bool HasWuAnGuoDamageObserver(long id) => WuAnGuoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 720)]
     internal bool HasWuAnGuoBeforeDamageObserver(long id) => HasWuAnGuoDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 540)]
-    internal bool IsWuAnGuoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuAnGuoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27010)]
     internal bool AdvanceWuAnGuoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuAnGuoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

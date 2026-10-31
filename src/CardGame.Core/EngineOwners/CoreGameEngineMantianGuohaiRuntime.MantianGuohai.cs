@@ -137,17 +137,4 @@ internal sealed partial class CoreGameEngineMantianGuohaiRuntime
     }
 
     internal bool MantianGuohaiFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => child is ProgramSkillFrame { MantianGuohaiReturn: { } receipt } frame && receipt.CardUseFrameId == parent.Id && IsMantianGuohaiGiftProgram(frame);
-    internal bool HasMantianGuohaiPrompt() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.MantianGuohaiReturn is not null && IsMantianGuohaiGiftProgram(frame));
-    internal void AssertMantianGuohaiState()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.MantianGuohaiReturn is not null))
-            if (!IsMantianGuohaiGiftProgram(frame))
-                throw new InvalidOperationException("Mantian Guohai changed its gift parent.");
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(f => f.MantianGuohaiGift is not null))
-        {
-            var state = use.MantianGuohaiGift!;
-            if (!IsMantianGuohaiUse(use.Id) || state.GiftTargets.Distinct().Count() != state.GiftTargets.Count || state.GiftTargets.Any(t => !use.Action!.TargetSeats.Contains(t)) || state.GiftIndex < 0 || state.GiftIndex > state.GiftTargets.Count || state.EffectRound < 0 || state.ProgramFrameId is { } program && !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == program && IsMantianGuohaiGiftProgram(f)))
-                throw new InvalidOperationException("Mantian Guohai changed its frozen acquisition or gift cursor.");
-        }
-    }
 }

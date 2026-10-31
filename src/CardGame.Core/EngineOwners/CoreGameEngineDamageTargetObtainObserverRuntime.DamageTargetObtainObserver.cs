@@ -35,6 +35,4 @@ internal sealed partial class CoreGameEngineDamageTargetObtainObserverRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 40)]
     internal bool HasPaidDamageTargetObtainObserver(long id) => PaidDamageTargetObtainObserverRoot(id)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 310, group: 10)]
-    internal bool IsPaidDamageTargetObtainDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } w && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && PaidDamageTargetObtainObserverRoot(w.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId && f.ParentFrameId == dying.ParentFrameId);
 }

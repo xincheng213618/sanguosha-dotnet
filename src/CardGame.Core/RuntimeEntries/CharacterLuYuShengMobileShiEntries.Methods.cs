@@ -6,7 +6,6 @@ internal sealed partial class CharacterLuYuShengMobileShiEntries
     internal void AnswerMobileShiRunwei(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMobileShiRunwei(selected);
     internal void AnswerMobileShiShuanghuai(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMobileShiShuanghuai(selected);
     internal void ApplyMobileShiRunweiGrant(global::CardGame.Core.ProgramSkillFrame f, bool red) => _resolve().ApplyMobileShiRunweiGrant(f, red);
-    internal void AssertShiLysLuYuSheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiLysLuYuSheng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileShiRunweiGrant(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginMobileShiRunweiGrant(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileShiShuanghuaiGuard(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginMobileShiShuanghuaiGuard(frame);
     internal void BindShiLysShuanghuaiOption(global::CardGame.Core.ProgramSkillFrame f, string option) => _resolve().BindShiLysShuanghuaiOption(f, option);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterLuYuShengMobileShiEntries
     internal bool DrainShiLysLuYuSheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainShiLysLuYuSheng(f);
     internal void FinishShiLys(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShiLys(f);
     internal bool IsIssuedShiLysPhaseEnd(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedShiLysPhaseEnd(c, context);
-    internal bool IsMobileShiLuYuShengChoiceResult(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramChoiceResultBinding binding) => _resolve().IsMobileShiLuYuShengChoiceResult(frame, binding);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiLuYuShengPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().MobileShiLuYuShengPublicStates(owner, skillId);
     internal global::CardGame.Core.GameEngine.MobileShiLuYuShengTrack MobileShiLuYuShengTrackAt(int seat) => _resolve().MobileShiLuYuShengTrackAt(seat);
     internal int[] MobileShiRunweiRecipientSeats(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileShiRunweiRecipientSeats(f);

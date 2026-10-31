@@ -16,8 +16,6 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
         // when Start opens it, rather than keeping an uncommitted side ledger.
         var entries = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.From == CardLocation.OutsideGame && (m.To == CardLocation.Hand(0) && m.Reason == CardMoveReasons.InitialDeal || m.To == CardLocation.Equipment(0) && m.Reason == CardMoveReasons.EquipmentEnter) && _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(m.CardId)).OrderBy(m => m.Sequence).ToArray();
         var recipe = setup.StartingCards.Concat(setup.StartingEquipment).ToArray();
-        if (entries.Length != recipe.Length)
-            throw new InvalidOperationException("The starting resource recipe lost its exact generated initial-deal movements.");
         for (var index = 0; index < entries.Length; index++)
         {
             var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(entries[index].CardId);

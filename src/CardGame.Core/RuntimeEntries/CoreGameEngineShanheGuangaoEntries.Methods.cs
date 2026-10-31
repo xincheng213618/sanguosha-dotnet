@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheGuangaoEntries
 {
-    internal void AssertShanheGuangao(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShanheGuangao(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheGuangao(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheGuangao(supplied);
     internal bool CanOfferShanheGuangao(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShanheGuangao(candidate, trigger, context);
     internal void FinishShanheGuangao(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().FinishShanheGuangao(frame);

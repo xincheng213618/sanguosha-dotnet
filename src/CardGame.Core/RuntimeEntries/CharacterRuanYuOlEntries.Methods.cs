@@ -5,7 +5,6 @@ internal sealed partial class CharacterRuanYuOlEntries
     internal bool AdvanceRuanYuChildren() => _resolve().AdvanceRuanYuChildren();
     internal void AnswerRuanYu(global::CardGame.Core.PromptChoice supplied) => _resolve().AnswerRuanYu(supplied);
     internal void AppendRuanYuXingzuoEndingItems(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendRuanYuXingzuoEndingItems(items);
-    internal void AssertRuanYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertRuanYu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginRuanYu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginRuanYu(supplied, op);
     internal bool CanOfferRuanYu(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferRuanYu(c, t, context);
     internal void CaptureMovementBatchStartRuanYuMiaoxianPaymentSources(global::CardGame.Core.CardMovementBatchBuilder batch) => _resolve().CaptureMovementBatchStartRuanYuMiaoxianPaymentSources(batch);
@@ -27,7 +26,6 @@ internal sealed partial class CharacterRuanYuOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramCardTriggerCandidate> IncludeRuanYuMiaoxianRedCandidates(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramCardTriggerCandidate> ordinary, global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().IncludeRuanYuMiaoxianRedCandidates(ordinary, action, window);
     internal bool IsIssuedRuanYuMiaoxianRedCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedRuanYuMiaoxianRedCandidate(c, context);
     internal bool IsIssuedRuanYuXingzuoEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedRuanYuXingzuoEndingCandidate(c, context);
-    internal bool IsRuanYuDying() => _resolve().IsRuanYuDying();
     internal bool IsRuanYuMiaoxianBlackAvailable(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource source, bool forResponse) => _resolve().IsRuanYuMiaoxianBlackAvailable(owner, card, source, forResponse);
     internal bool IsRuanYuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsRuanYuMovement(f, effect, pending);
     internal void MoveRuanYuExchange(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.RuanYuEntity> entities, global::System.Collections.Generic.IReadOnlyList<int> desired) => _resolve().MoveRuanYuExchange(f, entities, desired);

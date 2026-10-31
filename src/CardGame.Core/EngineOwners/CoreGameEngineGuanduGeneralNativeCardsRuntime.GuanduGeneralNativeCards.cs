@@ -18,15 +18,6 @@ internal sealed partial class CoreGameEngineGuanduGeneralNativeCardsRuntime
 
     internal CardKind? GuanduLastDamageCard(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDamagingCardRecordedEvent>().LastOrDefault(e => e.TargetSeat == seat)?.Kind;
     internal static string GuanduKindName(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GuanduGeneralNativeCards.GuanduKindName(kind);
-    internal bool IsGuanduChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding binding)
-    {
-        if (!_coreGuanduActivitiesOperations.IsGuanduActivity || f.SkillId != "guandu:choulue" || f.InstructionIndex < 2 || binding.Name != "choulue-kind" || binding.ChooserSeat != f.OwnerSeat || f.WindowContext?.Window != SkillProgramTriggerWindow.PlayPhaseStarting || !_coreProgramEventHistoryOperations.ProgramEventHistory<GuanduGeneralCompletedEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId) || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions[0].Op != SkillProgramEffectOp.ResolveGuanduChoulue)
-            return false;
-        var armed = _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduChoulueArmedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
-        if (binding.OptionId == "none")
-            return armed.Length == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduGeneralCompletedEvent>().Any(e => e.FrameId == f.Id && !e.Completed);
-        return armed is [var receipt] && receipt.OwnerSeat == f.OwnerSeat && receipt.InstanceId == f.SkillInstanceId && receipt.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && receipt.PhaseBoundaryId == f.WindowContext.ParentFrameId && binding.OptionId == GuanduKindName(receipt.Kind) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == receipt.GiftCardId && m.Sequence > receipt.Before && m.Sequence <= receipt.After && m.From.OwnerSeat == receipt.ProviderSeat && m.To == CardLocation.Hand(f.OwnerSeat)) == 1;
-    }
 
     internal CardKind? GuanduChoulueFrozenBasicKind(ProgramSkillFrame f)
     {

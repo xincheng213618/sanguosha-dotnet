@@ -104,7 +104,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DaQiaoXiaoQiao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DaQiaoXiaoQiaoChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xingwu lost its exact private chooser or payable entity.");
-        AssertDaQiaoXiaoQiao(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (r.Stage == DaQiaoXiaoQiaoStage.Deposit)
@@ -198,7 +197,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DaQiaoXiaoQiao: { } r } f || f.Id != id)
             return;
-        AssertDaQiaoXiaoQiao(f);
         if (r.Stage is DaQiaoXiaoQiaoStage.Deposit or DaQiaoXiaoQiaoStage.Burst or DaQiaoXiaoQiaoStage.PileCards or DaQiaoXiaoQiaoStage.HandCards or DaQiaoXiaoQiaoStage.Target)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

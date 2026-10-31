@@ -111,8 +111,6 @@ internal static class ModeFlowExtensionChecks
         [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 10)]
         [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 10)]
         private bool Permission(ProgramSkillFrame frame) { Trace.Add($"core-permission:{frame.Id}"); return false; }
-        [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 10)]
-        [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 10)] private void Invariant(ProgramSkillFrame frame) { }
     }
     private static MethodInfo[] Methods(Type type) => type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
     private static void Reject<T>(Action action, string message) where T : Exception

@@ -69,7 +69,6 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
     internal void ResolveRecipientContestChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        _coreRecipientContestReceiptsOperations.AssertRecipientContestPrograms(f);
         var r = f.RecipientContest!;
         if (r.Stage != RecipientContestStage.ChoosingThird || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || choice.Cards.Count != 0 || choice.Targets is not [var third] || !RecipientContestThirds(f).Contains(third) || choice.Id.Value != $"recipient-contest.{(f.Id)}.third-{(third)}")
             throw new InvalidOperationException("The recipient contest lost its exact published third participant.");
@@ -92,7 +91,6 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.RecipientContest is not { } r)
             return false;
-        _coreRecipientContestReceiptsOperations.AssertRecipientContestPrograms(f);
         if (r.Stage == RecipientContestStage.GiftChildren)
         {
             if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id))

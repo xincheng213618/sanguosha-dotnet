@@ -95,7 +95,6 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
     internal void ResolveDyingSuitsChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        _coreDyingSuitsAndHistoricalUseObserversOperations.AssertDyingSuits(f);
         var r = f.DyingSuits!;
         var expected = DyingSuitsChoices(f).SingleOrDefault(c => c.Id == choice.Id);
         if (expected is null || !expected.Cards.SequenceEqual(choice.Cards) || !expected.Targets.SequenceEqual(choice.Targets))
@@ -165,7 +164,6 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.DyingSuits is not { } r)
             return false;
-        _coreDyingSuitsAndHistoricalUseObserversOperations.AssertDyingSuits(f);
         if (r.Stage is DyingSuitsStage.Recipient or DyingSuitsStage.SelectingDiscard)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

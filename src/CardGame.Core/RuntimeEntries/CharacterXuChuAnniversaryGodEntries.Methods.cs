@@ -12,7 +12,6 @@ internal sealed partial class CharacterXuChuAnniversaryGodEntries
     internal bool IsZhuangpoPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhuangpoPaidMovement(f, e, p);
     internal void NextZhuangpoTarget(global::CardGame.Core.ProgramSkillFrame f) => _resolve().NextZhuangpoTarget(f);
     internal void PublishShenXuChu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShenXuChu(f);
-    internal void RequireShenXuChu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireShenXuChu(f);
     internal bool ResumeShenXuChu(long id) => _resolve().ResumeShenXuChu(id);
     internal void ReturnShenXuChuDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShenXuChuDraw(supplied, outcome);
     internal bool ReturnShenXuChuMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShenXuChuMovement(f);

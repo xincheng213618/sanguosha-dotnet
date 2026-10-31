@@ -6,7 +6,6 @@ internal sealed partial class CharacterCaoZhiLeEntries
     internal void AddFuleMissingNativeActions(global::System.Collections.Generic.List<global::CardGame.Core.LegalAction> actions, global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> playable, int? selectedPhysicalCardId = default) => _resolve().AddFuleMissingNativeActions(actions, actor, playable, selectedPhysicalCardId);
     internal bool AdvanceWenlanChildren() => _resolve().AdvanceWenlanChildren();
     internal void AnswerWenlanHand(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWenlanHand(choice);
-    internal void AssertLeCaoZhiWenlan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLeCaoZhiWenlan(f);
     internal void AssignFuleEntities(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.FuMarkOrigin origin) => _resolve().AssignFuleEntities(f, ids, origin);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLeCaoZhiWenlan(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginLeCaoZhiWenlan(supplied);
     internal global::CardGame.Core.WenlanActionCapture? BindLeCaoZhiWenlanResponse(global::CardGame.Core.CardActionContext action, scoped out long parentId) => _resolve().BindLeCaoZhiWenlanResponse(action, out parentId);
@@ -36,8 +35,6 @@ internal sealed partial class CharacterCaoZhiLeEntries
     internal global::CardGame.Core.CardKind FuleSelectedSlashKind(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardKind fallback, global::CardGame.Core.CardConversionSource? explicitSource = default) => _resolve().FuleSelectedSlashKind(owner, card, fallback, explicitSource);
     internal bool FuleSlashAliasAllowed(global::CardGame.Core.CharacterState owner, bool forResponse) => _resolve().FuleSlashAliasAllowed(owner, forResponse);
     internal bool FuleTrueSlashUseFrontier(global::CardGame.Core.CharacterState owner) => _resolve().FuleTrueSlashUseFrontier(owner);
-    internal bool HasLeCaoZhiWenlanRescueContinuation(long dyingId) => _resolve().HasLeCaoZhiWenlanRescueContinuation(dyingId);
-    internal bool HasLeCaoZhiWenlanUseContinuation(long nativeId) => _resolve().HasLeCaoZhiWenlanUseContinuation(nativeId);
     internal bool HasWenlanBeforeDamageObserver(long id) => _resolve().HasWenlanBeforeDamageObserver(id);
     internal bool HasWenlanDamageObserver(long id) => _resolve().HasWenlanDamageObserver(id);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeLeCaoZhiFule(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeLeCaoZhiFule(supplied);

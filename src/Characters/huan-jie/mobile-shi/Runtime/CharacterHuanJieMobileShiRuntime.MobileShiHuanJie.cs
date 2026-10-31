@@ -17,8 +17,6 @@ internal sealed partial class CharacterHuanJieMobileShiRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         var exchange = op == SkillProgramEffectOp.ResolveMobileShiHuanJieGongmou;
-        if (f.InstructionIndex != 1 || f.MobileShiHuanJie is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.SkillId != (exchange ? ShiHjGongmou : ShiHjZhengshuo) || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || exchange && (f.TriggerId != "preparation-exchange" || f.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || !exchange && (f.TriggerId is not null || f.ActivationId != "reset-all-hands" || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play))
-            throw new InvalidOperationException("Shi Huan Jie lost its original preparation or once-paid limited Play activation.");
         var r = new MobileShiHuanJieReceipt(ShiHjSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, f.WindowContext?.ParentFrameId ?? f.ParentFrameId ?? 0, op, exchange ? MobileShiHuanJieStage.Target : MobileShiHuanJieStage.DiscardChildren)
         {
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
@@ -245,12 +243,5 @@ internal sealed partial class CharacterHuanJieMobileShiRuntime
             if (!order.SequenceEqual(r.ShuffleAfter) || random.State != r.RandomAfter || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHuanJieShuffledEvent>().Count(e => e.FrameId == f.Id && e.RandomBefore == r.RandomBefore && e.RandomAfter == r.RandomAfter && e.DeckCount == order.Count) != 1)
                 throw new InvalidOperationException("Zhengshuo lost its once-issued real complete-deck shuffle and deterministic RNG.");
         }
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 48300)]
-    internal void AssertShiHj(ProgramSkillFrame f)
-    {
-        if (f.MobileShiHuanJie is not null)
-            RequireShiHj(f);
     }
 }

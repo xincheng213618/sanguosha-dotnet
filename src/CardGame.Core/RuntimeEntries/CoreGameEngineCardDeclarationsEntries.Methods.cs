@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineCardDeclarationsEntries
 {
     internal void AddDeclarationSlashActions(global::System.Collections.Generic.List<global::CardGame.Core.LegalAction> actions, global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> playable) => _resolve().AddDeclarationSlashActions(actions, actor, playable);
     internal void AnswerCardDeclaration(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerCardDeclaration(choice);
-    internal bool AssertCardDeclarationInvariant() => _resolve().AssertCardDeclarationInvariant();
     internal global::CardGame.Core.Card? AvailableDeclarationCard(global::CardGame.Core.CharacterState owner) => _resolve().AvailableDeclarationCard(owner);
     internal bool CanChallengeDeclaration(int seat, int owner) => _resolve().CanChallengeDeclaration(seat, owner);
     internal bool CanDeclareCard(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().CanDeclareCard(owner, skillId);

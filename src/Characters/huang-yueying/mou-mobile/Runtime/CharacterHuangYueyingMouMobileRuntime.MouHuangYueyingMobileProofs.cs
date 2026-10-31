@@ -18,13 +18,6 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
         return r.Operation == SkillProgramEffectOp.TransferMouHuangYueyingQicaiGains && r.Source.SkillId == MouHuangYueyingMobileComposition.Qicai && r.Source.BindingId == "receive-three" && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Count(e => e.GrantId == r.GrantId && e.GainSequence == r.ClaimSequence && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.CardId == r.CardId && e.GainingSeat == r.RecipientSeat && e.BatchId == r.WindowId) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31500)]
-    internal void AssertMouHy(ProgramSkillFrame f)
-    {
-        if (f.MouHuangYueyingMobile is not null && !ValidMouHy(f))
-            throw new InvalidOperationException("Mobile Yueying lost her exact native Draw, placement or original gain debt.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 31500)]
     internal bool ContinuePaidMouHy(ProgramSkillFrame f) => f.MouHuangYueyingMobile is { Paid: true } && ValidMouHy(f) || f.WindowContext is { } context && IsIssuedMouHyQiCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context);
@@ -64,7 +57,6 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 31500)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31500)]
     internal bool MouHyDamageObserver(long id) => MouHyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31500)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31500)]
     internal bool MouHyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouHyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31500)]

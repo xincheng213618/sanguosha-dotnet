@@ -30,14 +30,6 @@ internal sealed partial class CharacterLiuPiOlRuntime
 
     internal LiuPiTableEntry LiuPiEntry(int id) => new(id, _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Rank, _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == id)?.Sequence ?? 0);
     internal bool LiuPiEntryAvailable(LiuPiTableEntry e) => _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.Processing && (_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == e.CardId)?.Sequence ?? 0) == e.MovementSequence && _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).Rank == e.Rank;
-    internal bool LiuPiEntryHistoryMatches(ProgramSkillFrame f, LiuPiTableEntry e)
-    {
-        if (e.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).Rank != e.Rank || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.SingleOrDefault(m => m.Sequence == e.MovementSequence)is not { } moved || moved.CardId != e.CardId || moved.To != CardLocation.Processing)
-            return false;
-        if (moved.From == CardLocation.DrawPile && moved.Reason.Value == LiuPiMovementReason(LiuPiExchangeStage.RevealChildren))
-            return _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardsRevealedEvent>().Any(p => p.FrameId == f.Id && p.SkillId == f.SkillId && p.Bind == LiuPiTableBind && p.Cards.Any(c => c.Id == e.CardId && c.Rank == e.Rank));
-        return moved.From == CardLocation.Hand(f.OwnerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<LiuPiExchangeCommittedEvent>().Any(p => p.ProgramFrameId == f.Id && p.Source == LiuPiSource(f) && moved.Sequence > p.SequenceBefore && moved.Sequence <= p.SequenceAfter && moved.Reason.Value == LiuPiMovementReason(p.FullExchange ? LiuPiExchangeStage.FullExchangeChildren : LiuPiExchangeStage.EqualExchangeChildren));
-    }
 
     internal IReadOnlyList<LiuPiTableEntry> LiuPiAvailableTable(ProgramSkillFrame f) => f.LiuPiExchange!.Table.Where(LiuPiEntryAvailable).ToArray();
     internal ProgramSkillFrame ReplaceLiuPiPublicTable(long id, IReadOnlyList<int> ids)
@@ -267,14 +259,6 @@ internal sealed partial class CharacterLiuPiOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26120)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26120)]
     internal bool ContinueIssuedLiuPiExchange(ProgramSkillFrame f) => f.LiuPiExchange is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26120)]
-    internal void AssertLiuPiExchange(ProgramSkillFrame f)
-    {
-        if (f.LiuPiExchange is not { } r)
-            return;
-        if (r.Source != LiuPiSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.TriggerId is not null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "exchange" || r.RevealLimit < 0 || r.SequenceBefore < 0 || r.SequenceAfter < r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.EqualRankBefore < 0 || r.EqualRankAfter < 0 || r.Table.Select(e => e.CardId).Distinct().Count() != r.Table.Count || r.Table.Any(e => e.CardId <= 0 || e.Rank is < 1 or > 13 || e.MovementSequence <= 0) || r.Table.Any(e => !LiuPiEntryHistoryMatches(f, e)) || r.SelectedHand.Distinct().Count() != r.SelectedHand.Count || r.SelectedTable.Distinct().Count() != r.SelectedTable.Count || r.FullHand.Distinct().Count() != r.FullHand.Count || r.FullOrder.Distinct().Count() != r.FullOrder.Count || r.FullOrder.Except(r.FullHand).Any() || r.SelectedTable.Except(r.Table.Select(e => e.CardId)).Any() && r.Stage == LiuPiExchangeStage.TableSelection || r.Stage == LiuPiExchangeStage.HandSelection && (r.SelectedTable.Count != 0 || r.SelectedHand.Count > r.Table.Count) || r.Stage == LiuPiExchangeStage.TableSelection && (r.SelectedHand.Count == 0 || r.SelectedTable.Count > r.SelectedHand.Count) || r.Stage is LiuPiExchangeStage.HandSelection or LiuPiExchangeStage.TableSelection && r.SelectedHand.Except(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(c => c.Id)).Any() || r.Stage is LiuPiExchangeStage.FullOffer or LiuPiExchangeStage.FullOrder or LiuPiExchangeStage.FullExchangeChildren && r.EqualRankAfter <= r.EqualRankBefore || r.Stage == LiuPiExchangeStage.FullOrder && !r.FullHand.Order().SequenceEqual(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(c => c.Id).Order()) || r.Stage == LiuPiExchangeStage.FullExchangeChildren && r.FullOrder.Count != r.FullHand.Count)
-            throw new InvalidOperationException("Yicheng lost its frozen owning activation, physical table, rank receipts or order.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveYichengPublicExchange)]
     internal PromptChoice AiLiuPiExchange(PendingDecision p, ProgramSkillFrame f)

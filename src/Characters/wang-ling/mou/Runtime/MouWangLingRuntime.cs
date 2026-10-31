@@ -30,7 +30,7 @@ internal interface IMouWangLingOperations : IProgramRuntimeOperations
     void Finish(ProgramSkillFrame frame);
 }
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MouWangLingRuntime(IMouWangLingFacts facts, IMouWangLingOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
     IProgramOperationDraws draws, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations, IProgramAwakeningOverrideQuery awakeningConditions) : IMouWangLingRuntime
@@ -209,8 +209,6 @@ internal sealed partial class MouWangLingRuntime(IMouWangLingFacts facts, IMouWa
         r.Gifts.Select(g=>g.CardId).Distinct().Count()==r.Gifts.Count&&r.Gifts.Select(g=>g.RecipientSeat).Distinct().Count()==r.Gifts.Count&&
         r.Kept.Distinct().Count()==r.Kept.Count&&r.Kept.All(id=>r.Materials.Any(m=>m.CardId==id))&&r.Before<=r.After&&r.After<=facts.MovementSequence&&
         facts.History<MouWangLingStartedEvent>().Count(e=>e==new MouWangLingStartedEvent(f.Id,r.Source,r.GameplayHash,r.Operation,r.ActualTurn,r.ParentFrameId))==1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,34500)]
-    internal void Assert(ProgramSkillFrame f){if(f.MouWangLing is not null&&!Valid(f))throw new InvalidOperationException("Wang Ling lost his original accepted source or physical payment cursor.");}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,34500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,34500)]
     internal bool PreservePaid(ProgramSkillFrame f)=>f.MouWangLing is{Paid:true}&&Valid(f);

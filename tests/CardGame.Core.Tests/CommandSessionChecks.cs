@@ -192,7 +192,6 @@ internal static class CommandSessionChecks
         public CommandOutcome Outcome => new(Status, Winner.None, null, null, null);
         public long EventSequence { get; set; }
         public void SynchronizeDerivedState() { }
-        public void AssertInvariants() { }
         public void RefreshDecisionRevision() { }
         public EventNotification?[] PreparePublicEvents(EventNotification[] events) => events;
         public void ClearPendingEvents() => PendingEvents.Clear();

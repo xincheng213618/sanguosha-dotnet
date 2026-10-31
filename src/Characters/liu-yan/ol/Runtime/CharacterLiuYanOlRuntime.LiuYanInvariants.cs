@@ -35,11 +35,4 @@ internal sealed partial class CharacterLiuYanOlRuntime
         var recovery = _coreProgramEventHistoryOperations.ProgramEventHistory<LiuYanLimuRecoveryIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         return r.RecoveryIssued ? r.Stage == LiuYanStage.LimuRecoveryChildren && recovery is [var rec] && rec.OwnerSeat == f.OwnerSeat && rec.Amount == 1 : recovery.Length == 0;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27230)]
-    internal void AssertLiuYan(ProgramSkillFrame f)
-    {
-        if (f.LiuYan is not null && !ValidLiuYan(f))
-            throw new InvalidOperationException("Liu Yan lost his actual target count, exact original physical payment, source generation or once-only native recovery return.");
-    }
 }

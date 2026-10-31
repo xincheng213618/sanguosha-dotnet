@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDamageTargetMountProgramsEntries
 {
     internal global::CardGame.Core.CardUseFrame? ActualDamageTargetMountUse(int ownerSeat, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ActualDamageTargetMountUse(ownerSeat, context);
-    internal void AssertDamageTargetMountState(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertDamageTargetMountState(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDamageTargetMount(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginDamageTargetMount(f);
     internal bool CanContinuePaidDamageTargetMount(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinuePaidDamageTargetMount(f);
     internal bool CanOfferDamageTargetMount(int ownerSeat, global::CardGame.Core.ProgramSkillWindowContext context, string? skillId = default) => _resolve().CanOfferDamageTargetMount(ownerSeat, context, skillId);

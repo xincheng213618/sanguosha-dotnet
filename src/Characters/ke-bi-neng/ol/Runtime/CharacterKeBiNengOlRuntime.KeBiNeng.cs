@@ -80,7 +80,6 @@ internal sealed partial class CharacterKeBiNengOlRuntime
 
     internal void PublishKeBiNeng(ProgramSkillFrame f)
     {
-        AssertKeBiNeng(f);
         var r = f.KeBiNengPingduan!;
         var choices = KeBiNengChoices(f);
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
@@ -107,7 +106,6 @@ internal sealed partial class CharacterKeBiNengOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { KeBiNengPingduan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.ActorSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], KeBiNengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Pingduan requires its original recipient's exact published private choice.");
-        AssertKeBiNeng(f);
         var option = choice.Parameters["option"];
         if (option == "decline")
         {
@@ -179,7 +177,6 @@ internal sealed partial class CharacterKeBiNengOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { KeBiNengPingduan: { } r } f && f.Id == id)
         {
-            AssertKeBiNeng(f);
             if (r.Stage is KeBiNengPingduanStage.BasicChoice or KeBiNengPingduanStage.RecastChoice or KeBiNengPingduanStage.EquipmentChoice)
             {
                 if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

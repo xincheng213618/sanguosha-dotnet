@@ -11,7 +11,6 @@ internal sealed partial class CharacterLvKaiOlRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BijingPunish: { Paid: true } } frame || frame.Id != id)
             return;
-        AssertBijingUnpaidSelection(frame);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return;
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -46,7 +45,6 @@ internal sealed partial class CharacterLvKaiOlRuntime
     {
         if (frame.BijingPunish is not { Paid: true } state)
             return false;
-        AssertBijingUnpaidSelection(frame);
         if (BijingLionChild(frame, child))
             return true;
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -77,7 +75,6 @@ internal sealed partial class CharacterLvKaiOlRuntime
     internal bool HasBijingPaidDamage(long id) => BijingPaidObserverRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 7171)]
     internal bool HasBijingBeforeDamage(long id) => BijingPaidObserverRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 7171)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 7171)]
     internal bool IsBijingPaidDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BijingPaidObserverRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 7171)]

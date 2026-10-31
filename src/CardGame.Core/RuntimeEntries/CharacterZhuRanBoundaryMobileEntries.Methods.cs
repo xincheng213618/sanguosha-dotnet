@@ -4,7 +4,6 @@ internal sealed partial class CharacterZhuRanBoundaryMobileEntries
 {
     internal bool AdvanceBoundaryDanshouObservers() => _resolve().AdvanceBoundaryDanshouObservers();
     internal void AnswerBoundaryDanshou(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryDanshou(choice);
-    internal void AssertBoundaryDanshou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryDanshou(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryDanshouChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryDanshouChoices(f);
     internal int BoundaryDanshouCount(int owner, int actor, int turn, int turnOwner, long cutoff) => _resolve().BoundaryDanshouCount(owner, actor, turn, turnOwner, cutoff);
     internal bool BoundaryDanshouDamageObserver(long id) => _resolve().BoundaryDanshouDamageObserver(id);

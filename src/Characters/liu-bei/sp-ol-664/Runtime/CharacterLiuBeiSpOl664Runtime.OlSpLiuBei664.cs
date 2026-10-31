@@ -334,20 +334,4 @@ internal sealed partial class CharacterLiuBeiSpOl664Runtime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5431)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5431)]
     internal bool CanContinuePaidOlSpLiuBei664(ProgramSkillFrame frame) => frame.OlSpLiuBei664 is { } draft && (frame.SkillId == OlSpZhujiu && draft.Stage == "wine" && _coreProgramEventHistoryOperations.ProgramEventHistory<OlSpLiuBeiZhujiuIssuedEvent>().Count(item => item.FrameId == frame.Id && item.OwnerSeat == frame.OwnerSeat && item.UseId == draft.UseId && item.PaidCount == draft.Cards.Count) == 1 || frame.SkillId == OlSpJinglei && _coreProgramEventHistoryOperations.ProgramEventHistory<OlSpLiuBeiJingleiPaidEvent>().Count(item => item.FrameId == frame.Id && item.OwnerSeat == frame.OwnerSeat && item.AlcoholUseId == draft.UseId) == 1);
-    internal bool IsOlSpZhujiuDyingRide(int index, DyingFrame dying)
-    {
-        if (index < 0 || index + 2 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame { SkillId: OlSpZhujiu, OlSpLiuBei664: { Stage: "wine" } draft } frame || frame.OwnerSeat != dying.VictimSeat || dying.ResponderSeat != frame.OwnerSeat || draft.DyingFrameId != dying.Id || frame.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != dying.Id || _resolutionStackOperations._resolutionStack[index + 2] is not CardUseFrame use || use.Id != draft.UseId || use.SourceSeat != frame.OwnerSeat || use.CardKind != CardKind.Alcohol || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != frame.OwnerSeat || !(use.PhysicalCardIds ?? []).SequenceEqual(draft.Cards) || !action.PhysicalCards.Select(cost => cost.CardId).SequenceEqual(draft.Cards) || draft.SequenceAfter <= draft.SequenceBefore || action.PhysicalCards.Any(cost => cost.From.OwnerSeat != frame.OwnerSeat || cost.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.Sequence > draft.SequenceBefore && move.Sequence <= draft.SequenceAfter && move.CardId == cost.CardId && move.From == cost.From && move.To == CardLocation.Processing && move.Reason == CardMoveReasons.Use) != 1) || _coreProgramEventHistoryOperations.ProgramEventHistory<OlSpLiuBeiZhujiuIssuedEvent>().Count(item => item.FrameId == frame.Id && item.UseId == use.Id && item.PaidCount == draft.Cards.Count) != 1)
-            return false;
-        for (var cursor = index + 3; cursor < _resolutionStackOperations._resolutionStack.Count; cursor++)
-        {
-            var child = _resolutionStackOperations._resolutionStack[cursor];
-            var parent = _resolutionStackOperations._resolutionStack[cursor - 1];
-            if (child is CardsMovedTriggerWindowFrame moved && parent.Id == use.Id && moved.Batch.ParentFrameId == use.Id && moved.Batch.Movements.All(move => draft.Cards.Contains(move.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) && (move.To == CardLocation.Processing && move.Reason == CardMoveReasons.Use || move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.UseFinished)))
-                continue;
-            if (!_coreParticipantHandDamageRidesOperations.ParticipantHandRescueObserverRide(child, parent, use) && !_coreProgramChildResolutionOperations.ProgramChildResolutionEdge(cursor))
-                return false;
-        }
-
-        return true;
-    }
 }

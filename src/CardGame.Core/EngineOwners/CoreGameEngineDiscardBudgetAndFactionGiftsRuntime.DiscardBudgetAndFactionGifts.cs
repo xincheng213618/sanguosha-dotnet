@@ -338,31 +338,4 @@ internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsRuntime
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(f.Id, f.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
-
-    internal void AssertBudgetGiftDraft(ProgramSkillFrame f, SkillProgramEffect paused)
-    {
-        if (f.DiscardBudgetDraft is { } d)
-        {
-            if (paused.Op != SkillProgramEffectOp.ResolveDiscardBudgetParticipants || f.WindowContext?.Window != SkillProgramTriggerWindow.DiscardPhaseEnded || d.Budget < 0 || d.Participants.Any(p => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(p.Seat)) || d.Participants.Select(p => p.Seat).Distinct().Count() != d.Participants.Count || d.Selected is null || d.Selected.Distinct().Count() != d.Selected.Count || d.Selected.Any(seat => !d.Participants.Any(p => p.Seat == seat)) || d.Cursor < 0 || d.Cursor > d.Selected.Count || d.Mode is not (null or "draw" or "damage"))
-                throw new InvalidOperationException("Discard budget lost its frozen selection or effect cursor.");
-            var selected = d.Selected.Select(seat => d.Participants.Single(p => p.Seat == seat)).ToArray();
-            if (d.Mode == "draw" && selected.Length > d.Budget || d.Mode == "damage" && (selected.Any(p => p.Hp <= 0) || selected.Sum(p => p.Hp) > d.Budget) || d.Committed && (d.Mode is null || d.Mode == "damage" && (selected.Length == 0 || selected.Sum(p => p.Hp) != d.Budget)))
-                throw new InvalidOperationException("Discard selection exceeded its frozen participant budget.");
-            if (d.Committed && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDiscardBudgetCommittedEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Budget == d.Budget && e.Mode == d.Mode && e.Participants.SequenceEqual(selected)))
-                throw new InvalidOperationException("Discard sequence lost its exact public commitment.");
-            if (!d.Committed && ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, DiscardBudgetChoices(f))))
-                throw new InvalidOperationException("Discard budget lost its legal prompt.");
-        }
-
-        if (f.CompletedFactionGiftDraft is { } gift)
-        {
-            var a = FactionGiftAction(f);
-            if (paused.Op != SkillProgramEffectOp.OfferCompletedFactionCostGift || gift.ActionId != a.ActionId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(gift.ProviderSeat) || gift.PhaseInstanceId <= 0 || gift.ProviderSeat != a.ActorSeat || gift.CardIds.Count == 0 || gift.CardIds.Distinct().Count() != gift.CardIds.Count || gift.CardIds.Any(id => !a.PhysicalCards.Any(p => p.CardId == id)) || gift.Stage is not ("offer" or "movement" or "reward" or "draw"))
-                throw new InvalidOperationException("Faction gift lost its exact action/cost parent.");
-            if (gift.Stage != "offer" && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CompletedFactionCostGiftedEvent>().Any(e => e.FrameId == f.Id && e.ActionId == gift.ActionId && e.ProviderSeat == gift.ProviderSeat && e.RecipientSeat == f.OwnerSeat && e.SkillInstanceId == f.SkillInstanceId && e.PhaseInstanceId == gift.PhaseInstanceId && e.CardIds.SequenceEqual(gift.CardIds)))
-                throw new InvalidOperationException("Faction reward lost its accepted real gift.");
-            if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && gift.Stage is "offer" or "reward" && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (gift.Stage == "offer" ? gift.ProviderSeat : f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, CompletedFactionGiftChoices(f))))
-                throw new InvalidOperationException("Faction gift lost its exact chooser and legal prompt.");
-        }
-    }
 }

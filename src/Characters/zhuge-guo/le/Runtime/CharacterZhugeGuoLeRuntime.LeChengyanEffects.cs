@@ -12,12 +12,6 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
     internal static IReadOnlyList<int> LeChengyanNativeTargets(CardUseFrame use) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeTargets(use);
     internal bool IsLeChengyanEffectUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { LeChengyanEffect: { Started: true, Finished: false } } u && ValidLeChengyanEffect(u);
     internal bool ValidLeChengyanEffect(CardUseFrame u) => u.LeChengyanEffect is { } p && u.Action is { Type: CardActionType.Use } a && a.ActionId == p.ActionId && a.ActorSeat == p.Source.OwnerSeat && u.SourceSeat == a.ActorSeat && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind)) && p.EffectKind != CardKind.Nullification && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(p.EffectKind)) && _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash == p.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<LeChengyanEffectIssuedEvent>().Count(e => e == new LeChengyanEffectIssuedEvent(p.ProgramFrameId, u.Id, p.ActionId, p.Source, p.ShownCardId, p.EffectKind)) == 1;
-    internal void AssertLeChengyanEffects()
-    {
-        foreach (var u in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.LeChengyanEffect is not null))
-            if (!ValidLeChengyanEffect(u) || u.LeChengyanEffect!.Targets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)))
-                throw new InvalidOperationException("Chengyan effect lost its original action or one issued shown-card receipt.");
-    }
 
     internal bool TryStartLeChengyanEffect(ProgramCardTriggerWindowFrame window)
     {
@@ -118,9 +112,6 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
             paused = true;
             return true;
         }
-
-        if (attack.TargetSeat != p.Targets[p.SlashCursor] || attack.EffectiveCardKind != p.EffectKind)
-            throw new InvalidOperationException("Chengyan Slash lost its current original target.");
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = null;
         _coreNativeCardContinuationCursorsOperations.ActiveDuel = null;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

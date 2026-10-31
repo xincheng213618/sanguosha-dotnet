@@ -8,7 +8,6 @@ internal sealed partial class CoreGameEngineWushuangEntries
     internal bool CanUseWushuangShop(int seat) => _resolve().CanUseWushuangShop(seat);
     internal void ChangeWushuangTokens(int seat, int delta, string reason) => _resolve().ChangeWushuangTokens(seat, delta, reason);
     internal void CompleteWushuangShopAction(long frameId) => _resolve().CompleteWushuangShopAction(frameId);
-    internal bool HasWushuangIntermissionBoundary() => _resolve().HasWushuangIntermissionBoundary();
     internal bool IsWushuangSkillGrantQualified(global::CardGame.Core.SkillGrant grant) => _resolve().IsWushuangSkillGrantQualified(grant);
     internal void RefreshWushuangOffers(int seat, bool opening = false) => _resolve().RefreshWushuangOffers(seat, opening);
     internal global::CardGame.Core.CommandResult RejectMissingWushuangFeature() => _resolve().RejectMissingWushuangFeature();

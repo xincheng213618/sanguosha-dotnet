@@ -144,7 +144,6 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangShiPingHongji: { Stage: HongjiStage.Choose } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HongjiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Hongji lost its exact frozen preparation choice.");
-        AssertZhangShiPing(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var phase = Enum.Parse<TurnPhase>(choice.Parameters["phase"]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangShiPingHongjiGrantedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, _coreActualRoundProgressRoundNumberAccess._roundNumber, r.RecipientSeat, phase, r.ParentWindowId));

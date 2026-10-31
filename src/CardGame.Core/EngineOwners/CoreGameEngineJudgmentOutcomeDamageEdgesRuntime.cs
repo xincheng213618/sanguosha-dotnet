@@ -8,24 +8,18 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineJudgmentOutcomeDamageEdgesRuntime
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
     private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries _coreDyingCursorRuntimeOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineDamageJudgmentSuitPaymentObserversEntries _coreDamageJudgmentSuitPaymentObserversOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineDamagePreventionProgramsEntries _coreDamagePreventionProgramsOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramChildResolutionEntries _coreProgramChildResolutionOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramJudgmentOutcomesEntries _coreProgramJudgmentOutcomesOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineZhenyiJudgmentWindowsEntries _coreZhenyiJudgmentWindowsOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreNativeJudgmentEntries _coreNativeJudgmentOperations;
-    internal CoreGameEngineJudgmentOutcomeDamageEdgesRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries coreDyingCursorRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineDamageJudgmentSuitPaymentObserversEntries coreDamageJudgmentSuitPaymentObserversOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineDamagePreventionProgramsEntries coreDamagePreventionProgramsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramChildResolutionEntries coreProgramChildResolutionOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramJudgmentOutcomesEntries coreProgramJudgmentOutcomesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineZhenyiJudgmentWindowsEntries coreZhenyiJudgmentWindowsOperations, global::CardGame.Core.RuntimeEntries.CoreNativeJudgmentEntries coreNativeJudgmentOperations)
+    internal CoreGameEngineJudgmentOutcomeDamageEdgesRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineDamageJudgmentSuitPaymentObserversEntries coreDamageJudgmentSuitPaymentObserversOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramChildResolutionEntries coreProgramChildResolutionOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramJudgmentOutcomesEntries coreProgramJudgmentOutcomesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineZhenyiJudgmentWindowsEntries coreZhenyiJudgmentWindowsOperations,global::CardGame.Core.RuntimeEntries.CoreNativeJudgmentEntries coreNativeJudgmentOperations)
     {
-        this._contentRegistryOperations = contentRegistryOperations;
         this._resolutionStackOperations = resolutionStackOperations;
-        this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
         this._coreDamageJudgmentSuitPaymentObserversOperations = coreDamageJudgmentSuitPaymentObserversOperations;
-        this._coreDamagePreventionProgramsOperations = coreDamagePreventionProgramsOperations;
         this._coreProgramChildResolutionOperations = coreProgramChildResolutionOperations;
         this._coreProgramEventHistoryOperations = coreProgramEventHistoryOperations;
         this._coreProgramJudgmentOutcomesOperations = coreProgramJudgmentOutcomesOperations;

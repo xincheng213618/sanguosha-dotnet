@@ -112,7 +112,6 @@ internal sealed partial class CharacterCuiYanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CuiYan: { Stage: CuiYanStage.DamageChoice } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CuiYanDamageChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zhijie lost its actual native range/target choice.");
-        AssertCuiYan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = choice.Targets.Single();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect, CuiYan = f.CuiYan!with { Stage = CuiYanStage.DamageChildren, DamageTarget = target } });
@@ -124,7 +123,6 @@ internal sealed partial class CharacterCuiYanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CuiYan: { } r } f || f.Id != id)
             return;
-        AssertCuiYan(f);
         if (r.Stage == CuiYanStage.DamageChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -170,7 +168,6 @@ internal sealed partial class CharacterCuiYanOlRuntime
     {
         if (f.CuiYan is not { Stage: not CuiYanStage.DamageChoice })
             return false;
-        AssertCuiYan(f);
         return true;
     }
 

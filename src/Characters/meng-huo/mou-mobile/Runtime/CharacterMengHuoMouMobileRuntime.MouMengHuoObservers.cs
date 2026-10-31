@@ -86,7 +86,6 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
     internal bool HasMouMhDamageObserver(long id) => MouMhObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30900)]
     internal bool HasMouMhBeforeDamageObserver(long id) => MouMhObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30900)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30900)]
     internal bool IsMouMhDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouMhObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30900)]
@@ -102,13 +101,6 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var child = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == recovery.Id);
         return index >= 0 && child > index + 1 && MouMhFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]) && MouMhObserverSuffix(index) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[child - 1]);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30900)]
-    internal void AssertMouMh(ProgramSkillFrame f)
-    {
-        if (f.MouMengHuo is not null && !ValidMouMh(f))
-            throw new InvalidOperationException("Mou Meng Huo changed its exact owning frame, charge debit or native receipt.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30900)]

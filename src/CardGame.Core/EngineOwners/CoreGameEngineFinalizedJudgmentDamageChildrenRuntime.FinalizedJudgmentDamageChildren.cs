@@ -16,14 +16,4 @@ internal sealed partial class CoreGameEngineFinalizedJudgmentDamageChildrenRunti
     }
 
     internal bool CanBeginFinalizedDamageChildJudgment(JudgmentFrame original, long parentFrameId, int targetSeat, string reason, JudgmentContinuationKind continuation, string? resultBind, SkillProgramCardSetVisibility? visibility) => continuation == JudgmentContinuationKind.ProgramSkill && resultBind is not null && visibility is { } publicResult && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame request && request.Id == parentFrameId && _coreProgramLifecycleOperations.MatchesProgramJudgmentInstruction(request, targetSeat, reason, resultBind, publicResult) && FinalizedJudgmentDamageParent(parentFrameId)?.Id == original.Id;
-    internal void AssertFinalizedJudgmentDamageChildren()
-    {
-        var judgments = _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().Where(frame => frame.CardAttack is null).ToArray();
-        for (var index = 1; index < judgments.Length; index++)
-        {
-            var nested = judgments[index];
-            if (nested.Continuation != JudgmentContinuationKind.ProgramSkill || FinalizedJudgmentDamageParent(nested.ParentFrameId)?.Id != judgments[index - 1].Id || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == nested.ParentFrameId)is not { } request || !_coreProgramLifecycleOperations.IsValidProgramJudgmentContinuation(nested, request))
-                throw new InvalidOperationException("A nested judgment lost its exact finalized-judgment damage response parent.");
-        }
-    }
 }

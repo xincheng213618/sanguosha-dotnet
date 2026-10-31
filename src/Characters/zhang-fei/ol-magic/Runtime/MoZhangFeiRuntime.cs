@@ -44,7 +44,7 @@ internal interface IMoZhangFeiOperations : IProgramRuntimeOperations
 
 // Every mutable continuation belongs to ProgramSkillFrame. The three ports
 // below carry scalar facts, native operations and the original frame store.
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MoZhangFeiRuntime(IMoZhangFeiFacts facts, IMoZhangFeiOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramOperationDraws draws,
     IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMoZhangFeiRuntime
@@ -223,7 +223,6 @@ internal sealed partial class MoZhangFeiRuntime(IMoZhangFeiFacts facts, IMoZhang
     private void Continue(long id)
     {
         if (frames.Top is not ProgramSkillFrame { MoZhangFei: { } r } f || f.Id != id) return;
-        Assert(f);
         if (r.Stage == MoZhangFeiStage.Drawing)
         {
             frames.ReplaceTop(f = f with { MoZhangFei = r with { Stage = MoZhangFeiStage.DrawChildren } });
@@ -448,12 +447,6 @@ internal sealed partial class MoZhangFeiRuntime(IMoZhangFeiFacts facts, IMoZhang
             f.WindowContext?.NativeDraw is { } draw && r.DrawAttemptId == draw.AttemptFrameId && r.TargetSeat == draw.RecipientSeat &&
             facts.History<MoZhangFeiColorEffectIssuedEvent>().Any(e => e.FrameId == r.GreenGrantFrameId &&
                 e.Color == MoZhangFeiColor.Green && e.TargetSeat == r.TargetSeat && e.ActualTurn == r.ActualTurn);
-    }
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33700)]
-    internal void Assert(ProgramSkillFrame f)
-    {
-        if (f.MoZhangFei is not null && !Valid(f))
-            throw new InvalidOperationException("Mo Zhang Fei lost its original frame, source, content or native window receipt.");
     }
     [ProgramPipelineHook(ProgramPipelinePhase.RumoOrigin, 33700)]
     internal bool RumoOrigin(long id, CardConversionSource source, string hash) => source.SkillId == Chenshi &&

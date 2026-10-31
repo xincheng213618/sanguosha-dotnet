@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineFrozenHandRosterEntries
 {
-    internal void AssertFrozenHandRoster(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertFrozenHandRoster(f);
     internal void FinishFrozenHandRoster(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishFrozenHandRoster(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> FrozenHandRosterChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FrozenHandRosterChoices(f);
     internal int FrozenHandRosterChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FrozenHandRosterChooser(f);

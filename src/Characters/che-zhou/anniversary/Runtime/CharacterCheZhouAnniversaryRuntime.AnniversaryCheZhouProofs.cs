@@ -32,16 +32,6 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
         return false;
     }
 
-    internal bool HasAnniversaryCheZhouPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, AnniversaryCheZhou.Stage: AnniversaryCheZhouStage.Selecting } f && p.PlayerSeat == f.OwnerSeat && ValidCheZhou(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, CheZhouChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 46400)]
-    internal void AssertCheZhou(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryCheZhou is null)
-            return;
-        if (!ValidCheZhou(f) || f.PendingMovementContinuation is { } p && !CheZhouMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
-            throw new InvalidOperationException("Pigua lost its exact damage, immutable Hand draft or original paid movement.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46400)]
     internal bool CheZhouMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryCheZhou is { Stage: AnniversaryCheZhouStage.MovementChildren } && e?.Op == SkillProgramEffectOp.ResolveAnniversaryCheZhouPigua && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidCheZhou(f);
     internal bool CheZhouFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -59,8 +49,6 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
     internal bool CheZhouDamageObserver(long id) => CheZhouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46400)]
     internal bool CheZhouBeforeDamageObserver(long id) => CheZhouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 46400)]
-    internal bool CheZhouDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CheZhouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46400)]
     internal bool AdvanceCheZhouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CheZhouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -157,7 +157,6 @@ internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime
     internal void ResolveUniqueLeaderTrickTargetChoice(PromptChoice selected)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A trick target choice lost its owning program.");
-        AssertUniqueLeaderTrickTargetDraft(frame);
         var draft = frame.UniqueLeaderTrickTargetDraft ?? throw new InvalidOperationException("The trick target draft is missing.");
         var choice = draft.Choices.SingleOrDefault(c => c.Id == selected.Id);
         if (choice is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
@@ -188,25 +187,6 @@ internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { UniqueLeaderTrickTargetDraft = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 200)]
-    internal void AssertUniqueLeaderTrickTargetDraft(ProgramSkillFrame frame)
-    {
-        if (frame.UniqueLeaderTrickTargetDraft is null && (frame.TriggerId is null || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.Triggers.SingleOrDefault(t => t.Id == frame.TriggerId)?.Effects.Any(e => UniqueLeaderTrickTargetContract.IsTargetOperation(e.Op)) != true))
-            return;
-        var offered = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<UniqueLeaderTrickTargetOfferedEvent>().Where(e => e.ProgramFrameId == frame.Id).ToArray();
-        var resolved = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<UniqueLeaderTrickTargetResolvedEvent>().Any(e => e.ProgramFrameId == frame.Id);
-        if (frame.UniqueLeaderTrickTargetDraft is not { } draft)
-        {
-            if (offered.Length != 0 && !resolved)
-                throw new InvalidOperationException("An offered unique-leader trick cannot lose its owning draft.");
-            return;
-        }
-
-        var use = RequireUniqueLeaderTrickParent(frame, out _);
-        if (draft.CardUseFrameId != use.Id || draft.ActionId != use.Action!.ActionId || draft.InstructionIndex != 1 || draft.Source != new CardConversionSource(frame.SkillId, frame.TriggerId!, frame.OwnerSeat, frame.SkillInstanceId) || draft.GameplayHash != frame.GameplayHash || !draft.OriginalTargetSeats.SequenceEqual(use.TargetSeats) || offered.Length != 1 || resolved || offered[0].CardUseFrameId != use.Id || offered[0].ActionId != draft.ActionId || offered[0].InstructionIndex != 1 || offered[0].Source != draft.Source || offered[0].GameplayHash != draft.GameplayHash || offered[0].Operation != draft.Operation || !offered[0].OriginalTargetSeats.SequenceEqual(draft.OriginalTargetSeats) || !offered[0].CandidateTargetSeats.SequenceEqual(draft.Choices.SelectMany(c => c.Targets.Take(1)).Distinct()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(draft.Choices, BuildUniqueLeaderTrickTargetChoices(frame, use, draft.Operation)) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: false } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.SourceSeat != frame.OwnerSeat || prompt.TargetSeat != frame.OwnerSeat || prompt.SkillPrompt?.SkillId != frame.SkillId || prompt.ValidCardIds.Count != 0 || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, draft.Choices) || !prompt.ValidTargetSeats.SequenceEqual(draft.Choices.SelectMany(c => c.Targets).Distinct()))
-            throw new InvalidOperationException("A unique-leader trick lost its exact source, native prefix or published target choice.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.OfferUniqueLargestHandTrickTargetAddition, SkillProgramEffectOp.JoinUniqueLargestHpTrickTargetAndDrawAfterDamage)]

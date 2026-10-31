@@ -203,11 +203,4 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
         if (r.Source != ShiHqSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.Hash || f.InstructionIndex != 1 || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || r.ParentId != f.WindowContext?.ParentFrameId || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Materials.Select(m => m.CardId).Distinct().Count() != r.Materials.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Hash == r.Hash && e.Turn == r.Turn && e.TurnOwner == r.TurnOwner && e.ParentId == r.ParentId && e.Operation == r.Operation) != 1)
             throw new InvalidOperationException("Qizhou changed its original source, actual turn, native instruction or paid cursor.");
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 49000)]
-    internal void AssertShiHq(ProgramSkillFrame f)
-    {
-        if (f.ShiHeQi is not null)
-            RequireShiHq(f);
-    }
 }

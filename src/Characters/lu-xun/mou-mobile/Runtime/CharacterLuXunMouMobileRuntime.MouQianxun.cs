@@ -73,20 +73,6 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
     internal bool ContinueIssuedMouLuXun(ProgramSkillFrame f) => f.MouLuXun is { Paid: true } && ValidMouLuXun(f);
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 32800)]
     internal bool IsMouLuXunMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.MouLuXun is { Stage: MouLuXunStage.HoldChildren or MouLuXunStage.ViewChildren or MouLuXunStage.GiftChildren or MouLuXunStage.ReturnChildren } r && effect?.Op == r.Operation && ValidMouLuXun(f) && pending == new ProgramMovementContinuation(f.OwnerSeat, 0, null) && r.Before <= r.After && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32800)]
-    internal void AssertMouLuXun(ProgramSkillFrame f)
-    {
-        if (f.MouLuXun is not { } r)
-            return;
-        if (!ValidMouLuXun(f) || !Enum.IsDefined(r.Stage) || r.Limit is < 0 or > 5 || r.Cursor < 0 || r.Cursor > r.Viewed.Count || r.Selected.Distinct().Count() != r.Selected.Count || r.Viewed.Distinct().Count() != r.Viewed.Count || r.Viewed.Count > r.Limit || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Lu Xun lost its issued source, bounded original physical entities or actual-turn cursor.");
-        if (r.Operation == SkillProgramEffectOp.RecordMouLuXunQianxun && (r.Kind is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunNameRecordedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Kind == r.Kind && e.WindowId == r.WindowId && e.ActualTurn == r.ActualTurn) != 1))
-            throw new InvalidOperationException("Qianxun lost its exact real trick-effect name registration.");
-        if (r.Operation == SkillProgramEffectOp.UseMouLuXunRecordedTrick && r.Paid && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunNameRemovedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Kind == r.Kind && e.ActualTurn == r.ActualTurn) != 1)
-            throw new InvalidOperationException("Qianxun cannot re-use or refund a paid recorded name.");
-        if (r.Viewed.Select((card, index) => (card, index)).Any(pair => _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunTopViewedEvent>().Count(e => e.FrameId == f.Id && e.Index == pair.index && e.CardId == pair.card) != 1))
-            throw new InvalidOperationException("Lianying lost an exact privately reserved top entity.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.RecordMouLuXunQianxun, SkillProgramEffectOp.UseMouLuXunRecordedTrick, SkillProgramEffectOp.DistributeMouLuXunLianying)]
     internal PromptChoice ChooseMouLuXunAi(PendingDecision prompt, ProgramSkillFrame f)

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRoundGainedTrickTargetsEntries
 {
-    internal void AssertRoundGainedTrickTargetDraft(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRoundGainedTrickTargetDraft(frame);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BuildRoundGainedTrickTargetChoices(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardUseFrame use) => _resolve().BuildRoundGainedTrickTargetChoices(frame, use);
     internal bool CanOfferRoundGainedTrickTarget(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferRoundGainedTrickTarget(candidate, trigger, context);
     internal bool HasRoundGainedTrickTargetCancellation(global::CardGame.Core.CardUseFrame use) => _resolve().HasRoundGainedTrickTargetCancellation(use);

@@ -21,9 +21,7 @@ internal sealed partial class CharacterFengXiAnniversaryEntries
     internal global::CardGame.Core.ProgramSkillFrame? FengXiObserverRoot() => _resolve().FengXiObserverRoot();
     internal bool FengXiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().FengXiRecoveryParent(f, recovery);
     internal void FinishFengXiOperation(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishFengXiOperation(f);
-    internal bool HasAnniversaryFengXiPrompt() => _resolve().HasAnniversaryFengXiPrompt();
     internal void PublishFengXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishFengXi(f);
-    internal void RequireFengXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireFengXi(f);
     internal bool RetainIssuedFengXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainIssuedFengXi(f);
     internal void ReturnFengXiDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome d) => _resolve().ReturnFengXiDraw(f, d);
     internal bool ReturnFengXiMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnFengXiMovement(f);

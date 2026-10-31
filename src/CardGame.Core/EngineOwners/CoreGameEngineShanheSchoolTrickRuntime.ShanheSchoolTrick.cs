@@ -86,15 +86,4 @@ internal sealed partial class CoreGameEngineShanheSchoolTrickRuntime
         _coreNativeNullificationOperations.BeginNullificationWindow(id, card, use.SourceSeat, use.TargetSeats, trick.ActionKind, null, trick.RequiredCardKind, use.CardKind);
         return true;
     }
-
-    internal void AssertShanheSchoolTrickRounds()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(f => f.ShanheSchoolTrick is not null))
-        {
-            var round = use.ShanheSchoolTrick!;
-            var native = round.Native;
-            if (use.Action is not { Type: CardActionType.Use } action || action.ActionId != round.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineShanheDoubleStealRuntime.IsShanheNativeTrickRepeatSource(use.CardKind, native.Source.SkillId) || native.Trick is null || native.Simple is not null || native.Source.OwnerSeat != use.SourceSeat || native.ActionId != action.ActionId || native.ProgramFrameId != round.ProgramFrameId || native.AutomaticGameplayHash != round.GameplayHash || native.WholeGroupRepeated != round.Started || round.Active && !round.Started || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSchoolTrickIssuedEvent>().Count(e => e.UseFrameId == use.Id && e.ActionId == round.ActionId && e.ProgramFrameId == round.ProgramFrameId && e.WindowFrameId == round.WindowFrameId && e.Source == native.Source && e.GameplayHash == round.GameplayHash) != 1 || _contentRegistryOperations._contentRegistry.GetSkill(native.Source.SkillId).Program?.GameplayHash != round.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSchoolTrickStartedEvent>().Count(e => e.UseFrameId == use.Id && e.ActionId == round.ActionId && e.ProgramFrameId == round.ProgramFrameId) != (round.Started ? 1 : 0) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSchoolTrickCompletedEvent>().Count(e => e.UseFrameId == use.Id && e.ActionId == round.ActionId && e.ProgramFrameId == round.ProgramFrameId) != (round.Started && !round.Active ? 1 : 0))
-                throw new InvalidOperationException("A school trick repeat lost its original one-use receipt or native extra-effect cursor.");
-        }
-    }
 }

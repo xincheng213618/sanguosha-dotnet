@@ -145,7 +145,6 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
     }
 
     internal bool HellSoulFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => child is ProgramSkillFrame { HellSoulReturn: { } returned } frame && returned.CardUseFrameId == parent.Id && IsExactHellSoulProgram(frame);
-    internal bool HasHellSoulPrompt() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.HellSoulReturn is not null && IsExactHellSoulProgram(frame));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40053)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40053)]
     internal bool CanContinueHellSoulProgram(ProgramSkillFrame frame) => frame.HellSoulReturn is not null && IsExactHellSoulProgram(frame);
@@ -161,13 +160,4 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
     }
 
     internal bool IsHellDestroyedSoulMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { } action && action.PhysicalCards.Any(material => material.CardId == cardId && material.CardKind == CardKind.ReturnSoul) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.ProgramEventHistory<HellReturnSoulDestroyedEvent>().Any(e => e.CardId == cardId && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.DiscardSequence && m.To == CardLocation.DiscardPile) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.DestroySequence && m.From == CardLocation.DiscardPile && m.To == CardLocation.OutsideGame && m.Reason.Value == "activity.hell.return-soul-destroyed"));
-    internal void AssertHellSoulCardState()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.HellSoulReturn is not null))
-            if (!IsExactHellSoulProgram(frame))
-                throw new InvalidOperationException("Return soul changed its issued hidden restoration child.");
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(f => f.HellSoul is not null))
-            if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.ReturnSoul || !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == use.HellSoul!.ProgramFrameId && IsExactHellSoulProgram(f)))
-                throw new InvalidOperationException("Return soul lost its exact native target restoration child.");
-    }
 }

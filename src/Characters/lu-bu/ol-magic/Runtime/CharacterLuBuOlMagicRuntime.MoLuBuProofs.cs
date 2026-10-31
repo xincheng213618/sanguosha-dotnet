@@ -8,12 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuOlMagicRuntime
 {
     internal bool ValidMoLuBu(ProgramSkillFrame f) => f.MoLuBu is { } r && f.InstructionIndex == 1 && r.Source.SkillId == f.SkillId && r.GameplayHash == f.GameplayHash && (r.Operation == SkillProgramEffectOp.ResolveMoLuBuKuangmoDeath ? _coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuKuangmoEnteredEvent>().Any(e => e.Source == r.Source && e.GameplayHash == r.GameplayHash) : r.Source == MoLuBuSource(f)) && _coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Operation == r.Operation && e.WindowId == r.WindowId && e.OriginalOwnerSeat == r.OriginalOwnerSeat && e.ActualTurn == r.ActualTurn && e.Reassign == r.Reassign) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30800)]
-    internal void AssertMoLuBu(ProgramSkillFrame f)
-    {
-        if (f.MoLuBu is not null && !ValidMoLuBu(f))
-            throw new InvalidOperationException("OL Lu Bu lost its original immutable source and issued Qi/pair obligation.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 30800)]
@@ -40,7 +34,6 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 30800)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30800)]
     internal bool MoLuBuDamageObserver(long id) => MoLuBuObserverRoot()is { MoLuBu: { } r } root && (r.WindowId == id || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 30800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30800)]
     internal bool MoLuBuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MoLuBuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30800)]

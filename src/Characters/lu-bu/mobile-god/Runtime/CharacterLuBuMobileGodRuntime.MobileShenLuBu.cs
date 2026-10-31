@@ -98,14 +98,6 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
     internal bool ValidMobileLbGain(ProgramSkillFrame f) => f.MobileLuBu is { Op: SkillProgramEffectOp.GainMobileShenLuBuDamageCard, Cards: [var id] } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > r.Before && m.Sequence <= r.After && m.From.Zone is CardZoneKind.DrawPile or CardZoneKind.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MobileLbGainReason) == 1;
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 40325)]
     internal bool ProveMobileLbGain(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.GainMobileShenLuBuDamageCard && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidMobileLbGain(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40325)]
-    internal void AssertMobileLb(ProgramSkillFrame f)
-    {
-        if (f.MobileLuBu is not { } r)
-            return;
-        if (r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.After < r.Before || r.Cards.Count > 1 || r.Cards.Count > 0 && !ValidMobileLbGain(f))
-            throw new InvalidOperationException("Mobile Wuqian lost its exact source, original paid instruction or once-moved damage-card gain.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40325)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40325)]

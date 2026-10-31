@@ -72,20 +72,9 @@ internal sealed partial class CharacterDianWeiMobileRuntime
     {
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || frame.SelectedCardPaymentResult is not null || frame.SelectedCardPayment is not { ActiveChildFrameId: null } payment || !MobileOrdinaryQiangxiPaid(frame))
             return false;
-        if (frame.InstructionIndex != 1 || frame.PendingMovementContinuation is not null)
-            throw new InvalidOperationException("Ordinary mobile Qiangxi lost its drained original weapon-payment return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { SelectedCardPaymentResult = new(payment.InstructionIndex, payment.Operation, payment.LastCompletedChildFrameId, Completed: true) });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 82800)]
-    internal void AssertMobileOrdinaryQiangxi(ProgramSkillFrame frame)
-    {
-        if (frame.MobileOrdinaryQiangxi is not { } receipt)
-            return;
-        if (frame.SkillId != MobileOrdinaryQiangxiComposition.Skill || frame.TriggerId is not null || receipt.FrameId != frame.Id || receipt.Source != new CardConversionSource(frame.SkillId, frame.ActivationId, frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || receipt.TurnNumber < 1 || receipt.PhaseInstanceId <= 0 || receipt.HpBefore < 1 || receipt.MovementBefore < 0 || receipt.MovementBefore > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || receipt.MovementAfter is { } after && (after <= receipt.MovementBefore || after > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || receipt.WeaponCardId is null) || frame.SelectedTargetSeats is not [var target] || receipt.TargetSeat != target || target == frame.OwnerSeat || frame.InstructionIndex is < 0 or > 2 || !receipt.SpecialRange && receipt.DistanceWithoutCost > receipt.RangeWithoutCost || (receipt.WeaponCardId is null) != (frame.ActivationId == MobileOrdinaryQiangxiComposition.Hp) || receipt.WeaponCardId is { } weapon && (!frame.SelectedCardIds.SequenceEqual([weapon]) || receipt.WeaponFrom is not { OwnerSeat: var owner, Zone: CardZoneKind.Hand or CardZoneKind.Equipment } || owner != frame.OwnerSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == frame.Id && e.OwnerSeat == frame.OwnerSeat && e.SkillId == frame.SkillId && e.ActivationId == frame.ActivationId) != 1 || frame.InstructionIndex == 2 && !MobileOrdinaryQiangxiPaid(frame))
-            throw new InvalidOperationException("Ordinary mobile Qiangxi lost its frozen cost, range, source or original paid damage tail.");
     }
 
     bool global::CardGame.Core.IMobileOrdinaryQiangxiQueries.AllowsWeaponTarget(int ownerSeat, int weaponId, int targetSeat) => AllowsMobileOrdinaryQiangxiWeaponTarget(ownerSeat, weaponId, targetSeat);

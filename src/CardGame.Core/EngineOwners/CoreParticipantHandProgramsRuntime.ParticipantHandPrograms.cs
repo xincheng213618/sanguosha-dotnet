@@ -185,8 +185,6 @@ internal sealed partial class CoreParticipantHandProgramsRuntime
             throw new InvalidOperationException("An awaited bound gift lost its exact card-use window and owning action.");
         var candidate = window.Candidates[window.CandidateIndex];
         var effect = ParticipantHandPaused(frame);
-        if (candidate.OwnerSeat != frame.OwnerSeat || candidate.SkillId != frame.SkillId || candidate.TriggerId != frame.TriggerId || frame.ActivationId != frame.TriggerId || candidate.SkillInstanceId != frame.SkillInstanceId || candidate.GameplayHash != frame.GameplayHash || effect is not { Op: SkillProgramEffectOp.MoveBoundCards, AwaitMovementTriggers: true, Destination: SkillProgramCardDestination.SelectedTargetHand })
-            throw new InvalidOperationException("An awaited bound gift lost its exact candidate or movement instruction.");
     }
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 750)]

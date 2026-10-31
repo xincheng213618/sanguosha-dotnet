@@ -77,7 +77,6 @@ internal sealed partial class CharacterCaoXiOlRuntime
     internal void AnswerCaoXi(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Cao Xi lost the decision owner.");
-        RequireCaoXi(f);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !CaoXiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Cao Xi requires its exact source-owned decision.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -107,7 +106,6 @@ internal sealed partial class CharacterCaoXiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.CaoXiGangshu is null && f.CaoXiJianxuan is null)
             return false;
-        RequireCaoXi(f);
         if (f.CaoXiGangshu is not null || f.CaoXiJianxuan?.Stage == CaoXiJianxuanStage.ChoosingRecipient)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

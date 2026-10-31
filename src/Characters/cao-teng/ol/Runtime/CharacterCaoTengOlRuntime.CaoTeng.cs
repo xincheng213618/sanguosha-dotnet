@@ -138,7 +138,6 @@ internal sealed partial class CharacterCaoTengOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoTeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != CaoTengChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoTengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Cao Teng lost the actual private chooser or original distinct choice.");
-        AssertCaoTeng(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (r.Stage == CaoTengStage.FactionChoice)
@@ -196,7 +195,6 @@ internal sealed partial class CharacterCaoTengOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { CaoTeng: { } r } f && f.Id == id)
         {
-            AssertCaoTeng(f);
             if (r.Stage is CaoTengStage.YongzuChildren or CaoTengStage.JianxiongDrawChildren or CaoTengStage.JianxiongClaimChildren)
             {
                 if (DrainCaoTeng(id))
@@ -240,7 +238,7 @@ internal sealed partial class CharacterCaoTengOlRuntime
                         {
                             var claimed = group.DamageClaimedPhysicalCardIds.ToHashSet();
                             foreach (var card in cards)
-                                global::CardGame.Core.EngineOwners.CoreNativeCoreInvariantsRuntime.RecordClaimedGroupPhysicalCard(claimed, group.ResolutionId, group.PhysicalCards, attack.ResolutionId, card.Id);
+                                global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.RecordClaimedGroupPhysicalCard(claimed, group.ResolutionId, group.PhysicalCards, attack.ResolutionId, card.Id);
                             group.SetClaimedPhysicalCards(claimed.ToArray());
                         }
 

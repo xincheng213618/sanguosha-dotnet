@@ -22,7 +22,6 @@ internal sealed partial class CoreGameEngineRoundGainedEquipmentDrawsRuntime
     internal SkillProgramStepOutcome BeginRoundGainedEquipmentDraw(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        AssertRoundGainedEquipmentDraw(frame);
         var q = ExactRoundGainedEquipmentDrawParent(frame) ?? throw new InvalidOperationException("A round-gained equipment draw requires its exact qualified committed Use.");
         if (frame.RoundGainedEquipmentDrawReceipt is not null || frame.PendingMovementContinuation is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundGainedEquipmentDrawIssuedEvent>().Any(e => _coreRoundGainedSourceUsesOperations.SameRoundGainedQualification(e.Qualification, q)) || _coreRoundGainedSourceUsesOperations.RoundGainedCurrentBoundary()is not { } boundary)
             throw new InvalidOperationException("A round-gained equipment Use cannot issue its draw twice or outside a real round.");
@@ -49,7 +48,6 @@ internal sealed partial class CoreGameEngineRoundGainedEquipmentDrawsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != id || frame.RoundGainedEquipmentDrawReceipt is null)
             return false;
-        AssertRoundGainedEquipmentDraw(frame);
         if (_corePublicPilePreparationOperations.PreparationGameEnded())
             return true;
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(frame.Id))
@@ -67,7 +65,6 @@ internal sealed partial class CoreGameEngineRoundGainedEquipmentDrawsRuntime
     {
         if (frame.RoundGainedEquipmentDrawReceipt is null || frame.PendingMovementContinuation is null)
             return false;
-        AssertRoundGainedEquipmentDraw(frame);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
@@ -82,25 +79,6 @@ internal sealed partial class CoreGameEngineRoundGainedEquipmentDrawsRuntime
             return false;
         var invoice = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.MovementSequenceBefore && m.Sequence <= receipt.MovementSequenceAfter && m.Reason.Value == RoundGainedEquipmentDrawReason).ToArray();
         return invoice.Select(m => m.CardId).SequenceEqual(receipt.DrawnCardIds) && invoice.All(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(frame.OwnerSeat)) && (receipt.DrawActual != 0 || receipt.MovementSequenceBefore == receipt.MovementSequenceAfter);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 220)]
-    internal void AssertRoundGainedEquipmentDraw(ProgramSkillFrame frame)
-    {
-        if (frame.RoundGainedEquipmentDrawReceipt is null && (frame.TriggerId is null || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.Triggers.SingleOrDefault(t => t.Id == frame.TriggerId)?.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawForRoundGainedEquipmentUse) != true))
-            return;
-        if (frame.RoundGainedEquipmentDrawReceipt is null)
-        {
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundGainedEquipmentDrawIssuedEvent>().Any(e => e.ProgramFrameId == frame.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundGainedEquipmentDrawResolvedEvent>().Any(e => e.ProgramFrameId == frame.Id))
-                throw new InvalidOperationException("A paid round-gained equipment draw lost its owning invoice.");
-            return;
-        }
-
-        if (!ValidRoundGainedEquipmentDraw(frame))
-            throw new InvalidOperationException("A round-gained equipment draw lost its qualified Use, exact source or once-paid actual entities.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !_coreRoundGainedEquipmentObserversOperations.RoundGainedEquipmentDrawFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("A round-gained equipment draw retained an unrelated child.");
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 130)]

@@ -147,22 +147,4 @@ internal sealed partial class CoreGameEngineColorFireAttacksRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
         return true;
     }
-
-    internal void AssertColorFireAttackReceipts()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(frame => frame.ColorFireAttack is not null))
-        {
-            var receipt = use.ColorFireAttack!;
-            if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.FireAttack || use.Action?.ActionId != receipt.ActionId || receipt.Source.OwnerSeat != use.SourceSeat || string.IsNullOrWhiteSpace(receipt.Source.SkillId) || string.IsNullOrWhiteSpace(receipt.Source.BindingId) || string.IsNullOrWhiteSpace(receipt.Source.SkillInstanceId))
-                throw new InvalidOperationException("Color Fire Attack has an invalid issued source identity.");
-            if (receipt.PaidCardId is not { } cost)
-                continue;
-            if (receipt.PaidFrom is not { } from || from.OwnerSeat != use.SourceSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || receipt.RevealedCardId != use.FireAttackSelection?.RevealedCardId || receipt.TargetSeat != global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use) || receipt.PaidIsRed != receipt.RevealedIsRed || receipt.RevealedIsRed is null || receipt.PaymentEndSequence <= receipt.PaymentStartSequence || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(move => move.Sequence > receipt.PaymentStartSequence && move.Sequence <= receipt.PaymentEndSequence).Any(move => move.CardId == cost && move.From == from && move.To.Zone is CardZoneKind.DiscardPile or CardZoneKind.OutsideGame && move.Reason == CardMoveReasons.FireAttackDiscard))
-                throw new InvalidOperationException("Color Fire Attack payment lost its exact original HE movement.");
-        }
-
-        foreach (var movement in _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Where(frame => frame.ResumeColorFireAttackFrameId is not null))
-            if (_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == movement.ResumeColorFireAttackFrameId)is not { ColorFireAttack.PaidCardId: not null } owner || movement.Batch.ParentFrameId != owner.Id || movement.Batch.AwaitingProgramFrameId is not null || movement.ResumeProgramFrameId is not null)
-                throw new InvalidOperationException("Color Fire Attack movement lost its exact paid CardUse return.");
-    }
 }

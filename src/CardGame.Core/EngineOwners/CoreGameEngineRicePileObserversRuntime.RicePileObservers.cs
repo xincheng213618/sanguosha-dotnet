@@ -37,6 +37,4 @@ internal sealed partial class CoreGameEngineRicePileObserversRuntime
     internal bool TryAdvanceRiceSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && RiceObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1610)]
     internal bool HasRiceDamageObserver(long id) => RiceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 230)]
-    internal bool IsRiceProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RiceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

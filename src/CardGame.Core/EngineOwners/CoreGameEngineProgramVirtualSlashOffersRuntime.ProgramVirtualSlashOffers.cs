@@ -7,18 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
 {
-    internal void AssertProgramVirtualSlashOffer(ProgramSkillFrame frame, SkillProgramEffect effect)
-    {
-        if (effect.Op != SkillProgramEffectOp.OfferVirtualSlashOrDraw || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()))
-            return;
-        if (frame.SelectedTargetSeats.Count != 1 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.Choices.Count == 0)
-            throw new InvalidOperationException("An assisted virtual card use lost its frozen selection or prompt.");
-        var actorSeat = frame.SelectedTargetSeats[0];
-        var targets = GetProgramVirtualSlashOfferTargets(actorSeat);
-        var choosingTargets = decision.Choices.All(choice => choice.Parameters.GetValueOrDefault("offer-option")?.StartsWith("target-", StringComparison.Ordinal) == true);
-        if (decision.PlayerSeat != (choosingTargets ? frame.OwnerSeat : actorSeat) || decision.Choices.Any(choice => choice.Cards.Count != 0 || choice.Parameters.GetValueOrDefault("program-action") != "virtual-slash-offer" || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || (choosingTargets ? choice.Targets.Count != 1 || !targets.Contains(choice.Targets[0]) || choice.Parameters.GetValueOrDefault("offer-option") != $"target-{(choice.Targets[0])}" : choice.Targets.Count != 0 || choice.Parameters.GetValueOrDefault("offer-option")is not ("slash" or "draw"))))
-            throw new InvalidOperationException("An assisted virtual card prompt has an invalid chooser, option or target.");
-    }
 
     internal int[] GetProgramVirtualSlashOfferTargets(int actorSeat) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && target.IsAlive && target.Seat != actorSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(actorSeat, target.Seat) && !_coreCardUseModulesOperations.IsCardUseForbidden(actorSeat, CardKind.Slash, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actorSeat, target.Seat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target)).Select(target => target.Seat).ToArray();
     internal SkillProgramStepOutcome OfferProgramVirtualSlashOrDraw(ProgramSkillFrame frame, int actorSeat)

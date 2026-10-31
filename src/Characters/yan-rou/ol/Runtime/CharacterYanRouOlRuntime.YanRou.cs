@@ -91,7 +91,6 @@ internal sealed partial class CharacterYanRouOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YanRou: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], YanRouChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Yan Rou lost its actual private chooser or published opaque slot.");
-        AssertYanRou(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == YanRouStage.TargetChoice)
         {
@@ -139,7 +138,6 @@ internal sealed partial class CharacterYanRouOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YanRou: { } r } f || f.Id != id)
             return;
-        AssertYanRou(f);
         if (r.Stage is YanRouStage.TargetChoice or YanRouStage.DiscardChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -205,7 +203,6 @@ internal sealed partial class CharacterYanRouOlRuntime
     {
         if (f.YanRou is null)
             return false;
-        AssertYanRou(f);
         return true;
     }
 

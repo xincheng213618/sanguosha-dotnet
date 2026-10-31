@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterHuaTuoHappyGodEntries
 {
     internal void AnswerHappyHuaNeedle(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHappyHuaNeedle(choice);
-    internal void AssertHappyHuaTuoFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHappyHuaTuoFrame(f);
     internal bool CanOfferHappyHuaTuo(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferHappyHuaTuo(gate);
     internal global::CardGame.Core.HappyMedicineHandLoss? CaptureHappyHuaTuoHandLoss(global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to, long sequence) => _resolve().CaptureHappyHuaTuoHandLoss(card, from, to, sequence);
     internal void ChangeHappyMedicine(global::CardGame.Core.ProgramSkillFrame f, int delta) => _resolve().ChangeHappyMedicine(f, delta);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterHuaTuoHappyGodEntries
     internal bool HappyHuaPayment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardConversionSource source, int before, int after, string purpose) => _resolve().HappyHuaPayment(f, source, before, after, purpose);
     internal int HappyMedicine(int owner) => _resolve().HappyMedicine(owner);
     internal int HappyMedicineRedLossCount(int owner, global::CardGame.Core.ProgramSkillWindowContext? context) => _resolve().HappyMedicineRedLossCount(owner, context);
-    internal bool HasExactHappyHuaTuoParticipantSelection(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasExactHappyHuaTuoParticipantSelection(f);
     internal void PublishHappyHuaNeedle(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishHappyHuaNeedle(f);
     internal global::CardGame.Core.SkillProgramStepOutcome ResolveHappyHuaTuo(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().ResolveHappyHuaTuo(supplied, op);
     internal bool ValidHappyHuaNeedle(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidHappyHuaNeedle(f);

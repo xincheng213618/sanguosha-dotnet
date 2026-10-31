@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRoundGainedEquipmentObserversEntries
 {
     internal bool HasRoundGainedEquipmentDrawBeforeDamageObserver(long id) => _resolve().HasRoundGainedEquipmentDrawBeforeDamageObserver(id);
-    internal bool HasRoundGainedEquipmentDrawCardObserver(long useId) => _resolve().HasRoundGainedEquipmentDrawCardObserver(useId);
     internal bool HasRoundGainedEquipmentDrawDamageObserver(long id) => _resolve().HasRoundGainedEquipmentDrawDamageObserver(id);
     internal bool HasRoundGainedEquipmentDrawObserver(long id, bool before) => _resolve().HasRoundGainedEquipmentDrawObserver(id, before);
     internal bool IsRoundGainedEquipmentDrawDying() => _resolve().IsRoundGainedEquipmentDrawDying();

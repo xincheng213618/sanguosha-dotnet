@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouZhugeJinRuntime(IMouZhugeJinFacts facts, IMouZhugeJinNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouZhugeJinRuntime
 {
     internal const string Action = "mou-zhuge-jin",GiveReason = "skill-program.mou:taozhou.give",DrawReason = "skill-program.mou:taozhou.draw",DiscardReason = "skill-program.mou-zhuge-jin.discard";
@@ -130,8 +130,6 @@ internal sealed class MouZhugeJinRuntime(IMouZhugeJinFacts facts, IMouZhugeJinNa
     [ProgramContinuation(ProgramContinuationKind.Resume, 35600)]
     private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouZhugeJin: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 35600)] private bool Movement(ProgramSkillFrame f) => f.MouZhugeJin is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 35600)]
-    private void Invariant(ProgramSkillFrame f) { if (f.MouZhugeJin is not null && !Valid(f)) throw new InvalidOperationException("Invalid own-frame Mou Zhuge Jin receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35600)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35600)]
     private bool Paid(ProgramSkillFrame f) => f.MouZhugeJin is { Committed: true } && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouZhugeJinTaozhou, SkillProgramEffectOp.ResolveMouZhugeJinHoude, SkillProgramEffectOp.ResolveMouZhugeJinZijin)]

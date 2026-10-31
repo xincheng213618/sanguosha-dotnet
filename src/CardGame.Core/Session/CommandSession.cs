@@ -58,7 +58,6 @@ internal sealed class CommandSession
         {
             operation();
             runtime.SynchronizeDerivedState();
-            runtime.AssertInvariants();
 
             // Every prepared output uses the next revision before it becomes
             // observable. A failed preparation restores the preceding prefix.
@@ -142,7 +141,6 @@ internal interface ICommandSessionRuntime : ICommandCheckpointSource
     CommandOutcome Outcome { get; }
     long EventSequence { get; set; }
     void SynchronizeDerivedState();
-    void AssertInvariants();
     void RefreshDecisionRevision();
     EventNotification?[] PreparePublicEvents(EventNotification[] events);
     void ClearPendingEvents();

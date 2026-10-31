@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineFinalTargetSlashEntries
 {
-    internal void AssertFinalTargetSlashReceipts() => _resolve().AssertFinalTargetSlashReceipts();
     internal bool CanOfferFinalTargetSlash(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext window) => _resolve().CanOfferFinalTargetSlash(candidate, trigger, window);
     internal bool DistanceBorrowedPaidWeaponSlash50HasRankSlashRange(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistanceBorrowedPaidWeaponSlash50HasRankSlashRange(q);
     internal bool DistanceBorrowedPhysicalSlash90IsWithinSpecificSlashRange(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistanceBorrowedPhysicalSlash90IsWithinSpecificSlashRange(q);
@@ -19,7 +18,6 @@ internal sealed partial class CoreGameEngineFinalTargetSlashEntries
     internal bool IsWithinSpecificSlashRange(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.CardKind kind, int? rank, long? existingUseFrameId = default, int? excludedEquipmentId = default, global::CardGame.Core.EquipmentSlot? excludedEquipmentSlot = default) => _resolve().IsWithinSpecificSlashRange(actor, target, kind, rank, existingUseFrameId, excludedEquipmentId, excludedEquipmentSlot);
     internal void IssueFinalTargetSlashReceipt(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().IssueFinalTargetSlashReceipt(frame, effect);
     internal int? ProvidedSpecificSlashRank(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState provider, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards, bool isTrueZhangba, global::CardGame.Core.CardKind kind = (global::CardGame.Core.CardKind)0) => _resolve().ProvidedSpecificSlashRank(actor, provider, cards, isTrueZhangba, kind);
-    internal bool ReceiptProducerMatches(global::CardGame.Core.ProgramTargetSlashReceipt receipt) => _resolve().ReceiptProducerMatches(receipt);
     internal int? SpecificSlashRank(global::CardGame.Core.CharacterState actor, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind, long? useId = default) => _resolve().SpecificSlashRank(actor, card, kind, useId);
     internal int? ZhangbaSpecificSlashRank(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards, global::CardGame.Core.CharacterState? provider = default) => _resolve().ZhangbaSpecificSlashRank(actor, cards, provider);
 }

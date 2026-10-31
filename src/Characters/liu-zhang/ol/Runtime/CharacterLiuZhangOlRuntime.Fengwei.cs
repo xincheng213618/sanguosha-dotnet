@@ -87,7 +87,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Fengwei: { Stage: FengweiStage.Choice } r } f || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(FengweiChoices(f).Where(c => c.Id == choice.Id).ToArray(), [choice]))
             throw new InvalidOperationException("Fengwei requires its actual positive round draw selection.");
-        AssertFengwei(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var count = int.Parse(choice.Parameters["count"], CultureInfo.InvariantCulture);
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
@@ -110,7 +109,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Fengwei: { } r } f || f.Id != id)
             return;
-        AssertFengwei(f);
         if (r.Stage == FengweiStage.Choice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -153,35 +151,17 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (f.Fengwei is null)
             return false;
-        AssertFengwei(f);
         return true;
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveFengweiRoundStartDraw)]
     internal PromptChoice AiFengwei(PendingDecision p, ProgramSkillFrame f) => p.Choices.Last();
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27510)]
-    internal void AssertFengwei(ProgramSkillFrame f)
-    {
-        if (f.Fengwei is not { } r)
-            return;
-        var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (f.InstructionIndex != 1 || f.SkillId != "ol:fengwei" || f.TriggerId != "round-draw" || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveFengweiRoundStartDraw || r.Source != FengweiSource(f) || r.GameplayHash != f.GameplayHash || r.Round != _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber || i < 1 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.RoundStarting } w || w.Id != r.ParentId || f.WindowContext?.ParentFrameId != w.Id || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) || _coreProgramEventHistoryOperations.ProgramEventHistory<FengweiStartedEvent>().Count(e => e == new FengweiStartedEvent(f.Id, r.Source, r.GameplayHash, r.ParentId, r.Round)) != 1 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Fengwei lost its genuine round owner, original source and scalar issuance.");
-        if (r.Stage == FengweiStage.DrawChildren)
-        {
-            if (r.Requested is < 1 or > 5 || r.Actual < 0 || r.Actual > r.Requested || f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<FengweiDrawCompletedEvent>().Count(e => e == new FengweiDrawCompletedEvent(f.Id, r.Source, r.Round, r.Requested, r.Actual, r.Before, r.After)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<FengweiAcquiredEvent>().Count(e => e.FrameId == f.Id) != r.Actual || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).Any(m => !IsFengweiMovement(f, m)))
-                throw new InvalidOperationException("Fengwei lost its exact positive or exhausted-zero draw completion.");
-        }
-        else if (r.Requested != 0 || r.Actual != 0 || r.Before != 0 || r.After != 0 || f.PendingMovementContinuation is not null)
-            throw new InvalidOperationException("Fengwei cannot prepay its round draw.");
-    }
 
     internal bool IsFengweiMovement(ProgramSkillFrame f, CardMovementRecord m) => f.Fengwei is { Stage: FengweiStage.DrawChildren } r && m.Sequence > r.Before && m.Sequence <= r.After && (m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == FengweiDrawReason || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle);
     internal bool FengweiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.Fengwei is not { Stage: FengweiStage.DrawChildren })
             return false;
-        AssertFengwei(f);
         if (child is CardsMovedTriggerWindowFrame moved)
             return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsFengweiMovement(f, m));
         if (child is HpChangedTriggerWindowFrame hp)

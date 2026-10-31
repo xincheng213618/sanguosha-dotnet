@@ -90,7 +90,6 @@ internal sealed partial class CharacterLiYiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Chanshuang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ChanshuangChooser(f) || !ChanshuangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Chanshuang requires its real participant's exact private choice.");
-        AssertLiYi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var option = selected.Parameters["option"];
@@ -206,7 +205,6 @@ internal sealed partial class CharacterLiYiOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Chanshuang: { } r } f && f.Id == id)
         {
-            AssertLiYi(f);
             if (r.Stage is ChanshuangStage.NativeUse or ChanshuangStage.SlashIssuing)
                 return;
             if (r.Stage is ChanshuangStage.CostChildren or ChanshuangStage.DrawChildren or ChanshuangStage.NativeChildren)
@@ -311,7 +309,6 @@ internal sealed partial class CharacterLiYiOlRuntime
     {
         if (f.Chanshuang is not { } r || r.Stage == ChanshuangStage.Votes)
             return false;
-        AssertLiYi(f);
         return r.Operation == SkillProgramEffectOp.ResolveChanshuangEnding || r.Votes.Count == 2;
     }
 

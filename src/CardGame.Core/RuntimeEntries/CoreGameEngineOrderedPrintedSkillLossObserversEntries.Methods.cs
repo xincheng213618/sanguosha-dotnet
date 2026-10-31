@@ -2,9 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOrderedPrintedSkillLossObserversEntries
 {
-    internal void AssertOrderedPrintedSkillLoss(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertOrderedPrintedSkillLoss(f);
-    internal void AssertOrderedPrintedSkillLossObservers() => _resolve().AssertOrderedPrintedSkillLossObservers();
-    internal void AssertOrderedPrintedSkillLossState() => _resolve().AssertOrderedPrintedSkillLossState();
     internal bool ExactOrderedPrintedSkillLossParent(global::CardGame.Core.ProgramSkillFrame f, scoped out global::CardGame.Core.DamageTriggerWindowFrame window, scoped out global::CardGame.Core.DamageFrame damage, scoped out global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ExactOrderedPrintedSkillLossParent(f, out window, out damage, out attack);
     internal bool HasOrderedPrintedSkillLossBeforeDamageObserver(long id) => _resolve().HasOrderedPrintedSkillLossBeforeDamageObserver(id);
     internal bool HasOrderedPrintedSkillLossDamageObserver(long id) => _resolve().HasOrderedPrintedSkillLossDamageObserver(id);

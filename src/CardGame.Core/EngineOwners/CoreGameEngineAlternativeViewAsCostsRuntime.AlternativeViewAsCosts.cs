@@ -107,22 +107,4 @@ internal sealed partial class CoreGameEngineAlternativeViewAsCostsRuntime
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(frame => frame.Action?.PhysicalCards.Any(cost => cost.CardId == card.Id) == true);
         return IsProgramAlternativeCost(use?.Action, card.Id) && use!.Action!.PhysicalCards.Single(cost => cost.CardId == card.Id).From == from ? CardLocation.DrawPile : to;
     }
-
-    internal bool TryValidateProgramAlternativeCostAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing, out bool valid)
-    {
-        valid = false;
-        var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == attack.ResolutionId);
-        if (!attack.PhysicalCards.Any(card => IsProgramAlternativeCost(use?.Action, card.Id)))
-            return false;
-        var costs = attack.PhysicalCards.Where(card => IsProgramAlternativeCost(use!.Action, card.Id)).Select(card => card.Id).ToHashSet();
-        // The spent cost can already have been drawn by a nested skill. Its
-        // declared provenance remains attached to the original use regardless.
-        if (costs.Any(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing))
-            return true;
-        var held = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(frame => frame.Id != attack.ResolutionId).SelectMany(frame => frame.Action?.PhysicalCards ?? []).Select(cost => cost.CardId).ToHashSet();
-        var expected = attack.PhysicalCards.Where(card => !costs.Contains(card.Id)).Select(card => card.Id).ToHashSet();
-        var actual = processing.Where(card => !held.Contains(card.Id)).Select(card => card.Id).ToHashSet();
-        valid = actual.SetEquals(expected);
-        return true;
-    }
 }

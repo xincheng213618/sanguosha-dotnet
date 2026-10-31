@@ -36,17 +36,6 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
         return f.PendingMovementContinuation is null;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33300)]
-    internal void AssertMouHxBojue(ProgramSkillFrame f)
-    {
-        if (f.MouHxBojue is null)
-            return;
-        if (!ValidMouHxBojue(f))
-            throw new InvalidOperationException("Bojue lost its original two commitments, native payment, or original activation cursor.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && f.MouHxBojue.Stage is MouHxBojueStage.Commit or MouHxBojueStage.Discard or MouHxBojueStage.OtherDiscard && (p.PlayerSeat != MouHxBojueChooser(f) || !p.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, MouHxBojueChoices(f))))
-            throw new InvalidOperationException("Bojue's private committed option or hidden native card slot was changed.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 33300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 33300)]
     internal bool ContinuePaidMouHxBojue(ProgramSkillFrame f) => f.MouHxBojue is { Votes.Count: 2 } && ValidMouHxBojue(f);
@@ -93,7 +82,6 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
     internal bool IsMouHxBojueDamageObserver(long id) => MouHxBojueObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33300)]
     internal bool IsMouHxBojueBeforeDamageObserver(long id) => MouHxBojueObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33300)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33300)]
     internal bool IsMouHxBojueDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouHxBojueObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33300)]

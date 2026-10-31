@@ -86,7 +86,6 @@ internal sealed partial class CharacterZouShiLeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Huoxin: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HuoxinChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Huoxin cannot answer an unpublished target, hidden slot or stale material choice.");
-        AssertHuoxin(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         switch (choice.Parameters["branch"])
         {
@@ -142,7 +141,6 @@ internal sealed partial class CharacterZouShiLeRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Huoxin: { } r } f || f.Id != id)
             return;
-        AssertHuoxin(f);
         if (r.Stage != HuoxinStage.ObtainChildren)
         {
             PublishHuoxin(f);

@@ -37,8 +37,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
         if (branch == "loss")
         {
             var m = f.WindowContext is { } c ? XiangLoss(f.OwnerSeat, c) : null;
-            if (m is null)
-                throw new InvalidOperationException("Guying lost its exact unconsumed off-turn atomic single-entity loss.");
             r = r with
             {
                 LossBatchId = f.WindowContext!.MovementBatch!.Id,
@@ -179,7 +177,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XiangChong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == XiangChongStage.Choice ? r.TurnOwner : f.OwnerSeat) || !XiangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("XiangChong requires its exact current chooser and frozen private card frontier.");
-        AssertXiang(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -271,7 +268,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XiangChong: { } r } f || f.Id != id)
             return;
-        AssertXiang(f);
         if (r.Stage is XiangChongStage.PaymentChildren or XiangChongStage.ClaimChildren or XiangChongStage.NativeChildren)
         {
             if (DrainXiang(id))

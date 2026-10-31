@@ -30,7 +30,6 @@ internal sealed partial class CharacterLuoXianOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Daili: { } pending } frame || frame.Id != id)
             return false;
-        RequireDaili(frame);
         if (DrainDailiChildren(id))
             return true;
         if (pending.Stage == DailiStage.FlipChildren && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)

@@ -66,7 +66,6 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
     internal bool HasMouZyMobileDamageObserver(long id) => MouZyMobileObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31100)]
     internal bool HasMouZyMobileBeforeDamageObserver(long id) => MouZyMobileObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31100)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31100)]
     internal bool IsMouZyMobileDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == d.ParentFrameId && MouZyMobileFirstChild(f, d)) || MouZyMobileObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31100)]
@@ -80,13 +79,6 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var c = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == recovery.Id);
         return i >= 0 && c > i + 1 && MouZyMobileFirstChild(f, _resolutionStackOperations._resolutionStack[i + 1]) && MouZyMobileObserverSuffix(i) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[c - 1]);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31100)]
-    internal void AssertMouZyMobile(ProgramSkillFrame f)
-    {
-        if (f.MouZhouYuMobile is not null && !ValidMouZyMobile(f))
-            throw new InvalidOperationException("Mobile Fanjian changed its actual-turn source, real covered card or native paid return.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31100)]

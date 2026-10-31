@@ -6,9 +6,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodEntries
     internal void AnswerShenHt(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShenHt(choice);
     internal void ApplySkillInvocationLuxin(global::CardGame.Core.SkillInvocationFrame f, global::CardGame.Core.SkillInvocationReaction r) => _resolve().ApplySkillInvocationLuxin(f, r);
     internal void ArmShenHtLuxin(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> ids) => _resolve().ArmShenHtLuxin(f, ids);
-    internal void AssertShenHt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShenHt(f);
     internal void AssertSkillInvocation(global::CardGame.Core.SkillInvocationFrame f) => _resolve().AssertSkillInvocation(f);
-    internal void AssertSkillInvocations() => _resolve().AssertSkillInvocations();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShenHuaTuo(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShenHuaTuo(supplied, op);
     internal void CaptureMovementBatchStartInvocationOrigin(global::CardGame.Core.CardMovementBatchBuilder batch) => _resolve().CaptureMovementBatchStartInvocationOrigin(batch);
     internal global::CardGame.Core.PromptChoice ChooseShenHtHuandao(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseShenHtHuandao(p, f);
@@ -19,13 +17,10 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodEntries
     internal void ContinueSkillInvocation(global::CardGame.Core.SkillInvocationFrame supplied) => _resolve().ContinueSkillInvocation(supplied);
     internal void FinishShenHt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShenHt(f);
     internal bool HasConvertedSkillInvocations(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().HasConvertedSkillInvocations(action, window);
-    internal bool HasExactBoundarySkillInvocation() => _resolve().HasExactBoundarySkillInvocation();
     internal bool HasExactSkillInvocationDying() => _resolve().HasExactSkillInvocationDying();
     internal bool HasSkillInvocationObserverSuffix(int rootIndex) => _resolve().HasSkillInvocationObserverSuffix(rootIndex);
     internal bool IsAcceptedViewAsInvocation(global::CardGame.Core.CardConversionSource source) => _resolve().IsAcceptedViewAsInvocation(source);
-    internal bool IsCardWindowWaitingForSkillInvocation(global::CardGame.Core.ProgramCardTriggerWindowFrame window, int index) => _resolve().IsCardWindowWaitingForSkillInvocation(window, index);
     internal bool IsExactSkillInvocationDying(global::CardGame.Core.DyingFrame? dying) => _resolve().IsExactSkillInvocationDying(dying);
-    internal bool IsProgramWaitingForSkillInvocation(global::CardGame.Core.ProgramSkillFrame program) => _resolve().IsProgramWaitingForSkillInvocation(program);
     internal bool IsSkillInvocationHealthChild(global::CardGame.Core.SkillInvocationFrame f, global::CardGame.Core.HpChangedTriggerWindowFrame hp) => _resolve().IsSkillInvocationHealthChild(f, hp);
     internal bool IsSkillInvocationHealthChild2(global::CardGame.Core.SkillInvocationFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSkillInvocationHealthChild(f, recovery);
     internal bool IsSkillInvocationMovementBatch(global::CardGame.Core.SkillInvocationFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsSkillInvocationMovementBatch(f, batch);

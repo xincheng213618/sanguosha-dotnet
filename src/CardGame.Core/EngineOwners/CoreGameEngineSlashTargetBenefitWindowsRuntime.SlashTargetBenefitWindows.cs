@@ -156,8 +156,6 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
             {
                 _coreRuntimeOperations.PopResolutionFrame(w.Id, ResolutionFrameKind.SlashTargetBenefitWindow);
                 var attack = _coreActiveNativeAttackQueriesOperations.ActiveCardAttack;
-                if (attack is null || attack.ResolutionId != w.ParentFrameId)
-                    throw new InvalidOperationException("A Slash benefit return lost its exact attack.");
                 if (_coreMatchOutcomeWinnerAccess._winner != Winner.None)
                 {
                     _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);

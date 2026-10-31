@@ -9,12 +9,7 @@ internal sealed partial class CharacterSunQuanOlMagicEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? AppendMoQuanyuPublicMarkers(int participant, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PlayerMarkerSnapshot>? ordinary) => _resolve().AppendMoQuanyuPublicMarkers(participant, ordinary);
     internal void ApplyMoQuanyuAttackPolicy(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().ApplyMoQuanyuAttackPolicy(attack);
     internal void ApplyMoQuanyuSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ApplyMoQuanyuSlash(f);
-    internal void AssertMoQiangang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMoQiangang(f);
-    internal void AssertMoQuanyu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMoQuanyu(f);
     internal void AssertMoQuanyuDeclarationQuotas() => _resolve().AssertMoQuanyuDeclarationQuotas();
-    internal void AssertMoQuanyuSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMoQuanyuSlash(f);
-    internal void AssertMoQuanyuSlashUses() => _resolve().AssertMoQuanyuSlashUses();
-    internal void AssertMoTianen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMoTianen(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMoQiangang(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMoQiangang(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMoQuanyuRound(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMoQuanyuRound(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMoQuanyuSlash(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMoQuanyuSlash(supplied);
@@ -59,11 +54,9 @@ internal sealed partial class CharacterSunQuanOlMagicEntries
     internal bool IsMoQiangangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMoQiangangMovement(f, effect, p);
     internal bool IsMoQuanyuAddedTargetFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.MoQuanyuTargetAddedEvent fact) => _resolve().IsMoQuanyuAddedTargetFact(use, fact);
     internal bool IsMoQuanyuCompleteZhangbaQuotaLegal(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<int> targets, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().IsMoQuanyuCompleteZhangbaQuotaLegal(actor, targets, cards);
-    internal bool IsMoQuanyuDying() => _resolve().IsMoQuanyuDying();
     internal bool IsMoQuanyuExtraRound(long id) => _resolve().IsMoQuanyuExtraRound(id);
     internal bool IsMoQuanyuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMoQuanyuMovement(f, effect, p);
     internal bool IsMoQuanyuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMoQuanyuRecoveryParent(f, recovery);
-    internal bool IsMoSunQuanPaidDying() => _resolve().IsMoSunQuanPaidDying();
     internal bool IsMoSunQuanPaidRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMoSunQuanPaidRecoveryParent(f, recovery);
     internal bool IsMoSunQuanTianenQuanyuRequest(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.MoQuanyuTargetRequest request) => _resolve().IsMoSunQuanTianenQuanyuRequest(f, request);
     internal bool IsMoTianenHandLimitExempt(global::CardGame.Core.CharacterState owner, int id) => _resolve().IsMoTianenHandLimitExempt(owner, id);

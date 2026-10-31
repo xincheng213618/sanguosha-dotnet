@@ -95,12 +95,4 @@ internal sealed partial class CoreGameEngineShanheMobilizationRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 62045)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 62045)]
     internal bool CanCompleteShanheMobilization(ProgramSkillFrame frame) => frame.ShanheMobilization is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62045)]
-    internal void AssertShanheMobilization(ProgramSkillFrame frame)
-    {
-        if (frame.ShanheMobilization is not { } receipt)
-            return;
-        if (_coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id != ShanheBattleSetup.BattleModeId || _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is null || frame.SkillId != ShanheMobilizationSkill || frame.TriggerId != "next-round-allies" || frame.WindowContext?.Window != SkillProgramTriggerWindow.RoundStarting || receipt.RoundNumber <= 0 || receipt.InstructionIndex != frame.InstructionIndex || receipt.TargetSeats.Count is < 1 or > 7 || receipt.TargetSeats.Distinct().Count() != receipt.TargetSeats.Count || receipt.TargetIndex < 0 || receipt.TargetIndex > receipt.TargetSeats.Count || receipt.StatePublished && receipt.TargetIndex == receipt.TargetSeats.Count || receipt.TargetSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || seat == frame.OwnerSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheMobilizationIssuedEvent>().Where(item => item.FrameId == frame.Id).ToArray()is not [var issued] || issued.InstructionIndex != receipt.InstructionIndex || issued.RoundNumber != receipt.RoundNumber || issued.Source != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || issued.TargetSeatsKey != string.Join(",", receipt.TargetSeats))
-            throw new InvalidOperationException("Mobilization lost its original round, public-death recipients or owning frame.");
-    }
 }

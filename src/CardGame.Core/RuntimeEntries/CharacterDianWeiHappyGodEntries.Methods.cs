@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterDianWeiHappyGodEntries
 {
     internal void AnswerHappyGuard(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHappyGuard(choice);
-    internal void AssertHappyDianWei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHappyDianWei(f);
     internal bool BeginHappyGuardRemovedWindow(global::CardGame.Core.HappyGuardRemovalReturn ret) => _resolve().BeginHappyGuardRemovedWindow(ret);
     internal bool CanOfferHappyDianWei(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanOfferHappyDianWei(g);
     internal void CaptureHappyGuardDeathRemoval(global::CardGame.Core.PlayerMarkerChangedEvent fact) => _resolve().CaptureHappyGuardDeathRemoval(fact);
@@ -21,8 +20,6 @@ internal sealed partial class CharacterDianWeiHappyGodEntries
     internal bool HappyGuardOriginalCandidate(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyGuardOriginalCandidate(f);
     internal bool HappyGuardRemovalIsPaid(global::CardGame.Core.HappyGuardRemovalReturn r) => _resolve().HappyGuardRemovalIsPaid(r);
     internal global::CardGame.Core.CardConversionSource HappyGuardSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyGuardSource(f);
-    internal bool HasExactHappyDianWeiElaiSelection(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasExactHappyDianWeiElaiSelection(f);
-    internal bool HasHappyDianWeiGuardPrompt() => _resolve().HasHappyDianWeiGuardPrompt();
     internal bool IsHappyDianWeiElaiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsHappyDianWeiElaiCandidate(c, context);
     internal bool IsHappyDianWeiElaiContext(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsHappyDianWeiElaiContext(f);
     internal bool IsOriginalDyingSuspendedByHappyGuardElai(global::CardGame.Core.DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByHappyGuardElai(dying);
@@ -30,7 +27,6 @@ internal sealed partial class CharacterDianWeiHappyGodEntries
     internal global::CardGame.Core.SkillProgramStepOutcome ResolveHappyDianWei(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().ResolveHappyDianWei(supplied, op);
     internal void ReturnHappyGuardElai(global::CardGame.Core.ProgramSkillFrame f, bool completed) => _resolve().ReturnHappyGuardElai(f, completed);
     internal void SetHappyGuard(global::CardGame.Core.ProgramSkillFrame f, int target, int count) => _resolve().SetHappyGuard(f, target, count);
-    internal bool TryAssertHappyDianWeiDeathRemoval(global::CardGame.Core.DeathFrame death) => _resolve().TryAssertHappyDianWeiDeathRemoval(death);
     internal bool TryBeginHappyDianWeiDeathRemovals(global::CardGame.Core.DeathFrame supplied) => _resolve().TryBeginHappyDianWeiDeathRemovals(supplied);
     internal bool ValidHappyGuardFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidHappyGuardFrame(f);
 }

@@ -5,7 +5,6 @@ internal sealed partial class CharacterDuXiOlEntries
     internal bool AdvanceDuXiSubtree() => _resolve().AdvanceDuXiSubtree();
     internal global::CardGame.Core.PromptChoice AiDuXi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiDuXi(p, f);
     internal void AnswerDuXi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerDuXi(choice);
-    internal void AssertDuXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertDuXi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDuXi(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginDuXi(input, operation);
     internal bool CanOfferDuXi(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferDuXi(candidate, trigger, context);
     internal void CaptureDuXiBixiongBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureDuXiBixiongBatch(batch);
@@ -28,7 +27,6 @@ internal sealed partial class CharacterDuXiOlEntries
     internal void FinishDuXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishDuXi(f);
     internal bool HasAnyDuXiSuitProhibition() => _resolve().HasAnyDuXiSuitProhibition();
     internal bool HasDuXiDamageObserver(long id) => _resolve().HasDuXiDamageObserver(id);
-    internal bool IsDuXiDying() => _resolve().IsDuXiDying();
     internal bool IsDuXiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDuXiRecoveryParent(f, recovery);
     internal bool IsDuXiSuitTargetProhibited(int sourceSeat, int targetSeat, global::CardGame.Core.Suit effectiveSuit) => _resolve().IsDuXiSuitTargetProhibited(sourceSeat, targetSeat, effectiveSuit);
     internal void PublishDuXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishDuXi(f);

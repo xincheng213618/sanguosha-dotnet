@@ -83,7 +83,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
 
     internal bool HasIssuedAHuiNanJuemanUse(long id) => IsAHuiNanJuemanUse(id);
     internal bool MatchesAHuiNanJuemanUseAction(long id, CardActionContext a, int cardId) => cardId == 0 && IsAHuiNanJuemanUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && a.ActionId == issued.ActionId && a.Type == CardActionType.Use && a.EffectiveKind == issued.EffectiveKind && a.ActorSeat == issued.ActorSeat && a.ProviderSeat == issued.ProviderSeat && a.PhysicalCards.Count == 0 && a.ConversionChain.SequenceEqual(issued.ConversionChain) && a.TargetSeats.SequenceEqual(issued.TargetSeats) && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed == false;
-    internal bool IsAHuiNanJuemanAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => IsAHuiNanJuemanUse(attack.ResolutionId) && attack.Card is null && attack.PhysicalCards.Count == 0 && processing.Count == 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && attack.EffectiveCardKind == use.CardKind && attack.SourceSeat == use.SourceSeat;
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 130)]
     internal bool FinishAHuiNanJuemanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
     {

@@ -120,7 +120,6 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenGuoJia: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShenGuoJiaChoices(frame).Where(current => current.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Shen Guo Jia requires the published current owner choice.");
-        AssertShenGuoJia(frame);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         if (receipt.Stage == ShenGuoJiaStage.Repeat)

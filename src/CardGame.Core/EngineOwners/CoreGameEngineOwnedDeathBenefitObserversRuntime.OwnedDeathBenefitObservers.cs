@@ -53,16 +53,4 @@ internal sealed partial class CoreGameEngineOwnedDeathBenefitObserversRuntime
             return false;
         return _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: false, incompleteAttackError: "Owned death-benefit damage must finish its actual damage/Dying children before its program tail.");
     }
-
-    internal void AssertOwnedDeathBenefitReturns()
-    {
-        var roots = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnedDeathBenefitReturn is not null).ToArray();
-        if (roots.Length == 0)
-            return;
-        foreach (var root in roots)
-            if (!OwnedDeathBenefitObserverPrefix(root))
-                throw new InvalidOperationException("Owned death benefit lost its frozen original cursor or exact paid descendant.");
-        _coreProgramAttackAttemptOperations.AssertProgramAttackState();
-        _coreSkillProgramsOperations.AssertProgramSkillState();
-    }
 }

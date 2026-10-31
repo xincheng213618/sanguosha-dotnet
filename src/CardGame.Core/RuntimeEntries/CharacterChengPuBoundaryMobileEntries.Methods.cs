@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterChengPuBoundaryMobileEntries
 {
     internal bool AdvanceBoundaryChengPuHealth() => _resolve().AdvanceBoundaryChengPuHealth();
-    internal void AssertBoundaryChengPuLihuo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryChengPuLihuo(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryChengPuLihuo(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryChengPuLihuo(supplied);
     internal global::CardGame.Core.CardUseFrame? BoundaryChengPuCompletedUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryChengPuCompletedUse(f);
     internal int BoundaryChengPuDamageTotal(long useId) => _resolve().BoundaryChengPuDamageTotal(useId);

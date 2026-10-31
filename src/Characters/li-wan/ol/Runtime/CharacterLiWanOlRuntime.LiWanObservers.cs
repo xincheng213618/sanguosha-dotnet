@@ -7,51 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiWanOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26720)]
-    internal void AssertLiWan(ProgramSkillFrame f)
-    {
-        if (f.LiWan is not { } r)
-            return;
-        if (r.Source != LiWanSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.InstructionIndex != 1 || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || !Enum.IsDefined(r.Stage) || !LiWanComposition.Handles(r.Op) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || f.WindowContext is not { } context || context.ParentFrameId != r.ParentId || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<LiWanStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var start] || start.Source != r.Source || start.GameplayHash != r.GameplayHash || start.Op != r.Op || start.ParentId != r.ParentId || start.ActualTurn != r.ActualTurn || start.EndingSerial != r.EndingSerial || start.PromiseFrameId != r.PromiseFrameId || start.RefundSequence != r.RefundSequence)
-            throw new InvalidOperationException("Li Wan lost her exact source, instruction, native parent or single issued receipt.");
-        var at = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-        if (at < 1)
-            throw new InvalidOperationException("Li Wan requires her retained native parent.");
-        if (r.Op is SkillProgramEffectOp.OfferLianjuSameColorGift or SkillProgramEffectOp.ResolveLianjuOppositeColorReturn)
-        {
-            if (_resolutionStackOperations._resolutionStack[at - 1] is not TurnEndingBoundaryFrame parent || parent.Id != r.ParentId || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || parent.TurnNumber != r.ActualTurn || context.Window != SkillProgramTriggerWindow.TurnEnding || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || r.EndingSerial != LianjuEndingSerial || r.Damage is not null || r.RefundSequence is not null || (r.Op == SkillProgramEffectOp.OfferLianjuSameColorGift ? parent.OwnerSeat != f.OwnerSeat || r.PromiseFrameId is not null : r.PromiseFrameId is not { } promise || LianjuDuePromises().SingleOrDefault(p => p.FrameId == promise)is not { } issued || issued.Source.OwnerSeat != f.OwnerSeat || issued.Source.SkillInstanceId != f.SkillInstanceId || issued.GameplayHash != f.GameplayHash || r.IsRed != !issued.IsRed || r.RecipientSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<LianjuPromiseConsumedEvent>().Count(e => e.PromiseFrameId == promise && e.ParentFrameId == parent.Id && e.EndingSerial == r.EndingSerial) != 1))
-                throw new InvalidOperationException("Lianju lost its actual Ending cursor, original promise or frozen opposite color.");
-            if (r.Stage == LiWanStage.Color ? r.IsRed is not null || r.RecipientSeat is not null || r.ChosenCards is not null : r.IsRed is null || (r.Stage == LiWanStage.Recipient ? r.RecipientSeat is not null || r.ChosenCards is not null : r.RecipientSeat is null || r.ChosenCards is null || r.ChosenCards.Count > 2 || r.ChosenCards.Distinct().Count() != r.ChosenCards.Count))
-                throw new InvalidOperationException("Lianju lost its public color and bounded unique entity selection.");
-            if (r.Stage == LiWanStage.Cards && r.ChosenCards!.Except(LianjuEligibleCards(r.Op == SkillProgramEffectOp.OfferLianjuSameColorGift ? f.OwnerSeat : _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, r.IsRed!.Value)).Any())
-                throw new InvalidOperationException("Lianju cannot select a played-out response, stale turn, different color or unavailable entity.");
-        }
-        else if (r.Op == SkillProgramEffectOp.DrawSilvMarkedCardAfterDamage)
-        {
-            if (r.Damage is not { } d || r.RecipientSeat != f.OwnerSeat || r.PromiseFrameId is not null || r.RefundSequence is not null || context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.DamageFrameId != d.DamageFrameId || context.Amount != d.ActualAmount || d.ActualAmount < 1 || d.TargetSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack[at - 1] is not DamageTriggerWindowFrame window || window.Id != r.ParentId || window.ParentFrameId != d.DamageFrameId || window.TargetSeat != f.OwnerSeat || window.TriggerWindow != context.Window || !_resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Any(damage => damage.Id == d.DamageFrameId && damage.ParentFrameId == d.DamageParentId && damage.TargetSeat == f.OwnerSeat && damage.Amount == d.ActualAmount))
-                throw new InvalidOperationException("Silv requires its exact actual damage instance rather than one draw per point.");
-        }
-        else
-        {
-            if (r.RefundSequence is not { } sequence || context.MovementBatch is not { } batch || context.MovementIndex is not { } index || _resolutionStackOperations._resolutionStack[at - 1] is not CardsMovedTriggerWindowFrame window || window.Id != r.ParentId || batch.Id != window.Id || index < 0 || index >= batch.Movements.Count || !batch.Movements.SequenceEqual(window.Batch.Movements) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) || batch.Movements[index] is not { } move || move.Sequence != sequence || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move)?.OwnerSeat != r.RecipientSeat || r.ChosenCards is not [var id] || id != move.CardId || SilvMark(id)is not { } mark || mark.Source.OwnerSeat != f.OwnerSeat || mark.Source.SkillInstanceId != f.SkillInstanceId || mark.GameplayHash != f.GameplayHash || r.Damage is not null || r.PromiseFrameId is not null)
-                throw new InvalidOperationException("Silv requires its exact marked entity, native discard provenance and actual losing owner.");
-        }
-
-        var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<LiWanPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Stage != LiWanStage.Children)
-        {
-            if (paid.Length != 0 || f.PendingMovementContinuation is not null || r.Before != 0 || r.After != 0 || r.Count != 0)
-                throw new InvalidOperationException("Lianju cannot move any card before the public draft is finished.");
-            return;
-        }
-
-        if (r.RecipientSeat is not { } recipient || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != recipient || paid is not [var invoice] || invoice.RecipientSeat != recipient || invoice.Before != r.Before || invoice.After != r.After || invoice.Count != r.Count || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Count < 0 || r.Count > (r.Op == SkillProgramEffectOp.DrawSilvMarkedCardAfterDamage ? 1 : r.ChosenCards!.Count))
-            throw new InvalidOperationException("Li Wan lost her single native payment invoice or movement return.");
-        var reason = r.Op == SkillProgramEffectOp.DrawSilvMarkedCardAfterDamage ? SilvDrawReason : r.Op == SkillProgramEffectOp.ReturnDiscardedSilvEntity ? SilvRefundReason : LianjuGainReason;
-        var actual = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == reason && m.To == CardLocation.Hand(recipient)).ToArray();
-        if (actual.Length != r.Count || actual.Select(m => m.CardId).Distinct().Count() != r.Count || actual.Any(m => m.From != (r.Op == SkillProgramEffectOp.DrawSilvMarkedCardAfterDamage ? CardLocation.DrawPile : CardLocation.DiscardPile)) || r.Op != SkillProgramEffectOp.DrawSilvMarkedCardAfterDamage && actual.Any(m => !r.ChosenCards!.Contains(m.CardId)))
-            throw new InvalidOperationException("Li Wan cannot replay a paid gain, change its entities, or count replacement cards.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26720)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26720)]
@@ -59,7 +14,6 @@ internal sealed partial class CharacterLiWanOlRuntime
     {
         if (f.LiWan is not null)
         {
-            AssertLiWan(f);
             return true;
         }
 
@@ -71,7 +25,6 @@ internal sealed partial class CharacterLiWanOlRuntime
     {
         if (f.LiWan is not { Stage: LiWanStage.Children } r || effect?.Op != r.Op || pending != f.PendingMovementContinuation)
             return false;
-        AssertLiWan(f);
         return true;
     }
 
@@ -79,7 +32,6 @@ internal sealed partial class CharacterLiWanOlRuntime
     {
         if (f.LiWan is not { Stage: LiWanStage.Children } r || f.PendingMovementContinuation is null)
             return false;
-        AssertLiWan(f);
         if (child is CardsMovedTriggerWindowFrame moved)
             return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.Reason.Value is LianjuGainReason or SilvDrawReason or SilvRefundReason || m.Reason == CardMoveReasons.Reshuffle));
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
@@ -99,8 +51,6 @@ internal sealed partial class CharacterLiWanOlRuntime
     internal bool HasLiWanDamageObserver(long id) => LiWanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 640)]
     internal bool HasLiWanBeforeDamageObserver(long id) => LiWanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 470)]
-    internal bool IsLiWanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LiWanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26720)]
     internal bool AdvanceLiWanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiWanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

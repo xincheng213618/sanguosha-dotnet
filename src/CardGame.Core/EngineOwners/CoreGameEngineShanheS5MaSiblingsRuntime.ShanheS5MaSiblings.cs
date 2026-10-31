@@ -122,19 +122,6 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 5760)]
     internal bool IsShanheS5TieqiMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeColorAllDiscard && frame.SlashSuitDiscard is { Stage: ProgramSlashSuitDiscardStage.JudgmentMovement or ProgramSlashSuitDiscardStage.PaymentMovement } && pending.SubjectSeat == frame.OwnerSeat && pending.CoverageResultBind is null && (frame.ShanheS5Tieqi is null || ValidShanheS5TieqiPayment(frame));
-    internal void AssertShanheS5Tieqi(ProgramSkillFrame frame)
-    {
-        if (frame.SlashSuitDiscard is not { } draft)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeColorAllDiscard || effect.JudgmentReason != draft.JudgmentReason || effect.ResultBind != draft.ResultBind)
-            throw new InvalidOperationException("Whole-color Tieqi lost its original instruction and judgment identity.");
-        _ = _coreSlashSuitDiscardOperations.SlashSuitDiscardAttack(frame, requireActive: false);
-        if (draft.Stage == ProgramSlashSuitDiscardStage.PaymentMovement ? !ValidShanheS5TieqiPayment(frame) : frame.ShanheS5Tieqi is not null)
-            throw new InvalidOperationException("Whole-color Tieqi lost its owning judgment or once-paid material proof.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && draft.Stage == ProgramSlashSuitDiscardStage.Choosing && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != draft.TargetSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, ShanheS5TieqiChoices(frame))))
-            throw new InvalidOperationException("Whole-color Tieqi lost its complete target-private payment choices.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5760)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5760)]

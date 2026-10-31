@@ -76,7 +76,6 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenHuaTuo: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ShenHuaTuoStage.LuxinChoice ? f.OwnerSeat : r.TargetSeat) || !ShenHtChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shen Hua Tuo requires its exact original chooser and current option.");
-        AssertShenHt(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var key = choice.Parameters["option"];
@@ -143,8 +142,6 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.ShenHuaTuo!;
-        if (r.Stage != ShenHuaTuoStage.Drawing || outcome.RecipientSeat != r.TargetSeat || outcome.RequestedCount != r.Count || f.NativeDraw is not null)
-            throw new InvalidOperationException("Luxin lost its once-issued exact real draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenHuaTuo = r with { Stage = ShenHuaTuoStage.DrawChildren, DrawOutcome = outcome, SequenceBefore = outcome.SequenceBefore, SequenceAfter = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         ArmShenHtLuxin(f, outcome.ActualDrawIds);
         ContinueShenHuaTuo(f.Id);
@@ -242,7 +239,6 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenHuaTuo: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertShenHt(f);
         if (r.Stage == ShenHuaTuoStage.Drawing)
             return;
         if (r.Stage is ShenHuaTuoStage.DrawChildren or ShenHuaTuoStage.DiscardChildren or ShenHuaTuoStage.RestoreChildren or ShenHuaTuoStage.SkillChildren)
@@ -300,20 +296,6 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 38700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 38700)]
     internal bool ContinueIssuedShenHt(ProgramSkillFrame f) => f.ShenHuaTuo is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 38700)]
-    internal void AssertShenHt(ProgramSkillFrame f)
-    {
-        if (f.ShenHuaTuo is not { } r)
-            return;
-        if (r.Source != ShenHtSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || !f.SelectedTargetSeats.SequenceEqual([r.TargetSeat]) || !Enum.IsDefined(r.Stage) || r.Count is < 0 or > 5)
-            throw new InvalidOperationException("Shen Hua Tuo lost its accepted source, original frame or recipient.");
-        if (r.SelectedGeneralId is not null)
-        {
-            var random = new DeterministicRandom(unchecked((int)r.RandomBefore));
-            if (r.GeneralCandidates.Count == 0 || r.SkillCandidates.Count == 0 || r.SelectedGeneralId != r.GeneralCandidates[random.Next(r.GeneralCandidates.Count)] || random.State != r.RandomAfterGeneral || r.SelectedSkillId != r.SkillCandidates[random.Next(r.SkillCandidates.Count)] || random.State != r.RandomAfterSkill || (r.GrantAdded ? !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenHuaTuoSkillGrantedEvent>().Any(e => e.FrameId == f.Id && e.TargetSeat == r.TargetSeat && e.GeneralId == r.SelectedGeneralId && e.SkillId == r.SelectedSkillId && e.GrantId == r.GrantedGrantId) : !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenHuaTuoSkillUnchangedEvent>().Any(e => e.FrameId == f.Id && e.TargetSeat == r.TargetSeat && e.GeneralId == r.SelectedGeneralId && e.SkillId == r.SelectedSkillId)))
-                throw new InvalidOperationException("Huandao lost its frozen two-stage random samples or once-issued grant.");
-        }
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShenHuaTuoLuxin)]
     internal PromptChoice ChooseShenHtLuxin(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();

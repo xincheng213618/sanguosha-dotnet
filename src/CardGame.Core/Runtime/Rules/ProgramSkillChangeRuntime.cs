@@ -15,13 +15,7 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
 {
     void IProgramSkillAcquisitions.Grant(ProgramSkillFrame frame, int recipientSeat, IReadOnlyList<string> skillIds) => Grant(frame, recipientSeat, skillIds);
     SkillGrant IProgramSkillAcquisitions.GrantOwnedSource(ProgramSkillFrame frame, string sourceId, string skillId) => GrantOwnedSource(frame, sourceId, skillId);
-    internal ProgramSkillFrame Prepare(ProgramSkillFrame supplied)
-    {
-        var active = facts.ActiveFrame(supplied.Id);
-        if (active.OwnerSeat != supplied.OwnerSeat || active.SkillId != supplied.SkillId || active.SkillInstanceId != supplied.SkillInstanceId || active.GameplayHash != supplied.GameplayHash || active.ActivationId != supplied.ActivationId || active.TriggerId != supplied.TriggerId || active.InstructionIndex != supplied.InstructionIndex || active.InstructionIndex < 1 || active.WindowContext?.ParentFrameId != supplied.WindowContext?.ParentFrameId)
-            throw new InvalidOperationException("A skill change lost its exact active owner, binding, instance or instruction.");
-        return active;
-    }
+    internal ProgramSkillFrame Prepare(ProgramSkillFrame supplied) => facts.ActiveFrame(supplied.Id);
 
     internal bool TryUpgradeConversionTier(ProgramSkillFrame supplied, string state, int? expectedTier)
     {

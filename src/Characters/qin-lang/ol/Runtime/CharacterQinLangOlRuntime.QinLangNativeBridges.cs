@@ -106,18 +106,6 @@ internal sealed partial class CharacterQinLangOlRuntime
 
     internal bool HasIssuedQinLangXianyingUse(long id) => IsQinLangXianyingUse(id);
     internal bool MatchesQinLangXianyingUseAction(long id, CardActionContext a, int cardId) => cardId == 0 && IsQinLangXianyingUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && a.ActionId == issued.ActionId && a.Type == CardActionType.Use && a.EffectiveKind == issued.EffectiveKind && a.ActorSeat == issued.ActorSeat && a.ProviderSeat == issued.ProviderSeat && a.PhysicalCards.Count == 0 && a.ConversionChain.SequenceEqual(issued.ConversionChain) && a.TargetSeats.SequenceEqual(issued.TargetSeats) && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed == false;
-    internal bool IsQinLangXianyingAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (!IsQinLangXianyingUse(attack.ResolutionId) || attack.Card is not null || attack.PhysicalCards.Count != 0 || processing.Count != 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || attack.EffectiveCardKind != use.CardKind)
-            return false;
-        if (use.CardKind == CardKind.Duel)
-            return _coreNativeCardContinuationCursorsOperations.ActiveDuel is { } duel && duel.ResolutionId == use.Id && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(duel.Attack, attack) && attack.CardUserSeat == use.SourceSeat && use.TargetIndex >= 0 && use.TargetIndex < use.TargetSeats.Count && (attack.SourceSeat == use.SourceSeat && attack.TargetSeat == use.TargetSeats[use.TargetIndex] || attack.TargetSeat == use.SourceSeat && attack.SourceSeat == use.TargetSeats[use.TargetIndex]);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind == CardKind.FireAttack)
-            return attack.SourceSeat == use.SourceSeat && (use.CardKind != CardKind.FireAttack || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FireAttackResolvedEvent>().Any(e => e.ResolutionId == use.Id && e.CausedDamage && e.MatchingDiscardCardId > 0));
-        return use.CardKind is CardKind.BarbarianAssault or CardKind.ArrowBarrage && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } group && group.ResolutionId == use.Id && group.DamageSourceSeat == attack.SourceSeat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack);
-    }
-
-    internal bool IsQinLangXianyingBorrowedAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: { } child } borrowed && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(child, attack) && IsQinLangXianyingUse(borrowed.ResolutionId) && attack.Card is not null && processing.Select(c => c.Id).Order().SequenceEqual(attack.PhysicalCards.Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Processing).Select(c => c.Id).Order());
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 140)]
     internal bool FinishQinLangXianyingAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
     {

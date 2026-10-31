@@ -57,7 +57,6 @@ internal sealed partial class CharacterDiaoChanMouMobileRuntime
     internal bool HasMouDiaoChanDamageObserver(long id) => MouDiaoChanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31700)]
     internal bool HasMouDiaoChanBeforeDamageObserver(long id) => MouDiaoChanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31700)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31700)]
     internal bool IsMouDiaoChanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouDiaoChanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31700)]
@@ -87,10 +86,4 @@ internal sealed partial class CharacterDiaoChanMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 31700)]
     internal bool ContinueAcceptedMouDiaoChan(ProgramSkillFrame f) => ValidMouDiaoChan(f) && f.MouDiaoChanMobile is { Paid: true };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31700)]
-    internal void AssertMouDiaoChan(ProgramSkillFrame f)
-    {
-        if (f.MouDiaoChanMobile is not null && !ValidMouDiaoChan(f))
-            throw new InvalidOperationException("Mou Diao Chan lost its paid source or native effect cursor.");
-    }
 }

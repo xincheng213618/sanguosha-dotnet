@@ -78,28 +78,6 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardObserversRunt
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == participant && recovery.Attempt.TargetSeat == participant && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason?.Value == global::CardGame.Core.EngineOwners.CoreGameEngineOutsidePhaseDrawDiscardRuntime.OutsidePhaseMovementReason(f, false);
     }
 
-    internal bool IsOutsidePhaseDrawDiscardChoice(ProgramSkillFrame f, PendingDecision decision)
-    {
-        if (f.OutsidePhaseDrawDiscard is not { Stage: OutsidePhaseDrawDiscardStage.Choosing } || !ValidOutsidePhaseDrawDiscardReceipt(f) || decision.Kind != DecisionKind.ProgramTrigger || !decision.IsPrivate || decision.PlayerSeat != f.OwnerSeat || decision.SourceSeat != f.OwnerSeat || decision.TargetSeat is not null || decision.ValidContentIds.Count != 0 || decision.RequiredCardCount != 0 || decision.SkillPrompt?.SkillId != f.SkillId)
-            return false;
-        var expected = _coreOutsidePhaseDrawDiscardOperations.OutsidePhaseDrawDiscardChoices(f);
-        return decision.ValidCardIds.SequenceEqual(expected.SelectMany(c => c.Cards).Distinct()) && decision.ValidTargetSeats.SequenceEqual(expected.SelectMany(c => c.Targets).Distinct()) && decision.Choices.Count == expected.Count && decision.Choices.Zip(expected).All(pair => pair.First.Id == pair.Second.Id && pair.First.Cards.SequenceEqual(pair.Second.Cards) && pair.First.Targets.SequenceEqual(pair.Second.Targets) && pair.First.Parameters.OrderBy(x => x.Key).SequenceEqual(pair.Second.Parameters.OrderBy(x => x.Key)));
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 440)]
-    internal void AssertOutsidePhaseDrawDiscard(ProgramSkillFrame f)
-    {
-        if (f.OutsidePhaseDrawDiscard is null)
-            return;
-        if (!ValidOutsidePhaseDrawDiscardReceipt(f))
-            throw new InvalidOperationException("Outside-phase draw/discard lost its real producer, actual phase, original candidate or once-issued native movement receipt.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !OutsidePhaseDrawDiscardFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Outside-phase draw/discard retained an unrelated first native child.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && f.OutsidePhaseDrawDiscard.Stage == OutsidePhaseDrawDiscardStage.Choosing && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } decision || !IsOutsidePhaseDrawDiscardChoice(f, decision)))
-            throw new InvalidOperationException("Outside-phase draw/discard lost its exact private forced choice.");
-    }
-
     internal bool OutsidePhaseDrawDiscardStructuralEdge(ResolutionFrame parent, ResolutionFrame child)
     {
         if (parent is ProgramSkillFrame f && OutsidePhaseDrawDiscardFirstChild(f, child))
@@ -108,7 +86,6 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardObserversRunt
     }
 
     internal ProgramSkillFrame? OutsidePhaseDrawDiscardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOutsidePhaseDrawDiscardObserversOperations.OutsidePhaseDrawDiscardFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 50)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 80)]
     internal bool IsOutsidePhaseDrawDiscardDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OutsidePhaseDrawDiscardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1860)]

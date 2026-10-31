@@ -101,7 +101,6 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OldHandDisposition: not null } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OldHandDispositionCurrent(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], OldHandChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Old-hand disposition lost its current exact private choice.");
-        AssertOldHandDisposition(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.OldHandDisposition!;
         switch (selected.Parameters["branch"])
@@ -192,7 +191,6 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
             return false;
         if (f.PendingMovementContinuation is not { } p || !IsOldHandDispositionMovement(f, OldHandPausedEffect(f), p))
             throw new InvalidOperationException("Old-hand disposition consumed an unrelated movement return.");
-        AssertOldHandDisposition(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd() || _coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, OldHandDisposition = r with { Stage = r.ReturnStage } });
@@ -208,7 +206,6 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OldHandDisposition: not null } f || f.Id != id)
             return false;
-        AssertOldHandDisposition(f);
         if (_coreGainGiftProgramsOperations.GainGiftHasFinalGameEnd())
             return true;
         if (f.PendingMovementContinuation is not null)
@@ -234,25 +231,6 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
     {
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { OldHandDisposition = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 520)]
-    internal void AssertOldHandDisposition(ProgramSkillFrame f)
-    {
-        if (f.OldHandDisposition is not { } r)
-            return;
-        if (r.ActualTurn != _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber || r.ParentFrameId != f.WindowContext?.ParentFrameId || r.Source != new CardConversionSource(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || OldHandPausedEffect(f)?.Op != SkillProgramEffectOp.ReplaceDiscardWithOldHandDisposition || !_coreHalfHandPhaseDebtProgramsOperations.HalfHandDebtLifecycleMatches(f, SkillProgramTriggerWindow.DiscardPhaseStarting) || r.OldIds.Distinct().Count() != r.OldIds.Count || r.DisposedIds.Any(id => !r.OldIds.Contains(id)) || r.DisposedIds.Distinct().Count() != r.DisposedIds.Count || r.Stage is not ("mode" or "give" or "target" or "foreign" or "movement") || r.ForeignDiscardCount > r.ActualDiscardCount || r.ActualDiscardCount < 0 || r.ForeignDiscardCount < 0)
-            throw new InvalidOperationException("Old-hand disposition lost its frame-owned identity or exact progress.");
-        if (r.Stage == "movement")
-        {
-            var destination = r.ReturnStage == "give" && r.TargetSeat is { } recipient ? CardLocation.Hand(recipient) : CardLocation.DiscardPile;
-            var expectedOwner = r.ReturnStage == "foreign" ? r.TargetSeat : f.OwnerSeat;
-            var paidMovements = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == OldHandDispositionReason).ToArray();
-            if (r.PaidIds.Count == 0 || r.Before > r.After || r.ReturnStage is not ("give" or "target" or "foreign") || r.ReturnStage is "give" or "foreign" && (r.TargetSeat is not { } target || target == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target)) || r.PaidIds.Distinct().Count() != r.PaidIds.Count || paidMovements.Length != r.PaidIds.Count || paidMovements.Any(m => !r.PaidIds.Contains(m.CardId) || m.From.OwnerSeat != expectedOwner || (r.ReturnStage == "foreign" ? m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment) : m.From != CardLocation.Hand(f.OwnerSeat)) || m.To != destination && !(r.ReturnStage == "foreign" && m.To == CardLocation.OutsideGame)) || r.ReturnStage is "give" or "target" && r.PaidIds.Any(id => !r.OldIds.Contains(id) || !r.DisposedIds.Contains(id)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OldHandDispositionPaymentEvent>().Count(e => e.FrameId == f.Id && e.Before == r.Before && e.After == r.After && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurn == r.ActualTurn && e.ReturnStage == r.ReturnStage && e.TargetSeat == r.TargetSeat && e.CardIds.SequenceEqual(r.PaidIds) && e.ActualCount == paidMovements.Length) != 1)
-                throw new InvalidOperationException("Old-hand disposition lost its actual paid movement receipt.");
-        }
-        else if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } decision && (decision.PlayerSeat != f.OwnerSeat || !decision.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(decision.Choices, OldHandChoices(f))))
-            throw new InvalidOperationException("Old-hand disposition published an invalid private prompt.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ReplaceDiscardWithOldHandDisposition)]

@@ -34,19 +34,6 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
         return r.Op == SkillProgramEffectOp.ResolveAnniversaryDagongCheAttack && f.SkillId == ZhangFenComposition.Cart && r.CartId > 0 && IsRealDagongChe(r.CartId) && r.Source.SkillInstanceId == DagongGrant(r.CartId) && (w.Window == SkillProgramTriggerWindow.PlayPhaseStarting && r.Count is >= 1 and <= 6 && r.Stage is ZhangFenStage.Targets or ZhangFenStage.NativeUse or ZhangFenStage.NativeReturned or ZhangFenStage.Done || w.Window == SkillProgramTriggerWindow.AfterDamageApplied && w.SourceSeat == f.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) && HasBoundDagongCheDiscardOrigin(f) && r.Count is >= 1 and <= 6 && r.Stage is ZhangFenStage.DiscardChoice or ZhangFenStage.DiscardChildren or ZhangFenStage.Done);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 43500)]
-    internal void RequireZhangFen(ProgramSkillFrame f)
-    {
-        if (f.ZhangFen is not { } r)
-            return;
-        if (!ValidZhangFen(f))
-            throw new InvalidOperationException("Zhang Fen lost his original candidate, source/hash, generated cart or actual-turn receipt.");
-        if (f.PendingMovementContinuation is { } p && !ZhangFenMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
-            throw new InvalidOperationException("Zhang Fen lost a real equipment, discard or paid native draw movement.");
-        if (r.Stage is ZhangFenStage.NativeUse or ZhangFenStage.NativeReturned && (r.UseId <= f.Id || r.ActionId <= 0 || r.Targets.Count is < 1 or > 6 || r.Targets.Distinct().Count() != r.Targets.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<DagongCheSlashIssuedEvent>().Count(e => e.Origin.FrameId == f.Id && e.Origin.UseId == r.UseId && e.Origin.ActionId == r.ActionId && e.Origin.Source == r.Source && e.Origin.Hash == r.Hash && e.Origin.CartId == r.CartId) != 1))
-            throw new InvalidOperationException("The generated cart lost its exact issued native zero-material Slash.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43500)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43500)]
     internal bool ZhangFenMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
@@ -63,7 +50,6 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 43500)]
     internal bool KeepPaidZhangFen(ProgramSkillFrame f) => IsUnbegunIssuedDagongCheDamage(f) || f.ZhangFen is { Stage: ZhangFenStage.PlaceChildren or ZhangFenStage.DiscardChoice or ZhangFenStage.DiscardChildren or ZhangFenStage.Drawing or ZhangFenStage.DrawChildren or ZhangFenStage.NativeUse or ZhangFenStage.NativeReturned } && ValidZhangFen(f);
-    internal bool HasZhangFenPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, ZhangFen.Stage: ZhangFenStage.Upgrade or ZhangFenStage.Targets or ZhangFenStage.DiscardChoice } f && p.PlayerSeat == f.OwnerSeat && ValidZhangFen(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhangFenChoices(f));
     [ProgramPipelineHook(ProgramPipelinePhase.CardEntitySkillLabel, 43500)]
     internal string? DagongCheUpgradeLabel(int cardId)
     {

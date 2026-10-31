@@ -25,53 +25,6 @@ internal sealed partial class CoreGameEngineWenyiDamageHealthRuntime
     }
 
     internal bool IsWenyiDamageHealthReturn(DamageFrame damage, HpChangedTriggerWindowFrame health) => damage.WenyiHealth is { } r && r.DamageFrameId == damage.Id && r.AttackFrameId == damage.ParentFrameId && r.SourceSeat == damage.SourceSeat && r.TargetSeat == damage.TargetSeat && r.Amount == damage.Amount && r.Nature == damage.Nature && health.Continuation == PostEventContinuation.WenyiDamageHealth && health.ResumeFrameId == damage.Id && health.Change.ParentFrameId == damage.Id && health.Id == health.Change.Id && health.Id == r.HealthChangeId && health.Change.TargetSeat == r.TargetSeat && health.Change.Kind == HpChangeKind.Damage && health.Change.Amount == (damage.ArmorPayment?.ActualHpLost ?? r.Amount) && health.Change.HpBefore == (damage.ArmorPayment?.HpBefore ?? r.Amount + 1) && health.Change.HpAfter == 1 && (damage.ArmorPayment is null || damage.ArmorPayment.HpAfter == 1 && _coreDamageArmorPaymentsOperations.IsIssuedDamageArmorPayment(damage)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WenyiDamageHealthStartedEvent>().Count(e => e.Receipt == r) == 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<WenyiDamageHealthReturnedEvent>().Any(e => e.Receipt == r);
-    internal bool HasWenyiDamageHealthContinuation(long attackFrameId)
-    {
-        for (var i = 0; i + 1 < _resolutionStackOperations._resolutionStack.Count; i++)
-            if (_resolutionStackOperations._resolutionStack[i] is DamageFrame { WenyiHealth: not null } damage && damage.ParentFrameId == attackFrameId && _resolutionStackOperations._resolutionStack[i + 1] is HpChangedTriggerWindowFrame health && IsWenyiDamageHealthReturn(damage, health))
-                return true;
-        return false;
-    }
-
-    internal IReadOnlyList<Card> SeparateWenyiDamageHealthChildProcessing(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (!_characterHuanShuJunOlOperations.HasHuanShuJunCapability || processing.Count == 0)
-            return processing;
-        for (var i = 0; i + 3 < _resolutionStackOperations._resolutionStack.Count; i++)
-        {
-            // Only the suspended original attack relinquishes its child's costs.
-            // A nested attack must retain the complete ancestor set for its own
-            // specialized, paid native-use matcher to verify.
-            if (_resolutionStackOperations._resolutionStack[i] is not DamageFrame { WenyiHealth: not null } damage || damage.ParentFrameId != attack.ResolutionId || _resolutionStackOperations._resolutionStack[i + 1] is not HpChangedTriggerWindowFrame health || !IsWenyiDamageHealthReturn(damage, health) || _resolutionStackOperations._resolutionStack[i + 2] is not ProgramSkillFrame { HuanShuJun: { Op: SkillProgramEffectOp.ResolveWenyiHealthOneAid, Paid: true, Stage: HuanShuJunStage.NativeUse, NativeReturned: false, Native: { } origin } receipt } program || _resolutionStackOperations._resolutionStack[i + 3] is not CardUseFrame use || use.Id != origin.UseId || origin.ProgramFrameId != program.Id || !_characterHuanShuJunOlOperations.HuanShuJunPaidOrPreparing(program) || !_characterHuanShuJunOlOperations.WenyiHpRoot(program) || !_characterHuanShuJunOlOperations.IsIssuedWenyiUse(use) || _characterHuanShuJunOlOperations.HuanShuJunObserverRoot()?.Id != program.Id || use.Action is not { Type: CardActionType.Use } action || action.ActionId != origin.ActionId || action.ActorSeat != origin.ActorSeat || action.ProviderSeat != origin.ProviderSeat || !action.PhysicalCards.Select(c => c.CardId).SequenceEqual(receipt.Materials.Select(c => c.CardId)) || !action.ConversionChain.SequenceEqual(receipt.Sources))
-                continue;
-            var reason = origin.Kind == CardKind.Peach ? CardMoveReasons.Use : CardMoveReasons.EquipmentUse;
-            var childIds = new HashSet<int>();
-            foreach (var cost in action.PhysicalCards)
-            {
-                if (_cardZonesOperations._cardZones.GetLocation(cost.CardId) != CardLocation.Processing)
-                    continue;
-                var payment = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault(m => m.CardId == cost.CardId);
-                if (payment is null || payment.Sequence <= receipt.Before || payment.From != cost.From || payment.To != CardLocation.Processing || payment.Reason != reason || payment.CardKind != cost.CardKind || attack.PhysicalCards.Any(c => c.Id == cost.CardId))
-                    return processing;
-                childIds.Add(cost.CardId);
-            }
-
-            if (childIds.Count > 0)
-                return processing.Where(card => !childIds.Contains(card.Id)).ToArray();
-        }
-
-        return processing;
-    }
-
-    internal void AssertWenyiDamageHealth()
-    {
-        foreach (var damage in _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Where(d => d.WenyiHealth is not null))
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == damage.Id);
-            if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not HpChangedTriggerWindowFrame health || !IsWenyiDamageHealthReturn(damage, health))
-                throw new InvalidOperationException("Wenyi lost the original damage's paid health-change child.");
-        }
-    }
 
     internal void ReturnWenyiDamageHealth(HpChangedTriggerWindowFrame health)
     {

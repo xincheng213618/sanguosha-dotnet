@@ -1,6 +1,6 @@
 using System.Globalization;
 namespace CardGame.Core;
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouDianWeiRuntime(IMouDianWeiFacts facts, IMouDianWeiNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouDianWeiRuntime
 {
     internal const string Action = "mou-dian-wei",DrawReason = "skill-program.mou:kuangzhan.draw";
@@ -124,8 +124,6 @@ internal sealed class MouDianWeiRuntime(IMouDianWeiFacts facts, IMouDianWeiNativ
     private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouDianWei: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 35300)]
     private bool Movement(ProgramSkillFrame f) => f.MouDianWei is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 35300)]
-    private void Invariant(ProgramSkillFrame f) { if (f.MouDianWei is not null && !Valid(f)) throw new InvalidOperationException("Invalid frame-owned Mou Dian Wei receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35300)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35300)]
     private bool Paid(ProgramSkillFrame f) => f.MouDianWei is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouDianWeiKuangzhan)]

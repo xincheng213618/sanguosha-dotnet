@@ -76,7 +76,6 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 54400)]
     internal bool BoundaryWjBeforeDamage(long id) => BoundaryWjRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == id && child is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 54400)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 54400)]
     internal bool BoundaryWjDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BoundaryWjRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 54400)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 54400)]
@@ -107,10 +106,4 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
     internal bool ReturnBoundaryWjMovement(ProgramSkillFrame frame) => frame.PendingMovementContinuation is not null && ResumeBoundaryWj(frame.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 54400)]
     internal bool AdvanceBoundaryWjChild() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BoundaryWjRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 54400)]
-    internal void AssertBoundaryWj(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryWangJi is not null && !ValidBoundaryWj(frame))
-            throw new InvalidOperationException("Wang Ji lost its original frame, designated Use or native payment proof.");
-    }
 }

@@ -96,7 +96,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLiuChengCompletion: { } r } f || f.Id != id)
             return;
-        AssertMouLiuChengCompletion(f);
         if (r.Stage is MouLiuChengStage.NativeUse or MouLiuChengStage.NativeIssuing or MouLiuChengStage.Drawing)
             throw new InvalidOperationException("Liu Cheng cannot resume before its exact native draw or Use returns.");
         if (DrainMouLiuChengChildren(f))

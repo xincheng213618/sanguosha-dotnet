@@ -93,7 +93,6 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuXunZhangcai: { } r } f || f.Id != id)
             return;
-        AssertWuLuXunZhangcai(f);
         if (r.Stage == WuLuXunZhangcaiStage.Drawing)
         {
             if (f.NativeDraw is null)

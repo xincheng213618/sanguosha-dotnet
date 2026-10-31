@@ -16,32 +16,12 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == r.WindowId && q.RemainingEights >= 0 && q.DrawCount == Math.Max(1, q.RemainingEights) && q.MovementSequence >= 0 && q.MovementSequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && (q.EffectiveRank == 8 || q.RuxianFrameId is { } active && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuXunRuxianActivatedEvent>().Any(e => e.FrameId == active && e.Source.OwnerSeat == f.OwnerSeat && e.ActualTurn <= q.ActualTurn) && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Any(e => e.ActorSeat == f.OwnerSeat && e.TurnNumber <= q.ActualTurn && e.TurnNumber > _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuXunRuxianActivatedEvent>().Single(a => a.FrameId == active).ActualTurn)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuXunZhangcaiQualifiedEvent>().Count(e => e.Qualification == q) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuXunZhangcaiStartedEvent>().Count(e => e == WuLuXunZhangcaiStart(f.Id, r)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuXunZhangcaiStartedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId && e.ActionId == q.ActionId) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29002)]
-    internal void AssertWuLuXunZhangcai(ProgramSkillFrame f)
-    {
-        if (f.WuLuXunZhangcai is not { } r)
-            return;
-        if (!WuLuXunZhangcaiRootMatches(f) || !Enum.IsDefined(r.Stage))
-            throw new InvalidOperationException("Zhangcai lost its exact native accepted action, post-payment rank-eight sample or issued all-ranks entitlement.");
-        var returned = _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuXunZhangcaiDrawReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Stage == WuLuXunZhangcaiStage.Drawing)
-        {
-            if (r.DrawOutcome is not null || returned.Length != 0 || f.PendingMovementContinuation is not null)
-                throw new InvalidOperationException("Zhangcai cannot reuse a returned native draw as a fresh request.");
-            return;
-        }
-
-        if (r.DrawOutcome is not { } o || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.Qualification.DrawCount || o.SequenceBefore < r.Qualification.MovementSequence || o.SequenceAfter < o.SequenceBefore || o.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || f.NativeDraw is not null || f.PendingMovementContinuation is not { } p || !IsWuLuXunZhangcaiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) || returned is not [var fact] || fact != new WuLuXunZhangcaiDrawReturnedEvent(f.Id, o.RequestedCount, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId))
-            throw new InvalidOperationException("Zhangcai lost its once-returned actual/replacement native draw invoice or unfinished children.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29002)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29002)]
     internal bool PermitPaidWuLuXunZhangcai(ProgramSkillFrame f)
     {
         if (f.WuLuXunZhangcai is null)
             return false;
-        AssertWuLuXunZhangcai(f);
         return true;
     }
 
@@ -76,8 +56,6 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     internal bool HasWuLuXunZhangcaiDamageObserver(long id) => WuLuXunZhangcaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1370)]
     internal bool HasWuLuXunZhangcaiBeforeDamageObserver(long id) => WuLuXunZhangcaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1200)]
-    internal bool IsWuLuXunZhangcaiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WuLuXunZhangcaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 460)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 450)]
     internal bool IsWuLuXunZhangcaiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

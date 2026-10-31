@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDistinctFactionDiscardsEntries
 {
-    internal void AssertDistinctFactionDiscardDraft(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertDistinctFactionDiscardDraft(f, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDistinctFactionDiscards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginDistinctFactionDiscards(f);
     internal bool CanStartDistinctFactionDiscard(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().CanStartDistinctFactionDiscard(gate);
     internal void CancelDistinctFactionDiscards(global::CardGame.Core.ProgramSkillFrame f, string reason) => _resolve().CancelDistinctFactionDiscards(f, reason);

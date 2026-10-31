@@ -65,13 +65,6 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
             throw new InvalidOperationException("The native converted Slash, paid assault or Dying recipient lost its exact owner, candidate, once-paid invoice or typed return.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 100)]
-    internal void AssertRegisteredBao2025(ProgramSkillFrame frame)
-    {
-        if (frame.Bao2025 is not null)
-            RequireBao2025(frame);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40)]
     internal bool CanContinueBao2025(ProgramSkillFrame f) => f.Bao2025 is { } r && ValidBao2025(f) && (r.GainedCardId is not null || r.Stage is ProgramBao2025Stage.AssaultCostChildren or ProgramBao2025Stage.AssaultUse or ProgramBao2025Stage.AssaultOutcomes or ProgramBao2025Stage.AssaultOutcomeChildren or ProgramBao2025Stage.DyingRecipientChoice or ProgramBao2025Stage.DyingSkillChildren or ProgramBao2025Stage.DyingRecoveryChildren);
@@ -79,7 +72,6 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
     internal bool IsBaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.Bao2025 is not null && e is not null && IsBaoOperation(e.Op) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidBao2025(f);
     internal bool IsChosenAssaultUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ChosenAssault: { } ret, CardId: 0, CardKind: CardKind.BarbarianAssault, PhysicalCardIds.Count: 0, Action: { Type: CardActionType.Use, EffectiveKind: CardKind.BarbarianAssault, PhysicalCards.Count: 0, ConversionChain.Count: 0 } action } use && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == ret.ProgramFrameId)is { Bao2025: { Stage: ProgramBao2025Stage.AssaultUse } r } parent && parent.InstructionIndex == ret.InstructionIndex && r.AssaultUseId == id && r.AssaultActionId == action.ActionId && action.ProviderSeat == parent.OwnerSeat && use.SourceSeat == action.ActorSeat && action.TargetSeats.SequenceEqual(use.TargetSeats) && ValidBao2025(parent);
     internal bool MatchesChosenAssaultUseAction(long id, CardActionContext action, int cardId) => cardId == 0 && IsChosenAssaultUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action!.ActionId == action.ActionId;
-    internal bool IsChosenAssaultAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => IsChosenAssaultUse(attack.ResolutionId) && processing.Count == 0 && attack.Card is null && attack.PhysicalCards.Count == 0 && attack.EffectiveCardKind == CardKind.BarbarianAssault && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } group && group.ResolutionId == attack.ResolutionId && group.CurrentAttack?.ResolutionId == attack.ResolutionId && group.DamageSourceSeat == attack.SourceSeat;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 400)]
     internal void ObserveChosenAssaultDamage(IGameEvent payload)
     {
@@ -116,8 +108,6 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 20)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1680)]
     internal bool HasBaoDamageObserver(long id) => BaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 170)]
-    internal bool IsBaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 450)]
     internal bool TryAdvanceBaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramAiChoice(SkillProgramEffectOp.TakeConvertedSlashTargetAndResetLimitedSkill, SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes, SkillProgramEffectOp.DyingRecipientChooseReplaceOrGrantThenRecover)]
@@ -145,12 +135,5 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
     {
         var resetId = _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.Single().SourceBind!;
         return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && (p.Seat == f.OwnerSeat || global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], p))).Any(p => _coreNationalSkillsOperations.GetSkillBindingShard(p).ProgramInstances.Where(i => i.SkillId == resetId).Any(i => i.Program.Triggers.Any(t => t.UsageScope == SkillUsageScope.Game && t.UsageLimit == 1 && t.Effects is [{ Op: SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes }] && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(p.Seat, resetId, _coreProgramLifecycleOperations.ProgramTriggerUsageId(new(p.Seat, resetId, t.Id, i.SkillInstanceId, i.Program.GameplayHash, t.Priority)), SkillUsageScope.Game) > 0)));
-    }
-
-    internal void AssertChosenAssaults()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.ChosenAssault is not null))
-            if (!IsChosenAssaultUse(use.Id))
-                throw new InvalidOperationException("Chosen assault lost its exact issued native action and paid typed program parent.");
     }
 }

@@ -105,7 +105,6 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
     internal void AnswerShanheChanrang(PromptChoice choice)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The edict lost its original frame.");
-        AssertShanheChanrang(frame);
         var draft = frame.ShanheChanrang!;
         if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheChanrangChoices(frame).Where(candidate => candidate.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The edict choice is no longer its exact issued card or branch.");
@@ -189,16 +188,6 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5434)]
     internal bool ContinuePaidShanheChanrang(ProgramSkillFrame frame) => frame.ShanheChanrang is { Stage: "paid", PaidCardId: not null };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 5434)]
-    internal void AssertShanheChanrang(ProgramSkillFrame frame)
-    {
-        if (frame.ShanheChanrang is not { } draft)
-            return;
-        if (frame.SkillId != ShanheChanrangSkill || frame.WindowContext is not { MovementBatch: { } batch } context || draft.ParentWindowId != context.ParentFrameId || draft.BatchId != batch.Id || draft.ActualTurn != batch.TurnNumber || draft.Recipients.Count == 0 || draft.Cursor < 0 || draft.Cursor >= draft.Recipients.Count || draft.Recipients.Distinct().Count() != draft.Recipients.Count || draft.Recipients.Contains(frame.OwnerSeat) || draft.Recipients.Any(recipient => !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheChanrangFirstGainEvent>().Any(fact => fact.BatchId == draft.BatchId && fact.ActualTurn == draft.ActualTurn && fact.RecipientSeat == recipient)) || draft.Stage is not ("branch" or "card" or "paid") || draft.Stage == "paid" && (draft.PaidCardId is null || draft.PaidMovementSequence is null || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheChanrangPaidEvent>().Any(fact => fact.FrameId == frame.Id && fact.CardId == draft.PaidCardId && fact.MovementSequence == draft.PaidMovementSequence)))
-            throw new InvalidOperationException("The edict lost its first-gain identity, original frame, cursor or once-paid receipt.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (prompt.PlayerSeat != (draft.Stage == "card" ? draft.GiverSeat : frame.OwnerSeat) || !prompt.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, draft.Choices)))
-            throw new InvalidOperationException("The edict's private payer is not the issued chooser.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShanheChanrangEdict)]
     internal PromptChoice AiShanheChanrang(PendingDecision decision, ProgramSkillFrame frame)

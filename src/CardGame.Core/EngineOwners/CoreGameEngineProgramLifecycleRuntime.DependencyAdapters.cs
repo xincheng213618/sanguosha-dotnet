@@ -57,13 +57,6 @@ internal sealed class CoreProgramLifecycleProgramTriggerAdapter(global::System.F
     public global::CardGame.Core.ProgramTriggerRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ProgramBoundaryInvariantRuntime))]
-internal sealed class CoreProgramLifecycleProgramBoundaryInvariantAdapter(global::System.Func<global::CardGame.Core.ProgramBoundaryInvariantRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreProgramLifecycleProgramBoundaryInvariantOperations
-{
-    private readonly global::System.Func<global::CardGame.Core.ProgramBoundaryInvariantRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramBoundaryInvariantRuntime Get() => this._targetFactory();
-}
-
 [global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ProgramRandomCardAcquisitionRuntime))]
 internal sealed class CoreProgramLifecycleProgramRandomCardAcquisitionAdapter(global::System.Func<global::CardGame.Core.ProgramRandomCardAcquisitionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreProgramLifecycleProgramRandomCardAcquisitionOperations
 {

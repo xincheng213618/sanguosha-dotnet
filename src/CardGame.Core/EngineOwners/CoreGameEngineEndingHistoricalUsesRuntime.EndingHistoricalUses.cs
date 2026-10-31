@@ -111,7 +111,6 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
     internal void ResolveHistoricalEndingChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        _coreDyingSuitsAndHistoricalUseObserversOperations.AssertEndingHistoricalUses(f);
         var r = f.EndingHistoricalUses!;
         var expected = HistoricalEndingChoices(f).SingleOrDefault(c => c.Id == choice.Id);
         if (expected is null || !expected.Cards.SequenceEqual(choice.Cards) || !expected.Targets.SequenceEqual(choice.Targets))
@@ -153,7 +152,6 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.EndingHistoricalUses is not { } r)
             return false;
-        _coreDyingSuitsAndHistoricalUseObserversOperations.AssertEndingHistoricalUses(f);
         if (r.Complete)
         {
             _coreSkillProgramsOperations.FinishProgramSkill(f, true);

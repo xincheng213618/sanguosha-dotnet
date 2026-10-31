@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineWushuangOriginalSkillsEntries
 {
-    internal void AssertWushuangOriginalSkill(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWushuangOriginalSkill(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWushuangOriginalSkill(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginWushuangOriginalSkill(supplied, operation);
     internal bool ContinuePaidWushuangOriginal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidWushuangOriginal(f);
     internal bool DrainWushuangOriginal(long id) => _resolve().DrainWushuangOriginal(id);

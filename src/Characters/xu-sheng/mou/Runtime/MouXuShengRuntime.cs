@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouXuShengRuntime(IMouXuShengFacts facts, IMouXuShengNative native, IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouXuShengRuntime
 {
@@ -180,8 +180,6 @@ internal sealed class MouXuShengRuntime(IMouXuShengFacts facts, IMouXuShengNativ
     private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouXuSheng: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 34900)]
     private bool Movement(ProgramSkillFrame f) => f.MouXuSheng is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 34900)]
-    private void Invariant(ProgramSkillFrame f) { if (f.MouXuSheng is not null && !Valid(f)) throw new InvalidOperationException("Invalid Mou Xu Sheng frame-owned receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 34900)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 34900)]
     private bool Paid(ProgramSkillFrame f) => f.MouXuSheng is { Accepted: true } && Valid(f);

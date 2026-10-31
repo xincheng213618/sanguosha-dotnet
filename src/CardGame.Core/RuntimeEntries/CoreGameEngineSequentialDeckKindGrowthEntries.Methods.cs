@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineSequentialDeckKindGrowthEntries
 {
     internal global::CardGame.Core.SkillProgramStepOutcome AcquireDeckKindSequentiallyAndGrowOnShortfall(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().AcquireDeckKindSequentiallyAndGrowOnShortfall(supplied, effect);
     internal void AddSequentialDeckKindGrowthBonusAttackRangeContribution(global::CardGame.Core.CharacterState player, global::System.Collections.Generic.List<global::CardGame.Core.RuleQueryContribution> contributions) => _resolve().AddSequentialDeckKindGrowthBonusAttackRangeContribution(player, contributions);
-    internal void AssertSequentialDeckKindGrowth(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertSequentialDeckKindGrowth(frame);
     internal bool CanContinueSequentialDeckKindGrowth(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinueSequentialDeckKindGrowth(frame);
     internal bool DrainSequentialDeckKindGrowthChildren(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DrainSequentialDeckKindGrowthChildren(frame);
     internal void FinishSequentialDeckKindGrowth(global::CardGame.Core.ProgramSkillFrame frame, bool cancelled) => _resolve().FinishSequentialDeckKindGrowth(frame, cancelled);

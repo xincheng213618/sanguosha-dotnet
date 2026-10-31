@@ -38,8 +38,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     internal bool HasMoQuanyuDamageObserver(long id) => MoQuanyuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1550)]
     internal bool HasMoQuanyuBeforeDamageObserver(long id) => MoQuanyuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1380)]
-    internal bool IsMoQuanyuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MoQuanyuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 630)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 570)]
     internal bool IsMoQuanyuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

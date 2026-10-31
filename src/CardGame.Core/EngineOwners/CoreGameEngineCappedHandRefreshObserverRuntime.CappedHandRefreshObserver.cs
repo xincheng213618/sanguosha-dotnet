@@ -29,6 +29,4 @@ internal sealed partial class CoreGameEngineCappedHandRefreshObserverRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 60)]
     internal bool HasCappedHandRefreshObserver(long damageWindowId) => CappedHandRefreshObserverRoot(damageWindowId)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 350, group: 10)]
-    internal bool IsCappedHandRefreshProgramDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && CappedHandRefreshObserverRoot(damage.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(frame => frame.Id == dying.FrameId && frame.ParentFrameId == dying.ParentFrameId);
 }

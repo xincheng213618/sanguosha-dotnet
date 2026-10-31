@@ -36,7 +36,6 @@ internal sealed partial class CoreGameEngineColdDamageRuntime
     }
 
     internal global::CardGame.Core.GameEngine.IDamageAttempt ColdDamageAttack(ColdDamageReplacementFrame frame) => frame.CardAttack ? _kernelCoreMainOperations.CreateCardAttackHandle(frame.ParentFrameId) : _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(frame.ParentFrameId);
-    internal bool HasColdDamageReplacement(long attackId) => _resolutionStackOperations._resolutionStack.OfType<ColdDamageReplacementFrame>().Any(f => f.ParentFrameId == attackId);
     internal bool HasColdDamagePrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ColdDamageReplacementFrame f && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == f.SourceSeat && p.Choices.Count > 0 && p.Choices.All(c => c.Parameters.GetValueOrDefault("program-action") == "native-cold-damage" && c.Parameters.GetValueOrDefault("frame-id") == f.Id.ToString(CultureInfo.InvariantCulture));
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.BeforeOpening, 5770)]
     [NativeFrameRoute(typeof(ColdDamageReplacementFrame), 5770)]
@@ -179,19 +178,5 @@ internal sealed partial class CoreGameEngineColdDamageRuntime
         _coreNativeAiDecisionsOperations.AddThought(thought);
         selected = decision.Choices.Single(c => c.Id == id);
         return true;
-    }
-
-    internal void AssertColdDamageReplacementFrames()
-    {
-        foreach (var frame in _resolutionStackOperations._resolutionStack.OfType<ColdDamageReplacementFrame>())
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-            var attack = ColdDamageAttack(frame);
-            var attempted = frame.CardAttack ? _coreCardAttackStateOperations.GetCardAttackState(frame.ParentFrameId).ColdDamageReplacementAttempted : _coreProgramAttackAttemptOperations.GetProgramAttackState(frame.ParentFrameId).ColdDamageReplacementAttempted;
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != frame.ParentFrameId || !attempted || attack.SourceSeat != frame.SourceSeat || attack.TargetSeat != frame.TargetSeat || attack.IsChainPropagation || attack.DamageRedirected || _coreNativeCardClassificationsOperations.GetDamageNature(attack) != DamageNature.Cold || frame.Amount <= 0 || frame.Amount != attack.DamageAmount || frame.Activated && !frame.ChoiceMade || frame.Discards.Count > 2 || frame.Discards.Count > 0 && !frame.Activated || frame.Discards.Select(d => d.CardId).Distinct().Count() != frame.Discards.Count || frame.Discards.Where((d, i) => d.FrameId != frame.Id || d.Ordinal != i + 1 || d.From.OwnerSeat != frame.TargetSeat || d.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == d.MovementSequence && m.CardId == d.CardId && m.From == d.From && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineColdDamageDefinitions.ColdDamageDiscardReason && m.To.Zone is CardZoneKind.DiscardPile or CardZoneKind.OutsideGame)).Any() || frame.LogicalDiscard is { } draft && (draft.ParentFrameId != frame.Id || draft.InitiatorSeat != frame.SourceSeat || draft.ExecutorSeat != frame.SourceSeat || draft.Reason != global::CardGame.Core.EngineOwners.CoreGameEngineColdDamageDefinitions.ColdDamageDiscardReason || !draft.Materials.Select(m => m.CardId).SequenceEqual(frame.Discards.Select(d => d.CardId))))
-                throw new InvalidOperationException("Cold replacement lost its direct attack, paid entity prefix or typed parent.");
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null && !HasColdDamagePrompt())
-                throw new InvalidOperationException("Cold replacement lost its source-only pending choice.");
-        }
     }
 }

@@ -3,8 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterWuAnGuoOlEntries
 {
     internal bool AdvanceWuAnGuoSubtree() => _resolve().AdvanceWuAnGuoSubtree();
-    internal void AssertWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWuAnGuoLiyong(f);
-    internal void AssertWuAnGuoLiyongNativeUses(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertWuAnGuoLiyongNativeUses(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginWuAnGuoLiyong(input);
     internal void BeginWuAnGuoLiyongDuel(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.WuAnGuoLiyongDuelOrigin origin) => _resolve().BeginWuAnGuoLiyongDuel(frame, origin);
     internal bool CanActivateWuAnGuoLiyong(global::CardGame.Core.CharacterState owner) => _resolve().CanActivateWuAnGuoLiyong(owner);
@@ -15,8 +13,6 @@ internal sealed partial class CharacterWuAnGuoOlEntries
     internal bool HasWuAnGuoBeforeDamageObserver(long id) => _resolve().HasWuAnGuoBeforeDamageObserver(id);
     internal bool HasWuAnGuoDamageObserver(long id) => _resolve().HasWuAnGuoDamageObserver(id);
     internal bool HasWuAnGuoLiyongCompletedUseParent(long useId) => _resolve().HasWuAnGuoLiyongCompletedUseParent(useId);
-    internal bool IsWuAnGuoDying() => _resolve().IsWuAnGuoDying();
-    internal bool IsWuAnGuoLiyongAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsWuAnGuoLiyongAttackConsistent(attack, processing);
     internal bool IsWuAnGuoLiyongDuelUse(long id) => _resolve().IsWuAnGuoLiyongDuelUse(id);
     internal bool IsWuAnGuoYangConversionAvailable(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource source, bool forResponse) => _resolve().IsWuAnGuoYangConversionAvailable(owner, card, source, forResponse);
     internal bool MatchesWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.WuAnGuoLiyongDuelOrigin origin) => _resolve().MatchesWuAnGuoLiyong(f, origin);

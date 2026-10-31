@@ -73,7 +73,6 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
     }
 
     internal long? JueshengDuelProgramParent(long id) => IsJueshengDuelUse(id) ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.JueshengDuel!.ProgramFrameId : null;
-    internal bool IsJueshengDuelAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => IsJueshengDuelUse(attack.ResolutionId) && attack.Card is null && attack.PhysicalCards.Count == 0 && processing.Count == 0 && attack.EffectiveCardKind == CardKind.Duel && attack.ProgramSkillCardUseFrameId == _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!.JueshengDuel!.ProgramFrameId;
     [NativeUseValidation(27350)]
     internal void ValidateJueshengNative(CardUseFrame use)
     {
@@ -125,7 +124,6 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Juesheng: { } r } f || f.Id != id)
             return;
-        AssertJuesheng(f);
         if (r.Stage != JueshengStage.GrantChildren)
             return;
         while (true)
@@ -195,7 +193,6 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
     {
         if (f.Juesheng is null)
             return false;
-        AssertJuesheng(f);
         return true;
     }
 }

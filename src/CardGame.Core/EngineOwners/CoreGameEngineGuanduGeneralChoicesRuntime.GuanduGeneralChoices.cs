@@ -52,7 +52,6 @@ internal sealed partial class CoreGameEngineGuanduGeneralChoicesRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanduGeneral: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Activity choice lost its exact published prompt.");
-        _coreGuanduGeneralsOperations.AssertGuanduGeneral(f);
         var option = choice.Parameters["option"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == "shicai-cost")

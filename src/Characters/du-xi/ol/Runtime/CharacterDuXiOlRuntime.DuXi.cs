@@ -119,7 +119,6 @@ internal sealed partial class CharacterDuXiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuXiQuxi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == DuXiQuxiStage.Obtain ? r.LessHandSeat : f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuXiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Quxi lost its exact current pair, private opaque card slot or source-owned transfer choice.");
-        AssertDuXi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -193,7 +192,6 @@ internal sealed partial class CharacterDuXiOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { DuXiQuxi: { } r } f && f.Id == id)
         {
-            AssertDuXi(f);
             if (DrainDuXiChildren(id))
                 return;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

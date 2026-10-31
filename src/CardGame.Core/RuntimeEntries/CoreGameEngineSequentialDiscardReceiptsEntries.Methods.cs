@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSequentialDiscardReceiptsEntries
 {
-    internal void AssertSequentialDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSequentialDiscard(f);
     internal global::CardGame.Core.ProgramSkillFrame FreezeSequentialDiscardTopPayment(global::CardGame.Core.ProgramSkillFrame f, string bind, string? except, global::CardGame.Core.SkillProgramCardDestination destination) => _resolve().FreezeSequentialDiscardTopPayment(f, bind, except, destination);
     internal bool HasSequentialDiscardTopPayment(global::CardGame.Core.ProgramSkillFrame f, string bind) => _resolve().HasSequentialDiscardTopPayment(f, bind);
     internal bool ValidSequentialDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidSequentialDiscard(f);

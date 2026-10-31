@@ -19,5 +19,4 @@ internal sealed partial class CoreGameEngineNativeDrawAttemptsRuntime
     internal void ReturnNativeDrawAttemptWindow(ProgramLifecycleTriggerWindowFrame window) => NativeDrawAttempts.ReturnNativeDrawAttemptWindow(window);
     internal void ContinueNativeDrawAttempt(long id) => NativeDrawAttempts.ContinueNativeDrawAttempt(id);
     internal static bool NativeDrawAttemptRidesOn(ResolutionFrame child, ResolutionFrame parent) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(child, parent);
-    internal void AssertNativeDrawAttempts() => NativeDrawAttempts.AssertNativeDrawAttempts();
 }

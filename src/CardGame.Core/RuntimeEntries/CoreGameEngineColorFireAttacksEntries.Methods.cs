@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineColorFireAttacksEntries
 {
-    internal void AssertColorFireAttackReceipts() => _resolve().AssertColorFireAttackReceipts();
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> ColorFireAttackCosts(global::CardGame.Core.CardUseFrame pending) => _resolve().ColorFireAttackCosts(pending);
     internal void CompleteColorFireAttackWithoutDamage(global::CardGame.Core.CardUseFrame pending, bool publishFailure = true) => _resolve().CompleteColorFireAttackWithoutDamage(pending, publishFailure);
     internal void ContinueColorFireAttackPayment(long useId) => _resolve().ContinueColorFireAttackPayment(useId);

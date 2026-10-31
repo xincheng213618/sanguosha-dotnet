@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOverflowTargetCancellationObserversEntries
 {
-    internal void AssertOverflowTargetCancellation(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertOverflowTargetCancellation(frame);
     internal bool HasOverflowAcceptedPrefix(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.OverflowUseTargetsCanceledEvent fact, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.IGameEvent> history, int boundary) => _resolve().HasOverflowAcceptedPrefix(use, fact, history, boundary);
     internal bool HasOverflowTargetCancellationBeforeDamageObserver(long id) => _resolve().HasOverflowTargetCancellationBeforeDamageObserver(id);
     internal bool HasOverflowTargetCancellationDamageObserver(long id) => _resolve().HasOverflowTargetCancellationDamageObserver(id);

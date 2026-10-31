@@ -8,7 +8,6 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodEntries
     internal int AnniversaryZjRank(int owner, global::CardGame.Core.ProgramSkillWindowContext? context) => _resolve().AnniversaryZjRank(owner, context);
     internal bool AnniversaryZjTurnShuffled() => _resolve().AnniversaryZjTurnShuffled();
     internal void AnswerAnniversaryTianjie(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerAnniversaryTianjie(choice);
-    internal void AssertAnniversaryZj(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertAnniversaryZj(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAnniversaryZj(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect e) => _resolve().BeginAnniversaryZj(supplied, e);
     internal bool CanTriggerAnniversaryZj(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanTriggerAnniversaryZj(g);
     internal global::CardGame.Core.PromptChoice ChooseAnniversaryTianjie(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseAnniversaryTianjie(p, f);
@@ -17,7 +16,6 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodEntries
     internal bool DrainAnniversaryZj(long id) => _resolve().DrainAnniversaryZj(id);
     internal void FinishAnniversaryZj(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishAnniversaryZj(f);
     internal bool HasAnniversaryTianjieDeadOwnerEnding(int actualOwner) => _resolve().HasAnniversaryTianjieDeadOwnerEnding(actualOwner);
-    internal bool HasHappySijunDrawPilePayment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.AnniversaryZhangJiaoReceipt r) => _resolve().HasHappySijunDrawPilePayment(f, r);
     internal bool IsAnniversaryTianjieDeadOwnerEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, int actualOwner) => _resolve().IsAnniversaryTianjieDeadOwnerEndingCandidate(candidate, actualOwner);
     internal void ObtainAnniversaryZjCards(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ObtainAnniversaryZjCards(supplied);
     internal bool ProveIsAnniversaryTianjieDeadOwnerEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().ProveIsAnniversaryTianjieDeadOwnerEndingCandidate(candidate);

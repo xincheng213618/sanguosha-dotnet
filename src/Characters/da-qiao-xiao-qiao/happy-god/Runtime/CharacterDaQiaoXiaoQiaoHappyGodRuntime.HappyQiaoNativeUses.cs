@@ -110,7 +110,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
     internal static bool SameHappyQiaoPlan(HappyQiaoPlan first, HappyQiaoPlan second) => JsonSerializer.Serialize(first) == JsonSerializer.Serialize(second);
     internal void IssueHappyQiaoShutuUse(ProgramSkillFrame frame)
     {
-        RequireHappyQiaoSkill(frame);
         if (frame.HappyQiao is not { Stage: HappyQiaoStage.IssuingUse, Native: { UseId: 0, ActionId: 0 } native } receipt)
             throw new InvalidOperationException("Shutu lost its accepted original native Use intent.");
         var actor = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
@@ -205,7 +204,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { HappyQiao: { Stage: HappyQiaoStage.IssuingUse, Native: { UseId: 0, ActionId: 0 } native } receipt } frame)
             return;
-        RequireHappyQiaoSkill(frame);
         var expectedTargets = HappyQiaoExpectedUseTargets(native);
         if (action.ActorSeat != frame.OwnerSeat || action.ProviderSeat != frame.OwnerSeat || action.RequesterSeat is not null || use.SourceSeat != frame.OwnerSeat || use.CardKind != native.Plan.Kind || !action.PhysicalCards.Select(c => c.CardId).Order().SequenceEqual(native.Plan.Cards.Order()) || action.PhysicalCards.Any(c => !native.Costs.Any(cost => cost.CardId == c.CardId && cost.CardKind == c.CardKind && cost.From == c.From)) || !(use.PhysicalCardIds ?? []).Order().SequenceEqual(native.Plan.Cards.Order()) || !use.TargetSeats.SequenceEqual(expectedTargets) || !action.ConversionChain.SequenceEqual((native.Plan.Action.ConversionSource is { } source ? new[] { source } : []).Concat(native.Plan.Action.AdditionalConversionSources ?? [])))
             throw new InvalidOperationException("Shutu changed its actual actor, original owned materials, accepted conversion or native targets.");

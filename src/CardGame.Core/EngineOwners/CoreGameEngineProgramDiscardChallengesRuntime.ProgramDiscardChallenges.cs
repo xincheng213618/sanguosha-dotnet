@@ -7,16 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramDiscardChallengesRuntime
 {
-    internal void ValidateProgramDiscardChallengeState(ProgramSkillFrame frame)
-    {
-        if (frame.DiscardChallenge is not { } draft)
-            return;
-        var paused = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (draft.Mode == "category" && paused.Op != SkillProgramEffectOp.ChooseCategoryAlternativeDiscard || draft.Mode == "escalating" && paused.Op != SkillProgramEffectOp.EscalatingDiscardOrDamage || draft.Mode is not ("category" or "escalating") || draft.ChooserSeat < 0 || draft.ChooserSeat >= _coreMatchDefinitionPlayerCountAccess._playerCount || draft.Cursor < 0 || draft.Cursor > _coreMatchDefinitionPlayerCountAccess._playerCount - 1 || draft.PreviousCount < 0 || draft.Remaining < -1 || draft.SelectedIds.Count != draft.SelectedIds.Distinct().Count() || draft.Mode == "category" && draft.SelectedIds.Count != 0 || draft.Mode == "escalating" && draft.SelectedIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id).OwnerSeat != draft.ChooserSeat || !paused.Zones.Contains(_cardZonesOperations._cardZones.GetLocation(id).Zone)) || draft.Mode == "category" && (draft.Remaining > paused.MinimumValue || draft.Remaining >= 0 && !draft.ComplementOnly && draft.Remaining != 0) || frame.PendingMovementContinuation is { } movement && (movement.SubjectSeat != draft.ChooserSeat || movement.CoverageResultBind is not null || !frame.ReexecuteParticipantInstruction || draft.SelectedIds.Count != 0))
-            throw new InvalidOperationException("Invalid serialized discard challenge state.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && frame.PendingMovementContinuation is null && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != draft.ChooserSeat || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") != "discard-challenge")))
-            throw new InvalidOperationException("A discard challenge must retain its chooser's private prompt.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ChooseCategoryAlternativeDiscard, SkillProgramEffectOp.EscalatingDiscardOrDamage)]
     internal PromptChoice SelectAiProgramDiscardChallenge(PendingDecision decision, ProgramSkillFrame frame)

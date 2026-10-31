@@ -19,7 +19,6 @@ internal sealed partial class CharacterLiuBeiSpOl664Entries
     internal global::CardGame.Core.SkillProgramStepOutcome GrantOlSpXudai(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().GrantOlSpXudai(frame);
     internal bool HasOlSpZhujiu(int seat) => _resolve().HasOlSpZhujiu(seat);
     internal bool IsOlSpJingleiMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsOlSpJingleiMovement(frame, effect, movement);
-    internal bool IsOlSpZhujiuDyingRide(int index, global::CardGame.Core.DyingFrame dying) => _resolve().IsOlSpZhujiuDyingRide(index, dying);
     internal int OlSpAlcoholCount(int owner) => _resolve().OlSpAlcoholCount(owner);
     internal global::CardGame.Core.Card[] OlSpBrewMaterials(int owner) => _resolve().OlSpBrewMaterials(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> OlSpLiuBeiChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().OlSpLiuBeiChoices(frame);

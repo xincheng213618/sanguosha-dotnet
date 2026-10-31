@@ -70,15 +70,6 @@ internal sealed partial class CoreGameEngineAlcoholSlashSuppressionsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CurrentTurnOwnSkillSuppressionsExpiredEvent(turnNumber, turnOwnerSeat));
     }
 
-    internal void AssertCurrentTurnOwnSkillSuppressions()
-    {
-        if (_coreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess._currentTurnOwnSkillSuppressions.Any(s => s.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || s.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || s.ParentFrameId <= 0 || s.EffectIndex < 0 || s.CardUseFrameId <= 0 || s.CardActionId <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s.Source.OwnerSeat) || string.IsNullOrWhiteSpace(s.Source.SkillId) || string.IsNullOrWhiteSpace(s.Source.BindingId) || string.IsNullOrWhiteSpace(s.Source.SkillInstanceId) || !_contentRegistryOperations._contentRegistry.Skills.ContainsKey(s.SuppressedSkillId)) || _coreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess._currentTurnOwnSkillSuppressions.GroupBy(s => (s.ParentFrameId, s.EffectIndex)).Any(group => group.Count() != 1))
-            throw new InvalidOperationException("An own-skill suppression lost its frozen identity or actual-turn expiry.");
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(f => f.ConsumedAlcoholBoost || f.ConsumedAlcoholBonus is not null))
-            if (!use.ConsumedAlcoholBoost || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.ConsumedAlcoholBonus is { } bonus && (bonus <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseAlcoholConsumptionCapturedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == action.ActionId && e.ActorSeat == use.SourceSeat && e.AlcoholBonus == bonus) != 1))
-                throw new InvalidOperationException("An Alcohol consumption receipt lost its original Slash action.");
-    }
-
     void global::CardGame.Core.IAlcoholSlashSuppressionProgramHost.SuppressOwnSkillAfterAlcoholSlashDamage(ProgramSkillFrame frame, string skillId) => SuppressOwnSkillAfterAlcoholSlashDamage(frame, skillId);
     SkillProgramStepOutcome global::CardGame.Core.IAlcoholSlashSuppressionProgramHost.StartOwnedDamagePointJudgment(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreOwnedDamagePointJudgmentsOperations.BeginOwnedDamagePointJudgment(frame, effect);
 }

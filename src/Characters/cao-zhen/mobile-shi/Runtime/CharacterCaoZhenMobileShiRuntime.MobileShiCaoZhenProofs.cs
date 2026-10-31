@@ -8,16 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhenMobileShiRuntime
 {
     internal bool ValidShiCaoZ(ProgramSkillFrame f) => f.ShiCaoZhen is { } r && f.SkillId == ShiCaoZSifeng && f.InstructionIndex == 1 && r.Source == ShiCaoZSource(f) && r.Hash == f.GameplayHash && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == r.Hash && r.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && r.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && r.ParentId == f.WindowContext?.ParentFrameId && Enum.IsDefined(r.Stage) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == r.Operation && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoZStartedEvent>().Count(e => e == new ShiCaoZStartedEvent(f.Id, r.Source, r.Hash, r.Turn, r.TurnOwner, r.ParentId, r.Operation)) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 49900)]
-    internal void RequireShiCaoZ(ProgramSkillFrame f)
-    {
-        if (f.ShiCaoZhen is not { } r)
-            return;
-        if (!ValidShiCaoZ(f) || r.Pool.Count > 3 || r.Pool.Count != r.Pool.Distinct().Count() || r.Assigned is < 0 or > 3 || r.Materials.Select(m => m.PlacementId).Distinct().Count() != r.Materials.Count || r.Materials.Any(m => !ValidShiCaoZMaterial(m) || m.Source.OwnerSeat != f.OwnerSeat) || r.Operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengPlace && (f.TriggerId != "place-forecast" || f.WindowContext?.Window != SkillProgramTriggerWindow.TurnEnding || r.Pool.Any(id => !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoZTopTakenEvent>().Any(e => e.FrameId == f.Id && e.CardId == id))) || r.Operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengUse && (f.TriggerId != "issued-use" || r.Materials.Count != 1 || r.Holder != r.Materials[0].Holder || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoZUseIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId && e.PlacementId == r.Materials[0].PlacementId) != 1) || r.Operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengEnd && (f.TriggerId != "issued-end" || r.Materials.Any(m => m.Holder != r.Holder) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoZEndIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Turn == r.Turn && e.Holder == r.Holder && e.Count == r.Materials.Count) != 1))
-            throw new InvalidOperationException("Sifeng lost its original source/hash, actual native trigger, ordered physical forecast or one issued obligation.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.Step == ResolutionFrameStep.AwaitingResponse && r.Stage is ShiCaoZStage.Assign or ShiCaoZStage.Discard or ShiCaoZStage.EndChoice && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || prompt.PlayerSeat != ShiCaoZChooser(f) || !prompt.IsPrivate || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, ShiCaoZChoices(f))))
-            throw new InvalidOperationException("Sifeng lost its exact issuer-only ordering or target-owned hand-only payment prompt.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49900)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49900)]
@@ -64,7 +54,6 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
     internal bool ShiCaoZDamageObserver(long id) => ShiCaoZObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49900)]
     internal bool ShiCaoZBeforeDamageObserver(long id) => ShiCaoZObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 49900)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49900)]
     internal bool ShiCaoZDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShiCaoZObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49900)]

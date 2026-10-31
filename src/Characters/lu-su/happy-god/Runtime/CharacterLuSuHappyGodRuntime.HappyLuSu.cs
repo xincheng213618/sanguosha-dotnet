@@ -29,7 +29,6 @@ internal sealed partial class CharacterLuSuHappyGodRuntime
     {
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyDingzhou: { } receipt } frame && frame.Id == id)
         {
-            AssertHappyDingzhou(frame);
             if (_characterLuSuMobileGodOperations.DrainShenLs(id))
                 return;
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

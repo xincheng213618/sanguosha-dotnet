@@ -32,8 +32,6 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     {
         if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.MoLuBuOpening is not { PlayStarted: false } r)
             return false;
-        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.NormalResumeSeat != r.NormalSeat || owner.Seat != r.Source.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != owner.Seat || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber)
-            throw new InvalidOperationException("Duoqi lost its exact opening actual-turn owner and first-seat return.");
         _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression with
         {
             MoLuBuOpening = r with

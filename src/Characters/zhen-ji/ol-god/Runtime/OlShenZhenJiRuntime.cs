@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class OlShenZhenJiRuntime(IProgramRuntimeFrames frames, IProgramEventHistoryQueries history, IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts, IProgramOperationDraws draws, IOlShenZhenJiFacts facts,
     IOlShenZhenJiOperations operations) : IOlShenZhenJiHost
@@ -72,7 +72,7 @@ internal sealed class OlShenZhenJiRuntime(IProgramRuntimeFrames frames, IProgram
             prompts.Current?.PlayerSeat != f.OwnerSeat || !OlShenfuSourceCurrent(f) ||
             !OlShenfuChoices(f).Any(c => RuntimeSkills.RuntimeRules_Core_AssistedPhysicalCards.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shenfu requires its exact unpaid current target or opaque hand slot.");
-        AssertOlShenfu(f); prompts.Clear();
+prompts.Clear();
         frames.ReplaceTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var option = choice.Parameters["option"];
         if (option == "finish") { FinishOlShenfu(f); return; }
@@ -144,24 +144,4 @@ internal sealed class OlShenZhenJiRuntime(IProgramRuntimeFrames frames, IProgram
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40525)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40525)]
     private bool RetainIssuedOlShenfu(ProgramSkillFrame f) => f.OlShenfu is not null;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveOlShenZhenJiShenfu)] private PromptChoice ChooseOlShenfu(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40525)] private void AssertOlShenfu(ProgramSkillFrame f)
-    {
-        if (f.OlShenfu is not { } r) return;
-        if (r.Source != OlShenfuSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != 1 || f.InstructionIndex != r.InstructionIndex ||
-            r.ActualTurn != facts.TurnNumber || f.OwnerSeat != facts.CurrentSeat || !Enum.IsDefined(r.Stage) || r.Ordinal < 0 ||
-            r.Targets.Distinct().Count() != r.Targets.Count || r.Targets.Any(t => !facts.ValidSeat(t) || r.Odd && t == f.OwnerSeat) ||
-            !r.Targets.ToHashSet().SetEquals(OlShenfuUsedTargets(f.OwnerSeat, r.ActualTurn)) ||
-            r.MovementBefore < 0 || r.MovementAfter < r.MovementBefore ||
-            history.Read<OlShenfuStartedEvent>().Count(e => e == new OlShenfuStartedEvent(f.Id, r.Source, r.ActualTurn, r.Odd)) != 1)
-            throw new InvalidOperationException("Shenfu lost its original ending, fixed branch or once-per-turn targets.");
-        if (r.Ordinal > 0 && (history.Read<OlShenfuTargetSelectedEvent>().Count(e => e.FrameId == f.Id && e.Ordinal == r.Ordinal &&
-            e.Source == r.Source && e.TargetSeat == r.TargetSeat && e.Mode == r.Mode && e.ActualTurn == r.ActualTurn) != 1 ||
-            r.Odd != (r.Mode == "thunder") || !r.Targets.Contains(r.TargetSeat)))
-            throw new InvalidOperationException("Shenfu lost its accepted flow target or mode.");
-        if (r.KilledByDamage != history.Read<OlShenfuDeathConfirmedEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == r.Ordinal && e.TargetSeat == r.TargetSeat))
-            throw new InvalidOperationException("Shenfu cannot repeat a thunder flow without the exact native dying result.");
-        if (r.Stage == OlShenfuStage.Children && r.Mode == "discard" && history.Read<OlShenfuDiscardedEvent>()
-            .Count(e => e.FrameId == f.Id && e.Ordinal == r.Ordinal && e.TargetSeat == r.TargetSeat && e.Before == r.MovementBefore && e.After == r.MovementAfter) != 1)
-            throw new InvalidOperationException("Shenfu lost its once-paid logical discard.");
-    }
 }

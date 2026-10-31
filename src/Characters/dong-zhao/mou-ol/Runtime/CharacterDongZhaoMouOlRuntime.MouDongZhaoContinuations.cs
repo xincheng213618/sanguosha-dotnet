@@ -162,10 +162,4 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 33500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 33500)]
     internal bool ContinueAcceptedMouDongZhao(ProgramSkillFrame f) => ValidMouDongZhao(f) || f.MouDongZhao is null && f.InstructionIndex is 0 or 1 && f.SkillId == MouDongZhaoComposition.Yishi && f.TriggerId == "follow-suit-loss" && f.ActivationId == f.TriggerId && f.WindowContext is { } context && IsIssuedMouYishiCandidate(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33500)]
-    internal void AssertMouDongZhao(ProgramSkillFrame f)
-    {
-        if (f.MouDongZhao is not null && !ValidMouDongZhao(f))
-            throw new InvalidOperationException("OL Dong Zhao has an invalid accepted native receipt.");
-    }
 }

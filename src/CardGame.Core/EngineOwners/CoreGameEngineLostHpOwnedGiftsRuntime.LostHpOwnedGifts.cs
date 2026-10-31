@@ -233,10 +233,4 @@ internal sealed partial class CoreGameEngineLostHpOwnedGiftsRuntime
 
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 500)]
     internal bool IsLostHpOwnedGiftProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && LostHpOwnedGiftObserverRoot()is not null;
-    internal void AssertLostHpOwnedGifts()
-    {
-        foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.LostHpOwnedGift is not null))
-            if (!IsValidLostHpOwnedGift(root) || LostHpOwnedGiftObserverRoot()?.Id != root.Id)
-                throw new InvalidOperationException("A lost-HP owned gift lost its exact actual Ending/draw/payment subtree.");
-    }
 }

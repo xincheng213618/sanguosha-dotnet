@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftEntries
 {
-    internal void AssertNamedDefenseAndPublicDraft(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertNamedDefenseAndPublicDraft(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLowHandPublicDraft(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginLowHandPublicDraft(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginNamedTargetDefense(global::CardGame.Core.ProgramSkillFrame frame, string ledgerId, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind> names) => _resolve().BeginNamedTargetDefense(frame, ledgerId, names);
     internal void ContinuePublicHandDraft(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ContinuePublicHandDraft(frame);

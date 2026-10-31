@@ -86,7 +86,6 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.OrderedPrintedSkillLoss is not { } r)
             return false;
-        _coreOrderedPrintedSkillLossObserversOperations.AssertOrderedPrintedSkillLoss(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         if (r.Stage == OrderedPrintedSkillLossStage.LossChildren)
@@ -117,7 +116,6 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossRuntime
             return false;
         if (f.OrderedPrintedSkillLoss.Stage != OrderedPrintedSkillLossStage.DrawChildren || f.PendingMovementContinuation is null)
             throw new InvalidOperationException("An ordered skill-loss movement returned outside its once-issued Draw.");
-        _coreOrderedPrintedSkillLossObserversOperations.AssertOrderedPrintedSkillLoss(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

@@ -22,15 +22,6 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessReturnsRuntime
         return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessRequestedOwnerDamagedEvent>().Any(fact => fact.ProgramFrameId == parent.Id && fact.NativeUseId == receipt.NativeUseId && fact.NativeActionId == receipt.NativeActionId && fact.TargetSeat == parent.OwnerSeat && fact.Amount > 0);
     }
 
-    internal bool IsRoundOnceCardlessProgramRequestAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { RoundOnceCardlessProgramRequest: { } receipt } use || attack.Card is not null || attack.PhysicalCards.Count != 0 || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == receipt.ProgramFrameId)is not ProgramSkillFrame parent || !_coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramRequestRidesOn(use, parent) || attack.EffectiveCardKind != use.CardKind || attack.SourceSeat != use.SourceSeat || attack.ProgramSkillCardUseFrameId != parent.Id)
-            return false;
-        var parentIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == parent.Id);
-        var outerCards = _resolutionStackOperations._resolutionStack.Take(parentIndex).OfType<CardUseFrame>().SelectMany(frame => frame.PhysicalCardIds ?? []).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Distinct().Order().ToArray();
-        return processing.Select(card => card.Id).Order().SequenceEqual(outerCards);
-    }
-
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 100)]
     internal bool FinishRoundOnceCardlessAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
     {

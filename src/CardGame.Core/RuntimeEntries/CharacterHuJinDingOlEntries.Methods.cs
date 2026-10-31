@@ -5,7 +5,6 @@ internal sealed partial class CharacterHuJinDingOlEntries
     internal bool AdvanceHuJinDingSubtree() => _resolve().AdvanceHuJinDingSubtree();
     internal global::CardGame.Core.PromptChoice AiQingyuan(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiQingyuan(prompt, f);
     internal void AnswerQingyuanPartner(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerQingyuanPartner(choice);
-    internal void AssertHuJinDing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHuJinDing(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginQingyuan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginQingyuan(supplied, op);
     internal bool CanOfferHuJinDing(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferHuJinDing(c, t, context);
     internal void CaptureQingyuanGainBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureQingyuanGainBatch(batch);
@@ -22,7 +21,6 @@ internal sealed partial class CharacterHuJinDingOlEntries
     internal bool HasZhongshenCardMark(int cardId) => _resolve().HasZhongshenCardMark(cardId);
     internal bool HuJinDingFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HuJinDingFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? HuJinDingObserverRoot() => _resolve().HuJinDingObserverRoot();
-    internal bool IsHuJinDingDying() => _resolve().IsHuJinDingDying();
     internal bool IsHuJinDingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsHuJinDingMovement(f, effect, pending);
     internal bool IsHuJinDingRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsHuJinDingRecoveryParent(f, recovery);
     internal bool IsLiveQingyuanPartner(global::CardGame.Core.QingyuanPartnerSelectedEvent p) => _resolve().IsLiveQingyuanPartner(p);

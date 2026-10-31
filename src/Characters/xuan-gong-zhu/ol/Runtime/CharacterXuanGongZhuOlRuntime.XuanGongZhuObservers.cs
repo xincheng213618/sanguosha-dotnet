@@ -7,31 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuanGongZhuOlRuntime
 {
-    internal void RequireIssuedXuanGongZhu(ProgramSkillFrame f)
-    {
-        if (f.GaolingRecovery is not null && !_coreIdentityConcealmentOperations.ValidGaolingRecovery(f))
-            throw new InvalidOperationException("Gaoling lost its exact actual appearance and selected recovery invoice.");
-        if (f.QimeiDraw is not null)
-            _coreQimeiProgramsOperations.RequireQimeiDraw(f);
-        if (f.ZhuijiInitialPaid is null && f.ZhuijiDebt is null)
-            return;
-        if (!_coreZhuijiProgramsOperations.ValidZhuijiIssued(f))
-            throw new InvalidOperationException("Zhuiji lost its actual source, phase and unique issued grant.");
-        if (f.ZhuijiDebt is not { } r)
-            return;
-        var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhuijiPlayDebtConsumedEvent>().Where(e => e.Grant == r.Grant).ToArray();
-        if (!Enum.IsDefined(r.Stage) || r.Stage == ZhuijiDebtStage.ChoosingDiscard && facts.Length != 0 || r.Stage != ZhuijiDebtStage.ChoosingDiscard && (facts is not [var paid] || paid.ProgramFrameId != f.Id || !paid.Paid))
-            throw new InvalidOperationException("Zhuiji debt lost its exact once-paid ending invoice.");
-        if (r.Stage == ZhuijiDebtStage.DiscardChildren && !_coreZhuijiProgramsOperations.IsZhuijiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), new(f.OwnerSeat, 0, null)))
-            throw new InvalidOperationException("Zhuiji ending discard lost its actual native physical movements.");
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 430)]
-    internal void AssertRegisteredIssuedXuanGongZhu(ProgramSkillFrame frame)
-    {
-        if (frame.ZhuijiInitialPaid is not null || frame.ZhuijiDebt is not null || frame.GaolingRecovery is not null)
-            RequireIssuedXuanGongZhu(frame);
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 370)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 370)]
@@ -67,8 +42,6 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1550)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1660)]
     internal bool HasXuanGongZhuDamageObserver(long id) => XuanGongZhuObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 210)]
-    internal bool IsXuanGongZhuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && XuanGongZhuObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 420)]
     internal bool TryAdvanceXuanGongZhuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XuanGongZhuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     SkillProgramStepOutcome global::CardGame.Core.IXuanGongZhuProgramHost.ArmQimeiPair(ProgramSkillFrame f) => _coreQimeiProgramsOperations.ArmQimeiPair(f);

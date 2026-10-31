@@ -289,13 +289,6 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
             throw new InvalidOperationException("Whirl deposit/removal lost its physical invoice.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 120)]
-    internal void AssertRegisteredPrivateWhirl(ProgramSkillFrame frame)
-    {
-        if (frame.PrivateWhirl is not null)
-            RequirePrivateWhirl(frame);
-    }
-
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 80)]
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 90)]
     internal void CleanupLostPrivateWhirlPiles()

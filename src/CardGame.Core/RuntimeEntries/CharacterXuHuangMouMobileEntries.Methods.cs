@@ -10,7 +10,6 @@ internal sealed partial class CharacterXuHuangMouMobileEntries
     internal void AnswerMouXuHuangObtain(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouXuHuangObtain(selected);
     internal void AnswerMouXuHuangShipo(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouXuHuangShipo(selected);
     internal void AnswerMouXuHuangStrategy(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouXuHuangStrategy(selected);
-    internal void AssertMouXuHuang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouXuHuang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouXuHuangDuanliang(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouXuHuangDuanliang(supplied);
     internal void BeginMouXuHuangDuelTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMouXuHuangDuelTargets(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouXuHuangShipo(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouXuHuangShipo(supplied);
@@ -27,8 +26,6 @@ internal sealed partial class CharacterXuHuangMouMobileEntries
     internal void FinishMouXuHuangShipo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouXuHuangShipo(f);
     internal bool HasMouXuHuangBeforeDamageObserver(long id) => _resolve().HasMouXuHuangBeforeDamageObserver(id);
     internal bool HasMouXuHuangDamageObserver(long id) => _resolve().HasMouXuHuangDamageObserver(id);
-    internal bool IsMouXuHuangDuelAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouXuHuangDuelAttackConsistent(attack, processing);
-    internal bool IsMouXuHuangDying() => _resolve().IsMouXuHuangDying();
     internal bool IsMouXuHuangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouXuHuangMovement(f, e, p);
     internal bool IsMouXuHuangNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsMouXuHuangNativeSettlementBatch(f, b);
     internal bool IsMouXuHuangNativeUse(long id) => _resolve().IsMouXuHuangNativeUse(id);

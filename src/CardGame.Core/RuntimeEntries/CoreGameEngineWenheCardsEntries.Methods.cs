@@ -4,16 +4,12 @@ internal sealed partial class CoreGameEngineWenheCardsEntries
 {
     internal void AddWenheCardActions(global::System.Collections.Generic.List<global::CardGame.Core.LegalAction> actions, global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IEnumerable<global::CardGame.Core.Card> cards) => _resolve().AddWenheCardActions(actions, actor, cards);
     internal void AssertWenheCardReceipt(global::CardGame.Core.CardUseFrame use) => _resolve().AssertWenheCardReceipt(use);
-    internal void AssertWenheCardState() => _resolve().AssertWenheCardState();
     internal bool CanBeWenheAdditionalTarget(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CharacterState target) => _resolve().CanBeWenheAdditionalTarget(use, target);
     internal void CompleteWenheCardChaos(long useId) => _resolve().CompleteWenheCardChaos(useId);
     internal void ContinueWenheCardEffect(long id) => _resolve().ContinueWenheCardEffect(id);
-    internal bool HasWenheCardEffectProcessing(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().HasWenheCardEffectProcessing(processing);
     internal bool IsWenheCardEffectHpReturn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.HpChangedTriggerWindowFrame hp) => _resolve().IsWenheCardEffectHpReturn(use, hp);
     internal bool IsWenheCardEffectMovement(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsWenheCardEffectMovement(use, batch);
     internal bool IsWenheCardEffectMovementReturn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardsMovedTriggerWindowFrame movement) => _resolve().IsWenheCardEffectMovementReturn(use, movement);
-    internal bool IsWenheCardEffectStateReturn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramLifecycleTriggerWindowFrame state) => _resolve().IsWenheCardEffectStateReturn(use, state);
-    internal bool IsWenheChaosAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsWenheChaosAttackConsistent(attack, processing);
     internal global::CardGame.Core.WenheCardEffectReceipt PlanWenheBeamSwap(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.WenheCardEffectReceipt receipt) => _resolve().PlanWenheBeamSwap(use, receipt);
     internal global::CardGame.Core.WenheCardEffectReceipt PlanWenheHandRedistribution(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.WenheCardEffectReceipt receipt) => _resolve().PlanWenheHandRedistribution(use, receipt);
     internal global::CardGame.Core.WenheCardEffectReceipt PlanWenheStarShift(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.WenheCardEffectReceipt receipt) => _resolve().PlanWenheStarShift(use, receipt);

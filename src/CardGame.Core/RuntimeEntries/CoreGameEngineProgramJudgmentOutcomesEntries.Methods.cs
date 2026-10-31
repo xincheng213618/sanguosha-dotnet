@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramJudgmentOutcomesEntries
 {
-    internal void AssertProgramJudgmentOutcomes(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertProgramJudgmentOutcomes(frame);
     internal bool HasRecipientJudgmentOutcomePrevention(int targetSeat) => _resolve().HasRecipientJudgmentOutcomePrevention(targetSeat);
     internal bool IsJudgmentOutcomePrevention(global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().IsJudgmentOutcomePrevention(trigger);
     internal bool IsUnclaimedJudgmentOutcomeCard(global::CardGame.Core.JudgmentFrame judgment, int cardId) => _resolve().IsUnclaimedJudgmentOutcomeCard(judgment, cardId);

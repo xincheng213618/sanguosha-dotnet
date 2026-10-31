@@ -53,8 +53,6 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     internal SkillProgramStepOutcome BeginShiSc(ProgramSkillFrame input, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        if (f.ShiSunChen is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
-            throw new InvalidOperationException("Shi Sun Chen lost his original unstarted instruction.");
         var r = new ShiScReceipt(ShiScSource(f), f.GameplayHash, op, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, f.WindowContext?.ParentFrameId, 0, 0, ShiScStage.Cards)
         {
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
@@ -162,7 +160,6 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiSunChen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ShiScChooser(f) || !ShiScChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shi Sun Chen rejects an unpublished chooser, original material or nonminimal fire target.");
-        RequireShiSc(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -242,7 +239,6 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShiSunChen: { } r } f && f.Id == id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
-            RequireShiSc(f);
             if (f.NativeDraw is not null || f.AttackAttempt is not null || r.Stage == ShiScStage.Drawing)
                 return true;
             if (DrainShiSc(id))
@@ -360,8 +356,6 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         var r = f.ShiSunChen!;
-        if (r.Stage != ShiScStage.Drawing || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1)
-            throw new InvalidOperationException("Lulian lost its exact one-card native draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiSunChen = r with { Stage = ShiScStage.DrawChildren, Before = checked((int)outcome.SequenceBefore), After = checked((int)outcome.SequenceAfter) }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiScDrawPaidEvent(f.Id, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));
         ContinueShiSc(f.Id);

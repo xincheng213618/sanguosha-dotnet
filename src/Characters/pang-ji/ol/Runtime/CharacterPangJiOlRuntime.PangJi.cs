@@ -96,7 +96,6 @@ internal sealed partial class CharacterPangJiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { PangJi: { Paid: false, Stage: PangJiStage.CostChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !PangJiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Biguo requires the exact original private HE cost choice.");
-        AssertPangJi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (choice.Parameters["pang-ji"] == "cancel")
@@ -177,8 +176,6 @@ internal sealed partial class CharacterPangJiOlRuntime
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PangJi = r = r with { Stage = PangJiStage.PindianChildren, Result = result, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BiguoPindianReturnedEvent(f.Id, r.PindianId, result.SourceSeat, result.OpponentSeat, result.SourceCardId, result.OpponentCardId, result.SourceRank, result.OpponentRank));
             }
-
-            AssertPangJi(f);
             if (r.Stage is PangJiStage.CostChildren or PangJiStage.ObtainChildren or PangJiStage.PindianChildren)
             {
                 if (DrainPangJi(id))

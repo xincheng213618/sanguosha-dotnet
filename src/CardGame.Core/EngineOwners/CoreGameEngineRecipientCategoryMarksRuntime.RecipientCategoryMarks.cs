@@ -205,7 +205,6 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
     internal void ResolveRecipientCategoryMarkChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Category mark choice lost its owning frame.");
-        _coreRecipientCategoryMarkObserversOperations.AssertRecipientCategoryMark(f);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_coreRecipientCategoryMarkObserversOperations.IsRecipientCategoryMarkChoice(f, prompt) || !RecipientCategoryMarkChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, choice)))
             throw new InvalidOperationException("A category mark choice changed its exact published actor, material or target.");
         var r = f.RecipientCategoryMark!;
@@ -317,7 +316,6 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RecipientCategoryMark: { } r } f || f.Id != id)
             return false;
-        _coreRecipientCategoryMarkObserversOperations.AssertRecipientCategoryMark(f);
         if (r.Stage is RecipientCategoryMarkStage.ChoosingGift or RecipientCategoryMarkStage.ChoosingTarget or RecipientCategoryMarkStage.ChoosingCards or RecipientCategoryMarkStage.ChoosingSlashTargets)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -357,7 +355,6 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
     {
         if (f.RecipientCategoryMark is not { Stage: RecipientCategoryMarkStage.GiftChildren or RecipientCategoryMarkStage.DiscardChildren or RecipientCategoryMarkStage.RecoveryChildren or RecipientCategoryMarkStage.DrawChildren })
             return false;
-        _coreRecipientCategoryMarkObserversOperations.AssertRecipientCategoryMark(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

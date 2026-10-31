@@ -2,11 +2,8 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineTieredRoundZeroReturnsEntries
 {
-    internal void AssertCappedConversionBenefits() => _resolve().AssertCappedConversionBenefits();
     internal bool HasTieredRoundZeroDyingRide(long dyingId) => _resolve().HasTieredRoundZeroDyingRide(dyingId);
     internal bool IsCappedConversionAwaitedMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsCappedConversionAwaitedMovement(frame, pending);
-    internal bool IsPaidZeroMaterialAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsPaidZeroMaterialAttackConsistent(attack, processing);
-    internal bool IsTieredRoundZeroBorrowedAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsTieredRoundZeroBorrowedAttackConsistent(attack, processing);
     internal bool IsTieredRoundZeroFireAttackUse(long id) => _resolve().IsTieredRoundZeroFireAttackUse(id);
     internal bool IsTieredRoundZeroProcessingParent(long id, int cardId) => _resolve().IsTieredRoundZeroProcessingParent(id, cardId);
     internal bool IsTieredRoundZeroRescueProgramDying() => _resolve().IsTieredRoundZeroRescueProgramDying();

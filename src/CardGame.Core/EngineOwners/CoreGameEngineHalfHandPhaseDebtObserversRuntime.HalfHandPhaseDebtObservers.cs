@@ -105,8 +105,6 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtObserversRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
         return index >= 0 && index + 1 < _resolutionStackOperations._resolutionStack.Count && _coreHalfHandTargetSupportOperations.HalfHandSupportPaymentMatches(f, parent, true) && HalfHandPhaseFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]);
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 470, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 550)]
     internal bool IsHalfHandPhaseDebtProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (HalfHandPhaseDebtObserverRoot() ?? _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Select(w => _corePaidOwnTargetObserversOperations.ActualUseTargetObserverRoot(w.ParentFrameId)).LastOrDefault(f => f?.HalfHandSupport is { Paid: true }))is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

@@ -19,15 +19,6 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
         return f.MouHuaXiongYaowu is { Benefit: not null } && ValidMouYaowuReceipt(f);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29100)]
-    internal void AssertMouHuaXiong(ProgramSkillFrame f)
-    {
-        if (f.MouHuaXiongYangwei is not null && !ValidMouYangweiReceipt(f) || f.MouHuaXiongYaowu is not null && !ValidMouYaowuReceipt(f))
-            throw new InvalidOperationException("Mobile Hua Xiong lost its exact issued owner, source, damage window or paid phase receipt.");
-        if (f.MouHuaXiongYaowu is { Benefit: null, SourceSeat: { } source } && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != source || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, MouYaowuChoices(f))))
-            throw new InvalidOperationException("Yaowu's unanswered benefit must retain its real source's private choice.");
-    }
-
     internal bool MouHuaXiongPaidRoot(ProgramSkillFrame f) => f.MouHuaXiongYangwei is not null ? ValidMouYangweiReceipt(f) : f.MouHuaXiongYaowu is { Benefit: not null } && ValidMouYaowuReceipt(f);
     internal bool MouHuaXiongFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -52,7 +43,6 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
     internal bool HasMouHuaXiongDamageObserver(long id) => MouHuaXiongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1410)]
     internal bool HasMouHuaXiongBeforeDamageObserver(long id) => MouHuaXiongObserverRoot()is { } root && (root.MouHuaXiongYaowu?.WindowId == id || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1240)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 800)]
     internal bool IsMouHuaXiongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouHuaXiongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 570)]

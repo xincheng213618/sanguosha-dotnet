@@ -6,9 +6,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodEntries
     internal void AnswerHappyQiaoHealth(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHappyQiaoHealth(choice);
     internal void AnswerHappyQiaoSkill(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerHappyQiaoSkill(answer);
     internal bool ApplyHappyQiaoCardMaximumHp(long ownerId, global::CardGame.Core.CardDamageMaximumHpReplacementReceipt receipt) => _resolve().ApplyHappyQiaoCardMaximumHp(ownerId, receipt);
-    internal void AssertHappyQiaoCardMaximumHealth() => _resolve().AssertHappyQiaoCardMaximumHealth();
-    internal void AssertHappyQiaoDamageHealth() => _resolve().AssertHappyQiaoDamageHealth();
-    internal void AssertHappyQiaoHealthFrames() => _resolve().AssertHappyQiaoHealthFrames();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyQiaoSkill(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginHappyQiaoSkill(supplied, operation);
     internal void BindHappyQiaoHealth(global::CardGame.Core.CharacterState player) => _resolve().BindHappyQiaoHealth(player);
     internal void BindHappyQiaoNativeUse(global::CardGame.Core.IGameEvent fact) => _resolve().BindHappyQiaoNativeUse(fact);
@@ -55,11 +52,8 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodEntries
     internal bool HappyQiaoSkillRecoveryParent(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().HappyQiaoSkillRecoveryParent(frame, recovery);
     internal global::CardGame.Core.PromptChoice HappyQiaoTongxinAi(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HappyQiaoTongxinAi(pending, frame);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.HappyQiaoPlan> HappyQiaoUsePlans(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HappyQiaoUsePlans(frame);
-    internal bool HasHappyQiaoCardMaximumHealthContinuation(long attackId) => _resolve().HasHappyQiaoCardMaximumHealthContinuation(attackId);
-    internal bool HasHappyQiaoDamageHealthContinuation(long attackId) => _resolve().HasHappyQiaoDamageHealthContinuation(attackId);
     internal bool HasHappyQiaoHealth(int seat) => _resolve().HasHappyQiaoHealth(seat);
     internal bool HasHappyQiaoHealthChoiceInSubtree(long id) => _resolve().HasHappyQiaoHealthChoiceInSubtree(id);
-    internal bool HasHappyQiaoHealthPrompt() => _resolve().HasHappyQiaoHealthPrompt();
     internal bool IsHappyQiaoCardMaximumHealthReturn(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.HpChangedTriggerWindowFrame health) => _resolve().IsHappyQiaoCardMaximumHealthReturn(parent, health);
     internal bool IsHappyQiaoDamageHealthReturn(global::CardGame.Core.DamageFrame damage, global::CardGame.Core.HpChangedTriggerWindowFrame health) => _resolve().IsHappyQiaoDamageHealthReturn(damage, health);
     internal bool IsHappyQiaoForeignHealthCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsHappyQiaoForeignHealthCandidate(candidate, context);
@@ -77,7 +71,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodEntries
     internal void RequireHappyQiaoQuery(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.HappyQiaoQueryReceipt query, bool selected) => _resolve().RequireHappyQiaoQuery(parent, query, selected);
     internal void RequireHappyQiaoRecoverToOrigin(global::CardGame.Core.RecoveryReplacementFrame frame, global::CardGame.Core.HappyQiaoRecoverToOrigin origin) => _resolve().RequireHappyQiaoRecoverToOrigin(frame, origin);
     internal void RequireHappyQiaoSelectedReceipt(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.HappyQiaoHealthReceipt r) => _resolve().RequireHappyQiaoSelectedReceipt(parent, r);
-    internal void RequireHappyQiaoSkill(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().RequireHappyQiaoSkill(frame);
     internal bool ResumeHappyQiaoNativeAttack() => _resolve().ResumeHappyQiaoNativeAttack();
     internal bool RetainHappyQiaoPaid(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().RetainHappyQiaoPaid(frame);
     internal void ReturnHappyQiaoCardMaximumHealth(global::CardGame.Core.HpChangedTriggerWindowFrame health) => _resolve().ReturnHappyQiaoCardMaximumHealth(health);
@@ -85,8 +78,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodEntries
     internal bool ReturnHappyQiaoMovement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnHappyQiaoMovement(frame);
     internal bool ReturnHappyQiaoShutuDeclaration(global::CardGame.Core.CardDeclarationFrame declaration, bool succeeded) => _resolve().ReturnHappyQiaoShutuDeclaration(declaration, succeeded);
     internal bool ReturnHappyQiaoUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnHappyQiaoUse(use);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> SeparateHappyQiaoCardMaximumHealthChildProcessing(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().SeparateHappyQiaoCardMaximumHealthChildProcessing(attack, processing);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> SeparateHappyQiaoDamageHealthChildProcessing(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().SeparateHappyQiaoDamageHealthChildProcessing(attack, processing);
     internal bool TryApplyHappyQiaoMaximumHp(long parentFrameId, int targetSeat, int newMaximum, string sourceId) => _resolve().TryApplyHappyQiaoMaximumHp(parentFrameId, targetSeat, newMaximum, sourceId);
     internal bool TryBeginHappyQiaoCardMaximumHealth(long attackId) => _resolve().TryBeginHappyQiaoCardMaximumHealth(attackId);
     internal bool TryBeginHappyQiaoDamageChoice(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().TryBeginHappyQiaoDamageChoice(attack);

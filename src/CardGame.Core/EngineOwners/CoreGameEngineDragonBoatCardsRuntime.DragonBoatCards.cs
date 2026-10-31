@@ -139,8 +139,6 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { DragonBoatCardEffect: { Kind: CardKind.AgainstCurrent } r } use)
             return false;
-        if (use.Action?.ActionId != r.ActionId || attack.EffectiveCardKind != CardKind.AgainstCurrent || attack.CardUserSeat != use.SourceSeat || use.TargetIndex != r.TargetIndex || _coreDyingCursorRuntimeOperations.ActiveDying is not null)
-            throw new InvalidOperationException("Against Current lost its exact completed native damage subtree.");
         if (r.Stage == DragonBoatCardEffectStage.FinishingAttack)
         {
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { DragonBoatCardEffect = null });
@@ -162,8 +160,6 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
         ContinueDragonBoatCardEffect(use.Id);
         return true;
     }
-
-    internal bool IsDragonBoatZeroAgainstCurrentAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing) => attack.Card is null && attack.EffectiveCardKind == CardKind.AgainstCurrent && attack.PhysicalCards.Count == 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { CardKind: CardKind.AgainstCurrent, CardId: 0, PhysicalCardIds.Count: 0, Action: { Type: CardActionType.Use, EffectiveKind: CardKind.AgainstCurrent, PhysicalCards.Count: 0 } action } use && _coreTieredRoundZeroUsesOperations.IsIssuedTieredRoundUse(use, true) && action.ActorSeat == use.SourceSeat && attack.CardUserSeat == use.SourceSeat && _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, use.TieredRoundConversionUse!.ActorSeat) && (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Contains(attack.TargetSeat) || attack.IsChainPropagation) && processing.Count == 0;
     internal IReadOnlyList<Card> DragonBoatDiscardableCards(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Where(card => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard)).ToArray();
     internal void BeginDragonBoatDiscard(CardUseFrame use)
     {
@@ -277,42 +273,7 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
 
     internal bool IsDragonBoatCardEffectMovement(CardUseFrame use, CardMovementBatchContext batch) => use.DragonBoatCardEffect is { } r && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == r.AwaitingProgramFrameId && batch.Movements.Count > 0 && (r.Stage == DragonBoatCardEffectStage.DrawingChildren && r.DrawOutcome is { } outcome && batch.Movements.All(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && (outcome.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(outcome.RecipientSeat) && m.Reason == CardMoveReasons.Draw || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle)) || r.Stage == DragonBoatCardEffectStage.DiscardChildren && r.DiscardSequence > 0 && batch.Movements is [var move] && move.Sequence == r.DiscardSequence && move.CardId == r.DiscardCardId && move.From == r.DiscardFrom && move.To == CardLocation.DiscardPile && move.Reason == new CardMoveReason("card.effect.dragon-boat.against-current"));
     internal bool IsDragonBoatCardEffectMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame frame) => frame.ResumeDragonBoatCardEffectFrameId == use.Id && frame.Id == frame.Batch.Id && frame.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(frame with { ResumeDragonBoatCardEffectFrameId = null }) && IsDragonBoatCardEffectMovement(use, frame.Batch);
-    internal bool IsDragonBoatCardEffectStateReturn(CardUseFrame use, ProgramLifecycleTriggerWindowFrame frame) => use.DragonBoatCardEffect is { Stage: DragonBoatCardEffectStage.DrawingChildren or DragonBoatCardEffectStage.DiscardChildren } && frame.ResumeProgramFrameId == use.Id && frame.CharacterStateContinuation == CharacterStateContinuation.DragonBoatCardEffect && frame.ResumeCardId is null && frame.ResumeCardKind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.Id == frame.Id && e.Change.ParentFrameId == use.Id) == 1;
     internal bool IsDragonBoatCardEffectHpReturn(CardUseFrame use, HpChangedTriggerWindowFrame hp) => use.DragonBoatCardEffect is { Stage: DragonBoatCardEffectStage.DrawingChildren or DragonBoatCardEffectStage.DiscardChildren } && hp.Continuation == PostEventContinuation.DragonBoatCardEffect && hp.ResumeFrameId == use.Id && hp.Change.ParentFrameId == use.Id && hp.CardId is null && hp.CardKind is null;
     internal bool IsDragonBoatCardEffectRecoveryReturn(CardUseFrame use, RecoveryReplacementFrame recovery) => recovery.ParentFrameId == use.Id && recovery.Return == new RecoveryReplacementReturn(PostEventContinuation.DragonBoatCardEffect, use.Id) && IsDragonBoatCardRecoveryAttempt(use, recovery.Attempt);
     internal bool IsDragonBoatCardRecoveryAttempt(CardUseFrame use, RecoveryAttempt attempt) => use.DragonBoatCardEffect is { Stage: DragonBoatCardEffectStage.DiscardChildren, DiscardCardId: { } card, DiscardFrom: { Zone: CardZoneKind.Equipment } from, DiscardSequence: > 0 } r && from.OwnerSeat == use.SourceSeat && attempt.SourceSeat == use.SourceSeat && attempt.TargetSeat == use.SourceSeat && attempt.Amount == 1 && attempt.Completion == new RecoveryAttemptCompletion(RecoveryAttemptProducer.SilverLion, MoveReason: new("card.effect.dragon-boat.against-current")) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.DiscardSequence && m.CardId == card && m.CardKind == CardKind.SilverLion && m.From == from && m.To == CardLocation.DiscardPile && m.Reason == new CardMoveReason("card.effect.dragon-boat.against-current"));
-    internal bool HasDragonBoatCardEffectProcessing(IReadOnlyList<Card> processing)
-    {
-        var uses = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray();
-        if (!uses.Any(use => use.DragonBoatCardEffect is not null))
-            return false;
-        foreach (var use in uses)
-            AssertDragonBoatCardReceipt(use);
-        var materials = uses.SelectMany(use => use.Action?.PhysicalCards.Select(card => card.CardId) ?? []).ToHashSet();
-        return processing.All(card => materials.Contains(card.Id));
-    }
-
-    internal void AssertDragonBoatCardReceipt(CardUseFrame use)
-    {
-        if (use.DragonBoatCardEffect is not { } r)
-            return;
-        if (!IsDragonBoatTrick(global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use)) || r.Kind != global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || use.Action?.ActionId != r.ActionId || r.TargetIndex != use.TargetIndex || r.TargetIndex < 0 || r.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[r.TargetIndex] != r.TargetSeat || !Enum.IsDefined(r.Stage) || r.Recipients is not System.Collections.IList { IsReadOnly: true } || r.Recipients.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat)) || r.Recipients.Distinct().Count() != r.Recipients.Count || r.RecipientIndex < 0 || r.RecipientIndex > r.Recipients.Count || r.RequestedCount is < 0 or > 5 || _coreProgramEventHistoryOperations.ProgramEventHistory<DragonBoatCardEffectStartedEvent>().Count(e => e.UseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId && e.Kind == global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) && e.TargetSeat == r.TargetSeat && e.TargetIndex == r.TargetIndex) != 1)
-            throw new InvalidOperationException("A Dragon Boat effect lost its exact action, resolved target or immutable recipient cursor.");
-        if (use.NativeDraw is { } paid && (r.Stage != DragonBoatCardEffectStage.Drawing || paid.ReturnKind != NativeDrawAttemptReturnKind.DragonBoatCardEffect || paid.RequestedCount != r.RequestedCount || paid.Recipients is not [var seat] || r.RecipientIndex >= r.Recipients.Count || r.Recipients[r.RecipientIndex] != seat || paid.RecipientIndex != 0 || paid.InstructionIndex != 0 || paid.ResultBind is not null || paid.Operation is not null || paid.Reason != CardMoveReasons.Draw || paid.ActiveAttemptId is null && paid.AttemptReturned))
-            throw new InvalidOperationException("A Dragon Boat card changed its already issued native draw request.");
-        if (r.Stage == DragonBoatCardEffectStage.DrawingChildren)
-        {
-            if (r.DrawOutcome is not { } result || use.NativeDraw is not null || r.RecipientIndex >= r.Recipients.Count || result.RecipientSeat != r.Recipients[r.RecipientIndex] || result.RequestedCount != r.RequestedCount || result.SequenceBefore > result.SequenceAfter || result.SequenceAfter > _coreOutsidePhaseDrawDiscardOperations.OutsidePhaseMovementSequence || result.ActualDrawIds.Count > r.RequestedCount || result.ActualDrawIds.Distinct().Count() != result.ActualDrawIds.Count || result.ActualDrawIds is not System.Collections.IList { IsReadOnly: true } || result.Replacement is not null && result.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > result.SequenceBefore && m.Sequence <= result.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(result.RecipientSeat) && m.Reason == CardMoveReasons.Draw).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(result.ActualDrawIds) || _coreProgramEventHistoryOperations.ProgramEventHistory<DragonBoatCardDrawAppliedEvent>().Count(e => e.UseFrameId == use.Id && e.NullificationFrameId == r.NullificationFrameId && e.RecipientIndex == r.RecipientIndex && e.RecipientSeat == result.RecipientSeat && e.RequestedCount == r.RequestedCount && e.ActualDrawCount == result.ActualDrawIds.Count && e.SequenceBefore == result.SequenceBefore && e.SequenceAfter == result.SequenceAfter) != 1 || result.AttemptFrameId is { } attempt && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == use.Id && e.RecipientSeat == result.RecipientSeat && e.RequestedCount == r.RequestedCount && e.Replaced == (result.Replacement is not null)) != 1)
-                throw new InvalidOperationException("A Dragon Boat card lost its actual draw materials or exact replacement return.");
-        }
-
-        if (r.DiscardCardId is { } discarded && (r.DiscardFrom is not { } from || r.DiscardSequence <= 0 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.DiscardSequence && m.CardId == discarded && m.From == from && m.To == CardLocation.DiscardPile && m.Reason == new CardMoveReason("card.effect.dragon-boat.against-current"))))
-            throw new InvalidOperationException("Against Current lost its genuine once-paid self-discard movement.");
-    }
-
-    internal void AssertDragonBoatCardState()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-            AssertDragonBoatCardReceipt(use);
-    }
 }

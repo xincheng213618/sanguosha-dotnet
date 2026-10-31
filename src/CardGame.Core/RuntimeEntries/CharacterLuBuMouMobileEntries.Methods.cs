@@ -4,8 +4,6 @@ internal sealed partial class CharacterLuBuMouMobileEntries
 {
     internal bool AdvanceMouLbChildren() => _resolve().AdvanceMouLbChildren();
     internal void AnswerMouLb(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouLb(choice);
-    internal void AssertMouLb(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouLb(f);
-    internal void AssertMouLbDuelUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertMouLbDuelUse(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouLbLiyu(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginMouLbLiyu(input);
     internal bool CanMouLbBonus(int owner, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanMouLbBonus(owner, c);
     internal bool CanMouLbDuel(global::CardGame.Core.ProgramSkillFrame f, int target) => _resolve().CanMouLbDuel(f, target);
@@ -24,7 +22,6 @@ internal sealed partial class CharacterLuBuMouMobileEntries
     internal bool MouLbBeforeDamageObserver(long id) => _resolve().MouLbBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouLbChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouLbChoices(f);
     internal bool MouLbDamageObserver(long id) => _resolve().MouLbDamageObserver(id);
-    internal global::System.Collections.Generic.IReadOnlyList<int> MouLbDuelOuterProcessing(global::CardGame.Core.CardUseFrame use) => _resolve().MouLbDuelOuterProcessing(use);
     internal bool MouLbDying() => _resolve().MouLbDying();
     internal bool MouLbFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouLbFirstChild(f, child);
     internal bool MouLbLionChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouLbLionChild(f, child);

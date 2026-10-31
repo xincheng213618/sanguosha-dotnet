@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheS5ShensuEntries
 {
-    internal void AssertShanheS5Shensu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShanheS5Shensu(f);
     internal bool CanOfferShanheS5Shensu(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferShanheS5Shensu(gate);
     internal bool ContinueShanheS5Shensu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueShanheS5Shensu(f);
     internal bool IsPaidShanheS5TurnoverReturn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsPaidShanheS5TurnoverReturn(f);

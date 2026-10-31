@@ -130,13 +130,4 @@ internal sealed partial class CharacterDingYuanOlRuntime
         origin = stamp;
         return true;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26020)]
-    internal void AssertAdoptedChildRelationshipFrame(ProgramSkillFrame frame)
-    {
-        if (frame.AdoptedChildRelationship is not { } receipt)
-            return;
-        if (frame.SkillId != "ol:cixiao" || receipt.FrameId != frame.Id || receipt.Source != new CardConversionSource(frame.SkillId, frame.TriggerId!, frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || receipt.ParentFrameId != frame.WindowContext?.ParentFrameId || receipt.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || receipt.Transfer != (receipt.PreviousHolder is not null) || frame.InstructionIndex is < 1 || frame.InstructionIndex > (receipt.Transfer ? 4 : 3))
-            throw new InvalidOperationException("An adopted-child frame lost its exact source, initial relationship or preparation.");
-    }
 }

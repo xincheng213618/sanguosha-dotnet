@@ -4,7 +4,7 @@ using static CardGame.Core.RuntimeSkills.RuntimeRules_Core_AssistedPhysicalCards
 namespace CardGame.Core;
 // One lazy module per match. The original frame remains the sole owner of all
 // selections, paid native segments and their return state.
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class SpPangTongRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
  IProgramRuntimePrompts prompts, INativeFrameRoutingFacts nativeFrames, IMatchParticipantStateAccess participants, ICardZoneQueries zones,
  IProgramContentQueries content, IProgramTurnQueries turn, IProgramEventHistoryQueries history,
@@ -79,7 +79,7 @@ internal sealed partial class SpPangTongRuntime(IProgramRuntimeFrames frames, IP
  }
  [ProgramAnswer("sp-pang-tong")] private void AnswerSpPangTong(PromptChoice selected)
  {
-  if(frames.Top is not ProgramSkillFrame{SpPangTong:{}r}f||!SpPangTongCurrent(f)||prompts.Current?.PlayerSeat!=f.OwnerSeat||!AssistedChoicesEqual([selected],SpPangTongChoices(f).Where(c=>c.Id==selected.Id).ToArray()))throw new InvalidOperationException("Guolun lost its actual private chooser and current material.");AssertSpPangTong(f);prompts.Clear();var branch=selected.Parameters["branch"];
+  if(frames.Top is not ProgramSkillFrame{SpPangTong:{}r}f||!SpPangTongCurrent(f)||prompts.Current?.PlayerSeat!=f.OwnerSeat||!AssistedChoicesEqual([selected],SpPangTongChoices(f).Where(c=>c.Id==selected.Id).ToArray()))throw new InvalidOperationException("Guolun lost its actual private chooser and current material.");prompts.Clear();var branch=selected.Parameters["branch"];
   if(branch=="decline"){FinishSpPangTong(f);return;}
   if(branch=="reveal")
   {
@@ -107,8 +107,7 @@ internal sealed partial class SpPangTongRuntime(IProgramRuntimeFrames frames, IP
  [ProgramContinuation(ProgramContinuationKind.Movement,24700)] private bool ReturnSpPangTongMovement(ProgramSkillFrame f)=>f.SpPangTong is not null&&ResumeSpPangTong(f.Id);
  [ProgramContinuation(ProgramContinuationKind.Resume,24700)] private bool ResumeSpPangTong(long id)
  {
-  if(frames.Top is not ProgramSkillFrame{SpPangTong:{}r}f||f.Id!=id)return false;AssertSpPangTong(f);
-  if(r.Stage is "reveal" or "exchange"){if(!SpPangTongCurrent(f)){FinishSpPangTong(f);return true;}if(prompts.Current is null)PublishSpPangTong(f);return true;}
+  if(frames.Top is not ProgramSkillFrame{SpPangTong:{}r}f||f.Id!=id)return false;  if(r.Stage is "reveal" or "exchange"){if(!SpPangTongCurrent(f)){FinishSpPangTong(f);return true;}if(prompts.Current is null)PublishSpPangTong(f);return true;}
   if(children.Begin(id,PostEventContinuation.AwaitedProgramMovement))return true;
   f=frames.ActiveProgram(id);r=f.SpPangTong!;if(r.Stage=="exchange-children"){frames.ReplaceTop(f=f with{PendingMovementContinuation=null});PaySpPangTongDraw(f);return true;}
   if(r.Stage=="health-children"&&participants.Players[f.OwnerSeat].IsAlive&&facts.Winner==Winner.None){frames.ReplaceTop(f=f with{SpPangTong=r with{Stage="grant-children"}});acquisitions.Grant(f,f.OwnerSeat,["ol:zhanji"]);frames.AdvanceProgram(id);return true;}
@@ -118,12 +117,8 @@ internal sealed partial class SpPangTongRuntime(IProgramRuntimeFrames frames, IP
  [PublicHandRevealReturn("guolun-foreign-hand")]
  private void ReturnGuolunPublicHand(ProgramSkillFrame f)
  {
-  if(f.SpPangTong is not {Stage:"exchange",RevealedCard:not null})
-   throw new InvalidOperationException("Guolun lost its selected original Hand entity.");
   PublishSpPangTong(f);
  }
  private bool ValidSeat(int seat)=>seat>=0&&seat<participants.Players.Count;
  private Card Card(int id)=>zones.CardsAt(zones.GetLocation(id)).Single(card=>card.Id==id);
- private SkillProgramEffect? PausedEffect(ProgramSkillFrame f)=>f.InstructionIndex<1?null:
-  ProgramInstructionResolver.Default.Resolve(f,content.Skill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
 }

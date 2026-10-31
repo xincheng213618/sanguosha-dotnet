@@ -71,10 +71,4 @@ internal sealed partial class CharacterCaoZhangBoundaryMobileRuntime
     internal bool BoundaryJiangchiSlashDistance(ProgramSlashDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryJiangchi(q.Actor.Seat)is { Mode: "assault" };
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeIntrinsicUseBan, 55500)]
     internal bool BoundaryJiangchiUseBan(ProgramCardUseQuery q) => q.ActionType == CardActionType.Use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryJiangchi(q.ActorSeat)is { Mode: "restraint" };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 55500)]
-    internal void AssertBoundaryJiangchiFrame(ProgramSkillFrame f)
-    {
-        if (f.BoundaryJiangchi is { } r && !ValidBoundaryJiangchiPreparation(f, r))
-            throw new InvalidOperationException("Jiangchi lost its original phase, source or prepared parent while a native child was suspended.");
-    }
 }

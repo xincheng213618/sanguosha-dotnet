@@ -7,13 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQiaoZhouOlRuntime
 {
-    internal bool HasQiaoZhouPreparationBoundaryFrame()
-    {
-        if (_resolutionStackOperations._resolutionStack.FirstOrDefault()is not QiaoZhouPreparationFrame f)
-            return false;
-        AssertQiaoZhouPreparation(f);
-        return true;
-    }
 
     internal void AssertQiaoZhouPreparation(QiaoZhouPreparationFrame f)
     {

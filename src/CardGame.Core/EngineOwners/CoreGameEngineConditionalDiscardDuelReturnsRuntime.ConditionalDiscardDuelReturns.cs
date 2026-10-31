@@ -57,30 +57,4 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelReturnsRuntime
             throw new InvalidOperationException("Conditional Duel lost its exact completed attack return.");
         _coreConditionalDiscardDuelsOperations.FinishConditionalDiscardDuel(f, true);
     }
-
-    internal void AssertConditionalDiscardDuels()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.ConditionalDiscardDuel is not null))
-        {
-            if (!ValidConditionalDuelPayments(f))
-                throw new InvalidOperationException("Conditional Duel has an invalid cost or activation receipt.");
-            var d = f.ConditionalDiscardDuel!;
-            if (d.Stage is ConditionalDiscardDuelStage.OwnerChoice or ConditionalDiscardDuelStage.TargetChoice)
-            {
-                if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != (d.Stage == ConditionalDiscardDuelStage.OwnerChoice ? f.OwnerSeat : d.TargetSeat) || !prompt.Choices.Select(c => c.Id).SequenceEqual(_coreConditionalDiscardDuelsOperations.ConditionalDuelChoices(f).Select(c => c.Id))))
-                    throw new InvalidOperationException("Conditional Duel lost its exact own-card private payment prompt.");
-            }
-
-            if (d.Stage == ConditionalDiscardDuelStage.DuelIssued && !_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Id == d.CardUseFrameId && u.ConditionalDiscardDuelOrigin is not null))
-                throw new InvalidOperationException("Conditional Duel lost its issued use.");
-        }
-
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.ConditionalDiscardDuelOrigin is not null))
-        {
-            var o = use.ConditionalDiscardDuelOrigin!;
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-            if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame f || !MatchesConditionalDuelOrigin(f, o) || use.Id != o.CardUseFrameId || !IsConditionalDiscardDuelUse(use.Id) || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveIsRed: false } || use.SelectedActorDuelOrigin is not null || use.DualColorDuelOrigin is not null || use.DamageTargetDuelOrigin is not null)
-                throw new InvalidOperationException("Conditional Duel requires its exact paid parent and real zero-entity action.");
-        }
-    }
 }

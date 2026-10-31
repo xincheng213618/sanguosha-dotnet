@@ -74,8 +74,6 @@ internal sealed partial class CharacterHuangQuanMouRuntime
     internal bool IsMouHqGiveTrigger(SkillProgramTrigger trigger) => trigger.Effects is [{ Op: SkillProgramEffectOp.ResolveMouHuangQuanTuicheng }];
     internal ProgramSkillWindowContext CreateMouHqGiveContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate c)
     {
-        if (c.OccurrenceIndex < 0 || c.OccurrenceIndex >= frame.Batch.Movements.Count)
-            throw new InvalidOperationException("Tuicheng lost its exact real Give batch.");
         var gift = MouHqGiftsForBatch(frame.Batch, c.OwnerSeat).Single(g => g.CompletionSequence == frame.Batch.Movements[c.OccurrenceIndex].Sequence);
         return new(SkillProgramTriggerWindow.CardsMoved, frame.Id, c.OwnerSeat, SourceSeat: c.OwnerSeat, TargetSeat: gift.Recipient, Amount: gift.Movements.Count, OccurrenceIndex: c.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]), MovementBatch: frame.Batch, MovementIndex: c.OccurrenceIndex)
         {

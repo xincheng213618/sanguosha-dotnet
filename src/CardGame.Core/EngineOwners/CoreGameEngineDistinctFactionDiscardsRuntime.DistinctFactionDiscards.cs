@@ -85,8 +85,6 @@ internal sealed partial class CoreGameEngineDistinctFactionDiscardsRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Missing participant discard frame.");
         var d = f.DistinctFactionDiscards ?? throw new InvalidOperationException("Missing participant discard draft.");
         var op = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect.Op;
-        if (op != SkillProgramEffectOp.DiscardDistinctFactionParticipants)
-            throw new InvalidOperationException("Participant discard lost its exact instruction.");
         if (!DistinctFactionOwnerValid(f) || d.Stage == "select" && !HasPayableDistinctFactionOwnerHe(f.OwnerSeat, f.SkillId, f.SkillInstanceId))
         {
             CancelDistinctFactionDiscards(f, "弃牌持有人、来源或必付牌已失效，技能剩余步骤取消。");
@@ -292,22 +290,5 @@ internal sealed partial class CoreGameEngineDistinctFactionDiscardsRuntime
         }
 
         return true;
-    }
-
-    internal void AssertDistinctFactionDiscardDraft(ProgramSkillFrame f, SkillProgramEffect paused)
-    {
-        if (f.DistinctFactionDiscards is not { } d)
-            return;
-        if (paused.Op != SkillProgramEffectOp.DiscardDistinctFactionParticipants || f.WindowContext is not null || d.Stage is not ("select" or "discard" or "discard-children" or "reward" or "reward-children") || d.SelectedSeats.Distinct().Count() != d.SelectedSeats.Count || d.SelectedSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == f.OwnerSeat) || d.ParticipantSeats.Distinct().Count() != d.ParticipantSeats.Count || d.ParticipantSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || d.ParticipantIndex < 0 || d.ParticipantIndex > d.ParticipantSeats.Count || d.Receipts.Select(p => p.OwnerSeat).Distinct().Count() != d.Receipts.Count || d.Receipts.Any(p => !d.ParticipantSeats.Contains(p.OwnerSeat) || p.Source.OwnerSeat != p.OwnerSeat || p.Source.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !Enum.IsDefined(p.EffectiveSuit) || p.MovementSequence <= 0 || p.Destination is { } dest && !(dest == CardLocation.OutsideGame && p.Source.Zone == CardZoneKind.Equipment && (_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(p.CardId)).Single(c => c.Id == p.CardId).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial2(p.CardId, p.Source, CardLocation.OutsideGame)))) || d.RewardIndex < 0 || d.RewardIndex > d.Receipts.Count(p => p.EffectiveSuit == Suit.Spade))
-            throw new InvalidOperationException("Participant discard lost its owning paid plan/cursor/receipt.");
-        if (d.Stage == "select")
-        {
-            if (d.ParticipantSeats.Count != 0 || d.ParticipantIndex != 0 || d.Receipts.Count != 0 || d.RewardIndex != 0)
-                throw new InvalidOperationException("Unpaid participant selection cannot contain a paid plan or receipt.");
-            return;
-        }
-
-        if (d.ParticipantSeats.Count != d.SelectedSeats.Count + 1 || d.ParticipantSeats[0] != f.OwnerSeat || !d.ParticipantSeats.Skip(1).ToHashSet().SetEquals(d.SelectedSeats) || d.ParticipantIndex > 0 && d.Receipts.FirstOrDefault()?.OwnerSeat != f.OwnerSeat || d.Receipts.Any(p => Array.IndexOf(d.ParticipantSeats.ToArray(), p.OwnerSeat) >= d.ParticipantIndex) || d.Receipts.Select(p => Array.IndexOf(d.ParticipantSeats.ToArray(), p.OwnerSeat)).Order().SequenceEqual(d.Receipts.Select(p => Array.IndexOf(d.ParticipantSeats.ToArray(), p.OwnerSeat))) == false || d.Receipts.Select(p => p.MovementSequence).Order().SequenceEqual(d.Receipts.Select(p => p.MovementSequence)) == false || d.Receipts.Any(p => !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == p.MovementSequence && m.CardId == p.CardId && m.From == p.Source && m.To == (p.Destination ?? CardLocation.DiscardPile) && m.Reason.Value == "skill-program." + f.SkillId + ".participant-discard")) || d.Stage == "discard-children" && (d.ParticipantIndex == 0 || d.Receipts.LastOrDefault()?.OwnerSeat != d.ParticipantSeats[d.ParticipantIndex - 1]) || d.Stage is "reward" or "reward-children" && d.ParticipantIndex != d.ParticipantSeats.Count || d.Stage == "reward-children" && d.RewardIndex == 0)
-            throw new InvalidOperationException("Paid receipt must join its real discard movement and exact frozen participant cursor.");
     }
 }

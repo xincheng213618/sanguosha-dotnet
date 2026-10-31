@@ -192,12 +192,6 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 54300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 54300)]
     internal bool KeepPaidBoundaryYanYan(ProgramSkillFrame f) => ValidBoundaryYanYanPrepared(f) || f.BoundaryYanYanClaim is not null && f.WindowContext is { } w && BoundaryYanYanClaimUse(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0), w, true)is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 54300)]
-    internal void AssertBoundaryYanYan(ProgramSkillFrame f)
-    {
-        if (f.BoundaryYanYan is not null && !ValidBoundaryYanYanPrepared(f))
-            throw new InvalidOperationException("Juzhan lost its frozen state epoch or original Slash occurrence.");
-    }
 
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> BoundaryYanYanPublicStates(CharacterState owner, string skillId) => skillId != BoundaryYanYanComposition.Skill ? [] : _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == skillId).SelectMany(i => new[] { new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "juzhan-state-count", ProgramPublicRuleStateKind.GameActivationProgress, _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryYanYanOccurrenceRecordedEvent>().Count(e => e.Occurrence.OwnerSeat == owner.Seat && e.Occurrence.SkillInstanceId == i.SkillInstanceId && e.Occurrence.Epoch == BoundaryYanYanEpoch(owner.Seat))), new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "juzhan-permanent-slash", ProgramPublicRuleStateKind.GameActivationProgress, BoundaryYanYanSlashBonus(owner.Seat)) }).ToArray();
 }

@@ -16,8 +16,6 @@ internal sealed partial class CharacterRuanYuOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var context = f.WindowContext ?? throw new InvalidOperationException("Ruan Yu requires a genuine native trigger.");
-        if (f.RuanYu is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            throw new InvalidOperationException("Ruan Yu lost his exact starting cursor.");
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
         if (!CanOfferRuanYu(candidate, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Ruan Yu lost his original source, actual phase or prepayment true-use qualification.");
@@ -116,7 +114,6 @@ internal sealed partial class CharacterRuanYuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanYuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
             throw new InvalidOperationException("Xingzuo requires the exact private current entity choice.");
-        AssertRuanYu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
@@ -257,7 +254,6 @@ internal sealed partial class CharacterRuanYuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanYu: { } r } f || f.Id != id)
             return;
-        AssertRuanYu(f);
         if (r.Stage is RuanYuStage.Hand or RuanYuStage.Bottom or RuanYuStage.Order or RuanYuStage.EndingTarget)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

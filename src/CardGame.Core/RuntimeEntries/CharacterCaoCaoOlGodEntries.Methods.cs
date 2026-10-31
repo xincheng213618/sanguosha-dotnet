@@ -8,7 +8,6 @@ internal sealed partial class CharacterCaoCaoOlGodEntries
     internal void FinishOlGuixin(global::CardGame.Core.ProgramSkillFrame f, bool cancelled) => _resolve().FinishOlGuixin(f, cancelled);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.OlGuixinCandidate> OlGuixinCandidates(global::CardGame.Core.ProgramSkillFrame f, int target) => _resolve().OlGuixinCandidates(f, target);
     internal bool OlGuixinMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().OlGuixinMovementProof(f, effect, pending);
-    internal void RequireOlGuixin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireOlGuixin(f);
     internal bool ResumeOlGuixin(long id) => _resolve().ResumeOlGuixin(id);
     internal bool RetainOlGuixinPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainOlGuixinPaid(f);
     internal bool ReturnOlGuixinMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnOlGuixinMovement(f);

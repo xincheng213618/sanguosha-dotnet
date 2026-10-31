@@ -93,46 +93,6 @@ internal sealed class DamageAdjacencyRuntime(
         return child is HpChangedTriggerWindowFrame changed && RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramHpReturnMatches(producer, changed);
     }
 
-    internal DamageCursorProjection ResolveDamageCursor(DamageTriggerWindowFrame window)
-    {
-        if (frames.Top is DamageTriggerWindowFrame top && top.Id == window.Id)
-            return new(top, false);
-        if (TypedDamageProgramObserver(window.Id) is { } program)
-            return new(program, false);
-        var recovery = protocols.ProjectTypedRecoveryDamageCursor(window.Id);
-        if (recovery.IsMalformed)
-            throw new InvalidOperationException("A recovery observer has an invalid frame-owned return.");
-        if (recovery.Root is { } recoveryRoot)
-            return new(recoveryRoot, false, recovery.OwnedDyingId);
-        if (HasMalformedDamagePostEventEdge(window.Id))
-        {
-            // Dying compatibility receipts cannot lend authority to a rejected
-            // root/candidate edge in the active damage subtree.
-            if (facts.ActiveDying is not null)
-                throw new InvalidOperationException("A dying damage subtree must retain its exact frozen observer chain.");
-            return default;
-        }
-
-        if (protocols.MouLixianDamageCursorRoot(window, out var lixianDyingId) is { } lixianRoot)
-            return new(lixianRoot, false, lixianDyingId);
-        if (protocols.AlcoholSlashReplacementDamageCursorRoot(window, out var replacementDyingId) is { } replacementRoot)
-            return new(replacementRoot, true, replacementDyingId);
-        if (protocols.RandomDamageTargetSkillDamageCursorRoot(window, out var randomSkillDyingId) is { } randomSkillRoot)
-            return new(randomSkillRoot, true, randomSkillDyingId);
-        if (protocols.DamageTargetSkillRoundDamageCursorRoot(window, out var roundSkillDyingId) is { } roundSkillRoot)
-            return new(roundSkillRoot, true, roundSkillDyingId);
-
-        // Complex paid operations carry additional producer receipts (e.g. a
-        // judgment, card use or death subtree). Keep those semantic proofs on
-        // their owning capabilities; ordinary typed movement/HP observers above
-        // do not run this compatibility path. Evaluate it only once per invariant.
-        var paidObserverSubtree = protocols.MatchesObserver(ProgramObserverProofPhase.PaidDamage, window.Id);
-        var includeNestedObservers = paidObserverSubtree ||
-            protocols.MatchesObserver(ProgramObserverProofPhase.NestedDamage, window.Id) ||
-            HasConvertingGiftObserver(window.Id);
-        return new(DamageCursorEffectiveTop(includeNestedObservers), paidObserverSubtree);
-    }
-
     internal bool HasMalformedDamagePostEventEdge(long windowId)
     {
         var windowIndex = facts.FrameIndex(windowId);
@@ -263,14 +223,5 @@ internal sealed class DamageAdjacencyRuntime(
 
         frames.Pop(window.ParentFrameId, ResolutionFrameKind.Damage);
         target.CompleteAttack();
-    }
-
-    private bool HasConvertingGiftObserver(long windowId)
-    {
-        for (var index = 0; index < facts.FrameCount; index++)
-            if (facts.FrameAt(index) is ProgramSkillFrame
-                { ConvertingGift: { Observe: true }, WindowContext.ParentFrameId: var parentId } &&
-                parentId == windowId) return true;
-        return false;
     }
 }

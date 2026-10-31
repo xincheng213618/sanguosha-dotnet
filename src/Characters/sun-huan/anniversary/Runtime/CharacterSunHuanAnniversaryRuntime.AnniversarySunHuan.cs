@@ -120,7 +120,6 @@ internal sealed partial class CharacterSunHuanAnniversaryRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversarySunHuan: { } r } f || f.Id != id)
             return false;
-        RequireSunHuan(f);
         if (r.Stage is AnniversarySunHuanStage.Drawing or AnniversarySunHuanStage.IssuingUse or AnniversarySunHuanStage.NativeUse)
             return true;
         if (DrainSunHuan(f))

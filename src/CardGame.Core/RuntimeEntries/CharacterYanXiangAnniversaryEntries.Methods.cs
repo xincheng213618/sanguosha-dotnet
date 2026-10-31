@@ -6,7 +6,6 @@ internal sealed partial class CharacterYanXiangAnniversaryEntries
     internal bool AdvanceYanXiangChildren() => _resolve().AdvanceYanXiangChildren();
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.RuleQueryContribution> AnniversaryYanXiangHandLimitContributions(global::CardGame.Core.CharacterState player) => _resolve().AnniversaryYanXiangHandLimitContributions(player);
     internal void AnswerYanXiang(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerYanXiang(choice);
-    internal void AssertYanXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertYanXiang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginYanXiang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginYanXiang(supplied, operation);
     internal void BindYanXiangUse(global::CardGame.Core.CardUseDeclaredEvent fact) => _resolve().BindYanXiangUse(fact);
     internal bool CanActivateYanXiang(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateYanXiang(c);
@@ -16,7 +15,6 @@ internal sealed partial class CharacterYanXiangAnniversaryEntries
     internal void ContinueYanXiang(long id) => _resolve().ContinueYanXiang(id);
     internal global::CardGame.Core.AnniversaryYanXiangLeaseEvent[] DueYanXiangRewards(int owner, string instance, global::CardGame.Core.CardActionContext? action) => _resolve().DueYanXiangRewards(owner, instance, action);
     internal void FinishYanXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishYanXiang(f);
-    internal bool HasAnniversaryYanXiangPrompt() => _resolve().HasAnniversaryYanXiangPrompt();
     internal bool IsAnniversaryYanXiangSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsAnniversaryYanXiangSettlementBatch(f, b);
     internal bool IsIssuedYanXiangReward(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedYanXiangReward(c, w);
     internal bool IsYanXiangNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsYanXiangNativeUse(use);

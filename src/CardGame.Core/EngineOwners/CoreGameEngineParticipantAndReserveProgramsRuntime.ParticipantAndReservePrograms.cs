@@ -281,45 +281,6 @@ internal sealed partial class CoreGameEngineParticipantAndReserveProgramsRuntime
         if (amount != previous)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(id, target, marker, amount - previous, count, source, "program.nature-effect"));
     }
-
-    internal void AssertParticipantReserveDraft(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.ReexecuteParticipantInstruction && paused.Op is not (SkillProgramEffectOp.DamageParticipants or SkillProgramEffectOp.LoseHpParticipants or SkillProgramEffectOp.DiscardParticipantCards or SkillProgramEffectOp.DiscardSelectedParticipantCards or SkillProgramEffectOp.RequestSlashByNearest or SkillProgramEffectOp.RequestLegalSlashByNearest or SkillProgramEffectOp.ChooseCategoryAlternativeDiscard or SkillProgramEffectOp.EscalatingDiscardOrDamage or SkillProgramEffectOp.ChooseCategoryOrSequentialDiscard or SkillProgramEffectOp.EscalatingDiscardOrDamageFromSelected or SkillProgramEffectOp.ChooseHandCountIntervention or SkillProgramEffectOp.ChooseTrickOrAllHandDiscard or SkillProgramEffectOp.AllHandDiscardOrDifferenceDamageFromSelected or SkillProgramEffectOp.RevealHandColorDiscardAndTake or SkillProgramEffectOp.DrawThenPutOwnedCardOnTopParticipants or SkillProgramEffectOp.DrawTurnOwnerThenDiscardMaximumHandForDodge or SkillProgramEffectOp.ObtainOneFromEachSelectedTarget or SkillProgramEffectOp.GiveShownCardToLeastOriginalTarget or SkillProgramEffectOp.TongxieFollowUp or SkillProgramEffectOp.TongxieGuard or SkillProgramEffectOp.YujueResolve or SkillProgramEffectOp.JieliePreventAndGift) && !HasExactTypedParticipantContinuation(frame, paused))
-            throw new InvalidOperationException("A participant cursor must resume its own committed instruction.");
-        if (frame.PrivateReserveDraft is not { } draft)
-            return;
-        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(draft.ChooserSeat) || draft.RequiredCount < 1 || draft.RequiredCount > 64 || draft.Mode is not ("exchange-hand" or "exchange-stars" or "discard-hand") || (draft.Mode == "discard-hand" ? paused.Op != SkillProgramEffectOp.DiscardParticipantCards : paused.Op != SkillProgramEffectOp.ExchangePrivatePile) || draft.SelectedHandIds.Count > draft.RequiredCount || draft.SelectedReserveIds.Count > draft.RequiredCount || draft.SelectedHandIds.Distinct().Count() != draft.SelectedHandIds.Count || draft.SelectedReserveIds.Distinct().Count() != draft.SelectedReserveIds.Count || draft.SelectedHandIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(draft.ChooserSeat)) || draft.SelectedReserveIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != new CardLocation(CardZoneKind.PrivateReserve, draft.ChooserSeat)) || draft.Mode == "exchange-stars" && draft.SelectedHandIds.Count != draft.RequiredCount)
-            throw new InvalidOperationException("A private reserve selection lost its physical owner or equal card cost.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != draft.ChooserSeat))
-            throw new InvalidOperationException("A private reserve selection must retain its chooser's private prompt.");
-    }
-
-    internal bool HasExactTypedParticipantContinuation(ProgramSkillFrame frame, SkillProgramEffect paused) => paused.Op switch
-    {
-        SkillProgramEffectOp.DamageOtherLiving => _coreStrategicProgramsOperations.IsValidStrategicDamageBatchContinuation(frame, paused),
-        SkillProgramEffectOp.LuochongResolve => _characterTengFangLanOlOperations.IsValidLuochongDyingContinuation(frame, paused),
-        SkillProgramEffectOp.PayBoundaryZhangFeiLiyong => frame.BoundaryLiyongPenalty is not null && _characterZhangFeiBoundaryMobileOperations.ValidBoundaryZhangFeiLiyongPenalty(frame),
-        SkillProgramEffectOp.ZhuihuanRetaliate => _characterYangWanOlOperations.IsValidZhuihuanContinuation(frame, paused),
-        SkillProgramEffectOp.DonateAllEquipmentAndOfferRecipientBenefits => frame.EquipmentDonation is not null && _coreEquipmentDonationObserversOperations.IsValidAllEquipmentDonation(frame),
-        SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou => _characterCaiFuRenOlOperations.IsIssuedOrdinaryCaiFuRenXianzhou(frame) && _coreEquipmentDonationObserversOperations.IsValidAllEquipmentDonation(frame),
-        SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting or SkillProgramEffectOp.ResolveBoundaryMobileQieting => _characterCaiFuRenOlOperations.CanContinueIssuedOrdinaryCaiFuRen(frame),
-        SkillProgramEffectOp.RequestAttackRangeAid => frame.AttackRangeAid is not null && _characterHanDangBoundaryMobileOperations.ValidProgramAttackRangeAid(frame),
-        SkillProgramEffectOp.ChooseEquipmentOrDrawAfterOtherActualTurn => frame.ActualEndedEquipment is not null && _coreEquipmentDonationObserversOperations.IsValidActualEndedEquipment(frame),
-        SkillProgramEffectOp.OfferSlashTargetBenefit => frame.SlashTargetBenefitDraft is { Settlement: false } && _coreSlashTargetBenefitPaymentsOperations.SlashBenefitProgramParentMatches(frame),
-        SkillProgramEffectOp.SettleDodgeCancelledSlashBenefit => frame.SlashTargetBenefitDraft is { Settlement: true } && _coreSlashTargetBenefitPaymentsOperations.SlashBenefitProgramParentMatches(frame),
-        SkillProgramEffectOp.ResolvePrepDiscardOrEnding or SkillProgramEffectOp.ResolvePrepDiscardOrImmediateDraw => frame.PrepDiscard is not null && _corePrepDiscardReceiptsOperations.ValidPrepDiscard(frame),
-        SkillProgramEffectOp.DrawPrepDiscardEnding => frame.PrepDiscardEndingDraw is not null && _corePrepDiscardEndingPromisesOperations.ValidPrepDiscardEndingDraw(frame),
-        SkillProgramEffectOp.DrawLostHpThenOfferOwnedCardsUpTo => frame.LostHpOwnedGift is not null && _coreLostHpOwnedGiftsOperations.IsValidLostHpOwnedGift(frame),
-        SkillProgramEffectOp.PayHpThenNullifyOwnActualUseTarget => frame.InstructionIndex == 1 && _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id)is var paidIndex && paidIndex > 0 && _resolutionStackOperations._resolutionStack[paidIndex - 1] is ActualUseTargetWindowFrame paidParent && _corePaidOwnTargetObserversOperations.PaidOwnTargetMatches(frame, paidParent, true),
-        SkillProgramEffectOp.RequireTargetDiscardOrEquipmentRecast => frame.InstructionIndex == 1 && frame.SlashTargetPenaltyDraft is { } penalty && penalty.Identity == frame.WindowContext?.SlashTargetPenalty && _coreSlashTargetPenaltyWindowsOperations.SlashTargetPenaltyProgramMatches(frame) && (penalty.Stage switch
-        {
-            SlashTargetPenaltyStage.Offered => _coreSlashTargetPenaltyPaymentsOperations.TargetPenaltyStillMayIssue(frame) && !penalty.Recast && penalty.PaidCardIds.Count == 0 && penalty.PaidFrom.Count == 0 && penalty.SequenceBefore == 0 && penalty.SequenceAfter == 0 && !penalty.DrawAttempted && penalty.ActualDrawCount == 0 && penalty.RewardBefore == 0 && penalty.RewardAfter == 0 && frame.PendingMovementContinuation is null,
-            SlashTargetPenaltyStage.CostChildren => _coreSlashTargetPenaltyPaymentsOperations.ValidTargetPenaltyPayment(frame) && !penalty.DrawAttempted && penalty.ActualDrawCount == 0 && penalty.RewardBefore == 0 && penalty.RewardAfter == 0,
-            SlashTargetPenaltyStage.RewardChildren => _coreSlashTargetPenaltyObserversOperations.ValidTargetPenaltyReward(frame),
-            _ => false
-        }),
-        _ => false
-    };
     internal void ExpireAttributedNatureMarkers(int ownerSeat)
     {
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)

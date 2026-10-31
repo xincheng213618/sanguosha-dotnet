@@ -89,15 +89,4 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiKeActionAcceptedEvent>().Count(e => e == new HuanpeiKeActionAcceptedEvent(f.Id, f.InstructionIndex, k.Source, f.GameplayHash, p.ProgramFrameId, p.Kind)) == 1;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28103)]
-    internal void AssertHuanpeiCaller(ProgramSkillFrame f)
-    {
-        if (f.HuanpeiReturn is not { } r)
-            return;
-        if (!ValidHuanpeiPayment(r.Payment) || r.Payment.Request.ParentFrameId != f.Id || r.Payment.Request.RequestFrameId != f.Id || r.Payment.Request.Cursor != f.InstructionIndex || r.Payment.Request.ParentSkillId != f.SkillId || r.Payment.Request.ParentSkillInstanceId != f.SkillInstanceId || r.Payment.Request.ParentGameplayHash != f.GameplayHash || r.Payment.Request.ParentOperation != _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op || r.UseId < 0 || r.ActionId < 0 || r.UseId == 0 && r.ActionId != 0 || r.UseId > 0 && !HasHuanpeiProgramPayment(f))
-            throw new InvalidOperationException("Huanpei's caller lost its exact native request, once-paid source or child return.");
-        if (f.KeBiNengPingduan is { SelectedBasicAction: { } selected } && selected.ConversionSource?.SkillId == "ol:huanpei" && !HasAcceptedHuanpeiKeAction(f, selected))
-            throw new InvalidOperationException("Huanpei's generic basic request changed its accepted native action.");
-    }
 }

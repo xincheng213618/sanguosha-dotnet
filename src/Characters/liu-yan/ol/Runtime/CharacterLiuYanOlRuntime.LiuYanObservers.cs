@@ -40,8 +40,6 @@ internal sealed partial class CharacterLiuYanOlRuntime
     internal bool HasLiuYanDamageObserver(long id) => LiuYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 850)]
     internal bool HasLiuYanBeforeDamageObserver(long id) => HasLiuYanDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 680)]
-    internal bool IsLiuYanDying() => IsLiuYanOriginalDyingRide() || _coreDyingCursorRuntimeOperations.ActiveDying is { } d && LiuYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27230)]
     internal bool AdvanceLiuYanChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuYanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

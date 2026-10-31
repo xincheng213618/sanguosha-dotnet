@@ -252,8 +252,6 @@ internal sealed partial class CharacterJiKangMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.MobileJiKang ?? throw new InvalidOperationException("Ji Kang draw lost its original receipt.");
-        if (r.Stage is not (MobileJiKangStage.Drawing or MobileJiKangStage.RewardDrawing) || f.NativeDraw is not null || outcome.RecipientSeat != r.Subject || outcome.RequestedCount != 1 || outcome.ActualDrawIds.Count > 1)
-            throw new InvalidOperationException("Ji Kang draw lost its exact original recipient and one-card typed return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileJiKangProgressEvent(f.Id, "draw-return", r.Cursor, r.Subject, outcome.ActualDrawIds.Count, 1, outcome.SequenceBefore, outcome.SequenceAfter));
         if (r.Stage == MobileJiKangStage.RewardDrawing)
         {

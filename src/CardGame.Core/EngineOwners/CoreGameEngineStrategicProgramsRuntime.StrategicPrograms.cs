@@ -392,15 +392,4 @@ internal sealed partial class CoreGameEngineStrategicProgramsRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillSuppressedEvent(suppression.SourceSeat, turnOwnerSeat, suppression.SkillId, false));
         }
     }
-
-    internal bool IsValidStrategicDamageBatchContinuation(ProgramSkillFrame frame, SkillProgramEffect paused) => paused.Op == SkillProgramEffectOp.DamageOtherLiving && frame.StrategicDamageBatch is { } batch && batch.InstructionIndex == frame.InstructionIndex && batch.RemainingTargetSeats.All(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && seat != frame.OwnerSeat) && batch.RemainingTargetSeats.Distinct().Count() == batch.RemainingTargetSeats.Count && batch.RemainingTargetSeats.SequenceEqual(batch.RemainingTargetSeats.Order());
-    internal void AssertStrategicProgramSelection(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.StrategicDraft is not { } draft)
-            return;
-        if (draft.Op != paused.Op || draft.Selected.Count > draft.Maximum || draft.Selected.Distinct().Count() != draft.Selected.Count || draft.Selected.Any(item => !draft.Candidates.Contains(item)) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat || prompt.Choices.Count == 0 || prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") != "strategic-choice" || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString() || choice.Parameters.GetValueOrDefault("selection-index") != draft.Selected.Count.ToString()))
-            throw new InvalidOperationException("Strategic selection lost its suspended instruction or validated prompt.");
-        if (draft.Op == SkillProgramEffectOp.SelectDistinctSuitHandDiscards && (!prompt.IsPrivate || draft.Maximum != (paused.Amount == 3 ? 3 : 4)))
-            throw new InvalidOperationException("Cross-owner hand selection must remain private.");
-    }
 }

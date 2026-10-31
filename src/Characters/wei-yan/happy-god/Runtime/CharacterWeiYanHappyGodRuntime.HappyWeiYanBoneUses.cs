@@ -33,7 +33,6 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
         {
             var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            RequireHappyWeiYan(frame);
             var receipt = frame.HappyWeiYan!;
             if (receipt.Stage is HappyWeiYanStage.IssuingUse or HappyWeiYanStage.NativeUse)
                 return true;
@@ -83,7 +82,6 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { HappyWeiYan: { Stage: HappyWeiYanStage.IssuingUse, NativeUse: { UseId: 0, ActionId: 0 } native } receipt } frame)
             return;
-        RequireHappyWeiYan(frame);
         if (use.SourceSeat != frame.OwnerSeat || action.ActorSeat != frame.OwnerSeat || action.ProviderSeat != frame.OwnerSeat || action.RequesterSeat is not null || action.ConversionChain.Count != 0 || use.CardId != native.Bone.CardId || use.CardKind != (native.Action.PlayedCardKind ?? native.Bone.PrintedKind) || action.PhysicalCards is not [{ CardId: var cardId, From: var from }] || cardId != native.Bone.CardId || from != CardLocation.DiscardPile || use.PhysicalCardIds is not [var physical] || physical != cardId || _cardZonesOperations._cardZones.GetLocation(cardId) != from || !use.TargetSeats.SequenceEqual(HappyBoneExpectedTargets(native)))
             throw new InvalidOperationException("Ezhi must issue the original discarded bone as one genuine legal native Use.");
         var bound = native with

@@ -203,24 +203,4 @@ internal sealed class ForeignTurnContestRuntime(IProgramRuntimeFrames frames, IN
             !history.Read<ForeignTurnContestSlashIssuedEvent>().Any(e => e.Return == returned)))
             throw new InvalidOperationException("A foreign contest lost its exact issued Slash child.");
     }
-
-    internal void AssertSlashChildren()
-    {
-        for (var index = 0; index < nativeFrames.FrameCount; index++)
-        {
-            if (nativeFrames.FrameAt(index) is not CardUseFrame { ForeignTurnContestSlashReturn: not null } use) continue;
-            var returned = use.ForeignTurnContestSlashReturn!;
-            if (index == 0 || nativeFrames.FrameAt(index - 1) is not ProgramSkillFrame parent ||
-                parent.Id != returned.ProgramFrameId || parent.ForeignTurnContest is not { Stage: ForeignTurnContestStage.SlashIssued } contest ||
-                contest.SlashReturn != returned || returned.Origin != contest.Origin ||
-                use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } ||
-                (use.CurrentSlashFirePolicy?.OriginalAction ?? use.Action) is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash } action ||
-                action.ActionId != returned.CardActionId || action.ActorSeat != returned.Origin.Result.OpponentSeat ||
-                action.ProviderSeat != action.ActorSeat || action.PhysicalCards.Count != 0 ||
-                !history.Read<TargetsConfirmedEvent>().Any(e => e.ResolutionId == use.Id &&
-                    e.TargetSeats.SequenceEqual([returned.Origin.Result.SourceSeat])) ||
-                use.TargetSeats.Count > 1 && !facts.HasAllowedSlashTargetTail(use))
-                throw new InvalidOperationException("A foreign virtual Slash lost its exact issued zero-entity use and typed parent.");
-        }
-    }
 }

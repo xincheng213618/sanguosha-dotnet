@@ -25,7 +25,6 @@ internal sealed partial class CoreGameEngineCardMovementProgramsRuntime
     void global::CardGame.Core.ICardMovementBatchPipeline.ObserveCommitted(CardMovementBatchBuilder batch, CardMovementRecord movement) => _programPipelineHooksOperations._programPipelineHooks.ObserveCommittedMovement(batch, movement);
     void global::CardGame.Core.ICardMovementBatchPipeline.CaptureFacts(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements) => _programPipelineHooksOperations._programPipelineHooks.CaptureMovementBatchFacts(batch, movements);
     CardMovementBatchContext global::CardGame.Core.ICardMovementBatchPipeline.Complete(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _programPipelineHooksOperations._programPipelineHooks.CompleteMovementBatch(batch, completed);
-    internal bool HasCardsMovedProgramBoundaryFrame() => _cardsMovedWindowOperations.Get().HasCardsMovedProgramBoundaryFrame();
     internal bool TryBeginCardsMovedProgramWindow(long? instructionFrameId = null, int? subjectSeat = null) => _cardsMovedWindowOperations.Get().TryBeginCardsMovedProgramWindow(instructionFrameId, subjectSeat);
     internal IReadOnlyList<ProgramTriggerCandidate> CollectCardsMovedProgramCandidates(CardMovementBatchContext batch) => _cardsMovedWindowOperations.Get().CollectCardsMovedProgramCandidates(batch);
     internal IReadOnlyList<ProgramTriggerCandidate> CollectDiscardPileReceivedCandidates(CardMovementBatchContext batch) => _cardsMovedWindowOperations.Get().CollectDiscardPileReceivedCandidates(batch);

@@ -86,7 +86,6 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryLiuYong: { } r } f || !AnniversaryLiuYongChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Liu Yong rejects a stale private material or native target plan.");
-        RequireAnniversaryLiuYong(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var option = choice.Parameters["option"];
@@ -142,7 +141,6 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryLiuYong: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return false;
-        RequireAnniversaryLiuYong(f);
         if (r.Stage is AnniversaryLiuYongStage.Gift or AnniversaryLiuYongStage.UseChoice)
         {
             PublishAnniversaryLiuYong(f);

@@ -118,16 +118,8 @@ internal sealed partial class CoreGameEngineForeignContestAidObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1800)]
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 180)]
     internal bool HasForeignContestAidDamageObserver(long window) => ForeignContestAidPaidObserverRoot(window)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 540, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 620)]
     internal bool IsForeignContestAidProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ForeignContestAidPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    internal bool HasSameTypeAidTargetObserver(long useId)
-    {
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.SameTypeAid?.Use.CardUseFrameId == useId)is not { } root || !SameTypeAidParentMatches(root))
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        return index == _resolutionStackOperations._resolutionStack.Count - 1 || ForeignContestAidPaidObserverRoot()?.Id == root.Id;
-    }
 
     internal bool TryGetSameTypeAidVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primary)
     {
@@ -154,16 +146,5 @@ internal sealed partial class CoreGameEngineForeignContestAidObserversRuntime
         // Preserve the mature producer's one primary post-redirection return.
         primary = Array.AsReadOnly(new[] { use.TargetSeats[0] });
         return true;
-    }
-
-    internal void AssertForeignContestAidPrograms()
-    {
-        foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-        {
-            _coreForeignTurnContestsOperations.AssertForeignTurnContest(root);
-            AssertSameTypeAid(root);
-        }
-
-        _foreignTurnContestOperations.Get().AssertSlashChildren();
     }
 }

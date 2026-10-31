@@ -124,7 +124,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BaoXin: { } r } f || f.Id != id)
             return;
-        AssertBaoXin(f);
         if (r.Stage is BaoXinStage.Mode or BaoXinStage.GiftCard or BaoXinStage.GiftTarget)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

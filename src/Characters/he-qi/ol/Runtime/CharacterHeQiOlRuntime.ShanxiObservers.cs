@@ -18,8 +18,6 @@ internal sealed partial class CharacterHeQiOlRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 90)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 200)]
     internal bool HasHeQiDamageObserver(long id) => HeQiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 50)]
-    internal bool IsHeQiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HeQiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 170)]
     internal bool TryAdvanceHeQiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HeQiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 300)]

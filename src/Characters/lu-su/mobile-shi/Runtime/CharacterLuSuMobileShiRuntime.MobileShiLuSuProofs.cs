@@ -8,18 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuSuMobileShiRuntime
 {
     internal bool ValidShiLs(ProgramSkillFrame f) => f.ShiLuSu is { } r && f.InstructionIndex == 1 && r.Source == ShiLsSource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && r.WindowId == f.WindowContext?.ParentFrameId && Enum.IsDefined(r.Stage) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsStartedEvent>().Count(e => e == new ShiLsStartedEvent(f.Id, r.Source, r.Hash, r.Turn, r.WindowId)) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 48900)]
-    internal void RequireShiLs(ProgramSkillFrame f)
-    {
-        if (f.ShiLuSu is not { } r)
-            return;
-        if (!ValidShiLs(f) || r.Seats.Count > 2 || r.Seats.Distinct().Count() != r.Seats.Count || r.Seats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || r.Cards.Count != r.Cards.Distinct().Count() || r.Cards.Count > r.Required || r.Required < 0 || r.X < 0 || r.GrantId > 0 && (f.TriggerId != "shared-last-hand" || f.WindowContext?.MovementBatch?.Id != r.BatchId || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsRefillIssuedEvent>().Count(e => e == new ShiLsRefillIssuedEvent(f.Id, r.GrantId, r.BatchId, r.X)) != 1) || r.Stage == ShiLsStage.Discard && r.Cards.Any(id => !ShiLsDiscardChoices(f).Any(c => c.Cards.SequenceEqual([id]))))
-            throw new InvalidOperationException("Shi Lu Su lost the original source, actual activation, authorized movement batch or unpaid exact cards.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && r.Stage is ShiLsStage.Target or ShiLsStage.Pair or ShiLsStage.Benefit or ShiLsStage.Discard && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ShiLsChoices(f))))
-            throw new InvalidOperationException("Shi Lu Su lost its exact originally published choice set.");
-    }
-
-    internal bool HasShiLsPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShiLuSu: not null, Step: ResolutionFrameStep.AwaitingResponse } f && p.PlayerSeat == f.OwnerSeat && ValidShiLs(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ShiLsChoices(f));
     [ProgramCardLegality(ProgramCardLegalityStage.AfterLegalActionKind, 48900)]
     internal bool ShiLsRecastBan(ProgramLegalActionQuery q) => q.Action.Kind == LegalActionKind.Recast && q.Action.CardId is { } id && IsShiLsHandAccess(q.Actor, id);
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 48900)]
@@ -48,7 +36,6 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
     internal bool ShiLsDamageChild(long id) => ShiLsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 48900)]
     internal bool ShiLsBeforeDamageChild(long id) => ShiLsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 48900)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 48900)]
     internal bool ShiLsDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiLsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 48900)]

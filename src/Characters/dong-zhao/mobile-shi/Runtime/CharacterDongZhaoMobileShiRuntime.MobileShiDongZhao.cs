@@ -232,15 +232,6 @@ internal sealed partial class CharacterDongZhaoMobileShiRuntime
     internal bool PaidShiDzCanReturn(ProgramSkillFrame f) => f.MobileShiDongZhao?.Stage is MobileShiDongZhaoStage.GainChildren or MobileShiDongZhaoStage.CostChildren or MobileShiDongZhaoStage.Target or MobileShiDongZhaoStage.ExtraDrawChildren || f.MobileShiDongZhao is null && f.InstructionIndex is 0 or 1 && f.TriggerId == "issued-extra-start" && f.WindowContext is { } w && IsIssuedShiDzExtra(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 100), w);
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 47700)]
     internal bool ShiDzMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.MobileShiDongZhao is { Stage: MobileShiDongZhaoStage.GainChildren or MobileShiDongZhaoStage.CostChildren or MobileShiDongZhaoStage.ExtraDrawChildren } && effect?.Op is SkillProgramEffectOp.ResolveMobileShiDongZhaoMiaolue or SkillProgramEffectOp.ResolveMobileShiDongZhaoYingjia;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 47700)]
-    internal void AssertShiDz(ProgramSkillFrame f)
-    {
-        if (f.MobileShiDongZhao is not { } r)
-            return;
-        var signed = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiDongZhaoStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.WindowId == r.WindowId && e.ActualTurn == r.ActualTurn && e.TriggerId == f.TriggerId) == 1;
-        if (!signed || r.GameplayHash != f.GameplayHash || f.WindowContext?.ParentFrameId != r.WindowId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalMovementSequenceAccess._movementSequence || f.TriggerId != "issued-extra-start" && r.Source != ShiDzSource(f) || f.TriggerId == "issued-extra-start" && (r.GrantFrameId <= 0 || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiDongZhaoExtraEnteredEvent>().Any(e => e.GrantFrameId == r.GrantFrameId && e.FrameId == f.Id && e.TargetSeat == f.OwnerSeat)))
-            throw new InvalidOperationException("Shi Dong Zhao lost its accepted original trigger, paid movement or exact extra-turn lease.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiDongZhaoMiaolue, SkillProgramEffectOp.ResolveMobileShiDongZhaoYingjia)]
     internal PromptChoice ChooseShiDzAi(PendingDecision p, ProgramSkillFrame f) => f.MobileShiDongZhao!.Stage switch

@@ -93,7 +93,6 @@ internal sealed partial class CharacterLuZhiWeiOlRuntime
     internal void ResolveQingzhongMinimumChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Qingzhong lost its owning chooser.");
-        RequireIssuedLuZhiWei(f);
         if (f.Qingzhong is not { Stage: QingzhongStage.ChooseMinimum } p || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Targets is not [var target] || !QingzhongMinimumSeats().Contains(target))
             throw new InvalidOperationException("Qingzhong choice is not a current minimum living hand seat.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -122,7 +121,6 @@ internal sealed partial class CharacterLuZhiWeiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qingzhong: { } p } f || f.Id != id)
             return false;
-        RequireIssuedLuZhiWei(f);
         if (p.Stage == QingzhongStage.ChooseMinimum)
         {
             if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)

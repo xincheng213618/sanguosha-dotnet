@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineTieredRoundZeroUsesEntries
 {
-    internal void AssertTieredRoundConversionUses() => _resolve().AssertTieredRoundConversionUses();
     internal void BeginTieredRoundForcedZeroSlash(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardConversionSource source, global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit) => _resolve().BeginTieredRoundForcedZeroSlash(actor, target, kind, source, borrowed, countsTowardLimit);
     internal bool ContinueTieredRoundZeroSimpleUse(long id, global::CardGame.Core.ProgramSimpleCardContinuation continuation) => _resolve().ContinueTieredRoundZeroSimpleUse(id, continuation);
     internal void ExecuteTieredRoundZeroPlay(global::CardGame.Core.CharacterState actor, global::CardGame.Core.LegalAction action) => _resolve().ExecuteTieredRoundZeroPlay(actor, action);

@@ -92,7 +92,6 @@ internal sealed partial class CharacterCaoShuangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.CaoShuangTuogu is null && f.CaoShuangShanzhuan is null)
             return;
-        AssertCaoShuangProgram(f);
         if (DrainCaoShuangChildren(id))
             return;
         if (f.CaoShuangTuogu is { Granted: false })

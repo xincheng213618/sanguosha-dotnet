@@ -137,8 +137,6 @@ internal sealed partial class CharacterZhangHengAnniversaryRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryZhangHeng = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
-
-    internal bool HasAnniversaryZhangHengPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryZhangHeng.Stage: "donor" or "cards", Step: ResolutionFrameStep.AwaitingResponse } f && ValidZhangHeng(f) && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ZhangHengChoices(f));
     [ProgramAiChoice(SkillProgramEffectOp.ResolveAnniversaryZhangHengDangzai)]
     internal PromptChoice ChooseZhangHeng(PendingDecision p) => p.Choices.FirstOrDefault(c => c.Cards.Count == 1) ?? p.Choices.First();
 }

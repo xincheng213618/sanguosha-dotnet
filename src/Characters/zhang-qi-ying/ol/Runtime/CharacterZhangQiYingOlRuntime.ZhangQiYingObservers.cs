@@ -17,13 +17,6 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
             throw new InvalidOperationException("Gouchen needs one exact already-paid three-category gain invoice.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 300)]
-    internal void AssertRegisteredZhangQiYing(ProgramSkillFrame frame)
-    {
-        if (frame.ZhangQiYing is not null)
-            AssertZhangQiYing(frame);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 260)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 260)]
     internal bool CanContinueZhangQiYing(ProgramSkillFrame f)
@@ -58,8 +51,6 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
     internal bool HasZhangQiYingDamageObserver(long id) => ZhangQiYingObserverRoot()is not null && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 420)]
     internal bool HasZhangQiYingBeforeDamageObserver(long id) => ZhangQiYingObserverRoot()is not null && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 190)]
-    internal bool IsZhangQiYingDying() => _coreDyingCursorRuntimeOperations.ActiveDying is not null && ZhangQiYingObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 330)]
     internal bool TryAdvanceZhangQiYingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangQiYingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

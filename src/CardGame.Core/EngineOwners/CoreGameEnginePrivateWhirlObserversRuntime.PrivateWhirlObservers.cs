@@ -18,8 +18,6 @@ internal sealed partial class CoreGameEnginePrivateWhirlObserversRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 40)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 150)]
     internal bool HasPrivateWhirlDamageObserver(long id) => PrivateWhirlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 190)]
-    internal bool IsPrivateWhirlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PrivateWhirlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 120)]
     internal bool TryAdvancePrivateWhirlSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && PrivateWhirlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

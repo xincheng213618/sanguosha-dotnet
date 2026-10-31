@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterDongZhaoMobileShiEntries
 {
     internal void AnswerShiDz(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiDz(choice);
-    internal void AssertShiDz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiDz(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiDz(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiDz(input, op);
     internal bool CanOfferShiDz(global::CardGame.Core.ProgramTriggerLegalityContext q) => _resolve().CanOfferShiDz(q);
     internal global::CardGame.Core.PromptChoice ChooseShiDzAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseShiDzAi(p, f);

@@ -5,8 +5,6 @@ internal sealed partial class CharacterGuanHaiOlEntries
     internal bool AdvanceGuanHaiChildren() => _resolve().AdvanceGuanHaiChildren();
     internal void AnswerGuanHai(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerGuanHai(choice);
     internal void AppendGuanHaiYouqueDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.DamageTriggerCandidate> result) => _resolve().AppendGuanHaiYouqueDamageCandidates(attack, window, result);
-    internal void AssertGuanHai(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertGuanHai(f);
-    internal void AssertXieweiPayments(global::CardGame.Core.CardUseFrame use) => _resolve().AssertXieweiPayments(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGuanHai(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginGuanHai(supplied, op);
     internal void BeginXieweiMultiTargetSlash(global::CardGame.Core.CharacterState actor, global::CardGame.Core.ProgramMultiCardViewAsSelection s, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().BeginXieweiMultiTargetSlash(actor, s, targets);
     internal void BindXieweiResponsePayment(long nativeUseId, global::CardGame.Core.CardActionContext action) => _resolve().BindXieweiResponsePayment(nativeUseId, action);
@@ -29,7 +27,6 @@ internal sealed partial class CharacterGuanHaiOlEntries
     internal global::CardGame.Core.ProgramSkillFrame? GuanHaiObserverRoot() => _resolve().GuanHaiObserverRoot();
     internal bool HasGuanHaiBeforeDamageObserver(long id) => _resolve().HasGuanHaiBeforeDamageObserver(id);
     internal bool HasGuanHaiDamageObserver(long id) => _resolve().HasGuanHaiDamageObserver(id);
-    internal bool IsGuanHaiDying() => _resolve().IsGuanHaiDying();
     internal bool IsGuanHaiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsGuanHaiMovement(f, e, p);
     internal bool IsGuanHaiPindianSource(global::CardGame.Core.PindianFrame p, bool revealed) => _resolve().IsGuanHaiPindianSource(p, revealed);
     internal bool IsGuanHaiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsGuanHaiRecoveryParent(f, recovery);

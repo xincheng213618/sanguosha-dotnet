@@ -50,13 +50,6 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
         return pending.Count == 0 ? pending.CardId is null && pending.From is null : pending.CardId is { } id && pending.From is { OwnerSeat: { } cardOwner } from && cardOwner == stepInfo.Seat && from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > pending.Before && m.Sequence <= pending.After && m.CardId == id && m.From == from && m.Reason.Value == "skill-program.xunyi.discard" && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(id).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)))) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26320)]
-    internal void RequireXunyi(ProgramSkillFrame frame)
-    {
-        if (frame.Xunyi is not null && !ValidXunyi(frame))
-            throw new InvalidOperationException("Xunyi lost its exact native damage, frozen relation, point cursor or once-paid consequence.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26320)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26320)]
     internal bool ContinueIssuedXunyi(ProgramSkillFrame frame) => ValidXunyi(frame);
@@ -86,8 +79,6 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
     internal bool HasXunyiDamageObserver(long id) => XunyiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 530)]
     internal bool HasXunyiBeforeDamageObserver(long id) => XunyiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 360)]
-    internal bool IsXunyiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && XunyiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26320)]
     internal bool AdvanceXunyiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XunyiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

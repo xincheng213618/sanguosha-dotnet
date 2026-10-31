@@ -116,7 +116,6 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyZhangLiao: not null } f || f.Id != id)
             return false;
-        RequireHappyZl(f);
         var r = f.HappyZhangLiao!;
         if (r.Stage == HappyZlStage.Drawing)
             return true;
@@ -218,7 +217,6 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
     internal void AnswerHappyZl(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Zhang Liao lost choice owner.");
-        RequireHappyZl(f);
         var r = f.HappyZhangLiao!;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([chosen], HappyZlChoices(f).Where(c => c.Id == chosen.Id).ToArray()))
             throw new InvalidOperationException("Happy Zhang Liao requires his exact current dynamic card choice.");

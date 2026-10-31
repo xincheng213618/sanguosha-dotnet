@@ -193,32 +193,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
         return receipt is not null && receipt.OwnerSeat == frame.OwnerSeat && receipt.OptionId == binding.OptionId && (IsHellTargetOp(producer.Effect.Op) ? receipt.OptionId == (receipt.TargetSeat is null ? "none" : "eligible") && (receipt.TargetSeat is null || _coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.TargetSeat.Value) && receipt.TargetSeat != frame.OwnerSeat) : receipt.TargetSeat is null && (producer.Effect.Op == SkillProgramEffectOp.RollHellElement ? receipt.OptionId is "fire" or "thunder" or "none" : receipt.OptionId is "nanman" or "wanjian"));
     }
 
-    internal bool HasExactHellKingParticipantSelection(ProgramSkillFrame frame)
-    {
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        var producer = plan.Instructions.Take(frame.InstructionIndex).Select((e, i) => (Effect: e, Index: i + 1)).LastOrDefault(p => IsHellTargetOp(p.Effect.Op) && frame.ChoiceBindings.Any(b => b.Name == p.Effect.ResultBind));
-        if (producer.Effect is null)
-            return false;
-        var binding = frame.ChoiceBindings.SingleOrDefault(b => b.Name == producer.Effect.ResultBind);
-        if (binding is null || !IsHellKingChoiceResult(frame, binding))
-            return false;
-        var receipt = _coreProgramEventHistoryOperations.ProgramEventHistory<HellKingChoiceRecordedEvent>().Single(e => e.ProgramFrameId == frame.Id && e.InstructionIndex == producer.Index && e.ResultBind == binding.Name);
-        return frame.SelectedTargetSeats.SequenceEqual(receipt.TargetSeat is { } target ? new[] { target } : []);
-    }
-
     internal bool IsHellRandomAssaultBranch(ProgramSkillFrame frame, SkillProgramEffect effect) => effect is { Op: SkillProgramEffectOp.UseVirtualOrdinaryTrick, Condition: { Kind: SkillProgramConditionKind.ChoiceIs, SourceBind: { } bind, OptionId: { } option } } && frame.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Instructions.Take(frame.InstructionIndex - 1).Any(e => e.Op == SkillProgramEffectOp.RollHellAssault && e.ResultBind == bind) && frame.ChoiceBindings.SingleOrDefault(b => b.Name == bind)is { } result && result.OptionId == option && IsHellKingChoiceResult(frame, result) && (effect.OutputKind == CardKind.BarbarianAssault && option == "nanman" || effect.OutputKind == CardKind.ArrowBarrage && option == "wanjian");
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 40000)]
-    internal void AssertHellKingSelection(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        if (frame.InstructionIndex < 1 || frame.InstructionIndex > plan.Instructions.Count)
-            return;
-        var paused = plan.Instructions[frame.InstructionIndex - 1];
-        if (!IsHellExtremeOp(paused.Op) || frame.ChoiceBindings.Any(b => b.Name == paused.ResultBind) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id)
-            return;
-        var seats = HellExtremeParticipants(frame, paused.Op);
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat || seats.Length < 2 || prompt.Choices.Count != seats.Length || prompt.Choices.Any(c => c.Cards.Count != 0 || c.Targets is not [var target] || !seats.Contains(target) || c.Parameters.GetValueOrDefault("program-action") != "hell-king-extreme" || c.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(CultureInfo.InvariantCulture)))
-            throw new InvalidOperationException("A Hell extreme-HP chooser lost its exact pending target domain.");
-    }
 
     [ProgramNativeDrawReturn(SkillProgramEffectOp.RewardHellRecoverySource, SkillProgramEffectOp.DrawHellPreparation)]
     internal void ReturnHellNativeDraw(ProgramSkillFrame frame, NativeDrawOutcome outcome)
@@ -255,8 +230,6 @@ internal sealed partial class CoreHellKingProgramsRuntime
         _coreCardUseLifecycleOperations.BeginSimpleCardUse(id, new(0, SimpleCardUseEffect.Alcohol));
         return SkillProgramStepOutcome.AwaitChild;
     }
-
-    internal bool IsExactHellPreparationAlcoholDraft(ProgramSkillFrame frame, ProgramVirtualBasicDraft draft) => draft.InstructionIndex == frame.InstructionIndex && draft.ChildFrameId is not null && HasExactHellPreparationParent(frame) && ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect.Op == SkillProgramEffectOp.UseHellPreparationAlcohol;
     internal bool HasHellZhiwangHolder => _contentRegistryOperations._contentRegistry.Skills.ContainsKey("hell:zhiwang") && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(p, "hell:zhiwang"));
 
     internal static bool IsHellZhiwangTrigger(SkillProgramTrigger trigger) => trigger.Window == SkillProgramTriggerWindow.CardsGained && trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DiscardHellOutsideDrawGain);

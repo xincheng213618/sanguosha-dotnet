@@ -46,8 +46,6 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
     internal bool HasWuHfDamageObserver(long id) => WuHfObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1491)]
     internal bool HasWuHfBeforeDamageObserver(long id) => WuHfObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1321)]
-    internal bool IsWuHfDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WuHfObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 930)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 870)]
     internal bool IsWuHfRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame r)
@@ -59,13 +57,6 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var child = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == r.Id);
         return i >= 0 && child > i + 1 && WuHfFirstChild(f, _resolutionStackOperations._resolutionStack[i + 1]) && WuHfObserverSuffix(i) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(r, _resolutionStackOperations._resolutionStack[child - 1]);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 30000)]
-    internal void AssertWuHf(ProgramSkillFrame f)
-    {
-        if (f.WuHuangFuSong is not null && !ValidWuHf(f))
-            throw new InvalidOperationException("Wu Huangfu Song changed the owning native receipt or paid physical movement.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30000)]

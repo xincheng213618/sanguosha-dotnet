@@ -63,7 +63,6 @@ internal sealed partial class CharacterWeiYanHappyGodEntries
     internal void PayHappyWeiYanMove(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.HappyWeiYanStage stage, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to, string reason) => _resolve().PayHappyWeiYanMove(frame, stage, card, from, to, reason);
     internal void PlaceHappyBone(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PlaceHappyBone(frame);
     internal void PresentHappyWeiYanAdditional(global::CardGame.Core.ProgramSkillFrame frame, int chooser, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> choices) => _resolve().PresentHappyWeiYanAdditional(frame, chooser, choices);
-    internal void RequireHappyWeiYan(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().RequireHappyWeiYan(frame);
     internal bool ResumeHappyBoneAttack() => _resolve().ResumeHappyBoneAttack();
     internal bool RetainHappyWeiYanAccepted(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().RetainHappyWeiYanAccepted(frame);
     internal bool ReturnHappyBoneUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnHappyBoneUse(use);

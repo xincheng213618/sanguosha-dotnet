@@ -4,7 +4,6 @@ internal sealed partial class CharacterLuSuHappyGodEntries
 {
     internal global::CardGame.Core.PromptChoice AiHappyDingzhou(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AiHappyDingzhou(decision, frame);
     internal void AnswerHappyDingzhou(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerHappyDingzhou(answer);
-    internal void AssertHappyDingzhou(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertHappyDingzhou(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyDingzhou(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHappyDingzhou(supplied);
     internal void ContinueHappyDingzhou(long id) => _resolve().ContinueHappyDingzhou(id);
     internal void FinishHappyDingzhou(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().FinishHappyDingzhou(frame);

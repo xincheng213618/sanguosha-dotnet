@@ -60,7 +60,6 @@ internal sealed partial class CharacterLuSuMobileGodRuntime
     {
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShenLuSu: { } r } f && f.Id == id)
         {
-            RequireShenLs(f);
             if (DrainShenLs(id))
                 return;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

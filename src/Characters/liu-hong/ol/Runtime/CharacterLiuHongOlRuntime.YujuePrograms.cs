@@ -224,33 +224,6 @@ internal sealed partial class CharacterLiuHongOlRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 
-    internal void AssertYujuePending(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.YujuePending is null && paused.Op != SkillProgramEffectOp.YujueResolve)
-            return;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var payments = history.OfType<ProgramYujueSlotPaidEvent>().Where(fact => fact.FrameId == frame.Id).ToArray();
-        var completed = history.OfType<ProgramYujueInvokedEvent>().Where(fact => fact.FrameId == frame.Id).ToArray();
-        var gifts = history.OfType<ProgramYujueGiftPaidEvent>().Where(fact => fact.FrameId == frame.Id).ToArray();
-        if (frame.YujuePending is not { } pending)
-        {
-            if (payments.Length != 0 && completed.Length != 1)
-                throw new InvalidOperationException("A paid Yujue invocation lost its frame-owned continuation receipt.");
-            return;
-        }
-
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-        if (paused.Op != SkillProgramEffectOp.YujueResolve || frame.TriggerId is not null || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || pending.Source != source || pending.GameplayHash != frame.GameplayHash || pending.InstructionIndex != frame.InstructionIndex || !System.Enum.TryParse<EquipmentSlot>(pending.AbolishedSlot, out var slot) || !global::CardGame.Core.EngineOwners.CharacterLiuHongOlDefinitions.YujueSlotOrder.Contains(slot) || pending.Stage is not (YujuePendingStage.SlotPaid or YujuePendingStage.GiftPaid) || payments is not [var paid] || paid.Source != source || paid.GameplayHash != frame.GameplayHash || paid.InstructionIndex != frame.InstructionIndex || paid.AbolishedSlot != pending.AbolishedSlot || completed.Length != 0 || pending.TargetSeat is { } target && (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == frame.OwnerSeat))
-            throw new InvalidOperationException("A Yujue receipt lost its exact activation, source instance or single paid slot.");
-        if (pending.Stage == YujuePendingStage.SlotPaid)
-        {
-            if (pending.GivenCardId is not null || pending.GiftMovementSequence is not null || gifts.Length != 0)
-                throw new InvalidOperationException("An unpaid Yujue gift contains a completed card invoice.");
-        }
-        else if (pending.TargetSeat is not { } giver || pending.GivenCardId is not { } card || pending.GiftMovementSequence is not { } sequence || gifts is not [var gift] || gift.Source != source || gift.GameplayHash != frame.GameplayHash || gift.InstructionIndex != frame.InstructionIndex || gift.TargetSeat != giver || gift.GivenCardId != card || gift.MovementSequence != sequence || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.Sequence == sequence && move.CardId == card && move.From == CardLocation.Hand(giver) && move.To == CardLocation.Hand(frame.OwnerSeat) && move.Reason.Value == $"skill-program.{(frame.SkillId)}.yujue-give") != 1)
-            throw new InvalidOperationException("A paid Yujue gift lost its exact once-only hand movement.");
-    }
-
     internal PromptChoice SelectAiYujueSlotChoice(PendingDecision decision)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat];

@@ -22,8 +22,6 @@ internal sealed class NativeDrawAttemptServices(global::System.Func<global::Card
     }
 
     public bool IsRedirectedGain(CardMovementRecord movement, CardLocation expectedTo) => getCoreHappyWeiYanGainDestinationsRuntime().IsHappyWeiYanRedirectedGain(movement, expectedTo);
-    public IEnumerable<NativeDrawAttemptStartedEvent> StartedEvents() => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<NativeDrawAttemptStartedEvent>();
-    public IEnumerable<NativeDrawAttemptDecidedEvent> DecidedEvents() => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<NativeDrawAttemptDecidedEvent>();
     public NativeDrawPileSlashProof? DrawPileSlashReplacementProof(ProgramSkillFrame frame, NativeDrawAttemptContext context) => getCharacterZhangFeiOlMagicRuntime().NativeDrawPileSlashReplacementProof(frame, context);
     public bool IsIssuedDrawPileSlashReplacement(NativeDrawAttemptContext context, NativeDrawReplacementResult replacement) => getCharacterZhangFeiOlMagicRuntime().IsIssuedNativeDrawPileSlashReplacement(context, replacement);
     public void CompleteLingkongReplacement(ProgramSkillFrame frame, NativeDrawAttemptFrame attempt, NativeDrawReplacementResult replacement) => getCharacterZhouFeiLeRuntime().CompleteLingkongNativeDrawReplacement(frame, attempt, replacement);

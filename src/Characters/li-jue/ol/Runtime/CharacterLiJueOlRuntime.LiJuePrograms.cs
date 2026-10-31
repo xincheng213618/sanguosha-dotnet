@@ -161,12 +161,5 @@ internal sealed partial class CharacterLiJueOlRuntime
             throw new InvalidOperationException("Yisuan cannot repeat a completed actual gain interval.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 240)]
-    internal void AssertRegisteredLiJue(ProgramSkillFrame frame)
-    {
-        if (frame.LiJue is not null)
-            RequireLiJue(frame);
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.ILiJueProgramHost.BeginLiJue(ProgramSkillFrame f, SkillProgramEffect e) => BeginLiJue(f, e);
 }

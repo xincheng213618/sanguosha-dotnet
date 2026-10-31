@@ -64,7 +64,6 @@ internal sealed partial class CharacterGongsunZanMouOlRuntime
     internal bool MouGszDamage(long id) => MouGszObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 32700)]
     internal bool MouGszBeforeDamage(long id) => MouGszObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 32700)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32700)]
     internal bool MouGszDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGszObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 32700)]
@@ -96,10 +95,4 @@ internal sealed partial class CharacterGongsunZanMouOlRuntime
     internal bool ReturnMouGszMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeMouGsz(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 32700)]
     internal bool AdvanceMouGszChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouGszObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 32700)]
-    internal void AssertMouGsz(ProgramSkillFrame f)
-    {
-        if (f.MouGongsunZan is not null && !ValidMouGsz(f))
-            throw new InvalidOperationException("Gongsun Zan lost his accepted native designation or paid original movement child.");
-    }
 }

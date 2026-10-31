@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDamageTargetBudgetEntries
 {
     internal global::CardGame.Core.SkillProgramStepOutcome ApplyDamageTargetBudget(global::CardGame.Core.SkillProgramEffect e, global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ApplyDamageTargetBudget(e, supplied);
-    internal void AssertDamageTargetBudgetReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertDamageTargetBudgetReceipt(f);
     internal global::CardGame.Core.CardConversionSource BudgetSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BudgetSource(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BuildDamageBudgetChoices(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame use, global::CardGame.Core.DamageTargetBudgetReceipt r) => _resolve().BuildDamageBudgetChoices(f, use, r);
     internal bool CanOfferDamageTargetBudget(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferDamageTargetBudget(c, t, context);

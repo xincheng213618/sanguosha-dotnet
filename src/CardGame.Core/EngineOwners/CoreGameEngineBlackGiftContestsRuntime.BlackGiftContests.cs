@@ -104,7 +104,6 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
     internal void ResolveBlackGiftChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        _coreRecipientConsequencesReceiptsOperations.AssertRecipientConsequences(f);
         var r = f.BlackGiftContest!;
         var seat = r.Stage == BlackGiftContestStage.ChoosingSecond ? f.OwnerSeat : BlackGiftWinner(r.Result!)!.Value;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [BlackGiftChoices(f).Single(c => c.Id == choice.Id)]))
@@ -175,7 +174,6 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.BlackGiftContest is not { } r)
             return false;
-        _coreRecipientConsequencesReceiptsOperations.AssertRecipientConsequences(f);
         if (_coreRecipientConsequencesReceiptsOperations.RecipientConsequencesGameEnded())
             return true;
         if (r.Stage is BlackGiftContestStage.ChoosingSecond or BlackGiftContestStage.ChoosingDiscard)

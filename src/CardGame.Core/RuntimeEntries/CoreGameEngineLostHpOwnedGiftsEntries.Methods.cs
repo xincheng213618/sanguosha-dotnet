@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineLostHpOwnedGiftsEntries
 {
-    internal void AssertLostHpOwnedGifts() => _resolve().AssertLostHpOwnedGifts();
     internal global::CardGame.Core.SkillProgramStepOutcome AwaitLostHpOwnedGiftMovements(long frameId) => _resolve().AwaitLostHpOwnedGiftMovements(frameId);
     internal void FinishLostHpOwnedGift(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().FinishLostHpOwnedGift(frame);
     internal bool IsLostHpOwnedGiftProgramDying() => _resolve().IsLostHpOwnedGiftProgramDying();

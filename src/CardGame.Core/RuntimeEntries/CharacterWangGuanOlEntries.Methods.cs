@@ -5,7 +5,6 @@ internal sealed partial class CharacterWangGuanOlEntries
     internal bool AdvanceWangGuanSubtree() => _resolve().AdvanceWangGuanSubtree();
     internal void AnswerWangGuan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerWangGuan(choice);
     internal void AssertShiluIdentity(global::CardGame.Core.ShiluHandIdentityGrantedEvent e) => _resolve().AssertShiluIdentity(e);
-    internal void AssertWangGuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWangGuan(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginWangGuan(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginWangGuan(input, op);
     internal bool CanRunIssuedMiuyanCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunIssuedMiuyanCandidate(c, context);
     internal long CaptureMiuyanQualificationStamp(long underlying) => _resolve().CaptureMiuyanQualificationStamp(underlying);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterWangGuanOlEntries
     internal bool IsMiuyanCategoryGiftMovementReveal(global::CardGame.Core.IGameEvent fact) => _resolve().IsMiuyanCategoryGiftMovementReveal(fact);
     internal bool IsMiuyanGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsMiuyanGrantQualified(owner, grant);
     internal bool IsMiuyanShandaoMovementReveal(global::CardGame.Core.IGameEvent fact) => _resolve().IsMiuyanShandaoMovementReveal(fact);
-    internal bool IsWangGuanDying() => _resolve().IsWangGuanDying();
     internal bool IsWangGuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWangGuanMovement(f, e, p);
     internal void IssueMiuyanUse(long useId, global::CardGame.Core.CardActionContext? action) => _resolve().IssueMiuyanUse(useId, action);
     internal global::CardGame.Core.CardUseFrame? MiuyanCandidateUse(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().MiuyanCandidateUse(c, context);

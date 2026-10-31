@@ -6,9 +6,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodEntries
     internal void AnswerKemingBorrow(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerKemingBorrow(selected);
     internal void AnswerKemingEcho(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerKemingEcho(choice);
     internal void AssertKemingEcho(global::CardGame.Core.KemingSkillEchoFrame f) => _resolve().AssertKemingEcho(f);
-    internal void AssertKemingEchoFrames() => _resolve().AssertKemingEchoFrames();
     internal void AssertKemingSourceReceipt(global::CardGame.Core.KemingSourceCapture c) => _resolve().AssertKemingSourceReceipt(c);
-    internal void AssertShenCaoPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShenCaoPi(f);
     internal bool BeginKemingEcho(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.KemingSourceCapture capture, global::CardGame.Core.KemingEchoReturn returned) => _resolve().BeginKemingEcho(parent, capture, returned);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShenCaoPi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShenCaoPi(supplied, op);
     internal bool CanTriggerShenCaoPi(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanTriggerShenCaoPi(g);
@@ -20,7 +18,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodEntries
     internal void FinishShenCaoPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShenCaoPi(f);
     internal bool HasKemingBorrowedSkill(global::CardGame.Core.CharacterState owner, string skill) => _resolve().HasKemingBorrowedSkill(owner, skill);
     internal bool HasKemingBorrowedSkillInstance(global::CardGame.Core.CharacterState owner, string skill, string instance) => _resolve().HasKemingBorrowedSkillInstance(owner, skill, instance);
-    internal bool HasKemingCixiongContinuation(global::CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle pending) => _resolve().HasKemingCixiongContinuation(pending);
     internal bool HasKemingCompletedCardEffect(global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().HasKemingCompletedCardEffect(action, window);
     internal bool HasKemingEchoPrompt() => _resolve().HasKemingEchoPrompt();
     internal bool IsIssuedShenCaoPiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedShenCaoPiCandidate(c, w);
@@ -30,7 +27,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> KemingBorrowChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KemingBorrowChoices(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.KemingBorrowOption> KemingBorrowOptions(int borrower, int source) => _resolve().KemingBorrowOptions(borrower, source);
     internal string? KemingBorrowedSkillInstance(global::CardGame.Core.CharacterState owner, string skill) => _resolve().KemingBorrowedSkillInstance(owner, skill);
-    internal bool KemingCixiongObserverEdge(int index) => _resolve().KemingCixiongObserverEdge(index);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> KemingEchoChoices(global::CardGame.Core.KemingSkillEchoFrame f) => _resolve().KemingEchoChoices(f);
     internal bool KemingEchoTypedParentMatches(global::CardGame.Core.KemingSkillEchoFrame f, global::CardGame.Core.ResolutionFrame parent) => _resolve().KemingEchoTypedParentMatches(f, parent);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.KemingBorrowOption> KemingPrintedBorrowOptions(global::CardGame.Core.ContentGeneralDefinition general) => _resolve().KemingPrintedBorrowOptions(general);

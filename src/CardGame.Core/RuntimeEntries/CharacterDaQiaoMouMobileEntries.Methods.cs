@@ -7,7 +7,6 @@ internal sealed partial class CharacterDaQiaoMouMobileEntries
     internal global::CardGame.Core.PromptChoice AiMouDaQiaoHeart(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouDaQiaoHeart(p, f);
     internal void AnswerMouDaQiaoGuose(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouDaQiaoGuose(choice);
     internal void AnswerMouDaQiaoHeart(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouDaQiaoHeart(choice);
-    internal void AssertMouDaQiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouDaQiao(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouDaQiaoGuose(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouDaQiaoGuose(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouDaQiaoLiuliPhase(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMouDaQiaoLiuliPhase(f);
     internal bool CanMouDaQiaoGuose(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanMouDaQiaoGuose(c);

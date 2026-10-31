@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineTargetedOrdinaryTrickEntries
 {
-    internal void AssertTargetedOrdinaryTrickReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertTargetedOrdinaryTrickReceipt(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginTargetedOrdinaryTrick(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginTargetedOrdinaryTrick(supplied);
     internal bool CanAddTargetedTrickTarget(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CharacterState target, bool removeTargets) => _resolve().CanAddTargetedTrickTarget(use, target, removeTargets);
     internal bool CanOfferTargetedOrdinaryTrick(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferTargetedOrdinaryTrick(candidate, trigger, context);

@@ -11,16 +11,6 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29300)]
     internal bool KeepPaidMouYuJin(ProgramSkillFrame f) => MouYuJinPaid(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29300)]
-    internal void AssertMouYuJin(ProgramSkillFrame f)
-    {
-        if (f.MouYuJinXiayuan is not null && !ValidMouXiayuan(f) || f.MouYuJinJieyue is not null && !ValidMouJieyue(f))
-            throw new InvalidOperationException("Mobile Yu Jin lost its original damage invoice, actual Hand2 payment or native Ending grant/gift receipt.");
-        if (f.MouYuJinJieyue is not { Stage: MouYuJinJieyueStage.GiftChoice } r || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id)
-            return;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != r.RecipientSeat || p.TargetSeat != r.RecipientSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, MouJieyueGiftChoices(f)))
-            throw new InvalidOperationException("Jieyue's actual beneficiary must retain the canonical independent private gift choice.");
-    }
 
     internal bool MouYuJinFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -48,7 +38,6 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
     internal bool HasMouYuJinDamageObserver(long id) => MouYuJinObserverRoot()is { } root && (root.MouYuJinXiayuan?.OriginalDamageWindowId == id || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1430)]
     internal bool HasMouYuJinBeforeDamageObserver(long id) => MouYuJinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1260)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 820)]
     internal bool IsMouYuJinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouYuJinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 590)]

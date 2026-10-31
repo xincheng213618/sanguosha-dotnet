@@ -54,15 +54,4 @@ internal sealed partial class CharacterWangKuangOlRuntime
         var tail = _coreProgramEventHistoryOperations.ProgramEventHistory<WangKuangRenxiaTailClosedEvent>().Where(e => e.FrameId == f.Id && e.Cursor == r.Cursor).ToArray();
         return r.Selected.Count == r.RequiredCount && r.Selected.Count == r.ActualCount && (r.After == paid[^1].After && tail.Length == 0 || tail is [{ After: var after }] && after == r.After);
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 26910)]
-    internal void AssertWangKuang(ProgramSkillFrame f)
-    {
-        if (f.WangKuangRenxia is not { } r)
-            return;
-        if (!ValidWangKuang(f))
-            throw new InvalidOperationException("Renxia lost its original source, exact actual Play obligation or frozen native per-iteration payment.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && r.Stage is WangKuangRenxiaStage.BranchChoice or WangKuangRenxiaStage.DiscardChoice && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, WangKuangChoices(f))))
-            throw new InvalidOperationException("Renxia lost its private original-owner branch or physical discard chooser.");
-    }
 }

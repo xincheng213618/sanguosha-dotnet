@@ -5,7 +5,6 @@ internal sealed partial class CharacterMaChengOlEntries
     internal bool AdvanceMaChengSubtree() => _resolve().AdvanceMaChengSubtree();
     internal void AnswerChenglie(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerChenglie(choice);
     internal void ApplyChenglieTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ApplyChenglieTargets(f);
-    internal void AssertMaCheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMaCheng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginChenglie(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginChenglie(supplied, op);
     internal void BeginChenglieCleanup(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginChenglieCleanup(f);
     internal global::CardGame.Core.PromptChoice ChenglieChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().ChenglieChoice(f, branch, label, cards, targets);
@@ -26,13 +25,11 @@ internal sealed partial class CharacterMaChengOlEntries
     internal bool DrainChenglie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainChenglie(f);
     internal void FinishChenglie(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishChenglie(f);
     internal void FinishChenglieMovement(long id) => _resolve().FinishChenglieMovement(id);
-    internal bool HasChenglieCompletedUseObserver(long useId) => _resolve().HasChenglieCompletedUseObserver(useId);
     internal bool HasChenglieResponseObserver(global::CardGame.Core.CardActionContext a, global::CardGame.Core.ProgramCardContinuation continuation) => _resolve().HasChenglieResponseObserver(a, continuation);
     internal bool HasChenglieTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasChenglieTargetTail(use);
     internal bool HasChenglieTargetTail2(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardActionContext action) => _resolve().HasChenglieTargetTail(use, action);
     internal bool HasMaChengBeforeDamageObserver(long id) => _resolve().HasMaChengBeforeDamageObserver(id);
     internal bool HasMaChengDamageObserver(long id) => _resolve().HasMaChengDamageObserver(id);
-    internal bool HasMaChengDyingObserver() => _resolve().HasMaChengDyingObserver();
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.NamedAmbushPileSnapshot>? IncludeChenglieSnapshots(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.NamedAmbushPileSnapshot>? ordinary, int holder, int viewer, bool revealAll) => _resolve().IncludeChenglieSnapshots(ordinary, holder, viewer, revealAll);
     internal bool IsChenglieAppliedTargetFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ChenglieTargetsAppliedEvent e, global::System.Collections.Generic.IReadOnlyList<int> precedingTargets, scoped out global::System.Collections.Generic.IReadOnlyList<int> resultTargets) => _resolve().IsChenglieAppliedTargetFact(use, e, precedingTargets, out resultTargets);
     internal bool IsChengliePrivateProcessingCard(int cardId) => _resolve().IsChengliePrivateProcessingCard(cardId);

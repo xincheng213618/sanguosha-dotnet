@@ -4,7 +4,6 @@ internal sealed partial class CharacterYuanJiOlEntries
 {
     internal global::CardGame.Core.PromptChoice AiYuanJi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiYuanJi(p, f);
     internal void AnswerYuanJiOrder(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerYuanJiOrder(choice);
-    internal void AssertYuanJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertYuanJi(f);
     internal void BeginYuanJiDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginYuanJiDraw(f);
     internal void CaptureYuanJiAtomicLoss(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureYuanJiAtomicLoss(batch);
     internal void CollectJieyanCandidates(global::CardGame.Core.CardMovementBatchContext batch, global::System.Collections.Generic.List<global::CardGame.Core.ProgramTriggerCandidate> result) => _resolve().CollectJieyanCandidates(batch, result);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterYuanJiOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> IncludeYuanJiIssuedReturns(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> ordinary) => _resolve().IncludeYuanJiIssuedReturns(owner, window, ordinary);
     internal bool IsIssuedJieyanCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedJieyanCandidate(c, context);
     internal bool IsIssuedYuanJiReturn(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedYuanJiReturn(c, context);
-    internal bool IsYuanJiDying() => _resolve().IsYuanJiDying();
     internal bool IsYuanJiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsYuanJiMovement(f, e, p);
     internal bool IsYuanJiOwnMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsYuanJiOwnMovement(f, m);
     internal bool IsYuanJiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsYuanJiRecoveryParent(f, recovery);
@@ -44,7 +42,6 @@ internal sealed partial class CharacterYuanJiOlEntries
     internal bool YuanJiObserverEdge(int n) => _resolve().YuanJiObserverEdge(n);
     internal global::CardGame.Core.ProgramSkillFrame? YuanJiObserverRoot() => _resolve().YuanJiObserverRoot();
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> YuanJiOrderChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().YuanJiOrderChoices(f);
-    internal bool YuanJiParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().YuanJiParent(f);
     internal bool YuanJiWindowCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context, scoped out global::CardGame.Core.ResolutionFrame parent) => _resolve().YuanJiWindowCandidate(candidate, context, out parent);
     internal bool HasYuanJiCapability { get => _resolve().HasYuanJiCapability; }
 }

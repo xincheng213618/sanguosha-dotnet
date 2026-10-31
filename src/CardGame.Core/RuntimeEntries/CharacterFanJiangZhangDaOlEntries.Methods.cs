@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterFanJiangZhangDaOlEntries
 {
     internal bool AdvanceFanJiangZhangDaSubtree() => _resolve().AdvanceFanJiangZhangDaSubtree();
-    internal void AssertJuesheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertJuesheng(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginJuesheng(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginJuesheng(supplied);
     internal bool CanActivateJuesheng(global::CardGame.Core.CharacterState owner) => _resolve().CanActivateJuesheng(owner);
     internal bool CanIssueJueshengDuel(int actor, int target) => _resolve().CanIssueJueshengDuel(actor, target);
@@ -15,8 +14,6 @@ internal sealed partial class CharacterFanJiangZhangDaOlEntries
     internal bool HasFanJiangZhangDaBeforeDamageObserver(long id) => _resolve().HasFanJiangZhangDaBeforeDamageObserver(id);
     internal bool HasFanJiangZhangDaDamageObserver(long id) => _resolve().HasFanJiangZhangDaDamageObserver(id);
     internal bool HasYuanchouArmorBypass(long useId, int targetSeat) => _resolve().HasYuanchouArmorBypass(useId, targetSeat);
-    internal bool IsFanJiangZhangDaDying() => _resolve().IsFanJiangZhangDaDying();
-    internal bool IsJueshengDuelAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsJueshengDuelAttackConsistent(attack, processing);
     internal bool IsJueshengDuelUse(long id) => _resolve().IsJueshengDuelUse(id);
     internal bool JueshengActorMatches(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.JueshengDuelOrigin origin) => _resolve().JueshengActorMatches(use, origin);
     internal long? JueshengDuelProgramParent(long id) => _resolve().JueshengDuelProgramParent(id);

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePublicPilePreparationReceiptsEntries
 {
-    internal void AssertPublicPilePreparation(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertPublicPilePreparation(f);
     internal bool HasPublicPilePreparationDamageObserver(long id) => _resolve().HasPublicPilePreparationDamageObserver(id);
     internal bool IsPublicPilePreparationMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsPublicPilePreparationMovement(f, effect, pending);
     internal bool IsPublicPilePreparationProgramDying() => _resolve().IsPublicPilePreparationProgramDying();

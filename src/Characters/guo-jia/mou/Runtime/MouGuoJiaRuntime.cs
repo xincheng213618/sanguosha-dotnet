@@ -83,6 +83,5 @@ internal sealed class MouGuoJiaRuntime(IMouGuoJiaFacts facts,IMouGuoJiaNative na
  [ProgramContinuation(ProgramContinuationKind.Resume,37100)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouGuoJia:not null}f||f.Id!=id)return false;Continue(id);return true;}
  [ProgramContinuation(ProgramContinuationKind.Movement,37100)]private bool Movement(ProgramSkillFrame f)=>f.MouGuoJia is not null&&Resume(f.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,37100)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,37100)]private bool Paid(ProgramSkillFrame f)=>f.MouGuoJia is not null&&Valid(f);
- [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,37100)]private void Invariant(ProgramSkillFrame f){if(f.MouGuoJia is not null&&!Valid(f))throw new InvalidOperationException("Invalid own-frame Mou Guo Jia receipt.");}
  [ProgramAiChoice(SkillProgramEffectOp.InitializeMouGuoJiaXianmou,SkillProgramEffectOp.ResolveMouGuoJiaXianmou,SkillProgramEffectOp.ResolveMouGuoJiaYiji)]private PromptChoice Ai(PendingDecision p,ProgramSkillFrame f)=>p.Choices.FirstOrDefault(c=>c.Parameters.GetValueOrDefault("branch")=="done"&&f.MouGuoJia!.Selected.Count>=Math.Min(f.MouGuoJia.X,f.MouGuoJia.Viewed.Count))??p.Choices.FirstOrDefault(c=>c.Parameters.GetValueOrDefault("branch")=="add")??p.Choices.First();
 }

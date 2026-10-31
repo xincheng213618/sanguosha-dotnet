@@ -179,7 +179,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { } r } f || !MobileJwChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Mobile Jiang Wei requires the current original chooser and exact private choice.");
-        RequireMobileJw(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = selected.Parameters["branch"];
@@ -328,7 +327,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { } r } f || f.Id != id)
             return;
-        RequireMobileJw(f);
         if (r.Stage == MobileJiangWeiStage.DeathIssued)
         {
             FinishMobileJw(f);

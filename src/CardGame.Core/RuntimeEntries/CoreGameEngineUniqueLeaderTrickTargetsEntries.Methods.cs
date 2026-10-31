@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsEntries
 {
-    internal void AssertUniqueLeaderTrickTargetDraft(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertUniqueLeaderTrickTargetDraft(frame);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BuildUniqueLeaderTrickTargetChoices(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardUseFrame use, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BuildUniqueLeaderTrickTargetChoices(frame, use, operation);
     internal bool CanBeUniqueLeaderTrickTarget(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CharacterState target) => _resolve().CanBeUniqueLeaderTrickTarget(use, target);
     internal bool CanOfferUniqueLeaderTrickTarget(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferUniqueLeaderTrickTarget(candidate, trigger, context);

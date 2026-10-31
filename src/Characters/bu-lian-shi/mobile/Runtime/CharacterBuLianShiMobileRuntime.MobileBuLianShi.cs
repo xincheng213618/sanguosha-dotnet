@@ -28,8 +28,6 @@ internal sealed partial class CharacterBuLianShiMobileRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    internal bool IsMobileBuLianShiAnxuEqualityResult(ProgramSkillFrame f, ProgramChoiceResultBinding binding) => f.InstructionIndex >= 3 && binding.Name == "mobile-anxu-equality" && binding.ChooserSeat == f.OwnerSeat && MobileBuLianShiAnxuPaid(f) && f.SelectedTargetSeats is [var recipient, var donor] && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileBuLianShiAnxuComparedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var compared] && compared.RecipientSeat == recipient && compared.DonorSeat == donor && compared.RecipientHand >= 0 && compared.DonorHand >= 0 && (!compared.Equal || compared.RecipientHand == compared.DonorHand) && binding.OptionId == (compared.Equal ? "equal" : "unequal");
     internal void PrepareMobileBuLianShiAnxu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

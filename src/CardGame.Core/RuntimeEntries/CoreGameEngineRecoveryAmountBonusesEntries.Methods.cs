@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRecoveryAmountBonusesEntries
 {
-    internal void AssertRecoveryAmountBonusReceipts() => _resolve().AssertRecoveryAmountBonusReceipts();
     internal bool HasOwnRecoveryAmountSupport(int targetSeat) => _resolve().HasOwnRecoveryAmountSupport(targetSeat);
     internal global::CardGame.Core.RecoveryAmountBonusReceipt? PrepareOwnRecoveryAmountBonus(global::CardGame.Core.PreparedRecoveryApplication application) => _resolve().PrepareOwnRecoveryAmountBonus(application);
     internal void RecordActualTurnRecovery(global::CardGame.Core.RecoveryAppliedEvent applied) => _resolve().RecordActualTurnRecovery(applied);

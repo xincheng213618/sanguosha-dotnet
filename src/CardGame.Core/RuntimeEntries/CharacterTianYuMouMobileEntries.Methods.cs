@@ -5,7 +5,6 @@ internal sealed partial class CharacterTianYuMouMobileEntries
     internal void AddMouTianYuRangeBonusAttackRangeContribution(global::CardGame.Core.CharacterState player, global::System.Collections.Generic.List<global::CardGame.Core.RuleQueryContribution> contributions) => _resolve().AddMouTianYuRangeBonusAttackRangeContribution(player, contributions);
     internal bool AdvanceMouTianYuChildren() => _resolve().AdvanceMouTianYuChildren();
     internal void AnswerMouTianYu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouTianYu(choice);
-    internal void AssertMouTianYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouTianYu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouTianYu(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouTianYu(input, op);
     internal bool CanOfferMouTianYu(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferMouTianYu(candidate, t, c);
     internal void CompleteMouTianYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompleteMouTianYu(f);

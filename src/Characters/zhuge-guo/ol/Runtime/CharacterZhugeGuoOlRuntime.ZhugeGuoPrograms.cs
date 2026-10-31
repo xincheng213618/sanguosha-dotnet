@@ -263,12 +263,5 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
         }
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 190)]
-    internal void AssertRegisteredZhugeGuo(ProgramSkillFrame frame)
-    {
-        if (frame.ZhugeGuo is not null)
-            RequireZhugeGuo(frame);
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IZhugeGuoProgramHost.BeginZhugeGuo(ProgramSkillFrame f, SkillProgramEffect e) => BeginZhugeGuo(f, e);
 }

@@ -5,7 +5,6 @@ internal sealed partial class CharacterChengGongYingOlEntries
     internal bool AdvanceChengGongYingSubtree() => _resolve().AdvanceChengGongYingSubtree();
     internal global::CardGame.Core.PromptChoice AiChengGongYing(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiChengGongYing(p, f);
     internal void AnswerChengGongYing(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerChengGongYing(choice);
-    internal void AssertChengGongYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertChengGongYing(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginChengGongYing(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginChengGongYing(input);
     internal void BindKuangxiangBlackUse(global::CardGame.Core.IGameEvent payload) => _resolve().BindKuangxiangBlackUse(payload);
     internal bool CanOfferChengGongYing(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferChengGongYing(candidate, trigger, c);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterChengGongYingOlEntries
     internal void FinishChengGongYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishChengGongYing(f);
     internal bool HasChengGongYingBeforeDamageObserver(long id) => _resolve().HasChengGongYingBeforeDamageObserver(id);
     internal bool HasChengGongYingDamageObserver(long id) => _resolve().HasChengGongYingDamageObserver(id);
-    internal bool IsChengGongYingDying() => _resolve().IsChengGongYingDying();
     internal bool IsChengGongYingIssuedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsChengGongYingIssuedMovement(f, m);
     internal bool IsChengGongYingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsChengGongYingMovement(f, effect, movement);
     internal void IssueChengGongYingDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueChengGongYingDiscard(f);

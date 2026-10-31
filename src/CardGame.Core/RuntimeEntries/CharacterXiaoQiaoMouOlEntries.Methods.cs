@@ -10,12 +10,10 @@ internal sealed partial class CharacterXiaoQiaoMouOlEntries
     internal bool ContinueMouXqJueyanSimpleUse(long id, global::CardGame.Core.ProgramSimpleCardContinuation c) => _resolve().ContinueMouXqJueyanSimpleUse(id, c);
     internal bool FinishMouXqJueyanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouXqJueyanAttack(attack, out paused);
     internal bool HasMouXqJueyanDyingResponse(global::CardGame.Core.CharacterState actor) => _resolve().HasMouXqJueyanDyingResponse(actor);
-    internal bool HasMouXqJueyanResponseContinuation(long parentId) => _resolve().HasMouXqJueyanResponseContinuation(parentId);
     internal bool HasMouXqProgramSlash(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IEnumerable<int> targets) => _resolve().HasMouXqProgramSlash(actor, targets);
     internal bool HasProspectiveMouXqQinglong(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().HasProspectiveMouXqQinglong(actor, target, attack);
     internal bool IsIssuedMouXqResponse(global::CardGame.Core.ResolutionFrame owner, global::CardGame.Core.CardActionContext action) => _resolve().IsIssuedMouXqResponse(owner, action);
     internal bool IsMouXqForcedRequest(global::CardGame.Core.MouXiaoQiaoJueyanResponseRequest r, global::CardGame.Core.ResolutionFrame parent) => _resolve().IsMouXqForcedRequest(r, parent);
-    internal bool IsMouXqJueyanAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().IsMouXqJueyanAttackConsistent(attack, processing);
     internal bool IsMouXqJueyanResponseRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsMouXqJueyanResponseRequest(f);
     internal bool IsMouXqJueyanUse(long id) => _resolve().IsMouXqJueyanUse(id);
     internal bool IsMouXqNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsMouXqNativeSettlementBatch(f, b);
@@ -28,9 +26,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouXqForcedSlashChoices(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, long parentId, bool qinglong) => _resolve().MouXqForcedSlashChoices(actor, target, parentId, qinglong);
     internal global::CardGame.Core.Card MouXqJueyanRepresentation(long id) => _resolve().MouXqJueyanRepresentation(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouXqJueyanResponseChoices(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, bool dying = false) => _resolve().MouXqJueyanResponseChoices(actor, kind, dying);
-    internal global::System.Collections.Generic.IReadOnlyList<int>? MouXqNativeAncestorProcessing(long id) => _resolve().MouXqNativeAncestorProcessing(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.MouXiaoQiaoOlUsePlan> MouXqNativePlans(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardConversionSource source) => _resolve().MouXqNativePlans(actor, kind, source);
-    internal global::CardGame.Core.PendingDecision MouXqProgramNativeDecision(global::CardGame.Core.PendingDecision p) => _resolve().MouXqProgramNativeDecision(p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouXqProgramSlashChoices(global::CardGame.Core.ProgramSkillFrame f, int actorSeat, global::System.Collections.Generic.IReadOnlyList<int> targets, string? resultBind = default) => _resolve().MouXqProgramSlashChoices(f, actorSeat, targets, resultBind);
     internal global::CardGame.Core.CardActionContext PrepareMouXqJueyanAction(global::CardGame.Core.CardActionContext action) => _resolve().PrepareMouXqJueyanAction(action);
     internal void PrepareMouXqProgramSlash(global::CardGame.Core.MouXiaoQiaoJueyanResponseRequest r) => _resolve().PrepareMouXqProgramSlash(r);

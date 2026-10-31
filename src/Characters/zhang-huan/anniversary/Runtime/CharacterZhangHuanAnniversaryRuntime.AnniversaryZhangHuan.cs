@@ -102,7 +102,6 @@ internal sealed partial class CharacterZhangHuanAnniversaryRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryZhangHuan: { } r } f || f.Id != id)
             return false;
-        RequireZhangHuan(f);
         if (r.Stage is AnniversaryZhangHuanStage.Drawing or AnniversaryZhangHuanStage.IssuingUse or AnniversaryZhangHuanStage.NativeUse)
             return true;
         if (DrainZhangHuan(f))

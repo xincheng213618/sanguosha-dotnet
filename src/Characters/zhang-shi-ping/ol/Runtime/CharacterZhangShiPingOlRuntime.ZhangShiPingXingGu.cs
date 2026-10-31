@@ -80,7 +80,6 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangShiPingXingGu: { Stage: XingGuStage.Choose } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XingGuPlacementChoices(f.OwnerSeat, f.SkillInstanceId).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xinggu lost its exact physical public mount or legal other recipient.");
-        AssertZhangShiPing(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single());
         var target = choice.Targets.Single();
@@ -98,7 +97,6 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ZhangShiPingXingGu: { } r } f && f.Id == id)
         {
-            AssertZhangShiPing(f);
             if (DrainXingGu(id))
                 return;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

@@ -134,30 +134,6 @@ internal sealed partial class CoreGameEngineProgramOwnedCardDistributionsRuntime
         Role.Rebel => target.Role == Role.Rebel,
         _ => false
     };
-    internal void AssertProgramOwnedCardDistribution(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (paused.Op != SkillProgramEffectOp.DistributeOwnedCards)
-        {
-            if (frame.OwnedCardDistribution is not null)
-                throw new InvalidOperationException("An owned-card distribution outlived its suspended instruction.");
-            return;
-        }
-
-        if (frame.OwnedCardDistribution is not { } distribution)
-            throw new InvalidOperationException("A suspended owned-card distribution lost its private progress.");
-        var remainingCards = distribution.Zones.Sum(zone => _cardZonesOperations._cardZones.CardsAt(new CardLocation(zone, distribution.CardOwnerSeat)).Count);
-        var targets = _coreProgramLifecycleOperations.GetProgramTargetSeats(distribution.CardOwnerSeat, distribution.TargetKind);
-        var binding = _coreProgramLifecycleOperations.GetProgramCardSet(frame, distribution.SourceBind);
-        var expectedReason = $"skill-program.{(frame.SkillId)}.{(paused.Op)}";
-        var expectedChoiceCount = remainingCards * targets.Count + (distribution.AllowDeclineBeforeFirst && distribution.GivenCardIds.Count == 0 ? 1 : 0);
-        if (distribution.SourceBind != paused.SourceBind || distribution.CardOwnerSeat != frame.OwnerSeat || distribution.RequiredCount <= 0 || distribution.RequiredCount != binding.CardIds.Count || distribution.GivenCardIds.Count >= distribution.RequiredCount || distribution.GivenCardIds.Count != distribution.TargetSeats.Count || distribution.GivenCardIds.Distinct().Count() != distribution.GivenCardIds.Count || !distribution.Zones.SequenceEqual(paused.Zones) || distribution.TargetKind != paused.TargetKind || distribution.AllowDeclineBeforeFirst != paused.AllowDeclineBeforeFirst || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != distribution.CardOwnerSeat || decision.Choices.Count != expectedChoiceCount || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("source-bind") != distribution.SourceBind || choice.Parameters.GetValueOrDefault("target-kind") != distribution.TargetKind.ToString() || choice.Parameters.GetValueOrDefault("move-reason") != expectedReason || choice.Parameters.GetValueOrDefault("distribution-index") != distribution.GivenCardIds.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("program-action") switch
-        {
-            "decline-owned-card-distribution" => !distribution.AllowDeclineBeforeFirst || distribution.GivenCardIds.Count != 0 || choice.Cards.Count != 0 || choice.Targets.Count != 0,
-            "distribute-owned-card" => choice.Cards.Count != 1 || choice.Targets.Count != 1 || !Enum.TryParse<CardZoneKind>(choice.Parameters.GetValueOrDefault("source-zone"), out var zone) || !distribution.Zones.Contains(zone) || _cardZonesOperations._cardZones.GetLocation(choice.Cards[0]) != new CardLocation(zone, distribution.CardOwnerSeat) || !targets.Contains(choice.Targets[0]),
-            _ => true
-        }))
-            throw new InvalidOperationException("A private owned-card distribution lost its exact instruction or prompt.");
-    }
 
     internal static string ProgramOwnedDistributionZoneName(CardZoneKind zone) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramOwnedCardDistributions.ProgramOwnedDistributionZoneName(zone);
 }

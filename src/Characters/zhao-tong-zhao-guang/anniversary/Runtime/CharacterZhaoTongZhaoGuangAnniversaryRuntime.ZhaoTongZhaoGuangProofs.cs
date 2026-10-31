@@ -25,13 +25,6 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
         return r.Count > 0 && r.Stage is AnniversaryQingrenStage.DrawChildren or AnniversaryQingrenStage.Completed && d.RecipientSeat == f.OwnerSeat && d.RequestedCount == r.Count && d.SequenceBefore >= 0 && d.SequenceAfter >= d.SequenceBefore && d.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && d.ActualDrawIds is System.Collections.IList { IsReadOnly: true } && d.ActualDrawIds.Distinct().Count() == d.ActualDrawIds.Count && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQingrenDrawReturnedEvent>().Count(e => e == new AnniversaryQingrenDrawReturnedEvent(f.Id, r.Count, d.ActualDrawIds.Count, d.SequenceBefore, d.SequenceAfter)) == 1 && d.ActualDrawIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter && m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == AnniversaryQingrenDrawReason) == 1);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 44600)]
-    internal void AssertAnniversaryQingren(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryQingren is not null && !ValidAnniversaryQingren(f))
-            throw new InvalidOperationException("Qingren lost its original ending candidate, frozen actual-turn count or native draw invoice.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 44600)]
     internal bool AnniversaryQingrenMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryQingren is { Stage: AnniversaryQingrenStage.DrawChildren } && ValidAnniversaryQingren(f) && e?.Op == SkillProgramEffectOp.DrawAnniversaryZhaoTongZhaoGuangQingren && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 44600)]
@@ -55,7 +48,6 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
     internal bool AnniversaryQingrenDamageObserver(long id) => AnniversaryQingrenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 44600)]
     internal bool AnniversaryQingrenBeforeDamageObserver(long id) => AnniversaryQingrenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 44600)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 44600)]
     internal bool AnniversaryQingrenDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryQingrenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 44600)]

@@ -107,7 +107,6 @@ internal sealed partial class CharacterYuanJiOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { YuanJi: { } r } f && f.Id == id)
         {
-            AssertYuanJi(f);
             if (r.Stage is YuanJiStage.DrawChildren or YuanJiStage.ReturnChildren)
             {
                 if (DrainYuanJi(f))
@@ -172,7 +171,6 @@ internal sealed partial class CharacterYuanJiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YuanJi: { Stage: YuanJiStage.ReturnOrder } r } f || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(YuanJiOrderChoices(f).Where(c => c.Id == choice.Id).ToArray(), [choice]))
             throw new InvalidOperationException("YuanJi return order requires the exact current private original entities.");
-        AssertYuanJi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var id = choice.Cards.Single();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YuanJiReturnSelectedEvent(f.Id, r.Ordered.Count, id));
@@ -240,7 +238,6 @@ internal sealed partial class CharacterYuanJiOlRuntime
     {
         if (f.YuanJi is not null)
         {
-            AssertYuanJi(f);
             return true;
         }
 

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramHandControlEntries
 {
     internal bool AllowsDrawTurnOwnerThenDiscardMaximumHandForDodgeActivation(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsDrawTurnOwnerThenDiscardMaximumHandForDodgeActivation(gate);
-    internal void AssertProgramHandControlDraft(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertProgramHandControlDraft(frame, paused);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BuildProgramHandControlChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BuildProgramHandControlChoices(frame);
     internal bool CanOfferProgramHandControl(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().CanOfferProgramHandControl(owner, trigger);
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteProgramHandControl(global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExecuteProgramHandControl(effect, frame);

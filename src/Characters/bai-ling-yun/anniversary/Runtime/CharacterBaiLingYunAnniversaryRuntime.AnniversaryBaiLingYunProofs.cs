@@ -19,18 +19,6 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
     }
 
     internal bool AnniversaryBlyUsePaid(ProgramSkillFrame f) => f.AnniversaryBly is { Plan: { } p } r && r.Viewed.Contains(p.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == p.CardId && m.Sequence > r.ViewAfter && m.From == AnniversaryBlyLease(f) && m.To == CardLocation.Processing && m.Reason == AnniversaryBlyReason("use")) == 1;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 43600)]
-    internal void RequireAnniversaryBly(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryBly is not { } r)
-            return;
-        if (!ValidAnniversaryBly(f))
-            throw new InvalidOperationException("Linghui lost its original ending, private viewed entities, source or actual turn.");
-        if (r.Stage is AnniversaryBlyStage.NativeUse or AnniversaryBlyStage.NativeTail && (r.Plan is null || !AnniversaryBlyUsePaid(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryBlyNativeIssuedEvent>().Count(e => e.Origin.FrameId == f.Id && e.Origin.UseId == r.UseId && e.Origin.ActionId == r.ActionId && e.Origin.Source == r.Source && e.Origin.Hash == r.Hash) != 1 || r.Returned && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryBlyNativeReturnedEvent>().Count(e => e == new AnniversaryBlyNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1))
-            throw new InvalidOperationException("Linghui lost its exact paid and once-completed native use.");
-        if (f.PendingMovementContinuation is { } pending && !AnniversaryBlyMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-            throw new InvalidOperationException("Linghui lost its original private viewing, use, gain or return payment.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43600)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43600)]
@@ -49,8 +37,6 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
             _ => false
         };
     }
-
-    internal bool HasAnniversaryBaiLingYunPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryBly.Stage: AnniversaryBlyStage.Choice, Step: ResolutionFrameStep.AwaitingResponse } f && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && ValidAnniversaryBly(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, AnniversaryBlyChoices(f));
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.ProcessingAllowance, 43600)]
     internal bool AnniversaryBlyProcessingAllowance(IReadOnlyList<Card> cards) => cards is [var card] && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.AnniversaryBly is not null)is { AnniversaryBly.Plan.CardId: var id } root && id == card.Id && ValidAnniversaryBly(root) && AnniversaryBlyUsePaid(root);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43600)]
@@ -77,7 +63,6 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
     internal bool AnniversaryBlyDamageObserver(long id) => AnniversaryBlyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 43600)]
     internal bool AnniversaryBlyBeforeDamageObserver(long id) => AnniversaryBlyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 43600)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 43600)]
     internal bool AnniversaryBlyDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryBlyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43600)]

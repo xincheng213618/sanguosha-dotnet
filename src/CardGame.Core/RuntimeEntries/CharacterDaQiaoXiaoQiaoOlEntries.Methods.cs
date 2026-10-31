@@ -4,7 +4,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlEntries
 {
     internal bool AdvanceDaQiaoXiaoQiaoChildren() => _resolve().AdvanceDaQiaoXiaoQiaoChildren();
     internal void AnswerDaQiaoXiaoQiao(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerDaQiaoXiaoQiao(choice);
-    internal void AssertDaQiaoXiaoQiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertDaQiaoXiaoQiao(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDaQiaoXiaoQiao(global::CardGame.Core.ProgramSkillFrame input, bool maintain) => _resolve().BeginDaQiaoXiaoQiao(input, maintain);
     internal long CaptureDaQiaoXiaoQiaoLuoyanQualificationStamp(global::CardGame.Core.CharacterState owner, long existingStamp) => _resolve().CaptureDaQiaoXiaoQiaoLuoyanQualificationStamp(owner, existingStamp);
     internal global::CardGame.Core.PromptChoice ChooseDaQiaoXiaoQiaoAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseDaQiaoXiaoQiaoAi(p, f);
@@ -24,7 +23,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlEntries
     internal void FinishDaQiaoXiaoQiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishDaQiaoXiaoQiao(f);
     internal bool HasDaQiaoXiaoQiaoBeforeDamageObserver(long id) => _resolve().HasDaQiaoXiaoQiaoBeforeDamageObserver(id);
     internal bool HasDaQiaoXiaoQiaoDamageObserver(long id) => _resolve().HasDaQiaoXiaoQiaoDamageObserver(id);
-    internal bool IsDaQiaoXiaoQiaoDying() => _resolve().IsDaQiaoXiaoQiaoDying();
     internal bool IsDaQiaoXiaoQiaoLuoyanGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsDaQiaoXiaoQiaoLuoyanGrantQualified(owner, grant);
     internal bool IsDaQiaoXiaoQiaoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDaQiaoXiaoQiaoRecoveryParent(f, recovery);
     internal void MoveDaQiaoXiaoQiao(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.DaQiaoXiaoQiaoStage stage, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.DaQiaoXiaoQiaoEntity> cards, global::CardGame.Core.CardLocation to, string reason, bool discard) => _resolve().MoveDaQiaoXiaoQiao(f, stage, cards, to, reason, discard);

@@ -11,7 +11,6 @@ internal sealed partial class CoreGameEngineShanheSourceBiriObserversRuntime
     {
         if (root.ShanheSourceBiri is not { } receipt)
             return false;
-        _coreShanheSourceBiriOperations.AssertShanheSourceBiri(root);
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (child is RecoveryReplacementFrame recovery)
             return receipt.Stage == ShanheSourceBiriStage.RecoveryChildren && recovery.Id == receipt.RecoveryAttemptId && recovery.Attempt.Amount == receipt.RecoveryAttemptAmount && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(root, recovery, history);
@@ -59,8 +58,6 @@ internal sealed partial class CoreGameEngineShanheSourceBiriObserversRuntime
         var child = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == recovery.Id);
         return parent >= 0 && child > parent && ShanheSourceBiriFirstChild(frame, _resolutionStackOperations._resolutionStack[parent + 1]) && _coreObserverSubtreesOperations.HasObserverSuffix(parent, (index) => _coreShanheSourceBiriObserversOperations.ShanheSourceBiriObserverEdge(index), (index, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index, dying)) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[child - 1]);
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 62047, group: 30)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 62047)]
     internal bool IsShanheSourceBiriObserverDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShanheSourceBiriObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 62047)]

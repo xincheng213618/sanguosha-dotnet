@@ -5,7 +5,6 @@ internal sealed partial class CharacterWangCanMobileEntries
     internal bool AdmitMobileWangCanRecovery(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().AdmitMobileWangCanRecovery(c, w);
     internal bool AdvanceMobileWangCanXiHealth() => _resolve().AdvanceMobileWangCanXiHealth();
     internal void AnswerMobileWangCanXi(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMobileWangCanXi(selected);
-    internal void AssertMobileWangCanXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileWangCanXi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileWangCanXi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMobileWangCanXi(supplied, op);
     internal bool CanOfferMobileWangCanMark(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanOfferMobileWangCanMark(g);
     internal void CaptureMobileWangCanRecovery(global::CardGame.Core.HpChangeContext change) => _resolve().CaptureMobileWangCanRecovery(change);

@@ -54,17 +54,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { HuanpeiResponse = null });
     }
 
-    internal bool HasHuanpeiNativeRequestContinuation(long parentId) => HuanpeiActiveDraft()is { HuanShuJun.Request: { } n } f && n.ParentFrameId == parentId && HuanpeiRequestParentCurrent(n) && HuanShuJunPaidOrPreparing(f) && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id || HuanShuJunObserverRoot()?.Id == f.Id);
-    internal void AssertHuanpeiRequests()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.HuanShuJun?.Op == SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse))
-        {
-            AssertHuanShuJun(f);
-            if (f.HuanShuJun!.Request is not { } n || n.Intent != HuanpeiIntent.Play && (!HuanpeiRequestParentCurrent(n) || f.HuanShuJun.OriginalDecision is not { } original || original.PromptId != n.OriginalPromptId || original.Revision != n.OriginalRevision))
-                throw new InvalidOperationException("Huanpei lost its frozen genuine native request.");
-        }
-    }
-
     internal bool HuanpeiDyingRescueRide(int index, DyingFrame dying)
     {
         if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index] != dying || _coreDyingCursorRuntimeOperations.ActiveDying?.FrameId != dying.Id)
@@ -81,16 +70,4 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     internal bool HasHuanpeiForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && HasHuanpeiForcedSlash(actor, target, false);
     internal bool HasHuanpeiForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.Attack.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && HasHuanpeiForcedSlash(actor, target, true);
-    internal bool HuanpeiPausedRequestRide(ProgramSkillFrame f, long owner)
-    {
-        if (f.HuanShuJun is not { Paid: true, Request: { } n, OriginalDecision: { } original } r || n.ParentFrameId != owner || !HuanpeiRequestParentCurrent(n) || !HuanShuJunPaidOrPreparing(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Round == r.Round) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiRequestCapturedEvent>().Count(e => e.FrameId == f.Id && e.Request == n && e.DecisionHash == HuanShuJunDecisionHash(original)) != 1)
-            return false;
-        var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (i < 1 || _resolutionStackOperations._resolutionStack[i - 1].Id != n.RequestFrameId)
-            return false;
-        return _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id || HuanShuJunObserverRoot()?.Id == f.Id;
-    }
-
-    internal bool HasHuanpeiBorrowedPaymentRide(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => HuanpeiActiveDraft()is { HuanShuJun: { Request: { Intent: HuanpeiIntent.BorrowedSword } n, OriginalDecision: { Kind: DecisionKind.RespondSlash } original } } f && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && pending.ActiveAttack is null && pending.AwaitingSlashChoice && pending.WeaponOwnerSeat == f.OwnerSeat && pending.SlashTargetSeat == n.FixedTargetSeat && n.Cursor == 0 && original.PlayerSeat == f.OwnerSeat && original.TargetSeat == pending.SlashTargetSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { Action: { } action } && n.ParentActionId == action.ActionId && HuanpeiPausedRequestRide(f, pending.ResolutionId);
-    internal bool HasHuanpeiQinglongPaymentRide(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => HuanpeiActiveDraft()is { HuanShuJun: { Request: { Intent: HuanpeiIntent.Qinglong } n, OriginalDecision: { Kind: DecisionKind.QinglongCrescentBlade } original } } f && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } blade && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(blade.Attack, attack) && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) && attack.SourceSeat == f.OwnerSeat && attack.TargetSeat == n.FixedTargetSeat && n.Cursor == 0 && original.PlayerSeat == f.OwnerSeat && original.TargetSeat == attack.TargetSeat && original.IncomingCard == attack.EffectiveCardKind && original.ValidTargetSeats.SequenceEqual([attack.TargetSeat]) && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { Action: { } action } && n.ParentActionId == action.ActionId && HuanpeiPausedRequestRide(f, attack.ResolutionId);
 }

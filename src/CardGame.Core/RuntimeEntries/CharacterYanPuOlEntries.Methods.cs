@@ -5,7 +5,6 @@ internal sealed partial class CharacterYanPuOlEntries
     internal bool AdvanceYanPuSubtree() => _resolve().AdvanceYanPuSubtree();
     internal void AnswerYanPu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerYanPu(choice);
     internal void AppendYanPuEndingItems(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendYanPuEndingItems(items);
-    internal void AssertYanPu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertYanPu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginYanPu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginYanPu(supplied, op);
     internal bool CanRunYanPuEnding(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunYanPuEnding(c, context);
     internal global::CardGame.Core.PromptChoice ChooseAiYanPu(global::CardGame.Core.PendingDecision d, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseAiYanPu(d, f);
@@ -21,7 +20,6 @@ internal sealed partial class CharacterYanPuOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> IncludeYanPuDrawObservers(global::CardGame.Core.CharacterState subject, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> existing) => _resolve().IncludeYanPuDrawObservers(subject, existing);
     internal bool IsYanPuAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsYanPuAwaitedMovement(f, e, p);
     internal bool IsYanPuDrawContext(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsYanPuDrawContext(c, context);
-    internal bool IsYanPuDying() => _resolve().IsYanPuDying();
     internal bool IsYanPuDyingExitContext(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsYanPuDyingExitContext(c, context);
     internal bool IsYanPuDyingExitEdge(int index) => _resolve().IsYanPuDyingExitEdge(index);
     internal bool IsYanPuEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsYanPuEndingCandidate(c);

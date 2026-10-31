@@ -5,8 +5,6 @@ internal sealed partial class CharacterDiaoChanMouMobileEntries
     internal bool AdvanceMouDiaoChanChildren() => _resolve().AdvanceMouDiaoChanChildren();
     internal global::CardGame.Core.PromptChoice AiMouDiaoChan(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMouDiaoChan(p, f);
     internal void AnswerMouDiaoChan(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouDiaoChan(choice);
-    internal void AssertMouDiaoChan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouDiaoChan(f);
-    internal void AssertMouDiaoChanRingUse(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSelectedActorDuelOrigin origin) => _resolve().AssertMouDiaoChanRingUse(use, origin);
     internal bool CanStartMouDiaoChanLijian(global::CardGame.Core.CharacterState owner) => _resolve().CanStartMouDiaoChanLijian(owner);
     internal void CompleteMouDiaoChanRingDuel(long frameId, int index, long useId) => _resolve().CompleteMouDiaoChanRingDuel(frameId, index, useId);
     internal bool ContinueAcceptedMouDiaoChan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueAcceptedMouDiaoChan(f);

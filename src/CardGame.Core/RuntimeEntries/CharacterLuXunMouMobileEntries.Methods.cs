@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLuXunMouMobileEntries
 {
     internal void AnswerMouLuXun(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouLuXun(choice);
-    internal void AssertMouLuXun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouLuXun(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouLuXun(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginMouLuXun(input, operation);
     internal void BeginMouLuXunView(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMouLuXunView(f);
     internal bool CanMouLuXunRecordNativeTarget(int target, global::CardGame.Core.CardActionContext action) => _resolve().CanMouLuXunRecordNativeTarget(target, action);
@@ -13,7 +12,6 @@ internal sealed partial class CharacterLuXunMouMobileEntries
     internal bool ContinueMouLuXun(long id) => _resolve().ContinueMouLuXun(id);
     internal bool DrainMouLuXun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouLuXun(f);
     internal void FinishMouLuXun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouLuXun(f);
-    internal bool HasNativeGroupEffectAttackObserver(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().HasNativeGroupEffectAttackObserver(attack);
     internal bool HasPerTargetTrickEffectBinding(global::CardGame.Core.ProgramCardTriggerCandidate c) => _resolve().HasPerTargetTrickEffectBinding(c);
     internal bool HideMouLuXunPrivateEntity(int id) => _resolve().HideMouLuXunPrivateEntity(id);
     internal bool IsMouLuXunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouLuXunMovement(f, effect, pending);

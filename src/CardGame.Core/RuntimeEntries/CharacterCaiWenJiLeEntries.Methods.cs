@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaiWenJiLeEntries
 {
-    internal void AssertBeifen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBeifen(f);
     internal void AssertBeifenUses() => _resolve().AssertBeifenUses();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBeifen(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBeifen(supplied);
     internal bool BeifenMotherMatches(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().BeifenMotherMatches(c, context);

@@ -23,7 +23,6 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodEntries
     internal bool AnniversaryHzTianchongSuffix(int rootIndex) => _resolve().AnniversaryHzTianchongSuffix(rootIndex);
     internal bool AnniversaryHzUseDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().AnniversaryHzUseDistance(q);
     internal void AnswerAnniversaryHz(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerAnniversaryHz(choice);
-    internal void AssertAnniversaryHz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertAnniversaryHz(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAnniversaryHz(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginAnniversaryHz(supplied, op);
     internal bool CanTriggerAnniversaryHz(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanTriggerAnniversaryHz(g);
     internal global::CardGame.Core.PromptChoice ChooseAnniversaryHzBody(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseAnniversaryHzBody(p, f);

@@ -36,6 +36,4 @@ internal sealed partial class CoreGameEngineDamageTargetMountObserverRuntime
     internal static bool MountObserverCandidateMatches(ProgramSkillFrame p, ProgramTriggerCandidate c) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(p, c);
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 30)]
     internal bool HasPaidDamageTargetMountObserver(long damageWindowId) => PaidDamageTargetMountObserverRoot(damageWindowId)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 300, group: 10)]
-    internal bool IsPaidDamageTargetMountDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && PaidDamageTargetMountObserverRoot(damage.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId && f.ParentFrameId == dying.ParentFrameId);
 }

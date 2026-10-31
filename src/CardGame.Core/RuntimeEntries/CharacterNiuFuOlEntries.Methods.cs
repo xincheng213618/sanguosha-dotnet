@@ -6,7 +6,6 @@ internal sealed partial class CharacterNiuFuOlEntries
     internal bool AdvanceNiuFuSubtree() => _resolve().AdvanceNiuFuSubtree();
     internal global::CardGame.Core.PromptChoice AiNiuFu(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiNiuFu(p, f);
     internal void AnswerNiuFu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerNiuFu(choice);
-    internal void AssertNiuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertNiuFu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginNiuFu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginNiuFu(supplied, op);
     internal void ContinueNiuFu(long id) => _resolve().ContinueNiuFu(id);
     internal bool ContinuePaidNiuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidNiuFu(f);
@@ -14,7 +13,6 @@ internal sealed partial class CharacterNiuFuOlEntries
     internal void FinishNiuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishNiuFu(f);
     internal bool HasNiuFuBeforeDamageObserver(long id) => _resolve().HasNiuFuBeforeDamageObserver(id);
     internal bool HasNiuFuDamageObserver(long id) => _resolve().HasNiuFuDamageObserver(id);
-    internal bool IsNiuFuDying() => _resolve().IsNiuFuDying();
     internal bool IsNiuFuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsNiuFuMovement(f, e, p);
     internal bool IsNiuFuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsNiuFuRecoveryParent(f, recovery);
     internal bool IsNiuFuZonglueDamage(int owner, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsNiuFuZonglueDamage(owner, c);

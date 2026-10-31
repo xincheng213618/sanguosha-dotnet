@@ -5,7 +5,6 @@ internal sealed partial class CharacterWangJiBoundaryMobileEntries
     internal bool AdvanceBoundaryWjChild() => _resolve().AdvanceBoundaryWjChild();
     internal global::CardGame.Core.PromptChoice AiBoundaryWj(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AiBoundaryWj(decision, frame);
     internal void AnswerBoundaryWj(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryWj(choice);
-    internal void AssertBoundaryWj(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryWj(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryWj(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginBoundaryWj(supplied, operation);
     internal bool BoundaryWjBeforeDamage(long id) => _resolve().BoundaryWjBeforeDamage(id);
     internal bool BoundaryWjCard(global::CardGame.Core.CardActionContext action) => _resolve().BoundaryWjCard(action);

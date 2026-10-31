@@ -4,7 +4,6 @@ internal sealed partial class CharacterHuangZuMobileShiEntries
 {
     internal bool AdvanceShiHzChildren() => _resolve().AdvanceShiHzChildren();
     internal void AnswerShiHz(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiHz(choice);
-    internal void AssertShiHzFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiHzFrame(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiHz(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShiHz(input, op);
     internal bool CanOfferShiHz(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShiHz(c, t, context);
     internal void CleanupShiHzStored(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CleanupShiHzStored(f);

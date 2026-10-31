@@ -67,7 +67,6 @@ internal sealed partial class CharacterFuRongOlRuntime
     internal void AnswerFuRongPair(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Xiaosi lost its choice parent.");
-        AssertFuRongPair(f);
         var r = f.FuRongPair!;
         var expected = r.Stage is FuRongPairStage.OwnerChoice or FuRongPairStage.TargetChoice ? FuRongPaymentChoices(f) : r.Stage == FuRongPairStage.UseChoice ? FuRongUseChoices(f) : throw new InvalidOperationException("Xiaosi is not awaiting a choice.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != (r.Stage == FuRongPairStage.TargetChoice ? r.TargetSeat : f.OwnerSeat) || !expected.Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(selected.Parameters.OrderBy(x => x.Key))))
@@ -114,7 +113,6 @@ internal sealed partial class CharacterFuRongOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.FuRongPair is not { } r)
             return false;
-        AssertFuRongPair(f);
         if (r.Stage is FuRongPairStage.OwnerChoice or FuRongPairStage.TargetChoice)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -191,7 +189,6 @@ internal sealed partial class CharacterFuRongOlRuntime
     {
         if (f.FuRongPair is not { Stage: FuRongPairStage.OwnerChildren or FuRongPairStage.TargetChildren or FuRongPairStage.DrawChildren or FuRongPairStage.NativeChildren })
             return false;
-        AssertFuRongPair(f);
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }

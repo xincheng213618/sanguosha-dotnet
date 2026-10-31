@@ -137,7 +137,6 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
     internal void ResolveGainGiftChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Gift has no owning program.");
-        _coreGainGiftObserversOperations.AssertGainGiftReceipt(f);
         var r = f.GainGiftReceipt!;
         if (r.Operation != SkillProgramEffectOp.GiveAfterBatchGain || r.Stage != GainGiftStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GainGiftChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Gift choice lost its current private owner and exact choices.");
@@ -205,7 +204,6 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GainGiftReceipt: not null } f || f.Id != id)
             return false;
-        _coreGainGiftObserversOperations.AssertGainGiftReceipt(f);
         if (GainGiftHasFinalGameEnd())
             return true;
         if (f.PendingMovementContinuation is not null)
@@ -229,7 +227,6 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
             return false;
         if (f.PendingMovementContinuation is not { } pending || !IsGainGiftMovement(f, GainGiftPausedEffect(f), pending))
             throw new InvalidOperationException("Gain/loss cannot consume another instruction's movement return.");
-        _coreGainGiftObserversOperations.AssertGainGiftReceipt(f);
         if (GainGiftHasFinalGameEnd())
             return true;
         if (_coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))

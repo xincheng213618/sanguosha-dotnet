@@ -67,7 +67,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Weiwan: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertWeiwan(f);
         if (r.Stage == WeiwanStage.HealthIssuing)
         {
             if (!_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)

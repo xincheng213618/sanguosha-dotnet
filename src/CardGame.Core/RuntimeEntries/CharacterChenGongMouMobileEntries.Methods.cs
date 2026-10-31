@@ -8,7 +8,6 @@ internal sealed partial class CharacterChenGongMouMobileEntries
     internal void AnswerMouChenGongBranch(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouChenGongBranch(selected);
     internal void AnswerMouChenGongGift(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouChenGongGift(selected);
     internal void AnswerMouChenGongRelease(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouChenGongRelease(selected);
-    internal void AssertMouChenGong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouChenGong(f);
     internal global::CardGame.Core.ProgramSkillWindowContext AttachMouChenGongProtection(global::CardGame.Core.BeforeDamageProgramCandidate item, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().AttachMouChenGongProtection(item, context);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouChenGongGift(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouChenGongGift(supplied);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouChenGongRelease(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMouChenGongRelease(supplied);

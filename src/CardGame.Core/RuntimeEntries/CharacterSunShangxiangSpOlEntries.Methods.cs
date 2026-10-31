@@ -6,8 +6,6 @@ internal sealed partial class CharacterSunShangxiangSpOlEntries
     internal bool AdvanceSpSunShangxiangLiangzhuChildren() => _resolve().AdvanceSpSunShangxiangLiangzhuChildren();
     internal global::CardGame.Core.PromptChoice AiSpSunShangxiangLiangzhu(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiSpSunShangxiangLiangzhu(p, f);
     internal void AnswerSpSunShangxiangLiangzhu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerSpSunShangxiangLiangzhu(choice);
-    internal void AssertSpSunShangxiangFanxiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSpSunShangxiangFanxiang(f);
-    internal void AssertSpSunShangxiangLiangzhu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSpSunShangxiangLiangzhu(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSpSunShangxiangLiangzhu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginSpSunShangxiangLiangzhu(supplied);
     internal bool CanOfferSpSunShangxiangFanxiang(int ownerSeat, global::CardGame.Core.SkillProgramTrigger t) => _resolve().CanOfferSpSunShangxiangFanxiang(ownerSeat, t);
     internal bool CanOfferSpSunShangxiangLiangzhu(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferSpSunShangxiangLiangzhu(c, t, context);

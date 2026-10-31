@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterPangTongFriendEntries
 {
-    internal void AssertFriendPangTong(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertFriendPangTong(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginFriendManjuan(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginFriendManjuan(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginFriendYangming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginFriendYangming(frame);
     internal bool CanOfferFriendPangTong(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferFriendPangTong(candidate, trigger, context);

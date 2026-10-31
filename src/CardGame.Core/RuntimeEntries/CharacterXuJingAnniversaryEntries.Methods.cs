@@ -24,11 +24,9 @@ internal sealed partial class CharacterXuJingAnniversaryEntries
     internal global::CardGame.Core.PromptChoice ChooseAnniversaryXuJingGift(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseAnniversaryXuJingGift(p, f);
     internal bool ContinueAnniversaryXuJing(long id) => _resolve().ContinueAnniversaryXuJing(id);
     internal bool DrainAnniversaryXuJing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainAnniversaryXuJing(f);
-    internal bool HasAnniversaryXuJingPrompt() => _resolve().HasAnniversaryXuJingPrompt();
     internal void MoveAnniversaryXuJingEntity(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.CardLocation source, global::CardGame.Core.CardLocation destination) => _resolve().MoveAnniversaryXuJingEntity(supplied, source, destination);
     internal void PublishAnniversaryXuJing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishAnniversaryXuJing(f);
     internal void RecordAnniversaryXuJingActualUse(global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent fact) => _resolve().RecordAnniversaryXuJingActualUse(fact);
-    internal void RequireAnniversaryXuJing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireAnniversaryXuJing(f);
     internal bool RetainAnniversaryXuJingIssued(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainAnniversaryXuJingIssued(f);
     internal void ReturnAnniversaryXuJingDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnAnniversaryXuJingDraw(f, outcome);
     internal bool ReturnAnniversaryXuJingMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnAnniversaryXuJingMovement(f);

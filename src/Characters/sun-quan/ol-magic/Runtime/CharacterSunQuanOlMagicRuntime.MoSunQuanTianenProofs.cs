@@ -94,10 +94,4 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
 
     internal bool MoTianenRequestMatches(ProgramSkillFrame f, MoQuanyuTargetRequest request) => f.MoTianen is { } r && r.Branch == MoTianenBranch.Different && r.PaymentSealed && request.ParentFrameId == f.Id && request.ParentInstructionIndex == f.InstructionIndex && request.ParentSource == r.Source && request.ParentGameplayHash == r.GameplayHash && request.UseId == r.UseId && request.ActionId == r.ActionId && request.TargetSeat == r.TargetSeat && request.RoundNumber == r.RoundNumber && request.ActualTurn == r.ActualTurn && request.TurnOwner == r.TurnOwner && request.DiscardBefore == r.Before && request.DiscardAfter == r.After && request.QuanyuSource == new CardConversionSource("ol:mo-quanyu", "target-only-choices", f.OwnerSeat, "issued:tianen:" + f.Id) && _contentRegistryOperations._contentRegistry.GetSkill("ol:mo-quanyu").Program?.GameplayHash == request.QuanyuGameplayHash;
     internal bool IsMoSunQuanTianenQuanyuRequest(ProgramSkillFrame f, MoQuanyuTargetRequest request) => f.MoTianen is { Stage: MoTianenStage.QuanyuChild, QuanyuRequest: { } issued, QuanyuChildFrameId: null } && issued == request && f.PendingMovementContinuation is null && MoTianenRequestMatches(f, request) && ValidMoTianen(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28920)]
-    internal void AssertMoTianen(ProgramSkillFrame f)
-    {
-        if (f.MoTianen is not null && !ValidMoTianen(f))
-            throw new InvalidOperationException("Tianen lost its frozen canonical Use, branch debit, original entity payment or signed target-only Quanyu return.");
-    }
 }

@@ -44,7 +44,6 @@ internal sealed partial class CoreGameEngineGameActivationAwakeningRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.GameActivationAwakening is not { } r)
             return false;
-        AssertGameActivationAwakeningReceipt(f, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!));
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -84,25 +83,6 @@ internal sealed partial class CoreGameEngineGameActivationAwakeningRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 30)]
-    internal void AssertGameActivationAwakeningReceipt(ProgramSkillFrame f, ProgramExecutionPlan plan)
-    {
-        if (f.GameActivationAwakening is null)
-        {
-            if (!plan.Instructions.Any(effect => effect.Op == SkillProgramEffectOp.AwakenAfterGameActivations))
-                return;
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GameActivationAwakeningMaximumPaidEvent>().Any(e => e.FrameId == f.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GameActivationAwakeningCompletedEvent>().Any(e => e.FrameId == f.Id))
-                throw new InvalidOperationException("An issued game-activation awakening lost its owning receipt.");
-            return;
-        }
-
-        if (!ValidGameActivationAwakeningReceipt(f))
-            throw new InvalidOperationException("Game-activation awakening lost its exact count, max-HP payment or grant continuation.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !GameActivationAwakeningFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Game-activation awakening retained an unrelated first native child.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 670)]
     internal bool CanContinueGameActivationAwakening(ProgramSkillFrame f) => f.GameActivationAwakening is not null && ValidGameActivationAwakeningReceipt(f);
     internal bool GameActivationAwakeningFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -112,8 +92,6 @@ internal sealed partial class CoreGameEngineGameActivationAwakeningRuntime
             return hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.ParentFrameId == f.Id && hp.Change.Kind == HpChangeKind.MaximumHp && hp.Change.SourceSeat is null && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount == r.MaximumBefore - r.MaximumAfter && hp.Change.HpBefore == r.HpAfter && hp.Change.HpAfter == r.HpAfter;
         return r.Stage == GameActivationAwakeningStage.GrantsIssued && child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 100)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 160)]
     internal bool IsGameActivationAwakeningProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _coreDrawDiscardCategoryRefundOperations.CategoryActivationObserverRoot(true)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     SkillProgramStepOutcome global::CardGame.Core.IGameActivationAwakeningProgramHost.BeginGameActivationAwakening(ProgramSkillFrame f, SkillProgramEffect e) => BeginGameActivationAwakening(f, e);

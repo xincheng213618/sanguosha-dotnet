@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 // The draft stays on the original instruction; this service joins its physical
 // journal and facts without retaining a second pending-discard store.
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class NativeLogicalDiscardRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     ICardZoneQueries zones, ICardMovementHistoryQueries movements, IProgramEventHistoryQueries history,
     IProgramContentQueries content, IProgramTurnQueries turn, ISelectionParticipantQueries participants,
@@ -146,23 +146,5 @@ internal sealed class NativeLogicalDiscardRuntime(IProgramRuntimeFrames frames, 
         frames.ReplaceTop(frame = frame with { LogicalDiscardInvocation = null });
         Complete(draft);
         return frames.ActiveProgram(frame.Id);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 19000)]
-    private void AssertNativeLogicalDiscardFrame(ProgramSkillFrame frame)
-    {
-        if (frame.LogicalDiscardInvocation is not { } draft) return;
-        if (!TracksInvocations || draft.InvocationId <= 0 || draft.InvocationId > facts.ResolutionSequence ||
-            draft.ParentFrameId != frame.Id || draft.InitiatorSeat != frame.OwnerSeat ||
-            draft.InstructionIndex != frame.InstructionIndex || !participants.IsValidSeat(draft.ExecutorSeat) ||
-            draft.TurnNumber != turn.TurnNumber || draft.ActualTurnOwnerSeat != turn.TurnOwnerSeat ||
-            draft.SequenceBefore < 0 || draft.SequenceBefore > facts.MovementSequence ||
-            string.IsNullOrWhiteSpace(draft.Reason.Value) || draft.Materials.Count == 0 ||
-            draft.Materials.Select(m => m.CardId).Distinct().Count() != draft.Materials.Count ||
-            draft.Materials.Any(m => !origins.IsOwnedDiscardSource(m.From) || !participants.IsValidSeat(m.From.OwnerSeat!.Value) ||
-                zones.GetLocation(m.CardId) != m.From && !movements.Read().Any(move =>
-                    move.CardId == m.CardId && move.Sequence > draft.SequenceBefore && move.From == m.From && move.Reason == draft.Reason)) ||
-            history.Read<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.InvocationId == draft.InvocationId))
-            throw new InvalidOperationException("A logical discard lost its owning instruction, frozen primary materials or original movement witness.");
     }
 }

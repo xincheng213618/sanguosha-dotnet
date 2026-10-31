@@ -68,7 +68,6 @@ internal sealed partial class CharacterSunYuanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunYuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SunYuanStage.Request ? r.Holder : f.OwnerSeat) || !SunYuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Sun Yuan requires her exact private choice and participant.");
-        AssertSunYuan(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (choice.Parameters["branch"] == "decline")
@@ -196,7 +195,6 @@ internal sealed partial class CharacterSunYuanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunYuan: { } r } f || f.Id != id)
             return;
-        AssertSunYuan(f);
         if (r.Stage is SunYuanStage.NativeUse or SunYuanStage.SlashIssuing)
             return;
         if (r.Stage is SunYuanStage.Target or SunYuanStage.ObtainCard or SunYuanStage.DiscardCards or SunYuanStage.Request)
@@ -298,7 +296,6 @@ internal sealed partial class CharacterSunYuanOlRuntime
     {
         if (f.SunYuan is not { Paid: true })
             return false;
-        AssertSunYuan(f);
         return true;
     }
 

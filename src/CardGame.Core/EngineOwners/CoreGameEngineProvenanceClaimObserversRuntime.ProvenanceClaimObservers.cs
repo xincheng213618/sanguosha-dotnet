@@ -43,6 +43,4 @@ internal sealed partial class CoreGameEngineProvenanceClaimObserversRuntime
 
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1720)]
     internal bool HasProvenanceClaimObserver(long damageId) => ProvenanceClaimDamageObserverRoot(damageId)is not null;
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 270, group: 10)]
-    internal bool IsProvenanceClaimProgramDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && ProvenanceClaimDamageObserverRoot(damage.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

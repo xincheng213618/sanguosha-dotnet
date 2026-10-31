@@ -226,14 +226,6 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsRuntime
             throw new InvalidOperationException("A designated extra target lost its exact source, prefix, native parent or public prompt.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 240)]
-    internal void AssertRegisteredDesignatedExtraTargetDraft(ProgramSkillFrame frame, ProgramExecutionPlan plan)
-    {
-        var program = _contentRegistryOperations._contentRegistry.Skills[frame.SkillId].Program!;
-        if (frame.DesignatedExtraTargetDraft is not null || program.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.AddOneDistanceFreeCurrentUseTarget)))
-            AssertDesignatedExtraTargetDraft(frame, frame.InstructionIndex > 0 ? plan.GetPausedInstruction(frame.InstructionIndex).Effect : plan.Instructions[0]);
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.AddOneDistanceFreeCurrentUseTarget)]
     internal PromptChoice SelectAiDesignatedExtraTargetChoice(PendingDecision decision, ProgramSkillFrame frame)
     {

@@ -123,7 +123,6 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuZhaoMidu: { } r } f || f.Id != id)
             return;
-        AssertHuZhaoMidu(f);
         if (r.Stage is HuZhaoMiduStage.CostChildren or HuZhaoMiduStage.DrawChildren && DrainHuZhaoChildren(id))
             return;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

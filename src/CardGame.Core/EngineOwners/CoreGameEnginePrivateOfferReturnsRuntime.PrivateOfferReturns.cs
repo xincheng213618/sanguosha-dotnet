@@ -119,14 +119,4 @@ internal sealed partial class CoreGameEnginePrivateOfferReturnsRuntime
             ResumePrivateOffer(f.Id);
         return true;
     }
-
-    internal void AssertPrivateOfferFrames()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-            if (f.PrivateOffer is not null && !ValidPrivateOfferReceipt(f))
-                throw new InvalidOperationException("Invalid deferred private offer receipt.");
-        foreach (var location in _cardZonesOperations._cardZones.PrivateTurnHoldLocations.Where(l => l.PrivateTurnHold?.DeferredOffer is not null && _cardZonesOperations._cardZones.CardsAt(l).Count != 0))
-            if (!_corePrivateCardOffersOperations.ValidPrivateOfferDeposit(location, out var id) || _cardZonesOperations._cardZones.CardsAt(location)is not [var card] || card.Id != id)
-                throw new InvalidOperationException("An issued private deposit lost its one real original entity.");
-    }
 }

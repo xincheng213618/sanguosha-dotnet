@@ -68,13 +68,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27450)]
-    internal void AssertBaoXin(ProgramSkillFrame f)
-    {
-        if (f.BaoXin is not null && !ValidBaoXin(f))
-            throw new InvalidOperationException("Bao Xin lost his exact native source, frozen damage qualification, original entities, random reservation or once-paid stage.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 390)]
     internal bool IsBaoXinMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.BaoXin is { Paid: true } r && effect?.Op == r.Op && pending == f.PendingMovementContinuation && pending.SubjectSeat == r.Recipient && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool BaoXinMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
@@ -113,8 +106,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
     internal bool HasBaoXinDamageObserver(long id) => BaoXinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1040)]
     internal bool HasBaoXinBeforeDamageObserver(long id) => HasBaoXinDamageObserver(id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 870)]
-    internal bool IsBaoXinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BaoXinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27450)]
     internal bool AdvanceBaoXinChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BaoXinObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

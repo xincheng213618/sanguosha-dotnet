@@ -69,6 +69,5 @@ internal sealed class MouXunYuAnniversaryRuntime(IMouXunYuAnniversaryFacts facts
  [ProgramContinuation(ProgramContinuationKind.Resume,37200)]private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouXunYuAnniversary:not null}f||f.Id!=id)return false;Continue(id);return true;}
  [ProgramContinuation(ProgramContinuationKind.Movement,37200)]private bool Movement(ProgramSkillFrame f)=>f.MouXunYuAnniversary is not null&&Resume(f.Id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,37200)][ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,37200)]private bool Paid(ProgramSkillFrame f)=>f.MouXunYuAnniversary is not null&&Valid(f);
- [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,37200)]private void Invariant(ProgramSkillFrame f){if(f.MouXunYuAnniversary is not null&&!Valid(f))throw new InvalidOperationException("Invalid own-frame Mou Xun Yu source/payment interval.");}
  [ProgramAiChoice(SkillProgramEffectOp.InitializeMouXunYuAnniversaryShimou,SkillProgramEffectOp.ResolveMouXunYuAnniversaryShimou,SkillProgramEffectOp.ResolveMouXunYuAnniversaryBizuo,SkillProgramEffectOp.SettleMouXunYuAnniversaryBizuo)]private PromptChoice Ai(PendingDecision p,ProgramSkillFrame f)=>p.Choices.FirstOrDefault(c=>c.Parameters.GetValueOrDefault("branch")=="done")??p.Choices.First();
 }

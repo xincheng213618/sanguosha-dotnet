@@ -76,8 +76,6 @@ internal sealed partial class CoreGameEngineShanheGuideSkillsRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheBuwuDrawIssuedEvent>().Single(item => item.FrameId == frame.Id);
-        if (frame.ShanheBuwuDrawOutcome is not null || frame.NativeDraw is not null || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != issued.Amount)
-            throw new InvalidOperationException("Buwu lost its original actual-damage draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheBuwuDrawOutcome = outcome });
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);

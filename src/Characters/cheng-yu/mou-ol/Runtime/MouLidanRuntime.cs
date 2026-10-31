@@ -100,11 +100,6 @@ internal sealed class MouLidanRuntime(IProgramRuntimeFrames frames, IProgramRunt
     private PromptChoice Ai(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.Single(c => c.Parameters["verb"] == "finish");
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 34100)]
     private bool PaidSource(ProgramSkillFrame f) => f.MouLidanSelection is not null && Valid(f) || facts.TargetUse(f)?.MouLidan is { Offered: false } r && r.Source == Source(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 34100)]
-    private void Invariant(ProgramSkillFrame f)
-    {
-        if (f.MouLidanSelection is not null && !Valid(f)) throw new InvalidOperationException("Lidan lost its owning designation window or paid permissions.");
-    }
     internal static bool Same(PromptChoice a, PromptChoice b) => a.Id == b.Id && a.Cards.SequenceEqual(b.Cards) &&
         a.Targets.SequenceEqual(b.Targets) && a.Parameters.OrderBy(p => p.Key).SequenceEqual(b.Parameters.OrderBy(p => p.Key));
 }

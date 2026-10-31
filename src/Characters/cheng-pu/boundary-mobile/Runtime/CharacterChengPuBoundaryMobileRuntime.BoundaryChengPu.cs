@@ -83,13 +83,6 @@ internal sealed partial class CharacterChengPuBoundaryMobileRuntime
             throw new InvalidOperationException("Lihuo lost its once-paid actual HP loss.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 56200)]
-    internal void AssertBoundaryChengPuLihuo(ProgramSkillFrame f)
-    {
-        if (f.BoundaryChengPuLihuo is not null)
-            RequireBoundaryChengPuLihuo(f);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 56200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 56200)]
     internal bool KeepBoundaryChengPuLihuo(ProgramSkillFrame f)
@@ -116,7 +109,6 @@ internal sealed partial class CharacterChengPuBoundaryMobileRuntime
 
     internal bool BoundaryChengPuHealthSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame dying && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, dying) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? BoundaryChengPuHealthRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterChengPuBoundaryMobileOperations.BoundaryChengPuHealthChild(f, child), (n) => _characterChengPuBoundaryMobileOperations.BoundaryChengPuHealthSuffix(n));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 56200)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 56200)]
     internal bool BoundaryChengPuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BoundaryChengPuHealthRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 56200)]

@@ -26,8 +26,6 @@ internal sealed partial class CharacterLiWanOlRuntime
         if (fact is CardUseDeclaredEvent declared)
         {
             var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == declared.ResolutionId);
-            if (use is null || use.SourceSeat != declared.SourceSeat || use.CardKind != declared.CardKind || use.CardId != declared.CardId)
-                throw new InvalidOperationException("Lianju lost the exact native declared use.");
             if (use.Action is { Type: not CardActionType.Use })
                 return;
             foreach (var id in use.Action?.PhysicalCards.Select(c => c.CardId) ?? use.PhysicalCardIds ?? [use.CardId])

@@ -4,7 +4,6 @@ internal sealed partial class CoreWenheActivityProgramsEntries
 {
     internal bool AllowsWenheActivation(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsWenheActivation(gate);
     internal bool AllowsWenheRuleTrigger(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsWenheRuleTrigger(gate);
-    internal void AssertWenheRuleFlow(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertWenheRuleFlow(f);
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteWenheActivity(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().ExecuteWenheActivity(frame, op);
     internal bool HasWenheDeadOwnerEnding(int actualOwner) => _resolve().HasWenheDeadOwnerEnding(actualOwner);
     internal bool IsWenheDeadOwnerEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, int actualOwner) => _resolve().IsWenheDeadOwnerEndingCandidate(candidate, actualOwner);

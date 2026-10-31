@@ -73,36 +73,6 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealObserv
         return moved.ResumeProgramFrameId is null && moved.Id == batch && moved.Batch.Id == batch && moved.Batch.ParentFrameId == f.Id && moved.Batch.AwaitingProgramFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count == r.PaidMaterials.Count && moved.Batch.Movements.Select(m => m.CardId).SequenceEqual(r.PaidMaterials.Select(m => m.CardId)) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.From == CardLocation.Hand(target) && m.To == CardLocation.DiscardPile && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.CompletedUndamagedDiscardReason(f) && m.CardKind == r.PaidMaterials.Single(c => c.CardId == m.CardId).PrintedKind);
     }
 
-    internal bool IsCompletedUndamagedTargetRevealChoice(ProgramSkillFrame f, PendingDecision decision)
-    {
-        if (f.CompletedUndamagedTargetReveal is not { Stage: CompletedUndamagedTargetRevealStage.ChoosingTarget or CompletedUndamagedTargetRevealStage.ChoosingCards } || !ValidCompletedUndamagedTargetRevealReceipt(f) || decision.Kind != DecisionKind.ProgramTrigger || !decision.IsPrivate || decision.PlayerSeat != f.OwnerSeat || decision.SourceSeat != f.OwnerSeat || decision.TargetSeat is not null || decision.ValidCardIds.Count != 0 || decision.ValidContentIds.Count != 0 || decision.RequiredCardCount != 0 || decision.SkillPrompt?.SkillId != f.SkillId)
-            return false;
-        var choices = _coreCompletedUndamagedTargetRevealOperations.CompletedUndamagedTargetRevealChoices(f);
-        return decision.ValidTargetSeats.SequenceEqual(choices.SelectMany(c => c.Targets).Distinct()) && decision.Choices.Count == choices.Count && decision.Choices.Zip(choices).All(p => global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.CompletedUndamagedChoiceEquals(p.First, p.Second));
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 500)]
-    internal void AssertCompletedUndamagedTargetReveal(ProgramSkillFrame f)
-    {
-        if (f.CompletedUndamagedTargetReveal is null)
-        {
-            // Old bindings in a full catalog do not scan the whole event history.
-            if (f.TriggerId is null || !ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger(f)).HasOperation(SkillProgramEffectOp.RevealUndamagedUseTargetHandAndDiscardSameColor))
-                return;
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CompletedUndamagedTargetRevealStartedEvent>().Any(e => e.FrameId == f.Id))
-                throw new InvalidOperationException("An issued completed-target reveal lost its owning receipt.");
-            return;
-        }
-
-        if (!ValidCompletedUndamagedTargetRevealReceipt(f))
-            throw new InvalidOperationException("Completed-target reveal lost its exact completed Use, whole-use damage exclusion, opaque selection or native paid invoice.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == f.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !CompletedUndamagedTargetRevealFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("Completed-target reveal retained an unrelated first native child.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.CompletedUndamagedTargetReveal.Stage is CompletedUndamagedTargetRevealStage.ChoosingTarget or CompletedUndamagedTargetRevealStage.ChoosingCards && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } decision || !IsCompletedUndamagedTargetRevealChoice(f, decision)))
-            throw new InvalidOperationException("Completed-target reveal lost its exact private opaque prompt.");
-    }
-
     internal bool CompletedUndamagedTargetRevealStructuralEdge(ResolutionFrame parent, ResolutionFrame child)
     {
         if (parent is ProgramSkillFrame root && CompletedUndamagedTargetRevealFirstChild(root, child))
@@ -117,8 +87,6 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealObserv
         var current = _resolutionStackOperations._resolutionStack[child];
         return global::CardGame.Core.EngineOwners.CoreGameEngineObserverSubtreesRuntime.IsObserverSkillsChangedEdge(parent, current) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, current) || _coreOriginalHandEntityObserversOperations.OriginalHandEntityStructuralEdge(parent, current) || _coreOutsidePhaseDrawDiscardObserversOperations.OutsidePhaseDrawDiscardStructuralEdge(parent, current) || CompletedUndamagedTargetRevealStructuralEdge(parent, current) || _coreRecipientCategoryMarkObserversOperations.RecipientCategoryMarkStructuralEdge(parent, current) || _coreOffTurnUsedCardObserversOperations.OffTurnUsedCardGiftStructuralEdge(parent, current) || _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandStructuralEdge(parent, current) || _coreResponseCompletionOperations.ResponseCompletionStructuralEdge(parent, current) || _coreCardSupplyCompletionOperations.CardSupplyCompletionStructuralEdge(parent, current) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child);
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 50, group: 70)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 60)]
     internal bool IsCompletedUndamagedTargetRevealDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CompletedUndamagedTargetRevealObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1830)]

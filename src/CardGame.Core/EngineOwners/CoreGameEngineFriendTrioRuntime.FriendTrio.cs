@@ -277,7 +277,6 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
     internal void ResolveFriendTrioChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        AssertFriendTrio(f);
         var r = f.FriendTrio!;
         if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FriendTrioChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Friend choice changed its frozen draft.");
@@ -518,7 +517,6 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
     {
         if (f.FriendTrio is not { Stage: FriendTrioStage.Movement } r)
             return false;
-        AssertFriendTrio(f);
         if (DrainFriendTrioChildren(f))
             return true;
         ContinueFriendTrio(f with { PendingMovementContinuation = null, FriendTrio = r with { Stage = r.NextStage } });
@@ -530,7 +528,6 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FriendTrio: { } r } f || f.Id != id || !IsFriendTrioOperation(r.Operation))
             return false;
-        AssertFriendTrio(f);
         if (r.Stage == FriendTrioStage.Movement)
             return ReturnFriendTrioMovement(f);
         if (r.Stage == FriendTrioStage.HpLoss)
@@ -558,15 +555,6 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
 
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 80)]
     internal bool IsFriendTrioMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => e is not null && IsFriendTrioOperation(e.Op) && f.FriendTrio is { Stage: FriendTrioStage.Movement or FriendTrioStage.EquipmentUse } r && r.Operation == e.Op && f.PendingMovementContinuation == pending && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 460)]
-    internal void AssertFriendTrio(ProgramSkillFrame f)
-    {
-        if (f.FriendTrio is not { } r || !IsFriendTrioOperation(r.Operation))
-            return;
-        var e = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        if (f.InstructionIndex != r.InstructionIndex || e.Op != r.Operation || !Enum.IsDefined(r.Stage) || r.Cards.Distinct().Count() != r.Cards.Count || r.Values is not System.Collections.IList { IsReadOnly: true } || r.Cards is not System.Collections.IList { IsReadOnly: true } || r.Stage == FriendTrioStage.EquipmentUse && (r.Operation != SkillProgramEffectOp.EquipFriendXuanjian || r.IssuedUseFrameId is null || r.IssuedActionId is null || !_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => FriendXuanjianFrameRidesOn(u, f))) || r.Stage == FriendTrioStage.Movement && (f.PendingMovementContinuation is null || r.Before > r.After || r.After > _coreCardMovementJournalMovementSequenceAccess._movementSequence || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendTrioMovementPaidEvent>().Count(x => x.ProgramFrameId == f.Id && x.Before == r.Before && x.After == r.After) != 1))
-            throw new InvalidOperationException("Friend skill lost its immutable owning receipt or paid child return.");
-    }
 
     internal bool FriendXuanjianFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => child is CardUseFrame { Action: { } a } u && parent is ProgramSkillFrame { FriendTrio: { Stage: FriendTrioStage.EquipmentUse } r } f && r.Operation == SkillProgramEffectOp.EquipFriendXuanjian && r.IssuedUseFrameId == u.Id && r.IssuedActionId == a.ActionId && r.Cards is [var card] && u.CardId == card && a.ActorSeat == f.OwnerSeat && a.EffectiveKind == CardKind.Xuanjian && a.ConversionChain.Any(s => s.OwnerSeat == f.OwnerSeat && s.SkillId == f.SkillId && s.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && s.SkillInstanceId == f.SkillInstanceId) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendXuanjianUseIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.UseFrameId == u.Id && e.ActionId == a.ActionId && e.CardId == card) == 1;
     [NativeUseReturn(140)]

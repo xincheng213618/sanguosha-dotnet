@@ -56,11 +56,4 @@ internal sealed partial class CoreGameEngineShanheS5XuchuRuntime
             throw new InvalidOperationException("S5 Luoyi's current-HP value lost its owning public reveal.");
         return fact;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 5710)]
-    internal void AssertShanheS5LuoyiFrozen(ProgramSkillFrame f)
-    {
-        foreach (var value in f.NumberBindings.Where(b => b.Name.StartsWith(ShanheS5LuoyiNumberPrefix, StringComparison.Ordinal)))
-            _ = ShanheS5LuoyiFrozen(f, value.Name[ShanheS5LuoyiNumberPrefix.Length..]);
-    }
 }

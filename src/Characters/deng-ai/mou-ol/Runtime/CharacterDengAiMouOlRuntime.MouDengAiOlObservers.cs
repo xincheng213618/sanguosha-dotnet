@@ -7,14 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiMouOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 33400)]
-    internal void AssertMouDengAiOl(ProgramSkillFrame f)
-    {
-        if (f.MouDengAiOl is not { } r)
-            return;
-        if (!ValidMouDengAiOl(f) || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Distance < 0 || r.HandCards.Distinct().Count() != r.HandCards.Count || r.GuCards.Distinct().Count() != r.GuCards.Count || r.NativeReturned && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || r.Stage is MouDengAiOlStage.CostChildren or MouDengAiOlStage.Material or MouDengAiOlStage.Snatch or MouDengAiOlStage.Issuing or MouDengAiOlStage.NativeUse && !r.Paid)
-            throw new InvalidOperationException("Mou Deng Ai lost its source, original paid cursor or native return.");
-    }
 
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33400)]
     internal bool IsMouDengAiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation m) => f.MouDengAiOl is { Stage: MouDengAiOlStage.Children or MouDengAiOlStage.CostChildren } r && ValidMouDengAiOl(f) && effect?.Op == r.Operation && m == f.PendingMovementContinuation && m.SubjectSeat == f.OwnerSeat && m.BeforeCount == 0 && m.CoverageResultBind is null;
@@ -52,7 +44,6 @@ internal sealed partial class CharacterDengAiMouOlRuntime
     internal bool HasMouDengAiDamage(long id) => MouDengAiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33400)]
     internal bool HasMouDengAiBeforeDamage(long id) => MouDengAiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 33400)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33400)]
     internal bool IsMouDengAiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouDengAiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33400)]

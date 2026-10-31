@@ -97,7 +97,6 @@ internal sealed partial class CharacterZhuJunOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhuJunCuipoDraw: { } r } f || f.Id != id)
             return;
-        AssertZhuJunCuipo(f);
         if (_coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhuJunCuipoDrawCompletedEvent(id, r.Qualification.OriginFrameId, r.Qualification.ActionId));
@@ -129,7 +128,6 @@ internal sealed partial class CharacterZhuJunOlRuntime
     {
         if (f.ZhuJunCuipoDraw is null)
             return false;
-        AssertZhuJunCuipo(f);
         return true;
     }
 

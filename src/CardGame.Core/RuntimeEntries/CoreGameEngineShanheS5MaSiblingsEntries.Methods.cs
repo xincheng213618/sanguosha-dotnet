@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheS5MaSiblingsEntries
 {
-    internal void AssertShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertShanheS5Tieqi(frame);
     internal bool CanContinuePaidShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CanContinuePaidShanheS5Tieqi(frame);
     internal bool CanPayShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.Card[] cards) => _resolve().CanPayShanheS5Tieqi(frame, cards);
     internal void FinishShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame, bool paid) => _resolve().FinishShanheS5Tieqi(frame, paid);

@@ -71,7 +71,6 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceXiying: { } r } f || r.Stage is not (ShanheSourceXiyingStage.Cost or ShanheSourceXiyingStage.Targets) || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !SourceXiyingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Source1180 lost its exact current owner/other-character payment choice.");
-        _coreShanheSourceXiyingEndingOperations.AssertSourceXiyingFrame(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = r.Stage == ShanheSourceXiyingStage.Cost ? f.OwnerSeat : r.Seats[r.Index];
         if (selected.Parameters["branch"] == "ban")
@@ -111,7 +110,6 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceXiying: { } r } f || f.Id != id)
             return;
-        _coreShanheSourceXiyingEndingOperations.AssertSourceXiyingFrame(f);
         if (r.Stage is ShanheSourceXiyingStage.CostChildren or ShanheSourceXiyingStage.TargetChildren or ShanheSourceXiyingStage.RewardChildren)
         {
             if (DrainSourceXiying(id))

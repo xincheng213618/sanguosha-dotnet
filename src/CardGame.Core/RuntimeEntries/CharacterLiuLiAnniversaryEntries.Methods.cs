@@ -5,7 +5,6 @@ internal sealed partial class CharacterLiuLiAnniversaryEntries
     internal bool AdvanceLiuLiSubtree() => _resolve().AdvanceLiuLiSubtree();
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.RuleQueryContribution> AnniversaryLiuLiHandLimitContributions(global::CardGame.Core.CharacterState p) => _resolve().AnniversaryLiuLiHandLimitContributions(p);
     internal void AnswerLiuLi(global::CardGame.Core.PromptChoice c) => _resolve().AnswerLiuLi(c);
-    internal void AssertLiuLi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertLiuLi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginLiuLi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginLiuLi(supplied, op);
     internal bool CanStartLiuLiDehua(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanStartLiuLiDehua(g);
     internal bool CanStartLiuLiFuli(global::CardGame.Core.CharacterState owner) => _resolve().CanStartLiuLiFuli(owner);
@@ -15,10 +14,8 @@ internal sealed partial class CharacterLiuLiAnniversaryEntries
     internal bool DrainLiuLi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainLiuLi(f);
     internal void EnsureLiuLiDamagePool(int owner) => _resolve().EnsureLiuLiDamagePool(owner);
     internal void FinishLiuLi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLiuLi(f);
-    internal bool HasAnniversaryLiuLiPrompt() => _resolve().HasAnniversaryLiuLiPrompt();
     internal bool IsAnniversaryLiuLiHandLimitExempt(int seat, global::CardGame.Core.Card card) => _resolve().IsAnniversaryLiuLiHandLimitExempt(seat, card);
     internal bool IsAnniversaryLiuLiVirtualUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsAnniversaryLiuLiVirtualUse(use);
-    internal bool IsExactAnniversaryLiuLiBasicDraft(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramVirtualBasicDraft draft) => _resolve().IsExactAnniversaryLiuLiBasicDraft(f, draft);
     internal void IssueLiuLiSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueLiuLiSlash(f);
     internal void IssueLiuLiUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueLiuLiUse(f);
     internal bool KeepPaidLiuLi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidLiuLi(f);
@@ -30,7 +27,6 @@ internal sealed partial class CharacterLiuLiAnniversaryEntries
     internal bool LiuLiChosenProof(global::CardGame.Core.AnniversaryLiuLiNameChosenEvent e) => _resolve().LiuLiChosenProof(e);
     internal bool LiuLiDamageObserver(long id) => _resolve().LiuLiDamageObserver(id);
     internal bool LiuLiDiscardProof(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LiuLiDiscardProof(f);
-    internal bool LiuLiDyingObserver() => _resolve().LiuLiDyingObserver();
     internal bool LiuLiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().LiuLiFirstChild(f, child);
     internal bool LiuLiHandNameForbidden(int owner, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IEnumerable<int> ids) => _resolve().LiuLiHandNameForbidden(owner, kind, ids);
     internal bool LiuLiMaterialsForbidden(global::CardGame.Core.ProgramCardMaterialQuery q) => _resolve().LiuLiMaterialsForbidden(q);

@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterMiHengLeEntries
 {
     internal bool AdvanceJiguChildren() => _resolve().AdvanceJiguChildren();
-    internal void AssertJigu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertJigu(f);
     internal void AssertSiruiUses() => _resolve().AssertSiruiUses();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginJiguDraw(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginJiguDraw(supplied);
     internal void BindSiruiResponseAction(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.CardActionContext action) => _resolve().BindSiruiResponseAction(parent, action);
@@ -28,7 +27,6 @@ internal sealed partial class CharacterMiHengLeEntries
     internal bool HasSiruiSlashDistance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int>? materialIds = default, global::CardGame.Core.CardConversionSource? conversionSource = default, long? existingUseFrameId = default) => _resolve().HasSiruiSlashDistance(actor, kind, materialIds, conversionSource, existingUseFrameId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeJigu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeJigu(supplied);
     internal bool IsJiguHandLimitExempt(global::CardGame.Core.CharacterState owner, int cardId) => _resolve().IsJiguHandLimitExempt(owner, cardId);
-    internal bool IsLeMiHengDying() => _resolve().IsLeMiHengDying();
     internal bool IsLeMiHengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLeMiHengMovement(f, effect, p);
     internal bool IsLeMiHengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLeMiHengRecoveryParent(f, recovery);
     internal bool IsSiruiOutsideGeneralWeaponMaterial(long useId, int cardId) => _resolve().IsSiruiOutsideGeneralWeaponMaterial(useId, cardId);
@@ -44,7 +42,6 @@ internal sealed partial class CharacterMiHengLeEntries
     internal int JiguMarkedHandCount(int owner) => _resolve().JiguMarkedHandCount(owner);
     internal global::CardGame.Core.ProgramSkillFrame? JiguObserverRoot() => _resolve().JiguObserverRoot();
     internal bool JiguObserverSuffix(int index) => _resolve().JiguObserverSuffix(index);
-    internal bool JiguRootMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().JiguRootMatches(f);
     internal bool JiguRoundDisabled(int owner, int round) => _resolve().JiguRoundDisabled(owner, round);
     internal int JiguUseCount(int owner, int round) => _resolve().JiguUseCount(owner, round);
     internal bool PermitPaidJigu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PermitPaidJigu(f);

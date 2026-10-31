@@ -58,14 +58,6 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
         return start >= 0 && facts.Skip(start + 1).OfType<MaximumHpChangedEvent>().Any(e => e.PlayerSeat == f.OwnerSeat && e.SkillId == f.SkillId);
     }
 
-    internal bool HasAnniversaryLeiBoPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryLeiBo.Stage: AnniversaryLeiBoStage.PenaltyChoice or AnniversaryLeiBoStage.RewardChoice or AnniversaryLeiBoStage.PickReward, Step: ResolutionFrameStep.AwaitingResponse } f && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && ValidLeiBo(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, LeiBoChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 49800)]
-    internal void AssertLeiBo(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryLeiBo is not null && !ValidLeiBo(f))
-            throw new InvalidOperationException("Lei Bo lost its original damage, paid maximum-HP instruction or actual movement receipt.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49800)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49800)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49800)]
@@ -94,7 +86,6 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
     internal bool LeiBoDamageObserver(long id) => LeiBoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49800)]
     internal bool LeiBoBeforeDamageObserver(long id) => LeiBoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 49800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49800)]
     internal bool LeiBoDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LeiBoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49800)]

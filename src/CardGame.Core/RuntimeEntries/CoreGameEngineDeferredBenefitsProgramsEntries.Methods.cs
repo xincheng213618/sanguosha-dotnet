@@ -15,6 +15,4 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsEntries
     internal global::CardGame.Core.PromptChoice SelectAiFactionRecovery(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().SelectAiFactionRecovery(decision, frame);
     internal bool TryBeginFactionRecoveryDebts(global::CardGame.Core.GameEngine.DyingCompletionReceipt dying, bool survived) => _resolve().TryBeginFactionRecoveryDebts(dying, survived);
     internal bool TryContinueFactionRecoveryDebts(long frameId) => _resolve().TryContinueFactionRecoveryDebts(frameId);
-    internal void ValidateFactionRecoveryDraft(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidateFactionRecoveryDraft(frame);
-    internal void ValidateWeaponDamageDraft(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidateWeaponDamageDraft(frame);
 }

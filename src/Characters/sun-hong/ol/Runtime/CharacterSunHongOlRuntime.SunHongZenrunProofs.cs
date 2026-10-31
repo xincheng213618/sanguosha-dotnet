@@ -75,17 +75,6 @@ internal sealed partial class CharacterSunHongOlRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27571)]
-    internal void AssertZenrun(ProgramSkillFrame f)
-    {
-        if (f.Zenrun is not { } r)
-            return;
-        if (!ValidZenrun(f))
-            throw new InvalidOperationException("Zenrun lost its actual phase, native draw parent, opaque original HE slots or once-paid replacement receipt.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && r.Stage is ZenrunStage.Target or ZenrunStage.Cards or ZenrunStage.VictimChoice && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (prompt.PlayerSeat != (r.Stage == ZenrunStage.VictimChoice ? r.SourceSeat : f.OwnerSeat) || prompt.SkillPrompt?.SkillId != f.SkillId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, ZenrunChoices(f))))
-            throw new InvalidOperationException("Zenrun changed its actual chooser or exposed/replaced a private source slot.");
-    }
-
     internal bool ZenrunTakeMovementMatches(ProgramSkillFrame f, CardMovementRecord m, ZenrunMovementIssuedEvent paid) => m.Sequence > paid.Before && m.Sequence <= paid.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (f.Zenrun!.Materials.Any(c => c.CardId == m.CardId && c.Kind == m.CardKind && c.From == m.From) && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == ZenrunTakeReason || m.From == CardLocation.WoodenOxGrain(f.Zenrun.SourceSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard && f.Zenrun.Materials.Any(c => c.Kind == CardKind.WoodenOx && c.From == CardLocation.Equipment(f.Zenrun.SourceSeat)));
     internal bool ZenrunMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
     {

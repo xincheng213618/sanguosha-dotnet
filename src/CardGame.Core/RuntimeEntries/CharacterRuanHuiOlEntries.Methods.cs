@@ -6,7 +6,6 @@ internal sealed partial class CharacterRuanHuiOlEntries
     internal bool AdvanceRuanHuiSubtree() => _resolve().AdvanceRuanHuiSubtree();
     internal global::CardGame.Core.PromptChoice AiRuanHui(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiRuanHui(p, f);
     internal void AnswerRuanHui(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerRuanHui(choice);
-    internal void AssertRuanHui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertRuanHui(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginRuanHui(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginRuanHui(supplied, op);
     internal bool CanRunIssuedRuanHuiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunIssuedRuanHuiCandidate(c, context);
     internal void CaptureRuanHuiMovementBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureRuanHuiMovementBatch(batch);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterRuanHuiOlEntries
     internal bool HasRuanHuiDamageObserver(long id) => _resolve().HasRuanHuiDamageObserver(id);
     internal bool IsIssuedRuanHuiCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedRuanHuiCandidate(c);
     internal bool IsMingchaNormalDrawReplacement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsMingchaNormalDrawReplacement(f);
-    internal bool IsRuanHuiDying() => _resolve().IsRuanHuiDying();
     internal bool IsRuanHuiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsRuanHuiMovement(f, e, p);
     internal bool IsRuanHuiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsRuanHuiRecoveryParent(f, recovery);
     internal bool JingzhongAbolishedEquipmentUse(global::CardGame.Core.JingzhongUseEntityEvent fact, global::CardGame.Core.CardMovementRecord move) => _resolve().JingzhongAbolishedEquipmentUse(fact, move);

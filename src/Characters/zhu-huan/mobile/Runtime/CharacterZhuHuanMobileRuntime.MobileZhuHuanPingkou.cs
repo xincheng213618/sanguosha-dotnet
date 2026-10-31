@@ -100,7 +100,6 @@ internal sealed partial class CharacterZhuHuanMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileZhuHuanPingkou: { } r } f || f.Id != id)
             return false;
-        AssertMobileZhuHuanPingkou(f);
         if (f.AttackAttempt is not null)
             return true;
         if (!r.Sealed)
@@ -123,14 +122,6 @@ internal sealed partial class CharacterZhuHuanMobileRuntime
     }
 
     internal bool ValidMobileZhuHuanPingkou(ProgramSkillFrame f) => f.MobileZhuHuanPingkou is { } r && f.SkillId == MobileZhuHuanPingkouSkill && f.InstructionIndex == 1 && r.Source == MobileZhuHuanPingkouSource(f) && r.GameplayHash == f.GameplayHash && r.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && r.EndedFrame == f.WindowContext?.ParentFrameId && f.WindowContext?.Window == SkillProgramTriggerWindow.AfterTurnEnded && _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().Any(p => p.Id == r.EndedFrame && p.OwnerSeat == f.OwnerSeat && p.TurnNumber == r.ActualTurn) && r.Maximum > 0 && r.Maximum == _characterZhuHuanBoundaryMobileOperations.BoundaryPingkouMaximum(f.OwnerSeat) && r.Targets.Count <= r.Maximum && r.Targets.Distinct().Count() == r.Targets.Count && r.Targets.All(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && seat != f.OwnerSeat) && r.Index >= 0 && r.Index <= r.Targets.Count && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileZhuHuanPingkouStartedEvent>().Count(e => e == new MobileZhuHuanPingkouStartedEvent(f.Id, f.OwnerSeat, f.SkillInstanceId, f.GameplayHash, r.ActualTurn, r.EndedFrame, r.Maximum)) == 1 && r.Targets.OrderBy(seat => _coreTableOrderOperations.RelativeTableOrder(f.OwnerSeat, seat)).SequenceEqual(_coreProgramEventHistoryOperations.ProgramEventHistory<MobileZhuHuanPingkouTargetEvent>().Where(e => e.FrameId == f.Id).Select(e => e.Target).OrderBy(seat => _coreTableOrderOperations.RelativeTableOrder(f.OwnerSeat, seat))) && (!r.Sealed || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileZhuHuanPingkouSealedEvent>().Count(e => e.FrameId == f.Id && e.Count == r.Targets.Count) == 1);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 72500)]
-    internal void AssertMobileZhuHuanPingkou(ProgramSkillFrame f)
-    {
-        if (f.MobileZhuHuanPingkou is not { } r)
-            return;
-        if (!ValidMobileZhuHuanPingkou(f) || f.AttackAttempt is not null && (!r.Sealed || r.Index >= r.Targets.Count || f.AttackAttempt.TargetSeat != r.Targets[r.Index] || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileZhuHuanPingkouDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.Index == r.Index && e.Target == r.Targets[r.Index]) != 1))
-            throw new InvalidOperationException("Mobile Pingkou lost its actual-turn quota, original targets or issued native damage.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 72500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 72500)]

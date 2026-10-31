@@ -4,15 +4,12 @@ internal sealed partial class CharacterQiaoRuiAnniversaryEntries
 {
     internal bool AdvanceQiaoRuiChildren() => _resolve().AdvanceQiaoRuiChildren();
     internal void AnswerQiaoRui(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerQiaoRui(choice);
-    internal void AssertQiaoRui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertQiaoRui(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginQiaoRui(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginQiaoRui(supplied, op);
     internal void BindQiaoRuiSlash(global::CardGame.Core.CardUseDeclaredEvent e) => _resolve().BindQiaoRuiSlash(e);
     internal bool CanOfferQiaoRui(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferQiaoRui(c);
     internal void ChangeQiaoRuiMaximum(global::CardGame.Core.ProgramSkillFrame f, int amount, long lossBatch) => _resolve().ChangeQiaoRuiMaximum(f, amount, lossBatch);
     internal void ContinueQiaoRui(long id) => _resolve().ContinueQiaoRui(id);
     internal void FinishQiaoRui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishQiaoRui(f);
-    internal bool HasAnniversaryQiaoRuiPrompt() => _resolve().HasAnniversaryQiaoRuiPrompt();
-    internal bool HasQiaoRuiCompletedUseObserver(long parentUseId) => _resolve().HasQiaoRuiCompletedUseObserver(parentUseId);
     internal bool IsAnniversaryQiaoRuiSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsAnniversaryQiaoRuiSettlementBatch(f, b);
     internal bool IsQiaoRuiNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsQiaoRuiNativeUse(use);
     internal void IssueQiaoRuiSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueQiaoRuiSlash(f);

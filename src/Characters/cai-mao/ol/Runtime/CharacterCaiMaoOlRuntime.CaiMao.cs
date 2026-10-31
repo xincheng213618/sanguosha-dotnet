@@ -71,7 +71,6 @@ internal sealed partial class CharacterCaiMaoOlRuntime
 
     internal void PublishCaiMao(ProgramSkillFrame f)
     {
-        AssertCaiMao(f);
         var choices = CaiMaoChoices(f);
         if (choices.Count == 0)
         {
@@ -97,7 +96,6 @@ internal sealed partial class CharacterCaiMaoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaiMao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CaiMaoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Cai Mao requires the exact current private whole-operation choice.");
-        AssertCaiMao(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         if (!CaiMaoSourceLive(f))
@@ -176,7 +174,6 @@ internal sealed partial class CharacterCaiMaoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaiMao: { } r } f || f.Id != id)
             return;
-        AssertCaiMao(f);
         if (r.Stage is CaiMaoStage.Targets or CaiMaoStage.Exchange)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterBuLianShiMobileEntries
 {
-    internal bool IsMobileBuLianShiAnxuEqualityResult(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramChoiceResultBinding binding) => _resolve().IsMobileBuLianShiAnxuEqualityResult(f, binding);
     internal bool KeepMobileBuLianShiAnxuPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepMobileBuLianShiAnxuPaid(f);
     internal bool MobileBuLianShiAnxuPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileBuLianShiAnxuPaid(f);
     internal void PrepareMobileBuLianShiAnxu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().PrepareMobileBuLianShiAnxu(supplied);

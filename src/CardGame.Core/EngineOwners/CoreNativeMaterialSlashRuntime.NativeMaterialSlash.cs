@@ -140,14 +140,6 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
         return global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveKind == use.CardKind && issued.EffectiveKind == CardKind.Slash && issued.ConversionChain.Count == 0 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Any(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual(origin.TargetSeats)) && (!use.ProgramUseAccepted || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == origin.ActionId && e.Action.ActorSeat == origin.ActorSeat && e.Action.ProviderSeat == origin.ProviderSeat && e.Action.EffectiveKind == CardKind.Slash && e.Action.PhysicalCards.SequenceEqual(action.PhysicalCards) && e.Action.ConversionChain.Count == 0)) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangbaSerpentSpearConvertedEvent>().Any(e => e.ResolutionId == use.Id && e.UserSeat == origin.ActorSeat && e.IsUse && e.PhysicalCardIds.SequenceEqual(ids));
     }
 
-    internal bool IsExactNativeMaterialSlashExpansion(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { NativeMaterialSlashExtraTargets: not null } use || !MatchesNativeMaterialSlashExpansion(use) || attack.CardUserSeat != use.Action!.ActorSeat || !(attack.SourceSeat == use.SourceSeat && attack.EffectiveCardKind == use.CardKind && use.TargetSeats.Contains(attack.TargetSeat) || _coreNativeSlashTargetDuelOperations.IsNativeSlashTargetDuelAttack(attack)) || !attack.PhysicalCards.Select(card => card.Id).SequenceEqual(use.PhysicalCardIds!))
-            return false;
-        var retained = use.PhysicalCardIds!.Where(id => !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(use.Id, id)).ToHashSet();
-        return processing.All(card => retained.Contains(card.Id)) && retained.All(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile);
-    }
-
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 33730)]
     internal void AssertNativeMaterialSlashExpansions()
     {

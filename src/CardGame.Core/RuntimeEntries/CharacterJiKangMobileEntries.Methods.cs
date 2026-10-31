@@ -4,7 +4,6 @@ internal sealed partial class CharacterJiKangMobileEntries
 {
     internal bool AdvanceMobileJiKangHealth() => _resolve().AdvanceMobileJiKangHealth();
     internal void AnswerMobileJiKang(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMobileJiKang(selected);
-    internal void AssertMobileJiKang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileJiKang(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileJiKang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMobileJiKang(supplied, op);
     internal bool CanActivateMobileJiKang(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().CanActivateMobileJiKang(gate);
     internal void ContinueMobileJiKang(long id) => _resolve().ContinueMobileJiKang(id);

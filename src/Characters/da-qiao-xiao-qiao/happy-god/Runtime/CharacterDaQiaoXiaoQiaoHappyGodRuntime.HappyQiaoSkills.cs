@@ -116,7 +116,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyQiao: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !HappyQiaoChoices(frame).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [answer])))
             throw new InvalidOperationException("Happy Qiao requires her exact original live private choice.");
-        RequireHappyQiaoSkill(frame);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = answer.Parameters["branch"];
@@ -211,7 +210,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
             return false;
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { HappyQiao: { } receipt } frame && frame.Id == frameId)
         {
-            RequireHappyQiaoSkill(frame);
             if (receipt.Stage is HappyQiaoStage.IssuingUse or HappyQiaoStage.Declaration or HappyQiaoStage.NativeUse)
                 return true;
             if (frame.AttackAttempt is not null)

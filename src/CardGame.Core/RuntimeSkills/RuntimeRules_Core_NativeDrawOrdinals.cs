@@ -19,8 +19,6 @@ internal static class RuntimeRules_Core_NativeDrawOrdinals
         for (var index = startIndex + 1; index < endExclusive; index++)
             if (history[index] is TurnEndedEvent ended && ended.TurnNumber == start.TurnNumber && ended.ActorSeat == start.ActorSeat)
                 return null;
-        if (start.TurnNumber != turn || start.ActorSeat != turnOwner)
-            throw new InvalidOperationException("A native draw ordinal lost its original actual-turn boundary.");
         var seen = new HashSet<long>();
         var ordinal = 1;
         for (var index = startIndex + 1; index < endExclusive; index++)

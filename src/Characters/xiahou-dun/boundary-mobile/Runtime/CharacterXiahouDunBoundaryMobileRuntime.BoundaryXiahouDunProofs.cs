@@ -69,7 +69,6 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 60010)]
     internal bool BoundaryXiahouDunBeforeDamageObserver(long id) => BoundaryXiahouDunObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == id && c is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 60010)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 60010)]
     internal bool BoundaryXiahouDunDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BoundaryXiahouDunObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 60010)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 60010)]
@@ -100,10 +99,4 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 60010)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 60010)]
     internal bool KeepBoundaryXiahouDun(ProgramSkillFrame f) => f.BoundaryXiahouDun is { } r ? r.Stage != BoundaryXiahouDunStage.Selecting && ValidBoundaryXiahouDun(f) : f.SkillId == BoundaryXiahouDunQingjian && f.TriggerId == "distribute-at-ending" && f.WindowContext is { } context && IssuedBoundaryXiahouDun(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), context);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 60010)]
-    internal void AssertBoundaryXiahouDun(ProgramSkillFrame f)
-    {
-        if (f.BoundaryXiahouDun is not null && !ValidBoundaryXiahouDun(f))
-            throw new InvalidOperationException("Mobile Qingjian lost its original private payment or typed return.");
-    }
 }

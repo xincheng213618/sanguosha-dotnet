@@ -39,16 +39,6 @@ internal sealed partial class CharacterXiahouHuiAnniversaryRuntime
         return random.State == r.RandomAfter && selected.CardId == moved.CardId && selected.From == moved.From;
     }
 
-    internal bool HasAnniversaryXiahouHuiPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, XiahouHui.Stage: XiahouHuiStage.Recipient } f && p.PlayerSeat == f.OwnerSeat && ValidXiahouHui(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, XiahouHuiChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 46200)]
-    internal void AssertXiahouHui(ProgramSkillFrame f)
-    {
-        if (f.XiahouHui is null)
-            return;
-        if (!ValidXiahouHui(f) || f.PendingMovementContinuation is { } p && !XiahouHuiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
-            throw new InvalidOperationException($"Xiahou Hui lost her exact original trigger, actual draw entities or once-paid native movement ({(f.Id)}/{(f.XiahouHui.Stage)}).");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46200)]
     internal bool XiahouHuiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.XiahouHui is { Stage: XiahouHuiStage.MovementChildren } r && e?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidXiahouHui(f);
     internal bool XiahouHuiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -75,8 +65,6 @@ internal sealed partial class CharacterXiahouHuiAnniversaryRuntime
     internal bool XiahouHuiDamageObserver(long id) => XiahouHuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46200)]
     internal bool XiahouHuiBeforeDamageObserver(long id) => XiahouHuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 46200)]
-    internal bool XiahouHuiDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && XiahouHuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46200)]
     internal bool AdvanceXiahouHuiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XiahouHuiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

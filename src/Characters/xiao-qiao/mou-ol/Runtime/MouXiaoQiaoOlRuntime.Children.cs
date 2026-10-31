@@ -34,7 +34,6 @@ internal sealed partial class MouXiaoQiaoOlRuntime
     private ProgramSkillFrame? ObserverRoot() => frames.OfType<ProgramSkillFrame>().LastOrDefault(f =>
         frames.ChildOf(f.Id) is { } child && FirstChild(f, child) && (child is DyingFrame || health.PaidObserverSuffix(f.Id)));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 34000)]
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 34000)]
     internal bool DyingProof()
     {
         if (health.ActiveDying is not { } d || ObserverRoot() is not { } root) return false;

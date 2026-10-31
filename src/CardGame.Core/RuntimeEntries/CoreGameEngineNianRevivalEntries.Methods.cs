@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineNianRevivalEntries
 {
     internal bool AllowsNianRevival(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsNianRevival(gate);
-    internal void AssertNianRevival(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertNianRevival(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginNianRevival(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginNianRevival(input);
     internal bool CanCompleteNianRevival(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanCompleteNianRevival(f);
     internal void CompleteNianSegment(long id, int count) => _resolve().CompleteNianSegment(id, count);

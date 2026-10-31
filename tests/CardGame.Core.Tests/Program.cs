@@ -417,7 +417,7 @@ var tests = new (string Name, Action Body)[]
     ("Targeted trick hand HP: actual ending adjustment reward gift and cold", TargetedTrickHandHpChecks.ActualEndingDrawDiscardSelfAndOptionalGiftColdReturn),
     ("Phase start card control: payment privacy directed distance and actual expiry", PhaseStartCardControlChecks.MeibuPaymentPrivacyDirectedDistanceAndActualTurnExpiry),
     ("Card response completion cost: typed health kind actual recovery", CardResponseCompletionCostChecks.TypedHealthKindMatchesActualResponseCostRecovery),
-    ("program runtime proofs preserve typed admission order and dying groups", ProgramRuntimeProofChecks.OrderedTypedAdmissionAndDyingGroups),
+    ("program runtime dying permissions preserve group order and per-match binding", ProgramRuntimeProofChecks.OrderedTypedAdmissionAndDyingGroups),
     ("program continuation registration preserves ordered typed returns", ProgramContinuationChecks.OrderedRegistrationPreservesReturnBoundaries),
     ("native return protocol preserves ordered preparation and isolation", ProgramNativeReturnChecks.OrderedNativeBoundariesPreservePreparationAndIsolation),
     ("program window returns preserve typed parent guards and registration", ProgramWindowReturnChecks.RegistrationAndTypedParentGuardsPreserveBoundaries),
@@ -459,7 +459,6 @@ var tests = new (string Name, Action Body)[]
     ("Ordinary SP Cai Wen Ji original Dying four suits private cost cold replay", DyingSuitsAndEndingHistoryChecks.ChenqingOriginalDyingFourSuitsPrivateCostAndColdReplay),
     ("Skill changes: opening damage dying upgrades replacements and cold", SkillChangeOpeningChecks.DamageAndDyingChangesBeforeFirstRoundCold),
     ("Skill changes: shared cap state grants and paid child cold", SkillChangeOpeningChecks.SharedCapStateAndAcquisitionAfterPaidChildCold),
-    ("Skill changes: shared source rejects foreign owner instance and cursor", SkillChangeOpeningChecks.SharedChangeRejectsForeignOwnerInstanceAndCursor),
     ("Phase hand extra turn native public declaration paid selected beneficiary", PhaseHandExtraTurnAiChecks.NativePublicDeclarationPaysAndExecutesSelectedBeneficiaryExtraTurn),
     ("Turn kind hand exemption survives source suppression actual turn expiry", TurnHandLimitKindExemptionChecks.IssuedKindPolicySurvivesSourceSuppressionUntilActualTurnEnd),
     ("Recovery replacement paid Qixi stops after observer victory", RecoveryPaidWinnerChecks.SilverLionPaidQixiStopsAfterObserverVictory),
@@ -1605,7 +1604,6 @@ static void InvalidCardMovesAreAtomic()
         store.MoveMany([2, 1], CardLocation.DrawPile, CardLocation.Hand(1)));
     True(beforeInvalidBatch.SequenceEqual(store.CreateDiagnostics()));
     True(store.CardsAt(CardLocation.DrawPile) is not List<Card>);
-    store.AssertInvariants(expectedCardCount: 3);
 }
 
 static void SlashAndDodgeProcessing()

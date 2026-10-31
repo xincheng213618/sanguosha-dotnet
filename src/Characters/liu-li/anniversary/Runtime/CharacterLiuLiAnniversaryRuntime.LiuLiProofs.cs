@@ -62,15 +62,6 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             return false;
         return r.DrawCount == 0 ? r.Draw is null : r.Draw is { } draw && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.DrawCount && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiDrawReturnedEvent>().Count(e => e == new AnniversaryLiuLiDrawReturnedEvent(f.Id, r.DrawCount, draw.ActualDrawIds.Count, r.Before, r.After)) == 1;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 43300)]
-    internal void AssertLiuLi(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryLiuLi is not null && !ValidLiuLi(f))
-            throw new InvalidOperationException("Liu Li lost his exact original window/source, category payment, native draw or whole native Use.");
-    }
-
-    internal bool HasAnniversaryLiuLiPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryLiuLi: { Stage: AnniversaryLiuLiStage.Category or AnniversaryLiuLiStage.RangeTarget or AnniversaryLiuLiStage.UseChoice } } f && p.PlayerSeat == f.OwnerSeat && f.Step == ResolutionFrameStep.AwaitingResponse && ValidLiuLi(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, LiuLiChoices(f));
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43300)]
     internal bool LiuLiMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryLiuLi is { Stage: AnniversaryLiuLiStage.CostChildren or AnniversaryLiuLiStage.DrawChildren } && ValidLiuLi(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryLiuLiFuli && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43300)]
@@ -93,8 +84,6 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     internal bool LiuLiDamageObserver(long id) => LiuLiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 43300)]
     internal bool LiuLiBeforeDamageObserver(long id) => LiuLiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 43300)]
-    internal bool LiuLiDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LiuLiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 43300)]
     internal bool AdvanceLiuLiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuLiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

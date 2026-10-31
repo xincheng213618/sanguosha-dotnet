@@ -6,7 +6,6 @@ internal sealed partial class CharacterZhouFeiBoundaryMobileEntries
     internal global::CardGame.Core.PromptChoice AiBoundaryZf(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AiBoundaryZf(prompt, frame);
     internal void AnswerBoundaryZf(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerBoundaryZf(selected);
     internal void AppendBoundaryZfReturns(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendBoundaryZfReturns(items);
-    internal void AssertBoundaryZfFrame(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryZfFrame(frame);
     internal void AssertBoundaryZfUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertBoundaryZfUse(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryZf(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginBoundaryZf(supplied, operation);
     internal void BindBoundaryZfUse(global::CardGame.Core.CardUseDeclaredEvent declared) => _resolve().BindBoundaryZfUse(declared);

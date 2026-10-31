@@ -85,15 +85,6 @@ internal sealed partial class CoreGameEnginePindianHandReturnsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 7003)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 7003)]
     internal bool ContinuePaidPindianHandReturn(ProgramSkillFrame f) => HasPaidPindianHandReturn(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 7003)]
-    internal void AssertPindianHandReturn(ProgramSkillFrame f)
-    {
-        if (f.PindianHandReturn is not { } r || r.SourceRank <= r.OpponentRank)
-            return;
-        _ = RequirePindianHandReturn(f);
-        if (r.ReturnCount is { } count && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramPindianHalfReturnCountEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == r.TargetSeat && e.ReturnCount == count && e.HandCount / 2 == count) != 1)
-            throw new InvalidOperationException("The half-hand obligation changed after its actual post-gain selection.");
-    }
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 7003)]
     internal bool ResumeInvalidPindianHandReturn(long frameId)

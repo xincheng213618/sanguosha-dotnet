@@ -166,6 +166,4 @@ internal sealed partial class CharacterSimaYiMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouSmPlayedEvent(f.Id, r.Cursor, r.Actor, r.ResponseActionId, true));
         MouSimaYi.PlayedCompleted(f);
     }
-
-    internal bool IsMouSmPlayedCostFinished(ProgramCardTriggerWindowFrame w, CardActionCost cost) => w.MouSimaYiPlayed is { Window: SkillProgramTriggerWindow.CardResponseCompleted } back && ValidMouSmPlayedWindow(w) && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == back.FrameId)is ProgramSkillFrame { MouSimaYi: { } r } && w.Action.PhysicalCards.Contains(cost) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cost.CardId && m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.ResponseFinished);
 }

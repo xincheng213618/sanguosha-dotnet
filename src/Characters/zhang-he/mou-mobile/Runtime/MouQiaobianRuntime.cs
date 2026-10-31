@@ -256,8 +256,6 @@ internal sealed partial class MouQiaobianRuntime(IProgramRuntimeFrames frames,IP
     private bool Resume(long id){if(frames.Top is not ProgramSkillFrame{MouZhangHe:not null}f||f.Id!=id)return false;Continue(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,34200)]
     private bool Movement(ProgramSkillFrame f)=>f.MouZhangHe is not null&&Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState,34200)]
-    private void Invariant(ProgramSkillFrame f){if(f.MouZhangHe is not null&&!Valid(f))throw new InvalidOperationException("Invalid Qiaobian owning receipt.");}
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,34200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,34200)]
     private bool Paid(ProgramSkillFrame f)=>f.MouZhangHe is{Accepted:true}&&Valid(f)||f.SkillId==Qiaobian&&f.ActivationId==f.TriggerId&&f.SelectedCardIds.Count==0&&f.SelectedTargetSeats.Count==0&&f.InstructionIndex is 0 or 1&&f.WindowContext is{}context&&

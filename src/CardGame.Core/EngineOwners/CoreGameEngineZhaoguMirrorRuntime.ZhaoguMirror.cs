@@ -204,29 +204,6 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 62057)]
     internal bool ContinueIssuedZhaogu(ProgramSkillFrame frame) => frame.ZhaoguMirror is not null && ValidZhaoguHeader(frame);
-    internal void AssertZhaoguMirror(ProgramSkillFrame frame, SkillProgramEffect? paused)
-    {
-        if (frame.ZhaoguMirror is not { } receipt)
-            return;
-        if (paused?.Op != SkillProgramEffectOp.ResolveShanheZhaoguMirror || !ValidZhaoguHeader(frame) || (receipt.Stage == ZhaoguMirrorStage.Template ? receipt.Template is not null : receipt.Template is null) || receipt.Template is { } template && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardsRevealedEvent>().Count(e => e.FrameId == frame.Id && e.SkillId == frame.SkillId && e.BindingId == frame.TriggerId && e.Bind == ZhaoguRevealKey && e.Cards is [var card] && card.Id == template.Id && card.Kind == template.Kind) != 1)
-            throw new InvalidOperationException("Zhaogu Mirror lost its frozen template, original phase header or single public reveal.");
-        if (receipt.Stage is ZhaoguMirrorStage.Template or ZhaoguMirrorStage.UseChooser)
-        {
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != frame.OwnerSeat || !prompt.Choices.Select(c => c.Id).SequenceEqual(ZhaoguChoices(frame).Select(c => c.Id)))
-                throw new InvalidOperationException("Zhaogu Mirror lost its unpaid exact choice.");
-        }
-        else if (receipt.Stage == ZhaoguMirrorStage.BasicChild)
-        {
-            if (frame.VirtualBasicDraft is not { } draft || !IsZhaoguVirtualBasicDraft(frame, draft) || draft.ChildFrameId is { } child && (_coreCardUseLifecycleOperations.LifecycleCardUse(child)is not { } basic || basic.CardKind != receipt.Template!.Kind))
-                throw new InvalidOperationException("Zhaogu Mirror basic child lost its single generic draft.");
-        }
-        else if (receipt.Stage == ZhaoguMirrorStage.TrickChild && (_coreCardUseLifecycleOperations.LifecycleCardUse(receipt.TrickChildId)is not { } use || !IsZhaoguVirtualOrdinaryTrickUse(use)))
-            throw new InvalidOperationException("Zhaogu Mirror trick child lost its actual original Use.");
-        else if (receipt.Stage == ZhaoguMirrorStage.RevealChildren && !_characterXiaoQiaoMouOlOperations.IsPublicHandRevealProducerSuspended(frame.Id, ZhaoguRevealKey))
-            throw new InvalidOperationException("Zhaogu Mirror reveal lost its native reveal child.");
-        else if (receipt.Stage == ZhaoguMirrorStage.TrickCleanup && (receipt.TrickChildId <= 0 || receipt.TrickActionId <= 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.TrickChildId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Count(e => e.UseId == receipt.TrickChildId && e.Origin.ParentProgramFrameId == frame.Id && e.Origin.CardActionId == receipt.TrickActionId && e.Origin.SkillInstanceId == frame.SkillInstanceId) != 1))
-            throw new InvalidOperationException("Zhaogu Mirror cleanup lost its original retired attack and single typed return.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShanheZhaoguMirror)]
     internal PromptChoice ChooseZhaoguMirror(PendingDecision prompt, ProgramSkillFrame frame) => prompt.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("program-action") != ZhaoguCancelAction) ?? prompt.Choices.First();

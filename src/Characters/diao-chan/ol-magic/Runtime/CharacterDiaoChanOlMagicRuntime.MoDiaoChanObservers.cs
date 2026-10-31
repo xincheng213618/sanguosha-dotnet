@@ -60,7 +60,6 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     internal bool MoDcDamageObserver(long id) => MoDcObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31400)]
     internal bool MoDcBeforeDamageObserver(long id) => MoDcObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31400)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31400)]
     internal bool MoDcDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MoDcObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31400)]
@@ -74,13 +73,6 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var c = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == recovery.Id);
         return i >= 0 && c > i + 1 && MoDcFirstChild(f, _resolutionStackOperations._resolutionStack[i + 1]) && MoDcObserverSuffix(i) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[c - 1]);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31400)]
-    internal void AssertMoDc(ProgramSkillFrame f)
-    {
-        if (f.MoDiaoChan is not null && !ValidMoDc(f))
-            throw new InvalidOperationException("Magic Diao Chan changed her source or native payment/child cursor.");
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31400)]

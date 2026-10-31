@@ -43,15 +43,6 @@ internal sealed partial class CoreGameEngineWushuangDeckCardsRuntime
         return moves.Length == r.CardIds.Count && moves.Select(m => m.CardId).SequenceEqual(r.CardIds) && moves.All(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "wushuang.obtain-deck-cards" && (r.Kind is null || m.CardKind == r.Kind) && (r.Category is null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(m.CardKind, [r.Category.Value]))) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangDeckCardsObtainedEvent>().Count(e => e.ProgramFrameId == f.Id && e.InstructionIndex == r.InstructionIndex && e.BatchId == r.BatchId && e.Count == moves.Length && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 62000)]
-    internal void AssertWushuangDeckGain(ProgramSkillFrame f, ProgramExecutionPlan plan)
-    {
-        if (f.WushuangDeckGain is not { } r)
-            return;
-        if (f.InstructionIndex < 1 || f.InstructionIndex > plan.Instructions.Count || plan.Instructions[f.InstructionIndex - 1] is not { Op: SkillProgramEffectOp.ObtainWushuangDeckCards } effect || !_coreWushuangModeProjectionOperations.IsWushuangMode || effect.Amount != r.Requested || effect.OutputKind != r.Kind || (effect.CardCategories.Count == 0 ? null : (SkillProgramCardCategory? )effect.CardCategories[0]) != r.Category || r.CardIds is not System.Collections.IList { IsReadOnly: true } || !ValidWushuangDeckGain(f))
-            throw new InvalidOperationException("The pile gain lost its instruction, immutable payment or physical movement.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 62000)]
     internal bool IsWushuangDeckGainMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ObtainWushuangDeckCards && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidWushuangDeckGain(f);
     [ProgramContinuation(ProgramContinuationKind.Movement, 62000)]

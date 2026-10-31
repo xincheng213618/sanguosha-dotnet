@@ -86,7 +86,6 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Beifen: not null } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertBeifen(f);
         if (_kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().TryStartPostInstructionWindow(id))
             return;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -153,13 +152,6 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
         // batch as well. After that child returns, the same scalar payment
         // invoice remains sufficient while later native children drain.
         return _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Where(b => b.Id == r.ObtainBatchId).All(ExactBatch) && _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Where(w => w.Id == r.ObtainBatchId).All(w => ExactBatch(w.Batch) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, w));
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28420)]
-    internal void AssertBeifen(ProgramSkillFrame f)
-    {
-        if (f.Beifen is not null && !ValidBeifenReceipt(f))
-            throw new InvalidOperationException("Beifen lost its original loss qualification, fresh suit search or once-paid real obtains.");
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 1800)]

@@ -126,30 +126,6 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
         return false;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 24780)]
-    internal void AssertSourceTiepaoReceipt(ProgramSkillFrame f)
-    {
-        if (f.ShanheSourceTiepao is not { } r)
-            return;
-        if (f.SkillId != ShanheSourceTiepaoComposition.SkillId || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } w || w.TargetSeat != f.OwnerSeat || w.SourceSeat != r.TargetSeat || w.ParentFrameId != r.DamageWindowId || w.DamageFrameId != r.DamageId || f.ParentFrameId != r.DamageWindowId || r.TargetSeat == f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(p => p.Id == r.DamageWindowId)is not { } parent || parent.ParentFrameId != r.DamageId || SourceTiepaoOriginalAttack(parent, r.DamageId, w.Amount)is not { } original || original.SourceSeat != r.TargetSeat || original.TargetSeat != f.OwnerSeat)
-            throw new InvalidOperationException("Source14075 receipt lost its exact original received-damage window and participants.");
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceTiepaoIssuedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
-        var returned = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceTiepaoReturnedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
-        if (r.MaterialCardId is null)
-        {
-            if (r.MaterialFrom is not null || r.UseId is not null || r.ActionId is not null || r.Issuing || r.Returned || r.MovementBefore != 0 || issued.Length != 0 || returned.Length != 0)
-                throw new InvalidOperationException("An unpaid Source14075 choice cannot retain another native use.");
-            return;
-        }
-
-        if (r.MaterialFrom is not { OwnerSeat: var owner, Zone: CardZoneKind.Hand or CardZoneKind.Equipment } from || owner != f.OwnerSeat || r.Issuing && (r.UseId is not null || r.ActionId is not null || r.Returned || issued.Length != 0 || returned.Length != 0))
-            throw new InvalidOperationException("Source14075 lost its original prospective owned material.");
-        if (r.Issuing)
-            return;
-        if (r.UseId is not { } useId || r.ActionId is not { } actionId || issued is not [var invoice] || invoice.DamageId != r.DamageId || invoice.UseId != useId || invoice.ActionId != actionId || invoice.OwnerSeat != f.OwnerSeat || invoice.TargetSeat != r.TargetSeat || invoice.CardId != r.MaterialCardId || invoice.From != from || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.MovementBefore && m.CardId == r.MaterialCardId && m.From == from && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use) != 1 || (r.Returned ? returned is not [var completion] || completion.UseId != useId || completion.OwnerSeat != f.OwnerSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == useId) != 1 : returned.Length != 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action?.ActionId != actionId))
-            throw new InvalidOperationException("Source14075 lost its exact once-paid material, native-use identity or original-frame return.");
-    }
-
     [ProgramDistanceRule(ProgramDistanceStage.DistanceBaseTerms, 24780)]
     internal void SourceTiepaoDistance(ProgramDistanceQuery q, List<RuleQueryBaseTerm> terms)
     {

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineQuotaTopProgramsEntries
 {
-    internal void AssertQuotaTop(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertQuotaTop(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginQuotaTop(global::CardGame.Core.ProgramSkillFrame frame, int count) => _resolve().BeginQuotaTop(frame, count);
     internal int ComputeTurnCriterionQuota(int ownerSeat) => _resolve().ComputeTurnCriterionQuota(ownerSeat);
     internal void FinishQuotaTop(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().FinishQuotaTop(frame);

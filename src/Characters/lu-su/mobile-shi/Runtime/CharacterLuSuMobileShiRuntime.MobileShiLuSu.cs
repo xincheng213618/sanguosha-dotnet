@@ -305,8 +305,6 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         var r = f.ShiLuSu!;
-        if (r.Stage != ShiLsStage.Drawing || outcome.RecipientSeat != r.Target || outcome.RequestedCount != r.X)
-            throw new InvalidOperationException("Shi Lu Su draw lost its original recipient and frozen amount.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShiLuSu = r with { Stage = ShiLsStage.DrawChildren, Before = checked((int)outcome.SequenceBefore), After = checked((int)outcome.SequenceAfter) }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         ContinueShiLs(f.Id);
     }

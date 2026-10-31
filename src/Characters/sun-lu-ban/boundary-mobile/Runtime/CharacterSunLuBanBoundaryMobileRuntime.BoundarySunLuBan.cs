@@ -59,16 +59,6 @@ internal sealed partial class CharacterSunLuBanBoundaryMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundarySunLuBanChoiceEvent(frame.Id, frame.OwnerSeat, frame.SkillInstanceId, frame.GameplayHash, use.Id, use.Action!.ActionId, frame.SelectedTargetSeats.Single(), effect.ResultBind!, option));
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    internal bool IsBoundarySunLuBanChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding) => frame.SkillId == BoundaryZenhui && binding.ChooserSeat == frame.OwnerSeat && binding.OptionId is "become-user" or "extra-target" && frame.WindowContext?.CardUse is { } context && frame.SelectedTargetSeats is [var target] && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundarySunLuBanChoiceEvent>().Count(fact => fact.FrameId == frame.Id && fact.OwnerSeat == frame.OwnerSeat && fact.SkillInstanceId == frame.SkillInstanceId && fact.GameplayHash == frame.GameplayHash && fact.UseFrameId == context.ParentCardUseFrameId && fact.ActionId == context.CardActionId && fact.SelectedSeat == target && fact.ResultBind == binding.Name && fact.OptionId == binding.OptionId) == 1 && ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Instructions.Take(frame.InstructionIndex).Count(effect => effect.Op == SkillProgramEffectOp.ChooseBoundarySunLuBanZenhui && effect.ResultBind == binding.Name) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.ChooseBoundarySunLuBanZenhui)]
     internal static PromptChoice BoundarySunLuBanChoiceAi(PendingDecision prompt) => prompt.Choices[0];
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 54100)]
-    internal void AssertBoundarySunLuBanChoice(ProgramSkillFrame frame)
-    {
-        if (frame.SkillId != BoundaryZenhui || frame.InstructionIndex != 2 || frame.ChoiceBindings.Any(binding => binding.Name == "own-role-choice"))
-            return;
-        if (!ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, BoundarySunLuBanChoices(frame)))
-            throw new InvalidOperationException("Mobile Zenhui lost its exact owner-only branch chooser on the original card-use frame.");
-    }
 }

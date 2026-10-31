@@ -18,7 +18,6 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryEntries
     internal global::System.Collections.Generic.IReadOnlyList<int> AnniversaryYizanPlayTargets(global::CardGame.Core.CharacterState owner, global::CardGame.Core.ProgramMultiCardViewAsSelection selection) => _resolve().AnniversaryYizanPlayTargets(owner, selection);
     internal bool AnniversaryZtgOriginal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AnniversaryZtgOriginal(f);
     internal global::CardGame.Core.CardConversionSource AnniversaryZtgSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AnniversaryZtgSource(f);
-    internal void AssertAnniversaryQingren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertAnniversaryQingren(f);
     internal bool BanUnavailableAnniversaryYizan(global::CardGame.Core.ProgramViewAsLegalityQuery q) => _resolve().BanUnavailableAnniversaryYizan(q);
     internal bool BanUnavailableAnniversaryYizanSingle(global::CardGame.Core.ProgramConfiguredViewAsQuery q) => _resolve().BanUnavailableAnniversaryYizanSingle(q);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginAnniversaryZhaoTongZhaoGuang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginAnniversaryZhaoTongZhaoGuang(supplied, op);

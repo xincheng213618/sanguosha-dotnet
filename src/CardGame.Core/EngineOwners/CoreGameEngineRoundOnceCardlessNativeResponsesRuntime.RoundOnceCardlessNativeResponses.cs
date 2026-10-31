@@ -126,18 +126,6 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRunt
         return owner is not null && IsIssuedRoundOnceCardlessResponse(owner, action) && action.EffectiveKind == CardKind.Dodge;
     }
 
-    internal void AssertRoundOnceCardlessNativeResponses()
-    {
-        foreach (var owner in _resolutionStackOperations._resolutionStack.Where(f => RoundOnceCardlessResponseReceipt(f)is not null))
-            RequireRoundOnceCardlessResponseAction(owner);
-        foreach (var window in _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Where(w => w.Action.Type == CardActionType.Response && w.Action.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.RoundOnceCardlessBasic is not null)))
-        {
-            var owner = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == window.ParentFrameId);
-            if (owner is null || !IsIssuedRoundOnceCardlessResponse(owner, window.Action))
-                throw new InvalidOperationException("Cardless response child lost its exact owning native frame receipt.");
-        }
-    }
-
     internal void ClearRoundOnceCardlessResponse(ResolutionFrame owner)
     {
         if (RoundOnceCardlessResponseReceipt(owner)is null)

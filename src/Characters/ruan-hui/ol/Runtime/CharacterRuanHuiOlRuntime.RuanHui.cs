@@ -97,7 +97,6 @@ internal sealed partial class CharacterRuanHuiOlRuntime
 
     internal void PublishRuanHui(ProgramSkillFrame f)
     {
-        AssertRuanHui(f);
         var choices = RuanHuiChoices(f);
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
         if (choices.Count == 0)
@@ -122,7 +121,6 @@ internal sealed partial class CharacterRuanHuiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanHui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanHuiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Ruan Hui requires her actual published native choice.");
-        AssertRuanHui(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = choice.Parameters["branch"];
@@ -192,7 +190,6 @@ internal sealed partial class CharacterRuanHuiOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { RuanHui: { } r } f && f.Id == id)
         {
-            AssertRuanHui(f);
             if (r.Stage is RuanHuiStage.DrawChoice or RuanHuiStage.TargetChoice)
             {
                 if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)

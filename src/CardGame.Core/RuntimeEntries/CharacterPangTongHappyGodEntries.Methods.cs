@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterPangTongHappyGodEntries
 {
     internal void AnswerHappyPt(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHappyPt(choice);
-    internal void AssertHappyPt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHappyPt(f);
     internal void AssertHappyPtUpperReturn(global::CardGame.Core.CardUseFrame use) => _resolve().AssertHappyPtUpperReturn(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyPangTong(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginHappyPangTong(supplied, operation);
     internal void BeginHappyPtReward(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginHappyPtReward(f);
@@ -31,7 +30,6 @@ internal sealed partial class CharacterPangTongHappyGodEntries
     internal global::CardGame.Core.CardConversionSource HappyPtSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyPtSource(f);
     internal string HappyPtUpperBind(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyPtUpperBind(f);
     internal bool HappyPtUpperRidesOn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSkillFrame root) => _resolve().HappyPtUpperRidesOn(use, root);
-    internal bool HasHappyPangTongPrompt() => _resolve().HasHappyPangTongPrompt();
     internal bool IsHappyPangTongFactionOrigin(global::CardGame.Core.ProgramSkillFrame frame, int actor, int target, string? bind) => _resolve().IsHappyPangTongFactionOrigin(frame, actor, target, bind);
     internal bool IsHappyPtActualRoundStart(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsHappyPtActualRoundStart(candidate, context);
     internal bool KeepHappyPtPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepHappyPtPaid(f);

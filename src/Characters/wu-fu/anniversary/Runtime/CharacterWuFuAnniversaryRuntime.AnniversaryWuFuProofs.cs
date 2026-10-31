@@ -56,18 +56,6 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
         return f.PendingMovementContinuation is null;
     }
 
-    internal bool HasAnniversaryWuFuPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryWuFu.Stage: AnniversaryWuFuStage.Target or AnniversaryWuFuStage.Commit or AnniversaryWuFuStage.AdjustDiscard, Step: ResolutionFrameStep.AwaitingResponse } f && p.PlayerSeat == WuFuChooser(f) && p.TargetSeat == WuFuChooser(f) && ValidWuFu(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, WuFuChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 46600)]
-    internal void AssertWuFu(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryWuFu is null)
-            return;
-        if (!ValidWuFu(f))
-            throw new InvalidOperationException("Zhonge lost its original actual phase, native payment or simultaneous commitments.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null && f.AnniversaryWuFu.Stage is AnniversaryWuFuStage.Target or AnniversaryWuFuStage.Commit or AnniversaryWuFuStage.AdjustDiscard && !HasAnniversaryWuFuPrompt())
-            throw new InvalidOperationException("Zhonge's original private participant choice changed.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46600)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46600)]
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 46600)]
@@ -113,7 +101,6 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
     internal bool WuFuDamageObserver(long id) => WuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46600)]
     internal bool WuFuBeforeDamageObserver(long id) => WuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 46600)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46600)]
     internal bool WuFuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46600)]

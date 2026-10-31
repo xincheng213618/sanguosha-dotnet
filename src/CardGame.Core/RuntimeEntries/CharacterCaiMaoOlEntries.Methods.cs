@@ -4,7 +4,6 @@ internal sealed partial class CharacterCaiMaoOlEntries
 {
     internal bool AdvanceCaiMaoChildren() => _resolve().AdvanceCaiMaoChildren();
     internal void AnswerCaiMao(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerCaiMao(choice);
-    internal void AssertCaiMao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertCaiMao(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCaiMao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginCaiMao(supplied, op);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CaiMaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CaiMaoChoices(f);
     internal bool CaiMaoDamageParentMatches(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CaiMaoDamageParentMatches(f, context);
@@ -19,7 +18,6 @@ internal sealed partial class CharacterCaiMaoOlEntries
     internal void FinishCaiMao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCaiMao(f);
     internal bool HasCaiMaoBeforeDamageObserver(long id) => _resolve().HasCaiMaoBeforeDamageObserver(id);
     internal bool HasCaiMaoDamageObserver(long id) => _resolve().HasCaiMaoDamageObserver(id);
-    internal bool IsCaiMaoDying() => _resolve().IsCaiMaoDying();
     internal void PayCaiMaoExchange(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayCaiMaoExchange(f);
     internal void PublishCaiMao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCaiMao(f);
     internal bool ResumeCaiMao(long id) => _resolve().ResumeCaiMao(id);

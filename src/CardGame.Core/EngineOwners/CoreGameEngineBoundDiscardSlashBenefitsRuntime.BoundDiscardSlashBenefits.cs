@@ -35,7 +35,6 @@ internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != id || frame.BoundDiscardSlashBenefits is not { } paid)
             return false;
-        AssertBoundDiscardSlashReceipt(frame);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id))
             return true;
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
@@ -56,17 +55,6 @@ internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime
         }
 
         return false;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 270)]
-    internal void AssertBoundDiscardSlashReceipt(ProgramSkillFrame frame)
-    {
-        if (frame.BoundDiscardSlashBenefits is not { } paid)
-            return;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        var source = _coreProgramLifecycleOperations.GetProgramCardSet(frame, paid.SourceBind);
-        if (frame.TriggerId is not null || frame.InstructionIndex != paid.InstructionIndex || paid.InstructionIndex < 1 || paid.InstructionIndex > plan.Instructions.Count || plan.Instructions[paid.InstructionIndex - 1].Op != SkillProgramEffectOp.DiscardBoundCardForTurnSlashBenefits || plan.Instructions[paid.InstructionIndex - 1].SourceBind != paid.SourceBind || paid.SourceLocation.OwnerSeat != frame.OwnerSeat || paid.SourceLocation.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !Enum.IsDefined(paid.EffectiveSuit) || source.CardIds is not [var original] || original != paid.CardId || source.SourceLocations is not [var location] || location != paid.SourceLocation || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == paid.MovementSequence && m.CardId == paid.CardId && m.From == paid.SourceLocation && m.Reason.Value == "skill-program.bound-discard-slash.cost" && m.To.Zone is CardZoneKind.DiscardPile or CardZoneKind.OutsideGame))
-            throw new InvalidOperationException("A paid discard lost its exact instruction, original binding or real movement.");
     }
 
     internal bool HasTurnSlashSuitAllowance(int owner, Suit? suit) => _turnCardUseEffectsOperations._turnCardUseEffects.HasSlashSuitAllowance(_coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, owner, suit) || _characterXinXianYingMobileShiOperations.HasShiXxySuitAllowance(owner, suit);

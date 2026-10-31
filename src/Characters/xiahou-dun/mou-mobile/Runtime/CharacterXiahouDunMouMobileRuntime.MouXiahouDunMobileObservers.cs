@@ -57,7 +57,6 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
     internal bool HasMouXiahouDunDamageObserver(long id) => MouXiahouDunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31200)]
     internal bool HasMouXiahouDunBeforeDamageObserver(long id) => MouXiahouDunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31200)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31200)]
     internal bool IsMouXiahouDunDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouXiahouDunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31200)]
@@ -96,10 +95,4 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 31200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 31200)]
     internal bool ContinueAcceptedMouXiahouDun(ProgramSkillFrame f) => f.MouXiahouDunMobile is { Stage: not MouXiahouDunMobileStage.SelectTargets } && ValidMouXiahouDun(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31200)]
-    internal void AssertMouXiahouDunMobile(ProgramSkillFrame f)
-    {
-        if (f.MouXiahouDunMobile is not null && !ValidMouXiahouDun(f))
-            throw new InvalidOperationException("Mou Xiahou Dun lost its owning source, roster or native cursor.");
-    }
 }

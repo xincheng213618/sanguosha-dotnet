@@ -4,7 +4,6 @@ internal sealed partial class CharacterHuaTuoMobileGodEntries
 {
     internal void AnswerMobileHt(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMobileHt(choice);
     internal void ApplyMobileHtAnimal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ApplyMobileHtAnimal(f);
-    internal void AssertMobileHt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileHt(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileHt(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMobileHt(supplied, op);
     internal void BeginMobileHtEntryBenefit(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BeginMobileHtEntryBenefit(f);
     internal bool CanActivateMobileHt(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().CanActivateMobileHt(gate);

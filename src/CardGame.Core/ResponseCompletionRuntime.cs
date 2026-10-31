@@ -32,10 +32,6 @@ internal sealed partial class ResponseCompletionRuntime
     {
         if (_facts.Winner != Winner.None || !HasCardResponseCompletedObserver(action, originalContinuation)) return false;
         var parent = _frames.Top ?? throw new InvalidOperationException("A finished response has no native parent.");
-        if (originalContinuation == ProgramCardContinuation.NullificationResponse
-            ? parent is not NullificationWindowFrame || attackOwnerFrameId is not null
-            : attackOwnerFrameId is null || parent.Id != attackOwnerFrameId.Value)
-            throw new InvalidOperationException("A finished response lost its exact native parent.");
         var costRecords = CaptureResponseCompletionCosts(action, originalContinuation, parent.Id);
         var costSequences = costRecords.Select(m => m.Sequence).ToHashSet();
         var batches = PendingMovementBatches().Where(b => b.ParentFrameId == parent.Id && b.AwaitingProgramFrameId is null &&

@@ -6,7 +6,6 @@ internal sealed partial class CharacterSunHaoOlEntries
     internal global::CardGame.Core.PromptChoice AiSunHao(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiSunHao(p, f);
     internal void AnswerSunHao(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerSunHao(choice);
     internal void ApplySunHaoChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ApplySunHaoChainedDamageBonus(attack);
-    internal void AssertSunHao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSunHao(f);
     internal void AssertSunHaoDamageReceipts() => _resolve().AssertSunHaoDamageReceipts();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginSunHao(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginSunHao(supplied, op);
     internal bool CanOfferSunHao(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferSunHao(candidate, trigger, c);
@@ -25,7 +24,6 @@ internal sealed partial class CharacterSunHaoOlEntries
     internal bool HasSunHaoDamageObserver(long id) => _resolve().HasSunHaoDamageObserver(id);
     internal bool IsGuimingTreatedWounded(global::CardGame.Core.CharacterState player) => _resolve().IsGuimingTreatedWounded(player);
     internal bool IsIssuedSunHaoCanshiCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsIssuedSunHaoCanshiCandidate(candidate, c);
-    internal bool IsSunHaoDying() => _resolve().IsSunHaoDying();
     internal bool IsSunHaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsSunHaoMovement(f, e, p);
     internal bool IsSunHaoPaymentMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsSunHaoPaymentMovement(f, m);
     internal bool IsSunHaoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunHaoRecoveryParent(f, recovery);

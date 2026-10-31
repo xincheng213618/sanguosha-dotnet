@@ -104,10 +104,4 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
         "none" => r.IsRed && chosen.RecipientSeat is null,
         _ => false
     }) && f.ChoiceBindings.Count(b => b.Name == "yaowu-benefit" && b.OptionId == r.Benefit && b.ChooserSeat == (chosen.RecipientSeat ?? f.OwnerSeat)) == 1);
-    internal bool IsMouHuaXiongChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding binding)
-    {
-        if (binding.Name != "yaowu-benefit" || f.InstructionIndex < 1 || f.MouHuaXiongYaowu is not { Benefit: not null } r || binding.OptionId != r.Benefit || !ValidMouYaowuReceipt(f))
-            return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuBenefitChosenEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var chosen] && chosen.Benefit == binding.OptionId && binding.ChooserSeat == (chosen.RecipientSeat ?? f.OwnerSeat);
-    }
 }

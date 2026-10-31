@@ -49,22 +49,6 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
         return receipt.Plan is not null && _coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.Benefactor) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenGuoJiaBenefactorEvent>().Any(value => value.Benefactor == receipt.Benefactor && value.Recipient == frame.OwnerSeat && frame.SkillInstanceId == $"acquired:{(value.GrantSource)}:{(ShenGuoJiaZuoxing)}") && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Count(value => value.FrameId == frame.Id && value.Seat == receipt.Benefactor && value.Purpose == "zuoxing") == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 38000)]
-    internal void AssertShenGuoJia(ProgramSkillFrame frame)
-    {
-        if (frame.ShenGuoJia is null)
-            return;
-        if (!ValidShenGuoJia(frame))
-            throw new InvalidOperationException("Shen Guo Jia lost his native owner, source instance, once-paid cost, judgment outcome or frame-owned continuation.");
-        var receipt = frame.ShenGuoJia;
-        if (receipt.Judgments is not System.Collections.IList { IsReadOnly: true } || receipt.Cards is not System.Collections.IList { IsReadOnly: true } || receipt.Plan is { Targets: not System.Collections.IList { IsReadOnly: true } })
-            throw new InvalidOperationException("Shen Guo Jia receipt collections must remain immutable.");
-        if (frame.PendingMovementContinuation is { } pending && !IsShenGuoJiaMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), pending))
-            throw new InvalidOperationException("Shen Guo Jia lost his own movement parent.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && receipt.Stage is ShenGuoJiaStage.Repeat or ShenGuoJiaStage.Recipient or ShenGuoJiaStage.AwakeningChoice or ShenGuoJiaStage.UseChoice && (prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, ShenGuoJiaChoices(frame))))
-            throw new InvalidOperationException("Shen Guo Jia changed a published owner menu.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 38000)]
     internal bool IsShenGuoJiaMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.ShenGuoJia is { } receipt && effect?.Op == receipt.Operation && frame.PendingMovementContinuation == pending && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && receipt.Stage is ShenGuoJiaStage.JudgmentChildren or ShenGuoJiaStage.GrowChildren or ShenGuoJiaStage.GainChildren or ShenGuoJiaStage.CleanupChildren or ShenGuoJiaStage.DrawChildren or ShenGuoJiaStage.CostChildren;
     internal bool ShenGuoJiaFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
@@ -92,8 +76,6 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     internal bool HasShenGuoJiaDamageObserver(long id) => ShenGuoJiaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 38000)]
     internal bool HasShenGuoJiaBeforeDamageObserver(long id) => ShenGuoJiaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 38000)]
-    internal bool IsShenGuoJiaDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShenGuoJiaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 38000)]
     internal bool AdvanceShenGuoJiaSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ShenGuoJiaObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

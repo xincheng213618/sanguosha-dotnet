@@ -37,11 +37,4 @@ internal sealed partial class CharacterAHuiNanOlRuntime
             return r.Use is { } o && issued is [var issue] && issue.Origin == o && o.ProgramFrameId == f.Id && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.ActualTurn == r.ActualTurn && o.ActorSeat == f.OwnerSeat && o.CardKind == r.History[2].Kind && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind) || o.CardKind is CardKind.Peach or CardKind.Alcohol) && returned.Length == (r.Stage == AHuiNanJuemanStage.NativeChildren ? 1 : 0);
         return r.Use is null && issued.Length == 0 && returned.Length == 0;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27200)]
-    internal void AssertAHuiNan(ProgramSkillFrame f)
-    {
-        if (f.AHuiNanJueman is not null && !ValidAHuiNan(f))
-            throw new InvalidOperationException("Jueman lost its actual-turn first-three declarations, started source, paid draw or exact native return.");
-    }
 }

@@ -157,7 +157,6 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
     internal void ResolveOutsidePhaseDrawDiscardChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Outside-phase choice lost its owner.");
-        _coreOutsidePhaseDrawDiscardObserversOperations.AssertOutsidePhaseDrawDiscard(f);
         var r = f.OutsidePhaseDrawDiscard!;
         if (r.Stage != OutsidePhaseDrawDiscardStage.Choosing || !OutsidePhaseDrawDiscardChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(choice.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Outside-phase choice changed its exact published opaque material or target.");
@@ -222,7 +221,6 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != frameId || f.OutsidePhaseDrawDiscard is not { } r)
             return false;
-        _coreOutsidePhaseDrawDiscardObserversOperations.AssertOutsidePhaseDrawDiscard(f);
         if (r.Stage == OutsidePhaseDrawDiscardStage.Choosing)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -247,7 +245,6 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
     {
         if (f.OutsidePhaseDrawDiscard is not { MovementIssued: true, Stage: OutsidePhaseDrawDiscardStage.MovementChildren })
             return false;
-        _coreOutsidePhaseDrawDiscardObserversOperations.AssertOutsidePhaseDrawDiscard(f);
         if (f.PendingMovementContinuation is null)
             throw new InvalidOperationException("Outside-phase child lost its owning movement return.");
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

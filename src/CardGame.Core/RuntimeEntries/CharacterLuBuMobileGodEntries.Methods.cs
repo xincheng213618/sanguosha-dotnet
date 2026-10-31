@@ -4,7 +4,6 @@ internal sealed partial class CharacterLuBuMobileGodEntries
 {
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.MobileLuBuWuqianIssuedEvent> ActiveMobileWuqian(int actor) => _resolve().ActiveMobileWuqian(actor);
     internal bool AllowsMobileLbDamageGain(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().AllowsMobileLbDamageGain(g);
-    internal void AssertMobileLb(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileLb(f);
     internal void AssertMobileLbUses() => _resolve().AssertMobileLbUses();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileLb(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMobileLb(supplied, op);
     internal void ContinueMobileLb(long id) => _resolve().ContinueMobileLb(id);

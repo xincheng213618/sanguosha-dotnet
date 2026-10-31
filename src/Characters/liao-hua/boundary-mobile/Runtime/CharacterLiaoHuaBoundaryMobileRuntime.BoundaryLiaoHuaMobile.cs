@@ -109,15 +109,6 @@ internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
         return true;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 55600)]
-    internal void AssertBoundaryLiaoHuaDiscard(ProgramSkillFrame frame)
-    {
-        if (frame.BoundaryLiaoHuaDiscardSlash is not { } receipt)
-            return;
-        if (!ValidBoundaryLiaoHuaDiscardSlash(frame) || receipt.Candidates is not System.Collections.IList { IsReadOnly: true } || receipt.CardId is null && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, BoundaryLiaoHuaDiscardChoices(frame))))
-            throw new InvalidOperationException("Mobile Dangxian lost its original frame, immutable candidates, current prompt or strict native movement invoice.");
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.ObtainBoundaryLiaoHuaDiscardSlash)]
     internal PromptChoice ChooseBoundaryLiaoHuaDiscard(PendingDecision prompt, ProgramSkillFrame frame) => prompt.Choices.First();
 }

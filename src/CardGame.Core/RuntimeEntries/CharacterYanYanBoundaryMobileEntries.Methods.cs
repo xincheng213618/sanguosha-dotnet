@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterYanYanBoundaryMobileEntries
 {
-    internal void AssertBoundaryYanYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertBoundaryYanYan(f);
     internal bool BoundaryYanYanClaimMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().BoundaryYanYanClaimMovement(f, effect, p);
     internal global::CardGame.Core.CardUseFrame? BoundaryYanYanClaimUse(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w, bool settled = false) => _resolve().BoundaryYanYanClaimUse(c, w, settled);
     internal long BoundaryYanYanEpoch(int owner) => _resolve().BoundaryYanYanEpoch(owner);

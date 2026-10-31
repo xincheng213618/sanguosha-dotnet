@@ -58,10 +58,4 @@ internal sealed partial class CharacterTianChouOlRuntime
     }
 
     internal bool IsTianChouTopMovement(TianChouShandaoTop t, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > t.Before && m.Sequence <= t.After && (m.Sequence == t.Sequence && m.CardId == t.CardId && m.CardKind == t.Kind && m.From == t.From && m.To == t.To && m.Reason.Value == TianChouTopReason || t.Kind == CardKind.WoodenOx && t.From == CardLocation.Equipment(t.OwnerSeat) && t.WoodenOxGrainIds.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(t.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 27090)]
-    internal void AssertTianChou(ProgramSkillFrame f)
-    {
-        if (f.TianChouShandao is not null && !ValidTianChou(f))
-            throw new InvalidOperationException("Shandao lost its frozen participants, exact sequential top payments or native global-trick receipt.");
-    }
 }

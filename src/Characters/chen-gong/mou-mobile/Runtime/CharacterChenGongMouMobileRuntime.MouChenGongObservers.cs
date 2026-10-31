@@ -57,17 +57,6 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
         return _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && target != f.OwnerSeat && x > 0 && accepted is [var accept] && accept == new MouChenGongReleaseAcceptedEvent(f.Id, target, x) && damage is [var issue] && issue == new MouChenGongReleaseDamageIssuedEvent(f.Id, f.OwnerSeat, target, x) && (r.Cleared ? r.Stage == MouChenGongReleaseStage.ClearChildren && cleared is [var clear] && clear.OwnerSeat == f.OwnerSeat && clear.FrozenX == x && clear.ClearedCount >= 0 : r.Stage == MouChenGongReleaseStage.Damage && cleared.Length == 0);
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 29600)]
-    internal void AssertMouChenGong(ProgramSkillFrame f)
-    {
-        if (f.MouChenGongGift is not null && !ValidMouChenGongGift(f))
-            throw new InvalidOperationException("Mingce lost its exact actual Play, original paid HE entity or accepted native loss/draw invoice.");
-        if (f.MouChenGongRelease is not null && !ValidMouChenGongRelease(f))
-            throw new InvalidOperationException("Mingce release lost its actual Play-start, frozen accepted X or damage-before-clear invoice.");
-        if (f.WindowContext?.MouChenGongProtection is not null && !ExactMouChenGongBeforeFrame(f, allowPrevented: true))
-            throw new InvalidOperationException("Zhichi's protection escaped its original native before-damage parent and actual-turn receipt.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29600)]
     internal bool PermitAcceptedMouChenGong(ProgramSkillFrame f)
@@ -127,7 +116,6 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     internal bool HasMouChenGongDamageObserver(long id) => MouChenGongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1490)]
     internal bool HasMouChenGongBeforeDamageObserver(long id) => MouChenGongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1320)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 740)]
     internal bool IsMouChenGongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouChenGongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 520)]

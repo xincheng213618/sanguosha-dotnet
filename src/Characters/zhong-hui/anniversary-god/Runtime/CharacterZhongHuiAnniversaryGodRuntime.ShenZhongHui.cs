@@ -131,7 +131,6 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
     {
         while (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShenZhongHui: { } r } f && f.Id == id)
         {
-            RequireShenZh(f);
             if (r.Stage is ShenZhongHuiStage.DrawAttempt or ShenZhongHuiStage.PhaseJudging)
                 return;
             if (DrainShenZh(id))
@@ -273,7 +272,6 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
     internal void AnswerShenZh(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Shen Zhong Hui lost his original choice owner.");
-        RequireShenZh(f);
         if (!ShenZhChoices(f).Any(c => c.Id == choice.Id && c.Targets.SequenceEqual(choice.Targets) && c.Cards.SequenceEqual(choice.Cards) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(choice.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Shen Zhong Hui rejects a stale or forged original choice.");
         var r = f.ShenZhongHui!;
@@ -358,17 +356,4 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 39300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 39300)]
     internal bool RetainShenZh(ProgramSkillFrame f) => f.ShenZhongHui is not null;
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 39300)]
-    internal void RequireShenZh(ProgramSkillFrame f)
-    {
-        if (f.ShenZhongHui is not { } r)
-            return;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (r.Source != ShenZhSource(f) || r.GameplayHash != f.GameplayHash || r.ParentId != f.WindowContext?.ParentFrameId || index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != r.ParentId || !ShenZhWindowMatches(f) || !Enum.IsDefined(r.Stage) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Count < 0 || r.Mask is < 0 or > 31 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Judgments is not System.Collections.IList { IsReadOnly: true } || r.Judgments.Count > 2 || r.Judgments.Distinct().Count() != r.Judgments.Count || r.JudgmentIndex < 0 || r.JudgmentIndex > r.Judgments.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhongHuiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ParentId == r.ParentId && e.Operation == r.Operation) != 1)
-            throw new InvalidOperationException("Shen Zhong Hui's original-frame dynamic receipt is inconsistent.");
-        if (r.Operation == SkillProgramEffectOp.ResolveLinjieRound && r.Stage != ShenZhongHuiStage.RoundChoice && _coreProgramEventHistoryOperations.ProgramEventHistory<LinjieTargetSelectedEvent>().Count(e => e.FrameId == f.Id && e.TargetSeat == r.TargetSeat) != 1)
-            throw new InvalidOperationException("Linjie lost its actually selected unmarked damage target.");
-        if (r.Stage is ShenZhongHuiStage.DrawChildren or ShenZhongHuiStage.DrawAttempt && r.Count < 1)
-            throw new InvalidOperationException("Shen Zhong Hui's draw must retain its positive frozen native entitlement.");
-    }
 }

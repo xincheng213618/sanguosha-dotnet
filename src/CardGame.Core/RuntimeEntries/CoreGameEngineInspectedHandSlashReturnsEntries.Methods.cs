@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineInspectedHandSlashReturnsEntries
 {
     internal global::CardGame.Core.RuleQueryEvaluation ApplyInspectedHandDistance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.RuleQueryEvaluation prior) => _resolve().ApplyInspectedHandDistance(actor, target, prior);
-    internal void AssertInspectedHandSlashes() => _resolve().AssertInspectedHandSlashes();
     internal bool CanIssueInspectedHandSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanIssueInspectedHandSlash(f);
     internal void CompleteInspectedHandSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().CompleteInspectedHandSlash(completion);
     internal void IssueInspectedHandSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueInspectedHandSlash(f);

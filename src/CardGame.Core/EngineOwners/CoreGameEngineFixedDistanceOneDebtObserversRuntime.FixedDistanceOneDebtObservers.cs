@@ -26,7 +26,6 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtObserversRuntime
     }
 
     internal ProgramSkillFrame? FixedDistanceDebtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreFixedDistanceOneDebtObserversOperations.FixedDistanceDebtFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 40, group: 10)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 170)]
     internal bool IsFixedDistanceDebtProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FixedDistanceDebtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1890)]

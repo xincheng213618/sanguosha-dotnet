@@ -269,13 +269,6 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyRuntime
             throw new InvalidOperationException("Courtesy returned to an already settled or missing distance step.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 480)]
-    internal void AssertRegisteredIncomingDistanceCourtesyReceipt(ProgramSkillFrame frame)
-    {
-        if (frame.IncomingDistanceCourtesy is not null)
-            RequireIncomingDistanceCourtesyReceipt(frame);
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.AdjustIncomingDistanceByLivingFactions, SkillProgramEffectOp.ChooseEndingCourtesyBenefits)]
     internal PromptChoice SelectAiIncomingDistanceCourtesy(PendingDecision p, ProgramSkillFrame f) => f.IncomingDistanceCourtesy!.Kind == IncomingDistanceCourtesyKind.FactionDistance ? p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? p.Choices[^1] : p.Choices.First(c => c.Parameters["selection"] == "0");
 }

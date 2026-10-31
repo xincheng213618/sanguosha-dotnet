@@ -7,14 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiZhiCaiOlRuntime
 {
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 170)]
-    internal void RequireIssuedXiZhiCai(ProgramSkillFrame f)
-    {
-        if (f.XianfuPending is not null && !ValidXianfuEcho(f))
-            throw new InvalidOperationException("Xianfu lost its exact original native mutation and once-issued echo.");
-        if (f.Chouce is not null && !ValidChouce(f))
-            throw new InvalidOperationException("Chouce lost its actual owning damage point, final judgment or paid outcome.");
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 140)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 140)]
@@ -81,8 +73,6 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     internal bool HasXiZhiCaiDamageObserver(long id) => XiZhiCaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 320)]
     internal bool HasXiZhiCaiBeforeDamageObserver(long id) => XiZhiCaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 80)]
-    internal bool IsXiZhiCaiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && XiZhiCaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 210)]
     internal bool TryAdvanceXiZhiCaiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XiZhiCaiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

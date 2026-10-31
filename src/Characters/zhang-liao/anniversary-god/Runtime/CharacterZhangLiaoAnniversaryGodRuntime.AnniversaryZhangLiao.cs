@@ -56,7 +56,6 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryZhangLiao: not null } f || f.Id != id)
             return false;
-        RequireAnnZl(f);
         var r = f.AnniversaryZhangLiao!;
         if (r.Stage == AnniversaryZhangLiaoStage.Drawing)
             return true;
@@ -130,7 +129,6 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
     internal void AnswerAnnZl(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Zhang Liao lost his choice frame.");
-        RequireAnnZl(f);
         var r = f.AnniversaryZhangLiao!;
         var exact = AnnZlChoices(f).SingleOrDefault(c => c.Id == chosen.Id && c.Cards.SequenceEqual(chosen.Cards) && c.Targets.SequenceEqual(chosen.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(chosen.Parameters.OrderBy(p => p.Key))) ?? throw new InvalidOperationException("Zhang Liao requires the exact current choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

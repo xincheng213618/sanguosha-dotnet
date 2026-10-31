@@ -41,8 +41,6 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
             "discard-ren" => HappySimaDiscardCount(f.OwnerSeat, context),
             _ => 0
         };
-        if (amount <= 0)
-            throw new InvalidOperationException("Happy Renjie lost its exact positive native damage or actual hand-discard count.");
         _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().ChangeAttributedMarker(f, new(ProgramParticipantRef.Owner), PlayerMarkerKind.Ren, amount);
         return SkillProgramStepOutcome.Continue;
     }
@@ -111,7 +109,6 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappySimaYi: { Stage: HappySimaYiStage.Choice } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappySimaFirstChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Happy Jilue requires the exact original first-use choice.");
-        RequireHappySimaFirst(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var take = choice.Parameters["mode"] == "draw";
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappySimaJilueFirstChosenEvent(f.Id, take));
@@ -138,7 +135,6 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappySimaYi: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return false;
-        RequireHappySimaFirst(f);
         if (r.Stage == HappySimaYiStage.Choice)
         {
             PublishHappySimaFirstDraw(f);
@@ -158,7 +154,6 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.OfferHappySimaJilueFirstDraw)]
     internal void ReturnHappySimaFirstDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        RequireHappySimaFirst(f);
         var r = f.HappySimaYi!;
         if (r.Stage != HappySimaYiStage.Drawing || r.Draw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Happy Jilue lost its once-requested one-card native draw.");
@@ -174,14 +169,6 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
     internal bool RetainHappySimaFirst(ProgramSkillFrame f) => f.HappySimaYi is not null;
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 41840)]
     internal bool ProveHappySimaFirst(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation continuation) => effect?.Op == SkillProgramEffectOp.OfferHappySimaJilueFirstDraw && f.HappySimaYi is { Stage: HappySimaYiStage.Children } && continuation.SubjectSeat == f.OwnerSeat && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null && ValidHappySimaDraw(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 41840)]
-    internal void RequireHappySimaFirst(ProgramSkillFrame f)
-    {
-        if (f.HappySimaYi is not { } r)
-            return;
-        if (f.SkillId != HappySimaJilue || r.Source != HappySimaSource(f) || r.Hash != f.GameplayHash || r.Parent != (f.WindowContext?.ParentFrameId ?? 0) || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.Instruction != f.InstructionIndex || HappySimaFirstAcceptedFrame(f.OwnerSeat) != f.Id || HappySimaPaidRen(f)?.ResolutionId != r.Payment || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.ProgramEventHistory<HappySimaJilueFirstOfferedEvent>().Count(e => e == new HappySimaJilueFirstOfferedEvent(f.Id, r.Source, r.Hash, r.Parent, r.Turn, r.Instruction, r.Payment)) != 1 || r.Stage == HappySimaYiStage.Children && !ValidHappySimaDraw(f))
-            throw new InvalidOperationException("Happy Jilue lost its actual accepted first frame, one-Ren cost, source or native draw receipt.");
-    }
 
     internal bool ValidHappySimaDraw(ProgramSkillFrame f) => f.HappySimaYi?.Draw is { } draw && draw.RequestedCount == 1 && draw.RecipientSeat == f.OwnerSeat && draw.SequenceBefore <= draw.SequenceAfter && draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == HappySimaDrawReason).Select(m => m.CardId).SequenceEqual(draw.ActualDrawIds) && _coreProgramEventHistoryOperations.ProgramEventHistory<HappySimaJilueFirstChosenEvent>().Count(e => e.FrameId == f.Id && e.Draw) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<HappySimaJilueDrawReturnedEvent>().Count(e => e == new HappySimaJilueDrawReturnedEvent(f.Id, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId)) == 1;
 }

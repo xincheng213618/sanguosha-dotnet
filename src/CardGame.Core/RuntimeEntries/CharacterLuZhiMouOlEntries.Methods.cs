@@ -6,7 +6,6 @@ internal sealed partial class CharacterLuZhiMouOlEntries
     internal void AdvanceMouLzDirectWindow(global::CardGame.Core.MouLuZhiOlDirectWindowFrame w) => _resolve().AdvanceMouLzDirectWindow(w);
     internal void AfterMouLzChain(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().AfterMouLzChain(attack);
     internal void AnswerMouLz(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouLz(choice);
-    internal void AssertMouLz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouLz(f);
     internal void BanMouLzResponse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BanMouLzResponse(f);
     internal void BeforeMouLzChain(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().BeforeMouLzChain(attack);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouLz(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouLz(supplied, op);
@@ -21,8 +20,6 @@ internal sealed partial class CharacterLuZhiMouOlEntries
     internal bool ExactMouLzDirectWindow(global::CardGame.Core.MouLuZhiOlDirectWindowFrame w) => _resolve().ExactMouLzDirectWindow(w);
     internal void FinishMouLz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouLz(f);
     internal bool FinishMouLzCounterAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouLzCounterAttack(attack, out paused);
-    internal bool HasMouLzDirectUseContinuation(long id) => _resolve().HasMouLzDirectUseContinuation(id);
-    internal bool HasMouLzSuspendedCompletedParent(global::CardGame.Core.ProgramCardTriggerWindowFrame w) => _resolve().HasMouLzSuspendedCompletedParent(w);
     internal bool IsMouLzCounterUse(global::CardGame.Core.CardUseFrame u) => _resolve().IsMouLzCounterUse(u);
     internal bool IsMouLzDirectCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsMouLzDirectCandidate(c, context);
     internal void IssueMouLzCounter(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouLzCounter(f);

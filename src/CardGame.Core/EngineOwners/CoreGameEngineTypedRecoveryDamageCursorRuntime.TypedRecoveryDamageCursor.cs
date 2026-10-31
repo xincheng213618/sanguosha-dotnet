@@ -19,7 +19,6 @@ internal sealed partial class CoreGameEngineTypedRecoveryDamageCursorRuntime
     internal static bool IsTypedRecoveryTargetSupported(RecoverProgramInstruction instruction) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.IsTypedRecoveryTargetSupported(instruction);
     internal bool UnsupportedTypedRecoveryTargetIsMalformed(ProgramSkillFrame producer, RecoverProgramInstruction instruction, int actualTarget) => HealthContinuations.UnsupportedTypedRecoveryTargetIsMalformed(producer, instruction, actualTarget);
     internal bool TypedResponseCompletionRecoveryMatches(RecoveryReplacementFrame recovery, IReadOnlyList<IGameEvent> history) => HealthContinuations.TypedResponseCompletionRecoveryMatches(recovery, history);
-    internal TypedRecoveryDamageCursorProjection ProjectTypedRecoveryDamageCursor(long windowId) => HealthContinuations.ProjectTypedRecoveryDamageCursor(windowId);
     internal bool TypedRecoveryApplicationBoundsMatch(RecoveryReplacementFrame recovery, IReadOnlyList<IGameEvent> history) => HealthContinuations.TypedRecoveryApplicationBoundsMatch(recovery, history);
     internal static bool IsRecoveryCursorPrimitive(ProgramSkillInstruction? instruction) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.IsRecoveryCursorPrimitive(instruction);
     internal SkillProgramEffect? TypedRecoveryPausedEffect(ProgramSkillFrame producer) => HealthContinuations.TypedRecoveryPausedEffect(producer);

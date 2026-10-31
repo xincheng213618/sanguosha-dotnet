@@ -79,16 +79,4 @@ internal sealed partial class CoreGameEngineShanheSourceZirunRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(id);
         return true;
     }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 24922)]
-    internal void AssertShanheSourceZirun(ProgramSkillFrame f)
-    {
-        if (f.ShanheSourceZirun is not { } r)
-            return;
-        if (f.SkillId != ShanheSourceZirunComposition.SkillId || f.InstructionIndex != 1 || f.WindowContext?.ParentFrameId != r.PreparationWindowId || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || !_coreHalfHandPhaseDebtProgramsOperations.HalfHandDebtLifecycleMatches(f, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || r.Recipients is not System.Collections.IList { IsReadOnly: true } || r.Recipients.Count is < 1 or > 8 || r.Recipients.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || r.Recipients.Distinct().Count() != r.Recipients.Count || !r.Recipients.Contains(f.OwnerSeat) || r.Index < 0 || r.Index >= r.Recipients.Count || r.RequestedCount is < 1 or > 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceZirunStartedEvent>().Count(e => e.FrameId == f.Id && e.PreparationWindowId == r.PreparationWindowId && e.ActualTurn == r.ActualTurn && e.OwnerSeat == f.OwnerSeat && e.RecipientCount == r.Recipients.Count) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceZirunRequestedEvent>().Where(e => e.FrameId == f.Id && e.Index == r.Index).ToArray()is not [var request] || request.RecipientSeat != r.Recipients[r.Index] || request.RequestedCount != r.RequestedCount || request.RequestedCount != (request.EquipmentCount == 0 ? 1 : 2))
-            throw new InvalidOperationException("Source1172 lost its original Preparation, frozen recipient order or single requested count.");
-        var returned = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceZirunReturnedEvent>().Where(e => e.FrameId == f.Id && e.Index == r.Index).ToArray();
-        if (r.ReturningChildren ? f.NativeDraw is not null || returned is not [var paid] || paid.RecipientSeat != request.RecipientSeat || paid.RequestedCount != request.RequestedCount || !f.NativeOperationDrawReturns.Any(n => n.Operation == SkillProgramEffectOp.ResolveShanheSourceZirun && n.InstructionIndex == f.InstructionIndex && n.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceZirunDefinitions.ShanheSourceZirunDraw && n.Outcome.RecipientSeat == paid.RecipientSeat && n.Outcome.RequestedCount == paid.RequestedCount && n.Outcome.SequenceBefore == paid.SequenceBefore && n.Outcome.SequenceAfter == paid.SequenceAfter && n.Outcome.ActualDrawIds.Count == paid.ActualCount) : returned.Length != 0 || f.NativeDraw is not { ReturnKind: NativeDrawAttemptReturnKind.ProgramOperation, Operation: SkillProgramEffectOp.ResolveShanheSourceZirun } active || active.RequestedCount != request.RequestedCount || !active.Recipients.SequenceEqual([request.RecipientSeat]))
-            throw new InvalidOperationException("Source1172 lost its original native draw payment or undrained recipient child.");
-    }
 }

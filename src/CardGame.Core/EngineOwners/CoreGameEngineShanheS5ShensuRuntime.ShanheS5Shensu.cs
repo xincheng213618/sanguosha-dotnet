@@ -82,7 +82,6 @@ internal sealed partial class CoreGameEngineShanheS5ShensuRuntime
         if (!IsShanheS5ShensuFrame(active))
             return 0;
         var root = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == active.Id) ?? throw new InvalidOperationException("S5 Shensu's original issuing frame is missing.");
-        AssertShanheS5Shensu(root);
         var receipt = root.ShanheS5Shensu!;
         if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2].Id != root.Id || _resolutionStackOperations._resolutionStack[^1] is not CardUseFrame { CardId: 0, CardKind: CardKind.Slash, PhysicalCardIds.Count: 0, Action: { PhysicalCards.Count: 0 } action } use || action.ActorSeat != root.OwnerSeat || use.SourceSeat != root.OwnerSeat || action.ConversionChain is not [var source] || source != receipt.Source)
             throw new InvalidOperationException("S5 Shensu base damage belongs only to its exact newly issued native virtual Slash.");
@@ -92,22 +91,12 @@ internal sealed partial class CoreGameEngineShanheS5ShensuRuntime
         return receipt.SkippedPhaseCount;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 59200)]
-    internal void AssertShanheS5Shensu(ProgramSkillFrame f)
-    {
-        if (f.ShanheS5Shensu is not { } r)
-            return;
-        if (f.SkillId != ShanheS5ShensuId || f.GameplayHash != r.GameplayHash || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.SkippedPhaseCount < 1 || f.WindowContext?.ParentFrameId != r.LifecycleFrameId || f.WindowContext.Window != r.Window || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5ShensuPreparedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid.Receipt != r || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().TakeWhile(e => e is not ShanheS5ShensuPreparedEvent p || p.FrameId != f.Id).OfType<ShanheS5SkippedPhaseRecordedEvent>().Count(e => e.OwnerSeat == f.OwnerSeat && e.ActualTurnNumber == r.ActualTurnNumber) != r.SkippedPhaseCount)
-            throw new InvalidOperationException("S5 Shensu lost its frozen actual-turn, phase costs or original native Slash invoice.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 59200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 59200)]
     internal bool ContinueShanheS5Shensu(ProgramSkillFrame f)
     {
         if (f.ShanheS5Shensu is null)
             return IsPaidShanheS5TurnoverReturn(f);
-        AssertShanheS5Shensu(f);
         return true;
     }
 

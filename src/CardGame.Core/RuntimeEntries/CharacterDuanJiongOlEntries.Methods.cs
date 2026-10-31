@@ -7,7 +7,6 @@ internal sealed partial class CharacterDuanJiongOlEntries
     internal bool AllowsDuanJiongSaogu(global::CardGame.Core.CharacterState owner) => _resolve().AllowsDuanJiongSaogu(owner);
     internal void AnswerSaogu(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerSaogu(choice);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> AppendDuanJiongSaoguDiscardCards(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> held) => _resolve().AppendDuanJiongSaoguDiscardCards(actor, held);
-    internal void AssertSaogu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertSaogu(f);
     internal void AssertSaoguNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertSaoguNativeUse(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDuanJiongSaogu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginDuanJiongSaogu(supplied);
     internal void BindDuanJiongSaoguNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindDuanJiongSaoguNativeUse(use);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterDuanJiongOlEntries
     internal bool HasDuanJiongBeforeDamageObserver(long id) => _resolve().HasDuanJiongBeforeDamageObserver(id);
     internal bool HasDuanJiongDamageObserver(long id) => _resolve().HasDuanJiongDamageObserver(id);
     internal bool HasIssuedDuanJiongSaoguUnlimitedUse(long id, int actor) => _resolve().HasIssuedDuanJiongSaoguUnlimitedUse(id, actor);
-    internal bool IsDuanJiongDying() => _resolve().IsDuanJiongDying();
     internal bool IsDuanJiongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDuanJiongRecoveryParent(f, recovery);
     internal bool IsDuanJiongSaoguDiscardQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsDuanJiongSaoguDiscardQuery(actor, id);
     internal bool IsDuanJiongSaoguSelectedDiscard(int actor, int id) => _resolve().IsDuanJiongSaoguSelectedDiscard(actor, id);

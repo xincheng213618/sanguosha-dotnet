@@ -50,13 +50,6 @@ internal sealed partial class CharacterSimaHuiOlRuntime
             throw new InvalidOperationException("Sima Hui lost its exact native source, frozen cards or completed payment invoice.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 220)]
-    internal void AssertRegisteredSimaHui(ProgramSkillFrame frame)
-    {
-        if (frame.SimaHui is not null)
-            AssertSimaHui(frame);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 180)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 180)]
     internal bool CanContinueSimaHui(ProgramSkillFrame f) => f.SimaHui is { } r && ValidSimaHui(f) && (r.Stage == "yeyan-paid" || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimaHuiSealMovedEvent>().Any(e => e.FrameId == f.Id) || r.ChainOrigin is not null);
@@ -99,8 +92,6 @@ internal sealed partial class CharacterSimaHuiOlRuntime
     }
 
     internal ProgramSkillFrame? SimaHuiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterSimaHuiOlOperations.SimaHuiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 110)]
-    internal bool IsSimaHuiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && SimaHuiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 140)]
     [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 250)]
     internal bool HasSimaHuiDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && SimaHuiObserverRoot()is not null;

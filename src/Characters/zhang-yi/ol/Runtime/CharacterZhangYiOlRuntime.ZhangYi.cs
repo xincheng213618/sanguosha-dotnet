@@ -85,7 +85,6 @@ internal sealed partial class CharacterZhangYiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYi: { Stage: ZhangYiStage.KangruiChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhangYiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Kangrui lost its paid draw, frozen injured actor or exact choice.");
-        AssertZhangYi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
         var recipient = _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat];
@@ -102,7 +101,6 @@ internal sealed partial class CharacterZhangYiOlRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ZhangYi: { } r } f && f.Id == id)
         {
-            AssertZhangYi(f);
             if (f.AttackAttempt is not null)
             {
                 _coreNativeDamageCompletionOperations.CompleteDamageAttack(_kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(f.Id));

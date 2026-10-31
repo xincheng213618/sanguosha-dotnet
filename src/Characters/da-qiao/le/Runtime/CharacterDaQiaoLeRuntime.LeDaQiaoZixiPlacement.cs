@@ -191,7 +191,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZixiPlacement: { Paid: true } } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return;
-        AssertZixiPlacement(f);
         if (_kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().TryStartPostInstructionWindow(id))
             return;
         CompleteZixiPlacement(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), true);

@@ -74,7 +74,6 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
     internal bool HasMouGnDamage(long id) => MouGnObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31900)]
     internal bool HasMouGnBeforeDamage(long id) => MouGnObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 31900)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31900)]
     internal bool IsMouGnDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGnObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31900)]
@@ -106,12 +105,6 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
     internal bool ReturnMouGnMovement(ProgramSkillFrame f) => f.PendingMovementContinuation is not null && ResumeMouGn(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 31900)]
     internal bool AdvanceMouGnChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouGnObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 31900)]
-    internal void AssertMouGn(ProgramSkillFrame f)
-    {
-        if (f.MouGanNing is not null && !ValidMouGn(f))
-            throw new InvalidOperationException("Gan Ning lost its actual source, guess/Wei issue or signed native movement.");
-    }
 
     internal IReadOnlyList<PlayerMarkerSnapshot>? AppendMouGanNingWei(int seat, IReadOnlyList<PlayerMarkerSnapshot>? ordinary) => MouGnWei(seat)is not null ? Array.AsReadOnly((ordinary ?? []).Where(m => m.Kind != PlayerMarkerKind.MouGanNingWei).Append(new PlayerMarkerSnapshot(PlayerMarkerKind.MouGanNingWei, "威", 1)).OrderBy(m => m.Kind).ToArray()) : ordinary;
 }

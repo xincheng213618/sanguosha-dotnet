@@ -93,7 +93,6 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
     internal SkillProgramStepOutcome BeginJoinedTrickDamageReward(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        AssertJoinedTrickDamageReward(frame);
         var benefit = ExactJoinedTrickDamageRewardParent(frame) ?? throw new InvalidOperationException("A joined trick reward requires its exact completed Use and same-use owner damage.");
         if (frame.JoinedTrickDamageRewardReceipt is not null || frame.PendingMovementContinuation is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JoinedTrickDamageRewardDrawIssuedEvent>().Any(e => e.Benefit == benefit))
             throw new InvalidOperationException("A joined trick cannot issue its completed damage reward twice.");
@@ -117,7 +116,6 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != id || frame.JoinedTrickDamageRewardReceipt is null)
             return false;
-        AssertJoinedTrickDamageReward(frame);
         if (_corePublicPilePreparationOperations.PreparationGameEnded())
             return true;
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(frame.Id))
@@ -135,7 +133,6 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
     {
         if (frame.JoinedTrickDamageRewardReceipt is null || frame.PendingMovementContinuation is null)
             return false;
-        AssertJoinedTrickDamageReward(frame);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
@@ -149,25 +146,6 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
             return false;
         var invoice = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.MovementSequenceBefore && m.Sequence <= receipt.MovementSequenceAfter && m.Reason.Value == JoinedTrickRewardReason).ToArray();
         return invoice.Length == receipt.DrawActual && invoice.Select(m => m.CardId).Distinct().Count() == receipt.DrawActual && invoice.All(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(frame.OwnerSeat)) && (receipt.DrawActual != 0 || receipt.MovementSequenceBefore == receipt.MovementSequenceAfter);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 230)]
-    internal void AssertJoinedTrickDamageReward(ProgramSkillFrame frame)
-    {
-        if (frame.JoinedTrickDamageRewardReceipt is null && (frame.TriggerId is null || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.Triggers.SingleOrDefault(t => t.Id == frame.TriggerId)?.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawAfterJoinedTrickDamage) != true))
-            return;
-        if (frame.JoinedTrickDamageRewardReceipt is null)
-        {
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JoinedTrickDamageRewardDrawIssuedEvent>().Any(e => e.ProgramFrameId == frame.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JoinedTrickDamageRewardResolvedEvent>().Any(e => e.ProgramFrameId == frame.Id))
-                throw new InvalidOperationException("A paid joined trick reward cannot lose its owning draw receipt.");
-            return;
-        }
-
-        if (!ValidJoinedTrickDamageReward(frame))
-            throw new InvalidOperationException("A joined trick reward lost its exact source, same-use damage or once-paid native draw invoice.");
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !_coreJoinedTrickDamageObserversOperations.JoinedTrickDamageRewardFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
-            throw new InvalidOperationException("A joined trick reward retained an unrelated native child.");
     }
 
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 120)]

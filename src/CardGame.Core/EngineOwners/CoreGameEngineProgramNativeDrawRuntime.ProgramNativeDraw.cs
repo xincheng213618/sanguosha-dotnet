@@ -13,5 +13,4 @@ internal sealed partial class CoreGameEngineProgramNativeDrawRuntime
     internal SkillProgramStepOutcome BeginOperationProgramDraw(ProgramSkillFrame frame, int recipientSeat, int requestedCount, CardMoveReason reason) => _closedProgramOperationDrawsSource.Get().BeginOperationProgramDraw(frame, recipientSeat, requestedCount, reason);
     internal bool ResumeProgramNativeDraw(long id) => NativeDrawProducer.ResumeProgramNativeDraw(id);
     internal bool ContinueProgramNativeDraw(long id) => NativeDrawProducer.ContinueProgramNativeDraw(id);
-    internal void AssertProgramNativeDraw(ProgramSkillFrame frame, ProgramExecutionPlan plan) => NativeDrawProducer.AssertProgramNativeDraw(frame, plan);
 }

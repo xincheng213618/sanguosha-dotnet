@@ -5,7 +5,6 @@ internal sealed partial class CharacterCaoPiMouEntries
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.MouCaoPiControl> ActiveMouCaoPiControls(int seat) => _resolve().ActiveMouCaoPiControls(seat);
     internal bool AdvanceMouCaoPiChildren() => _resolve().AdvanceMouCaoPiChildren();
     internal void AnswerMouCaoPi(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouCaoPi(choice);
-    internal void AssertMouCaoPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouCaoPi(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouCaoPi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouCaoPi(supplied, op);
     internal bool CanActivateMouCaoPi(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().CanActivateMouCaoPi(c);
     internal bool CanGainMouSongwei(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanGainMouSongwei(c);
@@ -18,7 +17,6 @@ internal sealed partial class CharacterCaoPiMouEntries
     internal bool HasMouCaoPiBeforeDamageObserver(long id) => _resolve().HasMouCaoPiBeforeDamageObserver(id);
     internal bool HasMouCaoPiDamageObserver(long id) => _resolve().HasMouCaoPiDamageObserver(id);
     internal bool HasMouXingshang(global::CardGame.Core.CharacterState owner) => _resolve().HasMouXingshang(owner);
-    internal bool IsMouCaoPiDying() => _resolve().IsMouCaoPiDying();
     internal bool IsMouCaoPiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation continuation) => _resolve().IsMouCaoPiMovement(f, effect, continuation);
     internal bool IsMouCaoPiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouCaoPiRecoveryParent(f, recovery);
     internal void LoseMouCaoPiSkills(global::CardGame.Core.CharacterState p, int source, global::System.Collections.Generic.IReadOnlyList<string>? ids) => _resolve().LoseMouCaoPiSkills(p, source, ids);

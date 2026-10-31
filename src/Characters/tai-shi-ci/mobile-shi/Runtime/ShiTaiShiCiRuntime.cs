@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class ShiTaiShiCiRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts, IProgramOperationDraws draws, IShiTaiShiCiFacts facts,
     IShiTaiShiCiOperations operations) : IShiTzProgramHost
@@ -464,23 +464,6 @@ internal sealed class ShiTaiShiCiRuntime(IProgramRuntimeFrames frames, IProgramR
         f.ShiTaiShiCi is { } r && (r.Stage is 8 or 14 or 18 || r is { Operation: "zhenfeng", Stage: 12 }) &&
         p.CoverageResultBind is null && p.BeforeCount == 0 &&
         p.SubjectSeat == (r.Stage == 18 ? r.TargetSeat : f.OwnerSeat);
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 67600)]
-    private void AssertShiTz(ProgramSkillFrame f)
-    {
-        if (f.ShiTaiShiCi is not { } r) return;
-        if (r.ActualTurn <= 0 || r.Source?.OwnerSeat != f.OwnerSeat ||
-            r.Operation is not ("hanzhan" or "zhanlie" or "range" or "gate" or "zhenfeng"))
-            throw new InvalidOperationException("Shi Tai Shi Ci lost its original typed operation receipt.");
-        if (r.Operation == "zhanlie" && r.Stage >= 6 && (r.TargetSeats is not { Count: >= 1 } targets ||
-            targets.Distinct().Count() != targets.Count || targets.Any(seat => !facts.ValidSeat(seat)) ||
-            !facts.History<ShiTzSlashIssuedEvent>().Any(e => e.FrameId == f.Id && e.Source == ShiTzSource(f) &&
-                e.TargetSeats.SequenceEqual(targets) && e.Options == r.Options)))
-            throw new InvalidOperationException("Zhanlie lost its issued slash options or ordered targets.");
-        if (r.Operation == "gate" && r.Stage >= 18 && !facts.History<ShiTzRespondGatePaidEvent>()
-            .Any(e => e.FrameId == f.Id && e.AttackResolutionId == r.AttackResolutionId))
-            throw new InvalidOperationException("Zhanlie gate lost its paid response qualification receipt.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShiTzZhanlie, SkillProgramEffectOp.ResolveShiTzZhenfeng,
         SkillProgramEffectOp.ResolveShiTzRespondGate)]

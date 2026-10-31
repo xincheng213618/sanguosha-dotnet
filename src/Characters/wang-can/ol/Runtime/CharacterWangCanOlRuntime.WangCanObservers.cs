@@ -62,13 +62,6 @@ internal sealed partial class CharacterWangCanOlRuntime
             throw new InvalidOperationException("Denglou native use is not uniquely issued.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 320)]
-    internal void AssertRegisteredIssuedWangCan(ProgramSkillFrame frame)
-    {
-        if (frame.WangCan is not null)
-            RequireIssuedWangCan(frame);
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 280)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 280)]
     internal bool CanContinueIssuedWangCan(ProgramSkillFrame f)
@@ -99,8 +92,6 @@ internal sealed partial class CharacterWangCanOlRuntime
     internal bool HasWangCanDamageObserver(long id) => WangCanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 440)]
     internal bool HasWangCanBeforeDamageObserver(long id) => WangCanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 210)]
-    internal bool IsWangCanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WangCanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 350)]
     internal bool TryAdvanceWangCanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WangCanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

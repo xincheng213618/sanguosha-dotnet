@@ -1,4 +1,4 @@
-﻿namespace CardGame.Core;
+namespace CardGame.Core;
 
 [Flags]
 public enum CardUseCategories
@@ -198,9 +198,6 @@ public static class CardUseCategoryCatalog
                 $"Card kind '{effectiveKind}' has no supported card-use category.")
         };
     }
-
-    internal static bool IsValid(CardUseCategories categories) =>
-        categories != CardUseCategories.None && (categories & ~All) == 0;
 }
 
 /// <summary>
@@ -680,72 +677,5 @@ internal sealed partial class TurnCardUseEffectStore
         if (expired.Length > 0)
             _damageModifiers.RemoveAll(item => predicate(item));
         return expired;
-    }
-
-    internal void AssertInvariants()
-    {
-        var all = _judgedRankSlashPolicies.Select(item => item.GrantSequence).Concat(_targetAdjustments.Select(item => item.GrantSequence))
-            .Concat(_prohibitions.Select(item => item.GrantSequence))
-            .Concat(_damageModifiers.Select(item => item.GrantSequence))
-            .Concat(_actionProhibitions.Select(item => item.GrantSequence))
-            .Concat(_handColorRestrictions.Select(item => item.GrantSequence))
-            .Concat(_ruleModifiers.Select(item => item.GrantSequence))
-            .Concat(_recoveryModifiers.Select(item => item.GrantSequence))
-            .Concat(_targetRestrictions.Select(item => item.GrantSequence))
-            .Concat(_conversions.Select(item => item.GrantSequence))
-            .Concat(_handCategoryRestrictions.Select(item => item.GrantSequence))
-            .Concat(_handLimitKindExemptions.Select(item => item.GrantSequence))
-            .Concat(_slashSuitAllowances.Select(item => item.GrantSequence))
-            .Concat(_firstRoundGameUsageRefunds.Select(item => item.GrantSequence))
-            .Concat(_inspectedHandDistances.Select(item => item.GrantSequence)).ToArray();
-        if (all.Length != all.Distinct().Count() || all.Any(sequence => sequence <= 0) ||
-            all.Any(sequence => sequence > _grantSequence) || JudgedRankSlashPoliciesAreInvalid() ||
-            _targetAdjustments.Any(item => !CardUseCategoryCatalog.IsValid(item.Categories) ||
-                item.MinimumTargets < 1 || !item.AllowAdd && !item.AllowRemove) ||
-            _prohibitions.Any(item => !CardUseCategoryCatalog.IsValid(item.Categories)) ||
-            _damageModifiers.Any(item => item.Amount <= 0 || item.CardKinds.Count == 0 ||
-                item.CardKinds.Distinct().Count() != item.CardKinds.Count ||
-                !Enum.IsDefined(item.Expiration) || !Enum.IsDefined(item.SourceScope) ||
-                item.TurnNumber <= 0 || item.Source.OwnerSeat < 0) ||
-            _actionProhibitions.Any(item => item.CardKinds.Count == 0 && item.Suits is not { Count: > 0 } || item.Suits is { Count: 0 } ||
-                item.Suits is not null && (item.CardKinds.Count != 0 || !item.ActionTypes.SequenceEqual([CardActionType.Use]) || item.Suits.Distinct().Count() != item.Suits.Count || item.Suits.Any(suit => !Enum.IsDefined(suit))) || item.ActionTypes.Count == 0 ||
-                item.CardKinds.Distinct().Count() != item.CardKinds.Count ||
-                item.ActionTypes.Distinct().Count() != item.ActionTypes.Count) ||
-            _handColorRestrictions.Any(item => item.AffectedSeat < 0) || HandCategoryRestrictionsAreInvalid() || HandLimitKindExemptionsAreInvalid() || BoundSlashBenefitsAreInvalid() ||
-            RecoveryModifiersAreInvalid() || _ruleModifiers.Any(item =>
-                !Enum.IsDefined(item.Expiration) || item.AffectedSeat is < 0 || item.PaidHpLossOrigin is not null && !PaidHpLossProgram.IsValidModifierOrigin(item) ||
-                item.Query == SkillRuleQuery.HandLimit &&
-                    (item.Operation != SkillRuleOperation.Add || item.Amount is < -20 or > 20 || item.Amount == 0 || item.CardKinds is { Count: > 0 }) ||
-                item.Query == SkillRuleQuery.OutgoingDistance &&
-                    (item.Operation != SkillRuleOperation.Add || item.PaidHpLossOrigin is null && item.Amount is < -20 or > 20 || item.Amount == 0 || item.CardKinds is { Count: > 0 }) ||
-                item.Query == SkillRuleQuery.SlashLimit &&
-                    (item.Operation == SkillRuleOperation.Unlimited
-                        ? item.Amount != 0 || item.CardKinds is { Count: > 0 }
-                        : item.Operation != SkillRuleOperation.Add || item.Amount < -20 || item.Amount == 0) ||
-                item.Query == SkillRuleQuery.CardUseDistanceLimit &&
-                    (item.Operation != SkillRuleOperation.Unlimited || item.Amount != 0 ||
-                     item.CardKinds is { Count: > 0 } distanceKinds && distanceKinds.Distinct().Count() != distanceKinds.Count) ||
-                item.Query == SkillRuleQuery.SlashDistanceLimit &&
-                    item.Operation != SkillRuleOperation.Unlimited ||
-                item.Query == SkillRuleQuery.AttackRange &&
-                    item.Operation != SkillRuleOperation.Unlimited ||
-                item.Query == SkillRuleQuery.CardTargetCount &&
-                    (item.Operation != SkillRuleOperation.Add || item.Amount <= 0 ||
-                     item.CardKinds is not { Count: > 0 } cardKinds ||
-                     cardKinds.Distinct().Count() != cardKinds.Count) ||
-                item.Query == SkillRuleQuery.CardEffectImmunity &&
-                    (item.Operation != SkillRuleOperation.Set || item.Amount != 1 || item.CardKinds is not { Count: > 0 } ||
-                     item.CardKinds.Any(kind => !GrantTurnCardEffectImmunityProgramOperationDescriptor.CardEffectImmunityKinds.Contains(kind))) ||
-                item.Query is not (SkillRuleQuery.DrawCount or SkillRuleQuery.HandLimit or SkillRuleQuery.SlashLimit or SkillRuleQuery.CardUseDistanceLimit or SkillRuleQuery.SlashDistanceLimit or
-                    SkillRuleQuery.AttackRange or SkillRuleQuery.CardTargetCount or SkillRuleQuery.CardEffectImmunity or SkillRuleQuery.OutgoingDistance)) ||
-            _targetRestrictions.Any(item => item.Restriction == SkillProgramCardTargetRestriction.SelfOnly
-                ? item.TargetSeat is not null || item.SubjectSeat < 0
-                : item.TargetSeat is null or < 0) ||
-            _conversions.Any(item => string.IsNullOrWhiteSpace(item.SourceBind) ||
-                item.ColorRelation != SkillProgramCardColorRelation.OppositeBoundCard ||
-                item.OutputKind != CardKind.Duel))
-        {
-            throw new InvalidOperationException("Turn card-use effects are inconsistent.");
-        }
     }
 }

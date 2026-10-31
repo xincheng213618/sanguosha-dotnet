@@ -105,7 +105,6 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != id || frame.OverflowTargetCancellation is not { } receipt)
             return false;
-        _coreOverflowTargetCancellationObserversOperations.AssertOverflowTargetCancellation(frame);
         if (DrainOverflowTargetChildren(frame))
             return true;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OverflowTargetCancellationCompletedEvent(frame.Id, receipt.CardUseFrameId, receipt.ActionId));
@@ -119,7 +118,6 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
     {
         if (frame.OverflowTargetCancellation is null || frame.PendingMovementContinuation is null)
             return false;
-        _coreOverflowTargetCancellationObserversOperations.AssertOverflowTargetCancellation(frame);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }

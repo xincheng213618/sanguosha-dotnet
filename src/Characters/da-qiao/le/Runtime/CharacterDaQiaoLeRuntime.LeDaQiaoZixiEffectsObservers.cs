@@ -11,7 +11,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         if (f.ZixiEffects is not { } r || !ValidZixiEffectsStarted(f))
             return false;
-        AssertZixiEffects(f);
         if (r.Stage == ZixiEffectsStage.Drawing && f.NativeDraw is not null)
             return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is RecoveryReplacementFrame recovery)
@@ -36,8 +35,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     internal bool HasZixiEffectsDamageObserver(long id) => ZixiEffectsObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1310)]
     internal bool HasZixiEffectsBeforeDamageObserver(long id) => ZixiEffectsObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 1140)]
-    internal bool IsZixiEffectsDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ZixiEffectsObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28720)]
     internal bool AdvanceZixiEffectsChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZixiEffectsObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

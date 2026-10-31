@@ -23,7 +23,6 @@ internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntim
         _ => false
     };
     internal static bool PaidCardUseHpFrameRidesOn(ResolutionFrame ride, ResolutionFrame beneath) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecoveryReplacementDamageRides.PaidCardUseHpFrameRidesOn(ride, beneath);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 10, group: 20)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 110)]
     internal bool IsPaidCardUseProgramDying() => _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.RecoveryPaidContinuation?.Kind is RecoveryPaidCardUseKind.DodgeCompletion or RecoveryPaidCardUseKind.CommittedSlash && IsRecoveryReplacementProgramDying(attack.ResolutionId);
     internal bool RecoveryReplacementDamageObserverRidesOn(int index)
@@ -44,9 +43,6 @@ internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntim
 
         return false;
     }
-
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 330, group: 10)]
-    internal bool MatchRecoveryReplacementProgramDying() => IsRecoveryReplacementProgramDying();
     internal bool IsRecoveryReplacementProgramDying(long? requiredPaidUseId = null)
     {
         var paymentCursor = _coreTypedRecoveryDamageCursorOperations.ProjectTypedCommittedSlashPaymentCursor();

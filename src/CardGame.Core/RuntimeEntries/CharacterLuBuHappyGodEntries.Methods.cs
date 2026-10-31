@@ -5,12 +5,10 @@ internal sealed partial class CharacterLuBuHappyGodEntries
     internal bool AdvanceHappyLuBuObserver() => _resolve().AdvanceHappyLuBuObserver();
     internal void AnswerHappyLuBuTarget(global::CardGame.Core.PromptChoice chosen) => _resolve().AnswerHappyLuBuTarget(chosen);
     internal void ApplyHappyLuBuUse(global::CardGame.Core.ProgramSkillFrame f, int? added) => _resolve().ApplyHappyLuBuUse(f, added);
-    internal void AssertHappyLuBu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertHappyLuBu(f);
     internal void AssertHappyLuBuUses() => _resolve().AssertHappyLuBuUses();
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyLuBu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginHappyLuBu(supplied, op);
     internal bool CompleteHappyLuBuActualStart(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame p) => _resolve().CompleteHappyLuBuActualStart(p);
     internal bool ContinueHappyLuBu(long id) => _resolve().ContinueHappyLuBu(id);
-    internal global::CardGame.Core.Card FindCardById(int id) => _resolve().FindCardById(id);
     internal global::CardGame.Core.PromptChoice HappyLuBuAi(global::CardGame.Core.PendingDecision p) => _resolve().HappyLuBuAi(p);
     internal bool HappyLuBuBeforeDamage(long id) => _resolve().HappyLuBuBeforeDamage(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyLuBuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyLuBuChoices(f);

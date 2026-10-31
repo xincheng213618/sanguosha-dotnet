@@ -5,7 +5,6 @@ internal sealed record OlCaoPiPlayer(int Seat, bool IsAlive, bool IsHuman, int M
 internal interface IOlShenCaoPiFacts : IProgramSelectionQuery
 {
     OlCaoPiPlayer Player(int seat);
-    bool ValidSeat(int seat);
     long MovementSequence { get; }
     Winner Winner { get; }
     ContentSkillDefinition Skill(string skillId);

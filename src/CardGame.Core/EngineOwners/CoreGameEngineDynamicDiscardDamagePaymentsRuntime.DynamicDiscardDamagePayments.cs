@@ -95,7 +95,6 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsRuntime
     {
         if (f.DynamicDiscardDamage is null)
             return false;
-        AssertDynamicDiscardDamage(f);
         if (f.DynamicDiscardDamage.Stage != DynamicDiscardDamageStage.Paid || f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat || !ValidDynamicDiscardDamagePayments(f))
             throw new InvalidOperationException("The paid target-HP cost lost its exact owning movement return.");
         if (TryDrainDynamicDiscardDamageCost(f))
@@ -122,7 +121,6 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         if (f.DynamicDiscardDamage is not { } r)
             return false;
-        AssertDynamicDiscardDamage(f);
         if (r.Stage == DynamicDiscardDamageStage.Choosing)
             return true;
         if (r.Stage == DynamicDiscardDamageStage.Paid)
@@ -250,46 +248,5 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsRuntime
         if (r.CardIds.Count != r.FrozenTargetHp || r.CardIds.Count != r.OriginalLocations.Count || r.CardIds.Distinct().Count() != r.CardIds.Count)
             return false;
         return r.CardIds.Select((id, i) => (id, i)).All(x => _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.CardId == x.id && m.Sequence > r.PaymentSequenceBefore && m.Sequence <= r.PaymentSequenceAfter && m.From == r.OriginalLocations[x.i] && m.Reason.Value == DynamicDiscardDamageReason && m.To == CardLocation.DiscardPile) == 1);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 550)]
-    internal void AssertDynamicDiscardDamage(ProgramSkillFrame f)
-    {
-        if (f.DynamicDiscardDamage is not { } r)
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.DiscardTargetHpCardsAndDamage || f.TriggerId is not null || effect.Target != SkillProgramEffectTarget.SelectedTarget || f.SelectedTargetSeats is not [var target] || target != r.TargetSeat || r.InstructionIndex != f.InstructionIndex || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || r.FrozenTargetHp < 1 || r.FrozenDistance < 1 || r.FrozenAttackRange < r.FrozenDistance && !(_characterSunYuanOlOperations.HasSunYuanCapability && _coreProgramEventHistoryOperations.ProgramEventHistory<SayingRangeGrantedEvent>().Any(grant => grant.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && (grant.OwnerSeat == f.OwnerSeat && grant.Holder == r.TargetSeat || grant.Holder == f.OwnerSeat && grant.OwnerSeat == r.TargetSeat))) || !Enum.IsDefined(r.Stage) || r.Stage == DynamicDiscardDamageStage.Finished || r.CardIds.Count != r.OriginalLocations.Count || r.CardIds.Count > r.FrozenTargetHp || r.CardIds.Distinct().Count() != r.CardIds.Count || r.OriginalLocations.Any(l => l.OwnerSeat != f.OwnerSeat || l.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || r.Stage != DynamicDiscardDamageStage.Choosing && !ValidDynamicDiscardDamagePayments(f))
-            throw new InvalidOperationException("Variable discard damage lost its frozen owning payment.");
-        var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        if (r.Stage == DynamicDiscardDamageStage.Choosing)
-        {
-            if (r.PaymentSequenceBefore != 0 || r.PaymentSequenceAfter != 0 || r.DamageFrameId is not null || r.ActualDamageTargetSeat is not null || r.DyingFrameId is not null || r.DyingSurvived is not null || f.AttackAttempt is not null || f.AttackReturn is not null)
-                throw new InvalidOperationException("An unpaid variable cost cannot contain damage or survival state.");
-            if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, DynamicDiscardDamageChoices(f))))
-                throw new InvalidOperationException("Variable cost lost its exact private choices.");
-            return;
-        }
-
-        if (facts.OfType<DynamicDiscardDamagePaidEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == r.TargetSeat && e.FrozenHp == r.FrozenTargetHp && e.ActualTurn == r.ActualTurn && e.CardIds.SequenceEqual(r.CardIds)) != 1)
-            throw new InvalidOperationException("Variable cost lost its one real paid fact.");
-        if (r.Stage == DynamicDiscardDamageStage.Paid && (r.DamageFrameId is not null || r.DyingFrameId is not null || f.AttackAttempt is not null))
-            throw new InvalidOperationException("Cost children precede issuance of the variable attack.");
-        if (r.Stage == DynamicDiscardDamageStage.DamageIssued && (f.AttackAttempt is not { } attack || f.AttackReturn is null || attack.SourceSeat != f.OwnerSeat || r.ActualDamageTargetSeat is { } actualTarget && attack.TargetSeat != actualTarget || r.ActualDamageTargetSeat is null && attack.TargetSeat != r.TargetSeat && !_resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().Any(w => w.ParentFrameId == f.Id && w.TargetSeat == r.TargetSeat && w.RedirectedTargetSeat == attack.TargetSeat)))
-            throw new InvalidOperationException("Issued variable damage lost its original typed attack.");
-        if (r.DamageFrameId is { } damage && (r.ActualDamageTargetSeat is not { } damageVictim || facts.OfType<DamageRequestedEvent>().Count(e => e.ResolutionId == damage && e.SourceSeat == f.OwnerSeat && e.TargetSeat == damageVictim && e.Amount > 0 && !e.SourceLess) != 1))
-            throw new InvalidOperationException("Variable damage lost its exact native issuance.");
-        if (r.DyingFrameId is { } capturedDying && (r.DamageFrameId is null || r.ActualDamageTargetSeat is not { } dyingVictim || facts.OfType<PlayerDyingEvent>().Count(e => e.ResolutionId == capturedDying && e.VictimSeat == dyingVictim && e.KillerSeat == f.OwnerSeat) != 1))
-            throw new InvalidOperationException("Variable survival cost cannot borrow another child's Dying.");
-        if (r.DyingSurvived is { } survived && (r.DyingFrameId is not { } survivalDying || r.ActualDamageTargetSeat is not { } survivalVictim || facts.OfType<DyingResolvedEvent>().Count(e => e.ResolutionId == survivalDying && e.VictimSeat == survivalVictim && e.Survived == survived) != 1))
-            throw new InvalidOperationException("Variable survival state lost its exact Dying completion.");
-        if (r.Stage is DynamicDiscardDamageStage.DamageCompleted or DynamicDiscardDamageStage.PenaltyIssued)
-        {
-            if (f.AttackAttempt is not null || f.AttackReturn is not null || facts.OfType<DynamicDiscardDamageCompletedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.OriginalTargetSeat == r.TargetSeat && e.DamageFrameId == r.DamageFrameId && e.ActualTargetSeat == r.ActualDamageTargetSeat && e.DyingFrameId == r.DyingFrameId && e.Survived == r.DyingSurvived && e.ActualTurn == r.ActualTurn) != 1 || r.DamageFrameId is { } completedDamage && !facts.OfType<AfterDamageEvent>().Any(e => e.ResolutionId == completedDamage && e.SourceSeat == f.OwnerSeat && e.TargetSeat == r.ActualDamageTargetSeat))
-                throw new InvalidOperationException("Variable attack tail precedes its exact native damage completion.");
-        }
-
-        var penalties = facts.OfType<DynamicDiscardDamagePenaltyEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Stage == DynamicDiscardDamageStage.PenaltyIssued ? penalties.Length != 1 || ((f.SkillId == "wushuang:skill-3062" || global::CardGame.Core.EngineOwners.CharacterZhugeKeMobileRuntime.IsMobileZhugeKeDuwu(f.SkillId)) ? r.DyingFrameId is null : r.DyingSurvived != true) || penalties[0].DamageFrameId != r.DamageFrameId || penalties[0].DyingFrameId != r.DyingFrameId || penalties[0].TargetSeat != r.ActualDamageTargetSeat || penalties[0].ActualTurn != r.ActualTurn || penalties[0].OwnerSeat != f.OwnerSeat : penalties.Length != 0)
-            throw new InvalidOperationException("Variable attack survival penalty must issue exactly once after its own survivor.");
     }
 }

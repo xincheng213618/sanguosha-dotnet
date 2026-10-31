@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLuZhiMobileEntries
 {
     internal void AnswerHpDifferencePileDamage(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerHpDifferencePileDamage(choice);
-    internal void AssertMobileLuZhiFrames(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileLuZhiFrames(f);
     internal bool CanOfferMobileLuZhiCompletion(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferMobileLuZhiCompletion(candidate, context);
     internal void CaptureMobileLuZhiYin(global::CardGame.Core.ProgramConversionPolarityCommittedEvent fact) => _resolve().CaptureMobileLuZhiYin(fact);
     internal void ContinueHpDifferencePileDamage(long id) => _resolve().ContinueHpDifferencePileDamage(id);

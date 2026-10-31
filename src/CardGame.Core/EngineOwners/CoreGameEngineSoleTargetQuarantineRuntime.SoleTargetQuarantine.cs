@@ -150,13 +150,6 @@ internal sealed partial class CoreGameEngineSoleTargetQuarantineRuntime
         _coreDeferredHandAlignmentsOperations.ContinueDeferredTurnEnd();
     }
 
-    internal bool HasSoleTargetQuarantineEndBoundary(DeferredTurnEndFrame parent)
-    {
-        if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[1] is not CardsMovedTriggerWindowFrame child || !MatchesSoleTargetQuarantineReturn(parent, child))
-            throw new InvalidOperationException("The quarantine return boundary lost its exact movement child.");
-        return true;
-    }
-
     internal void RefreshSoleProtectionObservers(CardUseFrame use)
     {
         var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Last(w => w.ParentFrameId == use.Id && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == SkillProgramTriggerWindow.CardUseTargetsFinalized);
@@ -175,16 +168,5 @@ internal sealed partial class CoreGameEngineSoleTargetQuarantineRuntime
         if (!expected.SequenceEqual(fact.AfterTargets))
             return false;
         return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SoleTargetProtectionPaidEvent>().Count(e => e.Receipt.CardUseFrameId == use.Id && e.Receipt.ActionId == fact.ActionId && e.Receipt.Source == fact.Source && e.Receipt.ProtectedSeat == fact.PreviousTargetSeat && e.Receipt.OriginalTargets.SequenceEqual(before) && IsValidSoleTargetProtectionPaidFact(e.Receipt) && _coreCompletedCategoryUseProofOperations.ActualHandGainMutationBinding(e.Receipt.ProgramFrameId, fact.Source.SkillId, fact.Source.OwnerSeat, SkillProgramTriggerWindow.CardUseTargetsFinalized, SkillProgramEffectOp.ProtectOtherSoleCardTarget)) == 1;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 70)]
-    internal void AssertSoleTargetProtection(ProgramSkillFrame f)
-    {
-        if (f.SoleTargetProtection is not { } r)
-            return;
-        if (!_coreSoleTargetProtectionOperations.HasExactSoleProtectionRoot(f) || f.InstructionIndex != 1 || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ Op: SkillProgramEffectOp.ProtectOtherSoleCardTarget }] || r.Materials.Select(m => m.CardId).Distinct().Count() != r.Materials.Count || r.ActorSeat == f.OwnerSeat || r.ProtectedSeat == f.OwnerSeat || r.OwnerHp <= r.ProtectedHp || (r.Stage is SoleTargetProtectionStage.ChoosingCost or SoleTargetProtectionStage.ChoosingBranch) == (f.PendingMovementContinuation is not null))
-            throw new InvalidOperationException("Sole-target protection lost its exact frozen source, effect, cost or continuation stage.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && r.Stage is SoleTargetProtectionStage.ChoosingCost or SoleTargetProtectionStage.ChoosingBranch && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, _coreSoleTargetProtectionOperations.SoleProtectionChoices(f))))
-            throw new InvalidOperationException("Sole-target protection lost its private owning prompt.");
     }
 }

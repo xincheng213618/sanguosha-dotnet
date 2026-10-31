@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaiFuRenBoundaryMobileEntries
 {
     internal void AnswerBoundaryMobileQieting(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryMobileQieting(frame, choice);
-    internal void AssertBoundaryMobileQieting(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertBoundaryMobileQieting(frame);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryMobileQietingHandChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryMobileQietingHandChoices(frame);
     internal global::CardGame.Core.CardSnapshot[] BoundaryMobileQietingPrivateCards(int viewer) => _resolve().BoundaryMobileQietingPrivateCards(viewer);
     internal bool BoundaryMobileQietingRecoveryMaterial(global::CardGame.Core.ProgramSkillFrame frame, int source, int target, int amount, int? cardId, global::CardGame.Core.CardMoveReason? reason) => _resolve().BoundaryMobileQietingRecoveryMaterial(frame, source, target, amount, cardId, reason);

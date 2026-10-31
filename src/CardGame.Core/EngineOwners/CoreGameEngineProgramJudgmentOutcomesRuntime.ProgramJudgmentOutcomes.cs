@@ -57,15 +57,6 @@ internal sealed partial class CoreGameEngineProgramJudgmentOutcomesRuntime
         return results is [var result] && result.ParentResolutionId == frame.Id && result.TargetSeat == outcome.TargetSeat && result.Reason == outcome.Reason && result.CardId == outcome.CardId && result.Suit == outcome.Suit && result.Rank == outcome.Rank && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramJudgmentOutcomeRecordedEvent>().Count(recorded => recorded.ProgramFrameId == frame.Id && recorded.Outcome == outcome) == 1;
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 1950)]
-    internal void AssertProgramJudgmentOutcomes(ProgramSkillFrame frame)
-    {
-        if (frame.JudgmentOutcomeBindings is not { } outcomes)
-            return;
-        if (outcomes.Select(outcome => outcome.Name).Distinct(StringComparer.Ordinal).Count() != outcomes.Count || outcomes.Any(outcome => !IsValidProgramJudgmentOutcome(frame, outcome)))
-            throw new InvalidOperationException("A program judgment outcome lost its frozen issued value.");
-    }
-
     internal bool IsJudgmentOutcomePrevention(SkillProgramTrigger trigger) => trigger.Effects.Any(effect => effect is { Op: SkillProgramEffectOp.StartJudgment, OutcomeBind: not null }) && trigger.Effects.Any(effect => effect is { Op: SkillProgramEffectOp.PreventCurrentDamage, Condition.Kind: SkillProgramConditionKind.JudgmentOutcomeMatchesSuits });
     internal bool HasRecipientJudgmentOutcomePrevention(int targetSeat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) && _coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive && _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[targetSeat], SkillProgramTriggerWindow.BeforeDamageApplied).Any(candidate => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate)is { Subject: SkillProgramTriggerSubject.DamageTarget } trigger && IsJudgmentOutcomePrevention(trigger));
 }

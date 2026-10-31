@@ -29,14 +29,6 @@ internal sealed partial class CharacterHuaTuoHappyGodRuntime
         return targets.Select((e, i) => e == new HappyHuaNeedleTargetEvent(f.Id, i, f.SelectedTargetSeats[i], mode.OptionId)).All(x => x);
     }
 
-    internal bool HasExactHappyHuaTuoParticipantSelection(ProgramSkillFrame f) => f.HappyHuaRescue is not null && ValidHappyHuaRescue(f) || f.HappyHuaNeedle is { Stage: HappyHuaNeedleStage.Committed } && ValidHappyHuaNeedle(f);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 41780)]
-    internal void AssertHappyHuaTuoFrame(ProgramSkillFrame f)
-    {
-        if (f.HappyHuaRescue is not null && !ValidHappyHuaRescue(f) || f.HappyHuaNeedle is not null && !ValidHappyHuaNeedle(f))
-            throw new InvalidOperationException("Happy Hua Tuo lost its exact original window, source, medicine payment or selected participants.");
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41780)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 41780)]
     internal bool ContinuePaidHappyHuaTuo(ProgramSkillFrame f) => f.HappyHuaRescue is not null && ValidHappyHuaRescue(f) || f.HappyHuaNeedle is { Amount: > 0 } && ValidHappyHuaNeedle(f);

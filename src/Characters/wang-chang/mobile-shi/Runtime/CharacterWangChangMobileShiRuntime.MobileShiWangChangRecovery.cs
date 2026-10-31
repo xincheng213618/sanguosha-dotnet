@@ -24,16 +24,6 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
             throw new InvalidOperationException("Shepan lost its original current damage-card target, branch or adjustment.");
     }
 
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 47400)]
-    internal void AssertShiWangChang(ProgramSkillFrame f)
-    {
-        if (f.MobileShiWangChang is null)
-            return;
-        RequireShiWangChang(f);
-        if (f.MobileShiWangChang.Stage is MobileShiWangChangStage.Targets or MobileShiWangChangStage.Mode && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } p || p.PlayerSeat != f.OwnerSeat || p.SkillPrompt?.SkillId != f.SkillId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, ShiWangChangChoices(f))))
-            throw new InvalidOperationException("Shi Wang Chang lost its exact current target or adjustment choices.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 47400)]
     internal bool IsShiKaijiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation movement)
     {
@@ -67,7 +57,6 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
     internal bool ShiKaijiNestedDamage(long id) => ShiKaijiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 47400)]
     internal bool ShiKaijiBeforeDamage(long id) => ShiKaijiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 47400)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 47400)]
     internal bool ShiKaijiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShiKaijiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 47400)]

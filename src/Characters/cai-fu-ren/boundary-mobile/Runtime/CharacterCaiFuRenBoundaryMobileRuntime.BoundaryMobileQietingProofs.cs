@@ -7,60 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiFuRenBoundaryMobileRuntime
 {
-    internal void AssertBoundaryMobileQieting(ProgramSkillFrame frame)
-    {
-        var receipt = frame.OrdinaryQieting!;
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingOptionIssuedEvent>().Where(entry => entry.FrameId == frame.Id).ToArray();
-        if (!receipt.Paid)
-        {
-            if (receipt.Stage != OrdinaryQietingStage.Choice || receipt.Option is not null || receipt.CardId is not null || receipt.PrintedKind is not null || receipt.MobileSelection is not null || receipt.DrawOutcome is not null || receipt.GrainIds.Count != 0 || issued.Length != 0 || receipt.Before != 0 || receipt.After != 0)
-                throw new InvalidOperationException("Unpaid mobile Qieting cannot hold a benefit or private view.");
-            return;
-        }
-
-        if (issued is not [var option] || option.Option != receipt.Option || option.Before < 0 || option.Before > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || receipt.Stage == OrdinaryQietingStage.Choice)
-            throw new InvalidOperationException("Mobile Qieting owns exactly one committed option.");
-        if (receipt.Option == "draw")
-        {
-            if (receipt.Stage is not (OrdinaryQietingStage.Draw or OrdinaryQietingStage.DrawChildren) || receipt.CardId is not null || receipt.PrintedKind is not null || receipt.MobileSelection is not null || receipt.GrainIds.Count != 0 || option.CardId is not null || option.PrintedKind is not null || option.Before > receipt.Before)
-                throw new InvalidOperationException("Mobile Qieting cannot combine its draw with another branch.");
-            if (receipt.Stage == OrdinaryQietingStage.DrawChildren && (receipt.DrawOutcome is not { } draw || draw.RecipientSeat != frame.OwnerSeat || draw.RequestedCount != 1 || draw.SequenceBefore != receipt.Before || draw.SequenceAfter != receipt.After || _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingDrawReturnedEvent>().Where(entry => entry.FrameId == frame.Id).ToArray()is not [var returned] || returned != new OrdinaryQietingDrawReturnedEvent(frame.Id, draw.ActualDrawIds.Count, draw.ReplacementGainedIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId)))
-                throw new InvalidOperationException("Mobile Qieting draw must retain its single typed native return.");
-        }
-        else if (receipt.Option == "hand")
-        {
-            if (receipt.MobileSelection is not { } selection || receipt.DrawOutcome is not null || receipt.GrainIds.Count != 0 || option.CardId is not null || option.PrintedKind is not null || receipt.Stage is not (OrdinaryQietingStage.Viewing or OrdinaryQietingStage.MovementChildren) || selection.ReplacedCardId is not null || selection.ReplacedKind is not null || selection.Hand is not System.Collections.IList { IsReadOnly: true } || selection.Viewed is not System.Collections.IList { IsReadOnly: true } || selection.Hand.Count == 0 || selection.Hand.Distinct().Count() != selection.Hand.Count || selection.Viewed.Count != Math.Min(2, selection.Hand.Count) || selection.Viewed.Distinct().Count() != selection.Viewed.Count)
-                throw new InvalidOperationException("Mobile Qieting must retain its original frozen at-most-two private hand sample.");
-            var random = new DeterministicRandom(unchecked((int)selection.RandomBefore));
-            var remaining = selection.Hand.ToList();
-            var expected = new List<int>();
-            while (expected.Count < 2 && remaining.Count > 0)
-            {
-                var index = random.Next(remaining.Count);
-                expected.Add(remaining[index]);
-                remaining.RemoveAt(index);
-            }
-
-            if (random.State != selection.RandomAfter || !expected.SequenceEqual(selection.Viewed) || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryMobileQietingViewedEvent>().Count(entry => entry == new BoundaryMobileQietingViewedEvent(frame.Id, frame.OwnerSeat, receipt.Qualification.TurnOwnerSeat, selection.Viewed.Count)) != 1)
-                throw new InvalidOperationException("Mobile Qieting cannot replace or redraw its private sample after a cold return.");
-            if (receipt.Stage == OrdinaryQietingStage.Viewing)
-            {
-                if (receipt.CardId is not null || receipt.PrintedKind is not null || receipt.Before != 0 || receipt.After != 0 || frame.PendingMovementContinuation is not null || !selection.Hand.SequenceEqual(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[receipt.Qualification.TurnOwnerSeat]).Select(card => card.Id)))
-                    throw new InvalidOperationException("Mobile Qieting viewing must retain the unchanged actual source hand.");
-            }
-            else if (receipt.CardId is not { } taken || !selection.Viewed.Contains(taken) || receipt.PrintedKind != _coreAdvancedLifecycleOperations.GetAdvancedCard(taken).Kind || option.Before > receipt.Before || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.Sequence > receipt.Before && move.Sequence <= receipt.After && IsBoundaryMobileQietingPaidMovement(frame, move)) != 1)
-                throw new InvalidOperationException("Mobile Qieting must obtain exactly one of its originally viewed real entities.");
-        }
-        else if (receipt.Option == "equipment")
-        {
-            if (receipt.Stage != OrdinaryQietingStage.MovementChildren || receipt.CardId is not { } id || receipt.PrintedKind is not { } kind || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind) || receipt.DrawOutcome is not null || receipt.MobileSelection is not { } selection || selection.Hand.Count != 0 || selection.Viewed.Count != 0 || selection.RandomBefore != 0 || selection.RandomAfter != 0 || (selection.ReplacedCardId is null) != (selection.ReplacedKind is null) || option.CardId != id || option.PrintedKind != kind || option.Before != receipt.Before || _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingEquipmentMovedEvent>().Where(entry => entry.FrameId == frame.Id).ToArray()is not [var moved] || moved.CardId != id || moved.PrintedKind != kind || moved.From != CardLocation.Equipment(receipt.Qualification.TurnOwnerSeat) || moved.To != CardLocation.Equipment(frame.OwnerSeat) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == moved.MovementSequence && IsBoundaryMobileQietingPaidMovement(frame, move)) || selection.ReplacedCardId is { } replacement && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.Sequence > receipt.Before && move.Sequence <= receipt.After && move.CardId == replacement && move.CardKind == selection.ReplacedKind && move.From == CardLocation.Equipment(frame.OwnerSeat) && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.EquipmentReplace) != 1)
-                throw new InvalidOperationException("Mobile Qieting lost the exact incoming equipment or its native slot replacement.");
-        }
-        else
-            throw new InvalidOperationException("Mobile Qieting has only its three printed benefits.");
-        if (frame.PendingMovementContinuation is { } movement && !_characterCaiFuRenOlOperations.IsOrdinaryCaiFuRenMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), movement))
-            throw new InvalidOperationException("Mobile Qieting cannot attach an unrelated payment return.");
-    }
 
     internal bool IsBoundaryMobileQietingPaidMovement(ProgramSkillFrame frame, CardMovementRecord move)
     {

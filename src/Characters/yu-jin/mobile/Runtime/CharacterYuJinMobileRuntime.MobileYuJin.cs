@@ -16,7 +16,6 @@ internal sealed partial class CharacterYuJinMobileRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 76300, SkillProgramEffectOp.CollectMobileYuJinJieyue)]
     internal bool MobileYuJinPreparationHasCards(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && HasMobileYuJinPile(candidate.OwnerSeat, candidate.SkillInstanceId);
     SkillProgramStepOutcome global::CardGame.Core.IMobileYuJinHost.Transfer(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginMobileYuJinTransfer(frame, effect);
-    bool global::CardGame.Core.IMobileYuJinHost.MatchesChoiceResult(ProgramSkillFrame frame, ProgramChoiceResultBinding binding) => MatchesMobileYuJinChoiceResult(frame, binding);
     internal static string MobileYuJinTransferReason(SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMobileYuJinJieyue ? "skill.mobile-yu-jin.jieyue.store" : "skill.mobile-yu-jin.jieyue.retrieve";
     internal SkillProgramStepOutcome BeginMobileYuJinTransfer(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
@@ -118,19 +117,4 @@ internal sealed partial class CharacterYuJinMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 76300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 76300)]
     internal bool KeepMobileYuJinPaidTransfer(ProgramSkillFrame frame) => frame.MobileYuJinTransfer is not null && ValidMobileYuJinTransfer(frame);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 76300)]
-    internal void AssertMobileYuJinTransfer(ProgramSkillFrame frame)
-    {
-        if (frame.MobileYuJinChoice is not null && !ValidMobileYuJinChoice(frame))
-            throw new InvalidOperationException("Jieyue's unpaid choice must stay on its original participant's ending frame.");
-        if (frame.MobileYuJinTransfer is not null)
-        {
-            if (!ValidMobileYuJinTransfer(frame))
-                throw new InvalidOperationException("Jieyue's paid transfer must remain on its exact original program frame.");
-            return;
-        }
-
-        if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<MobileYuJinTransferStartedEvent>().Any(e => e.FrameId == frame.Id) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<MobileYuJinTransferReturnedEvent>().Any(e => e.FrameId == frame.Id))
-            throw new InvalidOperationException("A paid Jieyue transfer cannot lose its original owning receipt.");
-    }
 }

@@ -67,7 +67,6 @@ internal sealed partial class CharacterZhangNiBoundaryMobileRuntime
     internal void AnswerBoundaryWurong(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Wurong lost its original private commitment frame.");
-        AssertBoundaryWurong(f);
         var r = f.BoundaryWurong!;
         if (!BoundaryWurongChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets)))
             throw new InvalidOperationException("Wurong rejects a stale strategy or payment entity.");
@@ -194,7 +193,6 @@ internal sealed partial class CharacterZhangNiBoundaryMobileRuntime
     internal bool KeepBoundaryWurongPaid(ProgramSkillFrame f) => f.BoundaryWurong is { Stage: >= BoundaryWurongStage.Revealed } || f.TriggerId == BoundaryZhangNiComposition.Skip && f.InstructionIndex is 0 or 1 && f.WindowContext is { } context && AdmitBoundaryWurongSkip(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 1000, context.OccurrenceIndex), context);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryZhangNiWurong)]
     internal static PromptChoice BoundaryWurongAi(PendingDecision p) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "pay") ?? p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "card") ?? p.Choices.First();
-    internal bool IsBoundaryWurongChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => f.SkillId == BoundaryZhangNiComposition.Skill && f.BoundaryWurong is { Stage: >= BoundaryWurongStage.Revealed, Outcome: { } outcome } r && b == new ProgramChoiceResultBinding(BoundaryZhangNiComposition.Result, outcome, f.OwnerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWurongRevealedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var revealed] && revealed == new BoundaryWurongRevealedEvent(f.Id, r.Suppress!.Value, r.Resist!.Value, outcome);
     internal BoundaryWurongSkipIssuedEvent[] PendingBoundaryWurongSkips(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWurongSkipIssuedEvent>().Where(e => e.Target == target && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(e.Source.SkillId)?.Program?.GameplayHash == e.Hash && !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWurongSkipConsumedEvent>().Any(c => c.IssuerFrameId == e.FrameId)).ToArray();
     internal bool HasPendingBoundaryWurongDrawSkip(int target) => PendingBoundaryWurongSkips(target).Length > 0;
     internal static string BoundaryWurongSkipInstance(BoundaryWurongSkipIssuedEvent e) => "issued:boundary-wurong-skip:" + e.FrameId;

@@ -9,7 +9,6 @@ internal sealed partial class CharacterGongsunZanMouMobileEntries
     internal void AnswerMouGszMobile(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerMouGszMobile(choice);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> AppendMouGszHuPlayable(global::CardGame.Core.CharacterState owner, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().AppendMouGszHuPlayable(owner, cards);
     internal void AssertMouGszHuPayments() => _resolve().AssertMouGszHuPayments();
-    internal void AssertMouGszMobile(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouGszMobile(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginMouGszMobile(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMouGszMobile(supplied, op);
     internal void BindMouGszHuAction(global::CardGame.Core.IGameEvent payload) => _resolve().BindMouGszHuAction(payload);
     internal void CaptureMouGszHuPaymentBatch(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().CaptureMouGszHuPaymentBatch(batch);

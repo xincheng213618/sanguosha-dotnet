@@ -76,7 +76,6 @@ internal sealed partial class CoreGameEngineGuanduGeneralsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanduGeneral: { } r } f || f.Id != id)
             return false;
-        AssertGuanduGeneral(f);
         if (r.Stage == "draw-attempt" || r.Stage == "native-use")
             return true;
         if (DrainGuanduGeneralChildren(id))
@@ -200,17 +199,6 @@ internal sealed partial class CoreGameEngineGuanduGeneralsRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         else
             _coreSkillProgramsOperations.FinishProgramSkill(f, completed);
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 44000)]
-    internal void AssertGuanduGeneral(ProgramSkillFrame f)
-    {
-        if (f.GuanduGeneral is not { } r)
-            return;
-        if (!IsGuanduGeneralContextAllowed(f.SkillId, r.Operation) || r.InstructionIndex != f.InstructionIndex || r.InstructionIndex != 1 || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.WindowId != f.WindowContext?.ParentFrameId || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Operation || _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduGeneralIssuedEvent>().Count(e => e == new GuanduGeneralIssuedEvent(f.Id, f.SkillId, r.Operation, f.OwnerSeat, r.ActualTurn, r.WindowId)) != 1 || r.Seats is null || r.Seats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || r.Seats.Distinct().Count() != r.Seats.Count)
-            throw new InvalidOperationException("Activity receipt lost its exact instruction, turn, participant snapshot or issuance.");
-        if (r.Stage == "draw-attempt" && (r.NextStage is null || r.Draw is not null || r.DrawRequested < 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.DrawRecipient)))
-            throw new InvalidOperationException("Activity draw lost its owned awaiting receipt.");
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 5300)]

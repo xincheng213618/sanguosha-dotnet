@@ -85,7 +85,6 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhaoXiang: { Stage: "selection" } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhaoXiangExchangeChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Five-Shu choice lost its original private sampled templates.");
-        AssertZhaoXiang(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.ZhaoXiang!;
         var generalId = choice.Parameters["general-id"];

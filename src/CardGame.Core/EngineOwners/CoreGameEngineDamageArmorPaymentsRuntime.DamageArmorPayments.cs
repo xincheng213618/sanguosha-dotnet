@@ -64,11 +64,4 @@ internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.ArmorPayment is not { } payment || !IsValidDamageArmorPayment(damage, requireApplied: true) || !DamageAppliedMatchesArmorPayment(applied, payment) || _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Any(previous => previous.ArmorPayment == payment))
             throw new InvalidOperationException("Damage lost its exact once-only Armor and HP payment.");
     }
-
-    internal void AssertDamageArmorPayments()
-    {
-        foreach (var damage in _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Where(frame => frame.ArmorPayment is not null))
-            if (!IsIssuedDamageArmorPayment(damage))
-                throw new InvalidOperationException("An Armor-paid damage segment lost its issued native payment receipt.");
-    }
 }

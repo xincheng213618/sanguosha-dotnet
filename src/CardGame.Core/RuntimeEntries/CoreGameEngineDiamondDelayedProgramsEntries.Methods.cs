@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDiamondDelayedProgramsEntries
 {
-    internal void AssertDiamondDelayed(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? paused) => _resolve().AssertDiamondDelayed(frame, paused);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginDiamondDelayed(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BeginDiamondDelayed(frame);
     internal bool CanActivateDiamondDelayed(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramActivation activation, string skillId) => _resolve().CanActivateDiamondDelayed(owner, activation, skillId);
     internal void ContinueProgramAfterDiamondDelayedUse(long completedUseId) => _resolve().ContinueProgramAfterDiamondDelayedUse(completedUseId);

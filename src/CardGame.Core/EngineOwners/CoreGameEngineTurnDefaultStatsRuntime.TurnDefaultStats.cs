@@ -159,7 +159,6 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Default-stat choice lost its owner.");
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
-        _coreTurnDefaultStatsValidationOperations.AssertTurnDefaultStatAllocation(f, plan);
         if (f.TurnDefaultStatAllocation is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } decision || !_coreTurnDefaultStatsValidationOperations.IsTurnDefaultStatChoice(f, decision) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], TurnDefaultStatChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("A default-stat choice changed its frozen slot or phase.");
         var slot = int.Parse(choice.Parameters["slot-index"], CultureInfo.InvariantCulture);

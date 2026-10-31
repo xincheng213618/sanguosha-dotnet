@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessingEntries
 {
-    internal void AssertRegisteredExtraEffectsAndRankGuess(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AssertRegisteredExtraEffectsAndRankGuess(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginExtraEffectsAndRankGuess(global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginExtraEffectsAndRankGuess(effect, supplied);
     internal bool CanContinueExtraEffectsAndRankGuess(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueExtraEffectsAndRankGuess(f);
     internal bool CanOfferExtraEffectsAndRankGuess(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferExtraEffectsAndRankGuess(candidate, trigger, context);

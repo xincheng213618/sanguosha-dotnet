@@ -7,7 +7,6 @@ internal sealed partial class CharacterSunJunMobileShiEntries
     internal bool AllowsShiSjActivation(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsShiSjActivation(gate);
     internal bool AllowsShiSjDamageBenefit(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().AllowsShiSjDamageBenefit(c, t, context);
     internal void AnswerShiSj(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiSj(choice);
-    internal void AssertShiSj(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiSj(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShiSj(global::CardGame.Core.ProgramSkillFrame input, bool benefit) => _resolve().BeginShiSj(input, benefit);
     internal void CaptureShiSjActualHandUse(global::CardGame.Core.CardUseDeclaredEvent fact) => _resolve().CaptureShiSjActualHandUse(fact);
     internal void CaptureShiSjResponseHandUse(global::CardGame.Core.CardActionAcceptedEvent fact) => _resolve().CaptureShiSjResponseHandUse(fact);

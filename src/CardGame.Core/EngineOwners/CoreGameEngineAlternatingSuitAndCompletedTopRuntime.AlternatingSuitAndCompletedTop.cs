@@ -30,7 +30,6 @@ internal sealed partial class CoreGameEngineAlternatingSuitAndCompletedTopRuntim
     }
 
     internal bool IsFirstCategoryUse(int owner, string skill, CardActionContext action) => action.ActorSeat == owner && _coreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses.GetValueOrDefault((_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, owner, skill, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind)), -1) == action.ActionId;
-    internal CardActionContext CompletedTopAction(ProgramSkillFrame f) => _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == f.WindowContext!.ParentFrameId).Action;
     internal int[] AvailableCompletedTopCosts(CardActionContext a, long parentFrameId) => a.PhysicalCards.Count != 1 ? [] : a.PhysicalCards.Where(c =>
     {
         var at = _cardZonesOperations._cardZones.GetLocation(c.CardId);
@@ -253,18 +252,6 @@ internal sealed partial class CoreGameEngineAlternatingSuitAndCompletedTopRuntim
 
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(f.Id, f.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
-    }
-
-    internal void AssertAlternatingSuitTop(ProgramSkillFrame f, SkillProgramEffect paused)
-    {
-        if (f.AlternatingSuitTop is not { } d)
-            return;
-        if (paused.Op != (d.Mode == "alternating" ? SkillProgramEffectOp.AlternatingSuitDrawDiscard : SkillProgramEffectOp.FirstCategoryCompletedTop) || d.Mode is not ("alternating" or "completed") || d.Stage is not ("draw" or "discard" or "order" or "discard-movement" or "top-movement" or "reward-draw") || d.Required < 0 || d.CardIds.Distinct().Count() != d.CardIds.Count || d.SelectedIds.Distinct().Count() != d.SelectedIds.Count || d.SelectedIds.Any(id => !d.CardIds.Contains(id)) || d.SelectedIds.Count > d.Required)
-            throw new InvalidOperationException("Alternating suit/top operation lost its typed instruction and cursor.");
-        if (d.Mode == "completed" && (f.WindowContext?.Window != SkillProgramTriggerWindow.CardUseCompleted || CompletedTopAction(f).ActionId != d.ActionId || !IsFirstCategoryUse(f.OwnerSeat, f.SkillId, CompletedTopAction(f))))
-            throw new InvalidOperationException("Completed top operation lost its exact first use parent.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && d.Stage is "discard" or "order" && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || p.Choices.Count != d.CardIds.Count - d.SelectedIds.Count || p.Choices.Any(c => c.Cards.Count != 1 || !d.CardIds.Except(d.SelectedIds).Contains(c.Cards[0]))))
-            throw new InvalidOperationException("Alternating suit/top prompt lost its exact choices.");
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 120)]

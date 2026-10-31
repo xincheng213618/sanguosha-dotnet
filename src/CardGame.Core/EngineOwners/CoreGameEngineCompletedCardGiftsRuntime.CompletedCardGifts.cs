@@ -215,20 +215,5 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal bool IsValidCompletedGiftTargetSelection(ProgramSkillFrame frame) => frame.CompletedCardGiftDraft is { RecipientSeat: { } recipient, GiftWasRed: true } draft && _coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) && recipient != frame.OwnerSeat && frame.SelectedTargetSeats.SequenceEqual(new[] { recipient }) && frame.WindowContext is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } use } && use.CardActionId == draft.CardActionId && use.ActorSeat == frame.OwnerSeat && _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(item => item.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).OfType<CompletedCardGiftedEvent>().Any(gift => gift.FrameId == frame.Id && gift.CardActionId == draft.CardActionId && gift.OwnerSeat == frame.OwnerSeat && gift.RecipientSeat == recipient && gift.IsRed);
-    internal void AssertCompletedCardGiftDraft(ProgramSkillFrame frame, SkillProgramEffect paused)
-    {
-        if (frame.CompletedCardGiftDraft is not { } draft)
-            return;
-        if (paused.Op != SkillProgramEffectOp.OfferCompletedCardGift || CompletedGiftAction(frame).ActionId != draft.CardActionId || (draft.RecipientSeat is null ? draft.GiftWasRed || frame.SelectedTargetSeats.Count != 0 || draft.RequestTargetSeat is not null : !IsValidCompletedGiftTargetSelection(frame)))
-            throw new InvalidOperationException("A completed gift lost its action, recipient or physical gift provenance.");
-        if (draft.RequestTargetSeat is { } target && (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not { IsAssistedProgramUse: true } faction || faction.ProgramSkillFrameId != frame.Id || faction.TargetSeat != target || faction.OwnerSeat != draft.RecipientSeat))
-            throw new InvalidOperationException("A completed gift faction request lost its frozen target or recipient.");
-        if (!ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && draft.RequestTargetSeat is null && !_coreCompletedGiftQinglongRidesOperations.IsUnselectedCompletedGiftQinglongRide(frame) && !_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(child => child.Action is { } action && action.ParentActionId == draft.CardActionId && action.ActorSeat == draft.RecipientSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && action.PhysicalCards.Count > 0))
-            throw new InvalidOperationException("A completed gift lost its real recipient-owned Slash child.");
-        if (ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) && draft.RequestTargetSeat is null && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != (draft.RecipientSeat ?? frame.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, CompletedCardGiftChoices(frame))))
-            throw new InvalidOperationException("A completed gift prompt changed its frozen physical cards, recipient or chooser.");
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.ICompletedCardGiftProgramHost.OfferCompletedCardGift(ProgramSkillFrame frame) => OfferProgramCompletedCardGift(frame);
 }

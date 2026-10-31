@@ -128,11 +128,5 @@ internal sealed partial class CoreGameEngineShownEntityTurnPoliciesRuntime
                 throw new InvalidOperationException("Shown entity policy lost an exact public frozen recipient/color restriction.");
     }
 
-    internal void AssertShownEntityTurnPrograms()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>())
-            AssertShownEntityUseBenefits(use);
-    }
-
     void global::CardGame.Core.IShownEntityTurnPolicyHost.IssueShownEntityTurnPolicy(ProgramSkillFrame f, string bind, string stateId) => IssueShownEntityTurnPolicy(f, bind, stateId);
 }

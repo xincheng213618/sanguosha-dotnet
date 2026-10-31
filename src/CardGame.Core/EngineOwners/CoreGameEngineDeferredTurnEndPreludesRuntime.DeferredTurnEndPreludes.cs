@@ -45,19 +45,4 @@ internal sealed partial class CoreGameEngineDeferredTurnEndPreludesRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(parent with { Prelude = parent.Prelude!with { CurrentChild = null } });
         _coreDeferredHandAlignmentsOperations.ContinueDeferredTurnEnd();
     }
-
-    internal bool HasDeferredTurnEndPreludeBoundary(DeferredTurnEndFrame parent)
-    {
-        if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[1] is not CardsMovedTriggerWindowFrame window || !MatchesDeferredTurnEndPreludeChild(parent, window) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
-            throw new InvalidOperationException("The end prelude lost its exact movement batch child.");
-        var candidate = window.Candidates[window.CandidateIndex];
-        var context = _coreCardMovementProgramsOperations.CreateCardsMovedProgramContext(window, candidate);
-        if (_resolutionStackOperations._resolutionStack.Count == 2 && window.Step == ResolutionFrameStep.AwaitingResponse && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Optional && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } decision && decision.PlayerSeat == (context.OptionalChooserSeat ?? candidate.OwnerSeat) && decision.SourceSeat == (context.OptionalChooserSeat is not null ? candidate.OwnerSeat : context.SourceSeat) && // Optional prompts use the owner when the movement context has no explicit target.
- // Keep this boundary aligned with ExposeProgramTriggerDecision.
-        decision.TargetSeat == (context.OptionalChooserSeat ?? context.TargetSeat ?? candidate.OwnerSeat) && decision.Choices.Count == 2 && decision.Choices.All(c => c.Parameters.GetValueOrDefault("skill-id") == candidate.SkillId && c.Parameters.GetValueOrDefault("binding-id") == candidate.BindingId && c.Parameters.GetValueOrDefault("skill-instance-id") == candidate.SkillInstanceId) && decision.Choices.Select(c => c.Parameters.GetValueOrDefault("program-action")).Order(StringComparer.Ordinal).SequenceEqual(["activate", "skip"]))
-            return true;
-        if (_resolutionStackOperations._resolutionStack.Count < 3 || _resolutionStackOperations._resolutionStack[2] is not ProgramSkillFrame child || child.WindowContext != context || child.OwnerSeat != candidate.OwnerSeat || child.SkillId != candidate.SkillId || child.SkillInstanceId != candidate.SkillInstanceId || child.TriggerId != candidate.BindingId || child.ActivationId != candidate.BindingId || child.GameplayHash != candidate.GameplayHash)
-            throw new InvalidOperationException("The end prelude movement window lost its exact candidate, prompt or program child.");
-        return true;
-    }
 }

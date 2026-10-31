@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsEntries
 {
     internal global::CardGame.Core.SkillProgramStepOutcome AddOneDistanceFreeCurrentUseTarget(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().AddOneDistanceFreeCurrentUseTarget(supplied);
     internal void AssertDesignatedExtraTargetDraft(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect paused) => _resolve().AssertDesignatedExtraTargetDraft(frame, paused);
-    internal void AssertRegisteredDesignatedExtraTargetDraft(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ProgramExecutionPlan plan) => _resolve().AssertRegisteredDesignatedExtraTargetDraft(frame, plan);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BuildDesignatedExtraTargetChoices(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardUseFrame use) => _resolve().BuildDesignatedExtraTargetChoices(frame, use);
     internal bool CanBeDistanceFreeDesignatedTarget(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CharacterState target) => _resolve().CanBeDistanceFreeDesignatedTarget(use, target);
     internal bool CanOfferDesignatedExtraTarget(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferDesignatedExtraTarget(candidate, trigger, context);

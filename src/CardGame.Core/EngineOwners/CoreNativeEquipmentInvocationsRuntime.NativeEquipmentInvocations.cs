@@ -126,25 +126,11 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
             return _characterHuaTuoAnniversaryGodOperations.SkillInvocationStructuralEdge(parent, child);
         return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreObserverSubtreesOperations.IsMovementObserverEdge(index);
     }
-
-    internal bool HasNativeEquipmentInvocation(long attackId) => FindNativeEquipmentInvocation(attackId)is { AttackRoot.CardAttack.Active: true } && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId == attackId;
     internal ResolutionFrame? NativeEquipmentInvariantTop(ResolutionFrame? actualTop)
     {
         if (actualTop?.Id != _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id || actualTop is DyingFrame or JudgmentFrame or CardUseFrame)
             return actualTop;
         return _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && FindNativeEquipmentInvocation(attack.ResolutionId)is { } projection ? projection.Parent : actualTop;
-    }
-
-    internal bool HasFactionDefenseEquipmentInvocation(global::CardGame.Core.NativeOwners.FactionDefenseHandle defense) => FindNativeEquipmentInvocation(defense.OwnerFrameId)is { Receipt.Kind: NativeEquipmentInvocationKind.FactionBagua } projection && projection.Parent is ResponseWindowFrame response && response.ParentFrameId == defense.OwnerFrameId && response.ResponderSeat == defense.OwnerSeat && projection.Receipt.ActorSeat == defense.CurrentCandidateSeat && projection.Receipt.TargetSeat == defense.OwnerSeat && HasNativeEquipmentInvocation(defense.OwnerFrameId);
-    internal bool HasQinglongFactionEquipmentInvocation(global::CardGame.Core.NativeOwners.FactionCardRequestHandle request) => request.IsQinglongCrescentBladeUse && !request.AwaitingProviders && !request.AwaitingZhuqueFanChoice && request.ActiveAttack is null && request.QinglongCrescentBlade is { } qinglong && FindNativeEquipmentInvocation(qinglong.OwnerFrameId)is { Receipt.Kind: NativeEquipmentInvocationKind.Qinglong } projection && projection.Receipt.FactionRequestId == request.OwnerFrameId && projection.Receipt.ActorSeat == request.OwnerSeat && projection.Receipt.PhysicalOwnerSeat == request.CurrentCandidateSeat && projection.Receipt.TargetSeat == request.TargetSeat && HasNativeEquipmentInvocation(qinglong.OwnerFrameId);
-    internal void AssertNativeEquipmentInvocations()
-    {
-        foreach (var parent in _resolutionStackOperations._resolutionStack.Where(f => f.NativeEquipmentInvocation is not null))
-        {
-            var r = parent.NativeEquipmentInvocation!;
-            if (r.ParentFrameId != parent.Id || !Enum.IsDefined(r.Kind) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.PhysicalCardIds is not System.Collections.IList { IsReadOnly: true } || r.PhysicalFrom is not System.Collections.IList { IsReadOnly: true } || r.PhysicalFrom.Count != r.PhysicalCardIds.Count || r.PhysicalCardIds.Distinct().Count() != r.PhysicalCardIds.Count || r.CommitmentNonce.Length != 16 || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeEquipmentInvocationIssuedEvent>().Count(e => e == new NativeEquipmentInvocationIssuedEvent(parent.Id, r.AttackId, r.Kind, r.ActorSeat, r.TargetSeat, r.SkillKey, r.OccurrenceKey, NativeEquipmentFingerprint(r))) != 1 || FindNativeEquipmentInvocation(r.AttackId)is not { } projection || projection.Parent.Id != parent.Id)
-                throw new InvalidOperationException("Native equipment lost its original owned activation and exact typed invocation child.");
-        }
     }
 
     internal void ContinueNativeEquipmentInvocation(SkillInvocationFrame frame)

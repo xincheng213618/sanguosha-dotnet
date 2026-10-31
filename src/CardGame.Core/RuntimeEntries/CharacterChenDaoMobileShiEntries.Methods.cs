@@ -4,7 +4,6 @@ internal sealed partial class CharacterChenDaoMobileShiEntries
 {
     internal void AnswerShiCdChoice(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerShiCdChoice(choice);
     internal void AppendShiCdEnding(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendShiCdEnding(items);
-    internal void AssertShiCdChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertShiCdChoice(f);
     internal void BindShiCdDraw(global::CardGame.Core.ProgramSkillFrame supplied, int count) => _resolve().BindShiCdDraw(supplied, count);
     internal bool CanOfferShiCd(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanOfferShiCd(g);
     internal void CaptureShiCdUse(global::CardGame.Core.IGameEvent payload) => _resolve().CaptureShiCdUse(payload);

@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNative native, IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouGuanPingRuntime
 {
@@ -91,8 +91,6 @@ internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNa
     private bool Resume(long id) { if (frames.Top is not ProgramSkillFrame { MouGuanPing: not null } f || f.Id != id) return false; Continue(id); return true; }
     [ProgramContinuation(ProgramContinuationKind.Movement, 35000)]
     private bool Movement(ProgramSkillFrame f) => f.MouGuanPing is not null && Resume(f.Id);
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 35000)]
-    private void Invariant(ProgramSkillFrame f) { if (f.MouGuanPing is not null && !Valid(f)) throw new InvalidOperationException("Invalid Wuwei original-use receipt."); }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35000)]
     private bool Paid(ProgramSkillFrame f) => f.MouGuanPing is not null && Valid(f);

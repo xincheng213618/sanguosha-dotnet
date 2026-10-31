@@ -24,7 +24,6 @@ internal interface INativeDrawProducerQueries : IProgramSelectionQuery
     long MovementSequence { get; }
     ProgramExecutionPlan ResolvePlan(ProgramSkillFrame frame);
     bool HasOperationReturn(SkillProgramEffectOp operation);
-    IEnumerable<NativeDrawAttemptDecidedEvent> DecidedEvents();
 }
 
 internal interface INativeDrawProducerOperations : IProgramRuntimeOperations
@@ -60,8 +59,6 @@ internal interface INativeDrawAttemptQueries : IProgramSelectionQuery
     IReadOnlyList<ProgramTriggerCandidate> CollectCandidates(int seat, SkillProgramTriggerFacts facts);
     IEnumerable<CardMovementRecord> Movements();
     bool IsRedirectedGain(CardMovementRecord movement, CardLocation expectedTo);
-    IEnumerable<NativeDrawAttemptStartedEvent> StartedEvents();
-    IEnumerable<NativeDrawAttemptDecidedEvent> DecidedEvents();
     NativeDrawPileSlashProof? DrawPileSlashReplacementProof(ProgramSkillFrame frame, NativeDrawAttemptContext context);
     bool IsIssuedDrawPileSlashReplacement(NativeDrawAttemptContext context, NativeDrawReplacementResult replacement);
 }

@@ -71,14 +71,6 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
         return true;
     }
 
-    internal bool HasAnniversaryYanXiangPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Step: ResolutionFrameStep.AwaitingResponse, AnniversaryYanXiang.Stage: AnniversaryYanXiangStage.Option or AnniversaryYanXiangStage.HandCards or AnniversaryYanXiangStage.DamageName or AnniversaryYanXiangStage.UseChoice } f && p.PlayerSeat == YanXiangChooser(f) && p.TargetSeat == p.PlayerSeat && p.SourceSeat == f.OwnerSeat && ValidYanXiang(f) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, YanXiangChoices(f));
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 46800)]
-    internal void AssertYanXiang(ProgramSkillFrame f)
-    {
-        if (f.AnniversaryYanXiang is not null && (!ValidYanXiang(f) || f.PendingMovementContinuation is { } p && !YanXiangMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p)))
-            throw new InvalidOperationException("Yan Xiang lost his original candidate, recipient, paid movement, issued lease or whole native return.");
-    }
-
     [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46800)]
     [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46800)]
     [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46800)]
@@ -107,7 +99,6 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
     internal bool YanXiangDamageObserver(long id) => YanXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46800)]
     internal bool YanXiangBeforeDamage(long id) => YanXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramDyingProof(ProgramDyingProofPhase.Invariant, 46800)]
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46800)]
     internal bool YanXiangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && YanXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46800)]

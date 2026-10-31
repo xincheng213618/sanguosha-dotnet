@@ -91,7 +91,6 @@ internal sealed partial class CharacterLiuPanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Pijing: { } r } f || f.Id != id)
             return;
-        AssertPijing(f);
         if (r.Stage is PijingStage.Toggles or PijingStage.Reciprocal)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -151,7 +150,6 @@ internal sealed partial class CharacterLiuPanOlRuntime
     {
         if (f.Pijing is null)
             return false;
-        AssertPijing(f);
         return true;
     }
 

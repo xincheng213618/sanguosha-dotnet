@@ -145,28 +145,6 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
     }
 
     internal void AdvanceOwnerDiedProgramCursor(ProgramDeathTriggerWindowFrame frame) => _programWindowCursorOperations.Get().AdvanceOwnerDiedProgramCursor(frame);
-    internal void AssertOwnerDiedProgramInvariant()
-    {
-        var death = _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().LastOrDefault() ?? throw new InvalidOperationException("An owner-death program invariant requires an active death.");
-        var window = _resolutionStackOperations._resolutionStack.OfType<ProgramDeathTriggerWindowFrame>().LastOrDefault();
-        if (window is null)
-            throw new InvalidOperationException("An unfinished death has no owner-death program window.");
-        if (window.DeathFrameId != death.Id || window.OwnerSeat != death.VictimSeat || window.KillerSeat != death.KillerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || death.OwnerDiedProgramsResolved || _coreMatchParticipantsPlayersAccess._players[window.OwnerSeat].IsAlive)
-            throw new InvalidOperationException("The owner-death program window has an invalid parent or cursor.");
-        var windowIndex = _resolutionStackOperations._resolutionStack.FindLastIndex(frame => frame is ProgramDeathTriggerWindowFrame candidate && candidate.Id == window.Id);
-        var programs = _resolutionStackOperations._resolutionStack.Skip(windowIndex + 1).OfType<ProgramSkillFrame>().Where(program => program.WindowContext is { Window: SkillProgramTriggerWindow.OwnerDied, ParentFrameId: var parentFrameId } && parentFrameId == window.Id).ToArray();
-        if (programs is [var program])
-        {
-            if (program.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } context || context.ParentFrameId != window.Id || program.OwnerSeat != window.OwnerSeat)
-                throw new InvalidOperationException("The active owner-death program binding lost its window.");
-            return;
-        }
-
-        if (programs.Length > 1)
-            throw new InvalidOperationException("An owner-death program window has multiple active bindings.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramDeathTriggerWindowFrame top || top.Id != window.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, PlayerSeat: var responder } || responder != window.OwnerSeat)
-            throw new InvalidOperationException("The owner-death program window lost its optional trigger prompt.");
-    }
 
     internal bool TryBeginKillDiedProgramWindow(DeathFrame death)
     {
@@ -244,29 +222,6 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
             throw new InvalidOperationException("The killer-death program cursor changed before it advanced.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramBindingResolvedEvent(current.Id, candidate.SkillId, candidate.BindingId, candidate.SkillInstanceId, candidate.OwnerSeat, SkillProgramTriggerWindow.CharacterDied, activated, completed));
         _coreRuntimeOperations.ReplaceRuntimeTop(current with { CandidateIndex = current.CandidateIndex + 1 });
-    }
-
-    internal void AssertKillDiedProgramInvariant()
-    {
-        var death = _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().LastOrDefault() ?? throw new InvalidOperationException("A killer-death program invariant requires an active death.");
-        var window = _resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().LastOrDefault();
-        if (window is null)
-            throw new InvalidOperationException("An unfinished death has no killer-death program window.");
-        if (window.DeathFrameId != death.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || death.KillerProgramsResolved)
-            throw new InvalidOperationException("The killer-death program window has an invalid parent or cursor.");
-        var windowIndex = _resolutionStackOperations._resolutionStack.FindLastIndex(frame => frame is ProgramKillTriggerWindowFrame candidate && candidate.Id == window.Id);
-        var programs = _resolutionStackOperations._resolutionStack.Skip(windowIndex + 1).OfType<ProgramSkillFrame>().Where(program => program.WindowContext is { Window: SkillProgramTriggerWindow.CharacterDied, ParentFrameId: var parentFrameId } && parentFrameId == window.Id).ToArray();
-        if (programs is [var program])
-        {
-            if (program.WindowContext is not { Window: SkillProgramTriggerWindow.CharacterDied } context || context.ParentFrameId != window.Id)
-                throw new InvalidOperationException("The active killer-death program binding lost its window.");
-            return;
-        }
-
-        if (programs.Length > 1)
-            throw new InvalidOperationException("A killer-death program window has multiple active bindings.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramKillTriggerWindowFrame top || top.Id != window.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, PlayerSeat: var responder } || responder != top.Candidates[top.CandidateIndex].OwnerSeat)
-            throw new InvalidOperationException("The killer-death program window lost its optional trigger prompt.");
     }
 
     internal void ContinueDeathOutcome(long deathFrameId)

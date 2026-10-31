@@ -268,14 +268,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         if (query.ParentFrameId != parent.Id || query.ParentKind != parent.Kind || parent is not ProgramSkillFrame program || query.InstructionIndex != program.InstructionIndex || query.TargetSeat < 0 || !HasHappyQiaoHealth(query.TargetSeat) || string.IsNullOrWhiteSpace(query.QueryKey) || selected != query.Pool.HasValue || !selected && _coreMatchParticipantsPlayersAccess._players[query.TargetSeat].HappyQiaoHealth != query.Before || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyQiaoHealthRequestedEvent>().Count(e => e == new HappyQiaoHealthRequestedEvent(query.Id, parent.Id, query.TargetSeat, HpChangeKind.Setting, 0, HappyQiaoHealthReturnKind.Query, query.QueryKey)) != 1 || selected && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyQiaoHealthPoolSelectedEvent>().Count(e => e == new HappyQiaoHealthPoolSelectedEvent(query.Id, parent.Id, query.TargetSeat, query.Pool!.Value, query.Before.Hp(query.Pool.Value), query.Before.MaximumHp)) != 1)
             throw new InvalidOperationException("Qiao query lost its exact key, original instruction, frozen values or selected sister.");
     }
-
-    internal bool HasHappyQiaoHealthPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is HappyQiaoHealthChoiceFrame f && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == f.OwnerSeat && HappyQiaoHealthChoices(f).Select(c => c.Id).SequenceEqual(p.Choices.Select(c => c.Id));
     internal bool HasHappyQiaoHealthChoiceInSubtree(long id) => _resolutionStackOperations._resolutionStack.LastOrDefault()is HappyQiaoHealthChoiceFrame f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id) <= _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.ParentFrameId) && _resolutionStackOperations._resolutionStack.Any(p => p.Id == id) && HappyQiaoHealthChoiceRidesOn(f, _resolutionStackOperations._resolutionStack[^2]);
-    internal void AssertHappyQiaoHealthFrames()
-    {
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<HappyQiaoHealthChoiceFrame>())
-            RequireHappyQiaoHealthChoice(f);
-    }
 
     internal void CompleteHappyQiaoHealthPayment(long parentFrameId, int targetSeat, HpChangeKind kind, int before, int after)
     {

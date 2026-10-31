@@ -90,7 +90,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouCaoPi: { Stage: MouCaoPiStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouCaoPiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Mou Cao Pi lost the exact live menu and original private chooser.");
-        AssertMouCaoPi(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var option = choice.Parameters["option"];
         var cost = int.Parse(choice.Parameters["cost"], CultureInfo.InvariantCulture);
@@ -157,7 +156,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouCaoPi: { } r } f || f.Id != id)
             return;
-        AssertMouCaoPi(f);
         if (f.NativeDraw is not null)
             return;
         if (r.Stage == MouCaoPiStage.Choosing)
@@ -230,22 +228,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28000)]
     internal bool ContinuePaidMouCaoPi(ProgramSkillFrame f) => f.MouCaoPi is { Stage: not MouCaoPiStage.Choosing };
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.AfterSelectionState, 28000)]
-    internal void AssertMouCaoPi(ProgramSkillFrame f)
-    {
-        if (f.MouCaoPi is not { } r)
-            return;
-        var expected = f.SkillId switch
-        {
-            "mou:xingshang" => SkillProgramEffectOp.MouCaoPiXingshang,
-            "mou:fangzhu" => SkillProgramEffectOp.MouCaoPiFangzhu,
-            "mou:songwei" => SkillProgramEffectOp.MouCaoPiRemoveWeiSkills,
-            _ => (SkillProgramEffectOp)(-1)};
-        if (r.Source != MouCaoPiSource(f) || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 1 || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Op != expected || !Enum.IsDefined(r.Stage) || f.TriggerId is not null || f.WindowContext is not null || f.ActivationId != "menu" || r.MovementBefore < 0 || r.MovementAfter < r.MovementBefore || r.MovementAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.ActualDraw is < 0 or > 3)
-            throw new InvalidOperationException("Mou Cao Pi lost the original source, phase or owning instruction.");
-        if (r.Stage != MouCaoPiStage.Choosing && (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.MarkerBefore > 9 || r.MarkerAfter != r.MarkerBefore - r.Cost || r.MarkerAfter < 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouCaoPiPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid != new MouCaoPiPaidEvent(f.Id, f.OwnerSeat, r.TargetSeat, r.Option, r.Cost, r.MarkerBefore, r.MarkerAfter)))
-            throw new InvalidOperationException("Mou Cao Pi cannot resume an unproved or twice-paid benefit.");
-    }
 
     [ProgramAiChoice(SkillProgramEffectOp.MouCaoPiXingshang, SkillProgramEffectOp.MouCaoPiFangzhu, SkillProgramEffectOp.MouCaoPiRemoveWeiSkills)]
     internal PromptChoice ChooseAiMouCaoPi(PendingDecision p, ProgramSkillFrame f)

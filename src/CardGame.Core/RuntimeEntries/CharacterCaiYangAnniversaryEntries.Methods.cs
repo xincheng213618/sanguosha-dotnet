@@ -5,7 +5,6 @@ internal sealed partial class CharacterCaiYangAnniversaryEntries
     internal bool AdmitCaiYangXunji(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().AdmitCaiYangXunji(c, w);
     internal bool AdvanceCaiYangObserver() => _resolve().AdvanceCaiYangObserver();
     internal void AppendCaiYangEnding(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendCaiYangEnding(items);
-    internal void AssertCaiYangXunjiDuelUse(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSelectedActorDuelOrigin origin) => _resolve().AssertCaiYangXunjiDuelUse(use, origin);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginCaiYang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginCaiYang(supplied, operation);
     internal int CaiYangChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => _resolve().CaiYangChainCursor(a);
     internal global::CardGame.Core.CaiYangXunjiOrigin? CaiYangDuelDamage(int owner, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CaiYangDuelDamage(owner, w);
@@ -24,7 +23,6 @@ internal sealed partial class CharacterCaiYangAnniversaryEntries
     internal bool HasCaiYangObserverDying() => _resolve().HasCaiYangObserverDying();
     internal bool HasCaiYangPaidDamageObserver(long id) => _resolve().HasCaiYangPaidDamageObserver(id);
     internal bool KeepCaiYangIssued(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepCaiYangIssued(f);
-    internal void RequireCaiYang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireCaiYang(f);
     internal bool ResumeAnniversaryCaiYangJiaofengSourceWindow(global::CardGame.Core.BeforeDamageProgramWindowFrame p, global::CardGame.Core.GameEngine.IDamageAttempt a) => _resolve().ResumeAnniversaryCaiYangJiaofengSourceWindow(p, a);
     internal bool ResumeCaiYang(long id) => _resolve().ResumeCaiYang(id);
     internal void ReturnCaiYangDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome draw) => _resolve().ReturnCaiYangDraw(supplied, draw);

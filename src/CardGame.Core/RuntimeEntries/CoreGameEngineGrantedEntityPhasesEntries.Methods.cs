@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineGrantedEntityPhasesEntries
 {
-    internal void AssertGrantedEntityPhase(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertGrantedEntityPhase(f);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGrantedEntityPlayPhase(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginGrantedEntityPlayPhase(input);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginGrantedPhaseSlashClaim(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginGrantedPhaseSlashClaim(input);
     internal bool CanOfferGrantedPhaseSlash(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().CanOfferGrantedPhaseSlash(candidate, trigger);

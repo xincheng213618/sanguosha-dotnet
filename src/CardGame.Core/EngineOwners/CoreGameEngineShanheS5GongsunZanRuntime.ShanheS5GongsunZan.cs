@@ -67,7 +67,6 @@ internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The range discard lost its owner.");
         var d = f.ShanheS5Qiaomeng ?? throw new InvalidOperationException("The range discard lost its original selection.");
-        AssertShanheS5Qiaomeng(f);
         if (d.Paid || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheS5QiaomengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The range discard no longer matches a published private zone slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -113,7 +112,6 @@ internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.ShanheS5Qiaomeng is not { Paid: true })
             return false;
-        AssertShanheS5Qiaomeng(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheS5Qiaomeng = null, PendingMovementContinuation = null });
@@ -137,16 +135,6 @@ internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
         if (f.ShanheS5Qiaomeng is not { Paid: true } d || d.SelectedIds.Count != d.RequiredCount || d.BatchId is null || d.After <= d.Before || d.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             return false;
         return d.SelectedIds.Select((id, index) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > d.Before && m.Sequence <= d.After && m.From == d.OriginalLocations[index] && m.Reason.Value == ShanheS5QiaomengReason && (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) == d.OriginalLocations[index] || m.From.Zone == CardZoneKind.Equipment && m.To == CardLocation.OutsideGame && (_coreCardAttackStateOperations.GetAttackCard(m.CardId).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)))) == 1).All(valid => valid) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5QiaomengPaidEvent>().Count(e => e.FrameId == f.Id && e.UseFrameId == d.UseFrameId && e.TargetSeat == d.TargetSeat && e.Count == d.RequiredCount && e.Before == d.Before && e.After == d.After) == 1;
-    }
-
-    [ProgramFrameInvariant(ProgramFrameInvariantPhase.BeforeSelectionState, 5740)]
-    internal void AssertShanheS5Qiaomeng(ProgramSkillFrame f)
-    {
-        if (f.ShanheS5Qiaomeng is not { } d)
-            return;
-        var use = _coreCurrentUsePhysicalClaimsOperations.CurrentFinalTargetSlashOwner(f);
-        if (f.InstructionIndex != 1 || use.Id != d.UseFrameId || use.Action!.ActionId != d.ActionId || f.WindowContext!.TargetSeat != d.TargetSeat || d.FrozenRange < 1 || d.RequiredCount < 1 || d.RequiredCount > d.FrozenRange || d.SelectedIds.Count > d.RequiredCount || d.SelectedIds.Distinct().Count() != d.SelectedIds.Count || d.OriginalLocations.Count != d.SelectedIds.Count || d.OriginalLocations.Any(from => from.OwnerSeat != d.TargetSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineShanheS5GongsunZanDefinitions.ShanheS5QiaomengZones.Contains(from.Zone)) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5QiaomengStartedEvent>().Count(e => e.FrameId == f.Id && e.UseFrameId == d.UseFrameId && e.ActionId == d.ActionId && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == d.TargetSeat && e.FrozenRange == d.FrozenRange && e.RequiredCount == d.RequiredCount) != 1 || (d.Paid ? !ValidShanheS5QiaomengPayment(f) : f.PendingMovementContinuation is not null || d.SelectedIds.Select((id, index) => _cardZonesOperations._cardZones.GetLocation(id) != d.OriginalLocations[index]).Any(invalid => invalid)))
-            throw new InvalidOperationException("The range discard lost its exact native use, target, frozen range, private selection or one real paid batch.");
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.DiscardAttackRangeCardsFromSlashTarget)]

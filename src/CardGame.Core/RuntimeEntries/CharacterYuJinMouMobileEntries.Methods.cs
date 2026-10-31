@@ -4,7 +4,6 @@ internal sealed partial class CharacterYuJinMouMobileEntries
 {
     internal bool AdvanceMouYuJinChildren() => _resolve().AdvanceMouYuJinChildren();
     internal void AnswerMouJieyueGift(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerMouJieyueGift(selected);
-    internal void AssertMouYuJin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMouYuJin(f);
     internal bool CanOfferMouJieyue(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferMouJieyue(c);
     internal bool CanOfferMouXiayuan(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferMouXiayuan(c);
     internal void CompleteMouJieyue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompleteMouJieyue(f);
