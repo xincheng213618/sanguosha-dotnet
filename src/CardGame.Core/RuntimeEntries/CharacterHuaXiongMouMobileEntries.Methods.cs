@@ -9,8 +9,6 @@ internal sealed partial class CharacterHuaXiongMouMobileEntries
     internal bool CanOfferMouYaowu(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().CanOfferMouYaowu(c);
     internal void CommitMouYaowuChoice(global::CardGame.Core.ProgramSkillFrame f, string benefit, int? recipient) => _resolve().CommitMouYaowuChoice(f, benefit, recipient);
     internal bool DistanceCardUseExemption20HasMouHuaXiongWei(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().DistanceCardUseExemption20HasMouHuaXiongWei(q);
-    internal bool HasMouHuaXiongBeforeDamageObserver(long id) => _resolve().HasMouHuaXiongBeforeDamageObserver(id);
-    internal bool HasMouHuaXiongDamageObserver(long id) => _resolve().HasMouHuaXiongDamageObserver(id);
     internal bool HasMouHuaXiongWei(int owner) => _resolve().HasMouHuaXiongWei(owner);
     internal bool IsMouHuaXiongDying() => _resolve().IsMouHuaXiongDying();
     internal bool IsMouHuaXiongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouHuaXiongRecoveryParent(f, recovery);

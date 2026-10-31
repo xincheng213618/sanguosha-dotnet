@@ -14,7 +14,6 @@ internal sealed partial class CharacterQiaoZhouOlEntries
     internal void ContinueQiaoZhouPreparation(long frameId) => _resolve().ContinueQiaoZhouPreparation(frameId);
     internal bool DrainQiaoZhouChildren(long id) => _resolve().DrainQiaoZhouChildren(id);
     internal void ExpireQiaoZhouForecasts(global::CardGame.Core.IGameEvent payload) => _resolve().ExpireQiaoZhouForecasts(payload);
-    internal bool HasQiaoZhouDamageObserver(long id) => _resolve().HasQiaoZhouDamageObserver(id);
     internal bool IsQiaoZhouPreparationMovement(global::CardGame.Core.QiaoZhouPreparationFrame f, global::CardGame.Core.CardsMovedTriggerWindowFrame child) => _resolve().IsQiaoZhouPreparationMovement(f, child);
     internal void PayQiaoZhouPreparation(global::CardGame.Core.QiaoZhouPreparationFrame f, int cardId) => _resolve().PayQiaoZhouPreparation(f, cardId);
     internal void PublishQiaoZhouForecast(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishQiaoZhouForecast(f);

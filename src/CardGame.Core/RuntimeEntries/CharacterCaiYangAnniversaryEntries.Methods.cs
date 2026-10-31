@@ -19,9 +19,7 @@ internal sealed partial class CharacterCaiYangAnniversaryEntries
     internal bool DrainCaiYang(long id) => _resolve().DrainCaiYang(id);
     internal void ExpireCaiYangXunji(global::CardGame.Core.TurnEndedEvent t) => _resolve().ExpireCaiYangXunji(t);
     internal void FinishCaiYang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCaiYang(f);
-    internal bool HasCaiYangBeforeDamageObserver(long id) => _resolve().HasCaiYangBeforeDamageObserver(id);
     internal bool HasCaiYangObserverDying() => _resolve().HasCaiYangObserverDying();
-    internal bool HasCaiYangPaidDamageObserver(long id) => _resolve().HasCaiYangPaidDamageObserver(id);
     internal bool KeepCaiYangIssued(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepCaiYangIssued(f);
     internal bool ResumeAnniversaryCaiYangJiaofengSourceWindow(global::CardGame.Core.BeforeDamageProgramWindowFrame p, global::CardGame.Core.GameEngine.IDamageAttempt a) => _resolve().ResumeAnniversaryCaiYangJiaofengSourceWindow(p, a);
     internal bool ResumeCaiYang(long id) => _resolve().ResumeCaiYang(id);

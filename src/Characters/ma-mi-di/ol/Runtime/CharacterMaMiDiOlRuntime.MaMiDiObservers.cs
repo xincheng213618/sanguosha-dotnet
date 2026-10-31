@@ -8,8 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaMiDiOlRuntime
 {
     internal bool IsMaMiDiStepMovement(MaMiDiDiscardStep step, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > step.Before && m.Sequence <= step.After && (m.CardId == step.CardId && m.CardKind == step.Kind && m.From == step.From && m.To == step.To && m.Reason.Value == MaMiDiDiscardReason || step.Kind == CardKind.WoodenOx && step.From == CardLocation.Equipment(step.TargetSeat) && step.WoodenOxGrain.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(step.TargetSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 610)]
-    internal bool IsMaMiDiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.MaMiDi is { Stage: MaMiDiStage.TargetChildren } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.BeforeCount == 0 && p.CoverageResultBind is null && p.SubjectSeat == MaMiDiCurrentTarget(r).Target;
     internal bool MaMiDiLion(ProgramSkillFrame f) => f.MaMiDi is { Stage: MaMiDiStage.TargetChildren, Steps.Count: > 0 } r && r.Steps[^1] is { Kind: CardKind.SilverLion, From.Zone: CardZoneKind.Equipment };
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 800)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 740)]
@@ -32,11 +30,6 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     }
 
     internal ProgramSkillFrame? MaMiDiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterMaMiDiOlOperations.MaMiDiFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 630)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 740)]
-    internal bool HasMaMiDiDamageObserver(long id) => MaMiDiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 770)]
-    internal bool HasMaMiDiBeforeDamageObserver(long id) => MaMiDiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27070)]
     internal bool AdvanceMaMiDiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MaMiDiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

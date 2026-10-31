@@ -20,11 +20,9 @@ internal sealed partial class CharacterXinXianYingMobileShiEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> ShiXinXianYingPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().ShiXinXianYingPublicStates(owner, skillId);
     internal global::CardGame.Core.PromptChoice ShiXxyAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiXxyAi(p, f);
     internal bool ShiXxyAlcoholDebit(long id, int actor) => _resolve().ShiXxyAlcoholDebit(id, actor);
-    internal bool ShiXxyBeforeDamageChild(long id) => _resolve().ShiXxyBeforeDamageChild(id);
     internal bool ShiXxyChildEdge(int i) => _resolve().ShiXxyChildEdge(i);
     internal bool ShiXxyChildSuffix(int n) => _resolve().ShiXxyChildSuffix(n);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiXxyChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiXxyChoices(f);
-    internal bool ShiXxyDamageChild(long id) => _resolve().ShiXxyDamageChild(id);
     internal bool ShiXxyDyingChild() => _resolve().ShiXxyDyingChild();
     internal bool ShiXxyFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiXxyFirstChild(f, child);
     internal bool ShiXxyMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShiXxyMovementProof(f, effect, p);

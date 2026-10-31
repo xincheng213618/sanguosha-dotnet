@@ -5,7 +5,6 @@ internal sealed partial class CoreGameEnginePairedHandRecastEntries
     internal global::CardGame.Core.SkillProgramStepOutcome BeginPairedHandRecast(global::CardGame.Core.ProgramSkillFrame supplied, int partnerSeat) => _resolve().BeginPairedHandRecast(supplied, partnerSeat);
     internal bool CanContinuePairedHandRecast(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinuePairedHandRecast(f);
     internal bool DrainPairedHandRecastChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainPairedHandRecastChildren(f);
-    internal bool IsPairedHandRecastMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsPairedHandRecastMovement(f, effect, pending);
     internal void IssuePairedHandRecastCost(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssuePairedHandRecastCost(f);
     internal void IssuePairedHandRecastDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssuePairedHandRecastDraw(f);
     internal global::CardGame.Core.PairedHandRecastMaterial[] PairedHandMaterials(int seat) => _resolve().PairedHandMaterials(seat);

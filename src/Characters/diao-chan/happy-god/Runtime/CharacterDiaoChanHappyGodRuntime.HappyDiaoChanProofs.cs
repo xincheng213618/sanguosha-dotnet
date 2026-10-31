@@ -78,9 +78,6 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
 
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 42220)]
-    internal bool HappyDcMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.HappyDiaoChan is { } r && effect?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is HappyDiaoChanStage.CostChildren or HappyDiaoChanStage.PindianChildren or HappyDiaoChanStage.GiveChildren && ValidHappyDc(f);
     internal bool IsHappyDiaoChanPindianSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch)
     {
         if (f.HappyDiaoChan is not { Stage: HappyDiaoChanStage.PindianChildren, Result: { } result } r || !ValidHappyDc(f) || batch.ParentFrameId != r.PindianId || batch.AwaitingProgramFrameId is not null || batch.TurnNumber != r.ActualTurn || batch.OriginSkillId != f.SkillId || batch.OriginSkillInstanceId != f.SkillInstanceId || batch.OriginOwnerSeat != f.OwnerSeat || batch.Movements.Count is < 1 or > 2)

@@ -30,8 +30,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool FinishWuJingFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => _resolve().FinishWuJingFactionDeclined(id, pending);
     internal bool FinishWuJingPaidAdapter(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWuJingPaidAdapter(f);
     internal bool HasIssuedWuJingHejiDistance(long? useId, int actor) => _resolve().HasIssuedWuJingHejiDistance(useId, actor);
-    internal bool HasWuJingBeforeDamageObserver(long id) => _resolve().HasWuJingBeforeDamageObserver(id);
-    internal bool HasWuJingDamageObserver(long id) => _resolve().HasWuJingDamageObserver(id);
     internal bool HasWuJingFactionDistance(int actor, int target) => _resolve().HasWuJingFactionDistance(actor, target);
     internal bool HasWuJingHejiTrickPaymentTail(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation) => _resolve().HasWuJingHejiTrickPaymentTail(use, continuation);
     internal bool HasWuJingZeroSupply(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasWuJingZeroSupply(f);
@@ -42,7 +40,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool IsWuJingHejiUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsWuJingHejiUse(use);
     internal bool IsWuJingHejiZeroUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsWuJingHejiZeroUse(use);
     internal bool IsWuJingLiubingCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsWuJingLiubingCandidate(c);
-    internal bool IsWuJingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWuJingMovement(f, e, p);
     internal bool IsWuJingNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsWuJingNativeSettlementBatch(f, batch);
     internal void ObserveWuJingNativeUse(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveWuJingNativeUse(payload);
     internal void PrepareWuJingChainedSlash(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ChainedStateBasicPayment p) => _resolve().PrepareWuJingChainedSlash(f, p);

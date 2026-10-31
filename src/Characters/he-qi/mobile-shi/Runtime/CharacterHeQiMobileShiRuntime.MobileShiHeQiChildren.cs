@@ -23,11 +23,6 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
     internal ProgramSkillFrame? ShiHqObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterHeQiMobileShiOperations.ShiHqFirstChild(f, child), (n) => _characterHeQiMobileShiOperations.ShiHqChildSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49000)]
     internal bool ShiHqDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiHqObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 49000)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 49000)]
-    internal bool ShiHqDamageChild(long id) => ShiHqObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49000)]
-    internal bool ShiHqBeforeDamageChild(long id) => ShiHqObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 49000)]
     internal bool ShiHqRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

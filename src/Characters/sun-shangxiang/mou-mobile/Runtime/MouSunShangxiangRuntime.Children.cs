@@ -4,10 +4,6 @@ internal sealed partial class MouSunShangxiangRuntime
 {
     [ProgramContinuation(ProgramContinuationKind.Movement,35100)]
     internal bool MovementReturned(ProgramSkillFrame f)=>f.MouSsx is not null&&f.PendingMovementContinuation is not null&&Resume(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments,35100)]
-    internal bool MovementProof(ProgramSkillFrame f,SkillProgramEffect? effect,ProgramMovementContinuation pending)=>
-        f.MouSsx is{Paid:true,Stage:MouSsxStage.GiftChildren or MouSsxStage.DepositChildren or MouSsxStage.DiscardChildren or MouSsxStage.FailureObtainChildren or MouSsxStage.DrawChildren}r&&Valid(f)&&
-        effect?.Op==r.Operation&&f.PendingMovementContinuation==pending&&pending.BeforeCount==0&&pending.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor,35100)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor,35100)]
     internal bool RecoveryParent(ProgramSkillFrame f,RecoveryReplacementFrame child)=>f.MouSsx is not null&&Valid(f)&&(health.ProgramRecoveryChild(f,child)||facts.MovementRecoveryChild(f,child));
@@ -23,13 +19,6 @@ internal sealed partial class MouSunShangxiangRuntime
             facts.History<MouSsxFailureStepEvent>().Any(e=>e.FrameId==f.Id&&e.Step==4)&&facts.History<MaximumHpChangedEvent>().Any(e=>e.PlayerSeat==f.OwnerSeat&&e.Delta==-1&&e.SkillId==Jieyin);
     }
     private ProgramSkillFrame? ObserverRoot()=>frames.OfType<ProgramSkillFrame>().LastOrDefault(f=>frames.ChildOf(f.Id)is{}child&&FirstChild(f,child)&&health.PaidObserverSuffix(f.Id));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage,35100)]
-    internal bool DamageObserver(long id)
-    {
-        if(ObserverRoot()is not{}root)return false;
-        for(ResolutionFrame? p=root;p is not null;p=frames.ParentOf(p.Id))if(p.Id==id)return true;
-        return false;
-    }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime,35100)]
     internal bool DyingObserver()
     {

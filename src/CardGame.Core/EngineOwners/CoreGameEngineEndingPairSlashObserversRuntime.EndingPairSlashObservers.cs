@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 530)]
     internal bool IsEndingPairMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (e?.Op == SkillProgramEffectOp.DrawEndingPairThenBlockRoundIfUnequal && f.EndingPairDraw is { AwaitingMovement: true } && _coreEndingPairDrawsOperations.ValidEndingPairDraw(f) || e?.Op == SkillProgramEffectOp.RecastSelectedPhysicalSlash && f.PlaySlashRecast is { AwaitingMovement: true } && _corePlaySlashRecastsOperations.ValidPlaySlashRecast(f));
     [ProgramContinuation(ProgramContinuationKind.MovementTail, 70)]
     internal bool ReturnEndingPairMovement(ProgramSkillFrame f)
@@ -94,10 +93,4 @@ internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 640)]
     internal bool IsEndingPairSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && EndingPairPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1770)]
-    internal bool HasEndingPairSlashDamageObserver(long windowId)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == windowId && f is DamageTriggerWindowFrame);
-        return index >= 2 && _resolutionStackOperations._resolutionStack[index] is DamageTriggerWindowFrame window && _resolutionStackOperations._resolutionStack[index - 1] is DamageFrame damage && damage.Id == window.ParentFrameId && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == damage.ParentFrameId)is { AttackAttempt: not null, AttackReturn: not null } attack && _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId == attack.Id && EndingPairPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id) < _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == attack.Id);
-    }
 }

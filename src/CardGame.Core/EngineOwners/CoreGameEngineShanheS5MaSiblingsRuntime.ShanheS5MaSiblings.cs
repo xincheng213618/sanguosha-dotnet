@@ -120,9 +120,6 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
         _coreSlashSuitDiscardOperations.FinishProgramSlashSuitDiscard(frame, paid);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 5760)]
-    internal bool IsShanheS5TieqiMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeColorAllDiscard && frame.SlashSuitDiscard is { Stage: ProgramSlashSuitDiscardStage.JudgmentMovement or ProgramSlashSuitDiscardStage.PaymentMovement } && pending.SubjectSeat == frame.OwnerSeat && pending.CoverageResultBind is null && (frame.ShanheS5Tieqi is null || ValidShanheS5TieqiPayment(frame));
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5760)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5760)]
     internal bool CanContinuePaidShanheS5Tieqi(ProgramSkillFrame frame) => frame.ShanheS5Tieqi is not null && IsShanheS5Tieqi(frame) && ValidShanheS5TieqiPayment(frame);

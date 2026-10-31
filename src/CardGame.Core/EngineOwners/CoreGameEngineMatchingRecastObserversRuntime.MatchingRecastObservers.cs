@@ -95,10 +95,6 @@ internal sealed partial class CoreGameEngineMatchingRecastObserversRuntime
     internal ProgramSkillFrame? MatchingRecastObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreMatchingRecastObserversOperations.MatchingRecastFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 90)]
     internal bool IsMatchingRecastDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MatchingRecastObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1870)]
-    internal bool HasMatchingRecastDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) && MatchingRecastObserverRoot()is not null;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 150)]
-    internal bool HasMatchingRecastBeforeDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == windowId && f is BeforeDamageProgramWindowFrame) && MatchingRecastObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 50)]
     internal bool TryAdvanceMatchingRecastSubtree()
     {

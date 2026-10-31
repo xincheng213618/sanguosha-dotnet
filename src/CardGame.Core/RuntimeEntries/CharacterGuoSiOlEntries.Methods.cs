@@ -27,10 +27,7 @@ internal sealed partial class CharacterGuoSiOlEntries
     internal bool GuoSiQualified(int seat) => _resolve().GuoSiQualified(seat);
     internal bool GuoSiResponseUse(global::CardGame.Core.CardActionContext a) => _resolve().GuoSiResponseUse(a);
     internal bool GuoSiTargetQuotaAllowed(global::CardGame.Core.ProgramTargetQuotaQuery query) => _resolve().GuoSiTargetQuotaAllowed(query);
-    internal bool HasGuoSiBeforeDamageObserver(long id) => _resolve().HasGuoSiBeforeDamageObserver(id);
-    internal bool HasGuoSiDamageObserver(long id) => _resolve().HasGuoSiDamageObserver(id);
     internal bool HasGuoSiTargetEffect(int actor, int target, global::CardGame.Core.DirectedTurnCardPolicyEffect effect) => _resolve().HasGuoSiTargetEffect(actor, target, effect);
-    internal bool IsGuoSiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsGuoSiMovement(f, e, p);
     internal bool IsGuoSiNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsGuoSiNativeUse(use);
     internal bool IsSuspendedGuoSiCompletedParent(global::CardGame.Core.CardUseFrame original) => _resolve().IsSuspendedGuoSiCompletedParent(original);
     internal void IssueSidao(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.LegalAction action) => _resolve().IssueSidao(f, action);

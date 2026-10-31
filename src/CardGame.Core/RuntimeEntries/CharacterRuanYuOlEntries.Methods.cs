@@ -20,8 +20,6 @@ internal sealed partial class CharacterRuanYuOlEntries
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.XingzuoEndingIssuedEvent> CurrentXingzuoDebts() => _resolve().CurrentXingzuoDebts();
     internal bool DrainRuanYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainRuanYu(f);
     internal void FinishRuanYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishRuanYu(f);
-    internal bool HasRuanYuBeforeDamageObserver(long id) => _resolve().HasRuanYuBeforeDamageObserver(id);
-    internal bool HasRuanYuDamageObserver(long id) => _resolve().HasRuanYuDamageObserver(id);
     internal bool HasRuanYuRedPayment(global::CardGame.Core.CardActionContext action, global::CardGame.Core.CardConversionSource source, string hash, long parentId) => _resolve().HasRuanYuRedPayment(action, source, hash, parentId);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramCardTriggerCandidate> IncludeRuanYuMiaoxianRedCandidates(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramCardTriggerCandidate> ordinary, global::CardGame.Core.CardActionContext action, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().IncludeRuanYuMiaoxianRedCandidates(ordinary, action, window);
     internal bool IsIssuedRuanYuMiaoxianRedCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedRuanYuMiaoxianRedCandidate(c, context);

@@ -8,8 +8,6 @@ internal sealed partial class CharacterDongBaiOlEntries
     internal void ContinueLianzhuAfterPublicReveal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueLianzhuAfterPublicReveal(f);
     internal bool DrainLianZhu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainLianZhu(f);
     internal void FinishLianZhu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLianZhu(f);
-    internal bool HasLianZhuDamageObserver(long id) => _resolve().HasLianZhuDamageObserver(id);
-    internal bool IsLianZhuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLianZhuMovement(f, effect, p);
     internal bool IsXiaHuiDiscardForbidden(int actorSeat, global::CardGame.Core.Card card, global::CardGame.Core.CardLocation from, global::CardGame.Core.OwnedCardMoveIntent intent) => _resolve().IsXiaHuiDiscardForbidden(actorSeat, card, from, intent);
     internal bool IsXiaHuiHandLimitExempt(int owner, global::CardGame.Core.Card card) => _resolve().IsXiaHuiHandLimitExempt(owner, card);
     internal bool IsXiaHuiPhysicalRestricted(int actorSeat, int cardId) => _resolve().IsXiaHuiPhysicalRestricted(actorSeat, cardId);

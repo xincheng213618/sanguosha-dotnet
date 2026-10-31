@@ -20,7 +20,6 @@ internal sealed partial class CharacterTaishiCiMobileGodEntries
     internal int[] ShenTscDiscardCards(int owner) => _resolve().ShenTscDiscardCards(owner);
     internal bool ShenTscMayTake(int owner, int actor) => _resolve().ShenTscMayTake(owner, actor);
     internal bool ShenTscMissionOver(int owner) => _resolve().ShenTscMissionOver(owner);
-    internal bool ShenTscPoweiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShenTscPoweiMovement(f, e, p);
     internal bool ShenTscPoweiSlashRange(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().ShenTscPoweiSlashRange(q);
     internal void ShenTscSetWei(global::CardGame.Core.ProgramSkillFrame f, int seat, int count) => _resolve().ShenTscSetWei(f, seat, count);
     internal int ShenTscWei(int seat, int owner) => _resolve().ShenTscWei(seat, owner);

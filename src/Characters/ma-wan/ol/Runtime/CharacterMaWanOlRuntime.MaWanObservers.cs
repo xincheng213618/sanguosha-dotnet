@@ -20,10 +20,6 @@ internal sealed partial class CharacterMaWanOlRuntime
 
     internal bool MaWanObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? MaWanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterMaWanOlOperations.MaWanFirstChild(f, child), (i) => _characterMaWanOlOperations.MaWanObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 440)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 550)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 580)]
-    internal bool HasMaWanDamageObserver(long id) => MaWanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26510)]
     internal bool AdvanceMaWanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MaWanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

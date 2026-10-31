@@ -19,10 +19,7 @@ internal sealed partial class CharacterGuoJiaMobileGodEntries
     internal void FinishShenGuoJiaIssue(long id) => _resolve().FinishShenGuoJiaIssue(id);
     internal bool HasShenGuoJiaAwakeningCondition(int seat, string skill, string? binding = default) => _resolve().HasShenGuoJiaAwakeningCondition(seat, skill, binding);
     internal bool HasShenGuoJiaAwakeningReceipt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasShenGuoJiaAwakeningReceipt(frame);
-    internal bool HasShenGuoJiaBeforeDamageObserver(long id) => _resolve().HasShenGuoJiaBeforeDamageObserver(id);
-    internal bool HasShenGuoJiaDamageObserver(long id) => _resolve().HasShenGuoJiaDamageObserver(id);
     internal bool IsShenGuoJiaJudgment(global::CardGame.Core.JudgmentFrame judgment, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsShenGuoJiaJudgment(judgment, frame);
-    internal bool IsShenGuoJiaMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsShenGuoJiaMovement(frame, effect, pending);
     internal bool IsShenGuoJiaVirtualUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsShenGuoJiaVirtualUse(use);
     internal void IssueShenGuoJiaVirtualUse(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IssueShenGuoJiaVirtualUse(frame);
     internal void MoveShenGuoJiaJudgments(global::CardGame.Core.ProgramSkillFrame frame, int target) => _resolve().MoveShenGuoJiaJudgments(frame, target);

@@ -10,7 +10,6 @@ internal sealed partial class CoreGameEngineEndRefillNextTurnEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> EndRefillNextTurnChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().EndRefillNextTurnChoices(f);
     internal double EndRefillNextTurnPublicScore(int owner) => _resolve().EndRefillNextTurnPublicScore(owner);
     internal double EndRefillPublicChoiceScore(int owner, int target) => _resolve().EndRefillPublicChoiceScore(owner, target);
-    internal bool IsEndRefillNextTurnMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsEndRefillNextTurnMovement(f, e, p);
     internal bool IsExactOwnAfterTurnEndedProgram(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsExactOwnAfterTurnEndedProgram(f);
     internal void PublishEndRefillNextTurnChoice(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().PublishEndRefillNextTurnChoice(supplied);
     internal void RequireEndRefillNextTurnReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireEndRefillNextTurnReceipt(f);

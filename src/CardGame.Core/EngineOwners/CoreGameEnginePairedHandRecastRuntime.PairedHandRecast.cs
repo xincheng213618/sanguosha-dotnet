@@ -179,9 +179,6 @@ internal sealed partial class CoreGameEnginePairedHandRecastRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 230)]
-    internal bool IsPairedHandRecastMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.PairedHandRecast && f.PairedHandRecast is { Stage: PairedHandRecastStage.CostChildren or PairedHandRecastStage.DrawChildren } r && f.PendingMovementContinuation == pending && pending.SubjectSeat == CurrentPairedRecast(r).Seat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && _corePairedHandRecastObserversOperations.ValidPairedHandRecastReceipt(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 620)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 640)]
     internal bool CanContinuePairedHandRecast(ProgramSkillFrame f) => f.PairedHandRecast is { Partner.Material: not null } && _corePairedHandRecastObserversOperations.ValidPairedHandRecastReceipt(f);

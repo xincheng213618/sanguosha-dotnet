@@ -30,11 +30,9 @@ internal sealed partial class CharacterFuRongOlEntries
     internal bool FuRongSourceCurrent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FuRongSourceCurrent(f);
     internal bool FuRongUnspentDiscard(global::CardGame.Core.ProgramSkillFrame f, int id) => _resolve().FuRongUnspentDiscard(f, id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> FuRongUseChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FuRongUseChoices(f);
-    internal bool HasFuRongDamageObserver(long id) => _resolve().HasFuRongDamageObserver(id);
     internal bool HasFuRongDiscardDistance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int>? ids) => _resolve().HasFuRongDiscardDistance(actor, kind, ids);
     internal bool HasIssuedFuRongDistance(long? existingUseFrameId, int ownerSeat) => _resolve().HasIssuedFuRongDistance(existingUseFrameId, ownerSeat);
     internal bool HasIssuedFuRongUnlimitedUse(long id, int seat) => _resolve().HasIssuedFuRongUnlimitedUse(id, seat);
-    internal bool IsFuRongAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFuRongAwaitedMovement(f, e, pending);
     internal bool IsFuRongDiscardQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsFuRongDiscardQuery(actor, id);
     internal bool IsFuRongSelectedDiscard(int seat, int id) => _resolve().IsFuRongSelectedDiscard(seat, id);
     internal void PublishFuRongPayment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishFuRongPayment(f);

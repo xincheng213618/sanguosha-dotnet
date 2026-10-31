@@ -25,16 +25,10 @@ internal sealed partial class CharacterTaoQianOlEntries
     internal void FinishTaoQian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishTaoQian(f);
     internal void FinishZhaohuo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhaohuo(f);
     internal bool FinishZongluanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishZongluanAttack(attack, out paused);
-    internal bool HasTaoQianBeforeDamageObserver(long id) => _resolve().HasTaoQianBeforeDamageObserver(id);
-    internal bool HasTaoQianDamageObserver(long id) => _resolve().HasTaoQianDamageObserver(id);
-    internal bool HasZhaohuoBeforeDamageObserver(long id) => _resolve().HasZhaohuoBeforeDamageObserver(id);
-    internal bool HasZhaohuoDamageObserver(long id) => _resolve().HasZhaohuoDamageObserver(id);
     internal bool IsIssuedZhaohuoCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedZhaohuoCandidate(candidate, context);
     internal bool IsIssuedZongluanUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedZongluanUse(use);
-    internal bool IsTaoQianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsTaoQianMovement(f, e, p);
     internal bool IsTaoQianRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().IsTaoQianRecoveryParent(f, child);
     internal bool IsZhaohuoHandLimitExempt(int ownerSeat, int cardId) => _resolve().IsZhaohuoHandLimitExempt(ownerSeat, cardId);
-    internal bool IsZhaohuoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsZhaohuoMovement(f, effect, pending);
     internal bool IsZhaohuoPhysicalRestricted(int actorSeat, int cardId) => _resolve().IsZhaohuoPhysicalRestricted(actorSeat, cardId);
     internal bool IsZhaohuoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().IsZhaohuoRecoveryParent(f, child);
     internal bool IsZongluanUse(long id) => _resolve().IsZongluanUse(id);

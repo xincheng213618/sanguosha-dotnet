@@ -94,9 +94,6 @@ internal sealed partial class CharacterLiuQiOlRuntime
         RequireLiuQi(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 160)]
-    internal bool IsLiuQiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.LiuQi is { Stage: LiuQiStage.GiftChildren or LiuQiStage.DrawChildren } && effect is not null && LiuQiComposition.IsOp(effect.Op) && CanContinueLiuQi(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal void RequireLiuQi(ProgramSkillFrame f)
     {
         if (f.LiuQi is not { } r || r.Source != LiuQiSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.WindowId != f.WindowContext?.ParentFrameId || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)

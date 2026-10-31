@@ -233,7 +233,6 @@ internal sealed partial class CoreGameEngineSourceCursesRuntime
     }
 
     internal SkillProgramEffect? SourceCursePausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 30)]
     internal bool IsSourceCurseMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.SourceCurseReceipt is { Stage: not SourceCurseStage.LossHpChildren } r && r.InstructionIndex == f.InstructionIndex && effect == SourceCursePausedEffect(f) && effect?.Op == (r.Stage == SourceCurseStage.DepositChildren ? SkillProgramEffectOp.DepositSelectedSourceCurse : SkillProgramEffectOp.DrawForSourceCurseUse) && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     SkillProgramStepOutcome global::CardGame.Core.ISourceCurseProgramHost.ExecuteSourceCurse(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteSourceCurse(effect, frame);
 }

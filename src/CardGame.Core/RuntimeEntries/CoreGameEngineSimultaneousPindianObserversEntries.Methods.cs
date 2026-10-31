@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSimultaneousPindianObserversEntries
 {
-    internal bool HasSimultaneousDamageObserver(long id) => _resolve().HasSimultaneousDamageObserver(id);
     internal bool IsSimultaneousPindianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsSimultaneousPindianMovement(f, e, p);
     internal bool SimultaneousFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().SimultaneousFirstChild(root, child);
     internal global::System.Collections.Generic.IReadOnlyList<int> SimultaneousHeldProcessingCards() => _resolve().SimultaneousHeldProcessingCards();

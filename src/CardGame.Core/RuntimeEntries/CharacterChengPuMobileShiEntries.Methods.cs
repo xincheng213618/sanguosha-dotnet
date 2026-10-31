@@ -24,6 +24,5 @@ internal sealed partial class CharacterChengPuMobileShiEntries
     internal bool ReturnShiCpChengPuMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiCpChengPuMovement(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiCpBihanDiscardChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiCpBihanDiscardChoices(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiCpBihanDiscarderChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiCpBihanDiscarderChoices(f);
-    internal bool ShiCpBihanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShiCpBihanMovement(f, effect, p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiCpDuzuoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiCpDuzuoChoices(f);
 }

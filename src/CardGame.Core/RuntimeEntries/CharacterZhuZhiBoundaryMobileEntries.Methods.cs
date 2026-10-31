@@ -17,7 +17,6 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileEntries
     internal bool HadBoundaryAnguoMark(int seat) => _resolve().HadBoundaryAnguoMark(seat);
     internal bool HasBoundaryAnguoMark(int seat) => _resolve().HasBoundaryAnguoMark(seat);
     internal bool HasExactBoundaryAnguoRescueTarget(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasExactBoundaryAnguoRescueTarget(frame);
-    internal bool IsBoundaryAnguoPayment(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBoundaryAnguoPayment(frame, effect, pending);
     internal bool KeepIssuedBoundaryAnguo(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepIssuedBoundaryAnguo(frame);
     internal void PublishBoundaryAnguo(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishBoundaryAnguo(frame);
     internal void RecordBoundaryAnguoPayment(long id) => _resolve().RecordBoundaryAnguoPayment(id);

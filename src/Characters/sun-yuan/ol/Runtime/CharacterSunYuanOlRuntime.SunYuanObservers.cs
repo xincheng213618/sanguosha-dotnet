@@ -8,9 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
 {
     internal static bool SunYuanMovementStage(SunYuanStage s) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_yuan_ol_SunYuanObservers.SunYuanMovementStage(s);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 440)]
-    internal bool IsSunYuanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.SunYuan is { Paid: true } r && SunYuanMovementStage(r.Stage) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && effect?.Op == r.Op;
     internal bool IsSunYuanPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.SunYuan!;
@@ -62,11 +59,6 @@ internal sealed partial class CharacterSunYuanOlRuntime
     }
 
     internal ProgramSkillFrame? SunYuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterSunYuanOlOperations.SunYuanFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 950)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1060)]
-    internal bool HasSunYuanDamageObserver(long id) => SunYuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1090)]
-    internal bool HasSunYuanBeforeDamageObserver(long id) => SunYuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27490)]
     internal bool AdvanceSunYuanChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SunYuanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

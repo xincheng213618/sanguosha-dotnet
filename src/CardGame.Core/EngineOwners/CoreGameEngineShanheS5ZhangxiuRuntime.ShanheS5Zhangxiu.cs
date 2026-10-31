@@ -57,13 +57,6 @@ internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 59401)]
     internal bool ReturnShanheS5XiongluanMovement(ProgramSkillFrame f) => f.ShanheS5Xiongluan is { ChildrenCompleted: false } && ResumeShanheS5Xiongluan(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 59401)]
-    internal bool IsShanheS5XiongluanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect?.Op != SkillProgramEffectOp.PayShanheS5Xiongluan || f.ShanheS5Xiongluan is not { Paid: true, ChildrenCompleted: false } || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
-            return false;
-        return true;
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 59401)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 59401)]

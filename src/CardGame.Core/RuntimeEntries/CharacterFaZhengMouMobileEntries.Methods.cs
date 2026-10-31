@@ -18,8 +18,6 @@ internal sealed partial class CharacterFaZhengMouMobileEntries
     internal bool DrainMouFaZhengChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouFaZhengChildren(f);
     internal bool ExcludeOrdinaryMovement_IsMouFaZhengGainTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsMouFaZhengGainTrigger(candidate, trigger);
     internal void FinishMouFaZheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouFaZheng(f);
-    internal bool HasMouFaZhengBeforeDamageObserver(long id) => _resolve().HasMouFaZhengBeforeDamageObserver(id);
-    internal bool HasMouFaZhengDamageObserver(long id) => _resolve().HasMouFaZhengDamageObserver(id);
     internal bool IsLiveMouFaZhengSource(global::CardGame.Core.MouFaZhengMarkEvent mark) => _resolve().IsLiveMouFaZhengSource(mark);
     internal bool IsMouFaZhengDirectRecovery(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouFaZhengDirectRecovery(f, recovery);
     internal bool IsMouFaZhengDying() => _resolve().IsMouFaZhengDying();

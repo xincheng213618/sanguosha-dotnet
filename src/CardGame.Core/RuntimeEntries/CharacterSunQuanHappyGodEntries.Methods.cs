@@ -14,9 +14,7 @@ internal sealed partial class CharacterSunQuanHappyGodEntries
     internal global::CardGame.Core.ProgramTriggerCandidate HappyLearningCandidate(int holder, int turn) => _resolve().HappyLearningCandidate(holder, turn);
     internal global::CardGame.Core.ProgramLifecycleTriggerWindowFrame? HappyLearningParent(long id) => _resolve().HappyLearningParent(id);
     internal global::CardGame.Core.ProgramCardTriggerWindowFrame? HappyShehuParent(long id) => _resolve().HappyShehuParent(id);
-    internal bool HappySunQuanBeforeDamage(long id) => _resolve().HappySunQuanBeforeDamage(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappySunQuanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappySunQuanChoices(f);
-    internal bool HappySunQuanDamageWindow(long id) => _resolve().HappySunQuanDamageWindow(id);
     internal bool HappySunQuanDying() => _resolve().HappySunQuanDying();
     internal bool HappySunQuanEligible(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HappySunQuanEligible(c, t, w);
     internal bool HappySunQuanFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HappySunQuanFirstChild(f, child);

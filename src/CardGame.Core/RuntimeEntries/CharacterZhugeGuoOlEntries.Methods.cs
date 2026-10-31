@@ -8,9 +8,6 @@ internal sealed partial class CharacterZhugeGuoOlEntries
     internal void CaptureQirangDeclaredUse(global::CardGame.Core.IGameEvent payload) => _resolve().CaptureQirangDeclaredUse(payload);
     internal void FinishZhugeGuo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhugeGuo(f);
     internal global::CardGame.Core.CardSnapshot[] GetZhugeGuoPrivatelyViewedCards(int viewer) => _resolve().GetZhugeGuoPrivatelyViewedCards(viewer);
-    internal bool HasZhugeGuoBeforeDamageObserver(long id) => _resolve().HasZhugeGuoBeforeDamageObserver(id);
-    internal bool HasZhugeGuoDamageObserver(long id) => _resolve().HasZhugeGuoDamageObserver(id);
-    internal bool IsZhugeGuoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhugeGuoMovement(f, e, p);
     internal void IssueQirangAcquiredBenefit(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ZhugeGuoReceipt r, global::CardGame.Core.CardMovementRecord movement) => _resolve().IssueQirangAcquiredBenefit(f, r, movement);
     internal void MarkYuhuaTopPlacement(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.ProgramTopReorder state) => _resolve().MarkYuhuaTopPlacement(supplied, state);
     internal void ObserveMovementBatchZhugeGuo(global::CardGame.Core.CardMovementBatchBuilder batch, global::CardGame.Core.CardMovementRecord movement) => _resolve().ObserveMovementBatchZhugeGuo(batch, movement);

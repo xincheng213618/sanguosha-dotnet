@@ -116,9 +116,6 @@ internal sealed partial class CoreGameEngineShanheXiashengRuntime
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 5408)]
-    internal bool IsShanheXiashengDrawMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation movement) => effect?.Op == SkillProgramEffectOp.ResolveShanheXiasheng && frame.ShanheXiasheng is { Stage: "draw-children", DrawOutcome: not null } && movement.SubjectSeat == frame.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Resume, 5408)]
     internal bool ResumeShanheXiasheng(long frameId)
     {

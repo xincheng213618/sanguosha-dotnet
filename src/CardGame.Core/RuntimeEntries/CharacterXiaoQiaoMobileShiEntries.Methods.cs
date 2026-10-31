@@ -18,12 +18,10 @@ internal sealed partial class CharacterXiaoQiaoMobileShiEntries
     internal bool ResumeShiXq(long id) => _resolve().ResumeShiXq(id);
     internal void ReturnShiXqDraw(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiXqDraw(input, outcome);
     internal bool ReturnShiXqMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiXqMovement(f);
-    internal bool ShiXqBeforeDamageObserver(long id) => _resolve().ShiXqBeforeDamageObserver(id);
     internal bool ShiXqChildEdge(int i) => _resolve().ShiXqChildEdge(i);
     internal bool ShiXqChildSuffix(int i) => _resolve().ShiXqChildSuffix(i);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiXqChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiXqChoices(f);
     internal (int Seat, string Skill)[] ShiXqCopyOptions(int owner) => _resolve().ShiXqCopyOptions(owner);
-    internal bool ShiXqDamageObserver(long id) => _resolve().ShiXqDamageObserver(id);
     internal bool ShiXqDyingObserver() => _resolve().ShiXqDyingObserver();
     internal bool ShiXqFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiXqFirstChild(f, child);
     internal global::CardGame.Core.ShiXqCopiedEvent[] ShiXqGrantLedger(int owner) => _resolve().ShiXqGrantLedger(owner);

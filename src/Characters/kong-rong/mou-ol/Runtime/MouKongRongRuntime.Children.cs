@@ -4,9 +4,6 @@ internal sealed partial class MouKongRongRuntime
 {
     [ProgramContinuation(ProgramContinuationKind.Movement,34600)]
     internal bool Movement(ProgramSkillFrame f)=>f.MouKrLiwen is not null&&f.PendingMovementContinuation is not null&&Resume(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments,34600)]
-    internal bool MovementProof(ProgramSkillFrame f,SkillProgramEffect? effect,ProgramMovementContinuation pending)=>f.MouKrLiwen is{Stage:MouKrLiwenStage.Children or MouKrLiwenStage.DrawChildren}&&
-        Valid(f)&&effect?.Op==SkillProgramEffectOp.ResolveMouKongRongLiwen&&f.PendingMovementContinuation==pending&&pending.BeforeCount==0&&pending.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor,34600)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor,34600)]
     internal bool RecoveryParent(ProgramSkillFrame f,RecoveryReplacementFrame child)=>(f.MouKrLiwen is not null||f.MouKrZhengyi is not null)&&Valid(f)&&health.ProgramRecoveryChild(f,child);
@@ -30,12 +27,6 @@ internal sealed partial class MouKongRongRuntime
     {
         if(health.ActiveDying is not{}dying||ObserverRoot()is not{}root)return false;
         for(ResolutionFrame? p=dying;p is not null;p=frames.ParentOf(p.Id))if(p.Id==root.Id)return true;return false;
-    }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage,34600)]
-    internal bool ObserverDamage(long id)
-    {
-        if(ObserverRoot()is not{}root)return false;
-        for(ResolutionFrame? p=root;p is not null;p=frames.ParentOf(p.Id))if(p.Id==id)return true;return false;
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,34600)]
     internal bool AdvanceChildren()=>ObserverRoot()is not null&&healthOperations.AdvanceObserverSubtree();

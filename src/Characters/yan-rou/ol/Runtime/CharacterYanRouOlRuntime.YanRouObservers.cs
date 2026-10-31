@@ -46,10 +46,6 @@ internal sealed partial class CharacterYanRouOlRuntime
     }
 
     internal ProgramSkillFrame? YanRouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterYanRouOlOperations.YanRouFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (c) => _coreObserverSubtreesOperations.IsMovementObserverEdge(c) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(c) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[c], _resolutionStackOperations2._resolutionStack()[c - 1]), (c, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(c, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 520)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 630)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 660)]
-    internal bool HasYanRouDamageObserver(long id) => YanRouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26800)]
     internal bool AdvanceYanRouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && YanRouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

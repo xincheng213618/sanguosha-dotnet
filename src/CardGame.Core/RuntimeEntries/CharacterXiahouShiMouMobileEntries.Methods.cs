@@ -20,8 +20,6 @@ internal sealed partial class CharacterXiahouShiMouMobileEntries
     internal bool ExactMouXiahouShiDamageContext(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactMouXiahouShiDamageContext(f);
     internal bool ExactMouXiahouShiSupportContext(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactMouXiahouShiSupportContext(f);
     internal void FinishMouXiahouShi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouXiahouShi(f);
-    internal bool HasMouXiahouShiBeforeDamageObserver(long id) => _resolve().HasMouXiahouShiBeforeDamageObserver(id);
-    internal bool HasMouXiahouShiDamageObserver(long id) => _resolve().HasMouXiahouShiDamageObserver(id);
     internal bool IsMouXiahouShiDirectRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouXiahouShiDirectRecoveryParent(f, recovery);
     internal bool IsMouXiahouShiDying() => _resolve().IsMouXiahouShiDying();
     internal bool IsMouXiahouShiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouXiahouShiMovement(f, e, pending);

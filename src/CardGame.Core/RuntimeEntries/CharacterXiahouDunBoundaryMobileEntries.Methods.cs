@@ -7,10 +7,8 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileEntries
     internal void AnswerBoundaryXiahouDun(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerBoundaryXiahouDun(selected);
     internal void AppendBoundaryXiahouDunEnding(global::System.Collections.Generic.List<global::CardGame.Core.TurnEndingBoundaryItem> items) => _resolve().AppendBoundaryXiahouDunEnding(items);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryXiahouDun(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginBoundaryXiahouDun(supplied, op);
-    internal bool BoundaryXiahouDunBeforeDamageObserver(long id) => _resolve().BoundaryXiahouDunBeforeDamageObserver(id);
     internal global::CardGame.Core.PromptChoice BoundaryXiahouDunChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, int value, string text, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().BoundaryXiahouDunChoice(f, branch, value, text, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryXiahouDunChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryXiahouDunChoices(f);
-    internal bool BoundaryXiahouDunDamageObserver(long id) => _resolve().BoundaryXiahouDunDamageObserver(id);
     internal global::CardGame.Core.BoundaryXiahouDunStoredEvent BoundaryXiahouDunDeposit(long id) => _resolve().BoundaryXiahouDunDeposit(id);
     internal global::CardGame.Core.BoundaryXiahouDunStoredEvent[] BoundaryXiahouDunDeposits(int owner) => _resolve().BoundaryXiahouDunDeposits(owner);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.BoundaryXiahouDunStoredEvent> BoundaryXiahouDunDueDeposits(int owner, long endingId) => _resolve().BoundaryXiahouDunDueDeposits(owner, endingId);
@@ -19,7 +17,6 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileEntries
     internal global::CardGame.Core.Card BoundaryXiahouDunHandCard(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PromptChoice c) => _resolve().BoundaryXiahouDunHandCard(f, c);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryXiahouDunHandChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryXiahouDunHandChoices(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.Card> BoundaryXiahouDunHeld(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryXiahouDunHeld(f);
-    internal bool BoundaryXiahouDunMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().BoundaryXiahouDunMovementProof(f, e, pending);
     internal global::CardGame.Core.ProgramSkillFrame? BoundaryXiahouDunObserverRoot() => _resolve().BoundaryXiahouDunObserverRoot();
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PrivateWhirlPileSnapshot>? BoundaryXiahouDunPileViews(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PrivateWhirlPileSnapshot>? existing, int owner, int viewer, bool revealAll) => _resolve().BoundaryXiahouDunPileViews(existing, owner, viewer, revealAll);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CardSnapshot> BoundaryXiahouDunPrivateCards(int viewer) => _resolve().BoundaryXiahouDunPrivateCards(viewer);

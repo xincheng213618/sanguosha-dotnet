@@ -47,17 +47,4 @@ internal sealed partial class CharacterZhuRongBoundaryMobileRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { PendingMovementContinuation = null });
         return SkillProgramStepOutcome.Continue;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 66201)]
-    internal bool MobileZhuRongExchangeMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect?.Op != SkillProgramEffectOp.ExchangeMobileLierenPindianCards || frame.SkillId != MobileZhuRongSkill || frame.InstructionIndex != 3 || pending != frame.PendingMovementContinuation || pending.SubjectSeat != frame.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || frame.PindianResultBindings is not [{ Name: "contest", SourceSeat: var owner, OpponentSeat: var opponent, SourceWon: false }] || owner != frame.OwnerSeat || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, TargetSeat: var target } || target != opponent)
-            return false;
-        var source = frame.CardSetBindings.SingleOrDefault(b => b.Name == MobileZhuRongSource);
-        var other = frame.CardSetBindings.SingleOrDefault(b => b.Name == MobileZhuRongOpponent);
-        if (source is not { Visibility: SkillProgramCardSetVisibility.Public, CardIds: [var sourceId], SourceLocations: [var sourceZone] } || sourceZone != CardLocation.DiscardPile || other is not { Visibility: SkillProgramCardSetVisibility.Public, CardIds: [var opponentId], SourceLocations: [var opponentZone] } || opponentZone != CardLocation.DiscardPile)
-            return false;
-        var disclosure = _modeRulesOperations._modeRules.PublishesCardMovementDisclosure ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.Unspecified;
-        return _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Concat(_resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Select(w => w.Batch)).Any(batch => batch.ParentFrameId == frame.Id && batch.OriginOwnerSeat == owner && batch.OriginSkillId == frame.SkillId && batch.OriginSkillInstanceId == frame.SkillInstanceId && batch.Movements is [var movement] && movement.From == CardLocation.DiscardPile && movement.Reason.Value == MobileZhuRongExchange && movement.Disclosure == disclosure && (movement.CardId == sourceId && movement.To == CardLocation.Hand(opponent) || movement.CardId == opponentId && movement.To == CardLocation.Hand(owner)) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(movement));
-    }
 }

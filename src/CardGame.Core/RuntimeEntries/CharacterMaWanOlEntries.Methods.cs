@@ -15,7 +15,6 @@ internal sealed partial class CharacterMaWanOlEntries
     internal bool DrainMaWan(long id) => _resolve().DrainMaWan(id);
     internal void FinishMaWan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMaWan(f);
     internal bool HasIssuedMaWanHunjiangCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedMaWanHunjiangCandidate(candidate, context);
-    internal bool HasMaWanDamageObserver(long id) => _resolve().HasMaWanDamageObserver(id);
     internal bool HasMaWanHunjiangTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasMaWanHunjiangTargetTail(use);
     internal void IssueMaWanHunjiangUse(long id, global::CardGame.Core.CardActionContext? action) => _resolve().IssueMaWanHunjiangUse(id, action);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MaWanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MaWanChoices(f);

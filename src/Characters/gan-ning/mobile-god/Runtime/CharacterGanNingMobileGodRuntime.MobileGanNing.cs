@@ -62,9 +62,6 @@ internal sealed partial class CharacterGanNingMobileGodRuntime
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter).ToArray();
         return moves.Length == r.Cards.Count && moves.Select(m => m.CardId).SequenceEqual(r.Cards) && moves.All(m => m.From == CardLocation.Hand(r.EndedSeat) && m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason.Value == MobileCampClaimReason) && _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerMarkerChangedEvent>().Count(e => e.ResolutionId == frame.Id && e.PlayerSeat == r.EndedSeat && e.Marker == PlayerMarkerKind.Camp && e.Count == 0 && e.SkillOwnerSeat == frame.OwnerSeat) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileCampClaimedEvent>().Count(e => e.ProgramFrameId == frame.Id && e.Source == r.Source && e.EndedFrameId == r.EndedFrameId && e.EndedSeat == r.EndedSeat && e.ActualTurn == r.ActualTurn && e.Count == r.Cards.Count && e.BatchId == r.BatchId && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 39825)]
-    internal bool IsMobileCampClaimMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ClaimMobileEndedCampHand && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidMobileCampClaim(frame);
     [ProgramContinuation(ProgramContinuationKind.Movement, 39825)]
     internal bool ReturnMobileCampClaim(ProgramSkillFrame frame)
     {

@@ -17,8 +17,6 @@ internal sealed partial class CharacterWenChouMouOlEntries
     internal bool ContinuePaidMouWenChou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidMouWenChou(f);
     internal bool DrainMouWenChouOl(long id) => _resolve().DrainMouWenChouOl(id);
     internal void FinishMouWenChouOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouWenChouOl(f);
-    internal bool HasMouWenChouBeforeDamage(long id) => _resolve().HasMouWenChouBeforeDamage(id);
-    internal bool HasMouWenChouDamage(long id) => _resolve().HasMouWenChouDamage(id);
     internal bool IsMouWenChouDuel(long id) => _resolve().IsMouWenChouDuel(id);
     internal bool IsMouWenChouDying() => _resolve().IsMouWenChouDying();
     internal bool IsMouWenChouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsMouWenChouMovement(f, effect, movement);

@@ -22,8 +22,6 @@ internal sealed partial class CharacterSunJianMouOlEntries
     internal bool DrainMouSunJianOlChildren(long id) => _resolve().DrainMouSunJianOlChildren(id);
     internal void FinishMouSunJianOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouSunJianOl(f);
     internal bool FinishMouSunJianOlCounterAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouSunJianOlCounterAttack(attack, out paused);
-    internal bool HasMouSunJianOlBeforeDamage(long id) => _resolve().HasMouSunJianOlBeforeDamage(id);
-    internal bool HasMouSunJianOlDamage(long id) => _resolve().HasMouSunJianOlDamage(id);
     internal bool HasMouSunJianOlHpSubject(int seat) => _resolve().HasMouSunJianOlHpSubject(seat);
     internal bool IsMouSunJianOlCounterUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsMouSunJianOlCounterUse(use);
     internal bool IsMouSunJianOlDying() => _resolve().IsMouSunJianOlDying();

@@ -66,13 +66,4 @@ internal sealed partial class CoreGameEngineRicePileReceiptsRuntime
             if ((store ? item.from.OwnerSeat != f.OwnerSeat || item.from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) : item.from != r.Pile.Location) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == item.id && m.From == item.from && m.To == to && m.Reason.Value == reason) != 1)
                 throw new InvalidOperationException("Rice transfer must match each actual paid physical entity and its precise source pile.");
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 40)]
-    internal bool IsRiceMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
-    {
-        if (f.RicePile is not { Stage: RicePileStage.DrawChildren or RicePileStage.MovementChildren } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != r.BeneficiarySeat || p.BeforeCount != 0 || p.CoverageResultBind is not null)
-            return false;
-        RequireRiceReceipt(f);
-        return true;
-    }
 }

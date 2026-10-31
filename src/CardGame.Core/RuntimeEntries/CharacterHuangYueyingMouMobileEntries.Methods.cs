@@ -24,11 +24,9 @@ internal sealed partial class CharacterHuangYueyingMouMobileEntries
     internal bool IsIssuedMouHyQiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedMouHyQiCandidate(c, context);
     internal bool IsMouHyJizhiHandLimitExempt(global::CardGame.Core.CharacterState owner, int cardId) => _resolve().IsMouHyJizhiHandLimitExempt(owner, cardId);
     internal bool IsMouHyQiGainCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsMouHyQiGainCandidate(candidate, batch);
-    internal bool MouHyDamageObserver(long id) => _resolve().MouHyDamageObserver(id);
     internal bool MouHyDying() => _resolve().MouHyDying();
     internal global::System.Collections.Generic.IEnumerable<(global::CardGame.Core.Card Card, global::CardGame.Core.CardLocation From)> MouHyEquipmentChoices(int owner, int target) => _resolve().MouHyEquipmentChoices(owner, target);
     internal bool MouHyFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouHyFirstChild(f, child);
-    internal bool MouHyMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation m) => _resolve().MouHyMovementProof(f, e, m);
     internal global::CardGame.Core.ProgramSkillFrame? MouHyObserverRoot() => _resolve().MouHyObserverRoot();
     internal bool MouHyObserverSuffix(int i) => _resolve().MouHyObserverSuffix(i);
     internal global::CardGame.Core.MouHuangYueyingQiGainClaimedEvent? MouHyQiBatchClaim(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().MouHyQiBatchClaim(candidate, batch);

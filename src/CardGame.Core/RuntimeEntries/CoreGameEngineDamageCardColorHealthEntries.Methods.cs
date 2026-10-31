@@ -9,8 +9,6 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthEntries
     internal bool DamageCardColorHealthObserverEdge(int index) => _resolve().DamageCardColorHealthObserverEdge(index);
     internal global::CardGame.Core.ProgramSkillFrame? DamageCardColorHealthObserverRoot() => _resolve().DamageCardColorHealthObserverRoot();
     internal bool ExactDamageColorHealthParent(global::CardGame.Core.ProgramSkillFrame f, scoped out global::CardGame.Core.BeforeDamageProgramWindowFrame window, scoped out global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ExactDamageColorHealthParent(f, out window, out attack);
-    internal bool HasDamageCardColorHealthBeforeDamage(long id) => _resolve().HasDamageCardColorHealthBeforeDamage(id);
-    internal bool HasDamageCardColorHealthDamageObserver(long id) => _resolve().HasDamageCardColorHealthDamageObserver(id);
     internal bool HasRecipientDamageCardColorHealth(int seat) => _resolve().HasRecipientDamageCardColorHealth(seat);
     internal bool IsDamageCardColorHealthRecoveryParent(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDamageCardColorHealthRecoveryParent(frame, recovery);
     internal global::CardGame.Core.SkillProgramStepOutcome ResolveDamageCardColorHealth(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ResolveDamageCardColorHealth(supplied);

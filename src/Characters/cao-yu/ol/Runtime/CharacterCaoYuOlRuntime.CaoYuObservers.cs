@@ -27,9 +27,6 @@ internal sealed partial class CharacterCaoYuOlRuntime
             return false;
         return r.Materials.Any(c => c.CardId == m.CardId && c.From == m.From && m.To == (r.Stage == CaoYuStage.XiangxuDiscardChildren ? CardLocation.DiscardPile : CardLocation.Hand(r.Target!.Value)) && m.Reason.Value == reason) || r.GrainIds.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard && r.Materials.Any(c => c.Kind == CardKind.WoodenOx && c.From == CardLocation.Equipment(f.OwnerSeat));
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 370)]
-    internal bool IsCaoYuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.CaoYu is { } r && CaoYuChildren(r.Stage) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && e is not null && e.Op == r.Op;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 170)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 160)]
     internal bool IsCaoYuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
@@ -55,11 +52,6 @@ internal sealed partial class CharacterCaoYuOlRuntime
     }
 
     internal ProgramSkillFrame? CaoYuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterCaoYuOlOperations.CaoYuFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 880)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 990)]
-    internal bool HasCaoYuDamageObserver(long id) => CaoYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1020)]
-    internal bool HasCaoYuBeforeDamageObserver(long id) => CaoYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27440)]
     internal bool AdvanceCaoYuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoYuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

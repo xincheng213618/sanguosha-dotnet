@@ -39,8 +39,6 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 33300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 33300)]
     internal bool ContinuePaidMouHxBojue(ProgramSkillFrame f) => f.MouHxBojue is { Votes.Count: 2 } && ValidMouHxBojue(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33300)]
-    internal bool IsMouHxBojueMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.MouHxBojue is { Stage: MouHxBojueStage.Children or MouHxBojueStage.NativeChildren } && effect?.Op == SkillProgramEffectOp.ResolveMouHuaXiongBojue && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidMouHxBojue(f);
     internal bool MouHxBojueLionPayment(ProgramSkillFrame f, int seat, CardMoveReason? reason) => f.MouHxBojue is { Stage: MouHxBojueStage.Children, PaidCard: { } id } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.CardKind == CardKind.SilverLion && m.From == CardLocation.Equipment(seat) && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason == reason);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 33300)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 33300)]
@@ -77,11 +75,6 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
 
     internal bool MouHxBojueObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || MouHxBojueNativeEdge(i) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MouHxBojueFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal ProgramSkillFrame? MouHxBojueObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterHuaXiongMouOlOperations.MouHxBojueFirstChild(f, child), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterHuaXiongMouOlOperations.MouHxBojueObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 33300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 33300)]
-    internal bool IsMouHxBojueDamageObserver(long id) => MouHxBojueObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33300)]
-    internal bool IsMouHxBojueBeforeDamageObserver(long id) => MouHxBojueObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33300)]
     internal bool IsMouHxBojueDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouHxBojueObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33300)]

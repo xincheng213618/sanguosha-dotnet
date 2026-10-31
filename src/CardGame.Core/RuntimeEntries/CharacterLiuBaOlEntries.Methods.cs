@@ -15,12 +15,9 @@ internal sealed partial class CharacterLiuBaOlEntries
     internal global::CardGame.Core.TongduGiftIssuedEvent? CurrentTongduDebt(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CurrentTongduDebt(c, context);
     internal bool DrainLiuBa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainLiuBa(f);
     internal void FinishLiuBa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLiuBa(f);
-    internal bool HasLiuBaBeforeDamageObserver(long id) => _resolve().HasLiuBaBeforeDamageObserver(id);
     internal bool HasLiuBaCoinEntity(int cardId) => _resolve().HasLiuBaCoinEntity(cardId);
-    internal bool HasLiuBaDamageObserver(long id) => _resolve().HasLiuBaDamageObserver(id);
     internal bool IsIssuedLiuBaCoinEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLiuBaCoinEndingCandidate(c, context);
     internal bool IsIssuedTongduCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedTongduCandidate(c, context);
-    internal bool IsLiuBaMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiuBaMovement(f, e, p);
     internal bool IsLiuBaRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiuBaRecoveryParent(f, recovery);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedTongduPlayEndingCandidates(global::CardGame.Core.CharacterState owner) => _resolve().IssuedTongduPlayEndingCandidates(owner);
     internal global::CardGame.Core.PromptChoice LiuBaChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, int? card = default, int? seat = default) => _resolve().LiuBaChoice(f, branch, label, card, seat);

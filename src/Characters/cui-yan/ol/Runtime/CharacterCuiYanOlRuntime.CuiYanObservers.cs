@@ -9,8 +9,6 @@ internal sealed partial class CharacterCuiYanOlRuntime
 {
 
     internal bool CuiYanDrawMovement(ProgramSkillFrame f, CardMovementRecord m) => f.CuiYan is { Stage: CuiYanStage.DrawChildren } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == CuiYanDrawReason || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 420)]
-    internal bool IsCuiYanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.CuiYan is { Stage: CuiYanStage.DrawChildren } && effect?.Op == SkillProgramEffectOp.ResolveShutongFinalizedUse && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool CuiYanFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.CuiYan is not { } r)
@@ -23,11 +21,6 @@ internal sealed partial class CharacterCuiYanOlRuntime
     }
 
     internal ProgramSkillFrame? CuiYanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterCuiYanOlOperations.CuiYanFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 930)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1040)]
-    internal bool HasCuiYanDamageObserver(long id) => CuiYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1070)]
-    internal bool HasCuiYanBeforeDamageObserver(long id) => HasCuiYanDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27470)]
     internal bool AdvanceCuiYanChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CuiYanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

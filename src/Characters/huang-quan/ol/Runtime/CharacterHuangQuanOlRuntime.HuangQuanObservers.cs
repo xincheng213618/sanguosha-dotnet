@@ -32,9 +32,6 @@ internal sealed partial class CharacterHuangQuanOlRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 230)]
-    internal bool IsHuangQuanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation continuation) => f.HuangQuan is { Stage: "draw-paid", RecipientSeat: var target } && continuation.SubjectSeat == target && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null && e?.Op is SkillProgramEffectOp.DrawForDianhuActualOccurrence or SkillProgramEffectOp.DrawAndOfferJianjiExactCard && ValidHuangQuanDraw(f);
     internal bool HuangQuanFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (!ValidHuangQuanDraw(root) || root.HuangQuan is not { } p)
@@ -47,11 +44,6 @@ internal sealed partial class CharacterHuangQuanOlRuntime
     }
 
     internal ProgramSkillFrame? HuangQuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterHuangQuanOlOperations.HuangQuanFirstChild(r, c), (i) => _coreJianjiDeclarationsOperations.HuangQuanDeclarationObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 190)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 300)]
-    internal bool HasHuangQuanDamageObserver(long id) => HuangQuanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 390)]
-    internal bool HasHuangQuanBeforeDamageObserver(long id) => HuangQuanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 300)]
     internal bool TryAdvanceHuangQuanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuangQuanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

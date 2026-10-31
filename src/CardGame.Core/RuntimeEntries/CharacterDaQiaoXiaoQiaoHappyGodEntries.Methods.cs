@@ -44,8 +44,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodEntries
     internal global::CardGame.Core.PromptChoice HappyQiaoShutuAi(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HappyQiaoShutuAi(pending, frame);
     internal bool HappyQiaoShutuChange(int owner, global::CardGame.Core.HpChangeContext change) => _resolve().HappyQiaoShutuChange(owner, change);
     internal bool HappyQiaoShutuDeclarationEdge(int index) => _resolve().HappyQiaoShutuDeclarationEdge(index);
-    internal bool HappyQiaoSkillBeforeDamageObserver(long id) => _resolve().HappyQiaoSkillBeforeDamageObserver(id);
-    internal bool HappyQiaoSkillDamageObserver(long id) => _resolve().HappyQiaoSkillDamageObserver(id);
     internal bool HappyQiaoSkillDying() => _resolve().HappyQiaoSkillDying();
     internal global::CardGame.Core.ProgramSkillFrame? HappyQiaoSkillObserverRoot() => _resolve().HappyQiaoSkillObserverRoot();
     internal bool HappyQiaoSkillQualified(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().HappyQiaoSkillQualified(gate);

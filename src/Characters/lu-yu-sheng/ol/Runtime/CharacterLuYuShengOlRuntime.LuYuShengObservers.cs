@@ -42,10 +42,6 @@ internal sealed partial class CharacterLuYuShengOlRuntime
     }
 
     internal ProgramSkillFrame? LuYuShengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLuYuShengOlOperations.LuYuShengFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (c) => _coreObserverSubtreesOperations.IsMovementObserverEdge(c) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(c) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[c], _resolutionStackOperations2._resolutionStack()[c - 1]), (c, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(c, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 540)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 650)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 680)]
-    internal bool HasLuYuShengDamageObserver(long id) => LuYuShengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26900)]
     internal bool AdvanceLuYuShengSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LuYuShengObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

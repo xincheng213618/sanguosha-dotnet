@@ -41,8 +41,6 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodEntries
     internal bool ReturnShenZhMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShenZhMovement(f);
     internal void SettleLishiDrawPhase(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SettleLishiDrawPhase(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShenZhChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShenZhChoices(f);
-    internal bool ShenZhMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShenZhMovement(f, effect, p);
-    internal bool ShenZhWindowMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShenZhWindowMatches(f);
     internal bool TryReturnLishiJudgment(global::CardGame.Core.JudgmentFrame j) => _resolve().TryReturnLishiJudgment(j);
     internal bool HasLishiCapability { get => _resolve().HasLishiCapability; }
 }

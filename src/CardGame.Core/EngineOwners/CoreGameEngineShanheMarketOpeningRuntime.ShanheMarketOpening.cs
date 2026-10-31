@@ -35,17 +35,4 @@ internal sealed partial class CoreGameEngineShanheMarketOpeningRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == execution.Id);
         return market.Id == origin.PurchaseFrameId && market.RewardId == origin.RewardId && index >= 0 && index + 1 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[index + 1].Id == window.Id;
     }
-
-    // A paid purchase may temporarily suspend a real damage/response subtree.
-    // Only descendants of that exact new purchase own its additional children.
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 62030)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 62030)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 62030)]
-    internal bool HasShanheMarketPurchaseObserver(long id)
-    {
-        var market = _resolutionStackOperations._resolutionStack.OfType<ShanheMarketPurchaseFrame>().SingleOrDefault();
-        if (market is null || !_coreShanheMarketOperations.ValidShanheMarketPurchase(market))
-            return false;
-        return _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == market.Id);
-    }
 }

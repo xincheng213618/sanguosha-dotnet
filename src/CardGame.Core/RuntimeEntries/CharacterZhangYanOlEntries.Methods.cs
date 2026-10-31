@@ -17,11 +17,9 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal bool DrainZhangYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainZhangYan(f);
     internal void FinishZhangYan(global::CardGame.Core.ProgramSkillFrame f, bool applied) => _resolve().FinishZhangYan(f, applied);
     internal bool HasIssuedZhangYanSujiRewardCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedZhangYanSujiRewardCandidate(c, context);
-    internal bool HasZhangYanDamageObserver(long id) => _resolve().HasZhangYanDamageObserver(id);
     internal bool HasZhangYanLangdaoTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasZhangYanLangdaoTargetTail(use);
     internal bool IsZhangYanLangdaoIssued(global::CardGame.Core.CardUseFrame use) => _resolve().IsZhangYanLangdaoIssued(use);
     internal bool IsZhangYanLangdaoUnrespondable(long id) => _resolve().IsZhangYanLangdaoUnrespondable(id);
-    internal bool IsZhangYanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhangYanMovement(f, e, p);
     internal bool IsZhangYanNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsZhangYanNativeSettlementBatch(f, batch);
     internal bool IsZhangYanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZhangYanRecoveryParent(f, recovery);
     internal bool IsZhangYanRewardMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsZhangYanRewardMovement(f, m);

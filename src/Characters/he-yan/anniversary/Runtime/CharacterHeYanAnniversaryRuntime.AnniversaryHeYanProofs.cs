@@ -7,10 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHeYanAnniversaryRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 44200)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 44200)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 44200)]
     internal bool HeYanMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
     {
         if (f.AnniversaryHeYan is not { Stage: AnniversaryHeYanStage.MovementChildren or AnniversaryHeYanStage.DrawChildren } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null)
@@ -43,11 +39,6 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? HeYanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterHeYanAnniversaryOperations.HeYanFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 44200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 44200)]
-    internal bool HeYanDamageObserver(long id) => HeYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 44200)]
-    internal bool HeYanBeforeDamageObserver(long id) => HeYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 44200)]
     internal bool HeYanDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HeYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 44200)]

@@ -83,8 +83,6 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageObservers
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50)]
     internal bool IsSameNameHandDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (SameNameHandObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id) || ResponseCompletionObserverRoot()is { } response && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == response.Id) || _coreCardSupplyCompletionOperations.CardSupplyCompletionObserverRoot()is { } supply && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == supply.Id));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1820)]
-    internal bool HasSameNameHandDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) && (SameNameHandObserverRoot()is not null || ResponseCompletionObserverRoot()is not null || _coreCardSupplyCompletionOperations.CardSupplyCompletionObserverRoot()is not null);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 10)]
     internal bool TryAdvanceSameNameHandSubtree()
     {

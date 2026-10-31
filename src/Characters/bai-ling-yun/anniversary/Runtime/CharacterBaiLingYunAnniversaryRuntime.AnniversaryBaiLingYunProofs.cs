@@ -19,9 +19,6 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
     }
 
     internal bool AnniversaryBlyUsePaid(ProgramSkillFrame f) => f.AnniversaryBly is { Plan: { } p } r && r.Viewed.Contains(p.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == p.CardId && m.Sequence > r.ViewAfter && m.From == AnniversaryBlyLease(f) && m.To == CardLocation.Processing && m.Reason == AnniversaryBlyReason("use")) == 1;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43600)]
     internal bool AnniversaryBlyMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (f.AnniversaryBly is not { } r || !ValidAnniversaryBly(f) || effect?.Op != SkillProgramEffectOp.ResolveAnniversaryBaiLingYunLinghui || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
@@ -58,11 +55,6 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? AnniversaryBlyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterBaiLingYunAnniversaryOperations.AnniversaryBlyFirstChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 43600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 43600)]
-    internal bool AnniversaryBlyDamageObserver(long id) => AnniversaryBlyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 43600)]
-    internal bool AnniversaryBlyBeforeDamageObserver(long id) => AnniversaryBlyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 43600)]
     internal bool AnniversaryBlyDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryBlyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43600)]

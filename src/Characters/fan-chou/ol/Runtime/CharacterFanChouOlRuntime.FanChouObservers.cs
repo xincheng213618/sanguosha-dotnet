@@ -32,11 +32,6 @@ internal sealed partial class CharacterFanChouOlRuntime
     }
 
     internal ProgramSkillFrame? FanChouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterFanChouOlOperations.FanChouFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 310)]
-    internal bool HasFanChouDamageObserver(long id) => FanChouObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 400)]
-    internal bool HasFanChouBeforeDamageObserver(long id) => FanChouObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 310)]
     internal bool TryAdvanceFanChouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FanChouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

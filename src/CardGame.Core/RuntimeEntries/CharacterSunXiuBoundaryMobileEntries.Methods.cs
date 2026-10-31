@@ -9,7 +9,6 @@ internal sealed partial class CharacterSunXiuBoundaryMobileEntries
     internal global::CardGame.Core.PromptChoice BoundaryXingxueChoice(global::CardGame.Core.ProgramSkillFrame frame, string branch, string key, string text, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().BoundaryXingxueChoice(frame, branch, key, text, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryXingxueChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryXingxueChoices(frame);
     internal int BoundaryXingxueChooser(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryXingxueChooser(frame);
-    internal bool BoundaryXingxuePaidMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().BoundaryXingxuePaidMovement(frame, effect, pending);
     internal void CompleteBoundaryXingxue(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CompleteBoundaryXingxue(frame);
     internal bool ContinueBoundaryXingxue(long id) => _resolve().ContinueBoundaryXingxue(id);
     internal bool IsBoundarySunXiuFactionRangeTarget(int actorSeat, int targetSeat) => _resolve().IsBoundarySunXiuFactionRangeTarget(actorSeat, targetSeat);

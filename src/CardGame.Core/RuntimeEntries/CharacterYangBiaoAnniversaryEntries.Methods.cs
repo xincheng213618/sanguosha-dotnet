@@ -28,13 +28,10 @@ internal sealed partial class CharacterYangBiaoAnniversaryEntries
     internal bool ValidYangBiaoUseCursor(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidYangBiaoUseCursor(f);
     internal global::CardGame.Core.PromptChoice YangBiaoAi(global::CardGame.Core.PendingDecision p) => _resolve().YangBiaoAi(p);
     internal global::CardGame.Core.AnniversaryYangBiaoDrawArmedEvent? YangBiaoArm(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext? context = default) => _resolve().YangBiaoArm(owner, instance, context);
-    internal bool YangBiaoBeforeDamageObserver(long id) => _resolve().YangBiaoBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> YangBiaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().YangBiaoChoices(f);
-    internal bool YangBiaoDamageObserver(long id) => _resolve().YangBiaoDamageObserver(id);
     internal int YangBiaoDiscardCount() => _resolve().YangBiaoDiscardCount();
     internal long YangBiaoDrawPhaseId(global::CardGame.Core.ProgramSkillWindowContext? context = default) => _resolve().YangBiaoDrawPhaseId(context);
     internal bool YangBiaoFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().YangBiaoFirstChild(f, child);
-    internal bool YangBiaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().YangBiaoMovement(f, e, p);
     internal global::CardGame.Core.ProgramSkillFrame? YangBiaoObserverRoot() => _resolve().YangBiaoObserverRoot();
     internal bool YangBiaoOriginal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().YangBiaoOriginal(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> YangBiaoPaymentChoices(global::CardGame.Core.ProgramSkillFrame f, bool gift) => _resolve().YangBiaoPaymentChoices(f, gift);

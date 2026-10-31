@@ -13,9 +13,6 @@ internal sealed partial class CharacterLiJueOlEntries
     internal global::CardGame.Core.CardMovementBatchContext CompleteMovementBatchCaptureLiJueUseDiscard(global::CardGame.Core.CardMovementBatchBuilder batch, global::CardGame.Core.CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureLiJueUseDiscard(batch, completed);
     internal global::CardGame.Core.ProgramSkillWindowContext CreateLiJueMovementContext(global::CardGame.Core.CardsMovedTriggerWindowFrame frame, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().CreateLiJueMovementContext(frame, candidate);
     internal void FinishLiJue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLiJue(f);
-    internal bool HasLiJueBeforeDamageObserver(long id) => _resolve().HasLiJueBeforeDamageObserver(id);
-    internal bool HasLiJueDamageObserver(long id) => _resolve().HasLiJueDamageObserver(id);
-    internal bool IsLiJueMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiJueMovement(f, effect, p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> LangxiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LangxiChoices(f);
     internal int[] LangxiTargets(int owner) => _resolve().LangxiTargets(owner);
     internal bool LiJueCurrentSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LiJueCurrentSource(f);

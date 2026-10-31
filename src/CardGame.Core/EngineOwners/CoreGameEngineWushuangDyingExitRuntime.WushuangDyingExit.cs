@@ -16,15 +16,5 @@ internal sealed partial class CoreGameEngineWushuangDyingExitRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(w => w.Id == parent.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == ret.DyingParentFrameId && _coreProgramEventHistoryOperations.ProgramEventHistory<DyingResolvedEvent>().Count(e => e.ResolutionId == ret.DyingFrameId && e.VictimSeat == ret.VictimSeat && e.Survived) == 1;
     }
-
-    internal bool IsExactWushuangDyingExitProgram(ProgramSkillFrame f) => f.WushuangCombat is { TacticId: 2174 or 2175 } && IsWushuangDyingExitReturn(f);
     internal bool IsWushuangDyingExitReturn(ProgramSkillFrame f) => f.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) && IsWushuangDyingExitContext(parent.Candidates[parent.CandidateIndex], context);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 61400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 61400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 61400)]
-    internal bool HasWushuangDyingExitDamageObserver(long id)
-    {
-        var root = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(IsExactWushuangDyingExitProgram);
-        return root is not null && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    }
 }

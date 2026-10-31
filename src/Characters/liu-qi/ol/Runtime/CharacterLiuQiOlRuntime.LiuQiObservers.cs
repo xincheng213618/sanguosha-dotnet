@@ -93,11 +93,6 @@ internal sealed partial class CharacterLiuQiOlRuntime
     }
 
     internal ProgramSkillFrame? LiuQiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterLiuQiOlOperations.LiuQiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1520)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1630)]
-    internal bool HasLiuQiDamageObserver(long id) => LiuQiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 510)]
-    internal bool HasLiuQiBeforeDamageObserver(long id) => LiuQiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 220)]
     internal bool TryAdvanceLiuQiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuQiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -15,14 +15,6 @@ internal sealed partial class MouDanchiRuntime
         }
         return null;
     }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 34101)]
-    private bool DamageObserver(long windowId)
-    {
-        if (frames.Find(windowId) is not DamageTriggerWindowFrame || MovementRoot() is not { } root) return false;
-        for (ResolutionFrame? current = root; current is not null; current = frames.ParentOf(current.Id))
-            if (current.Id == windowId) return true;
-        return false;
-    }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 34101)]
     private bool DyingObserver()
     {

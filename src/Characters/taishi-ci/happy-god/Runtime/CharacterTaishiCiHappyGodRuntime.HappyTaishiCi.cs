@@ -142,14 +142,4 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 41740)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41740)]
     internal bool RetainHappyTsc(ProgramSkillFrame f) => f.HappyTaishiCi is not null;
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 41740)]
-    internal bool ProveHappyTscMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation continuation) => f.HappyTaishiCi is { Stage: HappyTaishiCiStage.MovementChildren } r && effect?.Op == r.Op && continuation.SubjectSeat == f.OwnerSeat && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null && ValidHappyTscMaterial(f);
-
-    internal bool ValidHappyTscMaterial(ProgramSkillFrame f)
-    {
-        var r = f.HappyTaishiCi!;
-        if (r.Op == SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash)
-            return r.CardId is not { } card ? r.Before == r.After : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After && m.Reason == HappyTscSlashReason).ToArray()is [{ CardId: var actual, From: var from, To: var to, CardKind: var kind }] && actual == card && from == CardLocation.DrawPile && to == CardLocation.Hand(f.OwnerSeat) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
-        return r.Draw is { } draw && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Count && draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == HappyTscAwakenDrawReason).Select(m => m.CardId).SequenceEqual(draw.ActualDrawIds) && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyTaishiCiDrawReturnedEvent>().Count(e => e == new HappyTaishiCiDrawReturnedEvent(f.Id, draw.RequestedCount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId)) == 1;
-    }
 }

@@ -6,7 +6,6 @@ internal sealed partial class CharacterSunJianBoundaryMobileEntries
     internal void ContinueMobileSunJianPolu(long id) => _resolve().ContinueMobileSunJianPolu(id);
     internal bool KeepMobileSunJianPolu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepMobileSunJianPolu(frame);
     internal int MobileSunJianInvocationCount(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().MobileSunJianInvocationCount(frame);
-    internal bool ProveMobileSunJianPoluMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().ProveMobileSunJianPoluMovement(frame, effect, pending);
     internal bool ProveMobileSunJianPoluRecovery(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().ProveMobileSunJianPoluRecovery(frame, recovery);
     internal bool ResumeMobileSunJianPolu(long id) => _resolve().ResumeMobileSunJianPolu(id);
     internal void ReturnMobileSunJianPoluDraw(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnMobileSunJianPoluDraw(frame, outcome);

@@ -33,8 +33,6 @@ internal sealed partial class CharacterLiuZhangOlEntries
     internal bool FinishZonghuAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishZonghuAttack(attack, out paused);
     internal void FinishZonghuAttempt(global::CardGame.Core.ProgramSkillFrame f, bool success) => _resolve().FinishZonghuAttempt(f, success);
     internal bool HasAcceptedZonghuKeAction(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.LegalAction a) => _resolve().HasAcceptedZonghuKeAction(f, a);
-    internal bool HasLiuZhangBeforeDamageObserver(long id) => _resolve().HasLiuZhangBeforeDamageObserver(id);
-    internal bool HasLiuZhangDamageObserver(long id) => _resolve().HasLiuZhangDamageObserver(id);
     internal bool HasSayingZonghuPayment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame? use = default) => _resolve().HasSayingZonghuPayment(f, use);
     internal bool HasZonghuForcedSlash(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => _resolve().HasZonghuForcedSlash(actor, target, pending);
     internal bool HasZonghuForcedSlash2(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().HasZonghuForcedSlash(actor, target, pending);
@@ -46,7 +44,6 @@ internal sealed partial class CharacterLiuZhangOlEntries
     internal bool IsFengweiCardDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().IsFengweiCardDamage(attack);
     internal bool IsFengweiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsFengweiMovement(f, m);
     internal bool IsIssuedZonghuUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedZonghuUse(use);
-    internal bool IsLiuZhangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiuZhangMovement(f, effect, p);
     internal bool IsLiuZhangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiuZhangRecoveryParent(f, recovery);
     internal bool IsZonghuAnswer(global::CardGame.Core.ChoiceId id) => _resolve().IsZonghuAnswer(id);
     internal bool IsZonghuGiftMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsZonghuGiftMovement(f, m);

@@ -11,8 +11,6 @@ internal sealed partial class CharacterZouShiLeEntries
     internal long CaptureYunzhengQualificationStamp(long inner) => _resolve().CaptureYunzhengQualificationStamp(inner);
     internal void ContinueHuoxin(long id) => _resolve().ContinueHuoxin(id);
     internal void FinishHuoxin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuoxin(f);
-    internal bool HasHuoxinBeforeDamageObserver(long id) => _resolve().HasHuoxinBeforeDamageObserver(id);
-    internal bool HasHuoxinDamageObserver(long id) => _resolve().HasHuoxinDamageObserver(id);
     internal bool HasLiveYunzhengSource(global::CardGame.Core.CharacterState owner) => _resolve().HasLiveYunzhengSource(owner);
     internal bool HasYunzhengEntityMark(int cardId) => _resolve().HasYunzhengEntityMark(cardId);
     internal bool HasYunzhengHandEntityMark(int ownerSeat, int cardId) => _resolve().HasYunzhengHandEntityMark(ownerSeat, cardId);

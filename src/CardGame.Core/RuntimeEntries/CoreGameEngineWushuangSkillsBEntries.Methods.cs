@@ -23,7 +23,6 @@ internal sealed partial class CoreGameEngineWushuangSkillsBEntries
     internal void FinishWushuangB(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWushuangB(f);
     internal void FinishWushuangLiantao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWushuangLiantao(f);
     internal bool HasWushuangBianyuPotential(global::CardGame.Core.CharacterState owner) => _resolve().HasWushuangBianyuPotential(owner);
-    internal bool IsWushuangBMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWushuangBMovement(f, effect, pending);
     internal bool IsWushuangBZeroUse(long id) => _resolve().IsWushuangBZeroUse(id);
     internal bool IsWushuangZhendanConversionForbidden(global::CardGame.Core.ProgramConfiguredViewAsQuery q) => _resolve().IsWushuangZhendanConversionForbidden(q);
     internal bool IsWushuangZhendanSubmittedConversionForbidden(global::CardGame.Core.ProgramViewAsLegalityQuery q) => _resolve().IsWushuangZhendanSubmittedConversionForbidden(q);

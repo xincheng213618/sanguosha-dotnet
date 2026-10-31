@@ -22,7 +22,6 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryEntries
     internal bool DrainAnniversaryFuPair(long id) => _resolve().DrainAnniversaryFuPair(id);
     internal void ExpireAnniversaryXuewei(global::CardGame.Core.TurnStartedEvent fact) => _resolve().ExpireAnniversaryXuewei(fact);
     internal void FinishAnniversaryFuPair(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishAnniversaryFuPair(f);
-    internal bool HasAnniversaryFuPairBeforeDamageObserver(long id) => _resolve().HasAnniversaryFuPairBeforeDamageObserver(id);
     internal bool HasAnniversaryFuPairDying() => _resolve().HasAnniversaryFuPairDying();
     internal bool KeepPaidAnniversaryFuPair(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidAnniversaryFuPair(f);
     internal void PublishAnniversaryFuPair(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishAnniversaryFuPair(f);

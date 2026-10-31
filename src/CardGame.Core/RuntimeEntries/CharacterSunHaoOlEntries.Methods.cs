@@ -18,13 +18,10 @@ internal sealed partial class CharacterSunHaoOlEntries
     internal bool DistancePhysicalSlash20HasSunHaoCanshiIssuedDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash20HasSunHaoCanshiIssuedDistance(q);
     internal bool DrainSunHao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainSunHao(f);
     internal void FinishSunHao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSunHao(f);
-    internal bool HasSunHaoBeforeDamageObserver(long id) => _resolve().HasSunHaoBeforeDamageObserver(id);
     internal bool HasSunHaoCanshiIssuedDistance(long? useId, int actorSeat, int targetSeat) => _resolve().HasSunHaoCanshiIssuedDistance(useId, actorSeat, targetSeat);
     internal bool HasSunHaoCanshiResponseObligation(global::CardGame.Core.CardActionContext action, global::CardGame.Core.ProgramCardContinuation continuation) => _resolve().HasSunHaoCanshiResponseObligation(action, continuation);
-    internal bool HasSunHaoDamageObserver(long id) => _resolve().HasSunHaoDamageObserver(id);
     internal bool IsGuimingTreatedWounded(global::CardGame.Core.CharacterState player) => _resolve().IsGuimingTreatedWounded(player);
     internal bool IsIssuedSunHaoCanshiCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsIssuedSunHaoCanshiCandidate(candidate, c);
-    internal bool IsSunHaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsSunHaoMovement(f, e, p);
     internal bool IsSunHaoPaymentMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsSunHaoPaymentMovement(f, m);
     internal bool IsSunHaoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunHaoRecoveryParent(f, recovery);
     internal void ObserveSunHaoDamage(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveSunHaoDamage(payload);

@@ -35,6 +35,4 @@ internal sealed partial class CoreGameEngineRicePileObserversRuntime
     internal ProgramSkillFrame? RiceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreRicePileObserversOperations.RiceFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 470)]
     internal bool TryAdvanceRiceSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && RiceObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1610)]
-    internal bool HasRiceDamageObserver(long id) => RiceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

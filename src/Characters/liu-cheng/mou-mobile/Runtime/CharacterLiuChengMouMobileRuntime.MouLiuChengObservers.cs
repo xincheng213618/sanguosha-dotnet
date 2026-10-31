@@ -30,9 +30,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 340)]
-    internal bool IsMouLiuChengMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.MouLiuChengCompletion is { Paid: true, Stage: MouLiuChengStage.NativeChildren or MouLiuChengStage.DrawChildren } && e?.Op == SkillProgramEffectOp.ResolveMouLiuChengCompletion && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouLiuChengDrawMovement(ProgramSkillFrame f, CardMovementRecord m) => f.MouLiuChengCompletion is { Stage: MouLiuChengStage.DrawChildren, DrawOutcome: { } o } && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > o.SequenceBefore && m.Sequence <= o.SequenceAfter && (o.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MouLiuChengDrawReason || o.ReplacementGainedIds.Contains(m.CardId) && m.To == CardLocation.Hand(f.OwnerSeat) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle);
     internal bool IsMouLiuChengSuspendedCompletedAttack(CardUseFrame original, long? requiredWindowId = null)
     {
@@ -124,11 +121,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
 
     internal bool MouLiuChengObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _characterLiuChengMouMobileOperations.MouLiuChengNativeWindowEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame p && (_characterLiuChengMouMobileOperations.MouLiuChengFirstChild(p, _resolutionStackOperations2._resolutionStack()[n]) || p.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(p, _resolutionStackOperations2._resolutionStack()[n])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? MouLiuChengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLiuChengMouMobileOperations.MouLiuChengFirstChild(f, child), (index) => _characterLiuChengMouMobileOperations.MouLiuChengObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1320)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1430)]
-    internal bool HasMouLiuChengDamageObserver(long id) => MouLiuChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1460)]
-    internal bool HasMouLiuChengBeforeDamageObserver(long id) => MouLiuChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 490)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 480)]
     internal bool IsMouLiuChengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

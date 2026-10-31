@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiMouRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 35200)]
     internal bool MouJiangWeiAnniversaryMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MouJiangWeiAnniversary is { Paid: true } r && effect?.Op == r.Operation && MouJiangWeiAnniversary.Valid(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouJiangWeiAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -42,11 +41,6 @@ internal sealed partial class CharacterJiangWeiMouRuntime
     internal bool MouJiangWeiAnniversaryEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MouJiangWeiAnniversaryFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool MouJiangWeiAnniversarySuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterJiangWeiMouOperations.MouJiangWeiAnniversaryEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? MouJiangWeiAnniversaryRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterJiangWeiMouOperations.MouJiangWeiAnniversaryFirstChild(f, c), (n) => _characterJiangWeiMouOperations.MouJiangWeiAnniversarySuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 35200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 35200)]
-    internal bool MouJiangWeiAnniversaryDamageWindow(long id) => MouJiangWeiAnniversaryRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35200)]
-    internal bool MouJiangWeiAnniversaryBeforeDamage(long id) => MouJiangWeiAnniversaryRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35200)]
     internal bool MouJiangWeiAnniversaryDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouJiangWeiAnniversaryRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35200)]

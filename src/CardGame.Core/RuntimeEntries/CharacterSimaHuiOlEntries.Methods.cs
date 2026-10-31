@@ -13,8 +13,6 @@ internal sealed partial class CharacterSimaHuiOlEntries
     internal bool CanPreventSimaHuiDamage(int owner, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanPreventSimaHuiDamage(owner, trigger, context);
     internal bool ExactSimaHuiParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactSimaHuiParent(f);
     internal void FinishSimaHui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSimaHui(f);
-    internal bool HasSimaHuiBeforeDamageObserver(long id) => _resolve().HasSimaHuiBeforeDamageObserver(id);
-    internal bool HasSimaHuiDamageObserver(long id) => _resolve().HasSimaHuiDamageObserver(id);
     internal bool IsSimaHuiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSimaHuiMovement(f, effect, pending);
     internal bool IsSimaHuiYeyanSelectedPayment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsSimaHuiYeyanSelectedPayment(f);
     internal void IssueSimaHuiGift(global::CardGame.Core.ProgramSkillFrame f, int recipient) => _resolve().IssueSimaHuiGift(f, recipient);

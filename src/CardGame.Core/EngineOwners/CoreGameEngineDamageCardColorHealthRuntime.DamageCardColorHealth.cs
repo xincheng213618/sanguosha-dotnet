@@ -113,10 +113,6 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
     }
 
     internal ProgramSkillFrame? DamageCardColorHealthObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.DamageCardColorHealth is not null && _coreDamageCardColorHealthOperations.DamageCardColorHealthFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreDamageCardColorHealthOperations.DamageCardColorHealthObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamagePrelude, 10)]
-    internal bool HasDamageCardColorHealthBeforeDamage(long id) => DamageCardColorHealthObserverRoot()is { } root && (root.DamageCardColorHealth!.BeforeDamageWindowId == id || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1640)]
-    internal bool HasDamageCardColorHealthDamageObserver(long id) => DamageCardColorHealthObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30)]
     internal bool IsDamageCardColorHealthRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery)
     {

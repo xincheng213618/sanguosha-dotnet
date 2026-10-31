@@ -108,11 +108,6 @@ internal sealed partial class CharacterGuoSiOlRuntime
     }
 
     internal ProgramSkillFrame? GuoSiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterGuoSiOlOperations.GuoSiFirstChild(r, c), (i) => _characterGuoSiOlOperations.GuoSiObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 210)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 320)]
-    internal bool HasGuoSiDamageObserver(long id) => GuoSiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 410)]
-    internal bool HasGuoSiBeforeDamageObserver(long id) => GuoSiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 320)]
     internal bool TryAdvanceGuoSiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && GuoSiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

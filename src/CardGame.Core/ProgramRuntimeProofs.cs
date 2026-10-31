@@ -3,25 +3,7 @@ using System.Reflection;
 
 namespace CardGame.Core;
 
-// These are the original admission positions, not new gameplay timings. Keeping
-// them separate preserves the checks before/after native debt and payment rules.
-internal enum ProgramObserverProofPhase { PaidDamage, NestedDamage, BeforeDamagePrelude, BeforeDamage }
-internal enum ProgramMovementProofPhase { NativeCost, BeforePrivatePayments, PrivatePayments, EffectPayments, BoundEquipment }
-internal enum ProgramDyingProofPhase { Runtime =1}
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-internal sealed class ProgramObserverProofAttribute(ProgramObserverProofPhase phase, int order) : Attribute
-{
-    internal ProgramObserverProofPhase Phase { get; } = phase;
-    internal int Order { get; } = order;
-}
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-internal sealed class ProgramMovementProofAttribute(ProgramMovementProofPhase phase, int order) : Attribute
-{
-    internal ProgramMovementProofPhase Phase { get; } = phase;
-    internal int Order { get; } = order;
-}
+internal enum ProgramDyingProofPhase { Runtime = 1 }
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 internal sealed class ProgramDyingProofAttribute(ProgramDyingProofPhase phase, int order, int group = 200) : Attribute
@@ -33,17 +15,11 @@ internal sealed class ProgramDyingProofAttribute(ProgramDyingProofPhase phase, i
 
 internal sealed class ProgramRuntimeProofCatalog
 {
-    internal IReadOnlyDictionary<ProgramObserverProofPhase, IReadOnlyList<ProgramRuntimeRegistration>> Observers { get; }
-    internal IReadOnlyDictionary<ProgramMovementProofPhase, IReadOnlyList<ProgramRuntimeRegistration>> Movements { get; }
     internal IReadOnlyDictionary<ProgramDyingProofPhase, IReadOnlyList<IReadOnlyList<ProgramRuntimeRegistration>>> Dying { get; }
 
     private ProgramRuntimeProofCatalog(
-        Dictionary<ProgramObserverProofPhase, SortedDictionary<int, ProgramRuntimeRegistration>> observers,
-        Dictionary<ProgramMovementProofPhase, SortedDictionary<int, ProgramRuntimeRegistration>> movements,
         Dictionary<ProgramDyingProofPhase, SortedDictionary<int, SortedDictionary<int, ProgramRuntimeRegistration>>> dying)
     {
-        Observers = Freeze(observers);
-        Movements = Freeze(movements);
         Dying = new ReadOnlyDictionary<ProgramDyingProofPhase, IReadOnlyList<IReadOnlyList<ProgramRuntimeRegistration>>>(
             dying.ToDictionary(p => p.Key, p => (IReadOnlyList<IReadOnlyList<ProgramRuntimeRegistration>>)Array.AsReadOnly(
                 p.Value.Values.Select(group => (IReadOnlyList<ProgramRuntimeRegistration>)Array.AsReadOnly(group.Values.ToArray())).ToArray())));
@@ -51,18 +27,10 @@ internal sealed class ProgramRuntimeProofCatalog
 
     internal static ProgramRuntimeProofCatalog Discover(IEnumerable<MethodInfo> methods)
     {
-        var observers = Empty<ProgramObserverProofPhase>();
-        var movements = Empty<ProgramMovementProofPhase>();
         var dying = Enum.GetValues<ProgramDyingProofPhase>().ToDictionary(p => p,
             _ => new SortedDictionary<int, SortedDictionary<int, ProgramRuntimeRegistration>>());
         foreach (var method in methods)
         {
-            foreach (var attribute in method.GetCustomAttributes<ProgramObserverProofAttribute>())
-                Add(observers, attribute.Phase, attribute.Order, method, typeof(Func<long, bool>), [typeof(long)]);
-            foreach (var attribute in method.GetCustomAttributes<ProgramMovementProofAttribute>())
-                Add(movements, attribute.Phase, attribute.Order, method,
-                    typeof(Func<ProgramSkillFrame, SkillProgramEffect?, ProgramMovementContinuation, bool>),
-                    [typeof(ProgramSkillFrame), typeof(SkillProgramEffect), typeof(ProgramMovementContinuation)]);
             foreach (var attribute in method.GetCustomAttributes<ProgramDyingProofAttribute>())
             {
                 if (!Enum.IsDefined(attribute.Phase) || attribute.Group <= 0)
@@ -72,17 +40,7 @@ internal sealed class ProgramRuntimeProofCatalog
                 Add(group, attribute.Order, method, typeof(Func<bool>), []);
             }
         }
-        return new(observers, movements, dying);
-    }
-
-    private static Dictionary<T, SortedDictionary<int, ProgramRuntimeRegistration>> Empty<T>() where T : struct, Enum =>
-        Enum.GetValues<T>().ToDictionary(phase => phase, _ => new SortedDictionary<int, ProgramRuntimeRegistration>());
-
-    private static void Add<T>(Dictionary<T, SortedDictionary<int, ProgramRuntimeRegistration>> groups,
-        T phase, int order, MethodInfo method, Type delegateType, Type[] parameters) where T : struct, Enum
-    {
-        if (!Enum.IsDefined(phase)) throw new InvalidOperationException($"Runtime proof '{method.Name}' requires a valid phase.");
-        Add(groups[phase], order, method, delegateType, parameters);
+        return new(dying);
     }
 
     private static void Add(SortedDictionary<int, ProgramRuntimeRegistration> group, int order,
@@ -97,18 +55,12 @@ internal sealed class ProgramRuntimeProofCatalog
             throw new InvalidOperationException($"Duplicate runtime proof order '{order}' at '{method.Name}'.");
     }
 
-    private static IReadOnlyDictionary<T, IReadOnlyList<ProgramRuntimeRegistration>> Freeze<T>(
-        Dictionary<T, SortedDictionary<int, ProgramRuntimeRegistration>> groups) where T : notnull =>
-        new ReadOnlyDictionary<T, IReadOnlyList<ProgramRuntimeRegistration>>(groups.ToDictionary(p => p.Key,
-            p => (IReadOnlyList<ProgramRuntimeRegistration>)Array.AsReadOnly(p.Value.Values.ToArray())));
 }
 
 // Bind only the proof phases reached by this match. The shared catalog contains
 // method metadata; these delegates and their cache belong to one engine only.
 internal sealed class ProgramRuntimeProofs(ProgramRuntimeProofCatalog catalog, Func<ProgramRuntimeRegistration, Delegate> bind)
 {
-    private readonly Dictionary<ProgramObserverProofPhase, Func<long, bool>[]> _observers = new();
-    private readonly Dictionary<ProgramMovementProofPhase, Func<ProgramSkillFrame, SkillProgramEffect?, ProgramMovementContinuation, bool>[]> _movements = new();
     private readonly Dictionary<ProgramDyingProofPhase, Func<bool>[][]> _dying = new();
 
     internal bool IsDying(ProgramDyingProofPhase phase)

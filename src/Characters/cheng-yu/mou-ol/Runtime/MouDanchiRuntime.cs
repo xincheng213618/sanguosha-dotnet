@@ -138,10 +138,6 @@ internal sealed partial class MouDanchiRuntime(IProgramRuntimeFrames frames, IPr
     private bool Paid(ProgramSkillFrame f) => f.MouDanchi is not null && Valid(f) ||
         f.SkillId == MouChengYuComposition.Danchi && f.TriggerId == "source-next-use" && facts.NativeParentMatches(f) &&
         RewardPromise(f.OwnerSeat, facts.Action(f).ActionId) is { } p && p.GameplayHash == f.GameplayHash && p.Source.SkillInstanceId == f.SkillInstanceId;
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 34101)]
-    private bool MovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) =>
-        f.MouDanchi is { Stage: MouDanchiStage.Children } && Valid(f) && effect?.Op == SkillProgramEffectOp.ResolveMouChengYuDanchi &&
-        pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     private void Complete(ProgramSkillFrame f)
     {
         events.AdvanceFact(new MouDanchiCompletedEvent(f.Id, f.MouDanchi!.PromiseId, f.TriggerId == "source-next-use"));

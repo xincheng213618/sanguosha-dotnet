@@ -45,9 +45,6 @@ internal sealed partial class CharacterSunRuOlRuntime
     }
 
     internal ProgramSkillFrame? SunRuOlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterSunRuOlOperations.SunRuOlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 340)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 450)]
-    internal bool HasSunRuOlDamageObserver(long id) => SunRuOlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26110)]
     internal bool TryAdvanceSunRuOlSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SunRuOlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

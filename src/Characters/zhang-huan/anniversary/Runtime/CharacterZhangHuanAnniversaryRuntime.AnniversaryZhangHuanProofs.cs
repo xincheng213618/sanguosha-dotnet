@@ -16,9 +16,6 @@ internal sealed partial class CharacterZhangHuanAnniversaryRuntime
     }
 
     internal bool ValidZhangHuan(ProgramSkillFrame f) => f.AnniversaryZhangHuan is { } r && f.InstructionIndex == 1 && ZhangHuanParent(f) && r.Source == ZhangHuanSource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && r.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && r.ParentId == f.WindowContext?.ParentFrameId && Enum.IsDefined(r.Stage) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && r.Used.All(id => id > 0) && r.Used.Distinct().Count() == r.Used.Count && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryZhangHuanStartedEvent>().Count(e => e == new AnniversaryZhangHuanStartedEvent(f.Id, r.Source, r.Hash, r.Turn, r.TurnOwner, r.ParentId)) == 1;
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46300)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46300)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46300)]
     internal bool ZhangHuanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (f.AnniversaryZhangHuan is not { } r || effect?.Op != SkillProgramEffectOp.ResolveAnniversaryZhangHuanShuguo || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || !ValidZhangHuan(f))
@@ -47,11 +44,6 @@ internal sealed partial class CharacterZhangHuanAnniversaryRuntime
 
     internal ProgramSkillFrame? ZhangHuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangHuanAnniversaryOperations.ZhangHuanFirstChild(f, c), (i) => _characterZhangHuanAnniversaryOperations.ZhangHuanObserverSuffix(i));
     internal bool ZhangHuanObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, dying) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, dying) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, dying));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46300)]
-    internal bool ZhangHuanDamageObserver(long id) => ZhangHuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46300)]
-    internal bool ZhangHuanBeforeDamage(long id) => ZhangHuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46300)]
     internal bool ZhangHuanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ZhangHuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 46300)]

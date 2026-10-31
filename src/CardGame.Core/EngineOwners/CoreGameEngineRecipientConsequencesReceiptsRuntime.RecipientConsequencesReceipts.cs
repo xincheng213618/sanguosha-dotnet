@@ -112,9 +112,6 @@ internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
             return r.RecoveryRequested == 0;
         return facts.OfType<PrintedLordRecoveryRequestedEvent>().Count(e => e == new PrintedLordRecoveryRequestedEvent(f.Id, r.BeneficiarySeat, r.RecoveryRequested)) == 1 && (r.Stage is not (PrintedLordBenefitStage.Qualifying or PrintedLordBenefitStage.Complete) || facts.OfType<PrintedLordQualificationCapturedEvent>().Count(e => e == new PrintedLordQualificationCapturedEvent(f.Id, r.BeneficiarySeat)) == 1) && (r.Stage != PrintedLordBenefitStage.Complete || facts.OfType<PrintedLordQualificationIssuedEvent>().Count(e => e == new PrintedLordQualificationIssuedEvent(f.Id, r.BeneficiarySeat, r.Source, r.GameplayHash)) == 1);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 70)]
-    internal bool IsRecipientConsequencesMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => f.BlackGiftContest is { Stage: BlackGiftContestStage.GiftPaid or BlackGiftContestStage.DiscardPaid or BlackGiftContestStage.Pindian } && e?.Op == SkillProgramEffectOp.GiveBlackHandAndResolveRecipientContest && pending == f.PendingMovementContinuation && ValidBlackGiftContest(f);
     [ProgramContinuation(ProgramContinuationKind.Movement, 410)]
     internal bool ReturnRecipientConsequencesMovement(ProgramSkillFrame f)
     {

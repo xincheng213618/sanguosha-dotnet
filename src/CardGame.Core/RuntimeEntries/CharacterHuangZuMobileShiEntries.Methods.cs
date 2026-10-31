@@ -28,11 +28,9 @@ internal sealed partial class CharacterHuangZuMobileShiEntries
     internal bool ReturnShiHzNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnShiHzNativeUse(use);
     internal void SealShiHz(long id) => _resolve().SealShiHz(id);
     internal global::CardGame.Core.PromptChoice ShiHzAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiHzAi(p, f);
-    internal bool ShiHzBeforeDamageChild(long id) => _resolve().ShiHzBeforeDamageChild(id);
     internal bool ShiHzChildEdge(int i) => _resolve().ShiHzChildEdge(i);
     internal bool ShiHzChildSuffix(int n) => _resolve().ShiHzChildSuffix(n);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiHzChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiHzChoices(f);
-    internal bool ShiHzDamageChild(long id) => _resolve().ShiHzDamageChild(id);
     internal global::CardGame.Core.CardUseFrame? ShiHzDamageUse(global::CardGame.Core.ProgramSkillWindowContext context, int owner) => _resolve().ShiHzDamageUse(context, owner);
     internal int[]? ShiHzDiscardIndexes(global::CardGame.Core.CardMovementBatchContext batch, global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramInstructionFeatures features) => _resolve().ShiHzDiscardIndexes(batch, c, features);
     internal bool ShiHzDyingChild() => _resolve().ShiHzDyingChild();

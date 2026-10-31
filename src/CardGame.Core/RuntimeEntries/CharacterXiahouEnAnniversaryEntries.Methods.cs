@@ -7,8 +7,6 @@ internal sealed partial class CharacterXiahouEnAnniversaryEntries
     internal bool CanOfferAnniversaryXiahouEn(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferAnniversaryXiahouEn(candidate, trigger, context);
     internal void ContinueAnniversaryXiahouEn(long id) => _resolve().ContinueAnniversaryXiahouEn(id);
     internal bool HasXiahouEnObserverDying() => _resolve().HasXiahouEnObserverDying();
-    internal bool HasXiahouEnPaidDamageObserver(long id) => _resolve().HasXiahouEnPaidDamageObserver(id);
-    internal bool IsAnniversaryXiahouEnPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsAnniversaryXiahouEnPaidMovement(f, effect, pending);
     internal bool KeepIssuedAnniversaryXiahouEn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepIssuedAnniversaryXiahouEn(f);
     internal void RestoreXiahouEnSwordAtActualTurnEnd(global::CardGame.Core.TurnEndedEvent ended) => _resolve().RestoreXiahouEnSwordAtActualTurnEnd(ended);
     internal bool ResumeAnniversaryXiahouEn(long id) => _resolve().ResumeAnniversaryXiahouEn(id);

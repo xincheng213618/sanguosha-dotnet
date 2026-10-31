@@ -21,8 +21,6 @@ internal sealed partial class CharacterZhangXiuMouOlEntries
     internal bool DrainMouZhangXiuOl(long id) => _resolve().DrainMouZhangXiuOl(id);
     internal void FinishMouZhangXiuOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouZhangXiuOl(f);
     internal bool FinishMouZhangXiuOlSlashAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouZhangXiuOlSlashAttack(attack, out paused);
-    internal bool HasMouZhangXiuOlBeforeDamage(long id) => _resolve().HasMouZhangXiuOlBeforeDamage(id);
-    internal bool HasMouZhangXiuOlDamage(long id) => _resolve().HasMouZhangXiuOlDamage(id);
     internal bool IsMouZhangXiuOlDying() => _resolve().IsMouZhangXiuOlDying();
     internal bool IsMouZhangXiuOlMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsMouZhangXiuOlMovement(f, effect, movement);
     internal bool IsMouZhangXiuOlQiulieIneffective(global::CardGame.Core.CardUseFrame use) => _resolve().IsMouZhangXiuOlQiulieIneffective(use);

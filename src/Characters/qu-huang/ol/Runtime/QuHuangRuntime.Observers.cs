@@ -1,8 +1,6 @@
 namespace CardGame.Core;
 internal sealed partial class QuHuangRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 360)]
-    private bool IsQuHuangMovement(ProgramSkillFrame f,SkillProgramEffect? e,ProgramMovementContinuation p)=>f.QuHuang is{Paid:true}r&&e?.Op==r.Op&&p==f.PendingMovementContinuation&&p.SubjectSeat==r.TargetSeat&&p.BeforeCount==0&&p.CoverageResultBind is null;
     [ProgramViewContributor(ProgramViewContribution.PublicProcessingExclusion, 10)]
     private bool IsNishouHeldProcessingCard(int cardId)=>HasQuHuangCapability&&_cardZones.GetLocation(cardId)==CardLocation.Processing&&_resolutionStack.OfType<ProgramSkillFrame>().Any(f=>f.QuHuang is{Op:SkillProgramEffectOp.ResolveNishouIssuedCurrentPhaseSwap,Paid:true}r&&r.OwnerCards.Concat(r.OtherCards).Any(c=>c.CardId==cardId)&&ProgramEventHistory<QuHuangEntityMovedEvent>().Any(e=>e.FrameId==f.Id&&e.CardId==cardId&&e.To==CardLocation.Processing&&e.Stage is QuHuangStage.HoldOwner or QuHuangStage.HoldOther&&_cardMovements.LastOrDefault(m=>m.CardId==cardId)is{}last&&last.Sequence==e.Sequence&&last.From==e.From&&last.To==e.To&&last.Reason.Value==NishouHoldReason));
     [ProgramViewContributor(ProgramViewContribution.InvariantProcessing, 10)]
@@ -44,10 +42,5 @@ internal sealed partial class QuHuangRuntime
         }
         return true;
     }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 870)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 980)]
-    private bool HasQuHuangDamageObserver(long id)=>QuHuangObserverRoot()is{}root&&FrameIndex(f=>f.Id==id&&f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame)>FrameIndex(f=>f.Id==root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1010)]
-    private bool HasQuHuangBeforeDamageObserver(long id)=>HasQuHuangDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth,27420)]private bool AdvanceQuHuangChildren()=>prompts.Current is null&&QuHuangObserverRoot()is not null&&children.AdvanceObserverSubtree();
 }

@@ -14,13 +14,10 @@ internal sealed partial class CharacterWangGuanOlEntries
     internal void ContinueWangGuan(long id) => _resolve().ContinueWangGuan(id);
     internal bool? DecideIssuedTrigger630(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger630(candidate, context);
     internal void FinishWangGuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWangGuan(f);
-    internal bool HasWangGuanBeforeDamageObserver(long id) => _resolve().HasWangGuanBeforeDamageObserver(id);
-    internal bool HasWangGuanDamageObserver(long id) => _resolve().HasWangGuanDamageObserver(id);
     internal bool IsIssuedMiuyanCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedMiuyanCandidate(c);
     internal bool IsMiuyanCategoryGiftMovementReveal(global::CardGame.Core.IGameEvent fact) => _resolve().IsMiuyanCategoryGiftMovementReveal(fact);
     internal bool IsMiuyanGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsMiuyanGrantQualified(owner, grant);
     internal bool IsMiuyanShandaoMovementReveal(global::CardGame.Core.IGameEvent fact) => _resolve().IsMiuyanShandaoMovementReveal(fact);
-    internal bool IsWangGuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWangGuanMovement(f, e, p);
     internal void IssueMiuyanUse(long useId, global::CardGame.Core.CardActionContext? action) => _resolve().IssueMiuyanUse(useId, action);
     internal global::CardGame.Core.CardUseFrame? MiuyanCandidateUse(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().MiuyanCandidateUse(c, context);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.WangGuanHandEntity> MiuyanClaimEntities(global::CardGame.Core.MiuyanUseInvoice use, int owner) => _resolve().MiuyanClaimEntities(use, owner);

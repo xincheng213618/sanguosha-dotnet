@@ -150,8 +150,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
     }
 
     internal bool DrainMouCaoPi(ProgramSkillFrame f) => _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 550)]
-    internal bool IsMouCaoPiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation continuation) => f.MouCaoPi is { Stage: not MouCaoPiStage.Choosing } r && effect?.Op == r.Op && continuation == f.PendingMovementContinuation && continuation.SubjectSeat == r.TargetSeat && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<MouCaoPiPaidEvent>().Any(e => e.FrameId == f.Id && e.TargetSeat == r.TargetSeat && e.Option == r.Option && e.Cost == r.Cost);
     internal void ContinueMouCaoPi(long id)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouCaoPi: { } r } f || f.Id != id)

@@ -5,7 +5,6 @@ internal sealed partial class CharacterZhangLingOlEntries
     internal bool CanOfferCategoryTalismanRelease(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferCategoryTalismanRelease(candidate, trigger, context);
     internal bool CanReleaseCategoryTalisman(int holder, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanReleaseCategoryTalisman(holder, context);
     internal bool ContinueIssuedZhangLingBinding(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ContinueIssuedZhangLingBinding(frame);
-    internal bool IsCategoryTalismanMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsCategoryTalismanMovement(frame, effect, pending);
     internal bool IsCategoryTalismanUseForbidden(int actorSeat, global::CardGame.Core.CardKind effectiveKind, global::CardGame.Core.CardActionType type) => _resolve().IsCategoryTalismanUseForbidden(actorSeat, effectiveKind, type);
     internal global::CardGame.Core.SkillProgramStepOutcome IssueHuqiSlash(global::CardGame.Core.ProgramSkillFrame frame, string bind) => _resolve().IssueHuqiSlash(frame, bind);
     internal global::CardGame.Core.CategoryTalismanPlacedEvent? LiveCategoryTalisman(int seat) => _resolve().LiveCategoryTalisman(seat);

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineIncomingDistanceCourtesyObserversEntries
 {
-    internal bool HasIncomingDistanceCourtesyDamageObserver(long id) => _resolve().HasIncomingDistanceCourtesyDamageObserver(id);
     internal bool IncomingDistanceCourtesyFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().IncomingDistanceCourtesyFirstChild(root, child);
     internal global::CardGame.Core.ProgramSkillFrame? IncomingDistanceCourtesyObserverRoot() => _resolve().IncomingDistanceCourtesyObserverRoot();
     internal bool IsIncomingDistanceCourtesyDying() => _resolve().IsIncomingDistanceCourtesyDying();

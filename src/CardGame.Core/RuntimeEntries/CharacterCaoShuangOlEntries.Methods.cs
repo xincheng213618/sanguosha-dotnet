@@ -21,7 +21,6 @@ internal sealed partial class CharacterCaoShuangOlEntries
     internal void CompleteCaoShuangProgram(global::CardGame.Core.ProgramSkillFrame f, bool completed) => _resolve().CompleteCaoShuangProgram(f, completed);
     internal void ContinueCaoShuangProgram(long id) => _resolve().ContinueCaoShuangProgram(id);
     internal bool DrainCaoShuangChildren(long id) => _resolve().DrainCaoShuangChildren(id);
-    internal bool HasCaoShuangDamageObserver(long id) => _resolve().HasCaoShuangDamageObserver(id);
     internal void PublishCaoShuangShanzhuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCaoShuangShanzhuan(f);
     internal void PublishCaoShuangTuogu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCaoShuangTuogu(f);
     internal bool ResumeCaoShuang(long id) => _resolve().ResumeCaoShuang(id);

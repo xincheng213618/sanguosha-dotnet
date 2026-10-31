@@ -147,7 +147,4 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
         var invoice = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.MovementSequenceBefore && m.Sequence <= receipt.MovementSequenceAfter && m.Reason.Value == JoinedTrickRewardReason).ToArray();
         return invoice.Length == receipt.DrawActual && invoice.Select(m => m.CardId).Distinct().Count() == receipt.DrawActual && invoice.All(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(frame.OwnerSeat)) && (receipt.DrawActual != 0 || receipt.MovementSequenceBefore == receipt.MovementSequenceAfter);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 120)]
-    internal bool IsJoinedTrickDamageRewardAwaitedMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.PendingMovementContinuation == pending && effect?.Op == SkillProgramEffectOp.DrawAfterJoinedTrickDamage && ValidJoinedTrickDamageReward(frame);
 }

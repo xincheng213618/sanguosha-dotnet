@@ -31,9 +31,6 @@ internal sealed partial class CoreGameEngineForeignContestAidObserversRuntime
         if (!SameTypeAidParentMatches(f) || !Enum.IsDefined(r.Stage) || r.RecipientSeat is { } donor && (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(donor) || donor == f.OwnerSeat || donor == r.Use.ActorSeat) || r.Stage == SameTypeAidStage.ChoosingRecipient && (r.RecipientSeat is not null || r.Payment is not null || r.AddedTarget) || r.Stage != SameTypeAidStage.ChoosingRecipient && r.RecipientSeat is null || r.Payment is not null && (!IsValidSameTypeAidPayment(f) || r.AddedTarget) || r.Stage == SameTypeAidStage.GiftChildren && r.Payment is null || r.AddedTarget && (r.Stage != SameTypeAidStage.Complete || r.RecipientSeat is not { } extra || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SameTypeAidTargetAddedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.Use == r.Use && e.RecipientSeat == extra) != 1))
             throw new InvalidOperationException("Aid changed its exact actual use, recipient or committed payment.");
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 10)]
-    internal bool IsForeignContestOrAidMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && (effect?.Op == SkillProgramEffectOp.ResolveForeignTurnPindian && f.ForeignTurnContest is { Stage: ForeignTurnContestStage.ClaimChildren } && pending.SubjectSeat == f.OwnerSeat || effect?.Op == SkillProgramEffectOp.OfferSameTypeDifferentNameOrExtraTarget && f.SameTypeAid is { Stage: SameTypeAidStage.GiftChildren, RecipientSeat: { } donor } && pending.SubjectSeat == donor);
     internal ProgramSkillFrame? ForeignContestAidPaidObserverRoot(long? exactDamageWindow = null)
     {
         for (var rootIndex = 1; rootIndex < _resolutionStackOperations._resolutionStack.Count; rootIndex++)
@@ -114,10 +111,6 @@ internal sealed partial class CoreGameEngineForeignContestAidObserversRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1800)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 180)]
-    internal bool HasForeignContestAidDamageObserver(long window) => ForeignContestAidPaidObserverRoot(window)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 620)]
     internal bool IsForeignContestAidProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ForeignContestAidPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 

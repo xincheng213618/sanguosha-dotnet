@@ -37,13 +37,4 @@ internal sealed partial class CoreGameEngineShanheSourceLiuSandaoRuntime
         _corePhysicalMovementFacadesOperations.MoveCards(weapons, CardLocation.Equipment(frame.OwnerSeat), CardLocation.DiscardPile, new("skill-program." + frame.SkillId + ".awakening-weapon-discard"));
         return _coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 24791)]
-    internal bool SourceZhanshenWeaponMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation movement)
-    {
-        if (effect?.Op != SkillProgramEffectOp.DiscardShanheSourceZhanshenWeapons || movement != frame.PendingMovementContinuation || movement.SubjectSeat != frame.OwnerSeat || movement.BeforeCount != 0 || movement.CoverageResultBind is not null || frame.InstructionIndex != 2 || !_coreGameActivationAwakeningOperations.ExactGameActivationAwakeningParent(frame))
-            return false;
-        var batches = _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Select(child => child.Batch).Concat(_pendingCardsMovedBatchesOperations._pendingCardsMovedBatches).Where(batch => batch.ParentFrameId == frame.Id && batch.OriginOwnerSeat == frame.OwnerSeat && batch.OriginSkillId == frame.SkillId && batch.OriginSkillInstanceId == frame.SkillInstanceId && batch.Movements.Count > 0 && batch.Movements.All(move => move.Reason.Value == "skill-program." + frame.SkillId + ".awakening-weapon-discard")).DistinctBy(batch => batch.Id).ToArray();
-        return batches is [var paid] && paid.Movements.All(move => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) && move.From == CardLocation.Equipment(frame.OwnerSeat) && move.To == CardLocation.DiscardPile && _coreFieldEquipmentOperations.FieldEquipmentSlot(_coreCardAttackStateOperations.GetAttackCard(move.CardId)) == EquipmentSlot.Weapon);
-    }
 }

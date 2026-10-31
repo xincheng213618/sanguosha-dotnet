@@ -134,7 +134,5 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1245)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1245)]
     internal bool CanContinueRandomAreaAcquisition(ProgramSkillFrame frame) => frame.RandomAreaAcquisition is { } r && (r.Steps.Count > 0 || r.TurnoverIssued) && _coreRandomAreaAcquisitionProofsOperations.ValidRandomAreaAcquisition(frame);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 480)]
-    internal bool IsRandomAreaAcquisitionMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ObtainRandomAreaFromEachOtherThenTurnOver && frame.RandomAreaAcquisition is { Stage: RandomAreaAcquisitionStage.MovementChildren, Steps.Count: > 0 } && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && _coreRandomAreaAcquisitionProofsOperations.ValidRandomAreaAcquisition(frame);
     SkillProgramStepOutcome global::CardGame.Core.IRandomAreaAcquisitionHost.ObtainRandomAreaFromEachOtherThenTurnOver(ProgramSkillFrame frame) => ObtainRandomAreaFromEachOtherThenTurnOver(frame);
 }

@@ -17,15 +17,4 @@ internal sealed partial class CoreGameEngineProgramChildResolutionRuntime
             return _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) && (child is not CardsMovedTriggerWindowFrame movement || movement.Batch.Movements.All(_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains));
         return _resolutionStackOperations._resolutionStack.HasIssuedLink(index);
     }
-
-    internal bool HasOwnedProgramChildSubtree(long rootFrameId)
-    {
-        var root = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == rootFrameId);
-        if (root < 0)
-            return false;
-        for (var index = root + 1; index < _resolutionStackOperations._resolutionStack.Count; index++)
-            if (!ProgramChildResolutionEdge(index))
-                return false;
-        return true;
-    }
 }

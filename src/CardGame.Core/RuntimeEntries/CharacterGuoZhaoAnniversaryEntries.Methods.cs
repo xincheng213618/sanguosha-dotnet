@@ -18,9 +18,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryEntries
     internal bool DrainGuoZhao(long id) => _resolve().DrainGuoZhao(id);
     internal bool ExcludeOrdinaryMovement_IssuedGuoZhaoColor(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IssuedGuoZhaoColor(candidate, trigger);
     internal void FinishGuoZhao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishGuoZhao(f);
-    internal bool GuoZhaoBeforeDamageObserver(long id) => _resolve().GuoZhaoBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> GuoZhaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GuoZhaoChoices(f);
-    internal bool GuoZhaoDamageObserver(long id) => _resolve().GuoZhaoDamageObserver(id);
     internal bool GuoZhaoDrawProof(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GuoZhaoDrawProof(f);
     internal bool GuoZhaoDyingObserver() => _resolve().GuoZhaoDyingObserver();
     internal global::CardGame.Core.Card[] GuoZhaoEquipmentCandidates(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GuoZhaoEquipmentCandidates(f);
@@ -29,7 +27,6 @@ internal sealed partial class CharacterGuoZhaoAnniversaryEntries
     internal bool GuoZhaoHasAvailableOption(int owner) => _resolve().GuoZhaoHasAvailableOption(owner);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.AnniversaryGuoZhaoLeaseEvent> GuoZhaoLeases(int owner) => _resolve().GuoZhaoLeases(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.AnniversaryGuoZhaoBenefit> GuoZhaoLostBenefits(int owner, string instance, string hash, global::CardGame.Core.CardMovementBatchContext? batch) => _resolve().GuoZhaoLostBenefits(owner, instance, hash, batch);
-    internal bool GuoZhaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().GuoZhaoMovement(f, e, p);
     internal global::CardGame.Core.ProgramSkillFrame? GuoZhaoObserverRoot() => _resolve().GuoZhaoObserverRoot();
     internal bool GuoZhaoObserverSuffix(int root) => _resolve().GuoZhaoObserverSuffix(root);
     internal bool GuoZhaoOptionUsed(int owner, string option) => _resolve().GuoZhaoOptionUsed(owner, option);

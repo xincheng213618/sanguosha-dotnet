@@ -12,7 +12,6 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyEntries
     internal global::CardGame.Core.Card[] IncomingDistanceCosts(int owner) => _resolve().IncomingDistanceCosts(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> IncomingDistanceCourtesyChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IncomingDistanceCourtesyChoices(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.RuleQueryContribution> IncomingDistanceCourtesyContributions(int target) => _resolve().IncomingDistanceCourtesyContributions(target);
-    internal bool IsIncomingDistanceCourtesyMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsIncomingDistanceCourtesyMovement(f, e, p);
     internal void IssueNextEndingCourtesyBenefit(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().IssueNextEndingCourtesyBenefit(supplied);
     internal void PublishIncomingDistanceCourtesyChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishIncomingDistanceCourtesyChoice(f);
     internal void RequireIncomingDistanceCourtesyReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireIncomingDistanceCourtesyReceipt(f);

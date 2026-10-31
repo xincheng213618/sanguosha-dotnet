@@ -135,7 +135,4 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HengwuDrawReturnedEvent(f.Id, f.OwnerSeat, r.DrawCount, o.ActualDrawIds.Count, o.SequenceBefore, o.SequenceAfter));
         ContinueShenMaChao(f.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 39000)]
-    internal bool IsShenMcNativeMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ShenMaChao is { Operation: SkillProgramEffectOp.DealShouliStartingMounts } r && e?.Op == r.Operation && r.Stage is ShenMaChaoStage.EquipmentUse or ShenMaChaoStage.EquipmentChildren && r.Cursor < r.Seats.Count && p.SubjectSeat == r.Seats[r.Cursor] && p.BeforeCount == 0 && p.CoverageResultBind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ShouliStartingMountIssuedEvent>().Count(x => x.FrameId == f.Id && x.Index == r.Cursor && x.UseId == r.UseId && x.CardId == r.CardId) == 1 && (r.Stage == ShenMaChaoStage.EquipmentUse ? _resolutionStackOperations._resolutionStack.Any(child => IsShouliStartingEquipmentRide(child, f)) : _coreProgramEventHistoryOperations.ProgramEventHistory<ShouliStartingMountFinishedEvent>().Count(x => x.FrameId == f.Id && x.Index == r.Cursor && x.UseId == r.UseId && x.CardId == r.CardId) == 1);
 }

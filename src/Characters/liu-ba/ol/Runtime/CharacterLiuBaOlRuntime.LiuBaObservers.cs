@@ -7,9 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBaOlRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 340)]
-    internal bool IsLiuBaMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.LiuBa is { Paid: true } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == r.Recipient && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool LiuBaMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.LiuBa!;
@@ -42,11 +39,6 @@ internal sealed partial class CharacterLiuBaOlRuntime
     }
 
     internal ProgramSkillFrame? LiuBaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLiuBaOlOperations.LiuBaFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 850)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 960)]
-    internal bool HasLiuBaDamageObserver(long id) => LiuBaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 990)]
-    internal bool HasLiuBaBeforeDamageObserver(long id) => HasLiuBaDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27390)]
     internal bool AdvanceLiuBaChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuBaObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

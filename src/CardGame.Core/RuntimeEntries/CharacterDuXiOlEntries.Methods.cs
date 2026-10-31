@@ -26,7 +26,6 @@ internal sealed partial class CharacterDuXiOlEntries
     internal void ExpireDuXiBixiong(global::CardGame.Core.IGameEvent payload) => _resolve().ExpireDuXiBixiong(payload);
     internal void FinishDuXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishDuXi(f);
     internal bool HasAnyDuXiSuitProhibition() => _resolve().HasAnyDuXiSuitProhibition();
-    internal bool HasDuXiDamageObserver(long id) => _resolve().HasDuXiDamageObserver(id);
     internal bool IsDuXiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDuXiRecoveryParent(f, recovery);
     internal bool IsDuXiSuitTargetProhibited(int sourceSeat, int targetSeat, global::CardGame.Core.Suit effectiveSuit) => _resolve().IsDuXiSuitTargetProhibited(sourceSeat, targetSeat, effectiveSuit);
     internal void PublishDuXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishDuXi(f);

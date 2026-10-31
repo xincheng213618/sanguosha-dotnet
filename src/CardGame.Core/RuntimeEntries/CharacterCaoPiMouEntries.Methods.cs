@@ -14,10 +14,7 @@ internal sealed partial class CharacterCaoPiMouEntries
     internal bool DrainMouCaoPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouCaoPi(f);
     internal void ExpireMouCaoPiControls(global::CardGame.Core.TurnEndedEvent e) => _resolve().ExpireMouCaoPiControls(e);
     internal void FinishMouCaoPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouCaoPi(f);
-    internal bool HasMouCaoPiBeforeDamageObserver(long id) => _resolve().HasMouCaoPiBeforeDamageObserver(id);
-    internal bool HasMouCaoPiDamageObserver(long id) => _resolve().HasMouCaoPiDamageObserver(id);
     internal bool HasMouXingshang(global::CardGame.Core.CharacterState owner) => _resolve().HasMouXingshang(owner);
-    internal bool IsMouCaoPiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation continuation) => _resolve().IsMouCaoPiMovement(f, effect, continuation);
     internal bool IsMouCaoPiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouCaoPiRecoveryParent(f, recovery);
     internal void LoseMouCaoPiSkills(global::CardGame.Core.CharacterState p, int source, global::System.Collections.Generic.IReadOnlyList<string>? ids) => _resolve().LoseMouCaoPiSkills(p, source, ids);
     internal bool MouCaoPiCannotRespondTo(int responder, int source) => _resolve().MouCaoPiCannotRespondTo(responder, source);

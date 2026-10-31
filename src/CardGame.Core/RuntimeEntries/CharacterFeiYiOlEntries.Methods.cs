@@ -35,10 +35,8 @@ internal sealed partial class CharacterFeiYiOlEntries
     internal bool FeiYiSourceCurrent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FeiYiSourceCurrent(f);
     internal bool FeiYiTrickPaymentMaterialsMatch(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().FeiYiTrickPaymentMaterialsMatch(use, batch);
     internal bool FeiYiYanruAvailable(global::CardGame.Core.CharacterState actor) => _resolve().FeiYiYanruAvailable(actor);
-    internal bool HasFeiYiDamageObserver(long id) => _resolve().HasFeiYiDamageObserver(id);
     internal bool HasFeiYiTrickPaymentTail(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation) => _resolve().HasFeiYiTrickPaymentTail(use, continuation);
     internal bool HasUnstartedFeiYiExtraEffect(long id) => _resolve().HasUnstartedFeiYiExtraEffect(id);
-    internal bool IsFeiYiAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsFeiYiAwaitedMovement(f, e, p);
     internal bool IsFeiYiExtraEffectRound(long id) => _resolve().IsFeiYiExtraEffectRound(id);
     internal bool IsFeiYiSingletonTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsFeiYiSingletonTrigger(t);
     internal bool IsFeiYiTrickPaymentBatch(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsFeiYiTrickPaymentBatch(use, batch);

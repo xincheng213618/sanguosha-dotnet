@@ -14,10 +14,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlEntries
     internal void ExpireNeifaTurn() => _resolve().ExpireNeifaTurn();
     internal void FinishNeifa(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishNeifa(f);
     internal bool HasIssuedNeifaCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HasIssuedNeifaCandidate(c, w);
-    internal bool HasNeifaBeforeDamageObserver(long id) => _resolve().HasNeifaBeforeDamageObserver(id);
-    internal bool HasNeifaDamageObserver(long id) => _resolve().HasNeifaDamageObserver(id);
     internal bool HasNeifaTrickTargetCancellation(global::CardGame.Core.CardUseFrame use) => _resolve().HasNeifaTrickTargetCancellation(use);
-    internal bool IsNeifaMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsNeifaMovement(f, e, p);
     internal bool IsNeifaTargetsResolvedFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.NeifaTargetsResolvedEvent fact, global::System.Collections.Generic.IReadOnlyList<int> original) => _resolve().IsNeifaTargetsResolvedFact(use, fact, original);
     internal bool IsNeifaUseForbidden(int actor, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardActionType type) => _resolve().IsNeifaUseForbidden(actor, kind, type);
     internal global::CardGame.Core.PromptChoice NeifaAi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().NeifaAi(f);

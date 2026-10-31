@@ -15,9 +15,7 @@ internal sealed partial class CharacterZhugeGuoLeEntries
     internal void FinishLeChengyan(global::CardGame.Core.ProgramSkillFrame f, bool replaced) => _resolve().FinishLeChengyan(f, replaced);
     internal bool FinishLeChengyanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishLeChengyanAttack(attack, out paused);
     internal bool FinishLeChengyanBorrowedNative(global::CardGame.Core.NativeOwners.BorrowedSwordHandle borrowed) => _resolve().FinishLeChengyanBorrowedNative(borrowed);
-    internal bool HasLeChengyanBeforeDamageObserver(long id) => _resolve().HasLeChengyanBeforeDamageObserver(id);
     internal bool HasLeChengyanBorrowedPrompt() => _resolve().HasLeChengyanBorrowedPrompt();
-    internal bool HasLeChengyanDamageObserver(long id) => _resolve().HasLeChengyanDamageObserver(id);
     internal bool HasLeXidiEntityMark(int cardId) => _resolve().HasLeXidiEntityMark(cardId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeLeXidi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeLeXidi(supplied);
     internal bool IsLeChengyanDying() => _resolve().IsLeChengyanDying();

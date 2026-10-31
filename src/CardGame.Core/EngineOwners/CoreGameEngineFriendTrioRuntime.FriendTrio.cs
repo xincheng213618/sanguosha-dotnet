@@ -553,9 +553,6 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 80)]
-    internal bool IsFriendTrioMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => e is not null && IsFriendTrioOperation(e.Op) && f.FriendTrio is { Stage: FriendTrioStage.Movement or FriendTrioStage.EquipmentUse } r && r.Operation == e.Op && f.PendingMovementContinuation == pending && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-
     internal bool FriendXuanjianFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => child is CardUseFrame { Action: { } a } u && parent is ProgramSkillFrame { FriendTrio: { Stage: FriendTrioStage.EquipmentUse } r } f && r.Operation == SkillProgramEffectOp.EquipFriendXuanjian && r.IssuedUseFrameId == u.Id && r.IssuedActionId == a.ActionId && r.Cards is [var card] && u.CardId == card && a.ActorSeat == f.OwnerSeat && a.EffectiveKind == CardKind.Xuanjian && a.ConversionChain.Any(s => s.OwnerSeat == f.OwnerSeat && s.SkillId == f.SkillId && s.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && s.SkillInstanceId == f.SkillInstanceId) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendXuanjianUseIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.UseFrameId == u.Id && e.ActionId == a.ActionId && e.CardId == card) == 1;
     [NativeUseReturn(140)]
     internal void ReturnFriendXuanjianUse(CardUseFrame use)

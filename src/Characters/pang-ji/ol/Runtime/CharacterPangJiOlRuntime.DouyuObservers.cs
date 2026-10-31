@@ -50,8 +50,6 @@ internal sealed partial class CharacterPangJiOlRuntime
     }
 
     internal ProgramSkillFrame? DouyuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterPangJiOlOperations.DouyuFirstChild(f, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _characterPangJiOlOperations.DouyuObserverEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying)));
-    internal bool HasDouyuDamageObserver(long id) => DouyuObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    internal bool HasDouyuBeforeDamageObserver(long id) => DouyuObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     internal bool AllowsDouyuNestedDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess)
     {
         if (f.AttackAttempt is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || DouyuObserverRoot()is not { } root || root.Id == f.Id)

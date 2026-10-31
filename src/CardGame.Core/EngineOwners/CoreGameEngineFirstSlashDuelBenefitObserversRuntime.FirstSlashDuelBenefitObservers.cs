@@ -40,9 +40,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitObserversRuntim
     }
 
     internal ProgramSkillFrame? FirstSlashDuelObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreFirstSlashDuelBenefitObserversOperations.FirstSlashDuelFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1590)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 130)]
-    internal bool HasFirstSlashDuelDamageObserver(long id) => FirstSlashDuelObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 100)]
     internal bool TryAdvanceFirstSlashDuelSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FirstSlashDuelObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -11,8 +11,6 @@ internal sealed partial class CharacterFanJiangZhangDaOlEntries
     internal void ExpireJueshengSkills(global::CardGame.Core.ActualTurnCursorReturnedEvent returned) => _resolve().ExpireJueshengSkills(returned);
     internal bool FanJiangZhangDaFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().FanJiangZhangDaFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? FanJiangZhangDaObserverRoot() => _resolve().FanJiangZhangDaObserverRoot();
-    internal bool HasFanJiangZhangDaBeforeDamageObserver(long id) => _resolve().HasFanJiangZhangDaBeforeDamageObserver(id);
-    internal bool HasFanJiangZhangDaDamageObserver(long id) => _resolve().HasFanJiangZhangDaDamageObserver(id);
     internal bool HasYuanchouArmorBypass(long useId, int targetSeat) => _resolve().HasYuanchouArmorBypass(useId, targetSeat);
     internal bool IsJueshengDuelUse(long id) => _resolve().IsJueshengDuelUse(id);
     internal bool JueshengActorMatches(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.JueshengDuelOrigin origin) => _resolve().JueshengActorMatches(use, origin);

@@ -68,9 +68,6 @@ internal sealed partial class CoreGameEngineFireTargetBenefitObserversRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 120)]
-    internal bool HasFireTargetBenefitObserver(long windowId) => FireTargetBenefitObserverRoot(windowId)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 320)]
     internal bool IsFireTargetBenefitProgramDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } w && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FireTargetBenefitObserverRoot(w.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId);
 }

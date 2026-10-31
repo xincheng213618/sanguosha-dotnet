@@ -139,8 +139,6 @@ prompts.Clear();
         events.AdvanceFact(new OlShenfuDrawReturnedEvent(f.Id, r.Ordinal, r.TargetSeat, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));
         ResumeOlShenfu(f.Id);
     }
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 40525)] private bool OlShenfuMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) =>
-        f.OlShenfu is { Stage: OlShenfuStage.Children, Mode: "discard" } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40525)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40525)]
     private bool RetainIssuedOlShenfu(ProgramSkillFrame f) => f.OlShenfu is not null;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveOlShenZhenJiShenfu)] private PromptChoice ChooseOlShenfu(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();

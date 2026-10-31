@@ -10,12 +10,9 @@ internal sealed partial class CharacterHuZhaoAnniversaryEntries
     internal bool DrainHuZhaoChildren(long id) => _resolve().DrainHuZhaoChildren(id);
     internal global::CardGame.Core.PromptChoice HuZhaoAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuZhaoAi(p, f);
     internal int HuZhaoAvailable(int seat) => _resolve().HuZhaoAvailable(seat);
-    internal bool HuZhaoBeforeDamageObserver(long id) => _resolve().HuZhaoBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HuZhaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuZhaoChoices(f);
-    internal bool HuZhaoDamageObserver(long id) => _resolve().HuZhaoDamageObserver(id);
     internal void HuZhaoDistance(global::CardGame.Core.ProgramDistanceQuery q, global::System.Collections.Generic.List<global::CardGame.Core.RuleQueryBaseTerm> terms) => _resolve().HuZhaoDistance(q, terms);
     internal bool HuZhaoFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HuZhaoFirstChild(f, child);
-    internal bool HuZhaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().HuZhaoMovement(f, e, p);
     internal global::CardGame.Core.ProgramSkillFrame? HuZhaoObserverRoot() => _resolve().HuZhaoObserverRoot();
     internal bool HuZhaoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().HuZhaoRecoveryParent(f, recovery);
     internal global::CardGame.Core.CardConversionSource HuZhaoSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuZhaoSource(f);

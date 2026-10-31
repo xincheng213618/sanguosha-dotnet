@@ -29,12 +29,6 @@ internal sealed partial class SpPangTongRuntime
    if(nativeFrames.FrameAt(index) is ProgramSkillFrame root&&SpPangTongFirstChild(root,nativeFrames.FrameAt(index+1))&&facts.SameNameObserverSuffix(root.Id))return root;
   return null;
  }
- private int FrameIndex(long id)=>nativeFrames.LastFrameIndex(id);
  [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 360)]
  private bool TryAdvanceSpPangTongSubtree()=>prompts.Current is null&&SpPangTongObserverRoot() is not null&&childOperations.AdvanceObserverSubtree();
- [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 250)]
- [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 360)]
- private bool HasSpPangTongDamageObserver(long id)=>SpPangTongObserverRoot() is{}root&&frames.OfType<ResolutionFrame>().Any(f=>f.Id==id&&f is DamageTriggerWindowFrame)&&FrameIndex(id)>FrameIndex(root.Id);
- [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 450)]
- private bool HasSpPangTongBeforeDamageObserver(long id)=>SpPangTongObserverRoot() is{}root&&frames.OfType<ResolutionFrame>().Any(f=>f.Id==id&&f is BeforeDamageProgramWindowFrame)&&FrameIndex(id)>FrameIndex(root.Id);
 }

@@ -14,8 +14,6 @@ internal sealed partial class CharacterTianChouOlEntries
     internal void ContinueTianChou(long id) => _resolve().ContinueTianChou(id);
     internal bool DrainTianChou(long id) => _resolve().DrainTianChou(id);
     internal void FinishTianChou(global::CardGame.Core.ProgramSkillFrame f, string reason) => _resolve().FinishTianChou(f, reason);
-    internal bool HasTianChouBeforeDamageObserver(long id) => _resolve().HasTianChouBeforeDamageObserver(id);
-    internal bool HasTianChouDamageObserver(long id) => _resolve().HasTianChouDamageObserver(id);
     internal bool IsTianChouRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsTianChouRecoveryParent(f, recovery);
     internal bool IsTianChouShandaoUse(long id) => _resolve().IsTianChouShandaoUse(id);
     internal bool IsTianChouTopMovement(global::CardGame.Core.TianChouShandaoTop t, global::CardGame.Core.CardMovementRecord m) => _resolve().IsTianChouTopMovement(t, m);

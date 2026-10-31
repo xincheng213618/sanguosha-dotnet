@@ -7,10 +7,8 @@ internal sealed partial class CharacterJiaXuMouEntries
     internal bool IsMouJxExactCardQuery(global::CardGame.Core.CharacterState actor, int? selected) => _resolve().IsMouJxExactCardQuery(actor, selected);
     internal void IssueMouJxUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouJxUse(f);
     internal bool MouJxAdvanceChildren() => _resolve().MouJxAdvanceChildren();
-    internal bool MouJxBeforeDamage(long id) => _resolve().MouJxBeforeDamage(id);
     internal bool MouJxBoundDistance(long id, int actor) => _resolve().MouJxBoundDistance(id, actor);
     internal bool MouJxCardDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().MouJxCardDistance(q);
-    internal bool MouJxDamageWindow(long id) => _resolve().MouJxDamageWindow(id);
     internal bool MouJxDying() => _resolve().MouJxDying();
     internal bool MouJxEdge(int i) => _resolve().MouJxEdge(i);
     internal global::System.Collections.Generic.IReadOnlyList<int> MouJxExpectedTargets(global::CardGame.Core.MouJiaXuNativeUse n) => _resolve().MouJxExpectedTargets(n);

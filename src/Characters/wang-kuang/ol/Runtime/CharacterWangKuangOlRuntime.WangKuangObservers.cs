@@ -24,10 +24,6 @@ internal sealed partial class CharacterWangKuangOlRuntime
     }
 
     internal ProgramSkillFrame? WangKuangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterWangKuangOlOperations.WangKuangFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 550)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 660)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 690)]
-    internal bool HasWangKuangDamageObserver(long id) => WangKuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26910)]
     internal bool AdvanceWangKuangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WangKuangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

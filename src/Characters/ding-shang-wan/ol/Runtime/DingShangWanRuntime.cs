@@ -152,8 +152,6 @@ prompts.Clear();var branch=choice.Parameters["branch"];
     {events.AdvanceFact(new DingShangWanCompletedEvent(f.Id,true));frames.ReplaceTop(f=f with{DingShangWan=null,PendingMovementContinuation=null});completion.Finish(f,true);}
     [ProgramContinuation(ProgramContinuationKind.Resume,26700)]private bool ResumeDingShangWan(long id){if(frames.Top is not ProgramSkillFrame{DingShangWan:not null}f||f.Id!=id)return false;ContinueDingShangWan(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,26700)]private bool ReturnDingShangWan(ProgramSkillFrame f){if(f.DingShangWan is null)return false;ContinueDingShangWan(f.Id);return true;}
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 160)]
-    private bool IsDingShangWanAwaitedMovement(ProgramSkillFrame f,SkillProgramEffect? e,ProgramMovementContinuation p)=>f.DingShangWan is{}r&&p.SubjectSeat==r.Payer&&p.BeforeCount==0&&p.CoverageResultBind is null&&(e is null||DingShangWanComposition.IsOperation(e.Op));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,26700)][ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,26700)]
     private bool ContinuePaidDingShangWan(ProgramSkillFrame f){if(f.DingShangWan is null)return false;return true;}
     [ProgramAiChoice(SkillProgramEffectOp.InitializeFudaoHandRecord,SkillProgramEffectOp.DrawFudaoRecordedPair,SkillProgramEffectOp.ResolveFengyanCounterpart)]

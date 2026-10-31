@@ -71,9 +71,6 @@ internal sealed partial class CoreGameEngineHuxinMirrorRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 62058)]
-    internal bool IsPaidHuxinMirrorMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.DiscardHuxinMirrorAndPreventDamage && frame.HuxinMirrorPayment is not null && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidPaidHuxinMirror(frame);
-
     internal IEnumerable<LegalAction> HuxinMirrorPlacementActions(CharacterState actor, IReadOnlyList<Card> cards) => cards.Where(card => card.Kind == CardKind.HuxinMirror && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(actor.Seat)).SelectMany(card => _coreMatchParticipantsPlayersAccess._players.Where(target => target.Seat != actor.Seat && _coreEquipmentPlacementAndHpPairOperations.CanPlaceOwnedEquipment(actor.Seat, target.Seat, card, CardLocation.Hand(actor.Seat))).Select(target => new LegalAction(LegalActionKind.Equip, card.Id, target.Seat, $"将【护心镜】置于{(target.Name)}的装备区")));
     internal bool TryPlaceHandHuxinMirror(CharacterState actor, LegalAction action)
     {

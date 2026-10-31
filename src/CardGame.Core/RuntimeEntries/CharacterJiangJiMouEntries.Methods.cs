@@ -14,9 +14,7 @@ internal sealed partial class CharacterJiangJiMouEntries
     internal void IssueMouJjRepeat(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouJjRepeat(f);
     internal void IssueMouJjUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouJjUse(f);
     internal bool MouJjAdvanceChildren() => _resolve().MouJjAdvanceChildren();
-    internal bool MouJjBeforeDamage(long id) => _resolve().MouJjBeforeDamage(id);
     internal bool MouJjDamage(global::CardGame.Core.GameEngine.IDamageAttempt a, long id) => _resolve().MouJjDamage(a, id);
-    internal bool MouJjDamageWindow(long id) => _resolve().MouJjDamageWindow(id);
     internal bool MouJjDying() => _resolve().MouJjDying();
     internal bool MouJjEdge(int i) => _resolve().MouJjEdge(i);
     internal global::System.Collections.Generic.IReadOnlyList<int> MouJjExpectedTargets(global::CardGame.Core.MouJiangJiNativeUse n) => _resolve().MouJjExpectedTargets(n);

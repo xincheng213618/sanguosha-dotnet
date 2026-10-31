@@ -35,7 +35,6 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShenHtChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShenHtChoices(f);
     internal string[] ShenHtGeneralCandidates(int seat) => _resolve().ShenHtGeneralCandidates(seat);
     internal string[] ShenHtLossSkillIds(global::CardGame.Core.ShenHuaTuoReceipt r) => _resolve().ShenHtLossSkillIds(r);
-    internal bool ShenHtMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShenHtMovementProof(f, e, p);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.SkillGrant> ShenHtRevocableGrants(int seat, string id) => _resolve().ShenHtRevocableGrants(seat, id);
     internal global::System.Collections.Generic.IReadOnlyList<(string Skill, string Occurrence, int Actor)> SkillInvocationEquipmentSources(global::CardGame.Core.CardActionContext action) => _resolve().SkillInvocationEquipmentSources(action);
     internal global::CardGame.Core.CardConversionSource? SkillInvocationMovementOrigin() => _resolve().SkillInvocationMovementOrigin();

@@ -28,11 +28,6 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
             return r.Actors.Count == 0 && r.Used.Count == 0 && r.Cursor == 0 && r.Stage is AnniversaryMaTieStage.ObtainChildren or AnniversaryMaTieStage.Target;
         return _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) && r.Target != f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieSelectedEvent>().Count(e => e.FrameId == f.Id && e.Target == r.Target && e.Count == r.Actors.Count) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieQueueEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.Actor).SequenceEqual(r.Actors);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46700)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46700)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 46700)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46700)]
     internal bool MaTieMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
     {
         if (!ValidMaTie(f) || f.AnniversaryMaTie is not { } r || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null)
@@ -83,11 +78,6 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
 
     internal bool MaTieSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _characterMaTieAnniversaryOperations.MaTieNativeEdge(i) || _resolutionStackOperations2._resolutionStack()[i - 1] is ProgramSkillFrame f && _characterMaTieAnniversaryOperations.MaTieFirstChild(f, _resolutionStackOperations2._resolutionStack()[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(i, dying) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(i, dying) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(i, dying));
     internal ProgramSkillFrame? MaTieObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterMaTieAnniversaryOperations.MaTieFirstChild(f, child), (i) => _characterMaTieAnniversaryOperations.MaTieSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46700)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46700)]
-    internal bool MaTieDamage(long id) => MaTieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46700)]
-    internal bool MaTieBeforeDamage(long id) => MaTieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46700)]
     internal bool MaTieDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MaTieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 46700)]

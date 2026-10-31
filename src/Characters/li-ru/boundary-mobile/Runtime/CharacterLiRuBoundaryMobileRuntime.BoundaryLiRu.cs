@@ -175,9 +175,6 @@ internal sealed partial class CharacterLiRuBoundaryMobileRuntime
             return (r.Stage == BoundaryLiRuMiejiStage.Gift) == r.Gift && r.Cards.Count == 0 && r.Payments.Count < r.Required && r.Before == 0 && r.After == 0;
         return r.Stage == BoundaryLiRuMiejiStage.Movement && r.Cards is [var id] && r.From is [var from] && r.Payments.LastOrDefault() == new BoundaryLiRuMiejiPayment(id, from, r.Before, r.After, r.Batch);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 55700)]
-    internal bool BoundaryLiRuMiejiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => effect?.Op == SkillProgramEffectOp.ResolveBoundaryLiRuMieji && f.BoundaryLiRuMieji is { Stage: BoundaryLiRuMiejiStage.Movement } r && ValidBoundaryLiRuMieji(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Movement, 55700)]
     internal bool ReturnBoundaryLiRuMieji(ProgramSkillFrame f)
     {

@@ -52,14 +52,6 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
         return f.InstructionIndex is 0 or 1 && f.TriggerId is { } id && f.ActivationId == id && f.WindowContext is { } c && CanRunIssuedKenshangCandidate(new(f.OwnerSeat, f.SkillId, id, f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 560)]
-    internal bool IsKenshangMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
-    {
-        if (f.Kenshang is not { Stage: KenshangProgramStage.DrawChildren } || e?.Op != SkillProgramEffectOp.DrawForKenshangShortDamage || p != f.PendingMovementContinuation)
-            return false;
-        return true;
-    }
-
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 830)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 770)]
     internal bool IsKenshangRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => false;
@@ -73,11 +65,6 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
     }
 
     internal ProgramSkillFrame? KenshangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterMaXiuMaTieOlOperations.KenshangFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 670)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 780)]
-    internal bool HasKenshangDamageObserver(long id) => KenshangObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 810)]
-    internal bool HasKenshangBeforeDamageObserver(long id) => KenshangObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27110)]
     internal bool AdvanceKenshangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && KenshangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

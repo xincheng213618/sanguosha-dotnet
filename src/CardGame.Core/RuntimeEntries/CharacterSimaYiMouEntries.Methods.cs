@@ -19,8 +19,6 @@ internal sealed partial class CharacterSimaYiMouEntries
     internal void IssueMouSmPlayedDeclaration(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouSmPlayedDeclaration(f);
     internal bool MatchesMouSmPlayedDeclaration(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardDeclarationFrame d) => _resolve().MatchesMouSmPlayedDeclaration(f, d);
     internal bool MouSmAdvanceChildren() => _resolve().MouSmAdvanceChildren();
-    internal bool MouSmBeforeDamage(long id) => _resolve().MouSmBeforeDamage(id);
-    internal bool MouSmDamageWindow(long id) => _resolve().MouSmDamageWindow(id);
     internal bool MouSmDeclarationEdge(int i) => _resolve().MouSmDeclarationEdge(i);
     internal global::System.Collections.Generic.IReadOnlyList<int> MouSmDeclarationTargets(global::CardGame.Core.CardDeclarationFrame frame, int viewer, bool revealAll) => _resolve().MouSmDeclarationTargets(frame, viewer, revealAll);
     internal bool MouSmDying() => _resolve().MouSmDying();

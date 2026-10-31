@@ -301,8 +301,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 38500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 38500)]
     internal bool ContinueIssuedShenDa(ProgramSkillFrame f) => f.ShenDengAi is { Stage: ShenDengAiStage.DrawAttempt or ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeUse or ShenDengAiStage.NativeChildren } || global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaQijing(f.SkillId) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.FrameId == f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 38500)]
-    internal bool ShenDaMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.ShenDengAi is { Stage: ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeChildren } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
 
     [ProgramAiChoice(SkillProgramEffectOp.AllocateShenDengAiTuoYu)]
     internal PromptChoice ChooseShenDaAllocation(PendingDecision p, ProgramSkillFrame f) => ChooseShenDa(p, f);

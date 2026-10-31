@@ -17,10 +17,7 @@ internal sealed partial class CharacterDuKuiAnniversaryEntries
     internal global::CardGame.Core.PromptChoice DuKuiChoice(global::CardGame.Core.ProgramSkillFrame f, string verb, string suffix, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().DuKuiChoice(f, verb, suffix, label, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> DuKuiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DuKuiChoices(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.PromptChoice> DuKuiFieldChoices(global::CardGame.Core.ProgramSkillFrame? f) => _resolve().DuKuiFieldChoices(f);
-    internal bool DuKuiMovementPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DuKuiMovementPaid(f);
-    internal bool DuKuiMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().DuKuiMovementProof(f, effect, pending);
     internal bool DuKuiMovementReturned(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DuKuiMovementReturned(f);
-    internal bool DuKuiNativeBatchPaid(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().DuKuiNativeBatchPaid(f, b);
     internal global::CardGame.Core.ProgramSkillFrame? DuKuiQuery(int actor, int? id = default) => _resolve().DuKuiQuery(actor, id);
     internal bool DuKuiRevealedProcessing(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().DuKuiRevealedProcessing(cards);
     internal bool DuKuiShownPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DuKuiShownPaid(f);

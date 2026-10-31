@@ -70,11 +70,6 @@ internal sealed partial class CharacterSunJianBoundaryMobileRuntime
         ContinueMobileSunJianPolu(frame.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 65000)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 65000)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 65000)]
-    internal bool ProveMobileSunJianPoluMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveMobileSunJianPolu && ValidMobileSunJianPolu(frame) && frame.MobileSunJianPolu is { AwaitingMovement: true, Draw: { } draw } r && pending == frame.PendingMovementContinuation && pending.SubjectSeat == draw.RecipientSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && draw.RequestedCount == r.Count && r.RecipientIndex < frame.SelectedTargetSeats.Count && draw.RecipientSeat == frame.SelectedTargetSeats[r.RecipientIndex] && draw.SequenceAfter >= draw.SequenceBefore && draw.ActualDrawIds.All(id => _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(draw.RecipientSeat) && m.Reason == global::CardGame.Core.EngineOwners.CharacterSunJianBoundaryMobileDefinitions.MobileSunJianPoluDraw));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 65000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 65000)]
     internal bool ProveMobileSunJianPoluRecovery(ProgramSkillFrame frame, RecoveryReplacementFrame recovery) => frame.MobileSunJianPolu is { AwaitingMovement: true, Draw.Replacement: not null } && ValidMobileSunJianPolu(frame) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, frame) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;

@@ -15,11 +15,8 @@ internal sealed partial class CharacterCaiFuRenOlEntries
     internal global::CardGame.Core.ProgramSkillWindowContext CreateOrdinaryCaiFuRenQietingContext(global::CardGame.Core.DeferredTurnEndFrame parent, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CreateOrdinaryCaiFuRenQietingContext(parent, candidate, context);
     internal bool DrainOrdinaryQieting(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainOrdinaryQieting(f);
     internal void FinishOrdinaryQieting(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishOrdinaryQieting(f);
-    internal bool HasOrdinaryCaiFuRenBeforeDamageObserver(long id) => _resolve().HasOrdinaryCaiFuRenBeforeDamageObserver(id);
-    internal bool HasOrdinaryCaiFuRenDamageObserver(long id) => _resolve().HasOrdinaryCaiFuRenDamageObserver(id);
     internal bool IsEligibleOrdinaryCaiFuRenQietingCandidate(global::CardGame.Core.DeferredTurnEndFrame parent, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsEligibleOrdinaryCaiFuRenQietingCandidate(parent, candidate, context);
     internal bool IsIssuedOrdinaryCaiFuRenXianzhou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsIssuedOrdinaryCaiFuRenXianzhou(f);
-    internal bool IsOrdinaryCaiFuRenMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsOrdinaryCaiFuRenMovement(f, effect, p);
     internal bool IsOrdinaryCaiFuRenQietingTrigger(global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().IsOrdinaryCaiFuRenQietingTrigger(trigger);
     internal bool IsOrdinaryCaiFuRenRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsOrdinaryCaiFuRenRecoveryParent(f, recovery);
     internal bool IsOrdinaryQietingPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsOrdinaryQietingPaidMovement(f, m);

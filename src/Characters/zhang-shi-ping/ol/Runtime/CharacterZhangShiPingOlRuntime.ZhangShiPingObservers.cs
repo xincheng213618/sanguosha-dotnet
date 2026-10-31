@@ -32,10 +32,6 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
 
     internal bool ZhangShiPingObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? ZhangShiPingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterZhangShiPingOlOperations.ZhangShiPingFirstChild(f, child), (i) => _characterZhangShiPingOlOperations.ZhangShiPingObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 460)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 570)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 600)]
-    internal bool HasZhangShiPingDamageObserver(long id) => ZhangShiPingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26610)]
     internal bool AdvanceZhangShiPingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangShiPingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

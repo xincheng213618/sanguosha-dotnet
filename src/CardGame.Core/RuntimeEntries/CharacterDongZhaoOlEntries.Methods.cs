@@ -10,8 +10,6 @@ internal sealed partial class CharacterDongZhaoOlEntries
     internal bool CanOfferDongZhao(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().CanOfferDongZhao(c, t, w);
     internal bool DongZhaoFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().DongZhaoFirstChild(root, child);
     internal global::CardGame.Core.ProgramSkillFrame? DongZhaoObserverRoot() => _resolve().DongZhaoObserverRoot();
-    internal bool HasDongZhaoDamageObserver(long id) => _resolve().HasDongZhaoDamageObserver(id);
-    internal bool IsDongZhaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsDongZhaoMovement(f, e, p);
     internal void PublishXianluePrompt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishXianluePrompt(f);
     internal void ResolveDongZhaoChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveDongZhaoChoice(choice);
     internal bool ResumeDongZhao(long id) => _resolve().ResumeDongZhao(id);

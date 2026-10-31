@@ -74,10 +74,6 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamageObserversRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1990)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 90)]
-    internal bool HasDynamicDiscardDamageObserver(long window) => DynamicDiscardDamageObserverRoot(window)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 340)]
     internal bool IsDynamicDiscardDamageProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DynamicDiscardDamageObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 560)]

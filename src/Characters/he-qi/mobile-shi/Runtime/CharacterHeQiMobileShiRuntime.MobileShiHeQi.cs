@@ -193,7 +193,6 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 49000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 49000)]
     internal bool KeepPaidShiHq(ProgramSkillFrame f) => f.ShiHeQi is { Stage: ShiHqStage.Drawing or ShiHqStage.DrawChildren or ShiHqStage.CleanupChildren or ShiHqStage.Complete } || f.SkillId == ShiHqQizhou && f.ShiHeQi is null && f.WindowContext is { } w && IsIssuedShiHqCleanupCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), w);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49000)]
     internal bool ShiHqMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.ShiHeQi is { } r && effect?.Op == r.Operation && r.Stage is ShiHqStage.DrawChildren or ShiHqStage.CleanupChildren && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiHeQiQizhouMark)]
     internal PromptChoice ChooseShiHqAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Targets.Contains(f.OwnerSeat)) ?? p.Choices.First();

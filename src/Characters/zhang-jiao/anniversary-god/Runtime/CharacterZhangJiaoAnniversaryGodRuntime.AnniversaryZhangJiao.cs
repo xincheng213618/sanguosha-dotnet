@@ -285,8 +285,6 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 39400)]
     internal bool ReturnAnniversaryZjMovement(ProgramSkillFrame f) => f.AnniversaryZhangJiao is { Stage: not AnniversaryZhangJiaoStage.SanshouSnapshot } && ResumeAnniversaryZj(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 39400)]
-    internal bool AnniversaryZjMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryZhangJiao is { Stage: AnniversaryZhangJiaoStage.Obtained or AnniversaryZhangJiaoStage.Shuffled } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 39400)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 39400)]
     internal bool ContinueIssuedAnniversaryZj(ProgramSkillFrame f) => f.AnniversaryZhangJiao is not null;

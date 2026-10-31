@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamEntries
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheSchoolTeamRank(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheSchoolTeamRank(supplied);
     internal void ContinueShanheSchoolTeamRank(long id) => _resolve().ContinueShanheSchoolTeamRank(id);
     internal bool IsActualShanheAlly(int seat) => _resolve().IsActualShanheAlly(seat);
-    internal bool MatchesShanheTeamRankMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().MatchesShanheTeamRankMovement(frame, effect, pending);
     internal global::CardGame.Core.ProgramSkillFrame RequireShanheTeamOpening(global::CardGame.Core.ProgramSkillFrame supplied, string skillId, string binding, bool requireActive = true) => _resolve().RequireShanheTeamOpening(supplied, skillId, binding, requireActive);
     internal bool ResumeShanheSchoolTeamRank(long frameId) => _resolve().ResumeShanheSchoolTeamRank(frameId);
     internal void ReturnShanheSchoolTeamRankDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShanheSchoolTeamRankDraw(supplied, outcome);

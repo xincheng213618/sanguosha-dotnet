@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeGuoLeRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 30200)]
     internal bool IsLeChengyanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.ResolveLeZhugeGuoChengyan && f.LeChengyan is { Stage: LeChengyanStage.RevealChildren or LeChengyanStage.SecondDrawChildren } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidLeChengyan(f);
     internal bool LeChengyanFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -21,11 +20,6 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
     internal bool LeChengyanObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && LeChengyanFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
     internal bool LeChengyanObserverSuffix(int index) => _resolutionStackOperations._resolutionStack[index + 1] is DyingFrame dying && index + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index + 1, dying) || _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _characterZhugeGuoLeOperations.LeChengyanObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? LeChengyanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhugeGuoLeOperations.LeChengyanFirstChild(f, c), (n) => _characterZhugeGuoLeOperations.LeChengyanObserverSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 30200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 30200)]
-    internal bool HasLeChengyanDamageObserver(long id) => LeChengyanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30200)]
-    internal bool HasLeChengyanBeforeDamageObserver(long id) => LeChengyanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30200)]
     internal bool IsLeChengyanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LeChengyanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30200)]

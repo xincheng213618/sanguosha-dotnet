@@ -33,11 +33,8 @@ internal sealed partial class CharacterCaoYuOlEntries
     internal void DrawCaoYu(global::CardGame.Core.ProgramSkillFrame f, int count, global::CardGame.Core.CaoYuStage stage, string reason) => _resolve().DrawCaoYu(f, count, stage, reason);
     internal bool ExcludeOrdinaryMovement_IsXiangxuMinimumTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsXiangxuMinimumTrigger(candidate, trigger);
     internal void FinishCaoYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCaoYu(f);
-    internal bool HasCaoYuBeforeDamageObserver(long id) => _resolve().HasCaoYuBeforeDamageObserver(id);
-    internal bool HasCaoYuDamageObserver(long id) => _resolve().HasCaoYuDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> IncludeXiangxuAfterTurnEndedItems(global::CardGame.Core.DeferredTurnEndFrame parent, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> ordinary) => _resolve().IncludeXiangxuAfterTurnEndedItems(parent, ordinary);
     internal bool IsCaoYuIssuedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsCaoYuIssuedMovement(f, m);
-    internal bool IsCaoYuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsCaoYuMovement(f, e, p);
     internal bool IsCaoYuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsCaoYuRecoveryParent(f, recovery);
     internal bool IsIssuedXiangxuEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedXiangxuEndingCandidate(c, context);
     internal bool IsXiangxuEndingTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsXiangxuEndingTrigger(t);

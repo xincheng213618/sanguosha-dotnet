@@ -86,7 +86,5 @@ internal sealed partial class CoreGameEngineSourceBeigongRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SourceDingxi = null, SourceHuojie = null, SourceXingxia = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 24510)]
     internal bool SourceBeigongMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => HasSourceBeigongState(f) && effect is not null && IsSourceBeigongOp(effect.Op) && pending == f.PendingMovementContinuation && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (pending.SubjectSeat == f.OwnerSeat || f.SourceXingxia is { Stage: SourceXingxiaStage.PaymentChildren } x && x.Index >= 0 && x.Index < x.Enemies.Count && pending.SubjectSeat == x.Enemies[x.Index]);
 }

@@ -28,8 +28,6 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtObserversRuntime
     internal ProgramSkillFrame? FixedDistanceDebtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreFixedDistanceOneDebtObserversOperations.FixedDistanceDebtFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 170)]
     internal bool IsFixedDistanceDebtProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FixedDistanceDebtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1890)]
-    internal bool HasFixedDistanceDebtDamageObserver(long window) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == window && f is DamageTriggerWindowFrame) && FixedDistanceDebtObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 30)]
     internal bool TryAdvanceFixedDistanceDebtSubtree()
     {

@@ -23,7 +23,6 @@ internal sealed partial class CharacterLuSuMobileGodEntries
     internal bool ShenLsEligible(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().ShenLsEligible(c, t, w);
     internal int[] ShenLsField(int seat) => _resolve().ShenLsField(seat);
     internal int[] ShenLsGiveable(int seat) => _resolve().ShenLsGiveable(seat);
-    internal bool ShenLsMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().ShenLsMovementProof(f, effect, pending);
     internal int[] ShenLsPeers(int owner, string skillId) => _resolve().ShenLsPeers(owner, skillId);
     internal bool ShenLsMode { get => _resolve().ShenLsMode; }
     internal bool ShenLsTeam { get => _resolve().ShenLsTeam; }

@@ -11,9 +11,6 @@ internal sealed partial class CharacterYuanHuanOlEntries
     internal int DeruActualNames(int seat) => _resolve().DeruActualNames(seat);
     internal bool DrainYuanHuanChildren(long id) => _resolve().DrainYuanHuanChildren(id);
     internal void FinishYuanHuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishYuanHuan(f);
-    internal bool HasYuanHuanBeforeDamageObserver(long id) => _resolve().HasYuanHuanBeforeDamageObserver(id);
-    internal bool HasYuanHuanDamageObserver(long id) => _resolve().HasYuanHuanDamageObserver(id);
-    internal bool IsYuanHuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsYuanHuanMovement(f, e, p);
     internal bool IsYuanHuanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsYuanHuanRecoveryParent(f, recovery);
     internal void IssueDeruTake(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueDeruTake(f);
     internal void IssueYuanHuanDraw(global::CardGame.Core.ProgramSkillFrame f, bool linjie) => _resolve().IssueYuanHuanDraw(f, linjie);

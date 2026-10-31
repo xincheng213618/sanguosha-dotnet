@@ -28,11 +28,6 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 120)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 120)]
     internal bool CanContinueZhaoXiang(ProgramSkillFrame f) => f.ZhaoXiang is not null && ValidZhaoXiang(f);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 100)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 210)]
-    internal bool HasZhaoXiangDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && ZhaoXiangObserverRoot()is not null;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 280)]
-    internal bool HasZhaoXiangBeforeDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && ZhaoXiangObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 180)]
     internal bool TryAdvanceZhaoXiangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhaoXiangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

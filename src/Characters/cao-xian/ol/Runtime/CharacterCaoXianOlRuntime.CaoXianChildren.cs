@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoXianOlRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 37300)]
     internal bool CaoXianMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => f.CaoXian is { } r && CaoXianRules.Valid(f) && op?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool CaoXianFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {

@@ -269,9 +269,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
         var invoice = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > receipt.Before && move.Sequence <= receipt.After && move.Reason.Value == GiftedSlashDrawReason(frame.SkillId)).ToArray();
         return invoice.Length == receipt.DrawActual && invoice.Select(move => move.CardId).Distinct().Count() == receipt.DrawActual && invoice.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(frame.OwnerSeat)) && (receipt.DrawActual > 0 || receipt.Before == receipt.After);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 20)]
-    internal bool IsGiftedSlashAwaitedMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.PendingMovementContinuation == pending && (frame.GiftedSlashGiftReceipt is not null && effect?.Op == SkillProgramEffectOp.GiveBoundHandAsSlashWithUseReward && ValidGiftedSlashGift(frame) || frame.GiftedSlashRewardReceipt is not null && effect?.Op == SkillProgramEffectOp.RewardGiftedSlashUse && ValidGiftedSlashReward(frame));
     internal bool GiftedSlashFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (frame.GiftedSlashGiftReceipt is not null ? !ValidGiftedSlashGift(frame) : !ValidGiftedSlashReward(frame))
@@ -290,8 +287,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
     internal ProgramSkillFrame? GiftedSlashObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreGiftedSlashUseRewardsOperations.GiftedSlashFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 270)]
     internal bool IsGiftedSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GiftedSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1930)]
-    internal bool HasGiftedSlashDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && GiftedSlashObserverRoot()is not null;
     SkillProgramStepOutcome global::CardGame.Core.IGiftedSlashUseRewardHost.BeginGiftedSlashGift(SkillProgramEffect effect, ProgramSkillFrame frame, int recipientSeat) => BeginGiftedSlashGift(effect, frame, recipientSeat);
     SkillProgramStepOutcome global::CardGame.Core.IGiftedSlashUseRewardHost.BeginGiftedSlashUseReward(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginGiftedSlashUseReward(effect, frame);
 }

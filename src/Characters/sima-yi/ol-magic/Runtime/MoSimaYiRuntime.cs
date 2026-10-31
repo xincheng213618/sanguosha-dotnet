@@ -217,10 +217,6 @@ internal sealed partial class MoSimaYiRuntime(IProgramRuntimeFrames frames, IPro
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 33900)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 33900)]
     private bool PaidContinuation(ProgramSkillFrame f) => Valid(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33900)]
-    private bool MovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) =>
-        Valid(f) && effect?.Op == f.MoSimaYi!.Operation && f.PendingMovementContinuation == pending &&
-        pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     private void Complete(ProgramSkillFrame f)
     {
         events.AdvanceFact(new MoSimaYiCompletedEvent(f.Id, f.MoSimaYi!.Operation));

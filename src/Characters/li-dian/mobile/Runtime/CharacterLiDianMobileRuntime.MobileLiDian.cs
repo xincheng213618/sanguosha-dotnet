@@ -87,9 +87,6 @@ internal sealed partial class CharacterLiDianMobileRuntime
         ContinueMobileLiDianWangxi(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 71010)]
-    internal bool ProveMobileLiDianWangxiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => e?.Op == SkillProgramEffectOp.DrawMobileLiDianWangxi && ValidMobileLiDianWangxi(f) && f.MobileLiDianWangxi is { AwaitingMovement: true, Draw: { } draw } r && r.RecipientIndex < 2 && pending == f.PendingMovementContinuation && pending.SubjectSeat == r.Recipients[r.RecipientIndex] && pending.SubjectSeat == draw.RecipientSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && draw.RequestedCount == 1 && draw.SequenceAfter >= draw.SequenceBefore && draw.ActualDrawIds.All(id => _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(draw.RecipientSeat) && m.Reason == global::CardGame.Core.EngineOwners.CharacterLiDianMobileDefinitions.MobileLiDianWangxiDraw));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 71010)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 71010)]
     internal bool ProveMobileLiDianWangxiRecovery(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.MobileLiDianWangxi is { AwaitingMovement: true, Draw.Replacement: not null } && ValidMobileLiDianWangxi(f) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;

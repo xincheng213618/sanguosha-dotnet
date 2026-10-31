@@ -19,7 +19,6 @@ internal sealed partial class CharacterCaoSongOlEntries
     internal void ContinueCaoSongLilu(long id) => _resolve().ContinueCaoSongLilu(id);
     internal bool DrainCaoSongLiluChildren(long id) => _resolve().DrainCaoSongLiluChildren(id);
     internal void ExpireCaoSongYizhengAtNextOwnTurn(global::CardGame.Core.TurnStartedEvent started) => _resolve().ExpireCaoSongYizhengAtNextOwnTurn(started);
-    internal bool HasCaoSongLiluDamageObserver(long id) => _resolve().HasCaoSongLiluDamageObserver(id);
     internal bool HasDamageAmountSupport(int sourceSeat, int targetSeat) => _resolve().HasDamageAmountSupport(sourceSeat, targetSeat);
     internal bool HasRecoveryAmountSupport(int targetSeat) => _resolve().HasRecoveryAmountSupport(targetSeat);
     internal bool IsAmountSupportHealthChild(global::CardGame.Core.ResolutionFrame? parent, global::CardGame.Core.HpChangedTriggerWindowFrame hp) => _resolve().IsAmountSupportHealthChild(parent, hp);

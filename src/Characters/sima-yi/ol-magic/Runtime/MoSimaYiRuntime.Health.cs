@@ -15,15 +15,6 @@ internal sealed partial class MoSimaYiRuntime
         }
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 33900)]
-    private bool OwnsMovementDamageObserver(long windowId)
-    {
-        if (frames.Find(windowId) is not DamageTriggerWindowFrame || MovementObserverRoot() is not { } root) return false;
-        for (ResolutionFrame? current = root; current is not null; current = frames.ParentOf(current.Id))
-            if (current.Id == windowId) return true;
-        return false;
-    }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33900)]
     private bool OwnsMovementDying()
     {

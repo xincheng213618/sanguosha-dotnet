@@ -250,9 +250,6 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 210)]
-    internal bool IsOutsidePhaseDrawDiscardMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect is not null && IsOutsidePhaseOperation(effect.Op) && f.OutsidePhaseDrawDiscard is { MovementIssued: true } r && r.Op == effect.Op && f.PendingMovementContinuation == pending && pending.SubjectSeat == r.ParticipantSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && _coreOutsidePhaseDrawDiscardObserversOperations.ValidOutsidePhaseDrawDiscardReceipt(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 620)]
     internal bool CanContinueOutsidePhaseDrawDiscard(ProgramSkillFrame f) => f.OutsidePhaseDrawDiscard is { MovementIssued: true } && _coreOutsidePhaseDrawDiscardObserversOperations.ValidOutsidePhaseDrawDiscardReceipt(f);

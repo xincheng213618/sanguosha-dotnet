@@ -18,8 +18,6 @@ internal sealed partial class CharacterJuShouMouEntries
     internal bool MatchesMouJsDeclaration(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardDeclarationFrame d) => _resolve().MatchesMouJsDeclaration(f, d);
     internal bool MouJsActionBan(global::CardGame.Core.ProgramLegalActionQuery q) => _resolve().MouJsActionBan(q);
     internal bool MouJsAdvanceChildren() => _resolve().MouJsAdvanceChildren();
-    internal bool MouJsBeforeDamage(long id) => _resolve().MouJsBeforeDamage(id);
-    internal bool MouJsDamageWindow(long id) => _resolve().MouJsDamageWindow(id);
     internal bool MouJsDeclarationEdge(int i) => _resolve().MouJsDeclarationEdge(i);
     internal bool MouJsDying() => _resolve().MouJsDying();
     internal bool MouJsEdge(int i) => _resolve().MouJsEdge(i);

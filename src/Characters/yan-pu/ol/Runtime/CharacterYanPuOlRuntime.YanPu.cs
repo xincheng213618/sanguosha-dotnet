@@ -273,9 +273,6 @@ internal sealed partial class CharacterYanPuOlRuntime
         ContinueYanPu(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 660)]
-    internal bool IsYanPuAwaitedMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.YanPu is { Stage: not (YanPuStage.GiftChoice or YanPuStage.EndingChoice or YanPuStage.EndingGiftChoice), Movements.Count: > 0 } r && (e is null || YanPuComposition.IsOperation(e.Op)) && p.BeforeCount == 0 && p.CoverageResultBind is null && p.SubjectSeat == r.Movements[^1].SubjectSeat;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26410)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26410)]
     internal bool ContinuePaidYanPu(ProgramSkillFrame f)

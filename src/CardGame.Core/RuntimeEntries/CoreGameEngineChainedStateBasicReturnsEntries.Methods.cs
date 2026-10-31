@@ -17,7 +17,6 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsEntries
     internal void EmitChainedStateBasicReturned(global::CardGame.Core.ChainedStateBasicUseReceipt r) => _resolve().EmitChainedStateBasicReturned(r);
     internal void ExecuteChainedStateBasicPaid(global::CardGame.Core.ChainedStateBasicFrame frame) => _resolve().ExecuteChainedStateBasicPaid(frame);
     internal bool FinishChainedStateBasicAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishChainedStateBasicAttack(attack, out paused);
-    internal bool HasChainedStateBasicDamageObserver(long id) => _resolve().HasChainedStateBasicDamageObserver(id);
     internal bool IsChainedStateBasicIssued(global::CardGame.Core.ChainedStateBasicUseReceipt receipt) => _resolve().IsChainedStateBasicIssued(receipt);
     internal bool IsChainedStateBasicProgramDying() => _resolve().IsChainedStateBasicProgramDying();
     internal bool IsChainedStateBasicProgramSelection(global::CardGame.Core.ProgramSkillFrame parent, global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.ChainedStateBasicFrame paid) => _resolve().IsChainedStateBasicProgramSelection(parent, effect, paid);

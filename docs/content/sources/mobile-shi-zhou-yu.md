@@ -50,8 +50,7 @@
 - 程序在活跃卡牌结算（`CardUseTargetsFinalized`/`BeforeDamageApplied` 窗口）内发出
   弃牌移动后同步驱动延续（无触发候选的移动批不会自行归还控制权）；伤害子结算经
   `CompleteProgramAttack` 恢复后于 `ChiYunStageResolveDamage`/`YanhuiStageEndingDamage`
-  阶段收尾。移动证明 `ProgramMovementProof(NativeCost)` 覆盖炽沄给牌、焰洄/焚涛弃置三个
-  批次。
+  阶段收尾。
 - 覆盖：炽沄给牌与接收者选项二（摸牌+横置）全流程、焰洄重复展示弃置与结束火焰伤害
   （含焚涛增幅联动）、雄姿保留选项二与焚涛弃置复横置各有专项检查
   （`ZhouYuChecks`，含冷恢复与短命令重放校验）。

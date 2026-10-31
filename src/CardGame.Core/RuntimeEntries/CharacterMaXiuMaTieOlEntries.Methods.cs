@@ -16,14 +16,11 @@ internal sealed partial class CharacterMaXiuMaTieOlEntries
     internal bool? DecideIssuedTrigger580(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger580(candidate, context);
     internal void FinishKenshang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishKenshang(f);
     internal bool HasAcceptedKenshangKeAction(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.LegalAction action) => _resolve().HasAcceptedKenshangKeAction(f, action);
-    internal bool HasKenshangBeforeDamageObserver(long id) => _resolve().HasKenshangBeforeDamageObserver(id);
-    internal bool HasKenshangDamageObserver(long id) => _resolve().HasKenshangDamageObserver(id);
     internal bool HasKenshangProgramSlash(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IEnumerable<int> targets) => _resolve().HasKenshangProgramSlash(actor, targets);
     internal bool HasKenshangRequestPrompt() => _resolve().HasKenshangRequestPrompt();
     internal bool HasKenshangTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasKenshangTargetTail(use);
     internal bool HasKenshangTargetTail2(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardActionContext action) => _resolve().HasKenshangTargetTail(use, action);
     internal bool IsIssuedKenshangCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedKenshangCandidate(c);
-    internal bool IsKenshangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsKenshangMovement(f, e, p);
     internal bool IsKenshangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsKenshangRecoveryParent(f, recovery);
     internal bool IsKenshangTargetsReplacedFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.SlashTargetsReplacedEvent fact) => _resolve().IsKenshangTargetsReplacedFact(use, fact);
     internal void IssueKenshangUse(long id, global::CardGame.Core.CardActionContext action) => _resolve().IssueKenshangUse(id, action);

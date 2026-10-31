@@ -19,17 +19,14 @@ internal sealed partial class CharacterGuoYouZhiMouMobileEntries
     internal void IssueMouGyzNativeUse(global::CardGame.Core.ProgramSkillFrame f, int index) => _resolve().IssueMouGyzNativeUse(f, index);
     internal bool KeepMouGyzPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepMouGyzPaid(f);
     internal bool MatchesMouGyzDeclaration(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.CardDeclarationFrame d) => _resolve().MatchesMouGyzDeclaration(root, d);
-    internal bool MouGyzBeforeDamage(long id) => _resolve().MouGyzBeforeDamage(id);
     internal global::CardGame.Core.PromptChoice MouGyzChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string text, int? card = default, int? option = default) => _resolve().MouGyzChoice(f, branch, text, card, option);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouGyzChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouGyzChoices(f);
-    internal bool MouGyzDamage(long id) => _resolve().MouGyzDamage(id);
     internal bool MouGyzDeclarationEdge(int i) => _resolve().MouGyzDeclarationEdge(i);
     internal global::System.Collections.Generic.IReadOnlyList<int> MouGyzDiscardCards(int actor, int turn) => _resolve().MouGyzDiscardCards(actor, turn);
     internal bool MouGyzDying() => _resolve().MouGyzDying();
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> MouGyzEligibleGifts(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouGyzEligibleGifts(f);
     internal global::System.Collections.Generic.IReadOnlyList<int> MouGyzExpectedNativeTargets(global::CardGame.Core.MouGuoYouZhiNativeReceipt r) => _resolve().MouGyzExpectedNativeTargets(r);
     internal bool MouGyzFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouGyzFirstChild(f, child);
-    internal bool MouGyzMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouGyzMovementProof(f, e, p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> MouGyzNativeActions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouGyzNativeActions(f);
     internal bool MouGyzNativeRidesOn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSkillFrame parent) => _resolve().MouGyzNativeRidesOn(use, parent);
     internal global::CardGame.Core.ProgramSkillFrame? MouGyzObserverRoot() => _resolve().MouGyzObserverRoot();

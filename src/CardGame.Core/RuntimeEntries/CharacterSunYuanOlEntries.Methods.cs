@@ -25,15 +25,12 @@ internal sealed partial class CharacterSunYuanOlEntries
     internal bool HasIssuedDongxinSlashDebitExemption(long useId, int actorSeat) => _resolve().HasIssuedDongxinSlashDebitExemption(useId, actorSeat);
     internal bool HasSayingRoundRange(int actor, int target) => _resolve().HasSayingRoundRange(actor, target);
     internal bool HasSayingWeijiePayment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame? use = default) => _resolve().HasSayingWeijiePayment(f, use);
-    internal bool HasSunYuanBeforeDamageObserver(long id) => _resolve().HasSunYuanBeforeDamageObserver(id);
-    internal bool HasSunYuanDamageObserver(long id) => _resolve().HasSunYuanDamageObserver(id);
     internal bool IsIssuedSayingUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedSayingUse(use);
     internal bool IsSayingFactionOrigin(global::CardGame.Core.ProgramSkillFrame f, int actor, int target, string resultBind) => _resolve().IsSayingFactionOrigin(f, actor, target, resultBind);
     internal bool IsSayingNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsSayingNativeSettlementBatch(f, batch);
     internal bool IsSayingRemovedMaterial(long useId, int cardId) => _resolve().IsSayingRemovedMaterial(useId, cardId);
     internal bool IsSayingSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsSayingSlashQuery(actor);
     internal bool IsSayingSlashRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsSayingSlashRequest(f);
-    internal bool IsSunYuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSunYuanMovement(f, effect, pending);
     internal bool IsSunYuanPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsSunYuanPaidMovement(f, m);
     internal bool IsSunYuanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunYuanRecoveryParent(f, recovery);
     internal void IssueSunYuanMove(global::CardGame.Core.ProgramSkillFrame supplied, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardLocation to, global::CardGame.Core.SunYuanStage stage, string reason, bool discard) => _resolve().IssueSunYuanMove(supplied, ids, to, stage, reason, discard);

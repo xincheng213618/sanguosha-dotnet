@@ -109,7 +109,6 @@ internal sealed partial class MouHuangQuanRuntime(IMouHuangQuanFacts facts,IMouH
     {events.AdvanceFact(new MouHqCompletedEvent(f.Id));frames.ReplaceTop(f=f with{MouHuangQuan=null,PendingMovementContinuation=null});native.Finish(f,accepted);}
     [ProgramContinuation(ProgramContinuationKind.Resume,35700)]internal bool ResumeMouHq(long id){if(frames.Top is not ProgramSkillFrame{MouHuangQuan:not null}f||f.Id!=id)return false;ContinueMouHq(id);return true;}
     [ProgramContinuation(ProgramContinuationKind.Movement,35700)]internal bool MovementMouHq(ProgramSkillFrame f)=>f.MouHuangQuan is not null&&f.PendingMovementContinuation is not null&&ResumeMouHq(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments,35700)]internal bool MouHqMovement(ProgramSkillFrame f,SkillProgramEffect? e,ProgramMovementContinuation p)=>Valid(f)&&f.MouHuangQuan is{Stage:MouHqStage.GiveChildren or MouHqStage.ReplyChildren or MouHqStage.DrawChildren}&&e?.Op is SkillProgramEffectOp.ResolveMouHuangQuanQiaodui or SkillProgramEffectOp.ResolveMouHuangQuanTuicheng&&p==f.PendingMovementContinuation&&p.BeforeCount==0&&p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath,35700)][ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss,35700)]internal bool KeepMouHq(ProgramSkillFrame f)=>f.MouHuangQuan is{Paid:true}&&Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuangQuanQiaodui,SkillProgramEffectOp.ResolveMouHuangQuanTuicheng)]internal PromptChoice ChooseMouHq(PendingDecision p,ProgramSkillFrame f)
     {

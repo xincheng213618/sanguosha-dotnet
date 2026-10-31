@@ -40,8 +40,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
 
         return previousIndex == cursor - 1 && previous == a.TargetSeat;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 39200)]
     internal bool ShenPtMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
     {
         if (f.ShenPangTong is not { Operation: SkillProgramEffectOp.ResolveShenPangTongKunyu, Stage: ShenPangTongStage.RemovalChildren } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null)
@@ -66,11 +64,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
     }
 
     internal ProgramSkillFrame? ShenPtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterPangTongAnniversaryGodOperations.ShenPtFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 39200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 39200)]
-    internal bool ShenPtDamageWindow(long id) => ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 39200)]
-    internal bool ShenPtBeforeDamage(long id) => ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 39200)]
     internal bool ShenPtDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 39200)]

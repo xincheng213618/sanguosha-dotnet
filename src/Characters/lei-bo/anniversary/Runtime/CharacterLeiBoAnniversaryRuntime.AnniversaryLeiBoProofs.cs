@@ -57,11 +57,6 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
         var start = Array.FindIndex(facts, e => e is AnniversaryLeiBoShuaijieStartedEvent s && s.FrameId == f.Id);
         return start >= 0 && facts.Skip(start + 1).OfType<MaximumHpChangedEvent>().Any(e => e.PlayerSeat == f.OwnerSeat && e.SkillId == f.SkillId);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 49800)]
     internal bool LeiBoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryLeiBo is { Stage: AnniversaryLeiBoStage.MovementChildren } && e?.Op is SkillProgramEffectOp.SettleAnniversaryLeiBoSileiPenalty or SkillProgramEffectOp.FinishAnniversaryLeiBoShuaijie && p == f.PendingMovementContinuation && ValidLeiBo(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 49800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 49800)]
@@ -81,11 +76,6 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
 
     internal bool LeiBoObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && LeiBoFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal ProgramSkillFrame? LeiBoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLeiBoAnniversaryOperations.LeiBoFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterLeiBoAnniversaryOperations.LeiBoObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 49800)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 49800)]
-    internal bool LeiBoDamageObserver(long id) => LeiBoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49800)]
-    internal bool LeiBoBeforeDamageObserver(long id) => LeiBoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49800)]
     internal bool LeiBoDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LeiBoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49800)]

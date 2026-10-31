@@ -22,23 +22,6 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageObserversRuntime
     internal ProgramSkillFrame? JoinedTrickDamageRewardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreJoinedTrickDamageObserversOperations.JoinedTrickDamageRewardFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30)]
     internal bool IsJoinedTrickDamageRewardDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && JoinedTrickDamageRewardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1670)]
-    internal bool HasJoinedTrickDamageRewardDamageObserver(long id) => HasJoinedTrickDamageRewardObserver(id, false);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 230)]
-    internal bool HasJoinedTrickDamageRewardBeforeDamageObserver(long id) => HasJoinedTrickDamageRewardObserver(id, true);
-    internal bool HasJoinedTrickDamageRewardObserver(long id, bool before)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && (before ? f is BeforeDamageProgramWindowFrame : f is DamageTriggerWindowFrame));
-        if (index < 0 || JoinedTrickDamageRewardObserverRoot()is not { } root)
-            return false;
-        var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index > rootIndex)
-            return true;
-        for (var child = index + 1; child <= rootIndex; child++)
-            if (!JoinedTrickDamageRewardStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreResponseCompletionOperations.ResponseCompletionStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]))
-                return false;
-        return index < rootIndex;
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 120)]
     internal bool TryAdvanceJoinedTrickDamageRewardSubtree()

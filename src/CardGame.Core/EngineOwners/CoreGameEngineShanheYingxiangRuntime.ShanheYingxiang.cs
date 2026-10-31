@@ -274,9 +274,6 @@ internal sealed partial class CoreGameEngineShanheYingxiangRuntime
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 5406)]
-    internal bool IsShanheYingxiangDrawMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation movement) => effect?.Op == SkillProgramEffectOp.ResolveShanheYingxiangUse && frame.ShanheYingxiang is { Stage: ShanheYingxiangStage.DrawChildren, DrawOutcome: { } outcome } && movement.SubjectSeat == frame.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && outcome.RecipientSeat == (frame.ShanheYingxiang.DrawIndex == 1 ? frame.OwnerSeat : frame.ShanheYingxiang.UserSeat);
     [ProgramContinuation(ProgramContinuationKind.Resume, 5406)]
     internal bool ResumeShanheYingxiang(long frameId)
     {

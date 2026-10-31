@@ -66,9 +66,6 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillObserversRuntime
     }
 
     internal ProgramSkillFrame? DeathGrowthObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreDeathGrowthSkillObserversOperations.DeathGrowthFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1570)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1690)]
-    internal bool HasDeathGrowthDamageObserver(long id) => DeathGrowthObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 440)]
     internal bool TryAdvanceDeathGrowthSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DeathGrowthObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

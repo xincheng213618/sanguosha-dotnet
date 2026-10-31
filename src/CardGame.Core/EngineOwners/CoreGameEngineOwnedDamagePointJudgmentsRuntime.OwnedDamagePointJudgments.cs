@@ -106,9 +106,6 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
         return _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
     }
 
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 90)]
-    internal bool HasOwnedDamagePointJudgmentObserver(long damageWindowId) => OwnedDamagePointJudgmentRoot(damageWindowId)is not null;
-
     internal bool IsOwnedDamagePointJudgmentResultClaimed(JudgmentFrame judgment)
     {
         if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || OwnedDamagePointJudgmentRoot(damage.Id)is not { } root || root.Id != judgment.ParentFrameId || root.OwnedDamagePointJudgment is not { } receipt || receipt.JudgmentFrameId != judgment.Id || receipt.ResultBind != judgment.ProgramResultBind || judgment.CardId is not { } cardId)

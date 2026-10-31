@@ -4,8 +4,6 @@ internal sealed partial class CharacterCaoCaoOlMagicEntries
 {
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> IncludeMoCaoCaoBaibi(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> candidates) => _resolve().IncludeMoCaoCaoBaibi(owner, window, candidates);
     internal bool MoCaoCaoAdvanceNativeChildren() => _resolve().MoCaoCaoAdvanceNativeChildren();
-    internal bool MoCaoCaoBeforeDamageWindow(long id) => _resolve().MoCaoCaoBeforeDamageWindow(id);
-    internal bool MoCaoCaoDamageWindow(long id) => _resolve().MoCaoCaoDamageWindow(id);
     internal bool MoCaoCaoDying() => _resolve().MoCaoCaoDying();
     internal string? MoCaoCaoEquipmentDescription(int seat) => _resolve().MoCaoCaoEquipmentDescription(seat);
     internal global::CardGame.Core.LegalAction? MoCaoCaoEquipmentPhysicalBan(global::CardGame.Core.ProgramLegalActionQuery q) => _resolve().MoCaoCaoEquipmentPhysicalBan(q);
@@ -19,7 +17,6 @@ internal sealed partial class CharacterCaoCaoOlMagicEntries
     internal bool MoCaoCaoHandSlashQuota(global::CardGame.Core.ProgramSlashQuotaQuery q) => _resolve().MoCaoCaoHandSlashQuota(q);
     internal bool MoCaoCaoHasHandPrivilege(int seat) => _resolve().MoCaoCaoHasHandPrivilege(seat);
     internal bool MoCaoCaoIssuedHandUse(long id, int actor) => _resolve().MoCaoCaoIssuedHandUse(id, actor);
-    internal bool MoCaoCaoMovementReturn(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MoCaoCaoMovementReturn(f, effect, p);
     internal bool MoCaoCaoNativeEdge(int i) => _resolve().MoCaoCaoNativeEdge(i);
     internal global::CardGame.Core.ProgramSkillFrame? MoCaoCaoNativeRoot() => _resolve().MoCaoCaoNativeRoot();
     internal bool MoCaoCaoNativeSuffix(int n) => _resolve().MoCaoCaoNativeSuffix(n);

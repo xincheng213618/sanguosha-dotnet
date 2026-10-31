@@ -11,9 +11,7 @@ internal sealed partial class CharacterTianYuMouMobileEntries
     internal void ContinueMouTianYu(long id) => _resolve().ContinueMouTianYu(id);
     internal bool ContinuePaidMouTianYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidMouTianYu(f);
     internal bool DrainMouTianYu(long id) => _resolve().DrainMouTianYu(id);
-    internal bool HasMouTianYuDamageObserver(long id) => _resolve().HasMouTianYuDamageObserver(id);
     internal bool IsMouTianYuDying() => _resolve().IsMouTianYuDying();
-    internal bool IsMouTianYuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation m) => _resolve().IsMouTianYuMovement(f, e, m);
     internal bool IsMouTianYuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouTianYuRecoveryParent(f, recovery);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouTianYuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouTianYuChoices(f);
     internal bool MouTianYuFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouTianYuFirstChild(f, child);

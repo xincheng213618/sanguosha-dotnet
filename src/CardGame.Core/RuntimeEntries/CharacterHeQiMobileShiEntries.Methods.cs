@@ -30,12 +30,10 @@ internal sealed partial class CharacterHeQiMobileShiEntries
     internal bool ResumeShiHq(long id) => _resolve().ResumeShiHq(id);
     internal void ReturnShiHqDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiHqDraw(f, outcome);
     internal bool ReturnShiHqMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiHqMovement(f);
-    internal bool ShiHqBeforeDamageChild(long id) => _resolve().ShiHqBeforeDamageChild(id);
     internal bool ShiHqChildEdge(int i) => _resolve().ShiHqChildEdge(i);
     internal bool ShiHqChildSuffix(int n) => _resolve().ShiHqChildSuffix(n);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiHqChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiHqChoices(f);
     internal global::CardGame.Core.ShiHqYingjiMarkedEvent? ShiHqCleanupSource() => _resolve().ShiHqCleanupSource();
-    internal bool ShiHqDamageChild(long id) => _resolve().ShiHqDamageChild(id);
     internal bool ShiHqDyingChild() => _resolve().ShiHqDyingChild();
     internal bool ShiHqFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiHqFirstChild(f, child);
     internal global::CardGame.Core.ShiHqYingjiMarkedEvent? ShiHqMark(int id) => _resolve().ShiHqMark(id);

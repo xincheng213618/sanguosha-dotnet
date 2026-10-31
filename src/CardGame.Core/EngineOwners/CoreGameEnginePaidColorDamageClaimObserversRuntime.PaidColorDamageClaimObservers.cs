@@ -108,12 +108,6 @@ internal sealed partial class CoreGameEnginePaidColorDamageClaimObserversRuntime
             return _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageDyingProgramMatches(response, dying);
         return _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1740)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 110)]
-    internal bool HasPaidColorDamageClaimDamageObserver(long exactDamageWindowId) => PaidColorDamageClaimObserverRoot(exactDamageWindowId)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 560)]
     internal bool IsPaidColorDamageClaimProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PaidColorDamageClaimObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 120)]
-    internal bool IsPaidColorDamageClaimMovement(ProgramSkillFrame root, SkillProgramEffect? op, ProgramMovementContinuation pending) => pending.SubjectSeat == root.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (op is not null && PaidColorDuelOperation.IsPayment(op.Op) && root.PaidColorConversion is not null || op?.Op == SkillProgramEffectOp.ClaimActualTurnDamageEntities && root.ActualTurnDamageClaim is not null) && IsValidPaidColorDamageClaimFrame(root);
 }

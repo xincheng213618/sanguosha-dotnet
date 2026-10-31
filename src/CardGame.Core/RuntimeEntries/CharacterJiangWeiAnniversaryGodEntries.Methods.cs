@@ -19,7 +19,6 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodEntries
     internal void IssueShenJwDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueShenJwDraw(f);
     internal void IssueShenJwSlash(global::CardGame.Core.ProgramSkillFrame f, int targetSeat) => _resolve().IssueShenJwSlash(f, targetSeat);
     internal void MoveShenJwJiufa(global::CardGame.Core.ProgramSkillFrame f, bool gain) => _resolve().MoveShenJwJiufa(f, gain);
-    internal bool ProveShenJwMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().ProveShenJwMovement(f, e, pending);
     internal void PublishShenJw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShenJw(f);
     internal bool ResumeShenJw(long id) => _resolve().ResumeShenJw(id);
     internal bool ReturnShenJwAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnShenJwAttack(completion);

@@ -21,13 +21,10 @@ internal sealed partial class CharacterMiHengLeEntries
     internal bool HasIssuedSiruiUse(long useId, int actorSeat) => _resolve().HasIssuedSiruiUse(useId, actorSeat);
     internal bool HasJiguEntityMark(int cardId) => _resolve().HasJiguEntityMark(cardId);
     internal bool HasJiguEntityMark2(int ownerSeat, int cardId) => _resolve().HasJiguEntityMark(ownerSeat, cardId);
-    internal bool HasLeMiHengBeforeDamageObserver(long id) => _resolve().HasLeMiHengBeforeDamageObserver(id);
-    internal bool HasLeMiHengDamageObserver(long id) => _resolve().HasLeMiHengDamageObserver(id);
     internal bool HasSiruiForcedSlash(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().HasSiruiForcedSlash(actor, target, pending);
     internal bool HasSiruiSlashDistance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int>? materialIds = default, global::CardGame.Core.CardConversionSource? conversionSource = default, long? existingUseFrameId = default) => _resolve().HasSiruiSlashDistance(actor, kind, materialIds, conversionSource, existingUseFrameId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeJigu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeJigu(supplied);
     internal bool IsJiguHandLimitExempt(global::CardGame.Core.CharacterState owner, int cardId) => _resolve().IsJiguHandLimitExempt(owner, cardId);
-    internal bool IsLeMiHengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLeMiHengMovement(f, effect, p);
     internal bool IsLeMiHengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLeMiHengRecoveryParent(f, recovery);
     internal bool IsSiruiOutsideGeneralWeaponMaterial(long useId, int cardId) => _resolve().IsSiruiOutsideGeneralWeaponMaterial(useId, cardId);
     internal bool IsSiruiOutsideResponseMaterial(long parentId, int cardId) => _resolve().IsSiruiOutsideResponseMaterial(parentId, cardId);

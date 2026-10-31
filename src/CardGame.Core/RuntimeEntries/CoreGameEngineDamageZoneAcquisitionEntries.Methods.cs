@@ -10,7 +10,6 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionEntries
     internal global::CardGame.Core.CardConversionSource DamageAcquisitionSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DamageAcquisitionSource(f);
     internal bool DrainDamageAcquisitionChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainDamageAcquisitionChildren(f);
     internal bool ExactDamageAcquisitionParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactDamageAcquisitionParent(f);
-    internal bool IsDamageAcquisitionMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsDamageAcquisitionMovement(f, e, p);
     internal void IssueDamageZoneAcquisition(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueDamageZoneAcquisition(f);
     internal void PublishDamageAcquisitionChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishDamageAcquisitionChoice(f);
     internal void RequireDamageAcquisitionReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireDamageAcquisitionReceipt(f);

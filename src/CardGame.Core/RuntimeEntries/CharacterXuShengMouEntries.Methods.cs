@@ -3,9 +3,7 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXuShengMouEntries
 {
     internal bool MouXuShengAdvanceChildren() => _resolve().MouXuShengAdvanceChildren();
-    internal bool MouXuShengBeforeDamage(long id) => _resolve().MouXuShengBeforeDamage(id);
     internal int MouXuShengDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().MouXuShengDamageBonus(attack);
-    internal bool MouXuShengDamageWindow(long id) => _resolve().MouXuShengDamageWindow(id);
     internal bool MouXuShengDying() => _resolve().MouXuShengDying();
     internal bool MouXuShengFirstNativeChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouXuShengFirstNativeChild(f, child);
     internal bool MouXuShengMovementReturn(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouXuShengMovementReturn(f, effect, p);

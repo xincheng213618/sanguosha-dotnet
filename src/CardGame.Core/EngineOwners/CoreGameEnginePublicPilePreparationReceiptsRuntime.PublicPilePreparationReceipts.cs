@@ -56,9 +56,6 @@ internal sealed partial class CoreGameEnginePublicPilePreparationReceiptsRuntime
     }
 
     internal bool PublicPilePreparationPaymentDestination(ProgramSkillFrame f, CardMovementRecord movement, CardLocation destination) => movement.To == destination || f.PublicPilePreparation is { Operation: SkillProgramEffectOp.StoreNonBasicOwnedPublicPile, Pile: { } pile } receipt && destination == pile.Location && movement.From == CardLocation.Equipment(f.OwnerSeat) && movement.Sequence > receipt.Before && movement.Sequence <= receipt.After && movement.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePublicPilePreparationRuntime.PreparationReason(f, "payment") && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId && fact.MovementSequence == movement.Sequence && fact.ParentFrameId == f.Id) == 1;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 20)]
-    internal bool IsPublicPilePreparationMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.PublicPilePreparation is { Stage: PublicPilePreparationStage.PaymentChildren or PublicPilePreparationStage.DrawChildren } r && effect?.Op == r.Operation && pending == f.PendingMovementContinuation && ValidPublicPilePreparation(f);
     internal bool PublicPilePreparationFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.PublicPilePreparation is not { } r || !ValidPublicPilePreparation(f))
@@ -114,6 +111,4 @@ internal sealed partial class CoreGameEnginePublicPilePreparationReceiptsRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 250)]
     internal bool IsPublicPilePreparationProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && PublicPilePreparationObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1910)]
-    internal bool HasPublicPilePreparationDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && PublicPilePreparationObserverRoot()is not null;
 }

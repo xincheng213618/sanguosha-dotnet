@@ -8,14 +8,11 @@ internal sealed partial class CharacterJianYongBoundaryMobileEntries
     internal bool BoundaryJianYongAdjustmentConsumes(global::CardGame.Core.NextActualUseTargetAdjustmentGrantedEvent grant, global::CardGame.Core.CardKind kind) => _resolve().BoundaryJianYongAdjustmentConsumes(grant, kind);
     internal bool BoundaryJianYongPhaseCurrent(global::CardGame.Core.BoundaryJianYongPhaseEvent e) => _resolve().BoundaryJianYongPhaseCurrent(e);
     internal bool BoundaryJianYongTrickForbidden(global::CardGame.Core.ProgramCardUseQuery q) => _resolve().BoundaryJianYongTrickForbidden(q);
-    internal bool BoundaryZongshiBeforeDamageChild(long id) => _resolve().BoundaryZongshiBeforeDamageChild(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryZongshiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryZongshiChoices(f);
     internal global::CardGame.Core.ProgramSkillWindowContext BoundaryZongshiContext(global::CardGame.Core.ResolutionFrame p, global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().BoundaryZongshiContext(p, c);
-    internal bool BoundaryZongshiDamageChild(long id) => _resolve().BoundaryZongshiDamageChild(id);
     internal bool BoundaryZongshiDyingChild() => _resolve().BoundaryZongshiDyingChild();
     internal bool BoundaryZongshiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().BoundaryZongshiFirstChild(f, child);
     internal int[] BoundaryZongshiLower(global::CardGame.Core.ResolutionFrame p) => _resolve().BoundaryZongshiLower(p);
-    internal bool BoundaryZongshiMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().BoundaryZongshiMovementProof(f, e, p);
     internal bool BoundaryZongshiNativeResult(global::CardGame.Core.ResolutionFrame p, scoped out global::CardGame.Core.PindianResult result, scoped out int comparison) => _resolve().BoundaryZongshiNativeResult(p, out result, out comparison);
     internal global::CardGame.Core.ProgramSkillFrame? BoundaryZongshiObserverRoot() => _resolve().BoundaryZongshiObserverRoot();
     internal bool BoundaryZongshiParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame p) => _resolve().BoundaryZongshiParent(f, p);

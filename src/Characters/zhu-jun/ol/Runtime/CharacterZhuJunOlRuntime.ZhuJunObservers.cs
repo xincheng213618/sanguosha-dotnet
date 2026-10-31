@@ -9,8 +9,6 @@ internal sealed partial class CharacterZhuJunOlRuntime
 {
 
     internal bool IsZhuJunDrawMovement(ProgramSkillFrame f, CardMovementRecord m) => f.ZhuJunCuipoDraw is { } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == ZhuJunDrawReason || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 240)]
-    internal bool IsZhuJunMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.ZhuJunCuipoDraw is not null && effect?.Op == SkillProgramEffectOp.ResolveCuipoActualTurnUse && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool ZhuJunFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.ZhuJunCuipoDraw is not { } r || f.PendingMovementContinuation is null)
@@ -23,10 +21,6 @@ internal sealed partial class CharacterZhuJunOlRuntime
     }
 
     internal ProgramSkillFrame? ZhuJunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhuJunOlOperations.ZhuJunFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 710)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 740)]
-    internal bool HasZhuJunDamageObserver(long id) => ZhuJunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27030)]
     internal bool AdvanceZhuJunSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhuJunObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

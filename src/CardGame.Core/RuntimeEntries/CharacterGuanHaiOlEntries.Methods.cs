@@ -25,9 +25,6 @@ internal sealed partial class CharacterGuanHaiOlEntries
     internal bool GuanHaiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().GuanHaiFirstChild(f, child);
     internal bool GuanHaiMovementMatches(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().GuanHaiMovementMatches(f, m);
     internal global::CardGame.Core.ProgramSkillFrame? GuanHaiObserverRoot() => _resolve().GuanHaiObserverRoot();
-    internal bool HasGuanHaiBeforeDamageObserver(long id) => _resolve().HasGuanHaiBeforeDamageObserver(id);
-    internal bool HasGuanHaiDamageObserver(long id) => _resolve().HasGuanHaiDamageObserver(id);
-    internal bool IsGuanHaiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsGuanHaiMovement(f, e, p);
     internal bool IsGuanHaiPindianSource(global::CardGame.Core.PindianFrame p, bool revealed) => _resolve().IsGuanHaiPindianSource(p, revealed);
     internal bool IsGuanHaiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsGuanHaiRecoveryParent(f, recovery);
     internal bool IsIssuedGuanHaiYouqueCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedGuanHaiYouqueCandidate(c, context);

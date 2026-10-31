@@ -18,9 +18,6 @@ internal sealed partial class CharacterXinPiOlEntries
     internal bool ExactYinjuUseCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context, scoped out global::CardGame.Core.YinjuTurnRelation relation, scoped out global::CardGame.Core.CardUseFrame use) => _resolve().ExactYinjuUseCandidate(c, context, out relation, out use);
     internal void FinishXinPi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishXinPi(f);
     internal bool HasIssuedYinjuCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HasIssuedYinjuCandidate(c, w);
-    internal bool HasXinPiBeforeDamageObserver(long id) => _resolve().HasXinPiBeforeDamageObserver(id);
-    internal bool HasXinPiDamageObserver(long id) => _resolve().HasXinPiDamageObserver(id);
-    internal bool IsXinPiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXinPiMovement(f, e, p);
     internal bool IsXinPiPhysicalClaim(long useId, int cardId) => _resolve().IsXinPiPhysicalClaim(useId, cardId);
     internal bool IsXinPiRecoveryCompletion(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryAttempt attempt) => _resolve().IsXinPiRecoveryCompletion(f, attempt);
     internal bool IsXinPiRemainingCardDamageIneffective(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().IsXinPiRemainingCardDamageIneffective(attack);

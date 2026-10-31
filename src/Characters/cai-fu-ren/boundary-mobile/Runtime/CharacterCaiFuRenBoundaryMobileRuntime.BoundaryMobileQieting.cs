@@ -11,7 +11,6 @@ internal sealed partial class CharacterCaiFuRenBoundaryMobileRuntime
     internal const string BoundaryMobileQietingSkill = "boundary:qieting-mobile", BoundaryMobileQietingHandReason = "skill-program.cai-fu-ren.qieting.hand";
     internal static bool IsBoundaryMobileQieting(ProgramSkillFrame frame) => frame.SkillId == BoundaryMobileQietingSkill;
     internal static bool IsKnownCaiFuRenQietingBinding(string skill, string? binding) => skill == "ol:qieting" && binding == "ordinary-turn-end" || skill == BoundaryMobileQietingSkill && binding == "mobile-turn-end";
-    internal static bool IsCaiFuRenQietingOperation(ProgramSkillFrame frame, SkillProgramEffect? effect) => effect?.Op == (IsBoundaryMobileQieting(frame) ? SkillProgramEffectOp.ResolveBoundaryMobileQieting : SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting);
     internal bool CaiFuRenQietingDisqualified(string skill, OrdinaryQietingTurnContext qualification)
     {
         if (skill != BoundaryMobileQietingSkill)

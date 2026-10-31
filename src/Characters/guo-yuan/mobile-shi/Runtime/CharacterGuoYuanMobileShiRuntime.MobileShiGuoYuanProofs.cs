@@ -8,9 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoYuanMobileShiRuntime
 {
     internal bool ValidShiGy(ProgramSkillFrame f) => f.ShiGuoYuan is { } r && f.InstructionIndex == 1 && r.Source == ShiGySource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && r.WindowId == f.WindowContext?.ParentFrameId && Enum.IsDefined(r.Stage) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiGyStartedEvent>().Count(e => e == new ShiGyStartedEvent(f.Id, r.Source, r.Hash, r.Turn, r.WindowId, f.TriggerId!)) == 1;
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 48100)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 48100)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 48100)]
     internal bool ShiGyMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
     {
         if (f.ShiGuoYuan is not { } r || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null || !ValidShiGy(f) || effect?.Op is not (SkillProgramEffectOp.ResolveMobileShiGuoYuanQingdao or SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng or SkillProgramEffectOp.ResolveMobileShiGuoYuanChenshe))
@@ -50,11 +47,6 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
             return d.Stage is CardDeclarationStage.Paying or CardDeclarationStage.Cleaning && d.ActiveChildFrameId == moved.Id && moved.ResumeDeclarationFrameId == d.Id && moved.Batch.ParentFrameId == d.Id && moved.Batch.Movements is [var m] && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.CardId == d.Payment.Cost.CardId && (d.Stage == CardDeclarationStage.Paying ? m.From == d.Payment.Cost.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay" : m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason.Value is "conversion.declaration.failed" or "conversion.declaration.cancelled");
         return _resolutionStackOperations._resolutionStack[i] is ProgramLifecycleTriggerWindowFrame skills && d.Stage == CardDeclarationStage.Granting && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == d.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeCardDeclaration;
     }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 48100)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 48100)]
-    internal bool ShiGyDamageChild(long id) => ShiGyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 48100)]
-    internal bool ShiGyBeforeDamageChild(long id) => ShiGyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 48100)]
     internal bool ShiGyDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiGyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 48100)]

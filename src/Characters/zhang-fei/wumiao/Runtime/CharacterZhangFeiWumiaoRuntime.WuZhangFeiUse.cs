@@ -224,9 +224,6 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
             return false;
         return draw.ActualDrawIds.Contains(move.CardId) && move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(f.OwnerSeat) && move.Reason.Value == WuZhangFeiXianlueDrawReason || draw.ReplacementGainedIds.Contains(move.CardId) && move.To == CardLocation.Hand(f.OwnerSeat) || move.From == CardLocation.DiscardPile && move.To == CardLocation.DrawPile && move.Reason == CardMoveReasons.Reshuffle;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 290)]
-    internal bool IsWuZhangFeiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (effect?.Op == SkillProgramEffectOp.ResolveWuZhangFeiUseSample && f.WuZhangFeiUse is { Stage: WuZhangFeiUseStage.MovementChildren } || effect?.Op == SkillProgramEffectOp.ResolveWuZhangFeiXianlue && f.WuZhangFeiXianlue is { Stage: WuZhangFeiXianlueStage.DrawChildren });
     internal bool AwaitWuZhangFeiChildren(long id)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -296,11 +293,6 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
 
     internal bool WuZhangFeiObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame parent && (_characterZhangFeiWumiaoOperations.WuZhangFeiFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child]) || parent.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? WuZhangFeiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterZhangFeiWumiaoOperations.WuZhangFeiFirstChild(f, child), (index) => _characterZhangFeiWumiaoOperations.WuZhangFeiObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1240)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1350)]
-    internal bool HasWuZhangFeiDamageObserver(long id) => WuZhangFeiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1380)]
-    internal bool HasWuZhangFeiBeforeDamageObserver(long id) => WuZhangFeiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     internal bool IsWuZhangFeiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {
         if (f.WuZhangFeiUse is null && f.WuZhangFeiXianlue is null || recovery.ParentFrameId == f.Id)

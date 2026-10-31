@@ -25,16 +25,12 @@ internal sealed partial class CharacterHuangYueyingOlMouEntries
     internal bool DrainMouHuangYueying(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouHuangYueying(f);
     internal void FinishMouBingcai(global::CardGame.Core.ProgramSkillFrame f, bool added) => _resolve().FinishMouBingcai(f, added);
     internal void FinishMouLixian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouLixian(f);
-    internal bool HasMouHuangYueyingBeforeDamageObserver(long id) => _resolve().HasMouHuangYueyingBeforeDamageObserver(id);
-    internal bool HasMouHuangYueyingDamageObserver(long id) => _resolve().HasMouHuangYueyingDamageObserver(id);
     internal bool HasUnstartedMouBingcaiExtraEffect(long id) => _resolve().HasUnstartedMouBingcaiExtraEffect(id);
     internal bool IsIssuedMouLixianUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedMouLixianUse(use);
     internal bool IsMouBingcaiExtraRound(long id) => _resolve().IsMouBingcaiExtraRound(id);
     internal bool IsMouBingcaiFirstBasicAction(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardActionContext action) => _resolve().IsMouBingcaiFirstBasicAction(use, action);
     internal bool IsMouBingcaiLegacyAlcoholUse(long id) => _resolve().IsMouBingcaiLegacyAlcoholUse(id);
-    internal bool IsMouHuangYueyingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouHuangYueyingMovement(f, effect, pending);
     internal bool IsMouHuangYueyingRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouHuangYueyingRecoveryParent(f, recovery);
-    internal bool IsMouLixianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouLixianMovement(f, effect, pending);
     internal bool IsMouLixianNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsMouLixianNativeSettlementBatch(f, batch);
     internal bool IsMouLixianRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouLixianRecoveryParent(f, recovery);
     internal bool IsMouLixianRemovedMaterial(long useId, int cardId) => _resolve().IsMouLixianRemovedMaterial(useId, cardId);

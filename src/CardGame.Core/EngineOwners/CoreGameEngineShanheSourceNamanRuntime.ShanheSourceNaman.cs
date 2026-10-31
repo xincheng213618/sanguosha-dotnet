@@ -27,14 +27,6 @@ internal sealed partial class CoreGameEngineShanheSourceNamanRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 23130, SkillProgramEffectOp.ClaimShanheSourceNamanResponseCards)]
     internal bool CanOfferShanheSourceNaman(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => ShanheSourceNamanMaterials(context, candidate.OwnerSeat).Length > 0;
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 23130)]
-    internal bool IsShanheSourceNamanMovement(ProgramSkillFrame frame, SkillProgramEffect? paidEffect, ProgramMovementContinuation movement)
-    {
-        if (paidEffect?.Op != SkillProgramEffectOp.ClaimShanheSourceNamanResponseCards || movement != frame.PendingMovementContinuation || movement.SubjectSeat != frame.OwnerSeat || movement.BeforeCount != 0 || movement.CoverageResultBind is not null || ShanheSourceNamanResponse(frame.WindowContext, frame.OwnerSeat)is not { ResponseCompletion: { } completion, Action: { } action })
-            return false;
-        var batches = _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Select(child => child.Batch).Concat(_pendingCardsMovedBatchesOperations._pendingCardsMovedBatches).Where(batch => batch.ParentFrameId == frame.Id && batch.OriginOwnerSeat == frame.OwnerSeat && batch.OriginSkillId == frame.SkillId && batch.OriginSkillInstanceId == frame.SkillInstanceId && batch.Movements.Count > 0 && batch.Movements.All(move => move.Reason.Value == "skill-program." + frame.SkillId + ".naman-response-claim")).DistinctBy(batch => batch.Id).ToArray();
-        return batches is [var paid] && paid.Movements.Select(move => move.CardId).Distinct().Count() == paid.Movements.Count && paid.Movements.All(move => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) && move.From == CardLocation.DiscardPile && move.To == CardLocation.Hand(frame.OwnerSeat) && action.PhysicalCards.Any(cost => cost.CardId == move.CardId) && completion.NativeCosts.Any(cost => cost.CardId == move.CardId && cost.Sequence < move.Sequence && cost.From == CardLocation.Processing && cost.To == CardLocation.DiscardPile && cost.Reason == CardMoveReasons.ResponseFinished));
-    }
 
     internal SkillProgramStepOutcome ClaimShanheSourceNamanResponseCards(ProgramSkillFrame supplied)
     {

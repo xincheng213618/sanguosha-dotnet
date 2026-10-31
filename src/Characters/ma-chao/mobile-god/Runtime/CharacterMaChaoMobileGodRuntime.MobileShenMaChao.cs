@@ -307,9 +307,6 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileMaChaoDrawReturnedEvent(f.Id, f.OwnerSeat, o.RequestedCount, o.ActualDrawIds.Count, o.SequenceBefore, o.SequenceAfter));
         ResumeMobileMaChao(f.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 40625)]
-    internal bool MobileMaChaoMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.MobileShenMaChao is { Stage: MobileMaChaoStage.Execute } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40625)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40625)]
     internal bool RetainMobileMaChao(ProgramSkillFrame f) => f.MobileShenMaChao is not null;

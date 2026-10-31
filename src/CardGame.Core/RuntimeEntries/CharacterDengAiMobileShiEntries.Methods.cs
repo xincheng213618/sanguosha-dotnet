@@ -26,14 +26,12 @@ internal sealed partial class CharacterDengAiMobileShiEntries
     internal bool ReturnShiDaMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiDaMovement(f);
     internal void SealShiDaMove(long id, global::CardGame.Core.CardMovementRecord move) => _resolve().SealShiDaMove(id, move);
     internal void SettleShiDaEquipmentLoss(global::CardGame.Core.IGameEvent payload) => _resolve().SettleShiDaEquipmentLoss(payload);
-    internal bool ShiDaBeforeDamageObserver(long id) => _resolve().ShiDaBeforeDamageObserver(id);
     internal (int Current, int Capacity) ShiDaCharge(int owner) => _resolve().ShiDaCharge(owner);
     internal bool ShiDaChildEdge(int i) => _resolve().ShiDaChildEdge(i);
     internal bool ShiDaChildSuffix(int i) => _resolve().ShiDaChildSuffix(i);
     internal global::CardGame.Core.PromptChoice ShiDaChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, int number = -1, int? target = default, int? card = default) => _resolve().ShiDaChoice(f, branch, label, number, target, card);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiDaChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiDaChoices(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiDaCostChoices(long id, int owner, int payer) => _resolve().ShiDaCostChoices(id, owner, payer);
-    internal bool ShiDaDamageObserver(long id) => _resolve().ShiDaDamageObserver(id);
     internal bool ShiDaDyingObserver() => _resolve().ShiDaDyingObserver();
     internal bool ShiDaFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiDaFirstChild(f, child);
     internal bool ShiDaHasJixiDiscard(global::CardGame.Core.ProgramTriggerCandidate candidate, int payer) => _resolve().ShiDaHasJixiDiscard(candidate, payer);

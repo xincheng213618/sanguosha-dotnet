@@ -353,8 +353,6 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 62053)]
     internal bool ReturnSourceMouMovement(ProgramSkillFrame f) => f.ShanheSourceMou is not null && ResumeSourceMou(f.Id);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 62053)]
     internal bool SourceMouMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.ShanheSourceMou is { Paid: true } r && effect?.Op == r.Operation && ValidSourceMou(f) && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 62053)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 62053)]

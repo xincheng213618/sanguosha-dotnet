@@ -8,8 +8,6 @@ internal sealed partial class CharacterZhangJiOlEntries
     internal bool CanBeginZhangJiJudgment(global::CardGame.Core.ProgramSkillFrame f, int targetSeat, string reason, string bind, global::CardGame.Core.SkillProgramCardSetVisibility visibility) => _resolve().CanBeginZhangJiJudgment(f, targetSeat, reason, bind, visibility);
     internal bool CanContinueZhangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueZhangJi(f);
     internal void FinishZhangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhangJi(f);
-    internal bool HasZhangJiBeforeDamageObserver(long id) => _resolve().HasZhangJiBeforeDamageObserver(id);
-    internal bool HasZhangJiDamageObserver(long id) => _resolve().HasZhangJiDamageObserver(id);
     internal bool IsZhangJiJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsZhangJiJudgment(j, f);
     internal bool IsZhangJiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhangJiMovement(f, e, p);
     internal void IssueZhangJiEquipment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueZhangJiEquipment(f);

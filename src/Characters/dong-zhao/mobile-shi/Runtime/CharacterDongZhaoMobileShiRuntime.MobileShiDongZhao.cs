@@ -230,8 +230,6 @@ internal sealed partial class CharacterDongZhaoMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 47700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 47700)]
     internal bool PaidShiDzCanReturn(ProgramSkillFrame f) => f.MobileShiDongZhao?.Stage is MobileShiDongZhaoStage.GainChildren or MobileShiDongZhaoStage.CostChildren or MobileShiDongZhaoStage.Target or MobileShiDongZhaoStage.ExtraDrawChildren || f.MobileShiDongZhao is null && f.InstructionIndex is 0 or 1 && f.TriggerId == "issued-extra-start" && f.WindowContext is { } w && IsIssuedShiDzExtra(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 100), w);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 47700)]
-    internal bool ShiDzMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.MobileShiDongZhao is { Stage: MobileShiDongZhaoStage.GainChildren or MobileShiDongZhaoStage.CostChildren or MobileShiDongZhaoStage.ExtraDrawChildren } && effect?.Op is SkillProgramEffectOp.ResolveMobileShiDongZhaoMiaolue or SkillProgramEffectOp.ResolveMobileShiDongZhaoYingjia;
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiDongZhaoMiaolue, SkillProgramEffectOp.ResolveMobileShiDongZhaoYingjia)]
     internal PromptChoice ChooseShiDzAi(PendingDecision p, ProgramSkillFrame f) => f.MobileShiDongZhao!.Stage switch

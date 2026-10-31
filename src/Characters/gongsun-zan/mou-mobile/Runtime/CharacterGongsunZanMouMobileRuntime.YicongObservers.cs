@@ -22,9 +22,6 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileStoredEvent>().Where(e => e.FrameId == f.Id).All(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == e.From && m.To == e.To)) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileDiscardedEvent>().Where(e => e.FrameId == f.Id).All(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == e.From && m.To == e.To));
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33600)]
-    internal bool MouGszMobileMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e is not null && MouGongsunZanMobileComposition.Handles(e.Op) && ValidMouGszMobile(f) && f.MouGongsunZanMobile!.Stage is MouGongsunZanMobileStage.MovementChildren or MouGongsunZanMobileStage.DrawChildren && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouGszMobileLion(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!ValidMouGszMobile(f) || f.MouGongsunZanMobile is not { Stage: MouGongsunZanMobileStage.MovementChildren })
@@ -57,11 +54,6 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
 
     internal bool MouGszMobileSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _resolutionStackOperations2._resolutionStack()[i - 1] is ProgramSkillFrame f && _characterGongsunZanMouMobileOperations.MouGszMobileChild(f, _resolutionStackOperations2._resolutionStack()[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouGszMobileRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterGongsunZanMouMobileOperations.MouGszMobileChild(f, c), (n) => _characterGongsunZanMouMobileOperations.MouGszMobileSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 33600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 33600)]
-    internal bool MouGszMobileDamageProof(long id) => MouGszMobileRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33600)]
-    internal bool MouGszMobileBeforeDamage(long id) => MouGszMobileRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33600)]
     internal bool MouGszMobileDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGszMobileRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 33600)]

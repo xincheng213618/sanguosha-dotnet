@@ -18,11 +18,8 @@ internal sealed partial class CharacterRuanHuiOlEntries
     internal bool? DecideIssuedTrigger560(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger560(candidate, context);
     internal bool DrainRuanHui(long id) => _resolve().DrainRuanHui(id);
     internal void FinishRuanHui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishRuanHui(f);
-    internal bool HasRuanHuiBeforeDamageObserver(long id) => _resolve().HasRuanHuiBeforeDamageObserver(id);
-    internal bool HasRuanHuiDamageObserver(long id) => _resolve().HasRuanHuiDamageObserver(id);
     internal bool IsIssuedRuanHuiCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedRuanHuiCandidate(c);
     internal bool IsMingchaNormalDrawReplacement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsMingchaNormalDrawReplacement(f);
-    internal bool IsRuanHuiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsRuanHuiMovement(f, e, p);
     internal bool IsRuanHuiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsRuanHuiRecoveryParent(f, recovery);
     internal bool JingzhongAbolishedEquipmentUse(global::CardGame.Core.JingzhongUseEntityEvent fact, global::CardGame.Core.CardMovementRecord move) => _resolve().JingzhongAbolishedEquipmentUse(fact, move);
     internal bool JingzhongClaimAlreadyIssued(global::CardGame.Core.JingzhongLeaseEvent lease, long action) => _resolve().JingzhongClaimAlreadyIssued(lease, action);

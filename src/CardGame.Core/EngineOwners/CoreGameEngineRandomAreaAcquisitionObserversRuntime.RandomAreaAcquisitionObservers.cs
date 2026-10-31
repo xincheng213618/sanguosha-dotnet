@@ -58,10 +58,6 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionObserversRuntim
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 10)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 10)]
     internal bool IsRandomAreaRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery) => frame.RandomAreaAcquisition is not null && RandomAreaFirstChild(frame, recovery);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 2010)]
-    internal bool HasRandomAreaDamageObserver(long id) => RandomAreaObserverRoot()is { } root && (root.RandomAreaAcquisition!.DamageWindowId == id || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamagePrelude, 20)]
-    internal bool HasRandomAreaBeforeDamageObserver(long id) => RandomAreaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 1245)]
     internal bool AdvanceRandomAreaChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && RandomAreaObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

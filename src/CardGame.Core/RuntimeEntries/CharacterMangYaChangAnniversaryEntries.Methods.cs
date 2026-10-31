@@ -15,7 +15,6 @@ internal sealed partial class CharacterMangYaChangAnniversaryEntries
     internal int JiedaoChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().JiedaoChainCursor(attack);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> JiedaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().JiedaoChoices(f);
     internal global::CardGame.Core.AnniversaryJiedaoFrame? JiedaoCostWitness(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().JiedaoCostWitness(c, w);
-    internal bool JiedaoDiscardMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().JiedaoDiscardMovementProof(f, effect, pending);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> JiedaoDiscardableCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().JiedaoDiscardableCards(f);
     internal bool JiedaoFinalRecipientMatches(global::CardGame.Core.AnniversaryJiedaoGrant grant, global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().JiedaoFinalRecipientMatches(grant, attack);
     internal bool JiedaoPaymentMatches(global::CardGame.Core.ProgramSkillFrame f) => _resolve().JiedaoPaymentMatches(f);

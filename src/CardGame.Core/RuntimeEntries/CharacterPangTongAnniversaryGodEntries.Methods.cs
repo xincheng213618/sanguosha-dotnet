@@ -17,8 +17,6 @@ internal sealed partial class CharacterPangTongAnniversaryGodEntries
     internal bool ReturnShenPtMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShenPtMovement(f);
     internal global::CardGame.Core.GameEngine.ProgramCardIdentityMatch? ShenPangTongLuansuoIdentity(global::CardGame.Core.CharacterState holder, global::CardGame.Core.Card card) => _resolve().ShenPangTongLuansuoIdentity(holder, card);
     internal bool ShenPtActualDamageTarget(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ShenPangTongReceipt r, global::CardGame.Core.AttackAttemptState a) => _resolve().ShenPtActualDamageTarget(f, r, a);
-    internal bool ShenPtBeforeDamage(long id) => _resolve().ShenPtBeforeDamage(id);
-    internal bool ShenPtDamageWindow(long id) => _resolve().ShenPtDamageWindow(id);
     internal bool ShenPtDying() => _resolve().ShenPtDying();
     internal bool ShenPtEligible(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().ShenPtEligible(c, t, w);
     internal bool ShenPtFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShenPtFirstChild(f, child);

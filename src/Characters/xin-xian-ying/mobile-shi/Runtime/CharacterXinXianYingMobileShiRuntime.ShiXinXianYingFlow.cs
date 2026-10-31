@@ -167,8 +167,6 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
         ContinueShiXxy(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 48200)]
     internal bool ShiXxyMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.ShiXinXianYing is { Stage: ShiXinXianYingStage.JiejieChildren or ShiXinXianYingStage.QingDiscardChildren or ShiXinXianYingStage.DrawChildren } && p.BeforeCount == 0 && p.CoverageResultBind is null && effect?.Op is SkillProgramEffectOp.ResolveMobileShiXinXianYingJiejie or SkillProgramEffectOp.ResolveMobileShiXinXianYingQingshi;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 48200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 48200)]

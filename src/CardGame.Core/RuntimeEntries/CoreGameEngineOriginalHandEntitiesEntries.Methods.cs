@@ -12,7 +12,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesEntries
     internal int GetOriginalHandAttackRangeBonus(int seat) => _resolve().GetOriginalHandAttackRangeBonus(seat);
     internal int GetOriginalHandHandLimitBonus(int seat) => _resolve().GetOriginalHandHandLimitBonus(seat);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeOriginalHandEntities(global::CardGame.Core.ProgramSkillFrame supplied, string stateId) => _resolve().InitializeOriginalHandEntities(supplied, stateId);
-    internal bool IsOriginalHandEntityMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsOriginalHandEntityMovement(f, effect, pending);
     internal void ObserveOriginalHandMovement(global::CardGame.Core.CardMovementRecord movement) => _resolve().ObserveOriginalHandMovement(movement);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> OriginalHandEntityChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().OriginalHandEntityChoices(f);
     internal global::CardGame.Core.OriginalHandPermanentBonus[] OriginalHandInheritableBonuses(int owner, string skill, string stateId) => _resolve().OriginalHandInheritableBonuses(owner, skill, stateId);

@@ -23,10 +23,7 @@ internal sealed partial class CharacterWangCanOlEntries
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteWangCan(global::CardGame.Core.SkillProgramEffectOp op, global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ExecuteWangCan(op, supplied);
     internal void FinishDenglouNativeReturn(global::CardGame.Core.WangCanNativeReceipt n) => _resolve().FinishDenglouNativeReturn(n);
     internal void FinishWangCan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWangCan(f);
-    internal bool HasWangCanBeforeDamageObserver(long id) => _resolve().HasWangCanBeforeDamageObserver(id);
-    internal bool HasWangCanDamageObserver(long id) => _resolve().HasWangCanDamageObserver(id);
     internal bool IsDenglouNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsDenglouNativeUse(use);
-    internal bool IsWangCanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWangCanMovement(f, effect, p);
     internal void IssueDenglouNativeUse(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.LegalAction action) => _resolve().IssueDenglouNativeUse(f, action);
     internal void IssueWangCanSegment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueWangCanSegment(f);
     internal void PaySanwenDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PaySanwenDraw(f);

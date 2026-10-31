@@ -6,7 +6,6 @@ internal sealed partial class CharacterWangJiBoundaryMobileEntries
     internal global::CardGame.Core.PromptChoice AiBoundaryWj(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AiBoundaryWj(decision, frame);
     internal void AnswerBoundaryWj(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryWj(choice);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryWj(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginBoundaryWj(supplied, operation);
-    internal bool BoundaryWjBeforeDamage(long id) => _resolve().BoundaryWjBeforeDamage(id);
     internal bool BoundaryWjCard(global::CardGame.Core.CardActionContext action) => _resolve().BoundaryWjCard(action);
     internal void BoundaryWjChangeMarkerCharge(long frameId, int owner, global::CardGame.Core.PlayerMarkerKind marker, int delta, int capacity, string reason) => _resolve().BoundaryWjChangeMarkerCharge(frameId, owner, marker, delta, capacity, reason);
     internal int BoundaryWjCharge(int owner) => _resolve().BoundaryWjCharge(owner);
@@ -15,9 +14,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileEntries
     internal global::CardGame.Core.PromptChoice BoundaryWjChoice(global::CardGame.Core.ProgramSkillFrame frame, string branch, int value, string text, bool card = false) => _resolve().BoundaryWjChoice(frame, branch, value, text, card);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryWjChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryWjChoices(frame);
     internal bool BoundaryWjCompletedWindow(global::CardGame.Core.ProgramSkillWindowContext context, scoped out global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().BoundaryWjCompletedWindow(context, out window);
-    internal bool BoundaryWjDamage(long id) => _resolve().BoundaryWjDamage(id);
     internal bool BoundaryWjDying() => _resolve().BoundaryWjDying();
-    internal bool BoundaryWjMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation continuation) => _resolve().BoundaryWjMovement(frame, effect, continuation);
     internal bool BoundaryWjObservesResponse(global::CardGame.Core.CardActionContext action) => _resolve().BoundaryWjObservesResponse(action);
     internal int BoundaryWjPeak(int owner) => _resolve().BoundaryWjPeak(owner);
     internal global::CardGame.Core.CardSnapshot[] BoundaryWjPrivateHand(int viewer) => _resolve().BoundaryWjPrivateHand(viewer);

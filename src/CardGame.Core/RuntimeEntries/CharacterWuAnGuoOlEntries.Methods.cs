@@ -10,8 +10,6 @@ internal sealed partial class CharacterWuAnGuoOlEntries
     internal bool ContinuePaidWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidWuAnGuoLiyong(f);
     internal void ContinueWuAnGuoLiyong(long id) => _resolve().ContinueWuAnGuoLiyong(id);
     internal void FinishWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame f, bool issued) => _resolve().FinishWuAnGuoLiyong(f, issued);
-    internal bool HasWuAnGuoBeforeDamageObserver(long id) => _resolve().HasWuAnGuoBeforeDamageObserver(id);
-    internal bool HasWuAnGuoDamageObserver(long id) => _resolve().HasWuAnGuoDamageObserver(id);
     internal bool HasWuAnGuoLiyongCompletedUseParent(long useId) => _resolve().HasWuAnGuoLiyongCompletedUseParent(useId);
     internal bool IsWuAnGuoLiyongDuelUse(long id) => _resolve().IsWuAnGuoLiyongDuelUse(id);
     internal bool IsWuAnGuoYangConversionAvailable(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource source, bool forResponse) => _resolve().IsWuAnGuoYangConversionAvailable(owner, card, source, forResponse);

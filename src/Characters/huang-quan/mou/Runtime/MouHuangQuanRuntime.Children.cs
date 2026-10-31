@@ -11,11 +11,6 @@ internal sealed partial class MouHuangQuanRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor,35700)][ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor,35700)]
     internal bool RecoveryParent(ProgramSkillFrame f,RecoveryReplacementFrame child)=>f.MouHuangQuan is not null&&Valid(f)&&facts.MovementRecoveryChild(f,child);
     private ProgramSkillFrame? ObserverRoot()=>frames.OfType<ProgramSkillFrame>().LastOrDefault(f=>frames.ChildOf(f.Id)is{}child&&FirstChild(f,child)&&health.PaidObserverSuffix(f.Id));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage,35700)]internal bool DamageObserver(long id)
-    {
-        if(ObserverRoot()is not{}root)return false;
-        for(ResolutionFrame? p=root;p is not null;p=frames.ParentOf(p.Id))if(p.Id==id)return true;return false;
-    }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime,35700)]internal bool DyingObserver()
     {
         if(health.ActiveDying is not{}dying||ObserverRoot()is not{}root)return false;

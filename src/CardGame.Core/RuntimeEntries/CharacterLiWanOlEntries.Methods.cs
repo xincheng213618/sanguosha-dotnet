@@ -15,11 +15,8 @@ internal sealed partial class CharacterLiWanOlEntries
     internal bool? DecideIssuedTrigger550(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger550(candidate, context);
     internal bool DrainLiWanChildren(long id) => _resolve().DrainLiWanChildren(id);
     internal void FreezeLianjuActorChange(global::CardGame.Core.IGameEvent fact) => _resolve().FreezeLianjuActorChange(fact);
-    internal bool HasLiWanBeforeDamageObserver(long id) => _resolve().HasLiWanBeforeDamageObserver(id);
-    internal bool HasLiWanDamageObserver(long id) => _resolve().HasLiWanDamageObserver(id);
     internal bool HasSilvEntityMark(int cardId) => _resolve().HasSilvEntityMark(cardId);
     internal bool IsIssuedLiWanCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedLiWanCandidate(c);
-    internal bool IsLiWanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLiWanMovement(f, effect, pending);
     internal bool IsLiWanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiWanRecoveryParent(f, recovery);
     internal bool IsRefundableSilvMovement(global::CardGame.Core.CardMovementRecord m) => _resolve().IsRefundableSilvMovement(m);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> LiWanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LiWanChoices(f);

@@ -16,9 +16,7 @@ internal sealed partial class CharacterYanPuOlEntries
     internal global::CardGame.Core.YanPuHuantuPromise? CurrentYanPuEnding(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CurrentYanPuEnding(c, context);
     internal bool? DecideIssuedTrigger680(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger680(candidate, context);
     internal bool DrainYanPuChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainYanPuChildren(f);
-    internal bool HasYanPuDamageObserver(long id) => _resolve().HasYanPuDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> IncludeYanPuDrawObservers(global::CardGame.Core.CharacterState subject, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> existing) => _resolve().IncludeYanPuDrawObservers(subject, existing);
-    internal bool IsYanPuAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsYanPuAwaitedMovement(f, e, p);
     internal bool IsYanPuDrawContext(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsYanPuDrawContext(c, context);
     internal bool IsYanPuDyingExitContext(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsYanPuDyingExitContext(c, context);
     internal bool IsYanPuDyingExitEdge(int index) => _resolve().IsYanPuDyingExitEdge(index);

@@ -55,7 +55,4 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
 
         return f.SelectedTargetSeats.Count == 0;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46500)]
-    internal bool WangChangMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.AnniversaryWangChang is { Stage: AnniversaryWangChangStage.MovementChildren } r && effect?.Op == r.Operation && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidWangChang(f);
 }

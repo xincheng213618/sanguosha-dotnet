@@ -28,9 +28,7 @@ internal sealed partial class CharacterZhangHuanAnniversaryEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> ZhangHuanActions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangHuanActions(f);
     internal global::CardGame.Core.PromptChoice ZhangHuanAi(global::CardGame.Core.PendingDecision p) => _resolve().ZhangHuanAi(p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.AnniversaryZhangHuanDiscard> ZhangHuanAvailable(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangHuanAvailable(f);
-    internal bool ZhangHuanBeforeDamage(long id) => _resolve().ZhangHuanBeforeDamage(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ZhangHuanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangHuanChoices(f);
-    internal bool ZhangHuanDamageObserver(long id) => _resolve().ZhangHuanDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.AnniversaryZhangHuanDiscard> ZhangHuanDiscards() => _resolve().ZhangHuanDiscards();
     internal bool ZhangHuanDying() => _resolve().ZhangHuanDying();
     internal bool ZhangHuanEndingSlashDebit(long id, int actor) => _resolve().ZhangHuanEndingSlashDebit(id, actor);

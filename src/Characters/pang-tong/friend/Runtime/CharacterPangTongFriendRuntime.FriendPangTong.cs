@@ -224,9 +224,6 @@ internal sealed partial class CharacterPangTongFriendRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 90)]
-    internal bool IsFriendPangTongMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.FriendPangTong is { Stage: FriendPangTongStage.Movement } receipt && effect?.Op == receipt.Operation && frame.PendingMovementContinuation == pending && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-
     [ProgramViewContributor(ProgramViewContribution.PublicCardsAfterResolution, 20)]
     internal IEnumerable<CardSnapshot> FriendPangTongPublicCards() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(frame => frame.FriendPangTong?.Operation == SkillProgramEffectOp.UseFriendDeckSuitsAtPlayEnd).SelectMany(frame => _cardZonesOperations._cardZones.CardsAt(FriendYangmingLocation(frame))).Select(_coreSnapshotValueProjectionOperations.ToSnapshot);
 }

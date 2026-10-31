@@ -23,8 +23,5 @@ internal sealed partial class CoreGameEngineDamagePreventionDrawRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(current with { PreventionDrawReceipt = new(current.InstructionIndex - 1, parent.Id, parent.SourceSeat, parent.TargetSeat, parent.Amount, multiplier, beforeSequence, afterSequence, actualCount) });
         return _coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 570)]
-    internal bool IsPreventionDrawMovement(ProgramSkillFrame frame, SkillProgramEffect? paidEffect, ProgramMovementContinuation movement) => paidEffect?.Op is SkillProgramEffectOp.PreventCurrentDamageAndDrawMultiple or SkillProgramEffectOp.PreventParticipantDamageDrawActualSource && movement.SubjectSeat == frame.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && frame.WindowContext is { Window: SkillProgramTriggerWindow.BeforeDamageApplied, Amount: > 0 } context && (paidEffect.Op == SkillProgramEffectOp.PreventParticipantDamageDrawActualSource || context.TargetSeat == frame.OwnerSeat) && _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().Any(parent => parent.Id == context.ParentFrameId && _corePreventionDrawObserversOperations.IsValidPreventionDrawReceipt(frame, parent));
     SkillProgramStepOutcome global::CardGame.Core.IDamagePreventionDrawProgramHost.PreventDamageAndDrawMultiple(ProgramSkillFrame frame, int multiplier) => PreventDamageAndDrawMultiple(frame, multiplier);
 }

@@ -71,9 +71,6 @@ internal sealed partial class CharacterWangCanOlRuntime
         RequireIssuedWangCan(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 280)]
-    internal bool IsWangCanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.WangCan is { } r && effect is not null && WangCanContract.Own(effect.Op) && r.Stage is WangCanStage.SanwenDiscard or WangCanStage.SanwenDraw or WangCanStage.QiaiGift or WangCanStage.DenglouViewChildren or WangCanStage.DenglouGain or WangCanStage.DenglouDiscard or WangCanStage.DenglouCancel && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && CanContinueIssuedWangCan(f);
     internal bool WangCanFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (root.WangCan is not { } r || !CanContinueIssuedWangCan(root))
@@ -87,11 +84,6 @@ internal sealed partial class CharacterWangCanOlRuntime
 
     internal ProgramSkillFrame? WangCanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterWangCanOlOperations.WangCanFirstChild(r, c), (i) => _characterWangCanOlOperations.WangCanObserverSuffix(i));
     internal bool WangCanObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterWangCanOlOperations.DenglouNativePaymentEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(i, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(i, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(i, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 240)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 350)]
-    internal bool HasWangCanDamageObserver(long id) => WangCanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 440)]
-    internal bool HasWangCanBeforeDamageObserver(long id) => WangCanObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 350)]
     internal bool TryAdvanceWangCanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WangCanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

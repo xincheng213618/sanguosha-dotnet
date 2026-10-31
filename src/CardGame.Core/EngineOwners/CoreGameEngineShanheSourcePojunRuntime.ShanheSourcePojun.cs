@@ -34,16 +34,4 @@ internal sealed partial class CoreGameEngineShanheSourcePojunRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourcePojunHeldEvent(frame.Id, use.Id, action.CardActionId, frame.OwnerSeat, target, cards.Length, before, after));
         return _coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 62049)]
-    internal bool IsShanheSourcePojunMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect?.Op != SkillProgramEffectOp.HoldShanheSourcePojunHand || frame.SkillId != ShanheSourcePojunSkill || frame.WindowContext is not { Window: SkillProgramTriggerWindow.SlashBeforeResponse, TargetSeat: { } target, CardUse: { } use } || pending.SubjectSeat != frame.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || frame.CardSetBindings.SingleOrDefault(set => set.Name == ShanheSourcePojunBind)is not { } cards || cards.CardIds.Count == 0)
-            return false;
-        var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShanheSourcePojunHeldEvent>().Where(fact => fact.ProgramFrameId == frame.Id).ToArray();
-        if (facts is not [var paid] || paid.CardUseFrameId != use.ParentCardUseFrameId || paid.ActionId != use.CardActionId || paid.OwnerSeat != frame.OwnerSeat || paid.TargetSeat != target || paid.Count != cards.CardIds.Count || paid.SequenceAfter - paid.SequenceBefore != paid.Count || cards.SourceLocations is null || cards.SourceLocations.Any(location => location != CardLocation.PojunHold(target)))
-            return false;
-        var moves = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(move => move.Sequence > paid.SequenceBefore && move.Sequence <= paid.SequenceAfter).ToArray();
-        return moves.Select(move => move.CardId).SequenceEqual(cards.CardIds) && moves.All(move => move.From == CardLocation.Hand(target) && move.To == CardLocation.PojunHold(target) && move.Reason == CardMoveReasons.PojunHold);
-    }
 }

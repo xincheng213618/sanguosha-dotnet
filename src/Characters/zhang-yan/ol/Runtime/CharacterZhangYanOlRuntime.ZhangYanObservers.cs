@@ -7,9 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYanOlRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 230)]
-    internal bool IsZhangYanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ZhangYan is { } r && r.Stage is ZhangYanStage.NativeChildren or ZhangYanStage.RewardChildren && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && (e is null || ZhangYanComposition.IsOperation(e.Op));
     internal bool IsZhangYanRewardMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.ZhangYan!;
@@ -42,17 +39,6 @@ internal sealed partial class CharacterZhangYanOlRuntime
     }
 
     internal ProgramSkillFrame? ZhangYanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangYanOlOperations.ZhangYanFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (c) => _coreObserverSubtreesOperations.IsMovementObserverEdge(c) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(c) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[c], _resolutionStackOperations2._resolutionStack()[c - 1]), (c, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(c, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 590)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 700)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 730)]
-    internal bool HasZhangYanDamageObserver(long id)
-    {
-        if (ZhangYanObserverRoot()is not { } root || !_resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame))
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id);
-        var own = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        return index > own || index + 1 == own && root.WindowContext?.ParentFrameId == id && root.ZhangYan!.Operation == SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard;
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27000)]
     internal bool AdvanceZhangYanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangYanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramPipelineHook(ProgramPipelinePhase.IsProgramMovementSettlement, 200)]

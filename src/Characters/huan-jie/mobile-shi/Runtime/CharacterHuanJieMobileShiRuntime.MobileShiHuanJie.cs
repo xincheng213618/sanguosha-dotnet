@@ -226,7 +226,6 @@ internal sealed partial class CharacterHuanJieMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 48300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 48300)]
     internal bool KeepPaidShiHj(ProgramSkillFrame f) => f.MobileShiHuanJie is { Stage: not (MobileShiHuanJieStage.Target or MobileShiHuanJieStage.Complete) };
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 48300)]
     internal bool ShiHjMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MobileShiHuanJie is { } r && effect?.Op == r.Operation && r.Stage is MobileShiHuanJieStage.ExchangeChildren or MobileShiHuanJieStage.DiscardChildren or MobileShiHuanJieStage.ShuffleChildren or MobileShiHuanJieStage.DrawChildren && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiHuanJieGongmou)]
     internal PromptChoice ChooseShiHjAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count).First();

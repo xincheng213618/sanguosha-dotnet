@@ -54,23 +54,6 @@ internal sealed partial class CoreGameEnginePairedColorResponseObserversRuntime
     internal ProgramSkillFrame? PairedColorDispositionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePairedColorResponseObserversOperations.PairedColorDispositionFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40)]
     internal bool IsPairedColorDispositionDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairedColorDispositionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1680)]
-    internal bool HasPairedColorDispositionDamageObserver(long id) => HasPairedColorDispositionObserver(id, false);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 220)]
-    internal bool HasPairedColorDispositionBeforeDamageObserver(long id) => HasPairedColorDispositionObserver(id, true);
-    internal bool HasPairedColorDispositionObserver(long id, bool before)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && (before ? f is BeforeDamageProgramWindowFrame : f is DamageTriggerWindowFrame));
-        if (index < 0 || PairedColorDispositionObserverRoot()is not { } root)
-            return false;
-        var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index > rootIndex)
-            return true;
-        for (var child = index + 1; child <= rootIndex; child++)
-            if (!PairedColorDispositionStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreResponseCompletionOperations.ResponseCompletionStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]))
-                return false;
-        return index < rootIndex;
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 110)]
     internal bool TryAdvancePairedColorDispositionSubtree()

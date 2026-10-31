@@ -35,8 +35,6 @@ internal sealed partial class CharacterCaoZhiLeEntries
     internal global::CardGame.Core.CardKind FuleSelectedSlashKind(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardKind fallback, global::CardGame.Core.CardConversionSource? explicitSource = default) => _resolve().FuleSelectedSlashKind(owner, card, fallback, explicitSource);
     internal bool FuleSlashAliasAllowed(global::CardGame.Core.CharacterState owner, bool forResponse) => _resolve().FuleSlashAliasAllowed(owner, forResponse);
     internal bool FuleTrueSlashUseFrontier(global::CardGame.Core.CharacterState owner) => _resolve().FuleTrueSlashUseFrontier(owner);
-    internal bool HasWenlanBeforeDamageObserver(long id) => _resolve().HasWenlanBeforeDamageObserver(id);
-    internal bool HasWenlanDamageObserver(long id) => _resolve().HasWenlanDamageObserver(id);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeLeCaoZhiFule(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeLeCaoZhiFule(supplied);
     internal bool IsExactWenlanFuMarking(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.FuMarkOrigin origin) => _resolve().IsExactWenlanFuMarking(f, ids, origin);
     internal bool IsFuleAliasSource(global::CardGame.Core.CardConversionSource? source) => _resolve().IsFuleAliasSource(source);
@@ -46,7 +44,6 @@ internal sealed partial class CharacterCaoZhiLeEntries
     internal bool IsWenlanDying() => _resolve().IsWenlanDying();
     internal bool IsWenlanEntryClaimed(long id) => _resolve().IsWenlanEntryClaimed(id);
     internal bool IsWenlanHandLike(int owner, int cardId) => _resolve().IsWenlanHandLike(owner, cardId);
-    internal bool IsWenlanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWenlanMovement(f, effect, pending);
     internal bool IsWenlanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWenlanRecoveryParent(f, recovery);
     internal bool IsWenlanTrueUse(global::CardGame.Core.CardActionContext action) => _resolve().IsWenlanTrueUse(action);
     internal global::CardGame.Core.CardKind[] LeCaoZhiModeNamePool() => _resolve().LeCaoZhiModeNamePool();

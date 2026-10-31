@@ -28,8 +28,6 @@ internal sealed partial class CharacterLuoXianOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26420)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26420)]
     internal bool ContinueIssuedDaili(ProgramSkillFrame frame) => ValidDaili(frame);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 110)]
-    internal bool IsDailiMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation movement) => effect?.Op == SkillProgramEffectOp.ResolveDailiTurnEnd && frame.Daili is { Stage: DailiStage.DrawChildren } && movement is { BeforeCount: 0, CoverageResultBind: null } && movement.SubjectSeat == frame.OwnerSeat && ValidDaili(frame);
     internal bool DailiFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (!ValidDaili(frame) || frame.Daili is not { } pending)
@@ -40,11 +38,6 @@ internal sealed partial class CharacterLuoXianOlRuntime
     }
 
     internal ProgramSkillFrame? DailiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterLuoXianOlOperations.DailiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 420)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 530)]
-    internal bool HasDailiDamageObserver(long id) => DailiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 560)]
-    internal bool HasDailiBeforeDamageObserver(long id) => DailiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26420)]
     internal bool AdvanceDailiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DailiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

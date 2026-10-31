@@ -183,9 +183,6 @@ internal sealed partial class CharacterChengGongYingOlRuntime
         ContinueChengGongYing(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 270)]
-    internal bool IsChengGongYingMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.ChengGongYing is { Recipient: { } payer, Stage: ChengGongYingStage.DrawChildren or ChengGongYingStage.DiscardChildren } && movement.SubjectSeat == payer && movement.BeforeCount == 0 && movement.CoverageResultBind is null && (effect is null || effect.Op == SkillProgramEffectOp.AdjustKuangxiangHandToFour);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27100)]
     internal bool ContinuePaidChengGongYing(ProgramSkillFrame f)

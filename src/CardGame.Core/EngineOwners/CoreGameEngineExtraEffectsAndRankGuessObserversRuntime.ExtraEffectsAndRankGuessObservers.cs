@@ -18,8 +18,6 @@ internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessObserversRun
     }
 
     internal ProgramSkillFrame? ExtraEffectsAndRankGuessObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreExtraEffectsAndRankGuessObserversOperations.ExtraEffectsAndRankGuessFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1600)]
-    internal bool HasExtraEffectsAndRankGuessDamageObserver(long id) => ExtraEffectsAndRankGuessObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 90)]
     internal bool TryAdvanceExtraEffectsAndRankGuessSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ExtraEffectsAndRankGuessObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

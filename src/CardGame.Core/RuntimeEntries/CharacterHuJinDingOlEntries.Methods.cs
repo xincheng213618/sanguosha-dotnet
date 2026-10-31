@@ -16,12 +16,9 @@ internal sealed partial class CharacterHuJinDingOlEntries
     internal bool DrainHuJinDingChildren(long id) => _resolve().DrainHuJinDingChildren(id);
     internal bool ExcludeOrdinaryMovement_IsQingyuanGainTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsQingyuanGainTrigger(candidate, trigger);
     internal void FinishQingyuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishQingyuan(f);
-    internal bool HasHuJinDingBeforeDamageObserver(long id) => _resolve().HasHuJinDingBeforeDamageObserver(id);
-    internal bool HasHuJinDingDamageObserver(long id) => _resolve().HasHuJinDingDamageObserver(id);
     internal bool HasZhongshenCardMark(int cardId) => _resolve().HasZhongshenCardMark(cardId);
     internal bool HuJinDingFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HuJinDingFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? HuJinDingObserverRoot() => _resolve().HuJinDingObserverRoot();
-    internal bool IsHuJinDingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsHuJinDingMovement(f, effect, pending);
     internal bool IsHuJinDingRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsHuJinDingRecoveryParent(f, recovery);
     internal bool IsLiveQingyuanPartner(global::CardGame.Core.QingyuanPartnerSelectedEvent p) => _resolve().IsLiveQingyuanPartner(p);
     internal bool MatchesZhongshenRoundGain(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.SkillProgramViewAs rule) => _resolve().MatchesZhongshenRoundGain(owner, card, rule);

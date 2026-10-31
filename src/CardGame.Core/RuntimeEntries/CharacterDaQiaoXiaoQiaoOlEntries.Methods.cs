@@ -21,8 +21,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.DaQiaoXiaoQiaoEntity> DaQiaoXiaoQiaoPileCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DaQiaoXiaoQiaoPileCards(f);
     internal bool DrainDaQiaoXiaoQiao(long id) => _resolve().DrainDaQiaoXiaoQiao(id);
     internal void FinishDaQiaoXiaoQiao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishDaQiaoXiaoQiao(f);
-    internal bool HasDaQiaoXiaoQiaoBeforeDamageObserver(long id) => _resolve().HasDaQiaoXiaoQiaoBeforeDamageObserver(id);
-    internal bool HasDaQiaoXiaoQiaoDamageObserver(long id) => _resolve().HasDaQiaoXiaoQiaoDamageObserver(id);
     internal bool IsDaQiaoXiaoQiaoLuoyanGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsDaQiaoXiaoQiaoLuoyanGrantQualified(owner, grant);
     internal bool IsDaQiaoXiaoQiaoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDaQiaoXiaoQiaoRecoveryParent(f, recovery);
     internal void MoveDaQiaoXiaoQiao(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.DaQiaoXiaoQiaoStage stage, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.DaQiaoXiaoQiaoEntity> cards, global::CardGame.Core.CardLocation to, string reason, bool discard) => _resolve().MoveDaQiaoXiaoQiao(f, stage, cards, to, reason, discard);

@@ -6,9 +6,7 @@ internal sealed partial class CharacterCaoHongMouEntries
     internal bool IsIssuedMouCaoHongCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedMouCaoHongCandidate(c, w);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedMouCaoHongPlayEndingCandidates(global::CardGame.Core.CharacterState owner) => _resolve().IssuedMouCaoHongPlayEndingCandidates(owner);
     internal bool MouCaoHongAdvanceChildren() => _resolve().MouCaoHongAdvanceChildren();
-    internal bool MouCaoHongBeforeDamage(long id) => _resolve().MouCaoHongBeforeDamage(id);
     internal bool MouCaoHongCanActivate(global::CardGame.Core.ProgramActivationLegalityContext c) => _resolve().MouCaoHongCanActivate(c);
-    internal bool MouCaoHongDamageWindow(long id) => _resolve().MouCaoHongDamageWindow(id);
     internal global::CardGame.Core.RuleQueryEvaluation MouCaoHongDistance(global::CardGame.Core.CharacterState source, global::CardGame.Core.CharacterState target, global::CardGame.Core.RuleQueryEvaluation original) => _resolve().MouCaoHongDistance(source, target, original);
     internal bool MouCaoHongDying() => _resolve().MouCaoHongDying();
     internal bool MouCaoHongEdge(int i) => _resolve().MouCaoHongEdge(i);

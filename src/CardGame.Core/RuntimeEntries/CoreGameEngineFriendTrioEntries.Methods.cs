@@ -21,7 +21,6 @@ internal sealed partial class CoreGameEngineFriendTrioEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.FriendPredictionView>? GetFriendPredictionViews(int? viewerSeat) => _resolve().GetFriendPredictionViews(viewerSeat);
     internal bool HasFriendTrioAlly(global::CardGame.Core.CharacterState owner, string id) => _resolve().HasFriendTrioAlly(owner, id);
     internal bool IsFriendActualCardUse(global::CardGame.Core.CardActionContext? action) => _resolve().IsFriendActualCardUse(action);
-    internal bool IsFriendTrioMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFriendTrioMovement(f, e, pending);
     internal void PublishFriendTrioChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishFriendTrioChoice(f);
     internal void ResolveFriendTrioChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveFriendTrioChoice(choice);
     internal bool ResumeFriendTrio(long id) => _resolve().ResumeFriendTrio(id);

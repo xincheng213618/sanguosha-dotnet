@@ -11,9 +11,7 @@ internal sealed partial class CharacterXunYuMouEntries
     internal global::CardGame.Core.MouXyBizuoGrant? MouXyAllocationLease(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouXyAllocationLease(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.MouXyBizuoEndedEvent> MouXyAllocationsDue() => _resolve().MouXyAllocationsDue();
     internal bool MouXyAttackReturned() => _resolve().MouXyAttackReturned();
-    internal bool MouXyBeforeDamage(long id) => _resolve().MouXyBeforeDamage(id);
     internal bool MouXyCompletedLogicalDiscard(global::CardGame.Core.MouXyDiscardEntry entry) => _resolve().MouXyCompletedLogicalDiscard(entry);
-    internal bool MouXyDamageWindow(long id) => _resolve().MouXyDamageWindow(id);
     internal bool MouXyDrawTwoTargets(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().MouXyDrawTwoTargets(query);
     internal bool MouXyDying() => _resolve().MouXyDying();
     internal bool MouXyEdge(int i) => _resolve().MouXyEdge(i);

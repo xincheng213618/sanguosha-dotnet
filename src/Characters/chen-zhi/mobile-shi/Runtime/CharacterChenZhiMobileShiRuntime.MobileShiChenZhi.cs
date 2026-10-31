@@ -268,8 +268,6 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 47600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 47600)]
     internal bool PaidShiCzCanReturn(ProgramSkillFrame f) => f.MobileShiChenZhi?.Stage is MobileShiChenZhiStage.DiscardChildren or MobileShiChenZhiStage.ExtraStartChildren or MobileShiChenZhiStage.DrawOwnerChildren or MobileShiChenZhiStage.DrawActorChildren or MobileShiChenZhiStage.ForeignDiscardChildren;
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 47600)]
-    internal bool ShiCzMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.MobileShiChenZhi is { } r && r.Stage is MobileShiChenZhiStage.DiscardChildren or MobileShiChenZhiStage.DrawOwnerChildren or MobileShiChenZhiStage.DrawActorChildren or MobileShiChenZhiStage.ForeignDiscardChildren && effect?.Op is SkillProgramEffectOp.ResolveMobileShiChenZhiQuanchong or SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing;
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing)]
     internal PromptChoice ChooseShiCzAi(PendingDecision pending, ProgramSkillFrame f)

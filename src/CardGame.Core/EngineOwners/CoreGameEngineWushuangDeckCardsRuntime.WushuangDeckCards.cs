@@ -42,9 +42,6 @@ internal sealed partial class CoreGameEngineWushuangDeckCardsRuntime
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter).ToArray();
         return moves.Length == r.CardIds.Count && moves.Select(m => m.CardId).SequenceEqual(r.CardIds) && moves.All(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "wushuang.obtain-deck-cards" && (r.Kind is null || m.CardKind == r.Kind) && (r.Category is null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(m.CardKind, [r.Category.Value]))) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangDeckCardsObtainedEvent>().Count(e => e.ProgramFrameId == f.Id && e.InstructionIndex == r.InstructionIndex && e.BatchId == r.BatchId && e.Count == moves.Length && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 62000)]
-    internal bool IsWushuangDeckGainMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ObtainWushuangDeckCards && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidWushuangDeckGain(f);
     [ProgramContinuation(ProgramContinuationKind.Movement, 62000)]
     internal bool ReturnWushuangDeckGain(ProgramSkillFrame f)
     {

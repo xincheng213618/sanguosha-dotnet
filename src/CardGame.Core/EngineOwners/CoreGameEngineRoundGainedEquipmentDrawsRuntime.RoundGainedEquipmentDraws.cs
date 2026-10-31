@@ -80,7 +80,4 @@ internal sealed partial class CoreGameEngineRoundGainedEquipmentDrawsRuntime
         var invoice = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.MovementSequenceBefore && m.Sequence <= receipt.MovementSequenceAfter && m.Reason.Value == RoundGainedEquipmentDrawReason).ToArray();
         return invoice.Select(m => m.CardId).SequenceEqual(receipt.DrawnCardIds) && invoice.All(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(frame.OwnerSeat)) && (receipt.DrawActual != 0 || receipt.MovementSequenceBefore == receipt.MovementSequenceAfter);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 130)]
-    internal bool IsRoundGainedEquipmentDrawAwaitedMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.PendingMovementContinuation == pending && effect?.Op == SkillProgramEffectOp.DrawForRoundGainedEquipmentUse && ValidRoundGainedEquipmentDraw(frame);
 }

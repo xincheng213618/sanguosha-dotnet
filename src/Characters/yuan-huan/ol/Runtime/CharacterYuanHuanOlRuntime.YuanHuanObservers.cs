@@ -17,14 +17,6 @@ internal sealed partial class CharacterYuanHuanOlRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 210)]
-    internal bool IsYuanHuanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
-    {
-        if (f.YuanHuan is not { Movements.Count: > 0 } r || e?.Op != r.Op || p != f.PendingMovementContinuation)
-            return false;
-        return true;
-    }
-
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 750)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 690)]
     internal bool IsYuanHuanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
@@ -49,11 +41,6 @@ internal sealed partial class CharacterYuanHuanOlRuntime
     }
 
     internal ProgramSkillFrame? YuanHuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterYuanHuanOlOperations.YuanHuanFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 560)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 670)]
-    internal bool HasYuanHuanDamageObserver(long id) => YuanHuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 700)]
-    internal bool HasYuanHuanBeforeDamageObserver(long id) => YuanHuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26920)]
     internal bool AdvanceYuanHuanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && YuanHuanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

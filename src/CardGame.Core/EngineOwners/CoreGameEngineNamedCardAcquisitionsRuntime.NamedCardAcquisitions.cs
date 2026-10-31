@@ -179,7 +179,4 @@ internal sealed partial class CoreGameEngineNamedCardAcquisitionsRuntime
         ResumeNamedCardAcquisition(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 320)]
-    internal bool IsNamedCardAcquisitionMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => f.NamedCardAcquisition is { Stage: NamedCardAcquisitionStage.MovementChildren } d && d.InstructionIndex == f.InstructionIndex && e?.Op == SkillProgramEffectOp.LoseSkillsAndObtainNamedCard && pending.SubjectSeat == f.OwnerSeat && pending.CoverageResultBind is null;
 }

@@ -194,9 +194,6 @@ internal sealed partial class CharacterYanRouOlRuntime
         ContinueYanRou(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 180)]
-    internal bool IsYanRouAwaitedMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.YanRou is { } r && p.SubjectSeat == r.Payer && p.BeforeCount == 0 && p.CoverageResultBind is null && (e is null || YanRouComposition.IsOperation(e.Op));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26800)]
     internal bool ContinuePaidYanRou(ProgramSkillFrame f)

@@ -7,10 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFengXiAnniversaryRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 44500)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 44500)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 44500)]
     internal bool FengXiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
     {
         if (f.AnniversaryFengXi is not { Stage: AnniversaryFengXiStage.MovementChildren or AnniversaryFengXiStage.DrawChildren } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null)
@@ -40,11 +36,6 @@ internal sealed partial class CharacterFengXiAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? FengXiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterFengXiAnniversaryOperations.FengXiFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 44500)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 44500)]
-    internal bool FengXiDamageObserver(long id) => FengXiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 44500)]
-    internal bool FengXiBeforeDamageObserver(long id) => FengXiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 44500)]
     internal bool FengXiDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && FengXiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 44500)]

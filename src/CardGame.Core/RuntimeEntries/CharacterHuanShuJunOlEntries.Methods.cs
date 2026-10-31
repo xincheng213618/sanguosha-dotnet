@@ -29,8 +29,6 @@ internal sealed partial class CharacterHuanShuJunOlEntries
     internal void FinishUnissuedWenyiPeach(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().FinishUnissuedWenyiPeach(supplied);
     internal void GiveWenyiEquipment(global::CardGame.Core.ProgramSkillFrame f, int cardId) => _resolve().GiveWenyiEquipment(f, cardId);
     internal bool HasAcceptedHuanpeiKeAction(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.LegalAction action) => _resolve().HasAcceptedHuanpeiKeAction(f, action);
-    internal bool HasHuanShuJunBeforeDamageObserver(long id) => _resolve().HasHuanShuJunBeforeDamageObserver(id);
-    internal bool HasHuanShuJunDamageObserver(long id) => _resolve().HasHuanShuJunDamageObserver(id);
     internal bool HasHuanpeiDyingResponse(global::CardGame.Core.CharacterState actor) => _resolve().HasHuanpeiDyingResponse(actor);
     internal bool HasHuanpeiForcedSlash(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => _resolve().HasHuanpeiForcedSlash(actor, target, pending);
     internal bool HasHuanpeiForcedSlash2(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().HasHuanpeiForcedSlash(actor, target, pending);
@@ -58,7 +56,6 @@ internal sealed partial class CharacterHuanShuJunOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HuanpeiResponseChoices(global::CardGame.Core.PendingDecision p) => _resolve().HuanpeiResponseChoices(p);
     internal bool HuanpeiRoundSpent(int owner) => _resolve().HuanpeiRoundSpent(owner);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CardConversionSource> HuanpeiSources(global::CardGame.Core.CharacterState owner) => _resolve().HuanpeiSources(owner);
-    internal bool IsHuanShuJunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsHuanShuJunMovement(f, effect, p);
     internal bool IsHuanShuJunRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsHuanShuJunRecoveryParent(f, recovery);
     internal bool IsHuanpeiAnswer(global::CardGame.Core.ChoiceId id) => _resolve().IsHuanpeiAnswer(id);
     internal bool IsHuanpeiUse(long id) => _resolve().IsHuanpeiUse(id);

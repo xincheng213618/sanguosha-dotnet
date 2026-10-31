@@ -202,9 +202,6 @@ internal sealed partial class CharacterFeiYiOlRuntime
         ContinueFeiYi(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 140)]
-    internal bool IsFeiYiAwaitedMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.FeiYi is { Paid: true, Stage: FeiYiStage.DrawChildren or FeiYiStage.DiscardChildren or FeiYiStage.HezhongDrawChildren } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && (e is null || FeiYiComposition.IsOperation(e.Op));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26600)]
     internal bool ContinuePaidFeiYi(ProgramSkillFrame f) => f.FeiYi is { Paid: true } r && _coreProgramEventHistoryOperations.ProgramEventHistory<FeiYiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;

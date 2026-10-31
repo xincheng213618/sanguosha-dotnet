@@ -38,9 +38,6 @@ internal sealed partial class CharacterXiahouHuiAnniversaryRuntime
         var selected = r.Candidates[random.Next(r.Candidates.Count)];
         return random.State == r.RandomAfter && selected.CardId == moved.CardId && selected.From == moved.From;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46200)]
-    internal bool XiahouHuiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.XiahouHui is { Stage: XiahouHuiStage.MovementChildren } r && e?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidXiahouHui(f);
     internal bool XiahouHuiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.XiahouHui is not { Stage: XiahouHuiStage.MovementChildren } r || !ValidXiahouHui(f))
@@ -60,11 +57,6 @@ internal sealed partial class CharacterXiahouHuiAnniversaryRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 46200)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 46200)]
     internal bool XiahouHuiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => XiahouHuiFirstChild(f, recovery);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46200)]
-    internal bool XiahouHuiDamageObserver(long id) => XiahouHuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46200)]
-    internal bool XiahouHuiBeforeDamageObserver(long id) => XiahouHuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46200)]
     internal bool AdvanceXiahouHuiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XiahouHuiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

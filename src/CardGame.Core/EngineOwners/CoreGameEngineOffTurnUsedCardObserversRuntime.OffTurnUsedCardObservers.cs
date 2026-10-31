@@ -15,9 +15,6 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 170)]
-    internal bool IsOffTurnUsedCardGiftMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.GiveOffTurnUsedCards && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && CanContinueOffTurnUsedCardGift(frame);
     internal bool OffTurnUsedCardGiftFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (root.OffTurnUsedCardGift is { Stage: OffTurnUsedCardGiftStage.GiftChildren } && OffTurnUsedCardGiftSkillsChangedEdge(root, child))
@@ -67,44 +64,4 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 580)]
     internal bool IsOffTurnUsedCardGiftProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.OffTurnUsedCardGift is not null && OffTurnUsedCardGiftObserverRoot(f.Id)is not null && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id));
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1790)]
-    internal bool HasOffTurnUsedCardGiftDamageObserver(long windowId) => OffTurnUsedCardGiftDamageObserver(windowId, false);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 140)]
-    internal bool HasOffTurnUsedCardGiftBeforeDamageObserver(long windowId) => OffTurnUsedCardGiftDamageObserver(windowId, true);
-    internal bool OffTurnUsedCardGiftDamageObserver(long windowId, bool before)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == windowId);
-        if (index < 0)
-            return false;
-        if (before ? _resolutionStackOperations._resolutionStack[index] is not BeforeDamageProgramWindowFrame : _resolutionStackOperations._resolutionStack[index] is not DamageTriggerWindowFrame)
-            return false;
-        if (_resolutionStackOperations._resolutionStack.Take(index).OfType<ProgramSkillFrame>().Any(f => f.OffTurnUsedCardGift is not null && OffTurnUsedCardGiftObserverRoot(f.Id)is not null))
-            return true;
-        ProgramTriggerCandidate? candidate = _resolutionStackOperations._resolutionStack[index] switch
-        {
-            BeforeDamageProgramWindowFrame b when b.CandidateIndex >= 0 && b.CandidateIndex < b.Candidates.Count => b.Candidates[b.CandidateIndex].Candidate,
-            DamageTriggerWindowFrame d when d.CandidateIndex >= 0 && d.CandidateIndex < d.Candidates.Count => d.Candidates[d.CandidateIndex].ToProgramCandidate(),
-            _ => null
-        };
-        if (candidate is null || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame producer || producer.WindowContext?.ParentFrameId != windowId || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(producer, candidate))
-            return false;
-        foreach (var root in _resolutionStackOperations._resolutionStack.Skip(index + 2).OfType<ProgramSkillFrame>().Where(f => f.OffTurnUsedCardGift is not null))
-        {
-            if (OffTurnUsedCardGiftObserverRoot(root.Id)is null)
-                continue;
-            var end = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-            var okay = true;
-            for (var edge = index + 2; edge <= end; edge++)
-                if (!_coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(edge))
-                {
-                    okay = false;
-                    break;
-                }
-
-            if (okay)
-                return true;
-        }
-
-        return false;
-    }
 }

@@ -15,13 +15,11 @@ internal sealed partial class CharacterCuiLieAnniversaryEntries
     internal bool CuiLieAdditionalEligible(global::CardGame.Core.CardUseFrame u, int seat) => _resolve().CuiLieAdditionalEligible(u, seat);
     internal bool CuiLieAdvanceChildren() => _resolve().CuiLieAdvanceChildren();
     internal global::CardGame.Core.PromptChoice CuiLieAi(global::CardGame.Core.PendingDecision p) => _resolve().CuiLieAi(p);
-    internal bool CuiLieBeforeDamage(long id) => _resolve().CuiLieBeforeDamage(id);
     internal global::CardGame.Core.ProgramSkillFrame CuiLieChildren(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.AnniversaryCuiLieStage stage) => _resolve().CuiLieChildren(f, stage);
     internal global::CardGame.Core.PromptChoice CuiLieChoice(global::CardGame.Core.ProgramSkillFrame f, string verb, string value, string text, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().CuiLieChoice(f, verb, value, text, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CuiLieChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CuiLieChoices(f);
     internal int CuiLieChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CuiLieChooser(f);
     internal bool CuiLieContestEligible(int owner, global::CardGame.Core.CardUseFrame use) => _resolve().CuiLieContestEligible(owner, use);
-    internal bool CuiLieDamageObserver(long id) => _resolve().CuiLieDamageObserver(id);
     internal bool CuiLieDelayedTargetLegal(global::CardGame.Core.CardUseFrame use, int target) => _resolve().CuiLieDelayedTargetLegal(use, target);
     internal bool CuiLieDisabled(int owner) => _resolve().CuiLieDisabled(owner);
     internal bool CuiLieDying() => _resolve().CuiLieDying();

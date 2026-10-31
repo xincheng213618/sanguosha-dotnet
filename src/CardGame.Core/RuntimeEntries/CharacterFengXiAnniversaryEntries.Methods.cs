@@ -12,9 +12,7 @@ internal sealed partial class CharacterFengXiAnniversaryEntries
     internal global::CardGame.Core.PromptChoice ChooseFengXi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseFengXi(p, f);
     internal bool ContinueFengXi(long id) => _resolve().ContinueFengXi(id);
     internal bool DrainFengXi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainFengXi(f);
-    internal bool FengXiBeforeDamageObserver(long id) => _resolve().FengXiBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> FengXiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FengXiChoices(f);
-    internal bool FengXiDamageObserver(long id) => _resolve().FengXiDamageObserver(id);
     internal bool FengXiDyingObserver() => _resolve().FengXiDyingObserver();
     internal bool FengXiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().FengXiFirstChild(f, child);
     internal bool FengXiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().FengXiMovement(f, effect, p);

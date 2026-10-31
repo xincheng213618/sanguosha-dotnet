@@ -51,10 +51,6 @@ internal sealed partial class CharacterPangJiOlEntries
     internal void FinalizeDouyuAssignments(global::CardGame.Core.DouyuWindowFrame window) => _resolve().FinalizeDouyuAssignments(window);
     internal void FinishPangJi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishPangJi(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PindianRevealedCard> GetDouyuOriginalSimultaneousCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GetDouyuOriginalSimultaneousCards(f);
-    internal bool HasDouyuBeforeDamageObserver(long id) => _resolve().HasDouyuBeforeDamageObserver(id);
-    internal bool HasDouyuDamageObserver(long id) => _resolve().HasDouyuDamageObserver(id);
-    internal bool HasPangJiBeforeDamageObserver(long id) => _resolve().HasPangJiBeforeDamageObserver(id);
-    internal bool HasPangJiDamageObserver(long id) => _resolve().HasPangJiDamageObserver(id);
     internal bool IsAcceptedBiguoUse(int actorSeat, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardActionType actionType, long? useId) => _resolve().IsAcceptedBiguoUse(actorSeat, kind, actionType, useId);
     internal bool IsBiguoCategoryForbidden(int seat, global::CardGame.Core.CardKind effectiveKind) => _resolve().IsBiguoCategoryForbidden(seat, effectiveKind);
     internal bool IsBiguoPindianFrame(global::CardGame.Core.PindianFrame child) => _resolve().IsBiguoPindianFrame(child);

@@ -8,9 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYanMobileShiRuntime
 {
     internal bool ValidShiZy(ProgramSkillFrame f) => f.ShiZhangYan is { } r && f.InstructionIndex == 1 && r.Source == ShiZySource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && r.WindowId == f.WindowContext?.ParentFrameId && Enum.IsDefined(r.Stage) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZyStartedEvent>().Count(e => e == new ShiZyStartedEvent(f.Id, r.Source, r.Hash, r.Op, r.Turn, r.WindowId, r.UseId, r.ActionId, r.Target, r.OriginalAttackActive, r.OriginalTargetIndex)) == 1;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 50500)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 50500)]
     internal bool ShiZyMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ShiZhangYan is { } r && ValidShiZy(f) && r.Stage is ShiZyStage.DiscardChildren or ShiZyStage.ObtainChildren && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && e?.Op is SkillProgramEffectOp.ResolveMobileShiZhangYanFeijing or SkillProgramEffectOp.ResolveMobileShiZhangYanXiaogePrevent;
     internal bool ShiZyFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -34,11 +31,6 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
     internal ProgramSkillFrame? ShiZyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangYanMobileShiOperations.ShiZyFirstChild(f, c), (n) => _characterZhangYanMobileShiOperations.ShiZySuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50500)]
     internal bool ShiZyDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiZyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 50500)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 50500)]
-    internal bool ShiZyDamageChild(long id) => ShiZyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 50500)]
-    internal bool ShiZyBeforeDamageChild(long id) => ShiZyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 50500)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 50500)]
     internal bool ShiZyRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

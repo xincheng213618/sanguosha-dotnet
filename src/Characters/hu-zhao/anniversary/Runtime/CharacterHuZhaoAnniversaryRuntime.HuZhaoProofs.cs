@@ -25,8 +25,6 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
             return !r.Restore && HuZhaoCount(r.SelectedMask) > 0 && r.Draw is null;
         return r.Stage == HuZhaoMiduStage.CostChildren ? r.Draw is null : r.Stage == HuZhaoMiduStage.DrawChildren && r.Draw is { } draw && draw.RecipientSeat == r.Recipient && draw.RequestedCount == HuZhaoCount(r.SelectedMask) && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After;
     }
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43000)]
-    internal bool HuZhaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.HuZhaoMidu is { Paid: true, Stage: HuZhaoMiduStage.CostChildren or HuZhaoMiduStage.DrawChildren } && ValidHuZhaoMidu(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryHuZhaoMidu && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 43000)]
     internal bool HuZhaoRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.HuZhaoMidu is { Stage: HuZhaoMiduStage.CostChildren, Restore: false } r && ValidHuZhaoMidu(f) && recovery.ParentFrameId == f.Id && recovery.Return == new RecoveryReplacementReturn(PostEventContinuation.Program, f.Id) && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason == new CardMoveReason("equipment.slot-abolished") && recovery.Attempt.SourceSeat == f.OwnerSeat && recovery.Attempt.TargetSeat == f.OwnerSeat && recovery.Attempt.Amount == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.Equipment(f.OwnerSeat) && m.Reason.Value == "equipment.slot-abolished" && _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Kind == CardKind.SilverLion);
@@ -46,11 +44,6 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? HuZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuZhaoAnniversaryOperations.HuZhaoFirstChild(f, c), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 43000)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 43000)]
-    internal bool HuZhaoDamageObserver(long id) => HuZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 43000)]
-    internal bool HuZhaoBeforeDamageObserver(long id) => HuZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 43000)]
     internal bool AdvanceHuZhaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuZhaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -7,9 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuPanOlRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 350)]
-    internal bool IsLiuPanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.Pijing is { Stage: PijingStage.GiftChildren or PijingStage.DrawChildren } r && pending == f.PendingMovementContinuation && effect?.Op == (r.Reciprocal ? SkillProgramEffectOp.ResolvePijingNextSoleTargetChoice : SkillProgramEffectOp.ResolvePijingTargetTogglesAndRandomGifts) && pending.BeforeCount == 0 && pending.CoverageResultBind is null && pending.SubjectSeat == (r.Stage == PijingStage.GiftChildren ? r.Toggles[r.Index].Seat : r.ActorSeat);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 150)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 140)]
     internal bool IsLiuPanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.Pijing is { Stage: PijingStage.GiftChildren, Gift: { Kind: CardKind.SilverLion, From.Zone: CardZoneKind.Equipment } g } r && recovery.ParentFrameId == f.Id && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.TargetSeat == g.DonorSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == PijingGiftReason && _coreProgramEventHistoryOperations.ProgramEventHistory<PijingGiftPaidEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Index && e.CardId == g.CardId);
@@ -31,11 +28,6 @@ internal sealed partial class CharacterLiuPanOlRuntime
     }
 
     internal ProgramSkillFrame? LiuPanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLiuPanOlOperations.LiuPanFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 860)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 970)]
-    internal bool HasLiuPanDamageObserver(long id) => LiuPanObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.Any(x => x.Id == id && x is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1000)]
-    internal bool HasLiuPanBeforeDamageObserver(long id) => LiuPanObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.Any(x => x.Id == id && x is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27410)]
     internal bool AdvanceLiuPanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuPanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

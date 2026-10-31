@@ -8,7 +8,6 @@ internal sealed partial class CoreGameEngineWushuangAuditCombatEntries
     internal bool HasWushuangWangongPrivilege(global::CardGame.Core.CharacterState actor, long? existingUseId = default) => _resolve().HasWushuangWangongPrivilege(actor, existingUseId);
     internal bool IsWangongModeSkill(string skillId) => _resolve().IsWangongModeSkill(skillId);
     internal bool IsWushuangCampClaimContext(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsWushuangCampClaimContext(frame);
-    internal bool IsWushuangCampClaimMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWushuangCampClaimMovement(frame, effect, pending);
     internal global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent? PreviousWushuangActualUse(int actor, global::CardGame.Core.CardUseFrame? current = default) => _resolve().PreviousWushuangActualUse(actor, current);
     internal bool RetainWushuangCampClaim(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().RetainWushuangCampClaim(frame);
     internal bool ReturnWushuangCampClaim(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnWushuangCampClaim(frame);

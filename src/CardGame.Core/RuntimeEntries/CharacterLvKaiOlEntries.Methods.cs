@@ -13,10 +13,7 @@ internal sealed partial class CharacterLvKaiOlEntries
     internal void ContinueBijingPaidGroup(long id) => _resolve().ContinueBijingPaidGroup(id);
     internal void ExecuteTunanEquipmentUse(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.Card card, int user) => _resolve().ExecuteTunanEquipmentUse(frame, card, user);
     internal void ExecuteTunanPeachUse(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.Card card, int user) => _resolve().ExecuteTunanPeachUse(frame, card, user);
-    internal bool HasBijingBeforeDamage(long id) => _resolve().HasBijingBeforeDamage(id);
-    internal bool HasBijingPaidDamage(long id) => _resolve().HasBijingPaidDamage(id);
     internal bool IsBijingPaidDying() => _resolve().IsBijingPaidDying();
-    internal bool IsBijingPaidMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBijingPaidMovement(frame, effect, pending);
     internal bool IsBijingRecoveryParent(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsBijingRecoveryParent(frame, recovery);
     internal bool KeepPaidBijingGroup(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepPaidBijingGroup(frame);
     internal void PresentBijingPunishCardPrompt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PresentBijingPunishCardPrompt(frame);

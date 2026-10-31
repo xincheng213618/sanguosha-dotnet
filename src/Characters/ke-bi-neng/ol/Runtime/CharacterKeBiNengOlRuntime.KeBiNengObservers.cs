@@ -33,11 +33,6 @@ internal sealed partial class CharacterKeBiNengOlRuntime
     }
 
     internal ProgramSkillFrame? KeBiNengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterKeBiNengOlOperations.KeBiNengFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1480)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1590)]
-    internal bool HasKeBiNengDamageObserver(long id) => KeBiNengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1610)]
-    internal bool HasKeBiNengBeforeDamageObserver(long id) => HasKeBiNengDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27040)]
     internal bool AdvanceKeBiNengSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && KeBiNengObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

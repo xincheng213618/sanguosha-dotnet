@@ -44,8 +44,6 @@ internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
     }
 
     internal static bool IsKuangfuPending(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_KuangfuReceipts.IsKuangfuPending(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 50)]
-    internal bool IsKuangfuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.DiscardEquipmentThenSlashAndOwnershipOutcome && pending == f.PendingMovementContinuation && f.Kuangfu is { Stage: KuangfuStage.EquipmentChildren or KuangfuStage.OutcomeChildren } && IsKuangfuPending(f) && ValidKuangfu(f);
     internal bool IsKuangfuSlashUse(CardUseFrame use) => use.KuangfuSlashReturn is { } returned && use.Id == returned.CardUseFrameId && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == returned.ProgramFrameId)is { } root && root.Kuangfu is { Stage: KuangfuStage.SlashIssued } receipt && receipt.SlashReturn == returned && ValidKuangfu(root) && (use.CurrentSlashFirePolicy?.OriginalAction ?? use.Action)is { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, EffectiveSuit: Suit.None, EffectiveRank: 0, PhysicalCards.Count: 0 } action && action.ActionId == returned.CardActionId && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, root.OwnerSeat, action.ProviderSeat) && action.ConversionChain.Count == 0;
     internal bool HasIssuedKuangfuDistance(long? id, int actor) => id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { } use && use.KuangfuSlashReturn?.Source.OwnerSeat == actor && IsKuangfuSlashUse(use);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 390)]
@@ -108,9 +106,6 @@ internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1710)]
-    internal bool HasKuangfuDamageObserver(long window) => KuangfuPaidObserverRoot(window)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 180)]
     internal bool IsKuangfuProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && KuangfuPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 490)]

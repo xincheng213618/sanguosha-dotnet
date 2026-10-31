@@ -21,13 +21,10 @@ internal sealed partial class CharacterHuangQuanOlEntries
     internal global::CardGame.Core.SkillProgramStepOutcome DrawAndOfferJianjiExactCard(global::CardGame.Core.ProgramSkillFrame supplied, int target) => _resolve().DrawAndOfferJianjiExactCard(supplied, target);
     internal global::CardGame.Core.SkillProgramStepOutcome DrawForDianhuActualOccurrence(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().DrawForDianhuActualOccurrence(supplied);
     internal void FinishHuangQuan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuangQuan(f);
-    internal bool HasHuangQuanBeforeDamageObserver(long id) => _resolve().HasHuangQuanBeforeDamageObserver(id);
-    internal bool HasHuangQuanDamageObserver(long id) => _resolve().HasHuangQuanDamageObserver(id);
     internal bool HuangQuanFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().HuangQuanFirstChild(root, child);
     internal global::CardGame.Core.ProgramSkillFrame? HuangQuanObserverRoot() => _resolve().HuangQuanObserverRoot();
     internal global::CardGame.Core.CardConversionSource HuangQuanSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuangQuanSource(f);
     internal bool IsDianhuDrawTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsDianhuDrawTrigger(t);
-    internal bool IsHuangQuanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation continuation) => _resolve().IsHuangQuanMovement(f, e, continuation);
     internal bool IsJianjiExactCardQuery(global::CardGame.Core.CharacterState actor, int? selectedId) => _resolve().IsJianjiExactCardQuery(actor, selectedId);
     internal bool IsJianjiOffTurnNativeUse(long id, int actor) => _resolve().IsJianjiOffTurnNativeUse(id, actor);
     internal global::CardGame.Core.SkillProgramStepOutcome IssueHuangQuanDraw(global::CardGame.Core.ProgramSkillFrame f, int target, string kind, global::CardGame.Core.DianhuOccurrence? occurrence) => _resolve().IssueHuangQuanDraw(f, target, kind, occurrence);

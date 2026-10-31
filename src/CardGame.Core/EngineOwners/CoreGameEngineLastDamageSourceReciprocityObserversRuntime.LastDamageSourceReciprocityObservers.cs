@@ -86,8 +86,6 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityObservers
         return _coreObserverSubtreesOperations.HasObserverSuffix(index + 1, (child) => global::CardGame.Core.EngineOwners.CoreGameEngineObserverSubtreesRuntime.IsObserverSkillsChangedEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)) ? root : null;
     }
     internal ProgramSkillFrame? AnyLastDamageSourceReciprocityObserverRoot() => _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Select(window => LastDamageSourceReciprocityObserverRoot(window.Id)).FirstOrDefault(root => root is not null);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1810)]
-    internal bool HasLastDamageSourceReciprocityDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == windowId && frame is DamageTriggerWindowFrame) && AnyLastDamageSourceReciprocityObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 80)]
     internal bool TryAdvanceLastDamageSourceReciprocitySubtree()
     {

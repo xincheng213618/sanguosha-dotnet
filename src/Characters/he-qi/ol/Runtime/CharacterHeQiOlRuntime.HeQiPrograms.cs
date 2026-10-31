@@ -190,9 +190,6 @@ internal sealed partial class CharacterHeQiOlRuntime
         RequireHeQi(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 360)]
-    internal bool IsHeQiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.HeQi is { Stage: HeQiStage.DiscardChildren or HeQiStage.ObtainChildren } && e?.Op == SkillProgramEffectOp.RevealJointHandsAndDiscardDodges && CanContinueHeQi(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal void RequireHeQi(ProgramSkillFrame f)
     {
         if (f.HeQi is not { } r || r.Source != HeQiSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.TurnOwnerSeat != f.OwnerSeat || f.SelectedTargetSeats is not [var t] || t != r.TargetSeat || !Enum.IsDefined(r.Stage) || r.Maximum < 1 || r.Revealed.Count > r.Maximum || r.Revealed.Distinct().Count() != r.Revealed.Count || r.Revealed.Any(id => !r.Candidates.Any(m => m.CardId == id)) || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)

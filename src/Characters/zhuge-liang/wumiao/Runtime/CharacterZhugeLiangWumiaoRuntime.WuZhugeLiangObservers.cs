@@ -21,8 +21,6 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
     }
 
     internal bool DrainWuZgl(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 30300)]
-    internal bool IsWuZglMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect is not null && WuZhugeLiangComposition.Handles(effect.Op) && ValidWuZgl(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool WuZglFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!ValidWuZgl(f))
@@ -40,11 +38,6 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
 
     internal bool WuZglObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame f && _characterZhugeLiangWumiaoOperations.WuZglFirstChild(f, _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? WuZglObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhugeLiangWumiaoOperations.WuZglFirstChild(f, c), (i) => _characterZhugeLiangWumiaoOperations.WuZglObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 30300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 30300)]
-    internal bool HasWuZglDamageObserver(long id) => WuZglObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30300)]
-    internal bool HasWuZglBeforeDamageObserver(long id) => WuZglObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30300)]
     internal bool IsWuZglDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WuZglObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30300)]

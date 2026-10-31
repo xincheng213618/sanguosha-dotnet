@@ -12,8 +12,6 @@ internal sealed partial class CharacterZhaoXiangOlEntries
     internal global::CardGame.Core.SkillProgramStepOutcome ExchangeFiveShuBySpentMeiYing(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ExchangeFiveShuBySpentMeiYing(supplied);
     internal void FinishZhaoXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhaoXiang(f);
     internal void GainMeiYingAfterActualSlashDamage(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().GainMeiYingAfterActualSlashDamage(supplied);
-    internal bool HasZhaoXiangBeforeDamageObserver(long id) => _resolve().HasZhaoXiangBeforeDamageObserver(id);
-    internal bool HasZhaoXiangDamageObserver(long id) => _resolve().HasZhaoXiangDamageObserver(id);
     internal bool IsMeiYingConversion(global::CardGame.Core.CardConversionSource source) => _resolve().IsMeiYingConversion(source);
     internal bool IsZhaoXiangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhaoXiangMovement(f, e, p);
     internal bool MeiYingConversionUnavailable(global::CardGame.Core.ProgramViewAsSourceQuery query) => _resolve().MeiYingConversionUnavailable(query);

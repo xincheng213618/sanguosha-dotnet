@@ -136,7 +136,5 @@ internal sealed partial class CharacterChengYuMouRuntime
         IReadOnlyList<NamedAmbushPrivateEntrySnapshot>? entries = viewer == holder || revealAll ? Array.AsReadOnly(records.Select(r => new NamedAmbushPrivateEntrySnapshot(_coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId)), r.Name)).ToArray()) : null;
         return Array.AsReadOnly((existing ?? []).Append(new NamedAmbushPileSnapshot(MouChengYuAnniversaryRuntime.Shizha, "识诈", records.Count, entries)).ToArray());
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 36800)]
     internal bool MouCyMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.MouChengYuAnniversary is { Stage: MouCyStage.ObtainChildren or MouCyStage.RevealChildren or MouCyStage.GainChildren or MouCyStage.DiscardChildren } && MouChengYuAnniversary.Valid(f) && effect?.Op == f.MouChengYuAnniversary.Operation && movement == f.PendingMovementContinuation && movement.BeforeCount == 0 && movement.CoverageResultBind is null;
 }

@@ -10,8 +10,6 @@ internal sealed partial class CharacterWuTuGuOlEntries
     internal void CaptureWuTuGuRanshangPayment(global::CardGame.Core.ProgramSkillHpLostEvent paid) => _resolve().CaptureWuTuGuRanshangPayment(paid);
     internal bool ContinuePaidWuTuGu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidWuTuGu(f);
     internal void ContinueWuTuGu(long id) => _resolve().ContinueWuTuGu(id);
-    internal bool HasWuTuGuBeforeDamageObserver(long id) => _resolve().HasWuTuGuBeforeDamageObserver(id);
-    internal bool HasWuTuGuDamageObserver(long id) => _resolve().HasWuTuGuDamageObserver(id);
     internal bool ResumeWuTuGu(long id) => _resolve().ResumeWuTuGu(id);
     internal bool ValidWuTuGuHanyongUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidWuTuGuHanyongUse(use);
     internal bool ValidWuTuGuRanshang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidWuTuGuRanshang(f);

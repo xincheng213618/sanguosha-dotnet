@@ -8,10 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTianYuMouMobileRuntime
 {
     internal bool ValidMouTianYu(ProgramSkillFrame f) => f.MouTianYu is { } r && f.InstructionIndex == 1 && r.Source == MouTianYuSource(f) && r.GameplayHash == f.GameplayHash && f.WindowContext?.ParentFrameId == r.WindowId && _coreProgramEventHistoryOperations.ProgramEventHistory<MouTianYuStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.WindowId == r.WindowId && e.UseId == r.UseId && e.ActionId == r.ActionId && e.TargetSeat == r.TargetSeat && e.TurnOrdinal == r.TurnOrdinal) == 1;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 30600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 30600)]
-    internal bool IsMouTianYuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation m) => f.MouTianYu is { Stage: MouTianYuStage.Children } && e is not null && MouTianYuComposition.Handles(e.Op) && ValidMouTianYu(f) && m.SubjectSeat == f.OwnerSeat && m.BeforeCount == 0 && m.CoverageResultBind is null;
     internal bool MouTianYuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.MouTianYu is not { Stage: MouTianYuStage.Children } r || !ValidMouTianYu(f))
@@ -26,10 +22,6 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
     internal bool MouTianYuObserverEdge(int index) => _coreObserverSubtreesOperations.IsMovementObserverEdge(index) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(index) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(index) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[index - 1], _resolutionStackOperations._resolutionStack[index]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]);
     internal bool MouTianYuObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _characterTianYuMouMobileOperations.MouTianYuObserverEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? MouTianYuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterTianYuMouMobileOperations.MouTianYuFirstChild(f, c), (n) => _characterTianYuMouMobileOperations.MouTianYuObserverSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 30600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 30600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30600)]
-    internal bool HasMouTianYuDamageObserver(long id) => MouTianYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30600)]
     internal bool IsMouTianYuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouTianYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30600)]

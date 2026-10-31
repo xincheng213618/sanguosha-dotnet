@@ -182,7 +182,6 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
     }
 
     internal SkillProgramEffect? OldHandPausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 260)]
     internal bool IsOldHandDispositionMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.ReplaceDiscardWithOldHandDisposition && f.OldHandDisposition is { Stage: "movement" } r && r.InstructionIndex == f.InstructionIndex && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Movement, 21701)]
     internal bool ReturnOldHandDispositionMovement(ProgramSkillFrame f)

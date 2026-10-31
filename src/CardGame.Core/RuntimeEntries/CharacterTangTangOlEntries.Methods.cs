@@ -21,9 +21,6 @@ internal sealed partial class CharacterTangTangOlEntries
     internal bool DrainTangTang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainTangTang(f);
     internal bool ExcludeOrdinaryMovement_IsTangTangZhiyiTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsTangTangZhiyiTrigger(candidate, trigger);
     internal void FinishTangTang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishTangTang(f);
-    internal bool HasTangTangBeforeDamageObserver(long id) => _resolve().HasTangTangBeforeDamageObserver(id);
-    internal bool HasTangTangDamageObserver(long id) => _resolve().HasTangTangDamageObserver(id);
-    internal bool IsTangTangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsTangTangMovement(f, e, p);
     internal bool IsTangTangPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsTangTangPaidMovement(f, m);
     internal bool IsTangTangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsTangTangRecoveryParent(f, recovery);
     internal void IssueTangTangMovement(global::CardGame.Core.ProgramSkillFrame supplied, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardLocation destination, global::CardGame.Core.TangTangStage stage, string reason) => _resolve().IssueTangTangMovement(supplied, ids, destination, stage, reason);

@@ -19,9 +19,6 @@ internal sealed partial class CharacterXiZhiCaiOlEntries
     internal global::CardGame.Core.ProgramSkillWindowContext CreateXianfuHpContext(global::CardGame.Core.HpChangeContext change, global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().CreateXianfuHpContext(change, c);
     internal void FinishChouce(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishChouce(f);
     internal void FinishXianfuEcho(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishXianfuEcho(f);
-    internal bool HasXiZhiCaiBeforeDamageObserver(long id) => _resolve().HasXiZhiCaiBeforeDamageObserver(id);
-    internal bool HasXiZhiCaiDamageObserver(long id) => _resolve().HasXiZhiCaiDamageObserver(id);
-    internal bool IsXiZhiCaiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXiZhiCaiMovement(f, e, p);
     internal bool IsXianfuEchoTrigger(global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().IsXianfuEchoTrigger(trigger);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.XianfuRelationGrant> LiveXianfuRelations() => _resolve().LiveXianfuRelations();
     internal void ObserveXianfuDamageQualification(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveXianfuDamageQualification(payload);

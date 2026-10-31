@@ -18,11 +18,8 @@ internal sealed partial class CharacterZhangWenAnniversaryEntries
     internal void RequireZhangWenSibian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireZhangWenSibian(f);
     internal bool ReturnZhangWenSibianMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnZhangWenSibianMovement(f);
     internal bool ValidZhangWenSibian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidZhangWenSibian(f);
-    internal bool ZhangWenBeforeDamageObserver(long id) => _resolve().ZhangWenBeforeDamageObserver(id);
-    internal bool ZhangWenDamageObserver(long id) => _resolve().ZhangWenDamageObserver(id);
     internal bool ZhangWenEntityAvailable(global::CardGame.Core.ZhangWenSibianEntity entity) => _resolve().ZhangWenEntityAvailable(entity);
     internal bool ZhangWenFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ZhangWenFirstChild(f, child);
-    internal bool ZhangWenMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ZhangWenMovement(f, e, p);
     internal global::CardGame.Core.ProgramSkillFrame? ZhangWenObserverRoot() => _resolve().ZhangWenObserverRoot();
     internal int[] ZhangWenRemainder(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangWenRemainder(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ZhangWenSibianChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangWenSibianChoices(f);

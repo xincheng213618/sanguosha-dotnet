@@ -115,8 +115,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntityObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 70)]
     internal bool IsOriginalHandEntityProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OriginalHandEntityObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1850)]
-    internal bool HasOriginalHandEntityDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) && OriginalHandEntityObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 100)]
     internal bool TryAdvanceOriginalHandEntitySubtree()
     {

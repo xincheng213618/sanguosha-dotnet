@@ -10,9 +10,7 @@ internal sealed partial class CharacterLuBuHappyGodEntries
     internal bool CompleteHappyLuBuActualStart(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame p) => _resolve().CompleteHappyLuBuActualStart(p);
     internal bool ContinueHappyLuBu(long id) => _resolve().ContinueHappyLuBu(id);
     internal global::CardGame.Core.PromptChoice HappyLuBuAi(global::CardGame.Core.PendingDecision p) => _resolve().HappyLuBuAi(p);
-    internal bool HappyLuBuBeforeDamage(long id) => _resolve().HappyLuBuBeforeDamage(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyLuBuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyLuBuChoices(f);
-    internal bool HappyLuBuDamage(long id) => _resolve().HappyLuBuDamage(id);
     internal bool HappyLuBuDying() => _resolve().HappyLuBuDying();
     internal bool HappyLuBuEligible(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HappyLuBuEligible(c, t, w);
     internal bool HappyLuBuExtraTarget(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CharacterState target) => _resolve().HappyLuBuExtraTarget(use, target);

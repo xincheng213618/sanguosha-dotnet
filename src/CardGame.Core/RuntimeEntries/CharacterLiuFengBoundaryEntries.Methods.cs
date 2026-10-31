@@ -9,12 +9,10 @@ internal sealed partial class CharacterLiuFengBoundaryEntries
     internal void BeginBoundaryLiuFengMovement(global::CardGame.Core.ProgramSkillFrame f, int[] ids, global::CardGame.Core.CardLocation destination, string movement) => _resolve().BeginBoundaryLiuFengMovement(f, ids, destination, movement);
     internal void BindBoundaryLiuFengNativeUse(global::CardGame.Core.CardUseFrame use) => _resolve().BindBoundaryLiuFengNativeUse(use);
     internal void BindBoundaryLiuFengUse(global::CardGame.Core.CardUseDeclaredEvent e) => _resolve().BindBoundaryLiuFengUse(e);
-    internal bool BoundaryLiuFengBeforeDamage(long id) => _resolve().BoundaryLiuFengBeforeDamage(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryLiuFengChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryLiuFengChoices(f);
     internal bool BoundaryLiuFengCostLegal(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PromptChoice choice) => _resolve().BoundaryLiuFengCostLegal(f, choice);
     internal bool BoundaryLiuFengCountsSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryLiuFengCountsSlash(f);
     internal int[] BoundaryLiuFengCurrentTargets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryLiuFengCurrentTargets(f);
-    internal bool BoundaryLiuFengDamageObserver(long id) => _resolve().BoundaryLiuFengDamageObserver(id);
     internal bool BoundaryLiuFengDying() => _resolve().BoundaryLiuFengDying();
     internal bool BoundaryLiuFengFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().BoundaryLiuFengFirstChild(f, child);
     internal bool BoundaryLiuFengHasCost(int actor) => _resolve().BoundaryLiuFengHasCost(actor);

@@ -100,9 +100,6 @@ internal sealed partial class CharacterYuJinMobileRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 76300)]
-    internal bool MobileYuJinPaidMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.MobileYuJinTransfer is { } r && effect?.Op == r.Operation && pending == frame.PendingMovementContinuation && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidMobileYuJinTransfer(frame);
     [ProgramContinuation(ProgramContinuationKind.Movement, 76300)]
     internal bool ReturnMobileYuJinMovement(ProgramSkillFrame frame)
     {

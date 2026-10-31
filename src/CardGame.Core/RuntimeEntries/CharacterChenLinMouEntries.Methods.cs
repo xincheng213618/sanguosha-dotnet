@@ -12,11 +12,9 @@ internal sealed partial class CharacterChenLinMouEntries
     internal void IssueMouChenLinNonHandDonorTickets(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouChenLinNonHandDonorTickets(f);
     internal void IssueMouChenLinUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouChenLinUse(f);
     internal bool MouChenLinAdvanceChildren() => _resolve().MouChenLinAdvanceChildren();
-    internal bool MouChenLinBeforeDamage(long id) => _resolve().MouChenLinBeforeDamage(id);
     internal int MouChenLinDamageCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => _resolve().MouChenLinDamageCursor(a);
     internal global::CardGame.Core.MouChenLinDamageReceipt? MouChenLinDamageState(long id) => _resolve().MouChenLinDamageState(id);
     internal bool MouChenLinDamageTargets(global::CardGame.Core.ProgramTargetCardWindowQuery q) => _resolve().MouChenLinDamageTargets(q);
-    internal bool MouChenLinDamageWindow(long id) => _resolve().MouChenLinDamageWindow(id);
     internal bool MouChenLinDying() => _resolve().MouChenLinDying();
     internal bool MouChenLinEdge(int i) => _resolve().MouChenLinEdge(i);
     internal bool MouChenLinFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouChenLinFirstChild(f, child);

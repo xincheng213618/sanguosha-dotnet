@@ -17,7 +17,6 @@ internal sealed partial class CharacterDongZhaoMobileShiEntries
     internal bool ReturnShiDz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiDz(f);
     internal void SealShiDz(long id) => _resolve().SealShiDz(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiDzChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiDzChoices(f);
-    internal bool ShiDzMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().ShiDzMovementProof(f, effect, movement);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiDzPayments(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiDzPayments(f);
     internal global::CardGame.Core.MobileShiDongZhaoExtraGrantedEvent? ShiDzPendingExtra(int beneficiary) => _resolve().ShiDzPendingExtra(beneficiary);
     internal int ShiDzSameNameMaximum(int seat) => _resolve().ShiDzSameNameMaximum(seat);

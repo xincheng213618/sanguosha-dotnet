@@ -47,7 +47,4 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
         // frozen payment ends after both records; no extra acquisition occurred.
         return gain.To == CardLocation.Hand(frame.OwnerSeat) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > gain.Sequence && move.Sequence <= payment.After).ToArray()is [var destroyed] && destroyed.Sequence == payment.After && destroyed.CardId == payment.CardId && destroyed.From == gain.To && destroyed.HappyZuoCiPhantomDestination is { OriginalForeignGainSequence: { } original, OriginalRecipient: { } recipient, Issuer: var issuer } && original == gain.Sequence && recipient == frame.OwnerSeat && issuer == payment.TargetSeat && _characterZuoCiHappyGodOperations.IsHappyZuoCiDestroyedMaterial(destroyed);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 40300)]
-    internal bool MobileGuixinMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveMobileShenCaoCaoGuixin && f.MobileGuixin is { Stage: MobileGuixinStage.MovementChildren } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidMobileGuixin(f);
 }

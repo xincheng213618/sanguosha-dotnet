@@ -8,15 +8,13 @@ namespace CardGame.Core.EngineOwners;
 [global::CardGame.Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineOldHandDispositionObserversRuntime
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries _coreObserverSubtreesOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineOldHandDispositionEntries _coreOldHandDispositionOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries _corePendingDecisionPolicyPipelineOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineOldHandDispositionObserversEntries _coreOldHandDispositionObserversOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CoreGameEngineOldHandDispositionObserversRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries coreObserverSubtreesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineOldHandDispositionEntries coreOldHandDispositionOperations,global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineOldHandDispositionObserversEntries coreOldHandDispositionObserversOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    internal CoreGameEngineOldHandDispositionObserversRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries coreObserverSubtreesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineOldHandDispositionEntries coreOldHandDispositionOperations,global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineOldHandDispositionObserversEntries coreOldHandDispositionObserversOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
     {
-        this._resolutionStackOperations = resolutionStackOperations;
         this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
         this._coreOldHandDispositionOperations = coreOldHandDispositionOperations;
         this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;

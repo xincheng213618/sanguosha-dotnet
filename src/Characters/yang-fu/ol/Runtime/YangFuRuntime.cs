@@ -264,14 +264,6 @@ var r = f.YangFu!; var choices = BingzhongChoices(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27310)]
     private bool ContinuePaidYangFu(ProgramSkillFrame f)
     { if (f.YangFu is not { } r || r.Stage == YangFuStage.Targets) return false; return true; }
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 300)]
-    private bool IsYangFuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
-    {
-        if (f.YangFu is not { } r || e?.Op != r.Op || p != f.PendingMovementContinuation ||
-            r.Stage is not (YangFuStage.DrawChildren or YangFuStage.EquipmentChildren or YangFuStage.SlashChildren) &&
-                !(r.Stage == YangFuStage.EquipmentUse && r.NativeOrigin is { } origin && facts.CardUse(origin.UseId) is { } use && IsIssuedSuyiUse(use))) return false;
-return true;
-    }
     private bool YangFuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.YangFu is not { } r) return false;         if (child is CardUseFrame use) return r.Stage is YangFuStage.EquipmentUse or YangFuStage.SlashUse && use.SuyiOrigin == r.NativeOrigin && IsIssuedSuyiUse(use);
@@ -293,18 +285,6 @@ return true;
         }
         return true;
     }
-    private bool IsAbove<T>(long id, long rootId) where T : ResolutionFrame
-    {
-        if (frames.Find(id) is not T child) return false;
-        for (var parent = frames.ParentOf(child.Id); parent is not null; parent = frames.ParentOf(parent.Id))
-            if (parent.Id == rootId) return true;
-        return false;
-    }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 770)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 880)]
-    private bool HasYangFuDamageObserver(long id) => YangFuObserverRoot() is { } root && IsAbove<DamageTriggerWindowFrame>(id, root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 910)]
-    private bool HasYangFuBeforeDamageObserver(long id) => YangFuObserverRoot() is { } root && IsAbove<BeforeDamageProgramWindowFrame>(id, root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27310)]
     private bool AdvanceYangFuObserver() => prompts.Current is null && YangFuObserverRoot() is not null && operations.AdvanceObserverSubtree();
 

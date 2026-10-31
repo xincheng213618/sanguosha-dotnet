@@ -7,11 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenQunBoundaryMobileRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 53600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 53600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 53600)]
-    internal bool BoundaryDingpinMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.BoundaryChenQunDingpin is { Stage: BoundaryDingpinStage.DrawChildren } r && e?.Op == SkillProgramEffectOp.ResolveBoundaryChenQunDingpin && p == f.PendingMovementContinuation && p.SubjectSeat == r.Target && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 53600)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 53600)]
     internal bool BoundaryDingpinRecovery(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.BoundaryChenQunDingpin is { Stage: BoundaryDingpinStage.DrawChildren, Draw.Replacement: not null } && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
@@ -33,10 +28,6 @@ internal sealed partial class CharacterChenQunBoundaryMobileRuntime
     }
 
     internal ProgramSkillFrame? BoundaryDingpinObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterChenQunBoundaryMobileOperations.BoundaryDingpinFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 53600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 53600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 53600)]
-    internal bool BoundaryDingpinDamageObserver(long id) => BoundaryDingpinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 53600)]
     internal bool BoundaryDingpinDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BoundaryDingpinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 53600)]

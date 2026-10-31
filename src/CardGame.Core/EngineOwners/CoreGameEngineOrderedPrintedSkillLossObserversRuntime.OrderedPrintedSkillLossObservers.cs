@@ -107,23 +107,6 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossObserversRunt
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 590)]
     internal bool IsOrderedPrintedSkillLossProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OrderedPrintedSkillLossObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1690)]
-    internal bool HasOrderedPrintedSkillLossDamageObserver(long id) => HasOrderedPrintedSkillLossObserver(id, false);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 160)]
-    internal bool HasOrderedPrintedSkillLossBeforeDamageObserver(long id) => HasOrderedPrintedSkillLossObserver(id, true);
-    internal bool HasOrderedPrintedSkillLossObserver(long id, bool before)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && (before ? f is BeforeDamageProgramWindowFrame : f is DamageTriggerWindowFrame));
-        if (index < 0 || OrderedPrintedSkillLossObserverRoot()is not { } root)
-            return false;
-        var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index > rootIndex)
-            return true; // Already proved by this exact root's suffix.
-        for (var child = index + 1; child <= rootIndex; child++)
-            if (!OrderedPrintedSkillLossStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !OrderedPrintedSkillLossSkillsChangedEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreMatchingRecastObserversOperations.MatchingRecastStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOverflowTargetCancellationObserversOperations.OverflowTargetCancellationStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]))
-                return false;
-        return index < rootIndex;
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 20)]
     internal bool TryAdvanceOrderedPrintedSkillLossSubtree()

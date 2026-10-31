@@ -8,7 +8,6 @@ internal sealed partial class CoreGameEngineSequentialDeckKindGrowthEntries
     internal bool DrainSequentialDeckKindGrowthChildren(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DrainSequentialDeckKindGrowthChildren(frame);
     internal void FinishSequentialDeckKindGrowth(global::CardGame.Core.ProgramSkillFrame frame, bool cancelled) => _resolve().FinishSequentialDeckKindGrowth(frame, cancelled);
     internal bool HasSequentialDeckKindGrowthParent(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasSequentialDeckKindGrowthParent(frame);
-    internal bool IsSequentialDeckKindGrowthMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSequentialDeckKindGrowthMovement(frame, effect, pending);
     internal bool ResumeSequentialDeckKindGrowth(long frameId) => _resolve().ResumeSequentialDeckKindGrowth(frameId);
     internal bool ReturnSequentialDeckKindGrowthMovement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnSequentialDeckKindGrowthMovement(frame);
     internal int SequentialDeckKindGrowthBonus(int owner) => _resolve().SequentialDeckKindGrowthBonus(owner);

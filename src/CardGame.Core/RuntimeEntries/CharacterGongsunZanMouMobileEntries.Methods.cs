@@ -30,16 +30,13 @@ internal sealed partial class CharacterGongsunZanMouMobileEntries
     internal bool MouGszHuHandSource(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardZoneKind> zones) => _resolve().MouGszHuHandSource(owner, card, zones);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.NativePublicPileCardSelection> MouGszHuOriginalChoices(global::CardGame.Core.NativePublicPileCardRequest request) => _resolve().MouGszHuOriginalChoices(request);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.PublicPersistentPileSource> MouGszHuPiles(int owner) => _resolve().MouGszHuPiles(owner);
-    internal bool MouGszMobileBeforeDamage(long id) => _resolve().MouGszMobileBeforeDamage(id);
     internal int MouGszMobileCharge(int owner) => _resolve().MouGszMobileCharge(owner);
     internal bool MouGszMobileChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouGszMobileChild(f, child);
     internal global::CardGame.Core.PromptChoice MouGszMobileChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string text, int amount = 0) => _resolve().MouGszMobileChoice(f, branch, text, amount);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouGszMobileChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouGszMobileChoices(f);
     internal global::CardGame.Core.DamageFrame? MouGszMobileDamage(global::CardGame.Core.ProgramSkillWindowContext c, int owner) => _resolve().MouGszMobileDamage(c, owner);
-    internal bool MouGszMobileDamageProof(long id) => _resolve().MouGszMobileDamageProof(id);
     internal bool MouGszMobileDying() => _resolve().MouGszMobileDying();
     internal bool MouGszMobileLion(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouGszMobileLion(f, child);
-    internal bool MouGszMobileMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouGszMobileMovement(f, e, p);
     internal bool MouGszMobileRecovery(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().MouGszMobileRecovery(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? MouGszMobileRoot() => _resolve().MouGszMobileRoot();
     internal bool MouGszMobileSuffix(int n) => _resolve().MouGszMobileSuffix(n);

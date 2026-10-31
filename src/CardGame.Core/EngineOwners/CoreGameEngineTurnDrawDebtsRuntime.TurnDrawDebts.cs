@@ -93,9 +93,6 @@ internal sealed partial class CoreGameEngineTurnDrawDebtsRuntime
             throw new InvalidOperationException("Debt selection lost its frozen ending amount.");
         return new(SkillProgramEffectOp.SelectOwnedCards, SkillProgramEffectTarget.Owner, receipt.RequiredPaymentCount, effect.Condition, zones: [CardZoneKind.Hand, CardZoneKind.Equipment], resultBind: effect.ResultBind);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 540)]
-    internal bool IsExtraDrawDebtMovement(ProgramSkillFrame frame, SkillProgramEffect? paid, ProgramMovementContinuation movement) => paid?.Op == SkillProgramEffectOp.DrawExtraAndArmTurnDamageUseDebt && frame.ExtraDrawReceipt is { } receipt && receipt.InstructionIndex == frame.InstructionIndex - 1 && receipt.StateId == paid.StateId && receipt.TurnOwnerSeat == frame.OwnerSeat && movement.SubjectSeat == frame.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null;
     internal void AssertTurnDrawDebtReceipts(ProgramSkillFrame frame, IReadOnlyList<SkillProgramEffect> instructions)
     {
         if (frame.ExtraDrawReceipt is { } drawn)

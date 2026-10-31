@@ -289,7 +289,6 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
     }
 
     internal SkillProgramEffect? ActualHandGainPausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 250)]
     internal bool IsActualHandGainMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ActualHandGain is { Stage: ActualHandGainProgramStage.MovementChildren, Issued: true } r && r.InstructionIndex == f.InstructionIndex && e?.Op == r.Operation && e == ActualHandGainPausedEffect(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramAiChoice(SkillProgramEffectOp.GiveSameCategoryFromDeck)]
     internal PromptChoice SelectAiActualHandGain(PendingDecision decision, ProgramSkillFrame f)

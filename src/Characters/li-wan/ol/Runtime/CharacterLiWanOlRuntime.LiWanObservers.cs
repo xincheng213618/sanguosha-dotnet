@@ -20,14 +20,6 @@ internal sealed partial class CharacterLiWanOlRuntime
         return f.InstructionIndex is 0 or 1 && f.TriggerId is { } id && f.ActivationId == id && f.WindowContext is { } context && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 0 && IsIssuedLiWanCandidate(new(f.OwnerSeat, f.SkillId, id, f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex)) && CanRunIssuedLiWanCandidate(new(f.OwnerSeat, f.SkillId, id, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 170)]
-    internal bool IsLiWanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (f.LiWan is not { Stage: LiWanStage.Children } r || effect?.Op != r.Op || pending != f.PendingMovementContinuation)
-            return false;
-        return true;
-    }
-
     internal bool LiWanFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.LiWan is not { Stage: LiWanStage.Children } r || f.PendingMovementContinuation is null)
@@ -46,11 +38,6 @@ internal sealed partial class CharacterLiWanOlRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 640)]
     internal bool IsLiWanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => false;
     internal ProgramSkillFrame? LiWanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLiWanOlOperations.LiWanFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 500)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 610)]
-    internal bool HasLiWanDamageObserver(long id) => LiWanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 640)]
-    internal bool HasLiWanBeforeDamageObserver(long id) => LiWanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26720)]
     internal bool AdvanceLiWanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiWanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

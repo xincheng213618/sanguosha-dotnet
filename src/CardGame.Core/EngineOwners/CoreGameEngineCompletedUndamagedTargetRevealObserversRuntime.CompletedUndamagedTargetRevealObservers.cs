@@ -89,8 +89,6 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealObserv
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 60)]
     internal bool IsCompletedUndamagedTargetRevealDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CompletedUndamagedTargetRevealObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1830)]
-    internal bool HasCompletedUndamagedTargetRevealDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) && CompletedUndamagedTargetRevealObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 20)]
     internal bool TryAdvanceCompletedUndamagedTargetRevealSubtree()
     {

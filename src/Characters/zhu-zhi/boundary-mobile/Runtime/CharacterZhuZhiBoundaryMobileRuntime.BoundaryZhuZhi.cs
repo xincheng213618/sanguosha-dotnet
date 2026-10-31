@@ -203,18 +203,6 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 53200)]
     internal bool ReturnBoundaryAnguoPayment(ProgramSkillFrame frame) => frame.BoundaryZhuZhi is not null && ContinueBoundaryAnguoPayment(frame.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 53200)]
-    internal bool IsBoundaryAnguoPayment(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect?.Op != SkillProgramEffectOp.PayBoundaryZhuZhiAnguo || frame.PendingMovementContinuation != pending || pending.SubjectSeat != frame.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || frame.BoundaryZhuZhi is not { Stage: BoundaryZhuZhiStage.PaymentChildren } receipt || !ValidBoundaryAnguo(frame))
-            return false;
-        var payments = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhuZhiPaymentEvent>().Where(e => e.FrameId == frame.Id && e.Owner == frame.OwnerSeat && e.Choice == receipt.Payment && e.HpBefore == receipt.HpBefore && e.MaximumBefore == receipt.MaximumBefore).ToArray();
-        if (payments is not [var payment])
-            return false;
-        if (receipt.Payment == "hp")
-            return receipt.Requested == receipt.HpBefore - 1 && payment.HpAfter == 1 && payment.MaximumAfter == receipt.MaximumBefore && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(loss => loss.FrameId == frame.Id && loss.SkillId == frame.SkillId && loss.TargetSeat == frame.OwnerSeat && loss.Amount == receipt.Requested && loss.RemainingHp == 1) == 1;
-        return receipt.Payment == "maximum" && receipt.Requested == receipt.MaximumBefore - 1 && payment.MaximumAfter == 1 && payment.HpAfter == Math.Min(1, receipt.HpBefore);
-    }
 
     internal bool ValidBoundaryAnguo(ProgramSkillFrame frame) => frame.BoundaryZhuZhi is { } receipt && frame.SkillId == BoundaryZhuZhiComposition.Skill && receipt.Source == BoundaryAnguoSource(frame) && receipt.GameplayHash == frame.GameplayHash && receipt.WindowId == frame.WindowContext?.ParentFrameId && receipt.Binding == frame.TriggerId && (receipt.Binding != "rescue-marked" || frame.SelectedTargetSeats.SequenceEqual([receipt.Victim]) && _coreDyingOwnedCardSelectionsOperations.ExactDyingOwnedCardEntry(frame, out var dying, out _) && dying.Id == receipt.DyingId && dying.VictimSeat == receipt.Victim) && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhuZhiStartedEvent>().Count(e => e.FrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.WindowId == receipt.WindowId && e.Binding == receipt.Binding && e.Victim == receipt.Victim && e.DyingId == receipt.DyingId) == 1;
     internal bool HasExactBoundaryAnguoRescueTarget(ProgramSkillFrame frame)

@@ -249,8 +249,6 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 39600)]
     internal bool ReturnAnniversaryHzMovement(ProgramSkillFrame f) => f.AnniversaryHuangZhong is not null && ResumeAnniversaryHz(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 39600)]
-    internal bool AnniversaryHzMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryHuangZhong is { Body: AnniversaryHzBody.Lifeng, Stage: AnniversaryHzStage.Children } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 39600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 39600)]
     internal bool ContinueIssuedAnniversaryHz(ProgramSkillFrame f) => f.AnniversaryHuangZhong is not null;

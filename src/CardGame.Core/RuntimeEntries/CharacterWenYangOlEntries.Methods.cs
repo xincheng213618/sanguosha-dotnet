@@ -14,8 +14,6 @@ internal sealed partial class CharacterWenYangOlEntries
     internal global::CardGame.Core.WenYangQingjiaoDebtIssuedEvent? CurrentWenYangDebt(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CurrentWenYangDebt(c, context);
     internal bool DrainWenYang(long id) => _resolve().DrainWenYang(id);
     internal void FinishWenYang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWenYang(f);
-    internal bool HasWenYangBeforeDamageObserver(long id) => _resolve().HasWenYangBeforeDamageObserver(id);
-    internal bool HasWenYangDamageObserver(long id) => _resolve().HasWenYangDamageObserver(id);
     internal bool IsIssuedWenYangQingjiaoEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWenYangQingjiaoEndingCandidate(c, context);
     internal bool IsWenYangChoujueCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsWenYangChoujueCandidate(candidate, c);
     internal bool IsWenYangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWenYangRecoveryParent(f, recovery);

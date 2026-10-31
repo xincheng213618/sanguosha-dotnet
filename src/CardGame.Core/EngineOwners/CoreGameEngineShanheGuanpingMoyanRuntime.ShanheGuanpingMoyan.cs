@@ -35,10 +35,6 @@ internal sealed partial class CoreGameEngineShanheGuanpingMoyanRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 2005)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 105)]
-    internal bool HasGuanpingMoyanPaidLongyinDamageObserver(long window) => _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == window && frame is BeforeDamageProgramWindowFrame or DamageTriggerWindowFrame) && GuanpingMoyanPaidLongyinRoot()is { AttackAttempt: not null, AttackReturn: not null };
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 535)]
     internal bool IsGuanpingMoyanPaidLongyinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GuanpingMoyanPaidLongyinRoot()is { AttackAttempt: not null } moyan && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == moyan.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 575)]

@@ -9,9 +9,6 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileEntries
     internal void ChangeXunyiRelation(global::CardGame.Core.ProgramSkillFrame frame, bool transfer) => _resolve().ChangeXunyiRelation(frame, transfer);
     internal bool ContinueIssuedXunyi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ContinueIssuedXunyi(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteXunyi(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().ExecuteXunyi(supplied, operation);
-    internal bool HasXunyiBeforeDamageObserver(long id) => _resolve().HasXunyiBeforeDamageObserver(id);
-    internal bool HasXunyiDamageObserver(long id) => _resolve().HasXunyiDamageObserver(id);
-    internal bool IsXunyiMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation continuation) => _resolve().IsXunyiMovement(frame, effect, continuation);
     internal bool IsXunyiRecoveryParent(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().IsXunyiRecoveryParent(frame, child);
     internal void PayXunyiPoint(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.Card? card, global::CardGame.Core.CardLocation? from) => _resolve().PayXunyiPoint(frame, card, from);
     internal void ResolveXunyiDiscard(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveXunyiDiscard(choice);

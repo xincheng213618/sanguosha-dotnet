@@ -90,9 +90,6 @@ internal sealed partial class CharacterHuaManOlRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 340)]
-    internal bool IsHuaManMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.HuaMan is { Paid: true } && effect is not null && HuaManComposition.Own(effect.Op) && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && CanContinueHuaMan(f);
     internal bool HuaManFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (root.HuaMan is not { } r || !CanContinueHuaMan(root))
@@ -112,11 +109,6 @@ internal sealed partial class CharacterHuaManOlRuntime
     }
 
     internal ProgramSkillFrame? HuaManObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterHuaManOlOperations.HuaManFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d))));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 410)]
-    internal bool HasHuaManDamageObserver(long id) => HuaManObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 500)]
-    internal bool HasHuaManBeforeDamageObserver(long id) => HuaManObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 410)]
     internal bool TryAdvanceHuaManSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuaManObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     internal bool HuaManLionCost(ProgramSkillFrame f) => f.HuaMan is { Stage: HuaManStage.DiscardChildren, DiscardedId: { } id } r && _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind == CardKind.SilverLion && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == CardLocation.Equipment(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason.Value == HuaManDiscardReason) == 1;

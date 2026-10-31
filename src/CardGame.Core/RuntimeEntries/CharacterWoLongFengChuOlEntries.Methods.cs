@@ -10,13 +10,11 @@ internal sealed partial class CharacterWoLongFengChuOlEntries
     internal bool EquipmentSlotNamedNameUsed(int seat, global::CardGame.Core.CardKind kind) => _resolve().EquipmentSlotNamedNameUsed(seat, kind);
     internal bool EquipmentSlotNamedPlayStillLegal(global::CardGame.Core.CharacterState actor, global::CardGame.Core.EquipmentSlotNamedUseDraft draft) => _resolve().EquipmentSlotNamedPlayStillLegal(actor, draft);
     internal bool EquipmentSlotNamedYin(int seat, string skill, string instance) => _resolve().EquipmentSlotNamedYin(seat, skill, instance);
-    internal bool HasWoLongFengChuDamageObserver(long id) => _resolve().HasWoLongFengChuDamageObserver(id);
     internal bool HideInternalEquipmentSlotPayment(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramActivation activation) => _resolve().HideInternalEquipmentSlotPayment(owner, activation);
     internal void InitializeEquipmentSlotNamedNativeTier() => _resolve().InitializeEquipmentSlotNamedNativeTier();
     internal bool IsEquipmentSlotNamedActionPayable(global::CardGame.Core.CharacterState actor, global::CardGame.Core.LegalAction action) => _resolve().IsEquipmentSlotNamedActionPayable(actor, action);
     internal bool IsEquipmentSlotNamedForcedSlashPayable(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardConversionSource source, global::CardGame.Core.CardKind kind, global::CardGame.Core.CharacterState target, bool qinglong) => _resolve().IsEquipmentSlotNamedForcedSlashPayable(actor, source, kind, target, qinglong);
     internal bool IsEquipmentSlotNamedSkill(string skill) => _resolve().IsEquipmentSlotNamedSkill(skill);
-    internal bool IsEquipmentSlotNamedUseMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsEquipmentSlotNamedUseMovement(frame, effect, pending);
     internal bool IsLuanfengRecoveryParent(global::CardGame.Core.ProgramSkillFrame producer, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLuanfengRecoveryParent(producer, recovery);
     internal void ObserveEquipmentSlotNamedNativeIssue(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveEquipmentSlotNamedNativeIssue(payload);
     internal global::System.Collections.Generic.IEnumerable<(global::CardGame.Core.CardConversionSource Source, global::CardGame.Core.SkillProgramViewAs Rule, string Hash)> PaidEquipmentSlotNamedZeroRules(global::CardGame.Core.CharacterState owner, global::CardGame.Core.CardKind? output, bool responseUse, bool dyingUse) => _resolve().PaidEquipmentSlotNamedZeroRules(owner, output, responseUse, dyingUse);

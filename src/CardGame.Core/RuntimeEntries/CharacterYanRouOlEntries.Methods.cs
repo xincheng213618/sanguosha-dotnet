@@ -11,8 +11,6 @@ internal sealed partial class CharacterYanRouOlEntries
     internal void ContinueYanRou(long id) => _resolve().ContinueYanRou(id);
     internal bool DrainYanRou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainYanRou(f);
     internal void FinishYanRou(global::CardGame.Core.ProgramSkillFrame f, bool applied) => _resolve().FinishYanRou(f, applied);
-    internal bool HasYanRouDamageObserver(long id) => _resolve().HasYanRouDamageObserver(id);
-    internal bool IsYanRouAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsYanRouAwaitedMovement(f, e, p);
     internal bool IsYanRouIssuedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsYanRouIssuedMovement(f, m);
     internal bool IsYanRouRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsYanRouRecoveryParent(f, recovery);
     internal void PublishYanRou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishYanRou(f);

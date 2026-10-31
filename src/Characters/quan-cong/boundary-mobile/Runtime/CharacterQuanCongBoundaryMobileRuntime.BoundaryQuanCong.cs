@@ -181,23 +181,6 @@ internal sealed partial class CharacterQuanCongBoundaryMobileRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 51200)]
     internal bool ReturnBoundaryYaomingMovement(ProgramSkillFrame frame) => frame.BoundaryQuanCongYaoming is not null && ContinueBoundaryYaoming(frame.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 51200)]
-    internal bool IsBoundaryYaomingPaidMovement(ProgramSkillFrame frame, SkillProgramEffect? paidEffect, ProgramMovementContinuation pending)
-    {
-        if (paidEffect?.Op != SkillProgramEffectOp.ResolveBoundaryQuanCongYaoming || frame.PendingMovementContinuation != pending || pending.SubjectSeat != frame.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || frame.BoundaryQuanCongYaoming is not { Stage: BoundaryQuanCongYaomingStage.Children } receipt || !ValidBoundaryYaoming(frame) || receipt.Before > receipt.After || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryQuanCongYaomingSelectedEvent>().Count(e => e.FrameId == frame.Id && e.Option == receipt.Option && e.TargetSeat == receipt.TargetSeat) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryQuanCongYaomingStateEvent>().Count(e => e.FrameId == frame.Id && e.OwnerSeat == frame.OwnerSeat && e.SkillInstanceId == frame.SkillInstanceId && e.Cause == "use") != 1)
-            return false;
-        if (receipt.Option == "discard" && receipt.DiscardedCardId is { } cardId)
-        {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryQuanCongYaomingDiscardedEvent>().Count(e => e.FrameId == frame.Id && e.TargetSeat == receipt.TargetSeat && e.CardId == cardId && e.Before == receipt.Before && e.After == receipt.After) != 1)
-                return false;
-            var invoice = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == frame.Id && e.Reason.Value == BoundaryYaomingDiscardReason && e.InitiatorSeat == frame.OwnerSeat && e.ExecutorSeat == frame.OwnerSeat && e.SubjectSeat == receipt.TargetSeat && e.ActualCount == 1 && e.SequenceBefore == receipt.Before && e.SequenceAfter == receipt.After);
-            return invoice is not null && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Any(material => material.InvocationId == invoice.InvocationId && material.CardId == cardId && material.From.OwnerSeat == receipt.TargetSeat && material.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == material.CompletionSequence && move.CardId == cardId && move.Sequence > receipt.Before && move.Sequence <= receipt.After && move.From == material.From && move.To == material.To && move.Reason.Value == BoundaryYaomingDiscardReason));
-        }
-
-        if (receipt.Option != "draw" || receipt.DiscardedCardId is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryQuanCongYaomingDrawReturnedEvent>().Count(e => e.FrameId == frame.Id && e.RecipientSeat == receipt.TargetSeat && e.AttemptId == receipt.DrawAttemptId) != 1)
-            return false;
-        return receipt.DrawAttemptId is not { } attempt || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptStartedEvent>().Count(e => e.Context.AttemptFrameId == attempt && e.Context.ParentFrameId == frame.Id && e.Context.RecipientSeat == receipt.TargetSeat && e.Context.RequestedCount == 1 && e.Return.Kind == NativeDrawAttemptReturnKind.ProgramOperation && e.Return.InstructionIndex == frame.InstructionIndex) == 1;
-    }
 
     internal void CompleteBoundaryYaoming(ProgramSkillFrame frame)
     {

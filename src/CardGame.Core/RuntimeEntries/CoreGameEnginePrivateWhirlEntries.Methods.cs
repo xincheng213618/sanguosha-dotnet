@@ -10,7 +10,6 @@ internal sealed partial class CoreGameEnginePrivateWhirlEntries
     internal bool DrainWhirl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainWhirl(f);
     internal void DrawWhirlSegment(global::CardGame.Core.ProgramSkillFrame f, int amount, global::CardGame.Core.PrivateWhirlStage stage) => _resolve().DrawWhirlSegment(f, amount, stage);
     internal void FinishWhirl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWhirl(f);
-    internal bool IsPrivateWhirlMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsPrivateWhirlMovement(f, effect, pending);
     internal void IssueWhirlSegment(global::CardGame.Core.ProgramSkillFrame f, int count) => _resolve().IssueWhirlSegment(f, count);
     internal global::CardGame.Core.PrivateWhirlDeposit[] LiveWhirl(int owner, string? skill = default, string? instance = default) => _resolve().LiveWhirl(owner, skill, instance);
     internal void PayWhirlRemoval(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PrivateWhirlDeposit> deposits, string reason) => _resolve().PayWhirlRemoval(f, deposits, reason);

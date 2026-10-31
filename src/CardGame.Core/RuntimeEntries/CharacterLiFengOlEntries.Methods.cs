@@ -17,14 +17,11 @@ internal sealed partial class CharacterLiFengOlEntries
     internal void FinishLiFeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLiFeng(f);
     internal bool HasJiyunCardMark(int ownerSeat, int cardId) => _resolve().HasJiyunCardMark(ownerSeat, cardId);
     internal bool HasJiyunResponseCompletion(global::CardGame.Core.CardActionContext action, global::CardGame.Core.ProgramCardContinuation continuation) => _resolve().HasJiyunResponseCompletion(action, continuation);
-    internal bool HasLiFengBeforeDamageObserver(long id) => _resolve().HasLiFengBeforeDamageObserver(id);
-    internal bool HasLiFengDamageObserver(long id) => _resolve().HasLiFengDamageObserver(id);
     internal bool HasLiveJiyunHandLease(global::CardGame.Core.JiyunLeaseIssuedEvent l) => _resolve().HasLiveJiyunHandLease(l);
     internal bool IsIssuedJiyunCompletedUseCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedJiyunCompletedUseCandidate(candidate, context);
     internal bool IsIssuedJiyunRetainedEntity(global::CardGame.Core.PublicPersistentPileSource pile, int cardId) => _resolve().IsIssuedJiyunRetainedEntity(pile, cardId);
     internal bool IsJiyunPile(global::CardGame.Core.PublicPersistentPileSource p) => _resolve().IsJiyunPile(p);
     internal bool IsLiFengCollectedEquipment(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardKind kind) => _resolve().IsLiFengCollectedEquipment(f, kind);
-    internal bool IsLiFengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLiFengMovement(f, effect, p);
     internal bool IsLiFengPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsLiFengPaidMovement(f, m);
     internal bool IsLiFengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiFengRecoveryParent(f, recovery);
     internal bool IsLiveJiyunPile(global::CardGame.Core.PublicPersistentPileSource p) => _resolve().IsLiveJiyunPile(p);

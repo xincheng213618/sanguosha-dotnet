@@ -3,8 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSourceBeigongChildrenEntries
 {
     internal bool AdvanceSourceBeigongChildren() => _resolve().AdvanceSourceBeigongChildren();
-    internal bool SourceBeigongBeforeDamage(long id) => _resolve().SourceBeigongBeforeDamage(id);
-    internal bool SourceBeigongDamageWindow(long id) => _resolve().SourceBeigongDamageWindow(id);
     internal bool SourceBeigongDying() => _resolve().SourceBeigongDying();
     internal bool SourceBeigongEdge(int i) => _resolve().SourceBeigongEdge(i);
     internal bool SourceBeigongFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().SourceBeigongFirstChild(f, child);

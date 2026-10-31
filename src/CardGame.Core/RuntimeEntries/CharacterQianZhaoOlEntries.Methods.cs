@@ -23,11 +23,8 @@ internal sealed partial class CharacterQianZhaoOlEntries
     internal void FreezeWeifuActorChange(global::CardGame.Core.IGameEvent fact) => _resolve().FreezeWeifuActorChange(fact);
     internal void FreezeWeifuJudgmentResult(global::CardGame.Core.IGameEvent payload) => _resolve().FreezeWeifuJudgmentResult(payload);
     internal bool HasIssuedWeifuCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedWeifuCandidate(c, context);
-    internal bool HasQianZhaoBeforeDamageObserver(long id) => _resolve().HasQianZhaoBeforeDamageObserver(id);
-    internal bool HasQianZhaoDamageObserver(long id) => _resolve().HasQianZhaoDamageObserver(id);
     internal bool HasWeifuTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasWeifuTargetTail(use);
     internal bool HasWeifuUseDistance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, long? cardUseFrameId) => _resolve().HasWeifuUseDistance(actor, kind, cardUseFrameId);
-    internal bool IsQianZhaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsQianZhaoMovement(f, e, p);
     internal bool IsQianZhaoRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsQianZhaoRecoveryParent(f, recovery);
     internal bool IsWeifuJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsWeifuJudgment(j, f);
     internal void IssueWeifuUse(long id, global::CardGame.Core.CardActionContext action) => _resolve().IssueWeifuUse(id, action);

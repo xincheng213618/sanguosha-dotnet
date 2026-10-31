@@ -55,11 +55,6 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
 
         return f.PendingMovementContinuation is null;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 48800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 48800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 48800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 48800)]
     internal bool MaMiaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryMaMiao is { Stage: "adjust-children" or "gain-children" } && e?.Op is SkillProgramEffectOp.ResolveAnniversaryMaMiaoZhangguan or SkillProgramEffectOp.ResolveAnniversaryMaMiaoCongfeng && p == f.PendingMovementContinuation && ValidMaMiao(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 48800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 48800)]
@@ -81,11 +76,6 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
 
     internal bool MaMiaoObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MaMiaoFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal ProgramSkillFrame? MaMiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterMaMiaoAnniversaryOperations.MaMiaoFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterMaMiaoAnniversaryOperations.MaMiaoObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 48800)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 48800)]
-    internal bool MaMiaoDamageObserver(long id) => MaMiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 48800)]
-    internal bool MaMiaoBeforeDamageObserver(long id) => MaMiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 48800)]
     internal bool MaMiaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MaMiaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 48800)]

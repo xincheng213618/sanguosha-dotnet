@@ -11,7 +11,6 @@ internal sealed partial class CharacterHuoJunOlEntries
     internal void ContinueHuoJunFenrui(long id) => _resolve().ContinueHuoJunFenrui(id);
     internal bool DrainHuoJunFenruiChildren(long id) => _resolve().DrainHuoJunFenruiChildren(id);
     internal void FinishHuoJunFenrui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuoJunFenrui(f);
-    internal bool HasHuoJunFenruiDamageObserver(long id) => _resolve().HasHuoJunFenruiDamageObserver(id);
     internal bool HuoJunDamageUsed(int owner, string skill) => _resolve().HuoJunDamageUsed(owner, skill);
     internal bool HuoJunDiscardable(int seat, global::CardGame.Core.CardZoneKind zone, global::CardGame.Core.Card c) => _resolve().HuoJunDiscardable(seat, zone, c);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HuoJunFenruiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuoJunFenruiChoices(f);

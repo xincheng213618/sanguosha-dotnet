@@ -135,25 +135,6 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
         return obtained.Length == chosen.Length && obtained.Select(e => e.CardId).Distinct().Count() == chosen.Length && chosen.All(e => obtained.Count(o => o.CardId == e.CardId && o.Suit == e.Suit) == 1) && obtained.All(e => e.BatchId == r.ObtainBatchId && e.MovementSequence > r.SequenceBefore && e.MovementSequence <= r.SequenceAfter && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == BeifenObtainReason) == 1);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 620)]
-    internal bool IsBeifenMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect is not { Op: SkillProgramEffectOp.ResolveBeifenLostMarkedSuitGains, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always } || f.Beifen is not { Stage: BeifenStage.ObtainChildren, ObtainBatchId: > 0 } r || f.WindowContext is not { } context || !ValidBeifenReceipt(f) || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != r.LossBatchId || !BeifenMotherMatches(candidate, context))
-            return false;
-        var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<BeifenObtainedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.MovementSequence).ToArray();
-        if (paid.Length == 0 || paid[0].MovementSequence != r.SequenceBefore + 1 || paid[^1].MovementSequence != r.SequenceAfter || paid.Where((e, i) => e.MovementSequence != r.SequenceBefore + i + 1).Any())
-            return false;
-        bool ExactBatch(CardMovementBatchContext batch) => batch.Id == r.ObtainBatchId && batch.ParentFrameId == f.Id && batch.AwaitingProgramFrameId == f.Id && batch.OriginOwnerSeat == f.OwnerSeat && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.Movements.Count == paid.Length && batch.Movements.Zip(paid).All(pair => pair.First.Sequence == pair.Second.MovementSequence && pair.First.CardId == pair.Second.CardId && pair.First.CardKind == pair.Second.PrintedKind && pair.First.From == CardLocation.DrawPile && pair.First.To == CardLocation.Hand(f.OwnerSeat) && pair.First.Reason.Value == BeifenObtainReason);
-        // While the exact child is pending or live, verify its actual producer
-        // batch as well. After that child returns, the same scalar payment
-        // invoice remains sufficient while later native children drain.
-        return _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Where(b => b.Id == r.ObtainBatchId).All(ExactBatch) && _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Where(w => w.Id == r.ObtainBatchId).All(w => ExactBatch(w.Batch) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, w));
-    }
-
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 1800)]
     internal void CollectWindow_CollectBeifenLossCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => result.AddRange(CollectBeifenLossCandidates(batch));
     [ProgramPipelineHook(ProgramPipelinePhase.ExcludeOrdinaryMovementCandidate, 1500)]

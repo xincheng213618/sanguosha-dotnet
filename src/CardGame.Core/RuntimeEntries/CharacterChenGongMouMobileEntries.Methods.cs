@@ -23,8 +23,6 @@ internal sealed partial class CharacterChenGongMouMobileEntries
     internal bool ExactMouChenGongBeforeFrame(global::CardGame.Core.ProgramSkillFrame f, bool allowPrevented) => _resolve().ExactMouChenGongBeforeFrame(f, allowPrevented);
     internal void FinishMouChenGongGift(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouChenGongGift(f);
     internal bool GateMouChenGongZhichi(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().GateMouChenGongZhichi(gate);
-    internal bool HasMouChenGongBeforeDamageObserver(long id) => _resolve().HasMouChenGongBeforeDamageObserver(id);
-    internal bool HasMouChenGongDamageObserver(long id) => _resolve().HasMouChenGongDamageObserver(id);
     internal bool IsIssuedMouChenGongZhichiCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedMouChenGongZhichiCandidate(candidate, context);
     internal bool IsMouChenGongDying() => _resolve().IsMouChenGongDying();
     internal bool IsMouChenGongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouChenGongMovement(f, e, p);

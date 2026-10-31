@@ -17,9 +17,6 @@ internal sealed partial class CharacterHanFuOlEntries
     internal bool HanFuLionProof(global::CardGame.Core.ProgramSkillFrame f, int seat, global::CardGame.Core.CardMoveReason? reason) => _resolve().HanFuLionProof(f, seat, reason);
     internal global::CardGame.Core.HanFuMaterial HanFuMaterialFor(int id) => _resolve().HanFuMaterialFor(id);
     internal global::CardGame.Core.ProgramSkillFrame? HanFuObserverRoot() => _resolve().HanFuObserverRoot();
-    internal bool HasHanFuBeforeDamageObserver(long id) => _resolve().HasHanFuBeforeDamageObserver(id);
-    internal bool HasHanFuDamageObserver(long id) => _resolve().HasHanFuDamageObserver(id);
-    internal bool IsHanFuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsHanFuMovement(f, e, p);
     internal bool IsHanFuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsHanFuRecoveryParent(f, recovery);
     internal int[] KuangshouDamagedSeats(int cutoff) => _resolve().KuangshouDamagedSeats(cutoff);
     internal void PayHanFuCards(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.HanFuMaterial> cards, global::CardGame.Core.CardLocation destination, string reason, global::CardGame.Core.HanFuStage stage) => _resolve().PayHanFuCards(f, cards, destination, reason, stage);

@@ -37,7 +37,6 @@ internal sealed partial class CharacterZhangFenAnniversaryEntries
     internal global::CardGame.Core.PromptChoice ZhangFenChoice(global::CardGame.Core.ProgramSkillFrame f, string option, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default, global::System.Collections.Generic.IReadOnlyDictionary<string, string>? extra = default) => _resolve().ZhangFenChoice(f, option, label, cards, targets, extra);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ZhangFenChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangFenChoices(f);
     internal int ZhangFenDestroyedCount(int owner, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().ZhangFenDestroyedCount(owner, w);
-    internal bool ZhangFenMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ZhangFenMovementProof(f, effect, p);
     internal bool ZhangFenSlashDamage(int owner, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().ZhangFenSlashDamage(owner, w);
     internal bool HasDagongCheCapability { get => _resolve().HasDagongCheCapability; }
 }

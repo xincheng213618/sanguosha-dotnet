@@ -42,15 +42,8 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 24405)]
     internal bool ReturnZhangQiYingMovement(ProgramSkillFrame f) => CanContinueZhangQiYing(f) && ResumeZhangQiYing(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 260)]
-    internal bool IsZhangQiYingMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.GainThreeDeckCategoriesAfterElementalDamage && CanContinueZhangQiYing(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool ZhangQiYingFirstChild(ProgramSkillFrame f, ResolutionFrame child) => f.ZhangQiYing is { Stage: "gain-children" } r && CanContinueZhangQiYing(f) && child is CardsMovedTriggerWindowFrame moved && moved.Batch.ParentFrameId == f.Id && moved.Batch.AwaitingProgramFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && r.Cards.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == ZhenyiGainReason);
     internal ProgramSkillFrame? ZhangQiYingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterZhangQiYingOlOperations.ZhangQiYingFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 220)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 330)]
-    internal bool HasZhangQiYingDamageObserver(long id) => ZhangQiYingObserverRoot()is not null && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 420)]
-    internal bool HasZhangQiYingBeforeDamageObserver(long id) => ZhangQiYingObserverRoot()is not null && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 330)]
     internal bool TryAdvanceZhangQiYingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangQiYingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

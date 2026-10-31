@@ -3,9 +3,7 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiuYongAnniversaryEntries
 {
     internal bool AdvanceAnniversaryLiuYongChildren() => _resolve().AdvanceAnniversaryLiuYongChildren();
-    internal bool AnniversaryLiuYongBeforeDamageObserver(long id) => _resolve().AnniversaryLiuYongBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> AnniversaryLiuYongChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AnniversaryLiuYongChoices(f);
-    internal bool AnniversaryLiuYongDamageObserver(long id) => _resolve().AnniversaryLiuYongDamageObserver(id);
     internal bool AnniversaryLiuYongDyingObserver() => _resolve().AnniversaryLiuYongDyingObserver();
     internal bool AnniversaryLiuYongFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().AnniversaryLiuYongFirstChild(f, child);
     internal int? AnniversaryLiuYongLeader(int owner, global::CardGame.Core.CardMovementBatchContext? beforeBatch = default) => _resolve().AnniversaryLiuYongLeader(owner, beforeBatch);

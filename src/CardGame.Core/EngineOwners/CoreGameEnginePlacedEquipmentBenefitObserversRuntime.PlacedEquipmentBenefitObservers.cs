@@ -141,12 +141,6 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitObserversRunti
 
         return null;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 20)]
-    internal bool IsPlacedEquipmentBenefitMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.PlaceOwnedEquipmentThenResolveSlotBenefit && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && f.PlacedEquipmentBenefit is { Stage: PlacedEquipmentBenefitStage.PlacementChildren or PlacedEquipmentBenefitStage.DrawChildren or PlacedEquipmentBenefitStage.DiscardChildren } && ValidPlacedEquipmentBenefit(f);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 310)]
     internal bool IsPlacedEquipmentBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PlacedEquipmentObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1850)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 120)]
-    internal bool HasPlacedEquipmentBenefitDamageObserver(long damageWindowId) => PlacedEquipmentObserverRoot(damageWindowId)is not null;
 }

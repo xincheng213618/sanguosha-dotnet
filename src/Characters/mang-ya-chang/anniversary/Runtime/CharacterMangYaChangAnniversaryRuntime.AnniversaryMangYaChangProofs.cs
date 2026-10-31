@@ -57,6 +57,4 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 44400)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 44400)]
     internal bool ContinueIssuedAnniversaryJiedao(ProgramSkillFrame f) => f.AnniversaryJiedao is not null && ValidJiedaoFrame(f) || f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && AdmitAnniversaryJiedaoCost(JiedaoCandidate(f), w);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 44400)]
-    internal bool JiedaoDiscardMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.PayAnniversaryMangYaChangJiedao && f.AnniversaryJiedao is { Stage: AnniversaryJiedaoStage.DiscardChildren } && ValidJiedaoFrame(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
 }

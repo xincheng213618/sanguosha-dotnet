@@ -17,9 +17,7 @@ internal sealed partial class CharacterJiangWeiMobileGodEntries
     internal bool IsMobileJwXinghunSlashSource(long? parentId, int actor, int target, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind, int physicalOwner, global::CardGame.Core.CardLocation from, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card>? materials, bool countsTowardLimit) => _resolve().IsMobileJwXinghunSlashSource(parentId, actor, target, card, kind, physicalOwner, from, materials, countsTowardLimit);
     internal bool IsOriginalDyingSuspendedByMobileJwShenpei(global::CardGame.Core.DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByMobileJwShenpei(dying);
     internal bool KeepPaidMobileJw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidMobileJw(f);
-    internal bool MobileJwBeforeDamageObserver(long id) => _resolve().MobileJwBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileJwChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileJwChoices(f);
-    internal bool MobileJwDamageObserver(long id) => _resolve().MobileJwDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> MobileJwDiscardable(global::CardGame.Core.ProgramSkillFrame f, int seat, global::CardGame.Core.CardZoneKind zone) => _resolve().MobileJwDiscardable(f, seat, zone);
     internal bool MobileJwDyingProof() => _resolve().MobileJwDyingProof();
     internal bool MobileJwFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MobileJwFirstChild(f, child);

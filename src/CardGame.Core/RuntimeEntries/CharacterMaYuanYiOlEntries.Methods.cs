@@ -13,13 +13,10 @@ internal sealed partial class CharacterMaYuanYiOlEntries
     internal bool DrainMaYuanYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMaYuanYi(f);
     internal void FinishMaYuanYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMaYuanYi(f);
     internal void FinishMaYuanYiMovement(long id, long before, int count) => _resolve().FinishMaYuanYiMovement(id, before, count);
-    internal bool HasMaYuanYiBeforeDamageObserver(long id) => _resolve().HasMaYuanYiBeforeDamageObserver(id);
-    internal bool HasMaYuanYiDamageObserver(long id) => _resolve().HasMaYuanYiDamageObserver(id);
     internal bool HasPaidMoucuanSourceLoss(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPaidMoucuanSourceLoss(f);
     internal bool IsBinghuoCleanupMovement(global::CardGame.Core.MaYuanYiReceipt r, global::CardGame.Core.CardMovementRecord m) => _resolve().IsBinghuoCleanupMovement(r, m);
     internal bool IsBinghuoHandoffMovement(global::CardGame.Core.MaYuanYiReceipt r, global::CardGame.Core.CardMovementRecord m) => _resolve().IsBinghuoHandoffMovement(r, m);
     internal bool IsBinghuoJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsBinghuoJudgment(j, f);
-    internal bool IsMaYuanYiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMaYuanYiMovement(f, e, p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> JibingPileCards(global::CardGame.Core.CharacterState owner) => _resolve().JibingPileCards(owner);
     internal bool MaYuanYiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MaYuanYiFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? MaYuanYiObserverRoot() => _resolve().MaYuanYiObserverRoot();

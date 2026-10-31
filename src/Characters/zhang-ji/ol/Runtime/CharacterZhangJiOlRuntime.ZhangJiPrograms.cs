@@ -116,8 +116,6 @@ internal sealed partial class CharacterZhangJiOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangJiNativeUseReturnedEvent(o, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 210)]
     internal bool IsZhangJiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e is not null && IsZhangJiOp(e.Op) && f.ZhangJi is { Stage: "movement" } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Movement, 23800)]
     internal bool ReturnZhangJiMovement(ProgramSkillFrame f)

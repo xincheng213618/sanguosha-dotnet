@@ -11,10 +11,7 @@ internal sealed partial class CharacterZhouYuMouMobileEntries
     internal void DisableMouZyMobile(global::CardGame.Core.ProgramSkillFrame f, string reason) => _resolve().DisableMouZyMobile(f, reason);
     internal bool DrainMouZyMobile(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouZyMobile(f);
     internal void FinishMouZyMobile(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouZyMobile(f);
-    internal bool HasMouZyMobileBeforeDamageObserver(long id) => _resolve().HasMouZyMobileBeforeDamageObserver(id);
-    internal bool HasMouZyMobileDamageObserver(long id) => _resolve().HasMouZyMobileDamageObserver(id);
     internal bool IsMouZyMobileDying() => _resolve().IsMouZyMobileDying();
-    internal bool IsMouZyMobileMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouZyMobileMovement(f, e, p);
     internal bool IsMouZyMobileRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouZyMobileRecoveryParent(f, recovery);
     internal bool KeepMouZyMobilePaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepMouZyMobilePaid(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardSnapshot> MouZhouYuMobilePublicCards() => _resolve().MouZhouYuMobilePublicCards();

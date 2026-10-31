@@ -561,12 +561,6 @@ internal sealed class ShiZhouYuRuntime(IProgramRuntimeFrames frames, IProgramRun
     [ProgramContinuation(ProgramContinuationKind.Movement, 67800)]
     private bool ReturnShiZhouYuMovement(ProgramSkillFrame f) => f.ShiZhouYu is not null && ResumeShiZhouYu(f.Id);
 
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 67800)]
-    private bool ShiZhouYuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) =>
-        f.ShiZhouYu is { Stage: ShiZhouYuComposition.ChiyunStageGiveIssued or
-            ShiZhouYuComposition.FentaoStageDiscardIssued or ShiZhouYuComposition.YanhuiResultDiscardIssued } r &&
-        p.CoverageResultBind is null && p.BeforeCount == 0 && p.SubjectSeat == r.TargetSeat;
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 67800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 67800)]
     private bool ContinuePaidShiZhouYu(ProgramSkillFrame f) => f.ShiZhouYu is not null;

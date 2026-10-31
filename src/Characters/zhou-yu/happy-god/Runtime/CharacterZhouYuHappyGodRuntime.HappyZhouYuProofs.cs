@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouYuHappyGodRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 41440)]
     internal bool HappyZyMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
     {
         if (f.HappyZhouYu is not { Stage: HappyZyStage.Children, Mode: "draw", Draw: not null } || e?.Op != SkillProgramEffectOp.ResolveHappyZhouYuQinyin || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null)
@@ -36,11 +34,6 @@ internal sealed partial class CharacterZhouYuHappyGodRuntime
     }
 
     internal ProgramSkillFrame? HappyZyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhouYuHappyGodOperations.HappyZyFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 41440)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 41440)]
-    internal bool HappyZyDamageObserver(long id) => HappyZyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 41440)]
-    internal bool HappyZyBeforeDamageObserver(long id) => HappyZyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 41440)]
     internal bool HappyZyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HappyZyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 41440)]

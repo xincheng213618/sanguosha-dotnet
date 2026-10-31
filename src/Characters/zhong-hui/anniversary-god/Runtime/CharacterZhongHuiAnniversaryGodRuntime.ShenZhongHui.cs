@@ -315,43 +315,6 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveLinjieRound, SkillProgramEffectOp.ChooseLishiPunishments, SkillProgramEffectOp.ResolveLishiPhase)]
     internal PromptChoice ChooseShenZhAi(PendingDecision prompt, ProgramSkillFrame f) => f.ShenZhongHui?.Stage == ShenZhongHuiStage.LishiChoice ? prompt.Choices.OrderByDescending(c => System.Numerics.BitOperations.PopCount((uint)int.Parse(c.Parameters["value"], CultureInfo.InvariantCulture))).First() : prompt.Choices.FirstOrDefault(c => c.Targets.Count == 1 && c.Targets[0] != f.OwnerSeat) ?? prompt.Choices[0];
-    internal bool ShenZhWindowMatches(ProgramSkillFrame f)
-    {
-        if (f.WindowContext is not { } w)
-            return false;
-        bool Matches(ProgramTriggerCandidate c) => c.OwnerSeat == f.OwnerSeat && c.SkillId == f.SkillId && c.BindingId == f.TriggerId && c.SkillInstanceId == f.SkillInstanceId && c.GameplayHash == f.GameplayHash;
-        return _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId) switch
-        {
-            ProgramLifecycleTriggerWindowFrame l => l.Window == w.Window && l.CandidateIndex >= 0 && l.CandidateIndex < l.Candidates.Count && Matches(l.Candidates[l.CandidateIndex]),
-            TurnEndingBoundaryFrame e => w.Window == SkillProgramTriggerWindow.TurnEnding && e.OwnerSeat == f.OwnerSeat && e.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && w.OwnerSeat == f.OwnerSeat && w.SourceSeat == e.OwnerSeat && w.TargetSeat == e.OwnerSeat && e.ItemIndex >= 0 && e.ItemIndex < e.Items.Count && e.Items[e.ItemIndex] is { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } endingCandidate } item && Matches(endingCandidate) && w.OccurrenceIndex == endingCandidate.OccurrenceIndex && w.Facts == (item.Facts ?? e.Facts),
-            DamageTriggerWindowFrame d => d.TriggerWindow == w.Window && d.TargetSeat == w.TargetSeat && d.CandidateIndex >= 0 && d.CandidateIndex < d.Candidates.Count && Matches(d.Candidates[d.CandidateIndex].ToProgramCandidate()),
-            ProgramCardTriggerWindowFrame c => c.CandidateIndex >= 0 && c.CandidateIndex < c.Candidates.Count && c.Candidates[c.CandidateIndex] is { } b && b.OwnerSeat == f.OwnerSeat && b.SkillId == f.SkillId && b.TriggerId == f.TriggerId && b.SkillInstanceId == f.SkillInstanceId && b.GameplayHash == f.GameplayHash && w.CardUse?.CardActionId == c.Action.ActionId,
-            _ => false
-        };
-    }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 39300)]
-    internal bool ShenZhMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
-    {
-        if (f.ShenZhongHui is not { } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != r.TargetSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null || r.After <= r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !ShenZhWindowMatches(f))
-            return false;
-        var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray();
-        if (r.Operation == SkillProgramEffectOp.ResolveLinjieDamage && r.Stage == ShenZhongHuiStage.DamageChildren)
-        {
-            var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<LinjieRandomDiscardedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-            return paid is [var e] && e.TargetSeat == r.TargetSeat && e.Before == r.Before && e.After == r.After && e.LastHand == r.LastHandDiscarded && moves.Count(m => m.CardId == e.CardId && m.From == CardLocation.Hand(r.TargetSeat) && m.Reason.Value == $"skill-program.{(ShenZhongHuiComposition.SameEdition(f.SkillId, ShenZhongHuiComposition.Linjie))}.random-discard" && (m.To == CardLocation.DiscardPile || IsLishiPaidDiscardMovement(m, CardLocation.Hand(r.TargetSeat), m.Reason))) == 1;
-        }
-
-        if (r.Operation != SkillProgramEffectOp.ResolveLishiPhase || r.Phase is not { } phase || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase))
-            return false;
-        if (r.Stage == ShenZhongHuiStage.PhaseCleanup && r.ResultId is { } id)
-            return _coreProgramEventHistoryOperations.ProgramEventHistory<LishiJudgmentReturnedEvent>().Count(e => e.FrameId == f.Id && e.JudgmentId == r.JudgmentId && e.Index == r.JudgmentIndex && e.CardId == id) == 1 && moves.Count(m => m.CardId == id && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason.Value == "skill-program.anniversary:lishi.judgment-finish") == 1;
-        if (r.Stage != ShenZhongHuiStage.Complete)
-            return false;
-        var settled = _coreProgramEventHistoryOperations.ProgramEventHistory<LishiDrawPhaseSettledEvent>().Where(e => e.FrameId == f.Id && e.Phase == phase).ToArray();
-        var cards = _coreProgramEventHistoryOperations.ProgramEventHistory<LishiDrawDiscardedEvent>().Where(e => e.FrameId == f.Id && e.Phase == phase).ToArray();
-        return settled is [{ DiscardedCount: > 0 } receipt] && cards.Length == receipt.DiscardedCount && cards.Select(e => e.CardId).Distinct().Count() == cards.Length && cards.All(e => moves.Count(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.From == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "skill-program.anniversary:lishi.draw-discard" && (m.To == CardLocation.DiscardPile || IsLishiPaidDiscardMovement(m, CardLocation.Hand(f.OwnerSeat), m.Reason))) == 1);
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 39300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 39300)]

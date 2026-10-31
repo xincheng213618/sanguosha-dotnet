@@ -49,11 +49,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     }
 
     internal ProgramSkillFrame? BeiMiHuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterBeiMiHuOlOperations.BeiMiHuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 130)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 240)]
-    internal bool HasBeiMiHuDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && BeiMiHuObserverRoot()is not null;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 330)]
-    internal bool HasBeiMiHuBeforeDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && BeiMiHuObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 230)]
     internal bool TryAdvanceBeiMiHuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BeiMiHuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

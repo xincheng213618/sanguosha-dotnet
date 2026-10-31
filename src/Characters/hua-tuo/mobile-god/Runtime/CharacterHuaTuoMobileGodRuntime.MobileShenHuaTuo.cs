@@ -308,8 +308,6 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 39100)]
     internal bool ReturnMobileHtMovement(ProgramSkillFrame f) => f.MobileHuaTuo is not null && ResumeMobileHt(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 39100)]
-    internal bool MobileHtMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.MobileHuaTuo is { Stage: MobileHuaTuoStage.Children } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 39100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 39100)]
     internal bool ContinueIssuedMobileHt(ProgramSkillFrame f) => f.MobileHuaTuo is not null;

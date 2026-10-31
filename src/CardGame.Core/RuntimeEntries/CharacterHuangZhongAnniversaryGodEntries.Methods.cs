@@ -12,7 +12,6 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodEntries
     internal int AnniversaryHzDijiDamage(global::CardGame.Core.GameEngine.IDamageAttempt a) => _resolve().AnniversaryHzDijiDamage(a);
     internal bool AnniversaryHzHeartForbidden(int actor, global::System.Collections.Generic.IEnumerable<int> ids) => _resolve().AnniversaryHzHeartForbidden(actor, ids);
     internal bool AnniversaryHzMaterialBan(global::CardGame.Core.ProgramCardMaterialQuery q) => _resolve().AnniversaryHzMaterialBan(q);
-    internal bool AnniversaryHzMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().AnniversaryHzMovementProof(f, e, p);
     internal bool AnniversaryHzProjectedBan(global::CardGame.Core.ProgramLegalActionQuery q) => _resolve().AnniversaryHzProjectedBan(q);
     internal global::CardGame.Core.AnniversaryHzZhanjueSpentEvent? AnniversaryHzRecoveryReservation(int actor, long? damageId) => _resolve().AnniversaryHzRecoveryReservation(actor, damageId);
     internal bool AnniversaryHzResponseBan(global::CardGame.Core.ProgramNativeResponseQuery q) => _resolve().AnniversaryHzResponseBan(q);
@@ -34,7 +33,6 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodEntries
     internal bool DrainAnniversaryHz(long id) => _resolve().DrainAnniversaryHz(id);
     internal bool HasAnniversaryHzIneffectiveResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, global::CardGame.Core.CardActionContext action, global::CardGame.Core.ProgramCardContinuation continuation) => _resolve().HasAnniversaryHzIneffectiveResponse(attack, action, continuation);
     internal bool HasAnniversaryHzPendingInvalidation(int actor) => _resolve().HasAnniversaryHzPendingInvalidation(actor);
-    internal bool HasAnniversaryHzTianchongDamageObserver(long windowId) => _resolve().HasAnniversaryHzTianchongDamageObserver(windowId);
     internal bool IsAnniversaryHzTianchongDying() => _resolve().IsAnniversaryHzTianchongDying();
     internal bool IsAnniversaryHzUseIneffective(global::CardGame.Core.CardUseFrame use) => _resolve().IsAnniversaryHzUseIneffective(use);
     internal void IssueAnniversaryHzActualUse(global::CardGame.Core.CardActionContext a, long parent) => _resolve().IssueAnniversaryHzActualUse(a, parent);

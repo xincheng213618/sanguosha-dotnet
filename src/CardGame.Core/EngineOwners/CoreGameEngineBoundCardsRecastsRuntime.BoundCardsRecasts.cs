@@ -132,9 +132,6 @@ internal sealed partial class CoreGameEngineBoundCardsRecastsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 62020)]
-    internal bool IsBoundCardsRecastMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.RecastBoundCards && frame.BoundCardsRecast is { Stage: ProgramBoundCardsRecastStage.CostChildren or ProgramBoundCardsRecastStage.DrawChildren } && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidBoundCardsRecast(frame);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 62020)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 62020)]
     internal bool CanKeepPaidBoundCardsRecast(ProgramSkillFrame frame) => frame.BoundCardsRecast is not null && ValidBoundCardsRecast(frame);

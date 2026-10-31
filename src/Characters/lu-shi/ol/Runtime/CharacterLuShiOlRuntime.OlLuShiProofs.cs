@@ -8,9 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuShiOlRuntime
 {
     internal bool HasOlLuShiJudgmentProof(ProgramSkillFrame f) => f.OlLuShi is { Operation: SkillProgramEffectOp.ResolveOlLuShiLeijie, Item: "slashes" } r && f.JudgmentOutcomeBindings is [var outcome] && outcome is { Name: "leijie-result", Suit: Suit.Spade, Rank: >= 2 and <= 9 } && outcome.TargetSeat == r.TargetSeat && _coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(f, outcome);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 42700)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 42700)]
     internal bool OlLuShiMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (f.OlLuShi is not { Stage: OlLuShiStage.Children } r || effect?.Op != r.Operation || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
@@ -45,11 +42,6 @@ internal sealed partial class CharacterLuShiOlRuntime
     }
 
     internal ProgramSkillFrame? OlLuShiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLuShiOlOperations.OlLuShiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 42700)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 42700)]
-    internal bool OlLuShiDamageObserver(long id) => OlLuShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 42700)]
-    internal bool OlLuShiBeforeDamage(long id) => OlLuShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 42700)]
     internal bool OlLuShiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OlLuShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 42700)]

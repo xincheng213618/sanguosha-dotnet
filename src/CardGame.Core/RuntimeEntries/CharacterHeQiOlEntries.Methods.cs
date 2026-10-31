@@ -10,8 +10,6 @@ internal sealed partial class CharacterHeQiOlEntries
     internal int EquipmentSuitCount(global::CardGame.Core.CharacterState owner) => _resolve().EquipmentSuitCount(owner);
     internal bool EquipmentSuitSourceQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant source) => _resolve().EquipmentSuitSourceQualified(owner, source);
     internal void FinishHeQi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHeQi(f);
-    internal bool HasHeQiBeforeDamageObserver(long id) => _resolve().HasHeQiBeforeDamageObserver(id);
-    internal bool HasHeQiDamageObserver(long id) => _resolve().HasHeQiDamageObserver(id);
     internal bool HeQiActivationAllowed(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillProgramActivation a) => _resolve().HeQiActivationAllowed(owner, a);
     internal bool HeQiActivationTargetAllowed(global::CardGame.Core.CharacterState owner, global::CardGame.Core.CharacterState target, global::CardGame.Core.SkillProgramActivation a) => _resolve().HeQiActivationTargetAllowed(owner, target, a);
     internal global::CardGame.Core.PromptChoice HeQiAiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HeQiAiChoice(f);
@@ -23,7 +21,6 @@ internal sealed partial class CharacterHeQiOlEntries
     internal bool HeQiTargetAllowed(int owner, int target) => _resolve().HeQiTargetAllowed(owner, target);
     internal bool IsEquipmentSuitGrantQualified(global::CardGame.Core.CharacterState owner, global::CardGame.Core.SkillGrant grant) => _resolve().IsEquipmentSuitGrantQualified(owner, grant);
     internal bool IsHeQiActivation(global::CardGame.Core.SkillProgramActivation a) => _resolve().IsHeQiActivation(a);
-    internal bool IsHeQiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsHeQiMovement(f, e, p);
     internal void IssueHeQiSegment(long id, global::CardGame.Core.HeQiReceipt r) => _resolve().IssueHeQiSegment(id, r);
     internal void PublishHeQiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishHeQiChoice(f);
     internal void RequireHeQi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireHeQi(f);

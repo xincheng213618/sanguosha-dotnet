@@ -7,7 +7,6 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileEntries
     internal global::CardGame.Core.PromptChoice BoundaryZhangZhaoPhaseAi(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryZhangZhaoPhaseAi(p, f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryZhangZhaoPhaseChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryZhangZhaoPhaseChoices(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.DiscardRecoveryEntity> BoundaryZhangZhaoPhaseEntities(global::CardGame.Core.ActualDiscardRecoveryPhaseKey phase) => _resolve().BoundaryZhangZhaoPhaseEntities(phase);
-    internal bool BoundaryZhangZhaoPhaseMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? op, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().BoundaryZhangZhaoPhaseMovement(f, op, p);
     internal bool BoundaryZhangZhaoPlacementPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryZhangZhaoPlacementPaid(f);
     internal bool KeepBoundaryZhangZhaoPaidReturn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepBoundaryZhangZhaoPaidReturn(f);
     internal bool KeepBoundaryZhangZhaoPlacement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepBoundaryZhangZhaoPlacement(f);

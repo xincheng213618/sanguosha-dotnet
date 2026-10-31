@@ -17,11 +17,8 @@ internal sealed partial class CharacterXieLingYuOlEntries
     internal global::CardGame.Core.YuandiOpportunityEvent? CurrentYuandiOpportunity(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CurrentYuandiOpportunity(c, context);
     internal bool ExcludeOrdinaryMovement_ResolveYuandiDiscardNames(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_ResolveYuandiDiscardNames(candidate, trigger);
     internal void FinishXieLingYu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishXieLingYu(f);
-    internal bool HasXieLingYuBeforeDamageObserver(long id) => _resolve().HasXieLingYuBeforeDamageObserver(id);
-    internal bool HasXieLingYuDamageObserver(long id) => _resolve().HasXieLingYuDamageObserver(id);
     internal bool HasXinyouCardMark(int ownerSeat, int cardId) => _resolve().HasXinyouCardMark(ownerSeat, cardId);
     internal bool IsIssuedYuandiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedYuandiCandidate(c, context);
-    internal bool IsXieLingYuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXieLingYuMovement(f, e, p);
     internal bool IsXieLingYuPaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsXieLingYuPaidMovement(f, m);
     internal bool IsXieLingYuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsXieLingYuRecoveryParent(f, recovery);
     internal bool IsXinyouHandLimitExempt(int ownerSeat, int cardId) => _resolve().IsXinyouHandLimitExempt(ownerSeat, cardId);

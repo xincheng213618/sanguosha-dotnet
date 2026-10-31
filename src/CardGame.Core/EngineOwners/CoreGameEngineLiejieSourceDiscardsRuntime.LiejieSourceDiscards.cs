@@ -236,9 +236,6 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
         if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !LiejieSourceDiscardFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))
             throw new InvalidOperationException("Paid Liejie continuation lost its exact native first child.");
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BeforePrivatePayments, 10)]
-    internal bool IsLiejieAwaitedMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.LiejieSourceDiscard && frame.LiejieDiscardPending is { Paid: true } draft && draft.InstructionIndex == frame.InstructionIndex && pending.SubjectSeat == draft.SourceSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool LiejieSourceDiscardFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (LiejieInitialClauseFirstChild(frame, child))
@@ -284,7 +281,5 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
     internal ProgramSkillFrame? LiejieSourceDiscardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreLiejieSourceDiscardsOperations.LiejieSourceDiscardFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 290)]
     internal bool IsLiejieSourceDiscardProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LiejieSourceDiscardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1960)]
-    internal bool HasLiejieSourceDiscardDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && LiejieSourceDiscardObserverRoot()is not null;
     internal PromptChoice SelectAiLiejieDiscardChoice(PendingDecision decision) => decision.Choices.OrderBy(c => c.Parameters.GetValueOrDefault("program-action") == "liejie-pick" ? 0 : 1).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

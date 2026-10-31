@@ -15,7 +15,6 @@ internal sealed partial class CharacterHeJinOlEntries
     internal bool DrainHeJinChildren(long id) => _resolve().DrainHeJinChildren(id);
     internal bool ExactHeJinDeathEntry(global::CardGame.Core.ProgramSkillFrame f, scoped out global::CardGame.Core.DeathFrame death, scoped out global::CardGame.Core.ProgramDeathTriggerWindowFrame window) => _resolve().ExactHeJinDeathEntry(f, out death, out window);
     internal void FinishHeJinMouzhu(global::CardGame.Core.ProgramSkillFrame f, bool issued) => _resolve().FinishHeJinMouzhu(f, issued);
-    internal bool HasHeJinDamageObserver(long id) => _resolve().HasHeJinDamageObserver(id);
     internal int HeJinDeathOwnedCardCount(global::CardGame.Core.DeathFrame death) => _resolve().HeJinDeathOwnedCardCount(death);
     internal bool HeJinFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HeJinFirstChild(f, child);
     internal int[] HeJinHandAt(long sequence, int seat) => _resolve().HeJinHandAt(sequence, seat);

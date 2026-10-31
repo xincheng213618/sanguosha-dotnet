@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 60)]
     internal bool IsRecipientContestMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && (f.UniqueHpPeer is { Stage: UniqueHpPeerStage.CostChildren or UniqueHpPeerStage.DrawChildren } peer && effect?.Op == SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer && pending.SubjectSeat == peer.ChooserSeat && _coreRecipientContestReceiptsOperations.ValidUniqueHpPeer(f) || f.RecipientContest is { Stage: RecipientContestStage.GiftChildren } && effect?.Op == SkillProgramEffectOp.GiveAllHandAndStartRecipientPindian && pending.SubjectSeat == f.OwnerSeat && _coreRecipientContestReceiptsOperations.ValidRecipientContest(f));
     [ProgramContinuation(ProgramContinuationKind.Movement, 400)]
     internal bool ReturnRecipientContestMovement(ProgramSkillFrame f)
@@ -92,12 +91,4 @@ internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 370)]
     internal bool IsRecipientContestProgramDying() => _coreRecipientConsequencesObserversOperations.IsRecipientConsequencesProgramDying() || _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RecipientContestPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1860)]
-    internal bool HasRecipientContestDamageObserver(long windowId)
-    {
-        if (_coreRecipientConsequencesObserversOperations.HasRecipientConsequencesDamageObserver(windowId))
-            return true;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == windowId && f is DamageTriggerWindowFrame);
-        return index >= 2 && _resolutionStackOperations._resolutionStack[index] is DamageTriggerWindowFrame window && _resolutionStackOperations._resolutionStack[index - 1] is DamageFrame damage && window.ParentFrameId == damage.Id && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == damage.ParentFrameId)is { AttackAttempt: not null, AttackReturn: not null } attack && _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId == attack.Id && RecipientContestPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id) < _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == attack.Id);
-    }
 }

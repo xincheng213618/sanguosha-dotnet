@@ -18,8 +18,6 @@ internal sealed partial class CharacterGuYongOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27598)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27598)]
     internal bool PermitPaidOrdinaryBingyi(ProgramSkillFrame f) => CanContinueIssuedOrdinaryGuYong(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 150)]
-    internal bool IsOrdinaryGuYongMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.OrdinaryBingyi is { Paid: true, Stage: OrdinaryBingyiStage.DrawChildren, DrawOutcome: { } o } && effect?.Op == SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi && p == f.PendingMovementContinuation && p.SubjectSeat == o.RecipientSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool IsOrdinaryBingyiDrawMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         if (f.OrdinaryBingyi is not { Paid: true, Stage: OrdinaryBingyiStage.DrawChildren, DrawOutcome: { } o } || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.Sequence <= o.SequenceBefore || m.Sequence > o.SequenceAfter)
@@ -42,11 +40,6 @@ internal sealed partial class CharacterGuYongOlRuntime
 
     internal bool OrdinaryBingyiObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? OrdinaryBingyiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterGuYongOlOperations.OrdinaryBingyiFirstChild(f, child), (i) => _characterGuYongOlOperations.OrdinaryBingyiObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1080)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1190)]
-    internal bool HasOrdinaryGuYongDamageObserver(long id) => OrdinaryBingyiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1220)]
-    internal bool HasOrdinaryGuYongBeforeDamageObserver(long id) => OrdinaryBingyiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 310)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 300)]
     internal bool IsOrdinaryGuYongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

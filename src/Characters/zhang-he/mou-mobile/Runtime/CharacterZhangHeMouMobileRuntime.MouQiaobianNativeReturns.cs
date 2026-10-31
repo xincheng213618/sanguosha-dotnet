@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangHeMouMobileRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 34200)]
-    internal bool MouQiaobianMovementReturn(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => effect?.Op is SkillProgramEffectOp.PrepareMouZhangHeQiaobian or SkillProgramEffectOp.ResolveMouZhangHeSkippedPhase && MouQiaobian.Valid(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouQiaobianFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!MouQiaobian.Valid(f) || f.MouZhangHe is not { } r)
@@ -26,11 +24,6 @@ internal sealed partial class CharacterZhangHeMouMobileRuntime
     internal bool MouQiaobianNativeEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MouQiaobianFirstNativeChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool MouQiaobianNativeSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterZhangHeMouMobileOperations.MouQiaobianNativeEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouQiaobianNativeRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangHeMouMobileOperations.MouQiaobianFirstNativeChild(f, c), (n) => _characterZhangHeMouMobileOperations.MouQiaobianNativeSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 34200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 34200)]
-    internal bool MouQiaobianDamage(long id) => MouQiaobianNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 34200)]
-    internal bool MouQiaobianBeforeDamage(long id) => MouQiaobianNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 34200)]
     internal bool MouQiaobianDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouQiaobianNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 34200)]

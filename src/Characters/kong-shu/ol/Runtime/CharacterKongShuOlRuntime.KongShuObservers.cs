@@ -7,10 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKongShuOlRuntime
 {
-    internal static bool KongShuMoving(KongShuStage stage) => global::CardGame.Core.RuntimeSkills.RuntimeRules_kong_shu_ol_KongShuObservers.KongShuMoving(stage);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 480)]
-    internal bool IsKongShuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.KongShu is { Paid: true } r && e?.Op == r.Op && KongShuMoving(r.Stage) && p == f.PendingMovementContinuation && p.SubjectSeat == r.Payer && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool IsKongShuPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.KongShu!;
@@ -43,11 +39,6 @@ internal sealed partial class CharacterKongShuOlRuntime
     }
 
     internal ProgramSkillFrame? KongShuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterKongShuOlOperations.KongShuFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1000)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1110)]
-    internal bool HasKongShuDamageObserver(long id) => KongShuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1140)]
-    internal bool HasKongShuBeforeDamageObserver(long id) => KongShuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27550)]
     internal bool AdvanceKongShuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && KongShuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -145,9 +145,6 @@ internal sealed partial class CoreGameEngineEquipmentDonationObserversRuntime
 
         return root;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1730)]
-    internal bool MatchEquipmentDonationDamageObserver(long damageWindowId) => HasEquipmentDonationDamageObserver(damageWindowId);
     internal bool HasEquipmentDonationDamageObserver(long? damageWindowId = null)
     {
         foreach (var root in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(IsEquipmentDonationAttack))
@@ -176,6 +173,4 @@ internal sealed partial class CoreGameEngineEquipmentDonationObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 520)]
     internal bool IsEquipmentDonationProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && (HasEquipmentDonationDamageObserver() || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => (f.EquipmentDonation is not null || f.ActualEndedEquipment is not null) && f.AttackAttempt is null && EquipmentDonationObserverRoot(f.Id)is not null));
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 130)]
-    internal bool IsEquipmentDonationMovement(ProgramSkillFrame f, SkillProgramEffect? paid, ProgramMovementContinuation pending) => pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (paid?.Op is (SkillProgramEffectOp.DonateAllEquipmentAndOfferRecipientBenefits or SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou) && f.EquipmentDonation is { Stage: EquipmentDonationStage.PaidMovement } && IsValidAllEquipmentDonation(f) || paid?.Op == SkillProgramEffectOp.ChooseEquipmentOrDrawAfterOtherActualTurn && f.ActualEndedEquipment is { Stage: ActualEndedTurnEquipmentStage.Moving } && IsValidActualEndedEquipment(f));
 }

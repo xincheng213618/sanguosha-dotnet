@@ -25,8 +25,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         };
         return candidate is not null && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 40600)]
     internal bool MobileJwMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
     {
         if (f.MobileJiangWei is not { } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null || r.Stage is not (MobileJiangWeiStage.ExchangeChildren or MobileJiangWeiStage.ReserveChildren or MobileJiangWeiStage.ReturnChildren or MobileJiangWeiStage.DiscardChildren or MobileJiangWeiStage.RecoveryChildren or MobileJiangWeiStage.GrantChildren) || !r.Paid.SequenceEqual(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After)) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiangWeiPaidEvent>().Count(e => e == new MobileJiangWeiPaidEvent(f.Id, r.PaymentIndex, r.Before, r.After, r.Paid.Count)) != 1)
@@ -84,11 +82,6 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     }
 
     internal ProgramSkillFrame? MobileJwObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterJiangWeiMobileGodOperations.MobileJwFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 40600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 40600)]
-    internal bool MobileJwDamageObserver(long id) => MobileJwObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 40600)]
-    internal bool MobileJwBeforeDamageObserver(long id) => MobileJwObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40600)]
     internal bool MobileJwDyingProof()
     {

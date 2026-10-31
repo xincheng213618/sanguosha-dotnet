@@ -51,7 +51,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodEntries
     internal bool ShenDaHasMaterialDomain(int actor, global::System.Collections.Generic.IReadOnlyList<int>? ids, global::CardGame.Core.ShenDengAiDomain domain) => _resolve().ShenDaHasMaterialDomain(actor, ids, domain);
     internal bool ShenDaIssuedQuota(long id, int actor) => _resolve().ShenDaIssuedQuota(id, actor);
     internal bool ShenDaMaterialPrivilege(global::CardGame.Core.ProgramNativeUseMaterialQuery q) => _resolve().ShenDaMaterialPrivilege(q);
-    internal bool ShenDaMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShenDaMovementProof(f, effect, p);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.GameEngine.ShenDaRepeatPlan> ShenDaRepeatPlans(int owner, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int> originalTargets) => _resolve().ShenDaRepeatPlans(owner, kind, originalTargets);
     internal bool ShenDaSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().ShenDaSlashDistance(q);
     internal bool ShenDaSlashQuota(global::CardGame.Core.ProgramSlashQuotaQuery q) => _resolve().ShenDaSlashQuota(q);

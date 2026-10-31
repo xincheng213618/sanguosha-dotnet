@@ -18,11 +18,8 @@ internal sealed partial class CharacterZhouQunOlEntries
     internal void ExpireTianhouWeather(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExpireTianhouWeather(f);
     internal void FinishZhouQun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhouQun(f);
     internal void GrantTianhouWeather(global::CardGame.Core.ProgramSkillFrame f, int recipient) => _resolve().GrantTianhouWeather(f, recipient);
-    internal bool HasZhouQunBeforeDamageObserver(long id) => _resolve().HasZhouQunBeforeDamageObserver(id);
-    internal bool HasZhouQunDamageObserver(long id) => _resolve().HasZhouQunDamageObserver(id);
     internal bool IsNingwuJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsNingwuJudgment(j, f);
     internal bool IsNingwuUseIneffective(global::CardGame.Core.CardUseFrame use) => _resolve().IsNingwuUseIneffective(use);
-    internal bool IsZhouQunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhouQunMovement(f, effect, p);
     internal bool IsZhouQunRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZhouQunRecoveryParent(f, recovery);
     internal global::CardGame.Core.CardUseFrame? NingwuEligibleUse(int holder, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().NingwuEligibleUse(holder, context);
     internal void PayTianhouExchange(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayTianhouExchange(f);

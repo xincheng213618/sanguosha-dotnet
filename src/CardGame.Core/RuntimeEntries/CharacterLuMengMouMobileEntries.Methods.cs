@@ -13,8 +13,6 @@ internal sealed partial class CharacterLuMengMouMobileEntries
     internal void ContinueMouDuojing(long id) => _resolve().ContinueMouDuojing(id);
     internal bool DrainMouDuojing(long id) => _resolve().DrainMouDuojing(id);
     internal void FinishMouDuojingTake(global::CardGame.Core.ProgramSkillFrame f, int? card, int? sequence) => _resolve().FinishMouDuojingTake(f, card, sequence);
-    internal bool HasMouLuMengBeforeDamageObserver(long id) => _resolve().HasMouLuMengBeforeDamageObserver(id);
-    internal bool HasMouLuMengDamageObserver(long id) => _resolve().HasMouLuMengDamageObserver(id);
     internal bool IsMouLuMengDying() => _resolve().IsMouLuMengDying();
     internal bool IsMouLuMengPeachForbidden(int actor, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardActionType type) => _resolve().IsMouLuMengPeachForbidden(actor, kind, type);
     internal bool IsMouLuMengPeachRescueAllowed(int actor) => _resolve().IsMouLuMengPeachRescueAllowed(actor);

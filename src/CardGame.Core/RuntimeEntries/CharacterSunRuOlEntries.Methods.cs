@@ -18,7 +18,6 @@ internal sealed partial class CharacterSunRuOlEntries
     internal global::CardGame.Core.ProgramSkillWindowContext CreateSunRuOlChishiContext(global::CardGame.Core.CardsMovedTriggerWindowFrame frame, global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().CreateSunRuOlChishiContext(frame, c);
     internal bool DrainSunRuOlChildren(long id) => _resolve().DrainSunRuOlChildren(id);
     internal bool ExcludeOrdinaryMovement_IsSunRuOlChishiTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsSunRuOlChishiTrigger(candidate, trigger);
-    internal bool HasSunRuOlDamageObserver(long id) => _resolve().HasSunRuOlDamageObserver(id);
     internal bool IsSunRuOlRecoveryParent(global::CardGame.Core.ProgramSkillFrame producer, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunRuOlRecoveryParent(producer, recovery);
     internal void IssueSunRuOlRefreshDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueSunRuOlRefreshDraw(f);
     internal bool? ProveSunRuMovement(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ProveSunRuMovement(trigger, candidate, context);

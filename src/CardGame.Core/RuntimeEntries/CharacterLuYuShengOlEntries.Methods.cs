@@ -13,8 +13,6 @@ internal sealed partial class CharacterLuYuShengOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardSnapshot> CurrentLuYuShengRevealedCards() => _resolve().CurrentLuYuShengRevealedCards();
     internal bool DrainLuYuSheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainLuYuSheng(f);
     internal void FinishLuYuSheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLuYuSheng(f);
-    internal bool HasLuYuShengDamageObserver(long id) => _resolve().HasLuYuShengDamageObserver(id);
-    internal bool IsLuYuShengAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLuYuShengAwaitedMovement(f, e, p);
     internal bool IsLuYuShengIssuedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsLuYuShengIssuedMovement(f, m);
     internal bool IsLuYuShengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLuYuShengRecoveryParent(f, recovery);
     internal void IssueLuYuShengDraw(global::CardGame.Core.ProgramSkillFrame f, int count) => _resolve().IssueLuYuShengDraw(f, count);

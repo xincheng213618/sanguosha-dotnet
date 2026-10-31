@@ -96,8 +96,5 @@ internal sealed partial class CoreGameEngineShanheSourceYanyuRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 62046)]
-    internal bool IsShanheSourceYanyuMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveShanheSourceYanyu && frame.ShanheSourceYanyu is { Stage: ShanheSourceYanyuStage.Movement } receipt && IsShanheSourceYanyuPreparation(frame) && receipt.InstructionIndex == frame.InstructionIndex && receipt.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && receipt.TargetSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && receipt.PreparationFrameId == frame.WindowContext!.ParentFrameId && effect.SourceBind == receipt.CardBind && effect.OutcomeBind == receipt.Outcome.Name && _coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(frame, receipt.Outcome) && receipt.Outcome.TargetSeat == receipt.TargetSeat && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-
     SkillProgramStepOutcome global::CardGame.Core.IShanheSourceYanyuHost.ResolveSourceYanyu(ProgramSkillFrame frame, SkillProgramEffect effect) => ResolveShanheSourceYanyu(frame, effect);
 }

@@ -31,9 +31,6 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
 
         return false;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46400)]
-    internal bool CheZhouMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryCheZhou is { Stage: AnniversaryCheZhouStage.MovementChildren } && e?.Op == SkillProgramEffectOp.ResolveAnniversaryCheZhouPigua && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidCheZhou(f);
     internal bool CheZhouFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.AnniversaryCheZhou is not { Stage: AnniversaryCheZhouStage.MovementChildren } r || !ValidCheZhou(f))
@@ -44,11 +41,6 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? CheZhouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCheZhouAnniversaryOperations.CheZhouFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46400)]
-    internal bool CheZhouDamageObserver(long id) => CheZhouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46400)]
-    internal bool CheZhouBeforeDamageObserver(long id) => CheZhouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46400)]
     internal bool AdvanceCheZhouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CheZhouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -393,9 +393,6 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         ContinueLeCaoZhiWenlan(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 310)]
-    internal bool IsWenlanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.LeCaoZhiWenlan is { Stage: WenlanStage.ObtainChildren } && effect?.Op == SkillProgramEffectOp.ResolveLeCaoZhiWenlan && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29081)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29081)]
     internal bool PermitPaidLeCaoZhiWenlan(ProgramSkillFrame f)
@@ -433,11 +430,6 @@ internal sealed partial class CharacterCaoZhiLeRuntime
 
     internal bool WenlanObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && (_characterCaoZhiLeOperations.WenlanFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || f.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(f, _resolutionStackOperations2._resolutionStack()[child])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? WenlanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterCaoZhiLeOperations.WenlanFirstChild(f, child), (index) => _characterCaoZhiLeOperations.WenlanObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1260)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1370)]
-    internal bool HasWenlanDamageObserver(long id) => WenlanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1400)]
-    internal bool HasWenlanBeforeDamageObserver(long id) => WenlanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 790)]
     internal bool IsWenlanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WenlanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 560)]

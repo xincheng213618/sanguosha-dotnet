@@ -24,11 +24,6 @@ internal sealed partial class CharacterKanZeOlRuntime
     }
 
     internal ProgramSkillFrame? KanZeObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterKanZeOlOperations.KanZeFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 290)]
-    internal bool HasKanZeBeforeDamageObserver(long id) => KanZeObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 80)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 190)]
-    internal bool HasKanZeDamageObserver(long id) => KanZeObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 160)]
     internal bool TryAdvanceKanZeSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && KanZeObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

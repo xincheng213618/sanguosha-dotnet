@@ -24,15 +24,6 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
             throw new InvalidOperationException("Shepan lost its original current damage-card target, branch or adjustment.");
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 47400)]
-    internal bool IsShiKaijiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation movement)
-    {
-        if (e?.Op != SkillProgramEffectOp.SelectMobileShiKaijiTargets || f.MobileShiWangChang is not { Stage: MobileShiWangChangStage.DrawChildren, Draw: not null } || movement != f.PendingMovementContinuation || movement.SubjectSeat != f.OwnerSeat || movement.BeforeCount != 0 || movement.CoverageResultBind is not null)
-            return false;
-        RequireShiWangChang(f);
-        return true;
-    }
-
     internal bool ShiKaijiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.SkillId != ShiKaiji || f.InstructionIndex != 1 || f.MobileShiWangChang is not { } r)
@@ -52,11 +43,6 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
     }
 
     internal ProgramSkillFrame? ShiKaijiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterWangChangMobileShiOperations.ShiKaijiFirstChild(f, child), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 47400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 47400)]
-    internal bool ShiKaijiNestedDamage(long id) => ShiKaijiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 47400)]
-    internal bool ShiKaijiBeforeDamage(long id) => ShiKaijiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 47400)]
     internal bool ShiKaijiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShiKaijiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 47400)]

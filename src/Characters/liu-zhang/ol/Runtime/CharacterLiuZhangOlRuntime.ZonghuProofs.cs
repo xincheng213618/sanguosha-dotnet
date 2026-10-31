@@ -47,9 +47,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         var native = _resolutionStackOperations._resolutionStack[index - 1];
         return native is ResponseWindowFrame response ? response.ParentFrameId == r.Need.OwnerFrameId : native.Id == r.Need.OwnerFrameId && native is CardUseFrame or ProgramSkillFrame or DyingFrame;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 450)]
-    internal bool IsLiuZhangMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.Fengwei is { Stage: FengweiStage.DrawChildren } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && effect?.Op == SkillProgramEffectOp.ResolveFengweiRoundStartDraw || f.Zonghu is { Stage: ZonghuStage.CostChildren, Paid: not null } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && effect?.Op == SkillProgramEffectOp.ResolveZonghuRequiredUseRequest;
     internal bool ZonghuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.Zonghu is not { Stage: ZonghuStage.CostChildren, Paid: { } p } r)
@@ -67,11 +64,6 @@ internal sealed partial class CharacterLiuZhangOlRuntime
 
     internal bool IsZonghuGiftMovement(ProgramSkillFrame f, CardMovementRecord m) => f.Zonghu is { Stage: ZonghuStage.CostChildren, Paid: { } paid } r && m.Sequence > r.Before && m.Sequence <= r.After && (paid.Gifts.Any(g => g.Sequence == m.Sequence && g.CardId == m.CardId && g.From == m.From && m.To == CardLocation.Hand(paid.RecipientSeat) && m.Reason.Value == ZonghuGiftReason) || r.GrainIds.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard && paid.Gifts.Any(g => g.Kind == CardKind.WoodenOx && g.From == CardLocation.Equipment(f.OwnerSeat)));
     internal ProgramSkillFrame? ZonghuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLiuZhangOlOperations.ZonghuFirstChild(f, c) || _characterLiuZhangOlOperations.FengweiFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 960)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1070)]
-    internal bool HasLiuZhangDamageObserver(long id) => ZonghuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1100)]
-    internal bool HasLiuZhangBeforeDamageObserver(long id) => ZonghuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27512)]
     internal bool AdvanceZonghuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZonghuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -6,7 +6,6 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsEntries
     internal bool CanPayShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.Card[] cards) => _resolve().CanPayShanheS5Tieqi(frame, cards);
     internal void FinishShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame, bool paid) => _resolve().FinishShanheS5Tieqi(frame, paid);
     internal bool IsShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsShanheS5Tieqi(frame);
-    internal bool IsShanheS5TieqiMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsShanheS5TieqiMovement(frame, effect, pending);
     internal void PublishShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishShanheS5Tieqi(frame);
     internal void ResolveShanheS5TieqiChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveShanheS5TieqiChoice(choice);
     internal bool ResumeShanheS5Tieqi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ResumeShanheS5Tieqi(frame);

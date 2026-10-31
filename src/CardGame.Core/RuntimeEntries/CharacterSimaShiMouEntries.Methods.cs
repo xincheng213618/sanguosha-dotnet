@@ -9,9 +9,7 @@ internal sealed partial class CharacterSimaShiMouEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> IncludeMouSimaShiDeathCandidates(global::CardGame.Core.CharacterState owner, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramTriggerCandidate> existing) => _resolve().IncludeMouSimaShiDeathCandidates(owner, existing);
     internal bool IsIssuedMouSimaShiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedMouSimaShiCandidate(c, w);
     internal bool MouSimaShiAdvanceChildren() => _resolve().MouSimaShiAdvanceChildren();
-    internal bool MouSimaShiBeforeDamage(long id) => _resolve().MouSimaShiBeforeDamage(id);
     internal string? MouSimaShiCardLabel(int cardId) => _resolve().MouSimaShiCardLabel(cardId);
-    internal bool MouSimaShiDamageWindow(long id) => _resolve().MouSimaShiDamageWindow(id);
     internal global::CardGame.Core.MouSimaShiClaimIssuedEvent? MouSimaShiDue(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().MouSimaShiDue(c, w);
     internal bool MouSimaShiDying() => _resolve().MouSimaShiDying();
     internal bool MouSimaShiEdge(int i) => _resolve().MouSimaShiEdge(i);

@@ -128,15 +128,6 @@ internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 5740)]
-    internal bool IsShanheS5QiaomengMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.DiscardAttackRangeCardsFromSlashTarget && f.ShanheS5Qiaomeng is { Paid: true } d && pending.SubjectSeat == d.TargetSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidShanheS5QiaomengPayment(f);
-    internal bool ValidShanheS5QiaomengPayment(ProgramSkillFrame f)
-    {
-        if (f.ShanheS5Qiaomeng is not { Paid: true } d || d.SelectedIds.Count != d.RequiredCount || d.BatchId is null || d.After <= d.Before || d.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            return false;
-        return d.SelectedIds.Select((id, index) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > d.Before && m.Sequence <= d.After && m.From == d.OriginalLocations[index] && m.Reason.Value == ShanheS5QiaomengReason && (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) == d.OriginalLocations[index] || m.From.Zone == CardZoneKind.Equipment && m.To == CardLocation.OutsideGame && (_coreCardAttackStateOperations.GetAttackCard(m.CardId).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)))) == 1).All(valid => valid) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5QiaomengPaidEvent>().Count(e => e.FrameId == f.Id && e.UseFrameId == d.UseFrameId && e.TargetSeat == d.TargetSeat && e.Count == d.RequiredCount && e.Before == d.Before && e.After == d.After) == 1;
-    }
-
     [ProgramAiChoice(SkillProgramEffectOp.DiscardAttackRangeCardsFromSlashTarget)]
     internal PromptChoice SelectAiShanheS5Qiaomeng(PendingDecision decision, ProgramSkillFrame f)
     {

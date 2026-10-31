@@ -22,10 +22,6 @@ internal sealed partial class CharacterFeiYiOlRuntime
     }
 
     internal ProgramSkillFrame? FeiYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterFeiYiOlOperations.FeiYiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 470)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 580)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 610)]
-    internal bool HasFeiYiDamageObserver(long id) => FeiYiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26600)]
     internal bool AdvanceFeiYiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FeiYiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

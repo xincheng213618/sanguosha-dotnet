@@ -80,9 +80,6 @@ internal sealed partial class CoreGameEngineShanheGuideSkillsRuntime
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 5409)]
-    internal bool IsShanheBuwuDrawMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation movement) => effect is { Op: SkillProgramEffectOp.ResolveShanheBuwu, StateId: "after" } && frame.ShanheBuwuDrawOutcome is not null && movement.SubjectSeat == frame.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Resume, 5409)]
     internal bool ResumeShanheBuwuDraw(long frameId)
     {

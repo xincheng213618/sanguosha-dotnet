@@ -22,8 +22,6 @@ internal sealed partial class CharacterLuSuMouEntries
     internal void IssueMouLuSuUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouLuSuUse(f);
     internal bool MatchesMouLuSuPlayedDeclaration(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardDeclarationFrame d) => _resolve().MatchesMouLuSuPlayedDeclaration(f, d);
     internal bool MouLuSuAdvanceChildren() => _resolve().MouLuSuAdvanceChildren();
-    internal bool MouLuSuBeforeDamage(long id) => _resolve().MouLuSuBeforeDamage(id);
-    internal bool MouLuSuDamageWindow(long id) => _resolve().MouLuSuDamageWindow(id);
     internal bool MouLuSuDying() => _resolve().MouLuSuDying();
     internal bool MouLuSuEdge(int i) => _resolve().MouLuSuEdge(i);
     internal bool MouLuSuFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouLuSuFirstChild(f, child);

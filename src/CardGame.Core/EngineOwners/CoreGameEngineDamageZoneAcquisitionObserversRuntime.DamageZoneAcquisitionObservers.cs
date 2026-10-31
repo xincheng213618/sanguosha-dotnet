@@ -28,8 +28,6 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionObserversRuntim
     internal ProgramSkillFrame? DamageAcquisitionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreDamageZoneAcquisitionObserversOperations.DamageAcquisitionFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 480)]
     internal bool TryAdvanceDamageAcquisitionSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DamageAcquisitionObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1580)]
-    internal bool HasDamageAcquisitionDamageObserver(long id) => DamageAcquisitionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 10)]
     internal bool IsDamageAcquisitionDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DamageAcquisitionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

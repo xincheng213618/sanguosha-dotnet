@@ -64,11 +64,6 @@ internal sealed partial class CharacterCaoTengOlRuntime
     }
 
     internal ProgramSkillFrame? CaoTengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterCaoTengOlOperations.CaoTengFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 760)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 870)]
-    internal bool HasCaoTengDamageObserver(long id) => CaoTengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 900)]
-    internal bool HasCaoTengBeforeDamageObserver(long id) => HasCaoTengDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27300)]
     internal bool AdvanceCaoTengChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoTengObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -227,9 +227,6 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 670)]
-    internal bool IsDrawAdviceAwaitedMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.DrawTwoThenDiscardTwoIfOverMaxHp && frame.PendingMovementContinuation == pending && frame.DrawAdviceReceipt is not null && ValidDrawAdviceReceipt(frame);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 760)]
     internal bool CanContinueIssuedDrawAdvice(ProgramSkillFrame frame) => frame.DrawAdviceReceipt is not null && ValidDrawAdviceReceipt(frame);
     internal bool DrawAdviceFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
@@ -257,7 +254,5 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
     internal ProgramSkillFrame? DrawAdviceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreDrawAdviceProgramsOperations.DrawAdviceFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 280)]
     internal bool IsDrawAdviceProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DrawAdviceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1950)]
-    internal bool HasDrawAdviceDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && DrawAdviceObserverRoot()is not null;
     SkillProgramStepOutcome global::CardGame.Core.IDrawAdviceProgramHost.BeginDrawAdvice(ProgramSkillFrame frame, int recipientSeat) => BeginDrawAdvice(frame, recipientSeat);
 }

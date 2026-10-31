@@ -17,14 +17,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 250)]
-    internal bool IsNiuFuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
-    {
-        if (f.NiuFu is not { Steps.Count: > 0 } r || e?.Op != r.Op || p != f.PendingMovementContinuation)
-            return false;
-        return true;
-    }
-
     internal bool NiuFuLionProof(ProgramSkillFrame f, int seat, CardMoveReason? reason)
     {
         var step = f.NiuFu!.Steps[^1];
@@ -65,11 +57,6 @@ internal sealed partial class CharacterNiuFuOlRuntime
     }
 
     internal ProgramSkillFrame? NiuFuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterNiuFuOlOperations.NiuFuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 610)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 720)]
-    internal bool HasNiuFuDamageObserver(long id) => NiuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 750)]
-    internal bool HasNiuFuBeforeDamageObserver(long id) => NiuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27050)]
     internal bool AdvanceNiuFuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && NiuFuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

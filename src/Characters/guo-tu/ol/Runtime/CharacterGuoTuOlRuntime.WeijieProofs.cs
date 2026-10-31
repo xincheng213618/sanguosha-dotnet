@@ -30,9 +30,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
         var native = _resolutionStackOperations._resolutionStack[index - 1];
         return native is ResponseWindowFrame response ? response.ParentFrameId == r.Need.OwnerFrameId : native.Id == r.Need.OwnerFrameId && native is CardUseFrame or ProgramSkillFrame or DyingFrame;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 400)]
-    internal bool IsWeijieMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.Weijie is { Stage: WeijieStage.CostChildren, Paid: not null } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && effect?.Op == SkillProgramEffectOp.ResolveWeijieRequiredBasicRequest;
     internal bool WeijieFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.Weijie is not { Stage: WeijieStage.CostChildren, Paid: { } p } r)
@@ -47,11 +44,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
     }
 
     internal ProgramSkillFrame? WeijieObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterGuoTuOlOperations.WeijieFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 910)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1020)]
-    internal bool HasWeijieDamageObserver(long id) => WeijieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1050)]
-    internal bool HasWeijieBeforeDamageObserver(long id) => WeijieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27462)]
     internal bool AdvanceWeijieChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WeijieObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     internal ProgramSkillFrame? ActiveWeijieDraft() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.Weijie is not null);

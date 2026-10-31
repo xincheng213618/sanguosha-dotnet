@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRecipientCategoryMarkContinuationsEntries
 {
     internal bool ExactRecipientCategoryDyingCursor(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.DyingFrame dying, global::CardGame.Core.ProgramLifecycleTriggerWindowFrame entry) => _resolve().ExactRecipientCategoryDyingCursor(root, dying, entry);
-    internal bool HasRecipientCategoryMarkDamageObserver(long windowId) => _resolve().HasRecipientCategoryMarkDamageObserver(windowId);
     internal bool IsOriginalDyingSuspendedByRecipientCategoryMark(global::CardGame.Core.DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByRecipientCategoryMark(dying);
     internal bool IsRecipientCategoryMarkProgramDying() => _resolve().IsRecipientCategoryMarkProgramDying();
     internal bool IsRecipientCategoryObserverEdge(int child) => _resolve().IsRecipientCategoryObserverEdge(child);

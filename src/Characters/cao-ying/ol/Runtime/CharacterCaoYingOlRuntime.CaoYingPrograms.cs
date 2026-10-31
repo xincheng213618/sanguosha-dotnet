@@ -190,9 +190,6 @@ internal sealed partial class CharacterCaoYingOlRuntime
             FinishCaoYing(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 70)]
-    internal bool IsCaoYingMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => CanContinueCaoYing(f) && e?.Op == SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage && p.SubjectSeat == f.OwnerSeat && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 50)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 50)]
     internal bool CanContinueCaoYing(ProgramSkillFrame f) => f.CaoYing is { Stage: CaoYingStage.DrawChildren or CaoYingStage.GrantSkills, Correct: >= 0 } && ValidCaoYing(f);
@@ -227,9 +224,6 @@ internal sealed partial class CharacterCaoYingOlRuntime
     }
 
     internal ProgramSkillFrame? CaoYingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCaoYingOlOperations.CaoYingFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 30)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 140)]
-    internal bool HasCaoYingDamageObserver(long id) => CaoYingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 110)]
     internal bool TryAdvanceCaoYingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoYingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     SkillProgramStepOutcome global::CardGame.Core.ICaoYingProgramHost.BeginCaoYing(ProgramSkillFrame f, SkillProgramEffect e) => BeginCaoYing(f, e);

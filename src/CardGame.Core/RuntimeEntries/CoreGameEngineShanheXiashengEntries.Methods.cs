@@ -6,7 +6,6 @@ internal sealed partial class CoreGameEngineShanheXiashengEntries
     internal void AnswerShanheXiasheng(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerShanheXiasheng(selected);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheXiasheng(global::CardGame.Core.ProgramSkillFrame supplied, string stage) => _resolve().BeginShanheXiasheng(supplied, stage);
     internal bool CanOfferShanheXiasheng(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShanheXiasheng(candidate, trigger, context);
-    internal bool IsShanheXiashengDrawMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsShanheXiashengDrawMovement(frame, effect, movement);
     internal bool IsShanheXiashengTargetFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.DesignatedExtraTargetResolvedEvent fact, global::System.Collections.Generic.IReadOnlyList<int> originalTargets) => _resolve().IsShanheXiashengTargetFact(use, fact, originalTargets);
     internal bool ResumeShanheXiasheng(long frameId) => _resolve().ResumeShanheXiasheng(frameId);
     internal void ReturnShanheXiashengDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShanheXiashengDraw(supplied, outcome);

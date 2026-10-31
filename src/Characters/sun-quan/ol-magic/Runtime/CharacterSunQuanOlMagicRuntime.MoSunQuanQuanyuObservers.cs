@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanOlMagicRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 440)]
     internal bool IsMoQuanyuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MoQuanyu is { Stage: MoQuanyuStage.DrawChildren, DrawOutcome: not null } && effect is { Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always } && effect.Op is (SkillProgramEffectOp.ResolveMoSunQuanQuanyuRoundChoices or SkillProgramEffectOp.ResolveMoSunQuanQuanyuTargetChoice) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MoQuanyuDrawMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
@@ -33,11 +32,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
 
     internal bool MoQuanyuObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame { Zenrun: { Paid: true } } replacement && _characterSunHongOlOperations.ZenrunFirstChild(replacement, _resolutionStackOperations2._resolutionStack()[n]) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? MoQuanyuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterSunQuanOlMagicOperations.MoQuanyuFirstChild(f, child), (index) => _characterSunQuanOlMagicOperations.MoQuanyuObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1420)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1530)]
-    internal bool HasMoQuanyuDamageObserver(long id) => MoQuanyuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1550)]
-    internal bool HasMoQuanyuBeforeDamageObserver(long id) => MoQuanyuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 630)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 570)]
     internal bool IsMoQuanyuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

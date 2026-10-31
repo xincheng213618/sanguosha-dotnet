@@ -28,13 +28,10 @@ internal sealed partial class CharacterMaChengOlEntries
     internal bool HasChenglieResponseObserver(global::CardGame.Core.CardActionContext a, global::CardGame.Core.ProgramCardContinuation continuation) => _resolve().HasChenglieResponseObserver(a, continuation);
     internal bool HasChenglieTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasChenglieTargetTail(use);
     internal bool HasChenglieTargetTail2(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardActionContext action) => _resolve().HasChenglieTargetTail(use, action);
-    internal bool HasMaChengBeforeDamageObserver(long id) => _resolve().HasMaChengBeforeDamageObserver(id);
-    internal bool HasMaChengDamageObserver(long id) => _resolve().HasMaChengDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.NamedAmbushPileSnapshot>? IncludeChenglieSnapshots(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.NamedAmbushPileSnapshot>? ordinary, int holder, int viewer, bool revealAll) => _resolve().IncludeChenglieSnapshots(ordinary, holder, viewer, revealAll);
     internal bool IsChenglieAppliedTargetFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ChenglieTargetsAppliedEvent e, global::System.Collections.Generic.IReadOnlyList<int> precedingTargets, scoped out global::System.Collections.Generic.IReadOnlyList<int> resultTargets) => _resolve().IsChenglieAppliedTargetFact(use, e, precedingTargets, out resultTargets);
     internal bool IsChengliePrivateProcessingCard(int cardId) => _resolve().IsChengliePrivateProcessingCard(cardId);
     internal bool IsIssuedChenglieCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedChenglieCandidate(c, context);
-    internal bool IsMaChengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMaChengMovement(f, e, pending);
     internal bool IsMaChengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMaChengRecoveryParent(f, recovery);
     internal bool MaChengFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MaChengFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? MaChengObserverRoot() => _resolve().MaChengObserverRoot();

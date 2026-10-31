@@ -15,11 +15,6 @@ internal sealed partial class CharacterHeQiOlRuntime
     }
 
     internal ProgramSkillFrame? HeQiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterHeQiOlOperations.HeQiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 90)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 200)]
-    internal bool HasHeQiDamageObserver(long id) => HeQiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 170)]
     internal bool TryAdvanceHeQiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HeQiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 300)]
-    internal bool HasHeQiBeforeDamageObserver(long id) => HeQiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
 }

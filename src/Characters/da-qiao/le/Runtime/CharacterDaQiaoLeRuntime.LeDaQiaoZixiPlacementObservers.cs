@@ -27,9 +27,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
 
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 470)]
-    internal bool IsZixiPlacementMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => HasPaidZixiPlacement(f) && effect is { Op: SkillProgramEffectOp.ResolveZixiQinJudgmentPlacement, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool ZixiPlacementBatch(ProgramSkillFrame f, CardMovementBatchContext batch)
     {
         if (!HasPaidZixiPlacement(f) || f.ZixiPlacement is not { } r || batch.ParentFrameId != f.Id || batch.AwaitingProgramFrameId != f.Id || batch.OriginOwnerSeat != f.OwnerSeat || batch.OriginSkillId != f.SkillId || batch.OriginSkillInstanceId != f.SkillInstanceId)
@@ -70,11 +67,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
 
     internal bool ZixiPlacementObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (next) => _coreObserverSubtreesOperations.IsMovementObserverEdge(next) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(next) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[next - 1], _resolutionStackOperations2._resolutionStack()[next]) || _resolutionStackOperations2._resolutionStack()[next - 1] is ProgramSkillFrame { Zenrun: not null } zenrun && _characterSunHongOlOperations.ZenrunFirstChild(zenrun, _resolutionStackOperations2._resolutionStack()[next]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[next], _resolutionStackOperations2._resolutionStack()[next - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[next], _resolutionStackOperations2._resolutionStack()[next - 1]) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(next), (next, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(next, dying));
     internal ProgramSkillFrame? ZixiPlacementObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterDaQiaoLeOperations.ZixiPlacementFirstChild(f, child), (index) => _characterDaQiaoLeOperations.ZixiPlacementObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1440)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1550)]
-    internal bool HasZixiPlacementDamageObserver(long id) => ZixiPlacementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1570)]
-    internal bool HasZixiPlacementBeforeDamageObserver(long id) => ZixiPlacementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28710)]
     internal bool AdvanceZixiPlacementChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZixiPlacementObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

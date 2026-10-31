@@ -14,7 +14,6 @@ internal sealed partial class CharacterLuXunMouMobileEntries
     internal void FinishMouLuXun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouLuXun(f);
     internal bool HasPerTargetTrickEffectBinding(global::CardGame.Core.ProgramCardTriggerCandidate c) => _resolve().HasPerTargetTrickEffectBinding(c);
     internal bool HideMouLuXunPrivateEntity(int id) => _resolve().HideMouLuXunPrivateEntity(id);
-    internal bool IsMouLuXunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouLuXunMovement(f, effect, pending);
     internal bool IsMouLuXunPrivateEntity(int id) => _resolve().IsMouLuXunPrivateEntity(id);
     internal bool IsMouLuXunVirtualParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsMouLuXunVirtualParent(f);
     internal void IssueMouLuXunUse(global::CardGame.Core.ProgramSkillFrame f, int index) => _resolve().IssueMouLuXunUse(f, index);

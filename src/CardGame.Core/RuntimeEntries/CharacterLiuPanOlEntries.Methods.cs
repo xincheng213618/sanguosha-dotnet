@@ -16,13 +16,10 @@ internal sealed partial class CharacterLiuPanOlEntries
     internal bool DrainPijing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainPijing(f);
     internal void DrawPijingReciprocal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrawPijingReciprocal(f);
     internal void FinishPijing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishPijing(f);
-    internal bool HasLiuPanBeforeDamageObserver(long id) => _resolve().HasLiuPanBeforeDamageObserver(id);
-    internal bool HasLiuPanDamageObserver(long id) => _resolve().HasLiuPanDamageObserver(id);
     internal bool HasPijingTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasPijingTargetTail(use);
     internal bool HasPijingTargetTail2(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardActionContext action) => _resolve().HasPijingTargetTail(use, action);
     internal bool HasPijingZeroTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasPijingZeroTargetTail(use);
     internal bool IsIssuedPijingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedPijingCandidate(c, context);
-    internal bool IsLiuPanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLiuPanMovement(f, effect, pending);
     internal bool IsLiuPanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLiuPanRecoveryParent(f, recovery);
     internal bool IsPijingAppliedTargetFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.PijingTargetsAppliedEvent fact, global::System.Collections.Generic.IReadOnlyList<int> precedingTargets, scoped out global::System.Collections.Generic.IReadOnlyList<int> resultTargets) => _resolve().IsPijingAppliedTargetFact(use, fact, precedingTargets, out resultTargets);
     internal void IssuePijingGift(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssuePijingGift(f);

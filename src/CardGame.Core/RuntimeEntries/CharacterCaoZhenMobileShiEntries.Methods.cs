@@ -26,12 +26,10 @@ internal sealed partial class CharacterCaoZhenMobileShiEntries
     internal bool ReturnShiCaoZMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiCaoZMovement(f);
     internal void SetShiCaoZAfter(long id) => _resolve().SetShiCaoZAfter(id);
     internal global::CardGame.Core.PromptChoice ShiCaoZAi(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiCaoZAi(decision, f);
-    internal bool ShiCaoZBeforeDamageObserver(long id) => _resolve().ShiCaoZBeforeDamageObserver(id);
     internal bool ShiCaoZChildEdge(int i) => _resolve().ShiCaoZChildEdge(i);
     internal bool ShiCaoZChildSuffix(int i) => _resolve().ShiCaoZChildSuffix(i);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiCaoZChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiCaoZChoices(f);
     internal int ShiCaoZChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiCaoZChooser(f);
-    internal bool ShiCaoZDamageObserver(long id) => _resolve().ShiCaoZDamageObserver(id);
     internal bool ShiCaoZDyingObserver() => _resolve().ShiCaoZDyingObserver();
     internal bool ShiCaoZFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiCaoZFirstChild(f, child);
     internal bool ShiCaoZMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShiCaoZMovementProof(f, e, p);

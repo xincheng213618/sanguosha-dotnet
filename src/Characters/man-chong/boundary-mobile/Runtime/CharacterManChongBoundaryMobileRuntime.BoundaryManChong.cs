@@ -112,8 +112,6 @@ internal sealed partial class CharacterManChongBoundaryMobileRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 53000)]
     internal bool BoundaryManChongPaidMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.BoundaryManChongJunxing is { Paid: true } draft && effect?.Op == SkillProgramEffectOp.ResolveBoundaryManChongJunxing && draft.InstructionIndex == frame.InstructionIndex && effect.SourceBind == draft.SourceBind && effect.ResultBind == draft.ResultBind && pending == frame.PendingMovementContinuation && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && draft.SelectedIds.Count == draft.Count && draft.SequenceAfter > draft.SequenceBefore && draft.SelectedIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == id && move.Sequence > draft.SequenceBefore && move.Sequence <= draft.SequenceAfter && move.From.OwnerSeat == draft.TargetSeat && move.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && move.To is { Zone: CardZoneKind.DiscardPile or CardZoneKind.OutsideGame } && move.Reason.Value == BoundaryManChongDiscard) == 1);
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryManChongJunxing)]

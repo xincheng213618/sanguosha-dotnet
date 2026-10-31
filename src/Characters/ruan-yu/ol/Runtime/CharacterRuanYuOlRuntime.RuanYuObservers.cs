@@ -56,8 +56,6 @@ internal sealed partial class CharacterRuanYuOlRuntime
 
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 380)]
     internal bool IsRuanYuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.RuanYu is { Paid: true } r && r.Stage is RuanYuStage.FrontChildren or RuanYuStage.EndingChildren or RuanYuStage.RedChildren && effect?.Op == r.Op && pending == f.PendingMovementContinuation && pending.SubjectSeat == r.Recipient && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool RuanYuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -73,11 +71,6 @@ internal sealed partial class CharacterRuanYuOlRuntime
     }
 
     internal ProgramSkillFrame? RuanYuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterRuanYuOlOperations.RuanYuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 890)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1000)]
-    internal bool HasRuanYuDamageObserver(long id) => RuanYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1030)]
-    internal bool HasRuanYuBeforeDamageObserver(long id) => HasRuanYuDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27430)]
     internal bool AdvanceRuanYuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && RuanYuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

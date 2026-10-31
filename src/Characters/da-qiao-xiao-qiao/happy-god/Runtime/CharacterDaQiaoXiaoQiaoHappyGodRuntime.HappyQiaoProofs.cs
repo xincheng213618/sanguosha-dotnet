@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 42400)]
     internal bool HappyQiaoBoundMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation continuation)
     {
         if (frame.HappyQiao is not { Stage: HappyQiaoStage.GainChildren or HappyQiaoStage.DiscardChildren } || effect?.Op is not (SkillProgramEffectOp.ResolveHappyQiaoShutu or SkillProgramEffectOp.ResolveHappyQiaoTongxin) || continuation != frame.PendingMovementContinuation || continuation.SubjectSeat != frame.OwnerSeat || continuation.BeforeCount != 0 || continuation.CoverageResultBind is not null)
@@ -38,11 +36,6 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
     }
 
     internal ProgramSkillFrame? HappyQiaoSkillObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoFirstSkillChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 42400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 42400)]
-    internal bool HappyQiaoSkillDamageObserver(long id) => HappyQiaoSkillObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 42400)]
-    internal bool HappyQiaoSkillBeforeDamageObserver(long id) => HappyQiaoSkillObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 42400)]
     internal bool HappyQiaoSkillDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HappyQiaoSkillObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 42400)]

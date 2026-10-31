@@ -6,8 +6,6 @@ internal sealed partial class CharacterDongZhuoMouOlEntries
     internal bool ContinueMouDongZhuoOlWine(long id, global::CardGame.Core.ProgramSimpleCardContinuation c) => _resolve().ContinueMouDongZhuoOlWine(id, c);
     internal bool IsMouDongZhuoOlWine(long id) => _resolve().IsMouDongZhuoOlWine(id);
     internal bool MouDongZhuoOlAdvanceChildren() => _resolve().MouDongZhuoOlAdvanceChildren();
-    internal bool MouDongZhuoOlBeforeDamage(long id) => _resolve().MouDongZhuoOlBeforeDamage(id);
-    internal bool MouDongZhuoOlDamageWindow(long id) => _resolve().MouDongZhuoOlDamageWindow(id);
     internal bool MouDongZhuoOlDying() => _resolve().MouDongZhuoOlDying();
     internal bool MouDongZhuoOlEdge(int i) => _resolve().MouDongZhuoOlEdge(i);
     internal bool MouDongZhuoOlFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouDongZhuoOlFirstChild(f, child);

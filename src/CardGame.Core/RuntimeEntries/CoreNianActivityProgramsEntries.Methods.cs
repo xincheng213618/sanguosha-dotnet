@@ -14,7 +14,6 @@ internal sealed partial class CoreNianActivityProgramsEntries
     internal bool ExcludeOrdinaryMovement_IsNianJingjueTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsNianJingjueTrigger(candidate, trigger);
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteNianActivity(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffect effect) => _resolve().ExecuteNianActivity(supplied, effect);
     internal bool IsNianRecoveryCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsNianRecoveryCandidate(candidate, context);
-    internal bool IsNianRuizhiMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? paidEffect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsNianRuizhiMovement(frame, paidEffect, pending);
     internal int[] MatchingNianJingjueMovements(global::CardGame.Core.CardMovementBatchContext batch, int owner) => _resolve().MatchingNianJingjueMovements(batch, owner);
     internal int NianBaonuDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().NianBaonuDamageBonus(attack);
     internal bool NianDongmianDirectedTargetProhibited(global::CardGame.Core.ProgramDirectedTargetQuery query) => _resolve().NianDongmianDirectedTargetProhibited(query);

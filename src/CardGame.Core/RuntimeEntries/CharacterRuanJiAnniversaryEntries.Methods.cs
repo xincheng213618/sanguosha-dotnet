@@ -23,10 +23,8 @@ internal sealed partial class CharacterRuanJiAnniversaryEntries
     internal global::CardGame.Core.RuanJiShownEntityAuthorizedEvent? RuanJiAuthorization(int owner, string instance, int cardId, bool red) => _resolve().RuanJiAuthorization(owner, instance, cardId, red);
     internal bool RuanJiConversionAvailable(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource source, global::CardGame.Core.CardKind kind) => _resolve().RuanJiConversionAvailable(owner, card, source, kind);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> RuanJiDiscardChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RuanJiDiscardChoices(f);
-    internal bool RuanJiDiscardPaid(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RuanJiReceipt r) => _resolve().RuanJiDiscardPaid(f, r);
     internal global::CardGame.Core.Card[] RuanJiDiscardable(int owner) => _resolve().RuanJiDiscardable(owner);
     internal bool RuanJiIncoming(int owner, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().RuanJiIncoming(owner, context);
-    internal bool RuanJiMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().RuanJiMovementProof(f, effect, pending);
     internal bool RuanJiNameAvailable(int owner, global::CardGame.Core.CardKind kind) => _resolve().RuanJiNameAvailable(owner, kind);
     internal bool RuanJiTriggerLegal(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().RuanJiTriggerLegal(candidate, trigger, context);
     internal global::CardGame.Core.CardActionContext? RuanJiWindowAction(global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().RuanJiWindowAction(context);

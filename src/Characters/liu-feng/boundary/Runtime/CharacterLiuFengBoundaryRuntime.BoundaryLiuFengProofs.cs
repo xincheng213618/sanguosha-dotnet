@@ -38,10 +38,6 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
             return false;
         return !r.Returned || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengUseReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId && e.Damaged == r.Damaged) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 50200)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 50200)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 50200)]
     internal bool BoundaryLiuFengMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.BoundaryLiuFeng is { Stage: BoundaryLiuFengStage.MovementChildren or BoundaryLiuFengStage.NativeTail } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidBoundaryLiuFeng(f);
     internal bool BoundaryLiuFengFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -79,11 +75,6 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
 
     internal bool BoundaryLiuFengSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeEdge(n) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame f && _characterLiuFengBoundaryOperations.BoundaryLiuFengFirstChild(f, _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d));
     internal ProgramSkillFrame? BoundaryLiuFengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLiuFengBoundaryOperations.BoundaryLiuFengFirstChild(f, c), (i) => _characterLiuFengBoundaryOperations.BoundaryLiuFengSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 50200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 50200)]
-    internal bool BoundaryLiuFengDamageObserver(long id) => BoundaryLiuFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 50200)]
-    internal bool BoundaryLiuFengBeforeDamage(long id) => BoundaryLiuFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50200)]
     internal bool BoundaryLiuFengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BoundaryLiuFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 50200)]

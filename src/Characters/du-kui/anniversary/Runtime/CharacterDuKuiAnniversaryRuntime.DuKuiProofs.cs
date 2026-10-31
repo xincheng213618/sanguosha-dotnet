@@ -30,25 +30,6 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
             return false;
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == shown.Sequence && m.CardId == r.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == "anniversary.fanyin.reveal") == 1;
     }
-
-    internal bool DuKuiMovementPaid(ProgramSkillFrame f)
-    {
-        if (f.DuKui is not { } r || r.Stage is not (DuKuiStage.RevealMovement or DuKuiStage.DeclineMovement or DuKuiStage.MoveChildren) || r.From is not { } from || r.To is not { } to || r.MovementSequence <= r.Before || r.MovementSequence > r.After)
-            return false;
-        var reason = r.Stage switch
-        {
-            DuKuiStage.RevealMovement => "anniversary.fanyin.reveal",
-            DuKuiStage.DeclineMovement => "anniversary.fanyin.unused",
-            _ => "anniversary.peiqi.move"
-        };
-        return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == r.MovementSequence && m.CardId == r.CardId && m.From == from && m.To == to && m.Reason.Value == reason) == 1;
-    }
-
-    internal bool DuKuiNativeBatchPaid(ProgramSkillFrame f, CardMovementBatchContext b) => f.DuKui is { Stage: DuKuiStage.NativeTail, NativeReturned: true } r && r.NativeBatches.Contains(b.Id) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.OriginOwnerSeat == f.OwnerSeat && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After) && _coreProgramEventHistoryOperations.ProgramEventHistory<DuKuiNativeBatchEvent>().Count(e => e == new DuKuiNativeBatchEvent(f.Id, r.UseId, b.Id, b.Movements.Count)) == 1;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43200)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43200)]
-    internal bool DuKuiMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.DuKui is { } r && ValidDuKuiFrame(f) && effect?.Op == r.Operation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (DuKuiMovementPaid(f) || r.Stage == DuKuiStage.NativeTail && r.NativeReturned && _coreProgramEventHistoryOperations.ProgramEventHistory<DuKuiNativeReturnedEvent>().Count(e => e == new DuKuiNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) == 1 && _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Where(b => r.NativeBatches.Contains(b.Id)).All(b => DuKuiNativeBatchPaid(f, b)));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 43200)]
     internal bool ContinuePaidDuKui(ProgramSkillFrame f) => f.DuKui is not null && ValidDuKuiFrame(f);

@@ -214,13 +214,6 @@ internal sealed partial class CharacterSunCeMobileGodRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 38100)]
     internal bool ReturnShenSunCeMovement(ProgramSkillFrame f) => f.ShenSunCe is not null && ResumeShenSunCe(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 38100)]
-    internal bool IsShenSunCePaidMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (f.ShenSunCe is not { Operation: SkillProgramEffectOp.ResolveShenSunCeFenghe, Stage: ShenSunCeStage.GiftChildren, CardId: > 0 } r || effect?.Op != r.Operation || f.PendingMovementContinuation != pending || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.RecipientSeat) || r.RecipientSeat == f.OwnerSeat || r.SequenceAfter <= r.SequenceBefore)
-            return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ShenSunCeGiftPaidEvent>().Count(e => e == new ShenSunCeGiftPaidEvent(f.Id, r.CardId, r.RecipientSeat, r.SequenceAfter)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence == r.SequenceAfter && m.CardId == r.CardId && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(r.RecipientSeat) && m.Reason.Value == ShenSunCeGiftReason) == 1;
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 38100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 38100)]

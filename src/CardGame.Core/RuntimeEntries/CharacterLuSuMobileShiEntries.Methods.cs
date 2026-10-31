@@ -36,10 +36,8 @@ internal sealed partial class CharacterLuSuMobileShiEntries
     internal void ReturnShiLsDraw(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiLsDraw(input, outcome);
     internal bool ReturnShiLsMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiLsMovement(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> ShiLsAuthorizedHandCards(global::CardGame.Core.CharacterState actor) => _resolve().ShiLsAuthorizedHandCards(actor);
-    internal bool ShiLsBeforeDamageChild(long id) => _resolve().ShiLsBeforeDamageChild(id);
     internal bool ShiLsChildSuffix(int i) => _resolve().ShiLsChildSuffix(i);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiLsChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiLsChoices(f);
-    internal bool ShiLsDamageChild(long id) => _resolve().ShiLsDamageChild(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiLsDiscardChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiLsDiscardChoices(f);
     internal bool ShiLsDyingChild() => _resolve().ShiLsDyingChild();
     internal bool ShiLsFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiLsFirstChild(f, child);

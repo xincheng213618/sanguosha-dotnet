@@ -16,8 +16,6 @@ internal sealed partial class CharacterQinLangOlEntries
     internal void FinishQinLang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishQinLang(f);
     internal bool FinishQinLangXianyingAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishQinLangXianyingAttack(attack, out paused);
     internal bool HasIssuedQinLangXianyingUse(long id) => _resolve().HasIssuedQinLangXianyingUse(id);
-    internal bool HasQinLangBeforeDamageObserver(long id) => _resolve().HasQinLangBeforeDamageObserver(id);
-    internal bool HasQinLangDamageObserver(long id) => _resolve().HasQinLangDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> IncludeQinLangXianyingAfterTurnEndedItems(global::CardGame.Core.DeferredTurnEndFrame parent, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> ordinary) => _resolve().IncludeQinLangXianyingAfterTurnEndedItems(parent, ordinary);
     internal bool IsIssuedQinLangXianyingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedQinLangXianyingCandidate(c, context);
     internal bool IsQinLangDiscardMovement(global::CardGame.Core.QinLangXianyingReceipt r, global::CardGame.Core.CardMovementRecord m) => _resolve().IsQinLangDiscardMovement(r, m);

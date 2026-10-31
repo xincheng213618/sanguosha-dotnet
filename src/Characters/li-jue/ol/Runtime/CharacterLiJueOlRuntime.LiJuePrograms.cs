@@ -134,9 +134,6 @@ internal sealed partial class CharacterLiJueOlRuntime
         RequireLiJue(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 200)]
-    internal bool IsLiJueMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.LiJue is { Stage: LiJueStage.GainChildren } && effect?.Op == SkillProgramEffectOp.PayMaxHpAndObtainActualUsedTrick && CanContinueLiJue(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal void RequireLiJue(ProgramSkillFrame f)
     {
         if (f.LiJue is not { } r || r.Source != LiJueSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.WindowId != f.WindowContext?.ParentFrameId)

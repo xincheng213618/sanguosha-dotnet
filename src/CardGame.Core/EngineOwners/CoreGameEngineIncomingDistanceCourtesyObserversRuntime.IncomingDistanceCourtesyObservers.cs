@@ -33,8 +33,6 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyObserversRun
     internal ProgramSkillFrame? IncomingDistanceCourtesyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreIncomingDistanceCourtesyObserversOperations.IncomingDistanceCourtesyFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 240)]
     internal bool IsIncomingDistanceCourtesyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && IncomingDistanceCourtesyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1790)]
-    internal bool HasIncomingDistanceCourtesyDamageObserver(long id) => IncomingDistanceCourtesyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 70)]
     internal bool TryAdvanceIncomingDistanceCourtesySubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && IncomingDistanceCourtesyObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

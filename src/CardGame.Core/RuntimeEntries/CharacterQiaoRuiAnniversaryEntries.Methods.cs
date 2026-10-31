@@ -17,10 +17,8 @@ internal sealed partial class CharacterQiaoRuiAnniversaryEntries
     internal void ObserveQiaoRuiDamage(global::CardGame.Core.DamageAppliedEvent e) => _resolve().ObserveQiaoRuiDamage(e);
     internal void PublishQiaoRui(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishQiaoRui(f);
     internal global::CardGame.Core.PromptChoice QiaoRuiAi(global::CardGame.Core.PendingDecision p) => _resolve().QiaoRuiAi(p);
-    internal bool QiaoRuiBeforeDamage(long id) => _resolve().QiaoRuiBeforeDamage(id);
     internal global::CardGame.Core.PromptChoice QiaoRuiChoice(global::CardGame.Core.ProgramSkillFrame f, string verb, string value, string text, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().QiaoRuiChoice(f, verb, value, text, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> QiaoRuiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().QiaoRuiChoices(f);
-    internal bool QiaoRuiDamageObserver(long id) => _resolve().QiaoRuiDamageObserver(id);
     internal bool QiaoRuiDying() => _resolve().QiaoRuiDying();
     internal bool QiaoRuiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().QiaoRuiFirstChild(f, child);
     internal bool QiaoRuiLastLoss(int owner, global::CardGame.Core.CardMovementBatchContext b) => _resolve().QiaoRuiLastLoss(owner, b);

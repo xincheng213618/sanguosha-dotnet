@@ -25,10 +25,6 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
         AssertQiaoZhouPreparation(prep);
         return _coreObserverSubtreesOperations.HasMovementObserverSuffix(0) ? prep : null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 380)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 490)]
-    internal bool HasQiaoZhouDamageObserver(long id) => QiaoZhouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame or DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26220)]
     internal bool AdvanceQiaoZhouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && QiaoZhouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

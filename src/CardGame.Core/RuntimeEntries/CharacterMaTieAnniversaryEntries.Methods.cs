@@ -26,12 +26,10 @@ internal sealed partial class CharacterMaTieAnniversaryEntries
     internal bool IsAnniversaryMaTieSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsAnniversaryMaTieSlashQuery(actor);
     internal bool IsIssuedMaTieReward(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsIssuedMaTieReward(c, w);
     internal void IssueMaTieSlash(global::CardGame.Core.ProgramSkillFrame f, int index) => _resolve().IssueMaTieSlash(f, index);
-    internal bool MaTieBeforeDamage(long id) => _resolve().MaTieBeforeDamage(id);
     internal bool MaTieCardParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().MaTieCardParent(f, window);
     internal global::CardGame.Core.CardUseFrame? MaTieCardWindow(global::CardGame.Core.ProgramSkillWindowContext c, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().MaTieCardWindow(c, window);
     internal global::CardGame.Core.PromptChoice MaTieChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string text, int? target = default, int option = -1) => _resolve().MaTieChoice(f, branch, text, target, option);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MaTieChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MaTieChoices(f);
-    internal bool MaTieDamage(long id) => _resolve().MaTieDamage(id);
     internal bool MaTieDying() => _resolve().MaTieDying();
     internal bool MaTieFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MaTieFirstChild(f, child);
     internal bool MaTieMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MaTieMovementProof(f, effect, p);

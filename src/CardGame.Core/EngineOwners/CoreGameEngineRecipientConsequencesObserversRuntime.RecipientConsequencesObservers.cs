@@ -81,11 +81,6 @@ internal sealed partial class CoreGameEngineRecipientConsequencesObserversRuntim
 
     internal ProgramSkillFrame? RecipientConsequencesObserverRoot() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => (f.BlackGiftContest is not null || f.PrintedLordBenefit is not null) && RecipientConsequencesPrefix(f, _resolutionStackOperations._resolutionStack.Count - 1));
     internal bool IsRecipientConsequencesProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && RecipientConsequencesObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
-    internal bool HasRecipientConsequencesDamageObserver(long id)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame);
-        return index >= 2 && _resolutionStackOperations._resolutionStack[index] is DamageTriggerWindowFrame w && _resolutionStackOperations._resolutionStack[index - 1] is DamageFrame damage && w.ParentFrameId == damage.Id && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == damage.ParentFrameId)is { AttackAttempt: not null, AttackReturn: not null } attack && _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId == attack.Id && RecipientConsequencesObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id) < _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == attack.Id);
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 540)]
     internal bool TryAdvanceRecipientConsequencesSubtree()

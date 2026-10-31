@@ -9,8 +9,6 @@ internal sealed partial class CharacterWangYunOlEntries
     internal bool CanWangYunLightning(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanWangYunLightning(f);
     internal void CompleteWangYunNativePayment(long useId) => _resolve().CompleteWangYunNativePayment(useId);
     internal void FinishWangYun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWangYun(f);
-    internal bool HasWangYunBeforeDamageObserver(long id) => _resolve().HasWangYunBeforeDamageObserver(id);
-    internal bool HasWangYunDamageObserver(long id) => _resolve().HasWangYunDamageObserver(id);
     internal bool IsWangYunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWangYunMovement(f, e, p);
     internal bool IsWangYunNativeMaterialPayment(global::CardGame.Core.WangYunNativeUseOrigin origin, global::CardGame.Core.CardActionCost material, global::CardGame.Core.CardMovementRecord movement, long after) => _resolve().IsWangYunNativeMaterialPayment(origin, material, movement, after);
     internal bool IsWangYunRandomConversionAvailable(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource source, bool forResponse) => _resolve().IsWangYunRandomConversionAvailable(owner, card, source, forResponse);

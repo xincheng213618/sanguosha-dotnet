@@ -35,15 +35,12 @@ internal sealed partial class CharacterZhaoZhongOlEntries
     internal global::CardGame.Core.BiriPotentialGainEvent? FirstBiriGain(int turn, int owner) => _resolve().FirstBiriGain(turn, owner);
     internal int? FirstPengbiActualTurn(int owner) => _resolve().FirstPengbiActualTurn(owner);
     internal void GrantPengbiSkill(global::CardGame.Core.ProgramSkillFrame f, int recipient, string skill) => _resolve().GrantPengbiSkill(f, recipient, skill);
-    internal bool HasZhaoZhongBeforeDamageObserver(long id) => _resolve().HasZhaoZhongBeforeDamageObserver(id);
-    internal bool HasZhaoZhongDamageObserver(long id) => _resolve().HasZhaoZhongDamageObserver(id);
     internal bool IsBiriTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsBiriTrigger(t);
     internal bool IsIssuedBiriCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedBiriCandidate(c, context);
     internal bool IsIssuedDiciChainCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedDiciChainCandidate(c, context);
     internal bool IsIssuedDiciChainTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsIssuedDiciChainTrigger(t);
     internal bool IsIssuedYintianRecoveryCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedYintianRecoveryCandidate(candidate, context);
     internal bool IsPengbiTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsPengbiTrigger(t);
-    internal bool IsZhaoZhongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhaoZhongMovement(f, e, p);
     internal bool IsZhaoZhongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().IsZhaoZhongRecoveryParent(f, child);
     internal void ObserveDiciEntry(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveDiciEntry(payload);
     internal void ObserveYintianNativeDamage(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveYintianNativeDamage(payload);

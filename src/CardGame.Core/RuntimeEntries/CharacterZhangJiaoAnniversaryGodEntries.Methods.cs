@@ -4,7 +4,6 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodEntries
 {
     internal global::CardGame.Core.PromptChoice AnniversaryTianjieChoice(global::CardGame.Core.ProgramSkillFrame f, int? target) => _resolve().AnniversaryTianjieChoice(f, target);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> AnniversaryTianjieChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AnniversaryTianjieChoices(f);
-    internal bool AnniversaryZjMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().AnniversaryZjMovementProof(f, e, p);
     internal int AnniversaryZjRank(int owner, global::CardGame.Core.ProgramSkillWindowContext? context) => _resolve().AnniversaryZjRank(owner, context);
     internal bool AnniversaryZjTurnShuffled() => _resolve().AnniversaryZjTurnShuffled();
     internal void AnswerAnniversaryTianjie(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerAnniversaryTianjie(choice);

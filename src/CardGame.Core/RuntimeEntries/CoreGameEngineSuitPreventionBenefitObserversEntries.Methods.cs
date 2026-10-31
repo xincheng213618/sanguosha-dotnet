@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSuitPreventionBenefitObserversEntries
 {
-    internal bool HasSuitPreventionBenefitObserver(long beforeDamageId) => _resolve().HasSuitPreventionBenefitObserver(beforeDamageId);
     internal bool IsSuitPlacementProgramDying() => _resolve().IsSuitPlacementProgramDying();
     internal bool MatchedJudgmentOriginalCandidate(global::CardGame.Core.ProgramSkillFrame root) => _resolve().MatchedJudgmentOriginalCandidate(root);
     internal bool SuitBenefitOriginalCandidate(global::CardGame.Core.ProgramSkillFrame root) => _resolve().SuitBenefitOriginalCandidate(root);

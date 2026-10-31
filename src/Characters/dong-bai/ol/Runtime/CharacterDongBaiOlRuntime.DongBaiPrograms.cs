@@ -194,9 +194,6 @@ internal sealed partial class CharacterDongBaiOlRuntime
         RequireLianZhu(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 100)]
-    internal bool IsLianZhuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.LianZhu is { Stage: LianZhuStage.GiftChildren or LianZhuStage.DiscardChildren or LianZhuStage.DrawChildren } && effect?.Op == SkillProgramEffectOp.RevealHandGiftAndResolveRecipientChoice && CanContinueLianZhu(f) && p.BeforeCount == 0 && p.CoverageResultBind is null && p.SubjectSeat == (f.LianZhu!.Stage == LianZhuStage.DiscardChildren ? f.LianZhu.RecipientSeat : f.OwnerSeat);
     internal void RequireLianZhu(ProgramSkillFrame f)
     {
         if (f.LianZhu is { Stage: LianZhuStage.GiftChildren } revealing && _characterXiaoQiaoMouOlOperations.IsPublicHandRevealProducerSuspended(f.Id, "lianzhu-gift-hand") && revealing.Source == LianZhuSource(f) && revealing.GameplayHash == f.GameplayHash && revealing.InstructionIndex == f.InstructionIndex && f.SelectedCardIds.SequenceEqual([revealing.GiftCardId]) && f.SelectedTargetSeats.SequenceEqual([revealing.RecipientSeat]) && revealing.GiftBefore == revealing.GiftAfter && revealing.Before == revealing.After && _coreProgramEventHistoryOperations.ProgramEventHistory<CardsRevealedEvent>().Any(e => e.ResolutionId == f.Id && e.Cards.Select(c => c.Id).SequenceEqual([revealing.GiftCardId])) && !_coreProgramEventHistoryOperations.ProgramEventHistory<LianZhuSegmentPaidEvent>().Any(e => e.FrameId == f.Id))

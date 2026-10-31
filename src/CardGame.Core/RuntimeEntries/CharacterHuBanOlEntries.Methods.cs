@@ -19,8 +19,6 @@ internal sealed partial class CharacterHuBanOlEntries
     internal void ExpireHuiyunAlcohol(global::CardGame.Core.IGameEvent fact) => _resolve().ExpireHuiyunAlcohol(fact);
     internal void FinishHuiyun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuiyun(f);
     internal void FinishHuiyunOpportunity(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuiyunOpportunity(f);
-    internal bool HasHuBanBeforeDamageObserver(long id) => _resolve().HasHuBanBeforeDamageObserver(id);
-    internal bool HasHuBanDamageObserver(long id) => _resolve().HasHuBanDamageObserver(id);
     internal bool HasHuiyunOption(int seat, int round) => _resolve().HasHuiyunOption(seat, round);
     internal bool HasHuiyunTrickPaymentProcessing(global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> processing) => _resolve().HasHuiyunTrickPaymentProcessing(processing);
     internal bool HasHuiyunTrickPaymentTail(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation) => _resolve().HasHuiyunTrickPaymentTail(use, continuation);

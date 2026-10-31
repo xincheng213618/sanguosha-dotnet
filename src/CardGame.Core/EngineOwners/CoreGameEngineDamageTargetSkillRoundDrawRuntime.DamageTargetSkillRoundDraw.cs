@@ -148,8 +148,5 @@ internal sealed partial class CoreGameEngineDamageTargetSkillRoundDrawRuntime
         RequireDamageTargetSkillRoundDraw(frame);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 500)]
-    internal bool IsDamageTargetSkillRoundMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.GrantDamageTargetSkillAndDrawByRound && f.DamageTargetSkillRoundDraw is not null && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     SkillProgramStepOutcome global::CardGame.Core.IDamageTargetSkillRoundDrawHost.GrantDamageTargetSkillAndDrawByRound(ProgramSkillFrame frame) => GrantDamageTargetSkillAndDrawByRound(frame);
 }

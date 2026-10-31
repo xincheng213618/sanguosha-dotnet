@@ -10,7 +10,6 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsEntries
     internal global::CardGame.Core.CardConversionSource DeathGrowthSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DeathGrowthSource(f);
     internal bool DrainDeathGrowthChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainDeathGrowthChildren(f);
     internal void FinishDeathGrowthSkill(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishDeathGrowthSkill(f);
-    internal bool IsDeathGrowthMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsDeathGrowthMovement(f, effect, p);
     internal void ResolveDeathGrowthChoice(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveDeathGrowthChoice(selected);
     internal bool ResumeDeathGrowthSkill(long id) => _resolve().ResumeDeathGrowthSkill(id);
     internal bool ReturnDeathGrowthMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnDeathGrowthMovement(f);

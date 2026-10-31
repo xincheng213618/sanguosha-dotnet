@@ -6,7 +6,6 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageEntries
     internal bool CanContinueSameNameHandDiscardOrDamage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueSameNameHandDiscardOrDamage(f);
     internal bool CanOfferSameNameHandDiscardOrDamage(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferSameNameHandDiscardOrDamage(candidate, trigger, context);
     internal void FinishSameNameHand(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSameNameHand(f);
-    internal bool IsSameNameHandDiscardOrDamageMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSameNameHandDiscardOrDamageMovement(f, e, pending);
     internal void PublishSameNameHandChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishSameNameHandChoice(f);
     internal void ResolveSameNameHandDiscardOrDamageChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveSameNameHandDiscardOrDamageChoice(choice);
     internal bool ResumeSameNameHandDiscardOrDamage(long id) => _resolve().ResumeSameNameHandDiscardOrDamage(id);

@@ -12,8 +12,6 @@ internal sealed partial class CharacterDengAiMouOlEntries
     internal bool ContinuePaidMouDengAi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidMouDengAi(f);
     internal bool DrainMouDengAiOl(long id) => _resolve().DrainMouDengAiOl(id);
     internal void FinishMouDengAiOl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouDengAiOl(f);
-    internal bool HasMouDengAiBeforeDamage(long id) => _resolve().HasMouDengAiBeforeDamage(id);
-    internal bool HasMouDengAiDamage(long id) => _resolve().HasMouDengAiDamage(id);
     internal bool IsMouDengAiDying() => _resolve().IsMouDengAiDying();
     internal bool IsMouDengAiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation m) => _resolve().IsMouDengAiMovement(f, effect, m);
     internal bool IsMouDengAiNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsMouDengAiNativeSettlementBatch(f, b);

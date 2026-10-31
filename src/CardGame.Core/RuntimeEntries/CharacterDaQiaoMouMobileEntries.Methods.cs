@@ -20,14 +20,12 @@ internal sealed partial class CharacterDaQiaoMouMobileEntries
     internal bool IsIssuedMouDaQiaoPhaseCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsIssuedMouDaQiaoPhaseCandidate(candidate, c);
     internal bool IsReturningMouDaQiaoLiuliPhase(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsReturningMouDaQiaoLiuliPhase(f);
     internal global::CardGame.Core.MouDaQiaoLiuliMarkGrantedEvent? LiveMouDaQiaoMark() => _resolve().LiveMouDaQiaoMark();
-    internal bool MouDaQiaoDamageObserver(long id) => _resolve().MouDaQiaoDamageObserver(id);
     internal bool MouDaQiaoDying() => _resolve().MouDaQiaoDying();
     internal bool MouDaQiaoFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouDaQiaoFirstChild(f, child);
     internal bool MouDaQiaoGuoseTarget(int owner, int? card, int target, string branch) => _resolve().MouDaQiaoGuoseTarget(owner, card, target, branch);
     internal int MouDaQiaoGuoseUses(int owner, global::CardGame.Core.ActualDiscardRecoveryPhaseKey phase) => _resolve().MouDaQiaoGuoseUses(owner, phase);
     internal bool MouDaQiaoHeartAvailable(int owner, int actualTurn) => _resolve().MouDaQiaoHeartAvailable(owner, actualTurn);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouDaQiaoHeartChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouDaQiaoHeartChoices(f);
-    internal bool MouDaQiaoMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation m) => _resolve().MouDaQiaoMovementProof(f, e, m);
     internal global::CardGame.Core.ProgramSkillFrame? MouDaQiaoObserverRoot() => _resolve().MouDaQiaoObserverRoot();
     internal bool MouDaQiaoObserverSuffix(int index) => _resolve().MouDaQiaoObserverSuffix(index);
     internal int MouDaQiaoProjectedPhaseUses(int owner, string skill, int fallback) => _resolve().MouDaQiaoProjectedPhaseUses(owner, skill, fallback);

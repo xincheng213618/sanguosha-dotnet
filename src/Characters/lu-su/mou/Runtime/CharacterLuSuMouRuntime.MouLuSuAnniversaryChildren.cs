@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuSuMouRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 36100)]
     internal bool MouLuSuMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => f.MouLuSuAnniversary is { } r && op?.Op == r.Operation && MouLuSuAnniversary.Valid(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouLuSuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -52,11 +51,6 @@ internal sealed partial class CharacterLuSuMouRuntime
     internal ProgramSkillFrame? MouLuSuRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLuSuMouOperations.MouLuSuFirstChild(f, c), (n) => _characterLuSuMouOperations.MouLuSuSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36100)]
     internal bool MouLuSuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouLuSuRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 36100)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 36100)]
-    internal bool MouLuSuDamageWindow(long id) => MouLuSuRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 36100)]
-    internal bool MouLuSuBeforeDamage(long id) => MouLuSuRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36100)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 36100)]
     internal bool MouLuSuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame rr)

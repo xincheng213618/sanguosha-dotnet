@@ -196,23 +196,6 @@ internal sealed partial class CharacterXuShuMobileRuntime
     }
 
     internal static bool MobileSpXuShuJianyanBatchMatches(ProgramSkillFrame f, MobileSpXuShuJianyanMovementReceipt m, CardMovementBatchContext batch) => batch.Id == m.BatchId && batch.Id > f.Id && batch.ParentFrameId == f.Id && batch.AwaitingProgramFrameId == f.Id && batch.OriginOwnerSeat == f.OwnerSeat && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.Movements.SequenceEqual(m.Movements);
-    internal bool ValidMobileSpXuShuJianyanMovement(ProgramSkillFrame f)
-    {
-        var r = f.MobileSpXuShuJianyan!;
-        if (r.Movement is not { } p || p.Before < 0 || p.After < p.Before || p.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || p.Movements.Select(m => m.CardId).Distinct().Count() != p.Movements.Count || p.Movements.Any(m => m.Sequence <= p.Before || m.Sequence > p.After || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)) || !p.Movements.SequenceEqual(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > p.Before && m.Sequence <= p.After)))
-            return false;
-        if (p.Movements.Count == 0)
-            return r.Stage == "cleanup-children" && p.Kind == "cleanup" && p.BatchId == 0 && p.Before == p.After && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSpXuShuJianyanCleanupPaidEvent>().Count(e => e == new MobileSpXuShuJianyanCleanupPaidEvent(f.Id, 0, p.Before, p.After)) == 1;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MobileSpXuShuJianyanNativeBatchIssuedEvent>().Count(e => e == new MobileSpXuShuJianyanNativeBatchIssuedEvent(f.Id, p.Kind, p.BatchId, f.Id, f.Id, f.OwnerSeat, f.SkillId, f.SkillInstanceId, p.Before, p.After, p.Movements.Count)) != 1 || _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Concat(_resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Select(w => w.Batch)).Where(b => b.Id == p.BatchId).Any(b => !MobileSpXuShuJianyanBatchMatches(f, p, b)))
-            return false;
-        return p.Kind switch
-        {
-            "reveal" => r.Stage is "search" or "recipient" && p.Movements is [var m] && r.RevealedIds.LastOrDefault() == m.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == MobileSpXuShuJianyanRevealReason && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSpXuShuJianyanRevealedEvent>().Count(e => e.FrameId == f.Id && e.CardId == m.CardId && e.Criterion == r.Criterion && e.MovementSequence == m.Sequence && e.Matched == (r.MatchedCardId == m.CardId)) == 1,
-            "gift" => r.Stage == "gift-children" && r.RecipientSeat is { } target && p.Movements is [var m] && m.CardId == r.MatchedCardId && m.From == CardLocation.Processing && m.To == _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), m.From, CardLocation.Hand(target)) && m.Reason.Value == MobileSpXuShuJianyanGiftReason && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSpXuShuJianyanGiftPaidEvent>().Count(e => e == new MobileSpXuShuJianyanGiftPaidEvent(f.Id, target, m.CardId, m.Sequence)) == 1,
-            "cleanup" => r.Stage == "cleanup-children" && p.Movements.All(m => r.RevealedIds.Contains(m.CardId) && (r.RecipientSeat is null || m.CardId != r.MatchedCardId) && m.From == CardLocation.Processing && (m.To == _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), m.From, CardLocation.DiscardPile) || _coreProgramAtomicCardMovesOperations.IsRedirectedPaidDiscardMovement(m, CardLocation.Processing, new(MobileSpXuShuJianyanCleanupReason))) && m.Reason.Value == MobileSpXuShuJianyanCleanupReason) && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileSpXuShuJianyanCleanupPaidEvent>().Count(e => e == new MobileSpXuShuJianyanCleanupPaidEvent(f.Id, p.Movements.Count, p.Before, p.After)) == 1,
-            _ => false
-        };
-    }
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 71700)]
     internal bool ReturnMobileSpXuShuJianyanMovement(ProgramSkillFrame f)
@@ -226,9 +209,6 @@ internal sealed partial class CharacterXuShuMobileRuntime
             ResumeMobileSpXuShuJianyan(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 71700)]
-    internal bool MobileSpXuShuJianyanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.ResolveMobileSpXuShuJianyan && f.SkillId == MobileSpXuShuJianyanSkill && f.TriggerId is null && f.ActivationId == "declare-and-give" && f.InstructionIndex == 1 && f.MobileSpXuShuJianyan is not null && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidMobileSpXuShuJianyanMovement(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 71700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 71700)]
     internal bool KeepMobileSpXuShuJianyanIssued(ProgramSkillFrame f) => f.MobileSpXuShuJianyan is { RevealedIds.Count: > 0 };

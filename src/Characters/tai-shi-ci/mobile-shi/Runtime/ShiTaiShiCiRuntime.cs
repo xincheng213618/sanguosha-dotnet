@@ -459,12 +459,6 @@ internal sealed class ShiTaiShiCiRuntime(IProgramRuntimeFrames frames, IProgramR
         return (r.Options & ShiTaiShiCiComposition.OptionExtraDamage) != 0 ? 1 : 0;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 67600)]
-    private bool ShiTzMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) =>
-        f.ShiTaiShiCi is { } r && (r.Stage is 8 or 14 or 18 || r is { Operation: "zhenfeng", Stage: 12 }) &&
-        p.CoverageResultBind is null && p.BeforeCount == 0 &&
-        p.SubjectSeat == (r.Stage == 18 ? r.TargetSeat : f.OwnerSeat);
-
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShiTzZhanlie, SkillProgramEffectOp.ResolveShiTzZhenfeng,
         SkillProgramEffectOp.ResolveShiTzRespondGate)]
     private PromptChoice ChooseShiTzAi(PendingDecision decision, ProgramSkillFrame f)

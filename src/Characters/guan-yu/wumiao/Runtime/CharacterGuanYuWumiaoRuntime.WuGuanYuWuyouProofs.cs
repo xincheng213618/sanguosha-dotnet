@@ -91,7 +91,4 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             return returned.BatchId == 0 && returned.After == returned.Before;
         return returned.BatchId > lease.FrameId && returned.After > returned.Before && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == lease.MovementCutoff && m.CardId == lease.CardId && m.CardKind == lease.PrintedKind && m.From == CardLocation.Hand(lease.Source.OwnerSeat) && m.To == CardLocation.Hand(lease.HolderSeat) && m.Reason.Value == WuyouReturnReason) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 630)]
-    internal bool IsWuyouMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => effect?.Op == SkillProgramEffectOp.ResolveWuyouContributionAndNamedReturn && f.Wuyou is { Stage: WuyouStage.ContributionChildren or WuyouStage.ReturnChildren, ContributionPaid: true } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidWuyouFrame(f, true);
 }

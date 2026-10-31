@@ -40,19 +40,6 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
 
     internal bool MouHuangYueyingLifecycleEdge(int index) => _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame window && _resolutionStackOperations._resolutionStack[index] is ProgramSkillFrame f && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) && f.WindowContext is { } context && context.ParentFrameId == window.Id && context.Window == window.Window;
     internal ProgramSkillFrame? MouHuangYueyingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterHuangYueyingOlMouOperations.MouHuangYueyingFirstChild(f, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (next) => _coreObserverSubtreesOperations.IsMovementObserverEdge(next) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(next) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[next - 1], _resolutionStackOperations2._resolutionStack()[next]) || _characterHuangYueyingOlMouOperations.MouHuangYueyingLifecycleEdge(next) || _characterHuangYueyingOlMouOperations.MouLixianCardWindowEdge(next) || _resolutionStackOperations2._resolutionStack()[next - 1] is ProgramSkillFrame { Zenrun: not null } zenrun && _characterSunHongOlOperations.ZenrunFirstChild(zenrun, _resolutionStackOperations2._resolutionStack()[next]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[next], _resolutionStackOperations2._resolutionStack()[next - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[next], _resolutionStackOperations2._resolutionStack()[next - 1]) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(next), (next, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(next, dying)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1510)]
-    internal bool HasMouHuangYueyingDamageObserver(long id)
-    {
-        if (MouHuangYueyingObserverRoot()is not { } root || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id)is not DamageTriggerWindowFrame window)
-            return false;
-        if (_resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id))
-            return true;
-        return root.MouLixian is { Paid: true } r && ValidMouLixianStarted(root) && r.WindowId == window.Id && root.WindowContext?.ParentFrameId == window.Id && window.TriggerWindow == SkillProgramTriggerWindow.AfterDamageApplied && _coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(root, window);
-    }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1530)]
-    internal bool HasMouHuangYueyingBeforeDamageObserver(long id) => MouHuangYueyingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28960)]
     internal bool AdvanceMouHuangYueyingChildren()

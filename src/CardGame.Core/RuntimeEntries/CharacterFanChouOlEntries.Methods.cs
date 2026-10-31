@@ -16,9 +16,6 @@ internal sealed partial class CharacterFanChouOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardSnapshot> FanChouPrivateDeckCards(int viewer) => _resolve().FanChouPrivateDeckCards(viewer);
     internal bool FanChouSourceCurrent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FanChouSourceCurrent(f);
     internal void FinishFanChou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishFanChou(f);
-    internal bool HasFanChouBeforeDamageObserver(long id) => _resolve().HasFanChouBeforeDamageObserver(id);
-    internal bool HasFanChouDamageObserver(long id) => _resolve().HasFanChouDamageObserver(id);
-    internal bool IsFanChouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsFanChouMovement(f, e, p);
     internal void IssueFanChouPaid(long id, global::CardGame.Core.FanChouReceipt r, int subject) => _resolve().IssueFanChouPaid(id, r, subject);
     internal void PayFanChouDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayFanChouDraw(f);
     internal void PublishFanChou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishFanChou(f);

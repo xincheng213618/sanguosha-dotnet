@@ -12,7 +12,6 @@ internal sealed partial class CharacterZhouYuMouEntries
     internal bool IsMouZyZeroFireUse(long id) => _resolve().IsMouZyZeroFireUse(id);
     internal void IssueMouZyUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouZyUse(f);
     internal bool MouZyAdvanceChildren() => _resolve().MouZyAdvanceChildren();
-    internal bool MouZyBeforeDamage(long id) => _resolve().MouZyBeforeDamage(id);
     internal bool MouZyDamageApplied(global::CardGame.Core.GameEngine.IDamageAttempt a, long id) => _resolve().MouZyDamageApplied(a, id);
     internal bool MouZyDying() => _resolve().MouZyDying();
     internal bool MouZyEdge(int i) => _resolve().MouZyEdge(i);
@@ -24,7 +23,6 @@ internal sealed partial class CharacterZhouYuMouEntries
     internal bool MouZyNativeRidesOn(global::CardGame.Core.CardUseFrame u, global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouZyNativeRidesOn(u, f);
     internal global::CardGame.Core.ProgramSkillFrame? MouZyObserverRoot() => _resolve().MouZyObserverRoot();
     internal bool MouZyOffTurnUse(long id, int actor) => _resolve().MouZyOffTurnUse(id, actor);
-    internal bool MouZyPaidDamage(long id) => _resolve().MouZyPaidDamage(id);
     internal bool MouZyRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().MouZyRecoveryParent(f, recovery);
     internal bool MouZySuffix(int i) => _resolve().MouZySuffix(i);
     internal int MouZyTargetLimit(global::CardGame.Core.CharacterState actor) => _resolve().MouZyTargetLimit(actor);

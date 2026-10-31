@@ -14,9 +14,7 @@ internal sealed partial class CharacterZhangHengAnniversaryEntries
     internal bool RetainZhangHeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainZhangHeng(f);
     internal bool ReturnZhangHengMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnZhangHengMovement(f);
     internal bool ValidZhangHeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidZhangHeng(f);
-    internal bool ZhangHengBeforeDamageObserver(long id) => _resolve().ZhangHengBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ZhangHengChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangHengChoices(f);
-    internal bool ZhangHengDamageObserver(long id) => _resolve().ZhangHengDamageObserver(id);
     internal global::System.Collections.Generic.IEnumerable<int> ZhangHengDonors(int owner) => _resolve().ZhangHengDonors(owner);
     internal bool ZhangHengDying() => _resolve().ZhangHengDying();
     internal bool ZhangHengFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ZhangHengFirstChild(f, child);

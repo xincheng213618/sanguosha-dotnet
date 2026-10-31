@@ -18,9 +18,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsEntries
     internal bool GiftedSlashFirstChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().GiftedSlashFirstChild(frame, child);
     internal global::CardGame.Core.ProgramSkillFrame? GiftedSlashObserverRoot() => _resolve().GiftedSlashObserverRoot();
     internal bool GiftedSlashPendingMatches(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().GiftedSlashPendingMatches(frame);
-    internal bool HasGiftedSlashDamageObserver(long id) => _resolve().HasGiftedSlashDamageObserver(id);
     internal bool HasIssuedGiftedSlashRewardCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedGiftedSlashRewardCandidate(candidate, context);
-    internal bool IsGiftedSlashAwaitedMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsGiftedSlashAwaitedMovement(frame, effect, pending);
     internal bool IsGiftedSlashProgramDying() => _resolve().IsGiftedSlashProgramDying();
     internal void IssueGiftedSlashUseBenefit(long useId, global::CardGame.Core.CardActionContext? action) => _resolve().IssueGiftedSlashUseBenefit(useId, action);
     internal bool ResumeGiftedSlashUseReward(long id) => _resolve().ResumeGiftedSlashUseReward(id);

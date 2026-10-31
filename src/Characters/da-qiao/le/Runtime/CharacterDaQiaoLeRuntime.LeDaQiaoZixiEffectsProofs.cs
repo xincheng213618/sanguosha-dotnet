@@ -13,9 +13,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiEffectsStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var started] && started == new ZixiEffectsStartedEvent(f.Id, r.Source, r.GameplayHash, r.UseId, r.ActionId, r.WindowId, r.TargetSeat, r.JudgmentCount, r.CardKind, r.SequenceBefore) && _coreProgramEventHistoryOperations.ProgramEventHistory<ZixiEffectsStartedEvent>().Count(e => e.UseId == r.UseId && e.Source.OwnerSeat == f.OwnerSeat) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 230)]
-    internal bool IsZixiEffectsMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.ZixiEffects is { Stage: ZixiEffectsStage.DrawChildren or ZixiEffectsStage.ObtainChildren } && effect?.Op == SkillProgramEffectOp.ResolveZixiUniqueTargetJudgmentEffects && ValidZixiEffectsStarted(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool ZixiEffectsPrimaryMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.ZixiEffects!;

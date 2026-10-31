@@ -71,8 +71,6 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 32800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 32800)]
     internal bool ContinueIssuedMouLuXun(ProgramSkillFrame f) => f.MouLuXun is { Paid: true } && ValidMouLuXun(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 32800)]
-    internal bool IsMouLuXunMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.MouLuXun is { Stage: MouLuXunStage.HoldChildren or MouLuXunStage.ViewChildren or MouLuXunStage.GiftChildren or MouLuXunStage.ReturnChildren } r && effect?.Op == r.Operation && ValidMouLuXun(f) && pending == new ProgramMovementContinuation(f.OwnerSeat, 0, null) && r.Before <= r.After && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
     [ProgramAiChoice(SkillProgramEffectOp.RecordMouLuXunQianxun, SkillProgramEffectOp.UseMouLuXunRecordedTrick, SkillProgramEffectOp.DistributeMouLuXunLianying)]
     internal PromptChoice ChooseMouLuXunAi(PendingDecision prompt, ProgramSkillFrame f)

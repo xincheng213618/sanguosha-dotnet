@@ -159,9 +159,6 @@ internal sealed partial class CoreGameEngineQimeiProgramsRuntime
         if (!ValidQimeiDraw(f))
             throw new InvalidOperationException("Qimei draw lost its exact mutation/source/once-consumed invoice.");
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 380)]
-    internal bool IsQimeiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.SettleQimeiPairEquality && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidQimeiDraw(f);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 2000)]
     internal void CollectWindow_CollectQimeiMovementCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => result.AddRange(CollectQimeiMovementCandidates(batch));
     [ProgramPipelineHook(ProgramPipelinePhase.ExcludeOrdinaryMovementCandidate, 2500)]

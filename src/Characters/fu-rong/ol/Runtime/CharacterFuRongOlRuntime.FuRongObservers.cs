@@ -31,10 +31,6 @@ internal sealed partial class CharacterFuRongOlRuntime
     }
 
     internal ProgramSkillFrame? FuRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterFuRongOlOperations.FuRongFirstChild(root, child), (root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 410)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 520)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 550)]
-    internal bool HasFuRongDamageObserver(long id) => FuRongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26310)]
     internal bool AdvanceFuRongSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FuRongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

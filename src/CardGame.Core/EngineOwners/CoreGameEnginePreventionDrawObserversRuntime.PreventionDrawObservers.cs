@@ -49,8 +49,6 @@ internal sealed partial class CoreGameEnginePreventionDrawObserversRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30)]
     internal bool HasPreventionDrawDying(long beforeDamageId) => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && PreventionDrawObserverRoot(beforeDamageId)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 400)]
     internal bool IsPreventionDrawProgramDying() => _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().Any(parent => HasPreventionDrawDying(parent.Id));

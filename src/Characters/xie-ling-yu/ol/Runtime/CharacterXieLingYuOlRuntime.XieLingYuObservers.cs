@@ -22,9 +22,6 @@ internal sealed partial class CharacterXieLingYuOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27581)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27581)]
     internal bool PermitIssuedXieLingYu(ProgramSkillFrame f) => CanContinueIssuedXieLingYu(f);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 530)]
-    internal bool IsXieLingYuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.XieLingYu is { Paid: true } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is XieLingYuStage.CostChildren or XieLingYuStage.DrawChildren;
     internal bool IsXieLingYuPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.XieLingYu!;
@@ -51,11 +48,6 @@ internal sealed partial class CharacterXieLingYuOlRuntime
     }
 
     internal ProgramSkillFrame? XieLingYuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterXieLingYuOlOperations.XieLingYuFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1050)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1160)]
-    internal bool HasXieLingYuDamageObserver(long id) => XieLingYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1190)]
-    internal bool HasXieLingYuBeforeDamageObserver(long id) => XieLingYuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 280)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 270)]
     internal bool IsXieLingYuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

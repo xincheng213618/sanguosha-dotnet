@@ -18,7 +18,6 @@ internal sealed partial class CharacterMaChaoMobileGodEntries
     internal global::CardGame.Core.PromptChoice MobileMaChaoChoice(global::CardGame.Core.ProgramSkillFrame f, string option, string text, int? target = default) => _resolve().MobileMaChaoChoice(f, option, text, target);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileMaChaoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileMaChaoChoices(f);
     internal global::CardGame.Core.Card[] MobileMaChaoDiscardable(int source, int target) => _resolve().MobileMaChaoDiscardable(source, target);
-    internal bool MobileMaChaoMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MobileMaChaoMovementProof(f, e, p);
     internal int MobileMaChaoSourceDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().MobileMaChaoSourceDamageBonus(attack);
     internal bool MobileMaChaoTriggerEligible(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().MobileMaChaoTriggerEligible(g);
     internal global::CardGame.Core.DamageNature MobileMaChaoYuliNature(global::CardGame.Core.GameEngine.IDamageAttempt attack, global::CardGame.Core.DamageNature priorNature) => _resolve().MobileMaChaoYuliNature(attack, priorNature);

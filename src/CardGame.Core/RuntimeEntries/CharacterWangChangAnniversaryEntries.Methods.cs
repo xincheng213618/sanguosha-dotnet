@@ -25,7 +25,6 @@ internal sealed partial class CharacterWangChangAnniversaryEntries
     internal global::CardGame.Core.PromptChoice WangChangChoice(global::CardGame.Core.ProgramSkillFrame f, string verb, string suffix, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default, global::System.Collections.Generic.IReadOnlyDictionary<string, string>? extra = default) => _resolve().WangChangChoice(f, verb, suffix, label, cards, targets, extra);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> WangChangChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WangChangChoices(f);
     internal global::System.Collections.Generic.IEnumerable<(global::CardGame.Core.Card Card, global::CardGame.Core.CardLocation From, int Slot, bool Hidden)> WangChangForeignCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WangChangForeignCards(f);
-    internal bool WangChangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().WangChangMovement(f, effect, p);
     internal bool WangChangOriginal(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().WangChangOriginal(f, operation);
     internal global::CardGame.Core.Card[] WangChangOwnCosts(int seat, string instance) => _resolve().WangChangOwnCosts(seat, instance);
 }

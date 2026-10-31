@@ -8,9 +8,7 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsEntries
     internal global::CardGame.Core.ProgramLiejieCostColorFrozenEvent ExactLiejiePaidColors(global::CardGame.Core.ProgramSkillFrame frame, string bind) => _resolve().ExactLiejiePaidColors(frame, bind);
     internal bool ExactLiejieParent(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExactLiejieParent(frame);
     internal void FreezeLiejieDiscardColors(global::CardGame.Core.ProgramSkillFrame frame, string sourceBind, global::System.Collections.Generic.IReadOnlyList<int> selectedIds, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardLocation> selectedLocations) => _resolve().FreezeLiejieDiscardColors(frame, sourceBind, selectedIds, selectedLocations);
-    internal bool HasLiejieSourceDiscardDamageObserver(long id) => _resolve().HasLiejieSourceDiscardDamageObserver(id);
     internal bool IsAtomicLiejieCostMove(global::CardGame.Core.ProgramSkillFrame frame, string sourceBind) => _resolve().IsAtomicLiejieCostMove(frame, sourceBind);
-    internal bool IsLiejieAwaitedMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLiejieAwaitedMovement(frame, effect, pending);
     internal bool IsLiejieDiscardDestination(global::CardGame.Core.CardMovementRecord movement) => _resolve().IsLiejieDiscardDestination(movement);
     internal bool IsLiejieSourceDiscardProgramDying() => _resolve().IsLiejieSourceDiscardProgramDying();
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> LiejieDiscardChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().LiejieDiscardChoices(frame);

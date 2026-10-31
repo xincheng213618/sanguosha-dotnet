@@ -43,15 +43,10 @@ internal sealed partial class CharacterSunQuanOlMagicEntries
     internal global::CardGame.Core.MoQuanyuParticipant FreezeMoQuanyuParticipant(int issuer, int participant, int index) => _resolve().FreezeMoQuanyuParticipant(issuer, participant, index);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.MoQuanyuPublicChoice> GetMoQuanyuPublicChoices() => _resolve().GetMoQuanyuPublicChoices();
     internal bool HasMoQuanyuAddedTargetTail(global::CardGame.Core.CardUseFrame use) => _resolve().HasMoQuanyuAddedTargetTail(use);
-    internal bool HasMoQuanyuBeforeDamageObserver(long id) => _resolve().HasMoQuanyuBeforeDamageObserver(id);
-    internal bool HasMoQuanyuDamageObserver(long id) => _resolve().HasMoQuanyuDamageObserver(id);
     internal bool HasMoQuanyuProspectiveQuota(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.CardKind kind) => _resolve().HasMoQuanyuProspectiveQuota(actor, target, kind);
-    internal bool HasMoSunQuanPaidBeforeDamageObserver(long id) => _resolve().HasMoSunQuanPaidBeforeDamageObserver(id);
-    internal bool HasMoSunQuanPaidDamageObserver(long id) => _resolve().HasMoSunQuanPaidDamageObserver(id);
     internal bool HasMoTianenEntityMark(int id) => _resolve().HasMoTianenEntityMark(id);
     internal bool HasUnstartedMoQuanyuExtraRound(long id) => _resolve().HasUnstartedMoQuanyuExtraRound(id);
     internal bool HideInternalMoQuanyuTargetChoice(global::CardGame.Core.ProgramActivationLegalityContext g) => _resolve().HideInternalMoQuanyuTargetChoice(g);
-    internal bool IsMoQiangangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMoQiangangMovement(f, effect, p);
     internal bool IsMoQuanyuAddedTargetFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.MoQuanyuTargetAddedEvent fact) => _resolve().IsMoQuanyuAddedTargetFact(use, fact);
     internal bool IsMoQuanyuCompleteZhangbaQuotaLegal(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<int> targets, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().IsMoQuanyuCompleteZhangbaQuotaLegal(actor, targets, cards);
     internal bool IsMoQuanyuExtraRound(long id) => _resolve().IsMoQuanyuExtraRound(id);

@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuLieMouRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 37500)]
     internal bool MouHuLieMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => f.MouHuLie is { } r && MouHuLieRules.Valid(f) && op?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouHuLieFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {

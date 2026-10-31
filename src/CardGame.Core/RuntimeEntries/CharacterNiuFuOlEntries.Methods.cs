@@ -11,9 +11,6 @@ internal sealed partial class CharacterNiuFuOlEntries
     internal bool ContinuePaidNiuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidNiuFu(f);
     internal bool DrainNiuFu(long id, bool movement) => _resolve().DrainNiuFu(id, movement);
     internal void FinishNiuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishNiuFu(f);
-    internal bool HasNiuFuBeforeDamageObserver(long id) => _resolve().HasNiuFuBeforeDamageObserver(id);
-    internal bool HasNiuFuDamageObserver(long id) => _resolve().HasNiuFuDamageObserver(id);
-    internal bool IsNiuFuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsNiuFuMovement(f, e, p);
     internal bool IsNiuFuRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsNiuFuRecoveryParent(f, recovery);
     internal bool IsNiuFuZonglueDamage(int owner, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsNiuFuZonglueDamage(owner, c);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> NiuFuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().NiuFuChoices(f);

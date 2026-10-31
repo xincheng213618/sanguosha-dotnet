@@ -20,8 +20,6 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27595)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27595)]
     internal bool PermitPaidOrdinaryCaiFuRen(ProgramSkillFrame f) => CanContinueIssuedOrdinaryCaiFuRen(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 140)]
-    internal bool IsOrdinaryCaiFuRenMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.OrdinaryQieting is { Paid: true, Stage: OrdinaryQietingStage.MovementChildren or OrdinaryQietingStage.DrawChildren } && global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsCaiFuRenQietingOperation(f, effect) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool IsOrdinaryQietingPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         if (f.OrdinaryQieting is not { Paid: true } r || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.Sequence <= r.Before || m.Sequence > r.After)
@@ -54,11 +52,6 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
 
     internal bool OrdinaryQietingObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? OrdinaryQietingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterCaiFuRenOlOperations.OrdinaryQietingFirstChild(f, child), (index) => _characterCaiFuRenOlOperations.OrdinaryQietingObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1070)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1180)]
-    internal bool HasOrdinaryCaiFuRenDamageObserver(long id) => OrdinaryQietingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1210)]
-    internal bool HasOrdinaryCaiFuRenBeforeDamageObserver(long id) => OrdinaryQietingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 300)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 290)]
     internal bool IsOrdinaryCaiFuRenRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

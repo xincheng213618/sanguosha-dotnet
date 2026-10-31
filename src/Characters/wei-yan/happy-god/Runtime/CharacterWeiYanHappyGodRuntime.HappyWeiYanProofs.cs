@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiYanHappyGodRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 42300)]
     internal bool HappyWeiYanMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (frame.HappyWeiYan is not { } receipt || effect?.Op != receipt.Operation || pending != frame.PendingMovementContinuation || pending.SubjectSeat != frame.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || receipt.Stage is not (HappyWeiYanStage.Replacing or HappyWeiYanStage.Placing or HappyWeiYanStage.GainChildren or HappyWeiYanStage.DrawChildren or HappyWeiYanStage.BoneDiscardChildren or HappyWeiYanStage.GujingDiscardChildren))
@@ -39,11 +37,6 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
     }
 
     internal ProgramSkillFrame? HappyWeiYanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterWeiYanHappyGodOperations.HappyWeiYanFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 42300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 42300)]
-    internal bool HappyWeiYanDamageObserver(long id) => HappyWeiYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 42300)]
-    internal bool HappyWeiYanBeforeDamageObserver(long id) => HappyWeiYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 42300)]
     internal bool HappyWeiYanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HappyWeiYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 42300)]

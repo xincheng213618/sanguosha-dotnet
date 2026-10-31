@@ -230,11 +230,6 @@ internal sealed partial class CharacterWangYunOlRuntime
     }
 
     internal ProgramSkillFrame? WangYunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterWangYunOlOperations.WangYunFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1540)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1650)]
-    internal bool HasWangYunDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && WangYunObserverRoot()is not null;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1650)]
-    internal bool HasWangYunBeforeDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && WangYunObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 190)]
     internal bool TryAdvanceWangYunSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WangYunObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

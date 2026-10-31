@@ -115,14 +115,8 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitObserversRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1820)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 200)]
-    internal bool HasSlashBenefitDamageObserver(long id) => SlashBenefitPaidObserverRoot(id)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 660)]
     internal bool IsSlashTargetBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SlashBenefitPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 90)]
-    internal bool IsSlashTargetBenefitMovement(ProgramSkillFrame root, SkillProgramEffect? op, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && root.SlashTargetBenefitDraft is { Stage: SlashTargetBenefitDraftStage.PaidChildren } d && pending.SubjectSeat == (d.Settlement ? root.OwnerSeat : d.Receipt.DrawBenefit ? root.OwnerSeat : d.Receipt.Use.TargetSeat) && op?.Op == (d.Settlement ? SkillProgramEffectOp.SettleDodgeCancelledSlashBenefit : SkillProgramEffectOp.OfferSlashTargetBenefit) && ValidSlashBenefitDraftPayment(root);
     internal bool SlashBenefitWindowMatches(SlashTargetBenefitWindowFrame w)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == w.Id);

@@ -266,9 +266,6 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 550)]
-    internal bool IsDrawDiscardCategoryMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.DrawThenDiscardDistinctCategories && effect.Amount == f.DrawDiscardCategoryRefund?.RequestedCount && effect.StateId == f.DrawDiscardCategoryRefund?.StateId && f.PendingMovementContinuation == pending && ValidDrawDiscardCategoryReceipt(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 680)]
     internal bool CanContinueDrawDiscardCategoryRefund(ProgramSkillFrame f) => f.DrawDiscardCategoryRefund is { DrawIssued: true } && ValidDrawDiscardCategoryReceipt(f);
     [ProgramAiChoice(SkillProgramEffectOp.DrawThenDiscardDistinctCategories)]
@@ -326,7 +323,5 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 150)]
     internal bool IsDrawDiscardCategoryProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CategoryActivationObserverRoot(false)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1940)]
-    internal bool HasCategoryActivationDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && (CategoryActivationObserverRoot(false)is not null || CategoryActivationObserverRoot(true)is not null);
     SkillProgramStepOutcome global::CardGame.Core.IDrawDiscardCategoryProgramHost.DrawThenDiscardDistinctCategories(ProgramSkillFrame f, int targetSeat, int amount, string stateId) => BeginDrawDiscardCategoryRefund(f, targetSeat, amount, stateId);
 }

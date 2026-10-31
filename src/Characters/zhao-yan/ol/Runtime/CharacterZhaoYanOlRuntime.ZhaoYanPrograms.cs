@@ -428,12 +428,6 @@ internal sealed partial class CharacterZhaoYanOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTongxieGuardedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.ProtectedSeat, preventerSeat, pending.PreventedAmount));
         return SkillProgramStepOutcome.Continue;
     }
-
-    // A lethal 同协 prevention cost starts its dying child while the guarded
-    // before-damage window is still live; the child pins the exact guard
-    // program frame, so the window keeps its damage context.
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 40)]
-    internal bool HasTongxieGuardDying(long beforeDamageId) => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true, ParentFrameId: var parentId } dying && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id)is var dyingIndex && dyingIndex >= 0 && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == parentId)is var programIndex && programIndex >= 0 && programIndex < dyingIndex && _resolutionStackOperations._resolutionStack[programIndex] is ProgramSkillFrame { TongxieGuard.AcceptedPreventer: not null } guard && guard.WindowContext is { Window: SkillProgramTriggerWindow.BeforeDamageApplied, ParentFrameId: var parent } && parent == beforeDamageId;
     // 同协 arm: price every offered member set; each chosen member scores as a
     // support target and a guaranteed unique-least draw adds its card value.
     [ProgramAiChoice(SkillProgramEffectOp.TongxieArm)]

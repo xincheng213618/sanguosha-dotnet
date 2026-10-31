@@ -8,9 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTangTangOlRuntime
 {
     internal static bool TangTangMoving(TangTangStage stage) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tang_tang_ol_TangTangObservers.TangTangMoving(stage);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 460)]
-    internal bool IsTangTangMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.TangTang is { Paid: true } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.BeforeCount == 0 && p.CoverageResultBind is null && (TangTangMoving(r.Stage) && p.SubjectSeat == (r.Stage == TangTangStage.TakeChildren ? r.Peer : r.Stage == TangTangStage.DrawChildren ? r.Recipient : f.OwnerSeat) || r.Stage is TangTangStage.HpIssuing or TangTangStage.HpChildren && p.SubjectSeat == r.Peer);
     internal bool IsTangTangPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.TangTang!;
@@ -57,11 +54,6 @@ internal sealed partial class CharacterTangTangOlRuntime
     }
 
     internal ProgramSkillFrame? TangTangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterTangTangOlOperations.TangTangFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 970)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1080)]
-    internal bool HasTangTangDamageObserver(long id) => TangTangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1110)]
-    internal bool HasTangTangBeforeDamageObserver(long id) => TangTangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27530)]
     internal bool AdvanceTangTangChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && TangTangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     internal IEnumerable<CardSnapshot> TangTangPrivatelyViewedCards(int viewerSeat) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnerSeat == viewerSeat && f.TangTang?.Stage == TangTangStage.TakeCards).SelectMany(f => f.TangTang!.Viewed.Where(id => _cardZonesOperations._cardZones.Contains(CardLocation.Hand(f.TangTang.Peer), id))).Distinct().Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id)));

@@ -20,14 +20,6 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
         return f.InstructionIndex is 0 or 1 && f.TriggerId is { } id && f.ActivationId == id && f.WindowContext is { } context && CanRunIssuedFulueCandidate(new(f.OwnerSeat, f.SkillId, id, f.SkillInstanceId, f.GameplayHash, 0), context);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 570)]
-    internal bool IsFulueMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (f.Fulue?.Stage != FulueStage.MovementChildren || effect is null || !PeiYuanShaoComposition.Handles(effect.Op) || pending != f.PendingMovementContinuation)
-            return false;
-        return true;
-    }
-
     internal bool FulueLionProof(ProgramSkillFrame f, int seat, CardMoveReason? reason) => f.Fulue is { Stage: FulueStage.MovementChildren, Obtained: { CardKind: CardKind.SilverLion, From.Zone: CardZoneKind.Equipment } cost } r && cost.From.OwnerSeat == seat && reason?.Value == FulueObtainReason && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == cost.CardId && m.From == cost.From && m.Reason == reason);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 840)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 780)]
@@ -46,11 +38,6 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
     }
 
     internal ProgramSkillFrame? FulueObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterPeiYuanShaoOlOperations.FulueFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 680)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 790)]
-    internal bool HasFulueDamageObserver(long id) => FulueObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 820)]
-    internal bool HasFulueBeforeDamageObserver(long id) => FulueObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27120)]
     internal bool AdvanceFulueSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FulueObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

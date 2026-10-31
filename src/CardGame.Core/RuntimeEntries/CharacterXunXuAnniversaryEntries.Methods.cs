@@ -36,9 +36,7 @@ internal sealed partial class CharacterXunXuAnniversaryEntries
     internal global::CardGame.Core.CommandError? ValidateXunXuPlay(global::CardGame.Core.CharacterState owner, global::CardGame.Core.LegalAction action, global::System.Collections.Generic.IReadOnlyList<int> ids, global::System.Collections.Generic.IReadOnlyList<int> targets) => _resolve().ValidateXunXuPlay(owner, action, ids, targets);
     internal bool WindowSettlement_IsAnniversaryXunXuSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsAnniversaryXunXuSettlementBatch(frame, batch);
     internal bool XunXuAllowance(int owner, global::CardGame.Core.CardKind kind) => _resolve().XunXuAllowance(owner, kind);
-    internal bool XunXuBeforeDamageObserver(long id) => _resolve().XunXuBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> XunXuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().XunXuChoices(f);
-    internal bool XunXuDamageObserver(long id) => _resolve().XunXuDamageObserver(id);
     internal int[] XunXuDiscardIndexes(global::CardGame.Core.CardMovementBatchContext batch, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().XunXuDiscardIndexes(batch, candidate);
     internal bool XunXuDyingObserver() => _resolve().XunXuDyingObserver();
     internal bool XunXuFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().XunXuFirstChild(f, child);

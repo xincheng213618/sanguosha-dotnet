@@ -10,10 +10,7 @@ internal sealed partial class CharacterHaoPuOlEntries
     internal bool DrainZhenyingChildren(long id) => _resolve().DrainZhenyingChildren(id);
     internal void FinishZhenying(global::CardGame.Core.ProgramSkillFrame f, bool duel) => _resolve().FinishZhenying(f, duel);
     internal global::CardGame.Core.ZhenyingHandPlan FreezeZhenyingHand(int seat) => _resolve().FreezeZhenyingHand(seat);
-    internal bool HasZhenyingBeforeDamageObserver(long id) => _resolve().HasZhenyingBeforeDamageObserver(id);
-    internal bool HasZhenyingDamageObserver(long id) => _resolve().HasZhenyingDamageObserver(id);
     internal bool IsZhenyingDuelUse(long id) => _resolve().IsZhenyingDuelUse(id);
-    internal bool IsZhenyingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhenyingMovement(f, effect, p);
     internal bool MatchesZhenyingDuel(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ZhenyingDuelOrigin d) => _resolve().MatchesZhenyingDuel(f, d);
     internal void PayZhenyingAdjustment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayZhenyingAdjustment(f);
     internal void PublishZhenyingChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishZhenyingChoice(f);

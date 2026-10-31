@@ -146,9 +146,6 @@ internal sealed partial class CharacterSuFeiOlRuntime
         RequireSuFei(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 220)]
-    internal bool IsSuFeiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.SuFei is { Stage: SuFeiStage.DrawChildren or SuFeiStage.GiftChildren } && e?.Op == SkillProgramEffectOp.DrawThenOfferActualConsecutiveTargetGift && CanContinueSuFei(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal void RequireSuFei(ProgramSkillFrame f)
     {
         if (f.SuFei is not { } r || r.Source != SuFeiSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.WindowId != f.WindowContext?.ParentFrameId || !ValidSuFeiQualification(r.Qualification, f.OwnerSeat) || r.DrawBefore > r.DrawAfter || r.DrawAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.ActualDraw is not (0 or 1) || r.DrawnId.HasValue != (r.ActualDraw == 1) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LianpianDrawPaidEvent>().Count(e => e == new LianpianDrawPaidEvent(f.Id, r.Source, r.GameplayHash, r.Qualification.Current.NativeUseId, r.Qualification.Current.Action.ActionId, r.DrawBefore, r.DrawAfter, r.ActualDraw)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == SuFeiDrawReason && (r.DrawnId is null || m.CardId == r.DrawnId)) != r.ActualDraw)

@@ -221,8 +221,5 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 300)]
-    internal bool IsNeifaMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.Neifa is { Stage: NeifaStage.GainChildren or NeifaStage.DiscardChildren or NeifaStage.EquipmentDrawChildren } && e is not null && NeifaComposition.IsOp(e.Op) && CanContinueNeifa(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
-
     SkillProgramStepOutcome global::CardGame.Core.INeifaProgramHost.BeginNeifa(ProgramSkillFrame f, SkillProgramEffect e) => BeginNeifa(f, e);
 }

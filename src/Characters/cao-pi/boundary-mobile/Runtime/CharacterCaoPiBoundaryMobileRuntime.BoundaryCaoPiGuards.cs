@@ -7,10 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoPiBoundaryMobileRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 54500)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 54500)]
-    internal bool BoundaryFangzhuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.BoundaryFangzhu is { Stage: BoundaryFangzhuStage.DiscardChildren or BoundaryFangzhuStage.DrawChildren } r && e?.Op == SkillProgramEffectOp.ResolveBoundaryCaoPiFangzhu && p == f.PendingMovementContinuation && p.SubjectSeat == r.Target && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 54500)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 54500)]
     internal bool BoundaryFangzhuRecovery(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.BoundaryFangzhu is { Stage: BoundaryFangzhuStage.DiscardChildren } r && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && r.Selected.Any(id => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind == CardKind.SilverLion && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.Equipment(r.Target)));
@@ -32,10 +28,6 @@ internal sealed partial class CharacterCaoPiBoundaryMobileRuntime
     }
 
     internal ProgramSkillFrame? BoundaryFangzhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterCaoPiBoundaryMobileOperations.BoundaryFangzhuFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 54500)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 54500)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 54500)]
-    internal bool BoundaryFangzhuDamageObserver(long id) => BoundaryFangzhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 54500)]
     internal bool BoundaryFangzhuDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BoundaryFangzhuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 54500)]

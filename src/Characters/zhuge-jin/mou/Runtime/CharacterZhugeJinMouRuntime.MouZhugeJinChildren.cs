@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeJinMouRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 35600)]
     internal bool MouZhugeJinMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MouZhugeJin is { Committed: true } r && effect?.Op == r.Operation && MouZhugeJin.Valid(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouZhugeJinFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -41,11 +40,6 @@ internal sealed partial class CharacterZhugeJinMouRuntime
     internal bool MouZhugeJinEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MouZhugeJinFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool MouZhugeJinSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterZhugeJinMouOperations.MouZhugeJinEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? MouZhugeJinRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhugeJinMouOperations.MouZhugeJinFirstChild(f, c), (n) => _characterZhugeJinMouOperations.MouZhugeJinSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 35600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 35600)]
-    internal bool MouZhugeJinDamageWindow(long id) => MouZhugeJinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35600)]
-    internal bool MouZhugeJinBeforeDamage(long id) => MouZhugeJinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35600)]
     internal bool MouZhugeJinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouZhugeJinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35600)]

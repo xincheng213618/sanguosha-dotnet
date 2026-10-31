@@ -12,9 +12,6 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 30800)]
     internal bool ContinueIssuedMoLuBu(ProgramSkillFrame f) => f.MoLuBu is not null && ValidMoLuBu(f) || f.WindowContext is { } c && IsIssuedMoLuBuDeathCandidate(new(f.OwnerSeat, f.SkillId, f.TriggerId ?? "", f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 30800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 30800)]
-    internal bool MoLuBuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation m) => f.MoLuBu is not null && ValidMoLuBu(f) && e is not null && MoLuBuComposition.Handles(e.Op) && m.SubjectSeat == f.OwnerSeat && m.BeforeCount == 0 && m.CoverageResultBind is null;
     internal bool MoLuBuFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.MoLuBu is not { } r || !ValidMoLuBu(f))
@@ -30,10 +27,6 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
 
     internal bool MoLuBuObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _resolutionStackOperations2._resolutionStack()[i - 1] is ProgramSkillFrame f && _characterLuBuOlMagicOperations.MoLuBuFirstChild(f, _resolutionStackOperations2._resolutionStack()[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? MoLuBuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLuBuOlMagicOperations.MoLuBuFirstChild(f, c), (i) => _characterLuBuOlMagicOperations.MoLuBuObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 30800)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 30800)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 30800)]
-    internal bool MoLuBuDamageObserver(long id) => MoLuBuObserverRoot()is { MoLuBu: { } r } root && (r.WindowId == id || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30800)]
     internal bool MoLuBuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MoLuBuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30800)]

@@ -28,8 +28,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionObserversRuntime
     }
 
     internal ProgramSkillFrame? PhaseNamePredictionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePhaseNamePredictionObserversOperations.PhaseNamePredictionFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1800)]
-    internal bool HasPhaseNamePredictionDamageObserver(long window) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == window && f is DamageTriggerWindowFrame) && PhaseNamePredictionObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 70)]
     internal bool TryAdvancePhaseNamePredictionSubtree()
     {

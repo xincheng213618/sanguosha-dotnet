@@ -71,12 +71,6 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyObserversRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1830)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 210)]
-    internal bool HasTargetPenaltyDamageObserver(long id) => TargetPenaltyPaidObserverRoot(id)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 670)]
     internal bool IsTargetPenaltyProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && TargetPenaltyPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 100)]
-    internal bool IsTargetPenaltyMovement(ProgramSkillFrame root, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && effect?.Op == SkillProgramEffectOp.RequireTargetDiscardOrEquipmentRecast && root.SlashTargetPenaltyDraft is { } d && pending.SubjectSeat == d.Identity.TargetSeat && _coreSlashTargetPenaltyPaymentsOperations.ValidTargetPenaltyPayment(root) && (d.Stage == SlashTargetPenaltyStage.CostChildren || d.Stage == SlashTargetPenaltyStage.RewardChildren && ValidTargetPenaltyReward(root));
 }

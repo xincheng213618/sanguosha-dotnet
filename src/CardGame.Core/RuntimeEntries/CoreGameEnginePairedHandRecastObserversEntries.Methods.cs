@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePairedHandRecastObserversEntries
 {
-    internal bool HasPairedHandRecastDamageObserver(long windowId) => _resolve().HasPairedHandRecastDamageObserver(windowId);
     internal bool IsPairedHandRecastDying() => _resolve().IsPairedHandRecastDying();
     internal bool PairedHandRecastFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().PairedHandRecastFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? PairedHandRecastObserverRoot() => _resolve().PairedHandRecastObserverRoot();

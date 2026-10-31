@@ -48,9 +48,6 @@ internal sealed partial class CoreGameEngineShanheMarketApplicationRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 62030)]
-    internal bool MatchesShanheMarketMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ApplyShanheMarketPurchase && frame.ShanheMarketApplication is { } receipt && receipt.InstructionIndex == frame.InstructionIndex && pending.SubjectSeat == 0 && pending.BeforeCount == 0 && pending.CoverageResultBind is null && RequireShanheMarketProgram(frame).Id == receipt.PurchaseFrameId;
     internal bool DrainShanheMarketChildren(ProgramSkillFrame frame) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(frame.Id);
     internal void ContinueShanheMarketApplication(long id)
     {

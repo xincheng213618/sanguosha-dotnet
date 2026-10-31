@@ -110,9 +110,6 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 62025)]
-    internal bool MatchesShanheTeamRankMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ApplyShanheSchoolTeamRank && frame.ShanheTeamRank is { EntryApplied: false, Stage: ShanheTeamRankStage.Next } && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-
     internal void ContinueShanheSchoolTeamRank(long id)
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShanheTeamRank: { } state } f && f.Id == id)

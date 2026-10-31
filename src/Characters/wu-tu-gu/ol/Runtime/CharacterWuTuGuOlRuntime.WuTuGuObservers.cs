@@ -28,11 +28,6 @@ internal sealed partial class CharacterWuTuGuOlRuntime
     }
 
     internal ProgramSkillFrame? WuTuGuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterWuTuGuOlOperations.WuTuGuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 780)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 890)]
-    internal bool HasWuTuGuDamageObserver(long id) => WuTuGuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 920)]
-    internal bool HasWuTuGuBeforeDamageObserver(long id) => HasWuTuGuDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27320)]
     internal bool AdvanceWuTuGuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuTuGuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

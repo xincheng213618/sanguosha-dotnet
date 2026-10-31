@@ -51,7 +51,4 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
             return r.Cursor == r.OtherSeats.Count && r.Stage is OlGuixinStage.TurnoverChildren or OlGuixinStage.Finished && r.FaceDownBefore.HasValue && r.FaceDownAfter.HasValue && _coreProgramEventHistoryOperations.ProgramEventHistory<OlGuixinTurnoverIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var turn] && turn == new OlGuixinTurnoverIssuedEvent(f.Id, r.FaceDownBefore.Value, r.FaceDownAfter.Value);
         return r.FaceDownBefore is null && r.FaceDownAfter is null && r.Stage != OlGuixinStage.TurnoverChildren;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 40700)]
-    internal bool OlGuixinMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveOlShenCaoCaoGuixin && f.OlGuixin is { Stage: OlGuixinStage.MovementChildren } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidOlGuixin(f);
 }

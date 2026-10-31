@@ -10,12 +10,10 @@ internal sealed partial class CharacterZhangLiaoHappyGodEntries
     internal void AnswerHappyZl(global::CardGame.Core.PromptChoice chosen) => _resolve().AnswerHappyZl(chosen);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyZl(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginHappyZl(supplied, op);
     internal void FinishHappyZl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHappyZl(f);
-    internal bool HappyZlBeforeDamageObserver(long id) => _resolve().HappyZlBeforeDamageObserver(id);
     internal bool HappyZlCannotRespond(global::CardGame.Core.CardActionContext action, int responderSeat) => _resolve().HappyZlCannotRespond(action, responderSeat);
     internal bool HappyZlCannotRespond2(long useId, int responderSeat) => _resolve().HappyZlCannotRespond(useId, responderSeat);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyZlChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZlChoices(f);
     internal global::CardGame.Core.HappyZlColorEvent? HappyZlColor(int owner, int target, bool? color) => _resolve().HappyZlColor(owner, target, color);
-    internal bool HappyZlDamageObserver(long id) => _resolve().HappyZlDamageObserver(id);
     internal global::CardGame.Core.CardUseFrame? HappyZlDamageUse(int owner, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HappyZlDamageUse(owner, w);
     internal bool HappyZlDying() => _resolve().HappyZlDying();
     internal bool HappyZlEligible(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HappyZlEligible(c, t, w);

@@ -11,8 +11,6 @@ internal sealed partial class CharacterHanDangMouMobileEntries
     internal void ContinueMouHanDang(long id) => _resolve().ContinueMouHanDang(id);
     internal global::CardGame.Core.CardActionContext? CurrentMouHanDangRespondedAction() => _resolve().CurrentMouHanDangRespondedAction();
     internal void FinishMouHanDang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouHanDang(f);
-    internal bool HasMouHanDangBeforeDamageObserver(long id) => _resolve().HasMouHanDangBeforeDamageObserver(id);
-    internal bool HasMouHanDangDamageObserver(long id) => _resolve().HasMouHanDangDamageObserver(id);
     internal bool IsMouHanDangDying() => _resolve().IsMouHanDangDying();
     internal bool IsMouHanDangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouHanDangMovement(f, e, p);
     internal bool IsMouHanDangNativeResponseAllowed(global::CardGame.Core.CharacterState provider, global::CardGame.Core.Card card, bool dyingUse = false) => _resolve().IsMouHanDangNativeResponseAllowed(provider, card, dyingUse);

@@ -26,11 +26,6 @@ internal sealed partial class CharacterZhangHengAnniversaryRuntime
             return f.PendingMovementContinuation is null && r.Cards.All(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Judgment(r.Donor));
         return r.Cards.Count > 0 && f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } p && p.SubjectSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryZhangHengMovedEvent>().Count(e => e == new AnniversaryZhangHengMovedEvent(f.Id, r.Donor, r.Cards.Count, r.Before, r.After)) == 1 && r.Cards.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == CardLocation.Judgment(r.Donor) && m.To == CardLocation.Judgment(f.OwnerSeat) && m.Reason == ZhangHengMoveReason) == 1);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 49600)]
     internal bool ZhangHengMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryZhangHeng is { Stage: "children" } && e?.Op == SkillProgramEffectOp.ResolveAnniversaryZhangHengDangzai && p == f.PendingMovementContinuation && ValidZhangHeng(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 49600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 49600)]
@@ -50,11 +45,6 @@ internal sealed partial class CharacterZhangHengAnniversaryRuntime
 
     internal bool ZhangHengObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && ZhangHengFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal ProgramSkillFrame? ZhangHengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangHengAnniversaryOperations.ZhangHengFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterZhangHengAnniversaryOperations.ZhangHengObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 49600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 49600)]
-    internal bool ZhangHengDamageObserver(long id) => ZhangHengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49600)]
-    internal bool ZhangHengBeforeDamageObserver(long id) => ZhangHengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49600)]
     internal bool ZhangHengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ZhangHengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49600)]

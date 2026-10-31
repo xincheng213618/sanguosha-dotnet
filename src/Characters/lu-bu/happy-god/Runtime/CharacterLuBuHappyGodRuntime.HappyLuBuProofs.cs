@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuHappyGodRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 41200)]
     internal bool HappyLuBuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (effect?.Op != SkillProgramEffectOp.ObtainHappyShenLuBuTurnBasic || f.HappyLuBu is not { Stage: HappyLuBuStage.BasicChildren, Paid.Count: 1 } r || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
@@ -17,11 +16,6 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
 
     internal bool HappyLuBuFirstChild(ProgramSkillFrame f, ResolutionFrame child) => f.HappyLuBu is { Stage: HappyLuBuStage.BasicChildren } r && f.PendingMovementContinuation is { } pending && HappyLuBuMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) && child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(r.Paid.Contains);
     internal ProgramSkillFrame? HappyLuBuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLuBuHappyGodOperations.HappyLuBuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 41200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 41200)]
-    internal bool HappyLuBuDamage(long id) => HappyLuBuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 41200)]
-    internal bool HappyLuBuBeforeDamage(long id) => HappyLuBuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 41200)]
     internal bool HappyLuBuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HappyLuBuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 41200)]

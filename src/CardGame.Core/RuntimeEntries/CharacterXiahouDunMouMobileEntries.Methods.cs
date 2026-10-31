@@ -11,8 +11,6 @@ internal sealed partial class CharacterXiahouDunMouMobileEntries
     internal bool ContinueAcceptedMouXiahouDun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueAcceptedMouXiahouDun(f);
     internal void ContinueMouXiahouDunMovement(long id) => _resolve().ContinueMouXiahouDunMovement(id);
     internal void FinishMouXiahouDun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouXiahouDun(f);
-    internal bool HasMouXiahouDunBeforeDamageObserver(long id) => _resolve().HasMouXiahouDunBeforeDamageObserver(id);
-    internal bool HasMouXiahouDunDamageObserver(long id) => _resolve().HasMouXiahouDunDamageObserver(id);
     internal bool IsIssuedMouXiahouDunPile(global::CardGame.Core.PublicPersistentPileSource source) => _resolve().IsIssuedMouXiahouDunPile(source);
     internal bool IsMouXiahouDunDying() => _resolve().IsMouXiahouDunDying();
     internal bool IsMouXiahouDunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouXiahouDunMovement(f, e, p);

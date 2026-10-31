@@ -142,8 +142,6 @@ internal sealed partial class CharacterWangYunOlRuntime
             PublishWangYun(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 130)]
     internal bool IsWangYunMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.ResolveLianjiPaidWeaponAndSlash && f.WangYunPlan is { Stage: "movement" } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Movement, 22900)]
     internal bool ReturnWangYunMovement(ProgramSkillFrame f)

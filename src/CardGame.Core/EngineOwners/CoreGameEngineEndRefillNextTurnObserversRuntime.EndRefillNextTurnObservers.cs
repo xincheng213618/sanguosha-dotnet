@@ -20,8 +20,6 @@ internal sealed partial class CoreGameEngineEndRefillNextTurnObserversRuntime
     internal ProgramSkillFrame? EndRefillObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreEndRefillNextTurnObserversOperations.EndRefillFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 230)]
     internal bool IsEndRefillDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && EndRefillObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1780)]
-    internal bool HasEndRefillDamageObserver(long id) => EndRefillObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 60)]
     internal bool TryAdvanceEndRefillSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && EndRefillObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

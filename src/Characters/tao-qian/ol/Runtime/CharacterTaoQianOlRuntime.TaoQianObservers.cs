@@ -18,8 +18,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28120)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28120)]
     internal bool PermitIssuedTaoQian(ProgramSkillFrame f) => f.TaoQian is { Paid: true } && CanContinueIssuedTaoQian(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 180)]
-    internal bool IsTaoQianMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => IsZhaohuoMovement(f, e, p) || f.TaoQian is { Paid: true } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is TaoQianStage.NativeChildren or TaoQianStage.DiscardChildren or TaoQianStage.DrawChildren;
     internal bool TaoQianPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.TaoQian!;
@@ -60,11 +58,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
     internal bool TaoQianLifecycleEdge(int index) => _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame w && _resolutionStackOperations._resolutionStack[index] is ProgramSkillFrame f && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && f.WindowContext is { } c && c.ParentFrameId == w.Id && c.Window == w.Window;
     internal bool TaoQianObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _characterTaoQianOlOperations.TaoQianLifecycleEdge(n) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame { Zenrun: not null } z && _characterSunHongOlOperations.ZenrunFirstChild(z, _resolutionStackOperations2._resolutionStack()[n]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? TaoQianObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterTaoQianOlOperations.TaoQianFirstChild(f, child), (i) => _characterTaoQianOlOperations.TaoQianObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1110)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1220)]
-    internal bool HasTaoQianDamageObserver(long id) => HasZhaohuoDamageObserver(id) || TaoQianObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1250)]
-    internal bool HasTaoQianBeforeDamageObserver(long id) => HasZhaohuoBeforeDamageObserver(id) || TaoQianObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28120)]
     internal bool AdvanceTaoQianChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && TaoQianObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

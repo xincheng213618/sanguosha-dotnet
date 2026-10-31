@@ -64,9 +64,6 @@ internal sealed partial class CoreGameEngineWushuangAuditCombatRuntime
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > receipt.SequenceBefore && m.Sequence <= receipt.SequenceAfter).ToArray();
         return moves.Length == receipt.Cards.Count && moves.Select(m => m.CardId).SequenceEqual(receipt.Cards) && moves.All(m => m.From == CardLocation.Hand(receipt.EndedSeat) && m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason.Value == WushuangCampClaimReason) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCampClaimedEvent>().Count(e => e.ProgramFrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.EndedFrameId == receipt.EndedFrameId && e.EndedSeat == receipt.EndedSeat && e.ActualTurn == receipt.ActualTurn && e.Count == receipt.Cards.Count && e.BatchId == receipt.BatchId && e.SequenceBefore == receipt.SequenceBefore && e.SequenceAfter == receipt.SequenceAfter) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 63200)]
-    internal bool IsWushuangCampClaimMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ClaimWushuangEndedCampHand && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidWushuangCampClaim(frame);
     [ProgramContinuation(ProgramContinuationKind.Movement, 63200)]
     internal bool ReturnWushuangCampClaim(ProgramSkillFrame frame)
     {

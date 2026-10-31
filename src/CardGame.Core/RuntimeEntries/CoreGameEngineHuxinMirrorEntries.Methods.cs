@@ -8,7 +8,6 @@ internal sealed partial class CoreGameEngineHuxinMirrorEntries
     internal bool HuxinMirrorDamageQualifies(int owner, int amount, global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().HuxinMirrorDamageQualifies(owner, amount, attack);
     internal bool HuxinMirrorIsEligible(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext window) => _resolve().HuxinMirrorIsEligible(owner, instance, window);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.LegalAction> HuxinMirrorPlacementActions(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().HuxinMirrorPlacementActions(actor, cards);
-    internal bool IsPaidHuxinMirrorMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsPaidHuxinMirrorMovement(frame, effect, pending);
     internal bool KeepPaidHuxinMirror(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepPaidHuxinMirror(frame);
     internal global::CardGame.Core.SkillProgramStepOutcome PayHuxinMirrorAndPrevent(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().PayHuxinMirrorAndPrevent(supplied);
     internal bool ResumePaidHuxinMirror(long id) => _resolve().ResumePaidHuxinMirror(id);

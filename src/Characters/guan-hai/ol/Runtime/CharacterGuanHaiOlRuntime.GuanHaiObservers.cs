@@ -19,9 +19,6 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
         return IsIssuedXieweiCandidate(candidate, c) || IsIssuedGuanHaiYouqueCandidate(candidate, c);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 520)]
-    internal bool IsGuanHaiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.GuanHai is { Paid: true } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is GuanHaiStage.XieweiChildren or GuanHaiStage.Pindian or GuanHaiStage.PindianChildren or GuanHaiStage.DiscardChildren or GuanHaiStage.NativeChildren or GuanHaiStage.RewardChildren;
     internal bool GuanHaiMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.GuanHai!;
@@ -66,11 +63,6 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     }
 
     internal ProgramSkillFrame? GuanHaiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterGuanHaiOlOperations.GuanHaiFirstChild(f, child), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1040)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1150)]
-    internal bool HasGuanHaiDamageObserver(long id) => GuanHaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1180)]
-    internal bool HasGuanHaiBeforeDamageObserver(long id) => GuanHaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 270)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 260)]
     internal bool IsGuanHaiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

@@ -11,7 +11,6 @@ internal sealed partial class CharacterZhangLiaoOlSpEntries
     internal void ContinueSpZhangLiao(long id) => _resolve().ContinueSpZhangLiao(id);
     internal bool DrainSpZhangLiaoChildren(long id) => _resolve().DrainSpZhangLiaoChildren(id);
     internal bool HasDiaolingAwakened(int seat) => _resolve().HasDiaolingAwakened(seat);
-    internal bool HasSpZhangLiaoDamageObserver(long id) => _resolve().HasSpZhangLiaoDamageObserver(id);
     internal void MoveSpZhangLiaoCards(long id, global::System.Collections.Generic.IReadOnlyList<int> cards, global::CardGame.Core.CardLocation destination, string reason) => _resolve().MoveSpZhangLiaoCards(id, cards, destination, reason);
     internal global::System.Collections.Generic.IReadOnlyList<int> MubingAvailableGifts(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MubingAvailableGifts(f);
     internal global::System.Collections.Generic.IReadOnlyList<int> MubingAvailableReveal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MubingAvailableReveal(f);

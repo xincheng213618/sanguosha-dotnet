@@ -20,17 +20,14 @@ internal sealed partial class CharacterLiuLiAnniversaryEntries
     internal void IssueLiuLiUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueLiuLiUse(f);
     internal bool KeepPaidLiuLi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidLiuLi(f);
     internal global::CardGame.Core.PromptChoice LiuLiAi(global::CardGame.Core.PendingDecision p) => _resolve().LiuLiAi(p);
-    internal bool LiuLiBeforeDamageObserver(long id) => _resolve().LiuLiBeforeDamageObserver(id);
     internal bool LiuLiCanDiscard(int seat, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().LiuLiCanDiscard(seat, cards);
     internal global::CardGame.Core.Card[][] LiuLiCategories(int seat) => _resolve().LiuLiCategories(seat);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> LiuLiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LiuLiChoices(f);
     internal bool LiuLiChosenProof(global::CardGame.Core.AnniversaryLiuLiNameChosenEvent e) => _resolve().LiuLiChosenProof(e);
-    internal bool LiuLiDamageObserver(long id) => _resolve().LiuLiDamageObserver(id);
     internal bool LiuLiDiscardProof(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LiuLiDiscardProof(f);
     internal bool LiuLiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().LiuLiFirstChild(f, child);
     internal bool LiuLiHandNameForbidden(int owner, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IEnumerable<int> ids) => _resolve().LiuLiHandNameForbidden(owner, kind, ids);
     internal bool LiuLiMaterialsForbidden(global::CardGame.Core.ProgramCardMaterialQuery q) => _resolve().LiuLiMaterialsForbidden(q);
-    internal bool LiuLiMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().LiuLiMovementProof(f, e, p);
     internal bool LiuLiNameChosen(int owner, global::CardGame.Core.CardKind kind) => _resolve().LiuLiNameChosen(owner, kind);
     internal global::CardGame.Core.ProgramSkillFrame? LiuLiObserverRoot() => _resolve().LiuLiObserverRoot();
     internal bool LiuLiOriginal(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LiuLiOriginal(f);

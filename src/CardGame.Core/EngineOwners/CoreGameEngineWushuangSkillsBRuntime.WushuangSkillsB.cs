@@ -559,9 +559,6 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 61200)]
-    internal bool IsWushuangBMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.WushuangB is { Stage: "complete", TargetSeat: var seat } r && r.Operation is SkillProgramEffectOp.ResolveWushuangDingan or SkillProgramEffectOp.RecoverWushuangChunlao && effect?.Op == r.Operation && pending.SubjectSeat == seat;
-
     internal WushuangBianyuMarkedEvent? BianyuActiveMark(int seat, int id)
     {
         if (id <= 0 || !HasWushuangBSkills || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(seat))

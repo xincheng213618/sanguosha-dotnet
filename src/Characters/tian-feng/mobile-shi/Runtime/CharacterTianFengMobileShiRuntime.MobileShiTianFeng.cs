@@ -263,8 +263,6 @@ internal sealed partial class CharacterTianFengMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 47500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 47500)]
     internal bool ContinuePaidShiTf(ProgramSkillFrame f) => f.MobileShiTianFeng is { Stage: > 0 };
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 47500)]
-    internal bool ShiTfMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MobileShiTianFeng is { Stage: 6 or 8 or 9 } r && effect?.Op == SkillProgramEffectOp.ResolveMobileShiTianFeng && p.CoverageResultBind is null && p.BeforeCount == 0 && p.SubjectSeat == (r.Stage == 6 ? r.Operation == "ending" ? f.OwnerSeat : _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat : r.TargetSeat);
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiTianFeng)]
     internal PromptChoice ChooseShiTf(PendingDecision prompt) => prompt.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "draw") ?? prompt.Choices[0];

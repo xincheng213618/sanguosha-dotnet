@@ -35,8 +35,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool ExactTanbanDrawEndFrame(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExactTanbanDrawEndFrame(frame);
     internal void FinishDiou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishDiou(f);
     internal bool FinishDiouAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishDiouAttack(attack, out paused);
-    internal bool HasDiouBeforeDamageObserver(long id) => _resolve().HasDiouBeforeDamageObserver(id);
-    internal bool HasDiouDamageObserver(long id) => _resolve().HasDiouDamageObserver(id);
     internal bool HasIssuedDiouResponse(global::CardGame.Core.CardActionContext action) => _resolve().HasIssuedDiouResponse(action);
     internal bool HasTanbanEntityMark(int cardId) => _resolve().HasTanbanEntityMark(cardId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeTanban(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeTanban(supplied);
@@ -44,7 +42,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool IsDiouCarrierDestroyedMaterial(global::CardGame.Core.CardMovementRecord movement) => _resolve().IsDiouCarrierDestroyedMaterial(movement);
     internal bool IsDiouCarrierDestroyedMaterial2(int cardId, global::CardGame.Core.CardLocation from, global::CardGame.Core.CardLocation to) => _resolve().IsDiouCarrierDestroyedMaterial(cardId, from, to);
     internal bool IsDiouCarrierDestroyedMaterial3(long useId, int cardId) => _resolve().IsDiouCarrierDestroyedMaterial(useId, cardId);
-    internal bool IsDiouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsDiouMovement(f, e, p);
     internal bool IsDiouNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsDiouNativeSettlementBatch(f, b);
     internal bool IsDiouRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDiouRecoveryParent(f, recovery);
     internal bool IsDiouSuspendedCompletedAttack(global::CardGame.Core.CardUseFrame original, long? requiredWindowId = default) => _resolve().IsDiouSuspendedCompletedAttack(original, requiredWindowId);

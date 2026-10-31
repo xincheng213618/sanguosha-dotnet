@@ -52,9 +52,4 @@ internal sealed partial class CoreGameEngineInspectedHandSlashObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 360)]
     internal bool IsInspectedHandProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && InspectedHandPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 50)]
-    internal bool IsInspectedHandMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.PayHpInspectHandThenDiscardOrSlash && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && f.InspectedHandSlash is { Stage: InspectedHandSlashStage.DiscardChildren } && _coreInspectedHandSlashReturnsOperations.ValidInspectedHandSlash(f);
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1870)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 250)]
-    internal bool HasInspectedHandDamageObserver(long window) => InspectedHandPaidObserverRoot(window)is not null;
 }

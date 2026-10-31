@@ -53,7 +53,6 @@ internal sealed partial class CharacterSimaHuiOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 180)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 180)]
     internal bool CanContinueSimaHui(ProgramSkillFrame f) => f.SimaHui is { } r && ValidSimaHui(f) && (r.Stage == "yeyan-paid" || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimaHuiSealMovedEvent>().Any(e => e.FrameId == f.Id) || r.ChainOrigin is not null);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 180)]
     internal bool IsSimaHuiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.SimaHui is { Stage: "seal-children" or "view-children" or "gift-children" or "return-children" } && effect is not null && IsSimaHuiOp(effect.Op) && pending.SubjectSeat == f.OwnerSeat && pending.CoverageResultBind is null && ValidSimaHui(f);
     [ProgramContinuation(ProgramContinuationKind.Movement, 23500)]
     internal bool ReturnSimaHuiMovement(ProgramSkillFrame f)
@@ -92,11 +91,6 @@ internal sealed partial class CharacterSimaHuiOlRuntime
     }
 
     internal ProgramSkillFrame? SimaHuiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterSimaHuiOlOperations.SimaHuiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 140)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 250)]
-    internal bool HasSimaHuiDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && SimaHuiObserverRoot()is not null;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 340)]
-    internal bool HasSimaHuiBeforeDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && SimaHuiObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 250)]
     internal bool TryAdvanceSimaHuiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SimaHuiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     internal IEnumerable<Card> SimaHuiPrivatelyViewedCards(int viewer) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnerSeat == viewer && f.SimaHui is { OriginalCards.Count: > 0 }).SelectMany(f => f.SimaHui!.OriginalCards).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Select(id => _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(c => c.Id == id));

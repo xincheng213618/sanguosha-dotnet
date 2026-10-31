@@ -22,10 +22,7 @@ internal sealed partial class CharacterLiuChengMouMobileEntries
     internal bool DrainMouLiuChengChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouLiuChengChildren(f);
     internal void FinishMouLiuCheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouLiuCheng(f);
     internal bool FinishMouLiuChengAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouLiuChengAttack(attack, out paused);
-    internal bool HasMouLiuChengBeforeDamageObserver(long id) => _resolve().HasMouLiuChengBeforeDamageObserver(id);
-    internal bool HasMouLiuChengDamageObserver(long id) => _resolve().HasMouLiuChengDamageObserver(id);
     internal bool IsIssuedMouLiuChengUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedMouLiuChengUse(use);
-    internal bool IsMouLiuChengMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouLiuChengMovement(f, e, p);
     internal bool IsMouLiuChengNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsMouLiuChengNativeSettlementBatch(f, b);
     internal bool IsMouLiuChengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouLiuChengRecoveryParent(f, recovery);
     internal bool IsMouLiuChengSuspendedCompletedAttack(global::CardGame.Core.CardUseFrame original, long? requiredWindowId = default) => _resolve().IsMouLiuChengSuspendedCompletedAttack(original, requiredWindowId);

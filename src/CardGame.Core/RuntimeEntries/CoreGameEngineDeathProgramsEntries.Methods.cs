@@ -20,7 +20,6 @@ internal sealed partial class CoreGameEngineDeathProgramsEntries
     internal global::CardGame.Core.DeathFrame GetCurrentDeathFrame(long expectedId) => _resolve().GetCurrentDeathFrame(expectedId);
     internal int GetMarkerSourceCount(global::CardGame.Core.CharacterState player, global::CardGame.Core.PlayerMarkerKind marker, int skillOwnerSeat) => _resolve().GetMarkerSourceCount(player, marker, skillOwnerSeat);
     internal bool HasInitialFilteredDeathClaimResources(global::CardGame.Core.ProgramTriggerLegalityContext eligibility) => _resolve().HasInitialFilteredDeathClaimResources(eligibility);
-    internal bool IsCommittedFilteredDeathClaimMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsCommittedFilteredDeathClaimMovement(frame, effect, pending);
     internal global::CardGame.Core.Card[] QueryProgramDeathCleanupCards(global::CardGame.Core.DeathFrame death, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardZoneKind> sourceZones) => _resolve().QueryProgramDeathCleanupCards(death, sourceZones);
     internal bool TryBeginKillDiedProgramWindow(global::CardGame.Core.DeathFrame death) => _resolve().TryBeginKillDiedProgramWindow(death);
     internal bool TryBeginOwnerDiedProgramWindow(global::CardGame.Core.DeathFrame death, global::CardGame.Core.CharacterState owner) => _resolve().TryBeginOwnerDiedProgramWindow(death, owner);

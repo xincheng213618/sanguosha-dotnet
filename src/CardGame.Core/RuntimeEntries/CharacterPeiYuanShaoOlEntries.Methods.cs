@@ -25,11 +25,8 @@ internal sealed partial class CharacterPeiYuanShaoOlEntries
     internal global::CardGame.Core.FulueUseEntry? FulueOriginalEntry(global::CardGame.Core.CardUseFrame use, int owner, string skill, string instance) => _resolve().FulueOriginalEntry(use, owner, skill, instance);
     internal bool FulueUseProof(global::CardGame.Core.CardUseFrame use) => _resolve().FulueUseProof(use);
     internal bool FulueZeroDamage(global::CardGame.Core.CardUseFrame use) => _resolve().FulueZeroDamage(use);
-    internal bool HasFulueBeforeDamageObserver(long id) => _resolve().HasFulueBeforeDamageObserver(id);
-    internal bool HasFulueDamageObserver(long id) => _resolve().HasFulueDamageObserver(id);
     internal bool HasFulueObtainableCard(int user, int target) => _resolve().HasFulueObtainableCard(user, target);
     internal bool HasIssuedFulueRequest(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasIssuedFulueRequest(f);
-    internal bool IsFulueMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFulueMovement(f, effect, pending);
     internal bool IsFulueRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsFulueRecoveryParent(f, recovery);
     internal bool IsIssuedFulueCandidate(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().IsIssuedFulueCandidate(c);
     internal void IssueFulueCounterUse(long useId, global::CardGame.Core.CardActionContext action) => _resolve().IssueFulueCounterUse(useId, action);

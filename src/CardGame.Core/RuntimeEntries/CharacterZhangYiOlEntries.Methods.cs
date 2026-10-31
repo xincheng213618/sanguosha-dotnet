@@ -13,7 +13,6 @@ internal sealed partial class CharacterZhangYiOlEntries
     internal void ContinueZhangYi(long id) => _resolve().ContinueZhangYi(id);
     internal bool DrainZhangYiChildren(long id) => _resolve().DrainZhangYiChildren(id);
     internal void FinishZhangYi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZhangYi(f);
-    internal bool HasZhangYiDamageObserver(long id) => _resolve().HasZhangYiDamageObserver(id);
     internal bool IsFirstZhangYiOwnTurnDamage(global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsFirstZhangYiOwnTurnDamage(c);
     internal bool IsZhangYiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZhangYiRecoveryParent(f, recovery);
     internal void ObserveZhangYiActualDamage(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveZhangYiActualDamage(payload);

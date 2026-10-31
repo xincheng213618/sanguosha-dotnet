@@ -115,10 +115,4 @@ internal sealed partial class CoreGameEnginePairBenefitObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 630)]
     internal bool IsPairBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairBenefitObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1760)]
-    internal bool HasPairBenefitDamageObserver(long damageWindowId)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == damageWindowId && f is DamageTriggerWindowFrame);
-        return index >= 2 && _resolutionStackOperations._resolutionStack[index] is DamageTriggerWindowFrame window && _resolutionStackOperations._resolutionStack[index - 1] is DamageFrame damage && damage.Id == window.ParentFrameId && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == damage.ParentFrameId)is { AttackAttempt: not null, AttackReturn: not null } attack && _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId == attack.Id && PairBenefitObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id) < _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == attack.Id);
-    }
 }

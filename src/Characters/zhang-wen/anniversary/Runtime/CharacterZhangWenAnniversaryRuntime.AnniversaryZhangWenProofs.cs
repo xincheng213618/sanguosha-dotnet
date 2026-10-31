@@ -52,9 +52,6 @@ internal sealed partial class CharacterZhangWenAnniversaryRuntime
         if (!ValidZhangWenSibian(f))
             throw new InvalidOperationException("Sibian lost its original draw parent, public top-four entities, extrema or once-paid movement return.");
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 45100)]
-    internal bool ZhangWenMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ZhangWenSibian is { Stage: ZhangWenSibianStage.RevealChildren or ZhangWenSibianStage.GainChildren or ZhangWenSibianStage.FinishChildren } && ValidZhangWenSibian(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryZhangWenSibian && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool ZhangWenFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.ZhangWenSibian is not { } r || f.PendingMovementContinuation is null || !ValidZhangWenSibian(f) || r.Steps.Count == 0)
@@ -66,11 +63,6 @@ internal sealed partial class CharacterZhangWenAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? ZhangWenObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterZhangWenAnniversaryOperations.ZhangWenFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 45100)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 45100)]
-    internal bool ZhangWenDamageObserver(long id) => ZhangWenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 45100)]
-    internal bool ZhangWenBeforeDamageObserver(long id) => ZhangWenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 45100)]
     internal bool AdvanceZhangWenSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangWenObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

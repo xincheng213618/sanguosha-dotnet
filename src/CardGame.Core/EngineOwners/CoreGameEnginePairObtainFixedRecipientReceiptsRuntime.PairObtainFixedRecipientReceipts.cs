@@ -49,7 +49,4 @@ internal sealed partial class CoreGameEnginePairObtainFixedRecipientReceiptsRunt
             return r.Stage == ProgramShownPairGiftStage.Complete && draws.Length == 0;
         return r.DrawSequenceBefore >= r.SequenceAfter && r.DrawSequenceAfter >= r.DrawSequenceBefore && r.ActualDrawCount is >= 0 and <= 1 && draws is [var draw] && draw.OwnerSeat == f.OwnerSeat && draw.RequestedCount == 1 && draw.ActualCount == r.ActualDrawCount && draw.SequenceBefore == r.DrawSequenceBefore && draw.SequenceAfter == r.DrawSequenceAfter && _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.DrawSequenceBefore && m.Sequence <= r.DrawSequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == $"{(_corePairObtainShownGiftsOperations.PairBenefitMoveReason(f, true))}.reward") == r.ActualDrawCount;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 520)]
-    internal bool IsPairBenefitMovement(ProgramSkillFrame f, SkillProgramEffect? paid, ProgramMovementContinuation movement) => movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && (paid?.Op == SkillProgramEffectOp.ObtainOneFromEachSelectedTarget && f.PairObtain is { AwaitingMovement: true } && ValidPairObtain(f) || paid?.Op == SkillProgramEffectOp.GiveShownCardToLeastOriginalTarget && f.ShownPairGift?.Stage is ProgramShownPairGiftStage.AwaitingGift or ProgramShownPairGiftStage.AwaitingReward && ValidShownPairGift(f));
 }

@@ -5,7 +5,6 @@ internal sealed partial class CoreGameEngineShanheGuangaoEntries
     internal global::CardGame.Core.SkillProgramStepOutcome BeginShanheGuangao(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginShanheGuangao(supplied);
     internal bool CanOfferShanheGuangao(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferShanheGuangao(candidate, trigger, context);
     internal void FinishShanheGuangao(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().FinishShanheGuangao(frame);
-    internal bool IsShanheGuangaoDrawMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsShanheGuangaoDrawMovement(frame, effect, movement);
     internal void PublishShanheGuangaoPrompt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishShanheGuangaoPrompt(frame);
     internal global::CardGame.Core.CardUseFrame RequireShanheGuangaoUse(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().RequireShanheGuangaoUse(frame);
     internal void ResolveShanheGuangaoChoice(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveShanheGuangaoChoice(selected);

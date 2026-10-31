@@ -22,9 +22,6 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 240)]
-    internal bool IsWuYixianMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.Yixian is { Paid: true } r && effect?.Op == SkillProgramEffectOp.ResolveYixianAllEquipmentObtainAndCompensate && pending == f.PendingMovementContinuation && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (r.Stage == YixianStage.EquipmentChildren ? pending.SubjectSeat == f.OwnerSeat : r.Stage is YixianStage.DrawChildren or YixianStage.RecoveryChildren && r.Cursor < r.Recipients.Count && pending.SubjectSeat == r.Recipients[r.Cursor].Seat);
     internal bool WuYixianPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         if (f.Yixian is not { Paid: true } r || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m))
@@ -72,11 +69,6 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal bool WuYixianObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (next) => _coreObserverSubtreesOperations.IsMovementObserverEdge(next) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(next) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[next - 1], _resolutionStackOperations2._resolutionStack()[next]) || _resolutionStackOperations2._resolutionStack()[next - 1] is ProgramSkillFrame { Zenrun: not null } zenrun && _characterSunHongOlOperations.ZenrunFirstChild(zenrun, _resolutionStackOperations2._resolutionStack()[next]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[next], _resolutionStackOperations2._resolutionStack()[next - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[next], _resolutionStackOperations2._resolutionStack()[next - 1]) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(next), (next, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(next, dying));
     internal ProgramSkillFrame? WuYixianObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterGuanYuWumiaoOperations.WuYixianFirstChild(f, child), (index) => _characterGuanYuWumiaoOperations.WuYixianObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1180)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1290)]
-    internal bool HasWuYixianDamageObserver(long id) => WuYixianObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1320)]
-    internal bool HasWuYixianBeforeDamageObserver(long id) => WuYixianObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28530)]
     internal bool AdvanceWuYixianChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuYixianObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

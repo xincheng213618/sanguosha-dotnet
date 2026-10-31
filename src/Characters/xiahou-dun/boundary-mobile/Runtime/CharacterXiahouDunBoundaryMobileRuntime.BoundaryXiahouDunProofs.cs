@@ -42,9 +42,6 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
 
         return r.Stage == BoundaryXiahouDunStage.Distributing && r.Payment.Count == 0 && r.Draw is null;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 60010)]
-    internal bool BoundaryXiahouDunMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => f.BoundaryXiahouDun is { } r && e?.Op == r.Op && f.PendingMovementContinuation == pending && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && r.Stage is BoundaryXiahouDunStage.StoreChildren or BoundaryXiahouDunStage.GiveChildren or BoundaryXiahouDunStage.DrawChildren && ValidBoundaryXiahouDun(f);
     internal bool BoundaryXiahouDunFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!ValidBoundaryXiahouDun(f))
@@ -63,11 +60,6 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
 
     internal bool BoundaryXiahouDunSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame f && _characterXiahouDunBoundaryMobileOperations.BoundaryXiahouDunFirstChild(f, _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? BoundaryXiahouDunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterXiahouDunBoundaryMobileOperations.BoundaryXiahouDunFirstChild(f, c), (n) => _characterXiahouDunBoundaryMobileOperations.BoundaryXiahouDunSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 60010)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 60010)]
-    internal bool BoundaryXiahouDunDamageObserver(long id) => BoundaryXiahouDunObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == id && c is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 60010)]
-    internal bool BoundaryXiahouDunBeforeDamageObserver(long id) => BoundaryXiahouDunObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == id && c is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 60010)]
     internal bool BoundaryXiahouDunDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BoundaryXiahouDunObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 60010)]

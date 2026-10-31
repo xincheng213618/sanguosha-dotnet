@@ -52,10 +52,6 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? CaiYangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterCaiYangAnniversaryOperations.CaiYangFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 45600)]
-    internal bool HasCaiYangBeforeDamageObserver(long id) => CaiYangObserverRoot()is { AnniversaryCaiYang.FirstDamage: not null } r && r.WindowContext?.ParentFrameId == id;
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 45600)]
-    internal bool HasCaiYangPaidDamageObserver(long id) => CaiYangObserverRoot()is { AnniversaryCaiYang.Stage: AnniversaryCaiYangStage.Damage } r && r.WindowContext?.ParentFrameId == id;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 45600)]
     internal bool HasCaiYangObserverDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CaiYangObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 45600)]

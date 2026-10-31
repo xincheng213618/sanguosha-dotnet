@@ -30,15 +30,12 @@ internal sealed partial class CharacterZhouYuLeEntries
     internal global::CardGame.Core.ProgramSkillFrame? GuYinObserverRoot() => _resolve().GuYinObserverRoot();
     internal bool GuYinObserverSuffix(int index) => _resolve().GuYinObserverSuffix(index);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.GuYinInitialEntity> GuYinOriginalEntities() => _resolve().GuYinOriginalEntities();
-    internal bool HasGuYinBeforeDamageObserver(long id) => _resolve().HasGuYinBeforeDamageObserver(id);
-    internal bool HasGuYinDamageObserver(long id) => _resolve().HasGuYinDamageObserver(id);
     internal bool HasPingluCustody(int owner, global::CardGame.Core.ActualDiscardRecoveryPhaseKey phase) => _resolve().HasPingluCustody(owner, phase);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeGuYin(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeGuYin(supplied);
     internal bool IsGuYinMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsGuYinMovement(f, effect, p);
     internal bool IsGuYinRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsGuYinRecoveryParent(f, recovery);
     internal bool IsIssuedGuYinCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedGuYinCandidate(c, context);
     internal bool IsIssuedGuYinInitialCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedGuYinInitialCandidate(c, context);
-    internal bool IsPingluMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsPingluMovement(frame, effect, pending);
     internal global::CardGame.Core.ActualDiscardRecoveryPhaseKey? PingluPlay(int actor) => _resolve().PingluPlay(actor);
     internal int[] PingluTargets(int actor) => _resolve().PingluTargets(actor);
     internal bool ResumeGuYin(long id) => _resolve().ResumeGuYin(id);
@@ -49,7 +46,6 @@ internal sealed partial class CharacterZhouYuLeEntries
     internal global::CardGame.Core.ProgramSkillWindowContext? TryCreateGuYinMovementContext(global::CardGame.Core.CardsMovedTriggerWindowFrame frame, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().TryCreateGuYinMovementContext(frame, candidate);
     internal bool ValidGuYinInitialEntry(global::CardGame.Core.GuYinInitialEntity e) => _resolve().ValidGuYinInitialEntry(e);
     internal bool ValidGuYinReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidGuYinReceipt(f);
-    internal bool ValidPingluPaid(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidPingluPaid(frame);
     internal bool ValidPingluStarted(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidPingluStarted(frame);
     internal bool HasGuYinCapability { get => _resolve().HasGuYinCapability; }
     internal bool HasLeZhouYuPingluCapability { get => _resolve().HasLeZhouYuPingluCapability; }

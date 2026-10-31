@@ -14,14 +14,11 @@ internal sealed partial class CharacterGongsunZanMouOlEntries
     internal bool DrainMouGsz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouGsz(f);
     internal void FinishMouGsz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouGsz(f);
     internal bool KeepAcceptedMouGsz(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepAcceptedMouGsz(f);
-    internal bool MouGszBeforeDamage(long id) => _resolve().MouGszBeforeDamage(id);
     internal global::CardGame.Core.PromptChoice MouGszChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string text, int? target = default) => _resolve().MouGszChoice(f, branch, text, target);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouGszChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouGszChoices(f);
-    internal bool MouGszDamage(long id) => _resolve().MouGszDamage(id);
     internal bool MouGszDying() => _resolve().MouGszDying();
     internal bool MouGszFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouGszFirstChild(f, child);
     internal bool MouGszLionChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouGszLionChild(f, child);
-    internal bool MouGszMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouGszMovementProof(f, e, p);
     internal global::CardGame.Core.ProgramSkillFrame? MouGszObserverRoot() => _resolve().MouGszObserverRoot();
     internal bool MouGszRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().MouGszRecoveryParent(f, child);
     internal global::CardGame.Core.CardConversionSource MouGszSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouGszSource(f);

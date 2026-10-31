@@ -6,7 +6,6 @@ internal sealed partial class CharacterLiRuBoundaryMobileEntries
     internal void AnswerBoundaryLiRuMieji(global::CardGame.Core.PromptChoice choice) => _resolve().AnswerBoundaryLiRuMieji(choice);
     internal global::System.Collections.Generic.IReadOnlyList<int> BoundaryLiRuLostCardTargets(int owner) => _resolve().BoundaryLiRuLostCardTargets(owner);
     internal global::System.Collections.Generic.IEnumerable<(global::CardGame.Core.Card Card, global::CardGame.Core.CardLocation From)> BoundaryLiRuMiejiCards(int target, bool gift) => _resolve().BoundaryLiRuMiejiCards(target, gift);
-    internal bool BoundaryLiRuMiejiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().BoundaryLiRuMiejiMovement(f, effect, p);
     internal global::CardGame.Core.CardConversionSource BoundaryLiRuSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().BoundaryLiRuSource(f);
     internal bool KeepPaidBoundaryLiRuMieji(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidBoundaryLiRuMieji(f);
     internal void PayBoundaryLiRuMieji(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayBoundaryLiRuMieji(f);

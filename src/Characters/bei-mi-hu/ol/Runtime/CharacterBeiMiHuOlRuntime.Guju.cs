@@ -34,8 +34,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
             _coreRuntimeOperations.ReturnRuntimeProgramMovement(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 170)]
     internal bool IsBeiMiHuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.DrawAfterActualKuiDamage && f.BeiMiHu is { Stage: "draw-children" } && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Movement, 23202)]
     internal bool ReturnBeiMiHuMovement(ProgramSkillFrame f)

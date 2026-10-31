@@ -25,7 +25,6 @@ internal sealed partial class CharacterHuaTuoMobileGodEntries
     internal int MobileHtCourseIndex(long id) => _resolve().MobileHtCourseIndex(id);
     internal global::CardGame.Core.MobileWulingAnimal[] MobileHtCourseOrder(long id) => _resolve().MobileHtCourseOrder(id);
     internal global::CardGame.Core.DiscardRecoveryEntity[] MobileHtDiscarded(int owner) => _resolve().MobileHtDiscarded(owner);
-    internal bool MobileHtMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MobileHtMovementProof(f, e, p);
     internal void MobileHtRecoverOne(global::CardGame.Core.ProgramSkillFrame f, int seat) => _resolve().MobileHtRecoverOne(f, seat);
     internal bool MobileHtSpirit(int seat, global::CardGame.Core.MobileWulingAnimal animal) => _resolve().MobileHtSpirit(seat, animal);
     internal int[] MobileHtTeachingTargets() => _resolve().MobileHtTeachingTargets();

@@ -7,10 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYongAnniversaryRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 43400)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43400)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 43400)]
     internal bool AnniversaryLiuYongMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (f.AnniversaryLiuYong is not { Stage: AnniversaryLiuYongStage.GiftChildren or AnniversaryLiuYongStage.DrawChildren } r || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || effect?.Op != (r.Mode == "gift" ? SkillProgramEffectOp.ResolveAnniversaryLiuYongZhuning : SkillProgramEffectOp.ResolveAnniversaryLiuYongFengxiang))
@@ -41,11 +37,6 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? AnniversaryLiuYongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLiuYongAnniversaryOperations.AnniversaryLiuYongFirstChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 43400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 43400)]
-    internal bool AnniversaryLiuYongDamageObserver(long id) => AnniversaryLiuYongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 43400)]
-    internal bool AnniversaryLiuYongBeforeDamageObserver(long id) => AnniversaryLiuYongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 43400)]
     internal bool AnniversaryLiuYongDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryLiuYongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43400)]

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageObserversEntries
 {
-    internal bool HasSameNameHandDamageObserver(long windowId) => _resolve().HasSameNameHandDamageObserver(windowId);
     internal bool IsSameNameHandDiscardOrDamageChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision decision) => _resolve().IsSameNameHandDiscardOrDamageChoice(f, decision);
     internal bool IsSameNameHandDying() => _resolve().IsSameNameHandDying();
     internal bool IsSameNameHandObserverEdge(int child) => _resolve().IsSameNameHandObserverEdge(child);

@@ -89,11 +89,6 @@ internal sealed class ProgramDeckCardsRuntime(IProgramRuntimeFrames frames, IPro
             fact.SequenceBefore == receipt.SequenceBefore && fact.SequenceAfter == receipt.SequenceAfter) == 1;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 62010)]
-    private bool IsDeckCardGainMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) =>
-        effect?.Op == SkillProgramEffectOp.ObtainDeckCards && pending.SubjectSeat == frame.OwnerSeat &&
-        pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidDeckCardGain(frame);
-
     [ProgramContinuation(ProgramContinuationKind.Movement, 62010)]
     private bool ReturnDeckCardGain(ProgramSkillFrame frame)
     {

@@ -45,13 +45,11 @@ internal sealed partial class CharacterLuBuOlMagicEntries
     internal bool MoGangquanTargetAllowed(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardConversionSource? source, global::System.Collections.Generic.IReadOnlyList<int>? ids = default) => _resolve().MoGangquanTargetAllowed(actor, target, kind, source, ids);
     internal global::System.Collections.Generic.IReadOnlyList<int> MoGangquanTargets(global::CardGame.Core.CharacterState actor, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource source) => _resolve().MoGangquanTargets(actor, card, source);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MoLuBuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MoLuBuChoices(f);
-    internal bool MoLuBuDamageObserver(long id) => _resolve().MoLuBuDamageObserver(id);
     internal global::CardGame.Core.MoLuBuPairChangedEvent? MoLuBuDeathPair(int beneficiary, global::CardGame.Core.DeathFrame death) => _resolve().MoLuBuDeathPair(beneficiary, death);
     internal bool MoLuBuDying() => _resolve().MoLuBuDying();
     internal bool MoLuBuFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MoLuBuFirstChild(f, child);
     internal int MoLuBuKuangDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().MoLuBuKuangDamage(attack);
     internal bool MoLuBuLastUseWasQi(int actor) => _resolve().MoLuBuLastUseWasQi(actor);
-    internal bool MoLuBuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation m) => _resolve().MoLuBuMovement(f, e, m);
     internal global::CardGame.Core.ProgramSkillFrame? MoLuBuObserverRoot() => _resolve().MoLuBuObserverRoot();
     internal bool MoLuBuObserverSuffix(int index) => _resolve().MoLuBuObserverSuffix(index);
     internal bool MoLuBuOpeningCardUseForbidden(global::CardGame.Core.ProgramCardUseQuery query) => _resolve().MoLuBuOpeningCardUseForbidden(query);

@@ -11,11 +11,8 @@ internal sealed partial class CharacterMengHuoMouMobileEntries
     internal void ContinueMouMh(long id) => _resolve().ContinueMouMh(id);
     internal bool DrainMouMh(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouMh(f);
     internal void FinishMouMh(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouMh(f);
-    internal bool HasMouMhBeforeDamageObserver(long id) => _resolve().HasMouMhBeforeDamageObserver(id);
-    internal bool HasMouMhDamageObserver(long id) => _resolve().HasMouMhDamageObserver(id);
     internal bool IsMouMengHuoUseForbidden(int actor, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardActionType type, long? existingUseId) => _resolve().IsMouMengHuoUseForbidden(actor, kind, type, existingUseId);
     internal bool IsMouMhDying() => _resolve().IsMouMhDying();
-    internal bool IsMouMhMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouMhMovement(f, effect, pending);
     internal bool IsMouMhRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouMhRecoveryParent(f, recovery);
     internal bool IsMouMhSilverLionChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().IsMouMhSilverLionChild(f, child);
     internal bool KeepPaidMouMh(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidMouMh(f);

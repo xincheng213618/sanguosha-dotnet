@@ -14,12 +14,10 @@ internal sealed partial class CharacterLuBuMobileGodEntries
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.RuleQueryContribution> MobileWuqianRuleContributions(global::CardGame.Core.CharacterState player, global::CardGame.Core.SkillRuleQuery query) => _resolve().MobileWuqianRuleContributions(player, query);
     internal void ObserveMobileWuqianUses(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveMobileWuqianUses(payload);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> ProjectMobileWumouActions(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> allActions, int? selectedPhysicalCardId) => _resolve().ProjectMobileWumouActions(actor, allActions, selectedPhysicalCardId);
-    internal bool ProveMobileLbGain(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ProveMobileLbGain(f, e, p);
     internal bool ResumeMobileLb(long id) => _resolve().ResumeMobileLb(id);
     internal bool RetainMobileLb(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainMobileLb(f);
     internal bool ReturnMobileLbMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMobileLbMovement(f);
     internal bool TryResolveMobileWumouUse(global::CardGame.Core.CharacterState actor, global::CardGame.Core.LegalAction action) => _resolve().TryResolveMobileWumouUse(actor, action);
-    internal bool ValidMobileLbGain(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidMobileLbGain(f);
     internal void ValidateMobileLbUse(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.MobileLuBuUseReceipt r) => _resolve().ValidateMobileLbUse(use, r);
     internal bool HasMobileWuqianCapability { get => _resolve().HasMobileWuqianCapability; }
 }

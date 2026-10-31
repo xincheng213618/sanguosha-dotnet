@@ -227,8 +227,6 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 300)]
     internal bool IsDyingSuitsMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending is not null && f.DyingSuits is { Stage: DyingSuitsStage.Drawing or DyingSuitsStage.Discarding, RecipientSeat: { } recipient } && (effect is null || effect.Op == SkillProgramEffectOp.DrawThenDiscardSuitsForDyingPeach) && pending.SubjectSeat == recipient && pending.BeforeCount == 0 && pending.CoverageResultBind is null && _coreDyingSuitsAndHistoricalUseObserversOperations.ValidDyingSuitsReceipt(f);
     internal void IssueDyingSuitsPeach(ProgramSkillFrame f)
     {

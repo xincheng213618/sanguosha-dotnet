@@ -9,16 +9,13 @@ internal sealed partial class CharacterZhouFeiBoundaryMobileEntries
     internal void AssertBoundaryZfUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertBoundaryZfUse(use);
     internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryZf(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().BeginBoundaryZf(supplied, operation);
     internal void BindBoundaryZfUse(global::CardGame.Core.CardUseDeclaredEvent declared) => _resolve().BindBoundaryZfUse(declared);
-    internal bool BoundaryZfBeforeDamage(long id) => _resolve().BoundaryZfBeforeDamage(id);
     internal bool BoundaryZfChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().BoundaryZfChild(frame, child);
     internal global::CardGame.Core.PromptChoice BoundaryZfChoice(global::CardGame.Core.ProgramSkillFrame frame, string branch, int value, string text, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().BoundaryZfChoice(frame, branch, value, text, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryZfChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryZfChoices(frame);
-    internal bool BoundaryZfDamage(long id) => _resolve().BoundaryZfDamage(id);
     internal global::CardGame.Core.BoundaryZhouFeiStoredEvent BoundaryZfDeposit(long id) => _resolve().BoundaryZfDeposit(id);
     internal bool BoundaryZfDying() => _resolve().BoundaryZfDying();
     internal global::CardGame.Core.BoundaryZhouFeiStoredEvent[] BoundaryZfLiveDeposits(int holder) => _resolve().BoundaryZfLiveDeposits(holder);
     internal global::System.Collections.Generic.IEnumerable<(int Encoded, int Index, int Direction)> BoundaryZfMovementGroups(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().BoundaryZfMovementGroups(batch);
-    internal bool BoundaryZfMovementProof(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation continuation) => _resolve().BoundaryZfMovementProof(frame, effect, continuation);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> BoundaryZfNativeActions(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryZfNativeActions(frame);
     internal bool BoundaryZfNativeRidesOn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryZfNativeRidesOn(use, frame);
     internal bool BoundaryZfNonPlaySlash(long id, int actor) => _resolve().BoundaryZfNonPlaySlash(id, actor);

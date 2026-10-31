@@ -26,9 +26,6 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
         return f.Diou is null && f.InstructionIndex is 0 or 1 && f.TriggerId == DiouBinding && f.WindowContext is { } c && IsIssuedDiouCandidate(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 330)]
-    internal bool IsDiouMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.Diou is { Paid: true, Stage: DiouStage.NativeChildren or DiouStage.DrawChildren } && e?.Op == SkillProgramEffectOp.ResolveDiouTanbanUse && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool DiouDrawMovement(ProgramSkillFrame f, CardMovementRecord m) => f.Diou is { Stage: DiouStage.DrawChildren, DrawOutcome: { } o } && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > o.SequenceBefore && m.Sequence <= o.SequenceAfter && (o.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == DiouDrawReason || o.ReplacementGainedIds.Contains(m.CardId) && m.To == CardLocation.Hand(f.OwnerSeat) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle);
     internal bool IsDiouSuspendedCompletedAttack(CardUseFrame original, long? requiredWindowId = null)
     {
@@ -190,11 +187,6 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
     internal bool DiouObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _characterDiaoChanLeOperations.DiouNativeWindowEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame p && (_characterDiaoChanLeOperations.DiouFirstChild(p, _resolutionStackOperations2._resolutionStack()[n]) || p.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(p, _resolutionStackOperations2._resolutionStack()[n])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? DiouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterDiaoChanLeOperations.DiouFirstChild(f, child), (index) => _characterDiaoChanLeOperations.DiouObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1310)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1420)]
-    internal bool HasDiouDamageObserver(long id) => DiouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1450)]
-    internal bool HasDiouBeforeDamageObserver(long id) => DiouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 480)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 470)]
     internal bool IsDiouRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

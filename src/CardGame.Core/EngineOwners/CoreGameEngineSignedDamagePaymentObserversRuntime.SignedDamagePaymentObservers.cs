@@ -49,10 +49,6 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentObserversRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 2000)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 100)]
-    internal bool HasSignedDamagePaymentObserver(long exactWindowId) => SignedDamagePaymentObserverRoot(exactWindowId)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 540)]
     internal bool IsSignedDamagePaymentProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SignedDamagePaymentObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 570)]

@@ -24,9 +24,7 @@ internal sealed partial class CharacterSunHuanAnniversaryEntries
     internal void ReturnSunHuanNative(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnSunHuanNative(use);
     internal void SettleSunHuanNative(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SettleSunHuanNative(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> SunHuanActions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SunHuanActions(f);
-    internal bool SunHuanBeforeDamage(long id) => _resolve().SunHuanBeforeDamage(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> SunHuanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SunHuanChoices(f);
-    internal bool SunHuanDamageObserver(long id) => _resolve().SunHuanDamageObserver(id);
     internal bool SunHuanDeclarationEdge(int i) => _resolve().SunHuanDeclarationEdge(i);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.AnniversarySunHuanDraw> SunHuanDraws(int seat, string instance) => _resolve().SunHuanDraws(seat, instance);
     internal bool SunHuanDying() => _resolve().SunHuanDying();

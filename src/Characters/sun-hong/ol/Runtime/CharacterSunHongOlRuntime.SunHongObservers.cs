@@ -79,8 +79,6 @@ internal sealed partial class CharacterSunHongOlRuntime
 
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 500)]
     internal bool IsSunHongMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.Xianbi is { Issued: true } r && XianbiChildren(r.Stage) && effect?.Op == SkillProgramEffectOp.ResolveXianbiHandAdjustmentAndRandomReturns && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null || f.Zenrun is { Paid: true } z && ZenrunChildren(z.Stage) && effect?.Op == SkillProgramEffectOp.ResolveZenrunNativeDrawReplacement && pending == f.PendingMovementContinuation && pending.SubjectSeat == z.SourceSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool XianbiMovementMatches(ProgramSkillFrame f, CardMovementRecord move)
     {
@@ -114,11 +112,6 @@ internal sealed partial class CharacterSunHongOlRuntime
     }
 
     internal ProgramSkillFrame? SunHongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterSunHongOlOperations.SunHongFirstChild(frame, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (at) => _coreObserverSubtreesOperations.IsMovementObserverEdge(at) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(at) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[at], _resolutionStackOperations2._resolutionStack()[at - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[at], _resolutionStackOperations2._resolutionStack()[at - 1]), (at, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(at, dying)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1020)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1130)]
-    internal bool HasSunHongDamageObserver(long id) => SunHongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1160)]
-    internal bool HasSunHongBeforeDamageObserver(long id) => SunHongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27570)]
     internal bool AdvanceSunHongChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SunHongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -11,8 +11,6 @@ internal sealed partial class CharacterDiaoChanMouMobileEntries
     internal void ContinueMouDiaoChan(long id) => _resolve().ContinueMouDiaoChan(id);
     internal bool DrainMouDiaoChanChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouDiaoChanChildren(f);
     internal void FinishMouDiaoChan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouDiaoChan(f);
-    internal bool HasMouDiaoChanBeforeDamageObserver(long id) => _resolve().HasMouDiaoChanBeforeDamageObserver(id);
-    internal bool HasMouDiaoChanDamageObserver(long id) => _resolve().HasMouDiaoChanDamageObserver(id);
     internal bool IsMouDiaoChanDying() => _resolve().IsMouDiaoChanDying();
     internal bool IsMouDiaoChanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouDiaoChanMovement(f, e, p);
     internal bool IsMouDiaoChanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouDiaoChanRecoveryParent(f, recovery);

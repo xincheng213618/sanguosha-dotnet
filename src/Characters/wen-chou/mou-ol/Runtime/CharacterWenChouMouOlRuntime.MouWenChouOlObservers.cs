@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWenChouMouOlRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33100)]
     internal bool IsMouWenChouMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.MouWenChouOl is { Stage: MouWenChouOlStage.Children or MouWenChouOlStage.DiscardChildren } r && effect?.Op == r.Operation && movement == f.PendingMovementContinuation && movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && ValidMouWenChouOl(f);
     internal bool MouWenChouLion(ProgramSkillFrame f, int seat, CardMoveReason? reason) => f.MouWenChouOl is { Stage: MouWenChouOlStage.DiscardChildren } r && r.TargetSeat == seat && reason?.Value == MouWenChouDiscardReason && _coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouDiscardPaidEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == seat && e.Before == r.Before && e.After == r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.CardKind == CardKind.SilverLion && m.From == CardLocation.Equipment(seat) && m.Sequence > e.Before && m.Sequence <= e.After && m.Reason == reason));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 33100)]
@@ -52,11 +50,6 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     internal bool MouWenChouObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || MouWenChouNativeEdge(n) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && MouWenChouFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
     internal bool MouWenChouObserverSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterWenChouMouOlOperations.MouWenChouObserverEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouWenChouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterWenChouMouOlOperations.MouWenChouFirstChild(f, c), (n) => _characterWenChouMouOlOperations.MouWenChouObserverSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 33100)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 33100)]
-    internal bool HasMouWenChouDamage(long id) => MouWenChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33100)]
-    internal bool HasMouWenChouBeforeDamage(long id) => MouWenChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33100)]
     internal bool IsMouWenChouDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouWenChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33100)]

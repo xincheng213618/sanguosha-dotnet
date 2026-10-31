@@ -8,10 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunChenMobileShiRuntime
 {
     internal bool ValidShiSc(ProgramSkillFrame f) => f.ShiSunChen is { } r && f.InstructionIndex == 1 && r.Source == ShiScSource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && r.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && r.WindowId == f.WindowContext?.ParentFrameId && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && Enum.IsDefined(r.Stage) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiScStartedEvent>().Count(e => e == new ShiScStartedEvent(f.Id, r.Source, r.Hash, r.Op, r.Turn, r.TurnOwner, r.PhaseId, r.WindowId, r.UseId, r.ActionId)) == 1;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49100)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49100)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49100)]
     internal bool ShiScMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => ValidShiSc(f) && f.ShiSunChen is { Stage: ShiScStage.DiscardChildren or ShiScStage.GiftChildren or ShiScStage.DrawChildren } r && effect?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool ShiScFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -31,11 +27,6 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     internal bool ShiScChildEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && ShiScFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool ShiScChildSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterSunChenMobileShiOperations.ShiScChildEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? ShiScObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterSunChenMobileShiOperations.ShiScFirstChild(f, child), (i) => _characterSunChenMobileShiOperations.ShiScChildSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 49100)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 49100)]
-    internal bool ShiScDamageObserver(long id) => ShiScObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49100)]
-    internal bool ShiScBeforeDamageObserver(long id) => ShiScObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49100)]
     internal bool ShiScDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiScObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49100)]

@@ -10,9 +10,7 @@ internal sealed partial class CharacterZhouYuHappyGodEntries
     internal void CaptureHappyZyPrevented(global::CardGame.Core.IdentityHpDeductionPreventedEvent fact) => _resolve().CaptureHappyZyPrevented(fact);
     internal global::CardGame.Core.PromptChoice ChooseHappyZy(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseHappyZy(p, f);
     internal bool DrainHappyZy(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainHappyZy(f);
-    internal bool HappyZyBeforeDamageObserver(long id) => _resolve().HappyZyBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyZyChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZyChoices(f);
-    internal bool HappyZyDamageObserver(long id) => _resolve().HappyZyDamageObserver(id);
     internal (global::CardGame.Core.NativeLogicalDiscardInvocationRecordedEvent Invocation, global::CardGame.Core.NativeLogicalDiscardMaterialCompletedEvent Material)? HappyZyDiscard(int owner) => _resolve().HappyZyDiscard(owner);
     internal bool HappyZyDying() => _resolve().HappyZyDying();
     internal bool HappyZyFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HappyZyFirstChild(f, child);

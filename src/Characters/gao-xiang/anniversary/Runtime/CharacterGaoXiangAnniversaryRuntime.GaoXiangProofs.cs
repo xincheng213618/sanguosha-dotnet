@@ -43,8 +43,6 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
         if (!ValidGaoXiang(f))
             throw new InvalidOperationException("Chiying lost its original skill/frame, frozen actor/participant queue or actual once-paid discard/gain receipt.");
     }
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 44900)]
-    internal bool GaoXiangMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.GaoXiangChiying is { Stage: GaoXiangChiyingStage.DiscardChildren or GaoXiangChiyingStage.GainChildren } && ValidGaoXiang(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryGaoXiangChiying && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool GaoXiangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.GaoXiangChiying is not { Stage: GaoXiangChiyingStage.DiscardChildren or GaoXiangChiyingStage.GainChildren } r || !ValidGaoXiang(f))
@@ -65,11 +63,6 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 44900)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 44900)]
     internal bool GaoXiangRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => GaoXiangFirstChild(f, recovery);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 44900)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 44900)]
-    internal bool GaoXiangDamageObserver(long id) => GaoXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 44900)]
-    internal bool GaoXiangBeforeDamageObserver(long id) => GaoXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 44900)]
     internal bool AdvanceGaoXiangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && GaoXiangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

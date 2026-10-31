@@ -12,9 +12,6 @@ internal sealed partial class CharacterLuoXianOlEntries
     internal bool DailiFirstChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().DailiFirstChild(frame, child);
     internal global::CardGame.Core.ProgramSkillFrame? DailiObserverRoot() => _resolve().DailiObserverRoot();
     internal bool DrainDailiChildren(long id) => _resolve().DrainDailiChildren(id);
-    internal bool HasDailiBeforeDamageObserver(long id) => _resolve().HasDailiBeforeDamageObserver(id);
-    internal bool HasDailiDamageObserver(long id) => _resolve().HasDailiDamageObserver(id);
-    internal bool IsDailiMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsDailiMovement(frame, effect, movement);
     internal void ObserveExplicitPublicHandReveal(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveExplicitPublicHandReveal(payload);
     internal int PubliclyRevealedHandCount(int owner) => _resolve().PubliclyRevealedHandCount(owner);
     internal global::CardGame.Core.SkillProgramStepOutcome ResolveDailiTurnEnd(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ResolveDailiTurnEnd(supplied);

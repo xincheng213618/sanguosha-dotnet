@@ -75,6 +75,4 @@ internal sealed partial class CoreGameEnginePrivateOfferObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 300)]
     internal bool IsPrivateOfferProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PrivateOfferObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1980)]
-    internal bool HasPrivateOfferDamageObserver(long windowId) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == windowId && f is DamageTriggerWindowFrame) && PrivateOfferObserverRoot()is not null;
 }

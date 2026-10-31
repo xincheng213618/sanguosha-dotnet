@@ -11,8 +11,6 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsEntries
     internal bool DrawAdviceFirstChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().DrawAdviceFirstChild(frame, child);
     internal global::CardGame.Core.ProgramSkillFrame? DrawAdviceObserverRoot() => _resolve().DrawAdviceObserverRoot();
     internal bool ExactDrawAdviceParent(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExactDrawAdviceParent(frame);
-    internal bool HasDrawAdviceDamageObserver(long id) => _resolve().HasDrawAdviceDamageObserver(id);
-    internal bool IsDrawAdviceAwaitedMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsDrawAdviceAwaitedMovement(frame, effect, pending);
     internal bool IsDrawAdviceProgramDying() => _resolve().IsDrawAdviceProgramDying();
     internal void PublishDrawAdviceDiscard(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishDrawAdviceDiscard(frame);
     internal void ResolveDrawAdviceChoice(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveDrawAdviceChoice(selected);

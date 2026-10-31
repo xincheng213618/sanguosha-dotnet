@@ -47,9 +47,6 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
         return r.Stage == HappyZuoCiStage.DrawChildren && r.DrawOutcome is { } draw && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Overflow && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZuoCiDrawReturnedEvent>().Count(e => e == new HappyZuoCiDrawReturnedEvent(f.Id, draw.RequestedCount, draw.ActualDrawIds.Count, r.Before, r.After)) == 1 && draw.ActualDrawIds.Distinct().Count() == draw.ActualDrawIds.Count && draw.ActualDrawIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Sequence > r.Before && m.Sequence <= r.After) == 1);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 42600)]
-    internal bool HappyZcMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.HappyZuoCi is { } r && effect?.Op == r.Operation && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && r.Stage is HappyZuoCiStage.InitialChildren or HappyZuoCiStage.GainChildren or HappyZuoCiStage.DrawChildren or HappyZuoCiStage.RefreshChildren && ValidHappyZc(f);
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 42600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 42600)]
     internal bool KeepPaidHappyZc(ProgramSkillFrame f) => f.HappyZuoCi is { Stage: not (HappyZuoCiStage.PhantomChoice or HappyZuoCiStage.TemplateChoice) } && ValidHappyZc(f);

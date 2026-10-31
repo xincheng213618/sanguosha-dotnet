@@ -150,9 +150,6 @@ internal sealed partial class CoreGameEngineShanheGuangaoRuntime
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 5405)]
-    internal bool IsShanheGuangaoDrawMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation movement) => effect?.Op == SkillProgramEffectOp.ResolveShanheGuangao && frame.ShanheGuangao is { Stage: "draw-children", DrawOutcome: not null } && movement.SubjectSeat == frame.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Resume, 5405)]
     internal bool ResumeShanheGuangao(long frameId)
     {

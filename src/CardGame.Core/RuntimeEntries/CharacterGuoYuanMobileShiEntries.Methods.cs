@@ -30,11 +30,9 @@ internal sealed partial class CharacterGuoYuanMobileShiEntries
     internal void ReturnShiGyNative(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnShiGyNative(use);
     internal void SealShiGy(long id) => _resolve().SealShiGy(id);
     internal void SettleShiGyNative(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SettleShiGyNative(f);
-    internal bool ShiGyBeforeDamageChild(long id) => _resolve().ShiGyBeforeDamageChild(id);
     internal bool ShiGyCardDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().ShiGyCardDistance(q);
     internal bool ShiGyChildSuffix(int i) => _resolve().ShiGyChildSuffix(i);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiGyChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiGyChoices(f);
-    internal bool ShiGyDamageChild(long id) => _resolve().ShiGyDamageChild(id);
     internal bool ShiGyDeclarationEdge(int i) => _resolve().ShiGyDeclarationEdge(i);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiGyDiscardChoices(global::CardGame.Core.ProgramSkillFrame f, int target) => _resolve().ShiGyDiscardChoices(f, target);
     internal bool ShiGyDyingChild() => _resolve().ShiGyDyingChild();

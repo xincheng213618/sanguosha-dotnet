@@ -38,11 +38,9 @@ internal sealed partial class CharacterWeiYanHappyGodEntries
     internal global::CardGame.Core.PromptChoice HappyGujingAi(global::CardGame.Core.PendingDecision decision) => _resolve().HappyGujingAi(decision);
     internal bool HappyGujingCanActivate(global::CardGame.Core.CharacterState owner) => _resolve().HappyGujingCanActivate(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyWeiYanAdditionalChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HappyWeiYanAdditionalChoices(frame);
-    internal bool HappyWeiYanBeforeDamageObserver(long id) => _resolve().HappyWeiYanBeforeDamageObserver(id);
     internal global::CardGame.Core.Card? HappyWeiYanBoneReturnCard(global::CardGame.Core.CharacterState actor, int? id) => _resolve().HappyWeiYanBoneReturnCard(actor, id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyWeiYanChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HappyWeiYanChoices(frame);
     internal bool HappyWeiYanCounterspellInvalidated(global::CardGame.Core.NullificationWindowFrame pending, global::CardGame.Core.CardActionContext action) => _resolve().HappyWeiYanCounterspellInvalidated(pending, action);
-    internal bool HappyWeiYanDamageObserver(long id) => _resolve().HappyWeiYanDamageObserver(id);
     internal bool HappyWeiYanDying() => _resolve().HappyWeiYanDying();
     internal bool HappyWeiYanFirstChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().HappyWeiYanFirstChild(frame, child);
     internal bool HappyWeiYanMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().HappyWeiYanMovement(frame, effect, pending);

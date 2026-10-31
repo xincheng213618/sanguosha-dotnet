@@ -102,6 +102,4 @@ internal sealed partial class CoreGameEngineGainGiftObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 200)]
     internal bool IsGainGiftProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GainGiftObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1750)]
-    internal bool HasGainGiftDamageObserver(long window) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == window && f is DamageTriggerWindowFrame) && GainGiftObserverRoot()is not null;
 }

@@ -105,8 +105,4 @@ internal sealed class DingShangWanFrameProofRuntime(IProgramRuntimeFrames frames
         }
         return true;
     }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 490)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 630)]
-    private bool HasDingShangWanDamageObserver(long id)=>DingShangWanObserverRoot()is{}root&&AllFrames.Any(f=>f.Id==id&&f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame)&&nativeFrames.LastFrameIndex(id)>nativeFrames.LastFrameIndex(root.Id);
 }

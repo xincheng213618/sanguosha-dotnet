@@ -19,10 +19,7 @@ internal sealed partial class CharacterHuaXiongMouOlEntries
     internal bool DrainMouHxBojue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouHxBojue(f);
     internal void FinishMouHxBojue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouHxBojue(f);
     internal bool FinishMouHxBojueAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouHxBojueAttack(attack, out paused);
-    internal bool IsMouHxBojueBeforeDamageObserver(long id) => _resolve().IsMouHxBojueBeforeDamageObserver(id);
-    internal bool IsMouHxBojueDamageObserver(long id) => _resolve().IsMouHxBojueDamageObserver(id);
     internal bool IsMouHxBojueDying() => _resolve().IsMouHxBojueDying();
-    internal bool IsMouHxBojueMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouHxBojueMovement(f, effect, pending);
     internal bool IsMouHxBojueRecovery(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouHxBojueRecovery(f, recovery);
     internal bool IsMouHxBojueUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsMouHxBojueUse(use);
     internal void IssueMouHxBojueSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouHxBojueSlash(f);

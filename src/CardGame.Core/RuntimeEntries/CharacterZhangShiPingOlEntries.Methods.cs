@@ -19,7 +19,6 @@ internal sealed partial class CharacterZhangShiPingOlEntries
     internal void FinishXingGu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishXingGu(f);
     internal bool HasIssuedHongjiCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedHongjiCandidate(c, context);
     internal bool HasOutstandingHongjiPhase(global::CardGame.Core.CharacterState recipient, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().HasOutstandingHongjiPhase(recipient, window);
-    internal bool HasZhangShiPingDamageObserver(long id) => _resolve().HasZhangShiPingDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HongjiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HongjiChoices(f);
     internal (bool Draw, bool Play) HongjiEligibility(int owner, int recipient, long? parentId) => _resolve().HongjiEligibility(owner, recipient, parentId);
     internal bool HongjiPromiseReservedByPhaseParent(global::CardGame.Core.ZhangShiPingHongjiGrantedEvent promise) => _resolve().HongjiPromiseReservedByPhaseParent(promise);

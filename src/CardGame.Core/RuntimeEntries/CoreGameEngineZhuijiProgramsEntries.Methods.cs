@@ -6,7 +6,6 @@ internal sealed partial class CoreGameEngineZhuijiProgramsEntries
     internal global::CardGame.Core.ZhuijiPlayPhaseKey? CaptureZhuijiEndingPhase(global::CardGame.Core.CharacterState owner) => _resolve().CaptureZhuijiEndingPhase(owner);
     internal global::CardGame.Core.ProgramSkillWindowContext CreateZhuijiEndingContext(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame f, global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CreateZhuijiEndingContext(f, c, context);
     internal bool HasIssuedZhuijiDebtCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HasIssuedZhuijiDebtCandidate(c, w);
-    internal bool IsZhuijiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhuijiMovement(f, e, p);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedZhuijiEndingCandidates(global::CardGame.Core.CharacterState owner) => _resolve().IssuedZhuijiEndingCandidates(owner);
     internal global::CardGame.Core.ZhuijiPlayGrant? MatchingZhuijiGrant(global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().MatchingZhuijiGrant(c);
     internal global::CardGame.Core.ZhuijiPlayGrant? MatchingZhuijiGrant2(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ZhuijiPlayPhaseKey phase) => _resolve().MatchingZhuijiGrant(c, phase);

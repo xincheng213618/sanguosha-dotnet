@@ -86,8 +86,6 @@ internal sealed partial class CoreGameEngineOwnTrickDrawTargetsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 560)]
     internal bool IsOwnTrickDrawMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation m) => e?.Op == SkillProgramEffectOp.DrawThenNullifyOwnMultiTargetTrick && f.OwnTrickDraw is not null && m.SubjectSeat == f.OwnerSeat && m.BeforeCount == 0 && m.CoverageResultBind is null && _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Any(p => OwnTrickDrawMatches(f, p));
     internal bool OwnTrickDrawFirstChild(ProgramSkillFrame f, ResolutionFrame child) => f.OwnTrickDraw is { } r && f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } m && m.SubjectSeat == f.OwnerSeat && child is CardsMovedTriggerWindowFrame first && first.Batch.ParentFrameId == f.Id && (first.Batch.AwaitingProgramFrameId is null || first.Batch.AwaitingProgramFrameId == f.Id) && first.Batch.OriginSkillId == f.SkillId && first.Batch.OriginSkillInstanceId == f.SkillInstanceId && first.Batch.OriginOwnerSeat == f.OwnerSeat && first.Batch.Movements.Count > 0 && first.Batch.Movements.All(x => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(x) && x.Sequence > r.SequenceBefore && x.Sequence <= r.SequenceAfter && x.From == CardLocation.DrawPile && x.To == CardLocation.Hand(f.OwnerSeat) && x.Reason.Value == OwnTrickDrawReason);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 490)]

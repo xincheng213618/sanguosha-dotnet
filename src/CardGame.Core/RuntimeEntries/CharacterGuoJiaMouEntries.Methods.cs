@@ -6,8 +6,6 @@ internal sealed partial class CharacterGuoJiaMouEntries
     internal bool IsMouGjJudgment(global::CardGame.Core.JudgmentFrame j, global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsMouGjJudgment(j, f);
     internal bool IsMouGjLightningJudgment(global::CardGame.Core.JudgmentFrame j) => _resolve().IsMouGjLightningJudgment(j);
     internal bool MouGjAdvanceChildren() => _resolve().MouGjAdvanceChildren();
-    internal bool MouGjBeforeDamage(long id) => _resolve().MouGjBeforeDamage(id);
-    internal bool MouGjDamageWindow(long id) => _resolve().MouGjDamageWindow(id);
     internal bool MouGjDying() => _resolve().MouGjDying();
     internal bool MouGjEdge(int i) => _resolve().MouGjEdge(i);
     internal bool MouGjFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouGjFirstChild(f, child);

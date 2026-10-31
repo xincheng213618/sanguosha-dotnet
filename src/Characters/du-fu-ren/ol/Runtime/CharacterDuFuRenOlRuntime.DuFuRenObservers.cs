@@ -35,10 +35,6 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     }
 
     internal ProgramSkillFrame? DuFuRenObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterDuFuRenOlOperations.DuFuRenFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 450)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 560)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 590)]
-    internal bool HasDuFuRenDamageObserver(long id) => DuFuRenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26520)]
     internal bool AdvanceDuFuRenSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DuFuRenObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

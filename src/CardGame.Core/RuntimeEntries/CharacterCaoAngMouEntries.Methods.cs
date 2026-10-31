@@ -11,8 +11,6 @@ internal sealed partial class CharacterCaoAngMouEntries
     internal bool IsMouCaExactCardQuery(global::CardGame.Core.CharacterState actor, int? selected) => _resolve().IsMouCaExactCardQuery(actor, selected);
     internal void IssueMouCaUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouCaUse(f);
     internal bool MouCaAdvanceChildren() => _resolve().MouCaAdvanceChildren();
-    internal bool MouCaBeforeDamage(long id) => _resolve().MouCaBeforeDamage(id);
-    internal bool MouCaDamageWindow(long id) => _resolve().MouCaDamageWindow(id);
     internal bool MouCaDying() => _resolve().MouCaDying();
     internal bool MouCaEdge(int i) => _resolve().MouCaEdge(i);
     internal global::System.Collections.Generic.IReadOnlyList<int> MouCaExpectedTargets(global::CardGame.Core.MouCaNativeUse n) => _resolve().MouCaExpectedTargets(n);

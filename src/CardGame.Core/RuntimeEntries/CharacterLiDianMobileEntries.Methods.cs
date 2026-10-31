@@ -6,7 +6,6 @@ internal sealed partial class CharacterLiDianMobileEntries
     internal void ContinueMobileLiDianWangxi(long id) => _resolve().ContinueMobileLiDianWangxi(id);
     internal bool ExactMobileLiDianDamage(global::CardGame.Core.ProgramSkillFrame f, scoped out global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().ExactMobileLiDianDamage(f, out c);
     internal bool KeepPaidMobileLiDianWangxi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidMobileLiDianWangxi(f);
-    internal bool ProveMobileLiDianWangxiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().ProveMobileLiDianWangxiMovement(f, e, pending);
     internal bool ProveMobileLiDianWangxiRecovery(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().ProveMobileLiDianWangxiRecovery(f, recovery);
     internal bool ResumeMobileLiDianWangxi(long id) => _resolve().ResumeMobileLiDianWangxi(id);
     internal void ReturnMobileLiDianWangxiDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnMobileLiDianWangxiDraw(f, outcome);

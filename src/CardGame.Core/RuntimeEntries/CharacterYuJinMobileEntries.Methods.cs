@@ -11,7 +11,6 @@ internal sealed partial class CharacterYuJinMobileEntries
     internal bool KeepMobileYuJinPaidTransfer(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepMobileYuJinPaidTransfer(frame);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileYuJinChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().MobileYuJinChoices(frame);
     internal bool MobileYuJinConversionUnavailable(global::CardGame.Core.ProgramConfiguredViewAsQuery query) => _resolve().MobileYuJinConversionUnavailable(query);
-    internal bool MobileYuJinPaidMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().MobileYuJinPaidMovement(frame, effect, pending);
     internal global::CardGame.Core.PublicPersistentPileSource? MobileYuJinPile(int seat, string instance) => _resolve().MobileYuJinPile(seat, instance);
     internal bool MobileYuJinPreparationHasCards(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().MobileYuJinPreparationHasCards(candidate, context);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileYuJinStorePayments(global::CardGame.Core.ProgramSkillFrame frame, int target) => _resolve().MobileYuJinStorePayments(frame, target);

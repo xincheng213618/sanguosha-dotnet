@@ -237,9 +237,6 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
         RequireZhugeGuo(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 140)]
-    internal bool IsZhugeGuoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ZhugeGuo is { Stage: ZhugeGuoStage.GainChildren } && e?.Op == SkillProgramEffectOp.ObtainDeckTrickForActualEquipmentUse && CanContinueZhugeGuo(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal void RequireZhugeGuo(ProgramSkillFrame f)
     {
         if (f.ZhugeGuo is not { } r || r.Source != ZhugeGuoSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.WindowId != f.WindowContext?.ParentFrameId || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)

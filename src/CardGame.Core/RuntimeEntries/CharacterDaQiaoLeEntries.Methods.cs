@@ -23,15 +23,9 @@ internal sealed partial class CharacterDaQiaoLeEntries
     internal void FollowZixiSoleTargetSubstitution(global::CardGame.Core.IGameEvent payload) => _resolve().FollowZixiSoleTargetSubstitution(payload);
     internal bool HasPaidZixiPlacement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPaidZixiPlacement(f);
     internal bool HasUnstartedZixiExtraEffect(long id) => _resolve().HasUnstartedZixiExtraEffect(id);
-    internal bool HasZixiEffectsBeforeDamageObserver(long id) => _resolve().HasZixiEffectsBeforeDamageObserver(id);
-    internal bool HasZixiEffectsDamageObserver(long id) => _resolve().HasZixiEffectsDamageObserver(id);
-    internal bool HasZixiPlacementBeforeDamageObserver(long id) => _resolve().HasZixiPlacementBeforeDamageObserver(id);
-    internal bool HasZixiPlacementDamageObserver(long id) => _resolve().HasZixiPlacementDamageObserver(id);
     internal bool IsTargetScopedZixiEffectRound(long id) => _resolve().IsTargetScopedZixiEffectRound(id);
-    internal bool IsZixiEffectsMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsZixiEffectsMovement(f, effect, pending);
     internal bool IsZixiEffectsRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZixiEffectsRecoveryParent(f, recovery);
     internal bool IsZixiExtraEffectRound(long id) => _resolve().IsZixiExtraEffectRound(id);
-    internal bool IsZixiPlacementMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsZixiPlacementMovement(f, effect, pending);
     internal bool IsZixiPlacementRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsZixiPlacementRecoveryParent(f, recovery);
     internal bool IsZixiQinJudgmentCard(int id) => _resolve().IsZixiQinJudgmentCard(id);
     internal void IssueZixiExtraEffect(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardUseFrame use, global::CardGame.Core.ProgramCardTriggerWindowFrame window) => _resolve().IssueZixiExtraEffect(f, use, window);

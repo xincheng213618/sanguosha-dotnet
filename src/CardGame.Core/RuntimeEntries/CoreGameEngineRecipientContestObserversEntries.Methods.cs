@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRecipientContestObserversEntries
 {
-    internal bool HasRecipientContestDamageObserver(long windowId) => _resolve().HasRecipientContestDamageObserver(windowId);
     internal bool HasUniqueHpPeerActualTargetObserver(long useId) => _resolve().HasUniqueHpPeerActualTargetObserver(useId);
     internal bool IsRecipientContestMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsRecipientContestMovement(f, effect, pending);
     internal bool IsRecipientContestProgramDying() => _resolve().IsRecipientContestProgramDying();

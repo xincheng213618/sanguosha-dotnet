@@ -26,8 +26,6 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28110)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28110)]
     internal bool PermitIssuedZhaoZhong(ProgramSkillFrame f) => CanContinueIssuedZhaoZhong(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 170)]
-    internal bool IsZhaoZhongMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ZhaoZhong is { Paid: true } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is ZhaoZhongStage.GiftChildren or ZhaoZhongStage.RecoveryChildren or ZhaoZhongStage.NextGiftChildren or ZhaoZhongStage.DrawChildren;
     internal bool ZhaoZhongPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.ZhaoZhong!;
@@ -65,11 +63,6 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     internal bool ZhaoZhongLifecycleEdge(int index) => _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame w && _resolutionStackOperations._resolutionStack[index] is ProgramSkillFrame f && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && f.WindowContext is { } c && c.ParentFrameId == w.Id && c.Window == w.Window;
     internal bool ZhaoZhongObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _characterZhaoZhongOlOperations.ZhaoZhongLifecycleEdge(n) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame { Zenrun: not null } z && _characterSunHongOlOperations.ZenrunFirstChild(z, _resolutionStackOperations2._resolutionStack()[n]) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? ZhaoZhongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterZhaoZhongOlOperations.ZhaoZhongFirstChild(f, child), (i) => _characterZhaoZhongOlOperations.ZhaoZhongObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1100)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1210)]
-    internal bool HasZhaoZhongDamageObserver(long id) => ZhaoZhongObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1240)]
-    internal bool HasZhaoZhongBeforeDamageObserver(long id) => ZhaoZhongObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28110)]
     internal bool AdvanceZhaoZhongChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhaoZhongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

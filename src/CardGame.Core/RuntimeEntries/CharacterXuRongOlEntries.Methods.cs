@@ -12,12 +12,9 @@ internal sealed partial class CharacterXuRongOlEntries
     internal global::CardGame.Core.ProgramSkillWindowContext CreateXuRongDyingContext(global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CreateXuRongDyingContext(context);
     internal bool ExactXuRongParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.XuRongPending r) => _resolve().ExactXuRongParent(f, r);
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteXuRong(global::CardGame.Core.SkillProgramEffectOp op, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExecuteXuRong(op, f);
-    internal bool HasXuRongBeforeDamageObserver(long id) => _resolve().HasXuRongBeforeDamageObserver(id);
-    internal bool HasXuRongDamageObserver(long id) => _resolve().HasXuRongDamageObserver(id);
     internal bool HasXuRongDyingQualification(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasXuRongDyingQualification(candidate, context);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeXuRong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().InitializeXuRong(f);
     internal bool IsXuRongCausalEntityClaim(long nativeOwnerId, int cardId) => _resolve().IsXuRongCausalEntityClaim(nativeOwnerId, cardId);
-    internal bool IsXuRongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsXuRongMovement(f, e, p);
     internal bool IsXuRongSlashTargetForbidden(int actor, int target, global::CardGame.Core.CardKind kind) => _resolve().IsXuRongSlashTargetForbidden(actor, target, kind);
     internal void IssueXuRongMove(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<int> ids, string reason) => _resolve().IssueXuRongMove(f, ids, reason);
     internal bool LiveXionghuoSource(global::CardGame.Core.XionghuoGrant grant) => _resolve().LiveXionghuoSource(grant);

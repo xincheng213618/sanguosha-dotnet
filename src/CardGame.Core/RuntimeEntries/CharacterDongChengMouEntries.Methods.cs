@@ -17,7 +17,6 @@ internal sealed partial class CharacterDongChengMouEntries
     internal void MouDcClaim(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouDcClaim(f);
     internal void MouDcClaimCandidates(global::CardGame.Core.CardActionContext a, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.List<global::CardGame.Core.ProgramCardTriggerCandidate> result) => _resolve().MouDcClaimCandidates(a, window, result);
     internal global::CardGame.Core.CardUseFrame? MouDcClaimUse(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w, bool settled = false) => _resolve().MouDcClaimUse(c, w, settled);
-    internal bool MouDcDamageObserver(long id) => _resolve().MouDcDamageObserver(id);
     internal bool MouDcDamageParent(global::CardGame.Core.MouDcOccurrence o) => _resolve().MouDcDamageParent(o);
     internal global::CardGame.Core.JudgmentFrame? MouDcDelayedDamage(global::CardGame.Core.MouDcOccurrence o) => _resolve().MouDcDelayedDamage(o);
     internal bool MouDcDying() => _resolve().MouDcDying();

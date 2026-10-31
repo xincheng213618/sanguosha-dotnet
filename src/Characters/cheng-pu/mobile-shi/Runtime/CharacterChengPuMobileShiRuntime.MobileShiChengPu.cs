@@ -316,8 +316,6 @@ internal sealed partial class CharacterChengPuMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 67300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 67300)]
     internal bool ContinuePaidShiCpBihan(ProgramSkillFrame f) => f.MobileShiChengPu is { Operation: "bihan", Stage: > 0 };
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 67300)]
-    internal bool ShiCpBihanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MobileShiChengPu is { Operation: "bihan", Stage: 9 } r && effect?.Op == SkillProgramEffectOp.ResolveMobileShiBihanGuard && p.CoverageResultBind is null && p.BeforeCount == 0 && p.SubjectSeat == r.TargetSeat;
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiDuzuoGrant)]
     internal PromptChoice ChooseShiCpDuzuo(PendingDecision prompt) => prompt.Choices.FirstOrDefault(choice => choice.Targets is [var seat] && seat == prompt.PlayerSeat) ?? prompt.Choices[0];

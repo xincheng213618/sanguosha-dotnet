@@ -11,10 +11,7 @@ internal sealed partial class CharacterLuZhiWeiOlEntries
     internal global::CardGame.Core.SkillProgramStepOutcome DrawAndArmQingzhongActualPlayDebt(global::CardGame.Core.ProgramSkillFrame input) => _resolve().DrawAndArmQingzhongActualPlayDebt(input);
     internal void FinishQingzhong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishQingzhong(f);
     internal bool HasIssuedQingzhongDebtCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HasIssuedQingzhongDebtCandidate(c, w);
-    internal bool HasLuZhiWeiBeforeDamageObserver(long id) => _resolve().HasLuZhiWeiBeforeDamageObserver(id);
-    internal bool HasLuZhiWeiDamageObserver(long id) => _resolve().HasLuZhiWeiDamageObserver(id);
     internal bool IsExactQingzhongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.QingzhongPending p, global::CardGame.Core.CardMovementRecord m) => _resolve().IsExactQingzhongMovement(f, p, m);
-    internal bool IsLuZhiWeiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLuZhiWeiMovement(f, e, p);
     internal void IssueQingzhongMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueQingzhongMovement(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedQingzhongEndingCandidates(global::CardGame.Core.CharacterState owner) => _resolve().IssuedQingzhongEndingCandidates(owner);
     internal bool LuZhiWeiFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().LuZhiWeiFirstChild(root, child);

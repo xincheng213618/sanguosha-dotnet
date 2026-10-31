@@ -6,11 +6,7 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsEntri
     internal bool DistancePhysicalSlash120HasIssuedSelectedForeignCardSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash120HasIssuedSelectedForeignCardSlashDistance(q);
     internal bool ForeignSelectedCardSlashStructuralEdge(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.ResolutionFrame child) => _resolve().ForeignSelectedCardSlashStructuralEdge(parent, child);
     internal bool HasIssuedSelectedForeignCardSlashDistance(long? useId, int actor) => _resolve().HasIssuedSelectedForeignCardSlashDistance(useId, actor);
-    internal bool HasSelectedForeignCardSlashBeforeDamageObserver(long id) => _resolve().HasSelectedForeignCardSlashBeforeDamageObserver(id);
-    internal bool HasSelectedForeignCardSlashDamageObserver(long id) => _resolve().HasSelectedForeignCardSlashDamageObserver(id);
-    internal bool HasSelectedForeignCardSlashObserver(long id, bool before) => _resolve().HasSelectedForeignCardSlashObserver(id, before);
     internal bool IsSelectedForeignCardSlashHpChange(long resumeFrameId, global::CardGame.Core.HpChangeContext change) => _resolve().IsSelectedForeignCardSlashHpChange(resumeFrameId, change);
-    internal bool IsSelectedForeignCardSlashMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSelectedForeignCardSlashMovement(frame, effect, pending);
     internal bool IsSelectedForeignCardSlashMovementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsSelectedForeignCardSlashMovementBatch(frame, batch);
     internal bool IsSelectedForeignCardSlashProgramDying() => _resolve().IsSelectedForeignCardSlashProgramDying();
     internal bool IsSelectedForeignCardSlashRemovedMaterial(long useId, int cardId) => _resolve().IsSelectedForeignCardSlashRemovedMaterial(useId, cardId);

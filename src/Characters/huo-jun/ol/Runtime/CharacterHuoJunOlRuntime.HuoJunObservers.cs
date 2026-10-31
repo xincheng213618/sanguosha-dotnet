@@ -29,9 +29,6 @@ internal sealed partial class CharacterHuoJunOlRuntime
 
     internal bool HuoJunFenruiObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? HuoJunFenruiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterHuoJunOlOperations.HuoJunFenruiFirstChild(f, child), (i) => _characterHuoJunOlOperations.HuoJunFenruiObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 370)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 480)]
-    internal bool HasHuoJunFenruiDamageObserver(long id) => HuoJunFenruiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26210)]
     internal bool AdvanceHuoJunFenruiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuoJunFenruiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

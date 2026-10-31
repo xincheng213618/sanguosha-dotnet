@@ -29,7 +29,6 @@ internal sealed partial class CharacterZuoCiHappyGodEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyZcChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZcChoices(f);
     internal (int Owner, global::CardGame.Core.HappyZuoCiState State, global::CardGame.Core.HappyZuoCiEntity Entity)? HappyZcEntity(int id) => _resolve().HappyZcEntity(id);
     internal int? HappyZcForeignGain(global::CardGame.Core.CardMovementRecord m) => _resolve().HappyZcForeignGain(m);
-    internal bool HappyZcMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().HappyZcMovement(f, effect, pending);
     internal bool HappyZcOriginalFrame(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZcOriginalFrame(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> HappyZcPhantomChoices(global::CardGame.Core.CharacterState owner) => _resolve().HappyZcPhantomChoices(owner);
     internal bool HappyZcPlanProof(global::CardGame.Core.HappyZuoCiPhantomDestinationPlan plan) => _resolve().HappyZcPlanProof(plan);

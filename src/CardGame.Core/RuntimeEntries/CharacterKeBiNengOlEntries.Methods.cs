@@ -16,8 +16,6 @@ internal sealed partial class CharacterKeBiNengOlEntries
     internal void ExpireKeBiNengPingduanAlcohol(int actualTurn, int turnOwner) => _resolve().ExpireKeBiNengPingduanAlcohol(actualTurn, turnOwner);
     internal void FinishKeBiNeng(global::CardGame.Core.ProgramSkillFrame f, string reason) => _resolve().FinishKeBiNeng(f, reason);
     internal bool HasIssuedKeBiNengPingduanUse(long id, int actor) => _resolve().HasIssuedKeBiNengPingduanUse(id, actor);
-    internal bool HasKeBiNengBeforeDamageObserver(long id) => _resolve().HasKeBiNengBeforeDamageObserver(id);
-    internal bool HasKeBiNengDamageObserver(long id) => _resolve().HasKeBiNengDamageObserver(id);
     internal bool IsKeBiNengPingduanBasicQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsKeBiNengPingduanBasicQuery(actor);
     internal bool IsKeBiNengPingduanPaymentFrame(global::CardGame.Core.ChainedStateBasicFrame paid) => _resolve().IsKeBiNengPingduanPaymentFrame(paid);
     internal bool IsKeBiNengPingduanPaymentFrame2(global::CardGame.Core.DrawFundedDistinctBasicFrame paid) => _resolve().IsKeBiNengPingduanPaymentFrame(paid);

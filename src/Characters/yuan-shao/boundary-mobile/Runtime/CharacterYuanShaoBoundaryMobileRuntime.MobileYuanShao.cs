@@ -71,15 +71,4 @@ internal sealed partial class CharacterYuanShaoBoundaryMobileRuntime
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 66002)]
-    internal bool MobileYuanShaoDrawMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect?.Op is not (SkillProgramEffectOp.DrawMobileLuanjiResponder or SkillProgramEffectOp.DrawMobileLuanjiNoDamage) || frame.SkillId != MobileYuanShaoLuanji || frame.InstructionIndex != 1 || pending != frame.PendingMovementContinuation || pending.SubjectSeat != frame.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || frame.WindowContext is not { } context)
-            return false;
-        var responder = effect.Op == SkillProgramEffectOp.DrawMobileLuanjiResponder;
-        var recipient = responder ? MobileYuanShaoResponder(context, frame.OwnerSeat) : frame.OwnerSeat;
-        var reason = responder ? MobileYuanShaoResponderDraw : MobileYuanShaoNoDamageDraw;
-        return recipient is { } seat && _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Concat(_resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Select(w => w.Batch)).Any(batch => batch.ParentFrameId == frame.Id && batch.OriginOwnerSeat == frame.OwnerSeat && batch.OriginSkillId == frame.SkillId && batch.OriginSkillInstanceId == frame.SkillInstanceId && batch.Movements is [var movement] && movement.From == CardLocation.DrawPile && movement.To == CardLocation.Hand(seat) && movement.Reason.Value == reason && _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(movement));
-    }
 }

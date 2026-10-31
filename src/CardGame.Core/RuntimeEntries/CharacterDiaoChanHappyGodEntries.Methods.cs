@@ -22,7 +22,6 @@ internal sealed partial class CharacterDiaoChanHappyGodEntries
     internal bool HappyDcFirstSlash(int owner, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HappyDcFirstSlash(owner, context);
     internal bool HappyDcMaterialBan(global::CardGame.Core.ProgramCardMaterialQuery q) => _resolve().HappyDcMaterialBan(q);
     internal bool HappyDcMaterialsForbidden(int seat, global::System.Collections.Generic.IEnumerable<int> material) => _resolve().HappyDcMaterialsForbidden(seat, material);
-    internal bool HappyDcMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().HappyDcMovement(f, effect, p);
     internal bool HappyDcOriginalCandidate(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyDcOriginalCandidate(f);
     internal global::System.Collections.Generic.IEnumerable<(int Source, int Opponent)> HappyDcPairs(int? discarded = default) => _resolve().HappyDcPairs(discarded);
     internal bool HappyDcProjectedUse(global::CardGame.Core.ProgramLegalActionQuery q) => _resolve().HappyDcProjectedUse(q);

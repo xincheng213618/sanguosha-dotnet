@@ -16,8 +16,6 @@ internal sealed partial class CharacterXiangChongOlEntries
     internal bool DrainXiang(long id) => _resolve().DrainXiang(id);
     internal void FinishXiang(global::CardGame.Core.ProgramSkillFrame f, string reason) => _resolve().FinishXiang(f, reason);
     internal void FinishXiangChongEquipment(global::CardGame.Core.ProgramSkillFrame f, bool issued) => _resolve().FinishXiangChongEquipment(f, issued);
-    internal bool HasXiangChongBeforeDamageObserver(long id) => _resolve().HasXiangChongBeforeDamageObserver(id);
-    internal bool HasXiangChongDamageObserver(long id) => _resolve().HasXiangChongDamageObserver(id);
     internal bool IsXiangChongClaimedUseMaterial(long useId, int cardId) => _resolve().IsXiangChongClaimedUseMaterial(useId, cardId);
     internal bool IsXiangChongEquipmentMaterialClaim(long useId, int cardId, global::CardGame.Core.CardActionContext action) => _resolve().IsXiangChongEquipmentMaterialClaim(useId, cardId, action);
     internal bool IsXiangChongGuyingEquipmentRide(global::CardGame.Core.ResolutionFrame ride, global::CardGame.Core.ResolutionFrame beneath) => _resolve().IsXiangChongGuyingEquipmentRide(ride, beneath);

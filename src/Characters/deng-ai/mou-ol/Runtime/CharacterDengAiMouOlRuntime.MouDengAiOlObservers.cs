@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiMouOlRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33400)]
     internal bool IsMouDengAiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation m) => f.MouDengAiOl is { Stage: MouDengAiOlStage.Children or MouDengAiOlStage.CostChildren } r && ValidMouDengAiOl(f) && effect?.Op == r.Operation && m == f.PendingMovementContinuation && m.SubjectSeat == f.OwnerSeat && m.BeforeCount == 0 && m.CoverageResultBind is null;
     internal bool MouDengAiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -39,11 +37,6 @@ internal sealed partial class CharacterDengAiMouOlRuntime
     internal bool MouDengAiObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || MouDengAiNativeEdge(n) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && MouDengAiFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
     internal bool MouDengAiObserverSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterDengAiMouOlOperations.MouDengAiObserverEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouDengAiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterDengAiMouOlOperations.MouDengAiFirstChild(f, c), (n) => _characterDengAiMouOlOperations.MouDengAiObserverSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 33400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 33400)]
-    internal bool HasMouDengAiDamage(long id) => MouDengAiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33400)]
-    internal bool HasMouDengAiBeforeDamage(long id) => MouDengAiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33400)]
     internal bool IsMouDengAiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouDengAiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33400)]

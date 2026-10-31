@@ -93,10 +93,6 @@ internal sealed partial class CharacterHuangGaiMouRuntime
     }
 
     internal ProgramSkillFrame? MouHgObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuangGaiMouOperations.MouHgFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 35400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 35400)]
-    internal bool MouHgDamageObserver(long id) => MouHgObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35400)]
     internal bool MouHgDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouHgObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 35400)]

@@ -12,11 +12,8 @@ internal sealed partial class CharacterZhugeLiangWumiaoEntries
     internal void ContinueWuZgl(long id) => _resolve().ContinueWuZgl(id);
     internal bool DrainWuZgl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainWuZgl(f);
     internal void FinishWuZgl(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWuZgl(f);
-    internal bool HasWuZglBeforeDamageObserver(long id) => _resolve().HasWuZglBeforeDamageObserver(id);
-    internal bool HasWuZglDamageObserver(long id) => _resolve().HasWuZglDamageObserver(id);
     internal bool IsWuZglCopyBlocked(int actor, int id) => _resolve().IsWuZglCopyBlocked(actor, id);
     internal bool IsWuZglDying() => _resolve().IsWuZglDying();
-    internal bool IsWuZglMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWuZglMovement(f, effect, pending);
     internal bool IsWuZglRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame r) => _resolve().IsWuZglRecoveryParent(f, r);
     internal bool IsWuZglReturnedCopyCost(global::CardGame.Core.CardActionContext action, global::CardGame.Core.CardActionCost cost, global::CardGame.Core.CardMovementRecord? finish = default) => _resolve().IsWuZglReturnedCopyCost(action, cost, finish);
     internal bool IsWuZglUseMaterialForbidden(int actor, global::System.Collections.Generic.IReadOnlyList<int> ids, long? existingUseId = default) => _resolve().IsWuZglUseMaterialForbidden(actor, ids, existingUseId);

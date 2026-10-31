@@ -15,32 +15,4 @@ internal sealed partial class CoreGameEngineProvenanceClaimObserversRuntime
             return false;
         return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(p, lifecycle.Candidates[lifecycle.CandidateIndex]) && p.WindowContext is { } context && context.ParentFrameId == lifecycle.Id && context.Window == lifecycle.Window && context.TargetSeat == original.OwnerSeat;
     }
-
-    internal ProgramSkillFrame? ProvenanceClaimDamageObserverRoot(long damageId)
-    {
-        var start = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == damageId);
-        if (start < 0 || start + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[start] is not DamageTriggerWindowFrame damage || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || _resolutionStackOperations._resolutionStack[start + 1] is not ProgramSkillFrame original || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(original, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || original.WindowContext?.ParentFrameId != damage.Id)
-            return null;
-        ProgramSkillFrame? paid = null;
-        for (var i = start + 2; i < _resolutionStackOperations._resolutionStack.Count; i++)
-        {
-            if (_resolutionStackOperations._resolutionStack[i] is ProgramSkillFrame { ProvenanceClaim: { } } claim)
-            {
-                _coreDiscardedProvenanceOperations.AssertProvenanceClaim(claim);
-                if (_resolutionStackOperations._resolutionStack[i - 1] is not CardsMovedTriggerWindowFrame movement || movement.CandidateIndex < 0 || movement.CandidateIndex >= movement.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(claim, movement.Candidates[movement.CandidateIndex]) || claim.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived } c || c.ParentFrameId != movement.Id)
-                    return null;
-                paid = claim;
-            }
-
-            if (_resolutionStackOperations._resolutionStack[i - 1] is DyingFrame dying && _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(i - 1, dying))
-                break;
-            if (!_coreProgramChildResolutionOperations.ProgramChildResolutionEdge(i))
-                return null;
-        }
-
-        return paid;
-    }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1720)]
-    internal bool HasProvenanceClaimObserver(long damageId) => ProvenanceClaimDamageObserverRoot(damageId)is not null;
 }

@@ -18,9 +18,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 160)]
-    internal bool IsHuanShuJunMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.HuanShuJun is { Paid: true } r && effect?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is HuanShuJunStage.AdjustmentChildren or HuanShuJunStage.DrawChildren or HuanShuJunStage.EquipmentGiftChildren or HuanShuJunStage.NativeChildren or HuanShuJunStage.FaceChildren or HuanShuJunStage.ChainChildren;
     internal bool HuanShuJunPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.HuanShuJun!;
@@ -82,19 +79,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     internal bool HuanShuJunObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterHuanShuJunOlOperations.HuanShuJunReplacementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? HuanShuJunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuanShuJunOlOperations.HuanShuJunFirstChild(f, c), (i) => _characterHuanShuJunOlOperations.HuanShuJunObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1090)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1200)]
-    internal bool HasHuanShuJunDamageObserver(long id)
-    {
-        if (HuanShuJunObserverRoot()is not { } root || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == id)is not DamageTriggerWindowFrame window)
-            return false;
-        if (_resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id))
-            return true;
-        return root.HuanShuJun is { Op: SkillProgramEffectOp.ResolveMiaoxinDamageDrawAndRefresh, Paid: true } r && r.WindowId == window.Id && root.WindowContext?.ParentFrameId == window.Id && window.TriggerWindow == SkillProgramTriggerWindow.AfterDamageApplied && _coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(root, window);
-    }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1230)]
-    internal bool HasHuanShuJunBeforeDamageObserver(long id) => HuanShuJunObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28100)]
     internal bool AdvanceHuanShuJunChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuanShuJunObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);

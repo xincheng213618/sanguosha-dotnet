@@ -71,16 +71,6 @@ internal sealed partial class CharacterYanLiangWenChouBoundaryMobileRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, completed: true);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 65710)]
-    internal bool ProveBoundaryYanLiangWenChouClaimMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect?.Op != SkillProgramEffectOp.ClaimBoundaryYanLiangWenChouDuelResponses || !ValidBoundaryYanLiangWenChouClaim(f) || f.BoundaryYanLiangWenChouClaim is not { } r || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
-            return false;
-        // The native batch is the paid gain, even if a later observer moves an
-        // entity again. Retain the original Duel/response invoice on this frame.
-        return _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Concat(_resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Select(w => w.Batch)).Any(batch => batch.ParentFrameId == f.Id && batch.OriginOwnerSeat == f.OwnerSeat && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.Movements.Select(m => m.CardId).SequenceEqual(r.CardIds) && batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == BoundaryYanLiangWenChouClaimReason && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)));
-    }
-
     [ProgramContinuation(ProgramContinuationKind.Resume, 65710)]
     internal bool ResumeBoundaryYanLiangWenChouClaim(long id)
     {

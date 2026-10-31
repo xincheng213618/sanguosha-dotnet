@@ -48,9 +48,6 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
             return receipt.Plan is null && receipt.Benefactor == -1;
         return receipt.Plan is not null && _coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.Benefactor) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenGuoJiaBenefactorEvent>().Any(value => value.Benefactor == receipt.Benefactor && value.Recipient == frame.OwnerSeat && frame.SkillInstanceId == $"acquired:{(value.GrantSource)}:{(ShenGuoJiaZuoxing)}") && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Count(value => value.FrameId == frame.Id && value.Seat == receipt.Benefactor && value.Purpose == "zuoxing") == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 38000)]
-    internal bool IsShenGuoJiaMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.ShenGuoJia is { } receipt && effect?.Op == receipt.Operation && frame.PendingMovementContinuation == pending && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && receipt.Stage is ShenGuoJiaStage.JudgmentChildren or ShenGuoJiaStage.GrowChildren or ShenGuoJiaStage.GainChildren or ShenGuoJiaStage.CleanupChildren or ShenGuoJiaStage.DrawChildren or ShenGuoJiaStage.CostChildren;
     internal bool ShenGuoJiaFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (!ValidShenGuoJia(frame) || frame.ShenGuoJia is not { } receipt)
@@ -71,11 +68,6 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     }
 
     internal ProgramSkillFrame? ShenGuoJiaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterGuoJiaMobileGodOperations.ShenGuoJiaFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 38000)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 38000)]
-    internal bool HasShenGuoJiaDamageObserver(long id) => ShenGuoJiaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 38000)]
-    internal bool HasShenGuoJiaBeforeDamageObserver(long id) => ShenGuoJiaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 38000)]
     internal bool AdvanceShenGuoJiaSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ShenGuoJiaObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

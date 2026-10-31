@@ -24,8 +24,6 @@ internal sealed partial class CharacterXuHuangMouMobileEntries
     internal bool DrainMouXuHuangChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouXuHuangChildren(f);
     internal void FinishMouXuHuangDuanliang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouXuHuangDuanliang(f);
     internal void FinishMouXuHuangShipo(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouXuHuangShipo(f);
-    internal bool HasMouXuHuangBeforeDamageObserver(long id) => _resolve().HasMouXuHuangBeforeDamageObserver(id);
-    internal bool HasMouXuHuangDamageObserver(long id) => _resolve().HasMouXuHuangDamageObserver(id);
     internal bool IsMouXuHuangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouXuHuangMovement(f, e, p);
     internal bool IsMouXuHuangNativeSettlementBatch(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementBatchContext b) => _resolve().IsMouXuHuangNativeSettlementBatch(f, b);
     internal bool IsMouXuHuangNativeUse(long id) => _resolve().IsMouXuHuangNativeUse(id);

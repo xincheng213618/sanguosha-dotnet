@@ -22,8 +22,6 @@ internal sealed partial class CharacterZhouFeiLeEntries
     internal bool DrainLeZhouFeiXianshu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().DrainLeZhouFeiXianshu(frame);
     internal bool ExactLingkongGainQualification(global::CardGame.Core.CardMovementBatchContext batch, global::CardGame.Core.CardConversionSource source, string hash, scoped out global::CardGame.Core.LingkongGainQualifiedEvent qualified) => _resolve().ExactLingkongGainQualification(batch, source, hash, out qualified);
     internal bool ExcludeOrdinaryMovement_IsLingkongGainTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsLingkongGainTrigger(candidate, trigger);
-    internal bool HasLeZhouFeiXianshuBeforeDamageObserver(long id) => _resolve().HasLeZhouFeiXianshuBeforeDamageObserver(id);
-    internal bool HasLeZhouFeiXianshuDamageObserver(long id) => _resolve().HasLeZhouFeiXianshuDamageObserver(id);
     internal bool HasLingkongEntityMark(int cardId) => _resolve().HasLingkongEntityMark(cardId);
     internal bool HasLingkongHandEntityMark(int ownerSeat, int cardId) => _resolve().HasLingkongHandEntityMark(ownerSeat, cardId);
     internal bool HasPaidLeZhouFeiXianshuSelection(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HasPaidLeZhouFeiXianshuSelection(frame);
@@ -31,7 +29,6 @@ internal sealed partial class CharacterZhouFeiLeEntries
     internal bool IsIssuedLingkongCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLingkongCandidate(candidate, context);
     internal bool IsIssuedLingkongGainCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLingkongGainCandidate(candidate, context);
     internal bool IsIssuedLingkongInitialCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedLingkongInitialCandidate(candidate, context);
-    internal bool IsLeZhouFeiXianshuMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsLeZhouFeiXianshuMovement(frame, effect, pending);
     internal bool IsLeZhouFeiXianshuRecoveryParent(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsLeZhouFeiXianshuRecoveryParent(frame, recovery);
     internal bool IsLingkongHandLimitExempt(global::CardGame.Core.CharacterState owner, int cardId) => _resolve().IsLingkongHandLimitExempt(owner, cardId);
     internal bool LeZhouFeiXianshuFirstChild(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.ResolutionFrame child) => _resolve().LeZhouFeiXianshuFirstChild(frame, child);

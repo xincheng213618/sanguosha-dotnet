@@ -36,10 +36,8 @@ internal sealed partial class CharacterLuYuShengMobileShiEntries
     internal void ReturnShiLysShuanghuaiDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiLysShuanghuaiDraw(f, outcome);
     internal bool SameShiLysShuanghuaiTarget(global::CardGame.Core.ProgramSkillFrame f) => _resolve().SameShiLysShuanghuaiTarget(f);
     internal void SealShiLys(long id) => _resolve().SealShiLys(id);
-    internal bool ShiLysBeforeDamageChild(long id) => _resolve().ShiLysBeforeDamageChild(id);
     internal bool ShiLysChildEdge(int i) => _resolve().ShiLysChildEdge(i);
     internal bool ShiLysChildSuffix(int n) => _resolve().ShiLysChildSuffix(n);
-    internal bool ShiLysDamageChild(long id) => _resolve().ShiLysDamageChild(id);
     internal bool ShiLysDyingChild() => _resolve().ShiLysDyingChild();
     internal bool ShiLysFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiLysFirstChild(f, child);
     internal global::CardGame.Core.BeforeDamageProgramWindowFrame? ShiLysGuardParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiLysGuardParent(f);

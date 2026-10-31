@@ -22,9 +22,7 @@ internal sealed partial class CharacterLuShiOlEntries
     internal bool HasOlLuShiJudgmentProof(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasOlLuShiJudgmentProof(f);
     internal bool IsOlLuShiLeijieNativeSlash(global::CardGame.Core.CardUseFrame use) => _resolve().IsOlLuShiLeijieNativeSlash(use);
     internal void IssueOlLuShiLeijieSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueOlLuShiLeijieSlash(f);
-    internal bool OlLuShiBeforeDamage(long id) => _resolve().OlLuShiBeforeDamage(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> OlLuShiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().OlLuShiChoices(f);
-    internal bool OlLuShiDamageObserver(long id) => _resolve().OlLuShiDamageObserver(id);
     internal global::CardGame.Core.Card[] OlLuShiDiscardCandidates(global::CardGame.Core.ProgramSkillFrame f) => _resolve().OlLuShiDiscardCandidates(f);
     internal bool OlLuShiDying() => _resolve().OlLuShiDying();
     internal bool OlLuShiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().OlLuShiFirstChild(f, child);

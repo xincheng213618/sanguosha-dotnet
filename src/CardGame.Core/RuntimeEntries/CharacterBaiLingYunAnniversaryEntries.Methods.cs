@@ -3,9 +3,7 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterBaiLingYunAnniversaryEntries
 {
     internal bool AdvanceAnniversaryBlyChildren() => _resolve().AdvanceAnniversaryBlyChildren();
-    internal bool AnniversaryBlyBeforeDamageObserver(long id) => _resolve().AnniversaryBlyBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> AnniversaryBlyChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AnniversaryBlyChoices(f);
-    internal bool AnniversaryBlyDamageObserver(long id) => _resolve().AnniversaryBlyDamageObserver(id);
     internal bool AnniversaryBlyDyingObserver() => _resolve().AnniversaryBlyDyingObserver();
     internal bool AnniversaryBlyFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().AnniversaryBlyFirstChild(f, child);
     internal bool AnniversaryBlyMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().AnniversaryBlyMovementProof(f, effect, pending);

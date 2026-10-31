@@ -54,9 +54,6 @@ internal sealed partial class CharacterZhouFeiBoundaryMobileRuntime
 
         return context.Window == SkillProgramTriggerWindow.RoundEnding && receipt.Stage is BoundaryZhouFeiStage.RoundChoice or BoundaryZhouFeiStage.EffectChildren && (receipt.Stage == BoundaryZhouFeiStage.RoundChoice || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhouFeiPaidEvent>().Count(entry => entry.FrameId == frame.Id && entry.Target == receipt.Target && entry.Branch == (receipt.Direction == 2 ? "recover" : "lose-hp") && entry.Count == 1) == 1);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 54700)]
-    internal bool BoundaryZfMovementProof(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation continuation) => effect is not null && ValidBoundaryZf(frame) && frame.BoundaryZhouFei is { } receipt && effect.Op == receipt.Op && frame.PendingMovementContinuation == continuation && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null && continuation.SubjectSeat == (receipt.Op == SkillProgramEffectOp.ResolveBoundaryZhouFeiLiangyin ? receipt.Target : receipt.Holder) && receipt.Stage is BoundaryZhouFeiStage.StoreChildren or BoundaryZhouFeiStage.DiscardChildren or BoundaryZhouFeiStage.DrawChildren or BoundaryZhouFeiStage.EffectChildren or BoundaryZhouFeiStage.ReturnChildren;
     internal bool BoundaryZfChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (!ValidBoundaryZf(frame))
@@ -77,11 +74,6 @@ internal sealed partial class CharacterZhouFeiBoundaryMobileRuntime
 
     internal bool BoundaryZfSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _resolutionStackOperations2._resolutionStack()[i - 1] is ProgramSkillFrame frame && _characterZhouFeiBoundaryMobileOperations.BoundaryZfChild(frame, _resolutionStackOperations2._resolutionStack()[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? BoundaryZfRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterZhouFeiBoundaryMobileOperations.BoundaryZfChild(frame, child), (index) => _characterZhouFeiBoundaryMobileOperations.BoundaryZfSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 54700)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 54700)]
-    internal bool BoundaryZfDamage(long id) => BoundaryZfRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == id && child is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 54700)]
-    internal bool BoundaryZfBeforeDamage(long id) => BoundaryZfRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == id && child is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 54700)]
     internal bool BoundaryZfDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BoundaryZfRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 54700)]

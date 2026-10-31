@@ -10,7 +10,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionEntries
     internal void ContinuePredictionAfterCost(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePredictionAfterCost(f);
     internal bool DrainPredictionChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainPredictionChildren(f);
     internal bool HasIssuedPhaseNamePrediction(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedPhaseNamePrediction(c, context);
-    internal bool IsPhaseNamePredictionMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsPhaseNamePredictionMovement(f, e, pending);
     internal void ObservePhaseNamePredictionUse(global::CardGame.Core.CardActionContext action, bool qualifiedActualUse = false) => _resolve().ObservePhaseNamePredictionUse(action, qualifiedActualUse);
     internal void ObservePredictionUse(global::CardGame.Core.PhaseNamePredictionPolicy p, global::CardGame.Core.PhaseNamePredictionActualUseEvent use) => _resolve().ObservePredictionUse(p, use);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> PredictionChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PredictionChoices(f);

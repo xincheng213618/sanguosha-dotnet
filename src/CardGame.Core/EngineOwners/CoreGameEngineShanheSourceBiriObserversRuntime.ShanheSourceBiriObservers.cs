@@ -42,12 +42,6 @@ internal sealed partial class CoreGameEngineShanheSourceBiriObserversRuntime
     }
 
     internal ProgramSkillFrame? ShanheSourceBiriObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.ShanheSourceBiri is not null && _coreShanheSourceBiriObserversOperations.ShanheSourceBiriFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreShanheSourceBiriObserversOperations.ShanheSourceBiriObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamagePrelude, 62047)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 62047)]
-    internal bool HasShanheSourceBiriBeforeDamageObserver(long id) => ShanheSourceBiriObserverRoot()is { } root && (root.ShanheSourceBiri!.BeforeDamageFrameId == id || _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 62047)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 62047)]
-    internal bool HasShanheSourceBiriDamageObserver(long id) => ShanheSourceBiriObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 62047)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 62047)]
     internal bool IsShanheSourceBiriRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery)

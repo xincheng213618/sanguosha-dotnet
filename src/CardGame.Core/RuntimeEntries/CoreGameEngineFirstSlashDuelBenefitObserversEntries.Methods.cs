@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitObserversEntrie
 {
     internal bool FirstSlashDuelFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().FirstSlashDuelFirstChild(root, child);
     internal global::CardGame.Core.ProgramSkillFrame? FirstSlashDuelObserverRoot() => _resolve().FirstSlashDuelObserverRoot();
-    internal bool HasFirstSlashDuelDamageObserver(long id) => _resolve().HasFirstSlashDuelDamageObserver(id);
     internal void RequireFirstSlashDuelBenefit(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireFirstSlashDuelBenefit(f);
     internal bool TryAdvanceFirstSlashDuelSubtree() => _resolve().TryAdvanceFirstSlashDuelSubtree();
     internal bool ValidFirstSlashDuelBenefit(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidFirstSlashDuelBenefit(f);

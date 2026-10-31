@@ -3,10 +3,8 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXuJingAnniversaryEntries
 {
     internal bool AdvanceAnniversaryXuJingChildren() => _resolve().AdvanceAnniversaryXuJingChildren();
-    internal bool AnniversaryXuJingBeforeDamageObserver(long id) => _resolve().AnniversaryXuJingBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> AnniversaryXuJingChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AnniversaryXuJingChoices(f);
     internal global::CardGame.Core.GameEngine.IDamageAttempt? AnniversaryXuJingDamage(global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().AnniversaryXuJingDamage(context);
-    internal bool AnniversaryXuJingDamageObserver(long id) => _resolve().AnniversaryXuJingDamageObserver(id);
     internal global::CardGame.Core.AnniversaryXuJingCaixiaIssuedEvent? AnniversaryXuJingDebt(int owner) => _resolve().AnniversaryXuJingDebt(owner);
     internal int[] AnniversaryXuJingDiscardIndexes(global::CardGame.Core.CardMovementBatchContext batch, global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().AnniversaryXuJingDiscardIndexes(batch, candidate);
     internal bool AnniversaryXuJingDyingObserver() => _resolve().AnniversaryXuJingDyingObserver();

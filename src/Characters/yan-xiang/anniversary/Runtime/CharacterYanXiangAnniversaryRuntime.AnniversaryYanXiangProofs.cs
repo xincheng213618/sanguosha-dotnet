@@ -70,10 +70,6 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46800)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46800)]
     internal bool YanXiangMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.AnniversaryYanXiang is { Stage: AnniversaryYanXiangStage.MovementChildren or AnniversaryYanXiangStage.NativeTail } r && effect?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidYanXiang(f);
     internal bool YanXiangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -94,11 +90,6 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
 
     internal ProgramSkillFrame? YanXiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterYanXiangAnniversaryOperations.YanXiangFirstChild(f, c), (i) => _characterYanXiangAnniversaryOperations.YanXiangObserverSuffix(i));
     internal bool YanXiangObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, dying) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, dying) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, dying));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46800)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46800)]
-    internal bool YanXiangDamageObserver(long id) => YanXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46800)]
-    internal bool YanXiangBeforeDamage(long id) => YanXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46800)]
     internal bool YanXiangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && YanXiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46800)]

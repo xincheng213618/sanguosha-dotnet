@@ -12,8 +12,6 @@ internal sealed partial class CharacterLiuYanOlEntries
     internal bool DistanceCardUseExemption80HasLiuYanLimuTargetAllowance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().DistanceCardUseExemption80HasLiuYanLimuTargetAllowance(q);
     internal bool DrainLiuYan(long id) => _resolve().DrainLiuYan(id);
     internal void FinishLiuYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLiuYan(f);
-    internal bool HasLiuYanBeforeDamageObserver(long id) => _resolve().HasLiuYanBeforeDamageObserver(id);
-    internal bool HasLiuYanDamageObserver(long id) => _resolve().HasLiuYanDamageObserver(id);
     internal bool HasLiuYanLimuQuotaAllowance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.Card? physical, global::System.Collections.Generic.IReadOnlyList<int>? ids, int? excludedId, global::CardGame.Core.EquipmentSlot? excludedSlot) => _resolve().HasLiuYanLimuQuotaAllowance(actor, target, physical, ids, excludedId, excludedSlot);
     internal bool HasLiuYanLimuTargetAllowance(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, int? excludedEquipmentId = default, global::CardGame.Core.EquipmentSlot? excludedEquipmentSlot = default) => _resolve().HasLiuYanLimuTargetAllowance(actor, target, excludedEquipmentId, excludedEquipmentSlot);
     internal bool IsLiuYanLegacyAlcoholUse(long id) => _resolve().IsLiuYanLegacyAlcoholUse(id);

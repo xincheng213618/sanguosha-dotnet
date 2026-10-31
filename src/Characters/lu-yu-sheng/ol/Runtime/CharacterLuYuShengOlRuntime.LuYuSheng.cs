@@ -227,9 +227,6 @@ internal sealed partial class CharacterLuYuShengOlRuntime
         ContinueLuYuSheng(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 200)]
-    internal bool IsLuYuShengAwaitedMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.LuYuSheng is { } r && p.SubjectSeat == r.Payer && p.BeforeCount == 0 && p.CoverageResultBind is null && (e is null || LuYuShengComposition.IsOperation(e.Op));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26900)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26900)]
     internal bool ContinuePaidLuYuSheng(ProgramSkillFrame f)

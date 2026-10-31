@@ -2,8 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineMatchingRecastObserversEntries
 {
-    internal bool HasMatchingRecastBeforeDamageObserver(long windowId) => _resolve().HasMatchingRecastBeforeDamageObserver(windowId);
-    internal bool HasMatchingRecastDamageObserver(long windowId) => _resolve().HasMatchingRecastDamageObserver(windowId);
     internal bool IsMatchingRecastChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision decision) => _resolve().IsMatchingRecastChoice(f, decision);
     internal bool IsMatchingRecastDying() => _resolve().IsMatchingRecastDying();
     internal bool MatchingRecastFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MatchingRecastFirstChild(f, child);

@@ -7,9 +7,7 @@ internal sealed partial class CharacterZhuJunOlEntries
     internal bool CanOfferZhuJun(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferZhuJun(candidate, trigger, context);
     internal bool ContinuePaidZhuJun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidZhuJun(f);
     internal void ContinueZhuJunCuipo(long id) => _resolve().ContinueZhuJunCuipo(id);
-    internal bool HasZhuJunDamageObserver(long id) => _resolve().HasZhuJunDamageObserver(id);
     internal bool IsZhuJunDrawMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsZhuJunDrawMovement(f, m);
-    internal bool IsZhuJunMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhuJunMovement(f, effect, p);
     internal void ObserveZhuJunActualUse(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveZhuJunActualUse(payload);
     internal bool ResumeZhuJunCuipo(long id) => _resolve().ResumeZhuJunCuipo(id);
     internal bool ReturnZhuJunMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnZhuJunMovement(f);

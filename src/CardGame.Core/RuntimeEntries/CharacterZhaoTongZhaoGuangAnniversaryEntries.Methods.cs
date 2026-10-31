@@ -3,11 +3,8 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryEntries
 {
     internal bool AdvanceAnniversaryQingrenChildren() => _resolve().AdvanceAnniversaryQingrenChildren();
-    internal bool AnniversaryQingrenBeforeDamageObserver(long id) => _resolve().AnniversaryQingrenBeforeDamageObserver(id);
-    internal bool AnniversaryQingrenDamageObserver(long id) => _resolve().AnniversaryQingrenDamageObserver(id);
     internal bool AnniversaryQingrenDyingObserver() => _resolve().AnniversaryQingrenDyingObserver();
     internal bool AnniversaryQingrenFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().AnniversaryQingrenFirstChild(f, child);
-    internal bool AnniversaryQingrenMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().AnniversaryQingrenMovementProof(f, e, p);
     internal global::CardGame.Core.ProgramSkillFrame? AnniversaryQingrenObserverRoot() => _resolve().AnniversaryQingrenObserverRoot();
     internal bool AnniversaryQingrenObserverSuffix(int root) => _resolve().AnniversaryQingrenObserverSuffix(root);
     internal bool AnniversaryYizanAlcoholAllowed(global::CardGame.Core.CharacterState owner, global::CardGame.Core.ProgramMultiCardViewAsSelection s) => _resolve().AnniversaryYizanAlcoholAllowed(owner, s);

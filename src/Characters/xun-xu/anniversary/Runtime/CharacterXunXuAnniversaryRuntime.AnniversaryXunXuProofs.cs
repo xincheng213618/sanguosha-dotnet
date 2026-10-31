@@ -22,10 +22,6 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
 
     internal bool IsXunXuFinishedMaterialBatch(CardUseFrame use, CardMovementBatchContext b) => use.Action is { Type: CardActionType.Use } a && b.ParentFrameId == use.Id && b.AwaitingProgramFrameId is null && b.Movements.Count > 0 && b.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && b.Movements.All(m => m.Sequence > 0 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.UseFinished && a.PhysicalCards.Any(c => c.CardId == m.CardId && c.CardKind == m.CardKind)) && b.Movements.Select(m => m.CardId).Distinct().Count() == b.Movements.Count;
     internal bool IsAnniversaryXunXuSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.AnniversaryXunXu is { Stage: "native-children" } r && HasXunXuNativeFinishOwner(f, out var use) && IsXunXuFinishedMaterialBatch(use!, b) && r.NativeFinishBatches.Any(frozen => frozen.Id == b.Id && frozen.ParentFrameId == b.ParentFrameId && frozen.AwaitingProgramFrameId == b.AwaitingProgramFrameId && frozen.Movements.SequenceEqual(b.Movements) && frozen.SourceCounts.SequenceEqual(b.SourceCounts) && (frozen.DestinationCounts ?? []).SequenceEqual(b.DestinationCounts ?? [])) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == use!.Id && e.ActionId == r.ActionId && e.BatchId == b.Id && e.Before == b.Movements.Min(m => m.Sequence) - 1 && e.After == b.Movements.Max(m => m.Sequence)) == 1;
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46100)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46100)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46100)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 46100)]
     internal bool XunXuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (f.AnniversaryXunXu is not { Stage: "children" or "native-children" } r || effect?.Op is not (SkillProgramEffectOp.ResolveAnniversaryXunXuDiyin or SkillProgramEffectOp.ResolveAnniversaryXunXuBoqiaCompletion) || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null)
@@ -65,11 +61,6 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? XunXuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterXunXuAnniversaryOperations.XunXuFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46100)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46100)]
-    internal bool XunXuDamageObserver(long id) => XunXuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46100)]
-    internal bool XunXuBeforeDamageObserver(long id) => XunXuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46100)]
     internal bool XunXuDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && XunXuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 46100)]

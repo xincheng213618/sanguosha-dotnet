@@ -7,9 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuJingOlRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 600)]
-    internal bool IsWuJingMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.WuJing is { Stage: WuJingStage.NativeChildren or WuJingStage.RewardChildren or WuJingStage.ClaimChildren } r && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && (e is null || e.Op == r.Operation);
     internal bool IsWuJingNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.WuJing is { Stage: WuJingStage.NativeChildren, NativeCompleted: true, NativeOrigin: { } origin } r && batch.ParentFrameId == origin.UseId && batch.AwaitingProgramFrameId is null && batch.Movements.Count > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingHejiReturnedEvent>().Count(e => e.ProgramFrameId == f.Id && e.UseId == origin.UseId) == 1 && batch.Movements.All(m => m.Sequence > r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.UseFinished && origin.Materials.Any(e => e.CardId == m.CardId && e.PrintedKind == m.CardKind));
     internal bool WuJingFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -33,11 +30,6 @@ internal sealed partial class CharacterWuJingOlRuntime
     }
 
     internal ProgramSkillFrame? WuJingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterWuJingOlOperations.WuJingFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (c) => _coreObserverSubtreesOperations.IsMovementObserverEdge(c) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(c) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[c], _resolutionStackOperations2._resolutionStack()[c - 1]), (c, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(c, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1460)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1570)]
-    internal bool HasWuJingDamageObserver(long id) => WuJingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1590)]
-    internal bool HasWuJingBeforeDamageObserver(long id) => HasWuJingDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27130)]
     internal bool AdvanceWuJingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuJingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramPipelineHook(ProgramPipelinePhase.IsProgramMovementSettlement, 300)]

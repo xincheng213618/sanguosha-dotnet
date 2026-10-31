@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErMouRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 35800)]
     internal bool MouHuCheErMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => f.MouHuCheEr is not null && op?.Op == SkillProgramEffectOp.ResolveMouHuCheErKongwu && ValidMouHuCheEr(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouHuCheErFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -27,11 +26,6 @@ internal sealed partial class CharacterHuCheErMouRuntime
     internal ProgramSkillFrame? MouHuCheErRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuCheErMouOperations.MouHuCheErFirstChild(f, c), (n) => _characterHuCheErMouOperations.MouHuCheErSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35800)]
     internal bool MouHuCheErDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouHuCheErRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 35800)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 35800)]
-    internal bool MouHuCheErDamageWindow(long id) => MouHuCheErRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 35800)]
-    internal bool MouHuCheErBeforeDamage(long id) => MouHuCheErRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35800)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 35800)]
     internal bool MouHuCheErRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

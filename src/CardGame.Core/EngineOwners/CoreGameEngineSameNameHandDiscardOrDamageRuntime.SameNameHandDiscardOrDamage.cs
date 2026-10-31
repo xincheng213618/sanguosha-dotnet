@@ -187,9 +187,6 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 140)]
-    internal bool IsSameNameHandDiscardOrDamageMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => e is { Op: SkillProgramEffectOp.OfferSameNameHandDiscardOrDamage } && f.SameNameHandDiscardOrDamage is { Stage: SameNameHandStage.DiscardChildren, TargetSeat: { } target } && f.PendingMovementContinuation == pending && pending.SubjectSeat == target && _coreSameNameHandDiscardOrDamageObserversOperations.ValidSameNameHandReceipt(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 520)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 540)]
     internal bool CanContinueSameNameHandDiscardOrDamage(ProgramSkillFrame f) => f.SameNameHandDiscardOrDamage is { Stage: SameNameHandStage.DiscardChildren or SameNameHandStage.DamageIssued or SameNameHandStage.Complete } && _coreSameNameHandDiscardOrDamageObserversOperations.ValidSameNameHandReceipt(f);

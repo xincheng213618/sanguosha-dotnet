@@ -9,9 +9,7 @@ internal sealed partial class CharacterChengYuMouEntries
     internal bool IsMouCyForeignHealthCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsMouCyForeignHealthCandidate(candidate, context);
     internal bool IsMouCyUseIneffective(global::CardGame.Core.CardUseFrame use) => _resolve().IsMouCyUseIneffective(use);
     internal bool MouCyAdvanceChildren() => _resolve().MouCyAdvanceChildren();
-    internal bool MouCyBeforeDamage(long id) => _resolve().MouCyBeforeDamage(id);
     internal bool MouCyCounterspellInvalidated(global::CardGame.Core.NullificationWindowFrame pending, global::CardGame.Core.CardActionContext action) => _resolve().MouCyCounterspellInvalidated(pending, action);
-    internal bool MouCyDamageWindow(long id) => _resolve().MouCyDamageWindow(id);
     internal bool MouCyDying() => _resolve().MouCyDying();
     internal bool MouCyEdge(int i) => _resolve().MouCyEdge(i);
     internal bool MouCyFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouCyFirstChild(f, child);

@@ -64,8 +64,6 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsRunti
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 480)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 520)]
     internal bool CanContinueSelectedForeignCardSlash(ProgramSkillFrame frame) => frame.ForeignSelectedCardSlash is { Stage: not ForeignSelectedCardSlashStage.ChoosingCard and not ForeignSelectedCardSlashStage.IssuingUse } && ValidSelectedForeignCardSlash(frame);
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 40)]
-    internal bool IsSelectedForeignCardSlashMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.UseSelectedForeignCardAsSlash && frame.PendingMovementContinuation == pending && frame.ForeignSelectedCardSlash is { Stage: ForeignSelectedCardSlashStage.SettlementChildren or ForeignSelectedCardSlashStage.DrawChildren } && ValidSelectedForeignCardSlash(frame);
     internal bool IsSelectedForeignCardSlashMovementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch)
     {
         if (frame.ForeignSelectedCardSlash is not { Stage: ForeignSelectedCardSlashStage.SettlementChildren, SlashReturn: { } r } receipt || !ValidSelectedForeignCardSlash(frame) || batch.ParentFrameId != r.CardUseFrameId || batch.AwaitingProgramFrameId is not null || batch.OriginOwnerSeat != frame.OwnerSeat || batch.OriginSkillId != frame.SkillId || batch.OriginSkillInstanceId != frame.SkillInstanceId || batch.Movements.Count == 0)
@@ -95,23 +93,6 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsRunti
     internal ProgramSkillFrame? SelectedForeignCardSlashObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.ForeignSelectedCardSlash is { Stage: ForeignSelectedCardSlashStage.SettlementChildren or ForeignSelectedCardSlashStage.DrawChildren } && _coreForeignSelectedCardSlashReturnsOperations.SelectedForeignCardSlashFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 140)]
     internal bool IsSelectedForeignCardSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SelectedForeignCardSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1650)]
-    internal bool HasSelectedForeignCardSlashDamageObserver(long id) => HasSelectedForeignCardSlashObserver(id, false);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 10)]
-    internal bool HasSelectedForeignCardSlashBeforeDamageObserver(long id) => HasSelectedForeignCardSlashObserver(id, true);
-    internal bool HasSelectedForeignCardSlashObserver(long id, bool before)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && (before ? f is BeforeDamageProgramWindowFrame : f is DamageTriggerWindowFrame));
-        if (index < 0 || SelectedForeignCardSlashObserverRoot()is not { } root)
-            return false;
-        var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index > rootIndex)
-            return true;
-        for (var child = index + 1; child <= rootIndex; child++)
-            if (!ForeignSelectedCardSlashStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreResponseCompletionOperations.ResponseCompletionStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]))
-                return false;
-        return index < rootIndex;
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 10)]
     internal bool TryAdvanceSelectedForeignCardSlashSubtree()

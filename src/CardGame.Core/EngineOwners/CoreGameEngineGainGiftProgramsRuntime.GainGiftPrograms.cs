@@ -265,7 +265,6 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
     }
 
     internal SkillProgramEffect? GainGiftPausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 60)]
     internal bool IsGainGiftMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.GainGiftReceipt is { Stage: not GainGiftStage.Choosing } r && r.InstructionIndex == f.InstructionIndex && effect?.Op == r.Operation && effect == GainGiftPausedEffect(f) && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     [ProgramViewContributor(ProgramViewContribution.ProgramPublicCards, 20)]
     internal IEnumerable<CardSnapshot> GainGiftPublicLostCards() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.GainGiftReceipt is { Stage: GainGiftStage.RedDrawChildren, LossIndex: > 0 }).Select(f => f.GainGiftReceipt!.RedLosses[f.GainGiftReceipt.LossIndex - 1].Card);

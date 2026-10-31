@@ -9,8 +9,6 @@ internal sealed partial class CharacterHuBanOlRuntime
 {
 
     internal static CardMoveReason HuiyunNativePaymentReason(HuiyunNativeInvoice n) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hu_ban_ol_HuiyunObservers.HuiyunNativePaymentReason(n);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 330)]
     internal bool IsHuBanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.Huiyun is { Stage: HuiyunStage.NativeChildren or HuiyunStage.RecastCostChildren or HuiyunStage.RecastDrawChildren or HuiyunStage.DrawChildren } r && e?.Op == SkillProgramEffectOp.ResolveHuiyunCompletedFireAttack && p == f.PendingMovementContinuation && p.SubjectSeat == HuiyunCurrent(r).TargetSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool IsHuiyunNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch)
     {
@@ -55,12 +53,6 @@ internal sealed partial class CharacterHuBanOlRuntime
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 840)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 950)]
-    internal bool HasHuBanDamageObserver(long id) => HuBanAnyObserverRootIndex()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > root;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 980)]
-    internal bool HasHuBanBeforeDamageObserver(long id) => HuBanAnyObserverRootIndex()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > root;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27380)]
     internal bool AdvanceHuBanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuBanAnyObserverRootIndex()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27381)]

@@ -96,11 +96,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
     }
 
     internal ProgramSkillFrame? XiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterXiangChongOlOperations.XiangFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterXiangChongOlOperations.XiangEquipmentObserverEdge(n) || _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1470)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1580)]
-    internal bool HasXiangChongDamageObserver(long id) => XiangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1600)]
-    internal bool HasXiangChongBeforeDamageObserver(long id) => HasXiangChongDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27140)]
     internal bool AdvanceXiangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XiangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

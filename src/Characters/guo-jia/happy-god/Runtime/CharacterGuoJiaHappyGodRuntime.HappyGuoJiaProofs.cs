@@ -40,9 +40,6 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
             return issued.Length == 0 && r.UseId == 0 && r.ActionId == 0;
         return issued is [var use] && use.UseId == r.UseId && use.ActionId == r.ActionId && use.Kind == r.Plan.Kind && use.Benefactor == r.Benefactor && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == r.Plan.Kind) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 40900)]
-    internal bool HappyGjMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.HappyGuoJia is { } r && e?.Op == r.Operation && f.PendingMovementContinuation == p && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is HappyGuoJiaStage.GrowChildren or HappyGuoJiaStage.GainChildren or HappyGuoJiaStage.CleanupChildren or HappyGuoJiaStage.DrawChildren or HappyGuoJiaStage.CostChildren;
     internal bool HappyGjFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!ValidHappyGj(f) || f.HappyGuoJia is not { } r)
@@ -61,11 +58,6 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
     }
 
     internal ProgramSkillFrame? HappyGjObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterGuoJiaHappyGodOperations.HappyGjFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 40900)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 40900)]
-    internal bool HappyGjDamageObserver(long id) => HappyGjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == id && c is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 40900)]
-    internal bool HappyGjBeforeDamageObserver(long id) => HappyGjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == id && c is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40900)]
     internal bool AdvanceHappyGjSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HappyGjObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

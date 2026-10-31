@@ -20,9 +20,7 @@ internal sealed partial class CharacterYuanYinAnniversaryEntries
     internal bool ReturnYuanYinMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnYuanYinMovement(f);
     internal bool TryBeginAnniversaryYuanYinDeathBeforeCleanup(long deathId) => _resolve().TryBeginAnniversaryYuanYinDeathBeforeCleanup(deathId);
     internal bool ValidYuanYin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidYuanYin(f);
-    internal bool YuanYinBeforeDamageObserver(long id) => _resolve().YuanYinBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> YuanYinChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().YuanYinChoices(f);
-    internal bool YuanYinDamageObserver(long id) => _resolve().YuanYinDamageObserver(id);
     internal bool YuanYinDeathHasCards(int victim) => _resolve().YuanYinDeathHasCards(victim);
     internal bool YuanYinDying() => _resolve().YuanYinDying();
     internal bool YuanYinFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().YuanYinFirstChild(f, child);

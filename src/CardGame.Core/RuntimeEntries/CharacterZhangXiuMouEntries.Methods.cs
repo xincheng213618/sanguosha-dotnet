@@ -12,8 +12,6 @@ internal sealed partial class CharacterZhangXiuMouEntries
     internal bool IsMouZhangXiuAnniversaryUse(long id) => _resolve().IsMouZhangXiuAnniversaryUse(id);
     internal void IssueMouZhangXiuAnniversarySlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMouZhangXiuAnniversarySlash(f);
     internal bool MouZhangXiuAnniversaryAdvanceChildren() => _resolve().MouZhangXiuAnniversaryAdvanceChildren();
-    internal bool MouZhangXiuAnniversaryBeforeDamage(long id) => _resolve().MouZhangXiuAnniversaryBeforeDamage(id);
-    internal bool MouZhangXiuAnniversaryDamageWindow(long id) => _resolve().MouZhangXiuAnniversaryDamageWindow(id);
     internal bool MouZhangXiuAnniversaryDying() => _resolve().MouZhangXiuAnniversaryDying();
     internal bool MouZhangXiuAnniversaryEdge(int i) => _resolve().MouZhangXiuAnniversaryEdge(i);
     internal bool MouZhangXiuAnniversaryFinalizedDamageUse(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().MouZhangXiuAnniversaryFinalizedDamageUse(query);

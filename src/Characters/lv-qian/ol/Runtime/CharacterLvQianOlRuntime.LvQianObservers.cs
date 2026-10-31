@@ -89,9 +89,6 @@ internal sealed partial class CharacterLvQianOlRuntime
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, window.OccurrenceIndex);
         return HasIssuedWeiluDebtCandidate(candidate, window) || IsIssuedZengdaoCandidate(candidate, window);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 310)]
-    internal bool IsLvQianMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.LvQian is not null && e is not null && LvQianComposition.Own(e.Op) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && CanContinueLvQian(f);
     internal bool LvQianFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (root.LvQian is not { } r || !CanContinueLvQian(root))
@@ -104,11 +101,6 @@ internal sealed partial class CharacterLvQianOlRuntime
     }
 
     internal ProgramSkillFrame? LvQianObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterLvQianOlOperations.LvQianFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d))));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 270)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 380)]
-    internal bool HasLvQianDamageObserver(long id) => LvQianObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 470)]
-    internal bool HasLvQianBeforeDamageObserver(long id) => LvQianObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 380)]
     internal bool TryAdvanceLvQianSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LvQianObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     internal bool IsLvQianRecoveryCompletion(ProgramSkillFrame f, RecoveryAttempt attempt) => f.LvQian is { Stage: LvQianStage.RecoveryChildren, HpProof: { Kind: HpChangeKind.Recovery } proof, Phase: { } phase } r && phase == f.WindowContext?.WeiluPhase && attempt.SourceSeat == f.OwnerSeat && attempt.TargetSeat == proof.TargetSeat && attempt.Amount == proof.Amount && attempt.HpBefore == proof.HpBefore && attempt.Completion.Producer == RecoveryAttemptProducer.Program && attempt.Completion.InstructionIndex == f.InstructionIndex && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WeiluDebtConsumedEvent>().Count(e => e.FrameId == f.Id && e.Phase == phase && e.TargetSeat == proof.TargetSeat && e.TargetAlive && e.Amount >= proof.Amount) == 1;

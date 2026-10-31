@@ -44,10 +44,6 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
                 return root;
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 360)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 470)]
-    internal bool HasWoLongFengChuDamageObserver(long id) => WoLongFengChuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26100)]
     internal bool TryAdvanceWoLongFengChuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WoLongFengChuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

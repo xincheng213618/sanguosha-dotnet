@@ -8,7 +8,6 @@ internal sealed partial class CharacterSunCeMobileGodEntries
     internal void ContinueShenSunCe(long id) => _resolve().ContinueShenSunCe(id);
     internal bool DrainShenSunCe(long id) => _resolve().DrainShenSunCe(id);
     internal void FinishShenSunCe(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShenSunCe(f);
-    internal bool IsShenSunCePaidMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsShenSunCePaidMovement(f, effect, pending);
     internal void IssueShenSunCeDraw(global::CardGame.Core.ProgramSkillFrame f, int count) => _resolve().IssueShenSunCeDraw(f, count);
     internal bool KeepPaidShenSunCe(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidShenSunCe(f);
     internal int Pingding(int seat) => _resolve().Pingding(seat);

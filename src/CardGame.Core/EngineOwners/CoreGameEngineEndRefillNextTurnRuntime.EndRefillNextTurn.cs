@@ -148,9 +148,6 @@ internal sealed partial class CoreGameEngineEndRefillNextTurnRuntime
         if (movements.Length != r.DrawActual || movements.Any(m => m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(r.TargetSeat)))
             throw new InvalidOperationException("A paid refill does not match the actual private card movements.");
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 30)]
-    internal bool IsEndRefillNextTurnMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.EndRefillNextTurn is { Stage: EndRefillNextTurnStage.MovementChildren } r && e?.Op == SkillProgramEffectOp.RefillAndScheduleNextTurnSelfOnly && p.SubjectSeat == r.TargetSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 450)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 440)]
     internal bool CanContinueEndRefillNextTurn(ProgramSkillFrame f)

@@ -20,14 +20,6 @@ internal sealed partial class CharacterRuanHuiOlRuntime
         return f.InstructionIndex is 0 or 1 && f.TriggerId is { } id && f.ActivationId == id && f.WindowContext is { } context && IsIssuedRuanHuiCandidate(new(f.OwnerSeat, f.SkillId, id, f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex)) && CanRunIssuedRuanHuiCandidate(new(f.OwnerSeat, f.SkillId, id, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 260)]
-    internal bool IsRuanHuiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
-    {
-        if (f.RuanHui is not { } r || e?.Op != r.Op || p != f.PendingMovementContinuation || r.Stage is RuanHuiStage.DrawChoice or RuanHuiStage.TargetChoice)
-            return false;
-        return true;
-    }
-
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 790)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 730)]
     internal bool IsRuanHuiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
@@ -57,11 +49,6 @@ internal sealed partial class CharacterRuanHuiOlRuntime
     }
 
     internal ProgramSkillFrame? RuanHuiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterRuanHuiOlOperations.RuanHuiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 620)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 730)]
-    internal bool HasRuanHuiDamageObserver(long id) => RuanHuiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 760)]
-    internal bool HasRuanHuiBeforeDamageObserver(long id) => RuanHuiObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27080)]
     internal bool AdvanceRuanHuiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && RuanHuiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -323,9 +323,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
         ContinueLeCaiYongFeibai(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 300)]
-    internal bool IsFeibaiMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.LeCaiYongFeibai is { Stage: FeibaiStage.ObtainChildren or FeibaiStage.DrawChildren } && effect?.Op == SkillProgramEffectOp.ResolveLeCaiYongFeibai && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29071)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29071)]
     internal bool PermitPaidLeCaiYongFeibai(ProgramSkillFrame f)
@@ -375,11 +372,6 @@ internal sealed partial class CharacterCaiYongLeRuntime
 
     internal bool FeibaiObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && (_characterCaiYongLeOperations.FeibaiFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || f.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(f, _resolutionStackOperations2._resolutionStack()[child])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? FeibaiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterCaiYongLeOperations.FeibaiFirstChild(f, child), (index) => _characterCaiYongLeOperations.FeibaiObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1250)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1360)]
-    internal bool HasFeibaiDamageObserver(long id) => FeibaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1390)]
-    internal bool HasFeibaiBeforeDamageObserver(long id) => FeibaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 780)]
     internal bool IsFeibaiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FeibaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 550)]

@@ -47,15 +47,12 @@ internal sealed partial class CharacterGuanYuWumiaoEntries
     internal bool HasPaidWuYixian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasPaidWuYixian(f);
     internal bool HasPotentialWuyouFactionSlash(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind) => _resolve().HasPotentialWuyouFactionSlash(actor, kind);
     internal bool HasPublicWuyouContributionPotential(global::CardGame.Core.CharacterState actor) => _resolve().HasPublicWuyouContributionPotential(actor);
-    internal bool HasWuYixianBeforeDamageObserver(long id) => _resolve().HasWuYixianBeforeDamageObserver(id);
-    internal bool HasWuYixianDamageObserver(long id) => _resolve().HasWuYixianDamageObserver(id);
     internal bool HasWumiaoFloodDiscardPrompt() => _resolve().HasWumiaoFloodDiscardPrompt();
     internal bool HasWuyouMaterialPrivilege(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int>? materialIds, long? existingUseFrameId = default) => _resolve().HasWuyouMaterialPrivilege(actor, kind, materialIds, existingUseFrameId);
     internal bool HasWuyouPotentialSlash(global::CardGame.Core.CharacterState actor) => _resolve().HasWuyouPotentialSlash(actor);
     internal bool IsJuewuSource(global::CardGame.Core.CardConversionSource? source) => _resolve().IsJuewuSource(source);
     internal bool IsJuewuTrueSlashUse(global::CardGame.Core.CharacterState owner) => _resolve().IsJuewuTrueSlashUse(owner);
     internal bool IsJuewuUsePaymentBatch(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsJuewuUsePaymentBatch(use, batch);
-    internal bool IsWuYixianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWuYixianMovement(f, effect, pending);
     internal bool IsWuYixianRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWuYixianRecoveryParent(f, recovery);
     internal bool IsWumiaoFloodHpReturn(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.HpChangedTriggerWindowFrame frame) => _resolve().IsWumiaoFloodHpReturn(use, frame);
     internal bool IsWumiaoFloodMovement(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().IsWumiaoFloodMovement(use, batch);
@@ -66,7 +63,6 @@ internal sealed partial class CharacterGuanYuWumiaoEntries
     internal bool IsWuyouFactionPaymentLegal(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards, bool isTrueZhangba = false) => _resolve().IsWuyouFactionPaymentLegal(pending, kind, cards, isTrueZhangba);
     internal bool IsWuyouIdentityKind(global::CardGame.Core.CharacterState holder, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind) => _resolve().IsWuyouIdentityKind(holder, card, kind);
     internal bool IsWuyouIdentityMaterial(global::CardGame.Core.CharacterState holder, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind, global::CardGame.Core.CardConversionSource? source) => _resolve().IsWuyouIdentityMaterial(holder, card, kind, source);
-    internal bool IsWuyouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWuyouMovement(f, effect, p);
     internal void IssueJuewuUse(global::CardGame.Core.CardUseFrame supplied) => _resolve().IssueJuewuUse(supplied);
     internal void IssueWuyouUse(global::CardGame.Core.CardUseFrame use) => _resolve().IssueWuyouUse(use);
     internal bool JuewuConversionUnavailable(global::CardGame.Core.ProgramConfiguredViewAsQuery query) => _resolve().JuewuConversionUnavailable(query);

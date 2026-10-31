@@ -150,9 +150,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
             FinishFirstSlashDuelBenefit(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 400)]
-    internal bool IsFirstSlashDuelMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => f.FirstSlashDuelBenefit is { SelectedBranch: "draw" } r && e?.Op == SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit && r.InstructionIndex == f.InstructionIndex && pending.SubjectSeat == f.OwnerSeat && pending.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 390)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 390)]
     internal bool CanContinueFirstSlashDuelBenefit(ProgramSkillFrame f) => f.FirstSlashDuelBenefit?.SelectedBranch == "draw" && _coreFirstSlashDuelBenefitObserversOperations.ValidFirstSlashDuelBenefit(f);

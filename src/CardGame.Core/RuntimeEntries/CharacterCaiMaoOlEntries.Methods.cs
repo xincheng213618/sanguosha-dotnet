@@ -16,8 +16,6 @@ internal sealed partial class CharacterCaiMaoOlEntries
     internal bool ContinuePaidCaiMao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidCaiMao(f);
     internal bool DrainCaiMao(long id) => _resolve().DrainCaiMao(id);
     internal void FinishCaiMao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCaiMao(f);
-    internal bool HasCaiMaoBeforeDamageObserver(long id) => _resolve().HasCaiMaoBeforeDamageObserver(id);
-    internal bool HasCaiMaoDamageObserver(long id) => _resolve().HasCaiMaoDamageObserver(id);
     internal void PayCaiMaoExchange(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PayCaiMaoExchange(f);
     internal void PublishCaiMao(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishCaiMao(f);
     internal bool ResumeCaiMao(long id) => _resolve().ResumeCaiMao(id);

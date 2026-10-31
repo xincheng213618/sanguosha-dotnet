@@ -250,9 +250,6 @@ internal sealed partial class CharacterFanChouOlRuntime
         RequireFanChou(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 240)]
-    internal bool IsFanChouMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.FanChou is { } r && e?.Op == SkillProgramEffectOp.ChooseXingluanRankSixBenefit && CanContinueFanChou(f) && p.SubjectSeat == (r.Branch == "other-discard" ? r.Recipient!.Value : f.OwnerSeat) && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal void RequireFanChou(ProgramSkillFrame f)
     {
         if (f.FanChou is not { } r || r.Source != FanChouSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.Use.WindowId != f.WindowContext?.ParentFrameId || r.Use.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Use.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Use.Action.ActorSeat != f.OwnerSeat || r.DeckCandidates.Count > 2 || r.DeckCandidates.Distinct().Count() != r.DeckCandidates.Count || !Enum.IsDefined(r.Stage) || f.WindowContext is not { } originalContext || !TryFanChouUse(f.OwnerSeat, originalContext, out var originalUse) || originalUse.WindowId != r.Use.WindowId || originalUse.NativeParentId != r.Use.NativeParentId || originalUse.ActualTurn != r.Use.ActualTurn || originalUse.PhaseInstance != r.Use.PhaseInstance || originalUse.ResponseKind != r.Use.ResponseKind || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(originalUse.Action, r.Use.Action))

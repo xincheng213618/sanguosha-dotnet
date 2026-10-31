@@ -123,8 +123,6 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 570)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 590)]
     internal bool CanContinueOrderedPrintedSkillLoss(ProgramSkillFrame f) => f.OrderedPrintedSkillLoss is not null && _coreOrderedPrintedSkillLossObserversOperations.ValidOrderedPrintedSkillLossReceipt(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 180)]
-    internal bool IsOrderedPrintedSkillLossMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.LoseFirstPrintedSkillsUntilTurnEndAndDraw && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && f.PendingMovementContinuation == pending && CanContinueOrderedPrintedSkillLoss(f);
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 40)]
     internal void RestoreOrderedPrintedSkillsAfterTurnEnded(TurnEndedEvent ended) => RestoreOrderedPrintedSkillsAtTurnEnd(ended.TurnNumber, ended.ActorSeat);
     internal void RestoreOrderedPrintedSkillsAtTurnEnd(int turnNumber, int turnOwnerSeat)

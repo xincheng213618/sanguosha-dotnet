@@ -145,8 +145,5 @@ internal sealed partial class CharacterXinPiOlRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 330)]
-    internal bool IsXinPiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.XinPi is { Stage: XinPiStage.ClaimChildren or XinPiStage.OwnerDrawChildren or XinPiStage.RecipientDrawChildren } r && e is not null && XinPiComposition.IsOp(e.Op) && CanContinueXinPi(f) && p.SubjectSeat == (r.Stage == XinPiStage.RecipientDrawChildren ? r.TargetSeat : f.OwnerSeat) && p.BeforeCount == 0 && p.CoverageResultBind is null;
-
     SkillProgramStepOutcome global::CardGame.Core.IXinPiProgramHost.BeginXinPi(ProgramSkillFrame f, SkillProgramEffect e) => BeginXinPi(f, e);
 }

@@ -16,8 +16,6 @@ internal sealed partial class CharacterCaoYingOlEntries
     internal bool DrainCaoYingChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainCaoYingChildren(f);
     internal void FinishCaoYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCaoYing(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CardSnapshot> GetCaoYingPrivateCards(int viewer) => _resolve().GetCaoYingPrivateCards(viewer);
-    internal bool HasCaoYingDamageObserver(long id) => _resolve().HasCaoYingDamageObserver(id);
-    internal bool IsCaoYingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsCaoYingMovement(f, e, p);
     internal bool IsMobileCaoYing(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsMobileCaoYing(frame);
     internal void ObserveCaoYingDamage(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveCaoYingDamage(payload);
     internal void ObserveCaoYingExpiry(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveCaoYingExpiry(payload);

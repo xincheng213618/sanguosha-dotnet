@@ -49,10 +49,6 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
             return false;
         return !r.Returned || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHaoMengUseReturnedEvent>().Count(e => e == new AnniversaryHaoMengUseReturnedEvent(f.Id, r.UseId, r.ActionId)) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49700)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49700)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49700)]
     internal bool HaoMengMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryHaoMeng is { Stage: AnniversaryHaoMengStage.NativeTail or AnniversaryHaoMengStage.HealthChildren } r && e?.Op == r.Operation && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidHaoMeng(f);
     internal bool HaoMengFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -88,11 +84,6 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
 
     internal bool HaoMengSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _characterHaoMengAnniversaryOperations.HaoMengNativeEdge(n) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame f && _characterHaoMengAnniversaryOperations.HaoMengFirstChild(f, _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d));
     internal ProgramSkillFrame? HaoMengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHaoMengAnniversaryOperations.HaoMengFirstChild(f, c), (i) => _characterHaoMengAnniversaryOperations.HaoMengSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 49700)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 49700)]
-    internal bool HaoMengDamageObserver(long id) => HaoMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49700)]
-    internal bool HaoMengBeforeDamage(long id) => HaoMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49700)]
     internal bool HaoMengDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HaoMengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49700)]

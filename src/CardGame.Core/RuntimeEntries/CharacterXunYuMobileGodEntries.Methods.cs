@@ -19,7 +19,6 @@ internal sealed partial class CharacterXunYuMobileGodEntries
     internal bool HasDinghanCancellation(global::CardGame.Core.CardUseFrame use) => _resolve().HasDinghanCancellation(use);
     internal bool HasQizhengPrompt() => _resolve().HasQizhengPrompt();
     internal bool IsDinghanCancellationFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.DinghanTargetCanceledEvent e, global::System.Collections.Generic.IReadOnlyList<int> before) => _resolve().IsDinghanCancellationFact(use, e, before);
-    internal bool IsTianzuoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsTianzuoMovement(f, effect, pending);
     internal void PayQizhengSingleResponse(long id, global::CardGame.Core.CharacterState responder, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind) => _resolve().PayQizhengSingleResponse(id, responder, card, kind);
     internal void PublishDinghanEdit(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishDinghanEdit(f);
     internal void PublishQizheng(global::CardGame.Core.CardUseFrame use) => _resolve().PublishQizheng(use);

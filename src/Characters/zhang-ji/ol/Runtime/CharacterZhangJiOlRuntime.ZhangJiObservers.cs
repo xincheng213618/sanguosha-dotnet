@@ -72,11 +72,6 @@ internal sealed partial class CharacterZhangJiOlRuntime
     }
 
     internal ProgramSkillFrame? ZhangJiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangJiOlOperations.ZhangJiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 170)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 280)]
-    internal bool HasZhangJiDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(x => x.Id == id && x is DamageTriggerWindowFrame) && ZhangJiObserverRoot()is not null;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 370)]
-    internal bool HasZhangJiBeforeDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(x => x.Id == id && x is BeforeDamageProgramWindowFrame) && ZhangJiObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 280)]
     internal bool TryAdvanceZhangJiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangJiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

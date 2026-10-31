@@ -84,37 +84,6 @@ internal sealed partial class CoreGameEngineDamageTargetRegionObtainRuntime
     }
 
     internal bool DamageTargetDuelBaseMatches(ProgramDamageTargetObtain receipt, ProgramDamageTargetDuelOrigin origin) => receipt.RegionObtain is { Paid: true } region ? region.ContainsEquipment && region.ActualObtainedCount > 0 && origin.BaseDamage == region.ActualObtainedCount : origin.BaseDamage is null;
-    internal bool IsExactDamageTargetRegionMovementChild(ProgramSkillFrame frame, CardsMovedTriggerWindowFrame first)
-    {
-        var draft = frame.DamageTargetObtain!;
-        var receipt = draft.RegionObtain;
-        if (receipt is not { Paid: true } || !_coreDamageTargetObtainProgramsOperations.IsValidDamageTargetObtain(frame) || frame.PendingMovementContinuation is not { CoverageResultBind: null } pending || pending.SubjectSeat != frame.OwnerSeat || first.Batch.ParentFrameId != frame.Id || first.Batch.AwaitingProgramFrameId != frame.Id || first.Batch.OriginSkillId != frame.SkillId || first.Batch.OriginSkillInstanceId != frame.SkillInstanceId || first.Batch.OriginOwnerSeat != frame.OwnerSeat)
-            return false;
-        if (draft.Stage == ProgramDamageTargetObtainStage.DrawChildren)
-            return !receipt.ContainsEquipment && receipt.ActualObtainedCount > 0 && first.Batch.Movements is [var draw] && draw.From == CardLocation.DrawPile && draw.To == CardLocation.Hand(draft.VictimSeat) && draw.Reason.Value == "skill-program.damage-target-obtain.benefit-draw" && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(draw);
-        return draft.Stage == ProgramDamageTargetObtainStage.ObtainChildren && first.Batch.Id == receipt.MovementBatchId && first.Batch.Movements.Select(move => new ProgramDamageTargetObtainReceipt(move.Sequence, move.CardId, move.CardKind, move.From, move.To, move.Reason.Value, _coreEquipmentContentOperations.EquipmentRules.IsEquipment(move.CardKind))).SequenceEqual(receipt.Movements);
-    }
-
-    internal ProgramSkillFrame? PaidDamageTargetRegionObtainObserverRoot(long windowId)
-    {
-        for (var index = 1; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
-        {
-            if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame { DamageTargetObtain: { RegionObtain.Paid: true } draft } frame || draft.DamageWindowId != windowId || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.Id != windowId || window.ParentFrameId != draft.DamageFrameId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack[index + 1] is not CardsMovedTriggerWindowFrame first || !IsExactDamageTargetRegionMovementChild(frame, first))
-                continue;
-            var valid = true;
-            for (var child = index + 1; child < _resolutionStackOperations._resolutionStack.Count; child++)
-                if (!_coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child) && !global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[child], _resolutionStackOperations._resolutionStack[child - 1]))
-                {
-                    valid = false;
-                    break;
-                }
-
-            if (valid)
-                return frame;
-        }
-
-        return null;
-    }
 
     internal PromptChoice SelectAiDamageTargetRegion(PendingDecision decision, ProgramSkillFrame frame)
     {

@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhenJiHappyGodRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 41240)]
     internal bool HappyZjMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
     {
         if (f.HappyZhenJi is not { } r || e?.Op != r.Op || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null || r.Payments.Count == 0 || r.Stage is not (HappyZjStage.EffectChildren or HappyZjStage.RewardChildren or HappyZjStage.StoreChildren or HappyZjStage.FeifuChildren or HappyZjStage.ReturnChildren))
@@ -35,11 +33,6 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     }
 
     internal ProgramSkillFrame? HappyZjObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhenJiHappyGodOperations.HappyZjFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 41240)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 41240)]
-    internal bool HappyZjDamageObserver(long id) => HappyZjObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 41240)]
-    internal bool HappyZjBeforeDamageObserver(long id) => HappyZjObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 41240)]
     internal bool HappyZjDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HappyZjObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 41240)]

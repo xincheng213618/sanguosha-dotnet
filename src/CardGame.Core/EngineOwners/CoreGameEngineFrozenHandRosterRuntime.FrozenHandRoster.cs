@@ -154,7 +154,6 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
     }
 
     internal SkillProgramEffect? FrozenHandRosterPausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 270)]
     internal bool IsFrozenHandRosterMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.ResolveFrozenHandRosterEndingExchange && f.FrozenHandRoster is { Stage: "movement" } r && r.InstructionIndex == f.InstructionIndex && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Movement, 22000)]
     internal bool ReturnFrozenHandRosterMovement(ProgramSkillFrame f)

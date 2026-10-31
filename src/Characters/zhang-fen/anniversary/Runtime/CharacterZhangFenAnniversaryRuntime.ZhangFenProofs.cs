@@ -34,19 +34,6 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
         return r.Op == SkillProgramEffectOp.ResolveAnniversaryDagongCheAttack && f.SkillId == ZhangFenComposition.Cart && r.CartId > 0 && IsRealDagongChe(r.CartId) && r.Source.SkillInstanceId == DagongGrant(r.CartId) && (w.Window == SkillProgramTriggerWindow.PlayPhaseStarting && r.Count is >= 1 and <= 6 && r.Stage is ZhangFenStage.Targets or ZhangFenStage.NativeUse or ZhangFenStage.NativeReturned or ZhangFenStage.Done || w.Window == SkillProgramTriggerWindow.AfterDamageApplied && w.SourceSeat == f.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) && HasBoundDagongCheDiscardOrigin(f) && r.Count is >= 1 and <= 6 && r.Stage is ZhangFenStage.DiscardChoice or ZhangFenStage.DiscardChildren or ZhangFenStage.Done);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43500)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 43500)]
-    internal bool ZhangFenMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
-    {
-        if (f.ZhangFen is not { } r || !ValidZhangFen(f) || effect?.Op != r.Op || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null)
-            return false;
-        if (r.Stage == ZhangFenStage.PlaceChildren)
-            return IsRealDagongChe(r.CartId) && _coreProgramEventHistoryOperations.ProgramEventHistory<DagongCheCreatedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Hash == r.Hash && e.CardId == r.CartId) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == r.CartId && m.From == CardLocation.OutsideGame && m.To == CardLocation.Equipment(f.OwnerSeat) && m.Sequence > r.Before && m.Sequence <= r.After) == 1;
-        if (r.Stage == ZhangFenStage.DiscardChildren)
-            return r.CardId > 0 && r.From is { } from && r.To is { } to && r.MoveSequence > r.Before && r.MoveSequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == r.MoveSequence && m.CardId == r.CardId && m.From == from && m.To == to && m.Reason.Value == "anniversary.dagong-che.discard" && (to == CardLocation.DiscardPile || _coreProgramAtomicCardMovesOperations.IsRedirectedPaidDiscardMovement(m, from, new("anniversary.dagong-che.discard")) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m))) == 1;
-        return r.Stage == ZhangFenStage.DrawChildren && r.Draw is { } draw && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.Count && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangFenDrawReturnedEvent>().Count(e => e == new ZhangFenDrawReturnedEvent(f.Id, r.Count, draw.ActualDrawIds.Count, r.Before, r.After)) == 1;
-    }
-
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 43500)]
     internal bool KeepPaidZhangFen(ProgramSkillFrame f) => IsUnbegunIssuedDagongCheDamage(f) || f.ZhangFen is { Stage: ZhangFenStage.PlaceChildren or ZhangFenStage.DiscardChoice or ZhangFenStage.DiscardChildren or ZhangFenStage.Drawing or ZhangFenStage.DrawChildren or ZhangFenStage.NativeUse or ZhangFenStage.NativeReturned } && ValidZhangFen(f);

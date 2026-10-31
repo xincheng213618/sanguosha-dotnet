@@ -12,9 +12,6 @@ internal sealed partial class CharacterZhangQiYingOlEntries
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteZhangQiYing(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().ExecuteZhangQiYing(supplied, op);
     internal global::CardGame.Core.CardLocation? FaluDiscardOwnedSource(global::CardGame.Core.CardMovementRecord movement) => _resolve().FaluDiscardOwnedSource(movement);
     internal int FaluTokenCount(int owner) => _resolve().FaluTokenCount(owner);
-    internal bool HasZhangQiYingBeforeDamageObserver(long id) => _resolve().HasZhangQiYingBeforeDamageObserver(id);
-    internal bool HasZhangQiYingDamageObserver(long id) => _resolve().HasZhangQiYingDamageObserver(id);
-    internal bool IsZhangQiYingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsZhangQiYingMovement(f, e, p);
     internal bool IsZhenyiHoutu(global::CardGame.Core.CardConversionSource source) => _resolve().IsZhenyiHoutu(source);
     internal void ObserveAcceptedZhenyiHoutu(global::CardGame.Core.CardActionAcceptedEvent accepted) => _resolve().ObserveAcceptedZhenyiHoutu(accepted);
     internal void PayZhenyiHoutu(global::CardGame.Core.CardActionContext action) => _resolve().PayZhenyiHoutu(action);

@@ -16,13 +16,10 @@ internal sealed partial class CharacterYaDanOlEntries
     internal void ExpireQingyaActualTurnAlcohol(global::CardGame.Core.IGameEvent payload) => _resolve().ExpireQingyaActualTurnAlcohol(payload);
     internal global::CardGame.Core.Card? FindQingyaDiscardCard(global::CardGame.Core.CharacterState actor, int id) => _resolve().FindQingyaDiscardCard(actor, id);
     internal void FinishYaDan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishYaDan(f);
-    internal bool HasYaDanBeforeDamageObserver(long id) => _resolve().HasYaDanBeforeDamageObserver(id);
-    internal bool HasYaDanDamageObserver(long id) => _resolve().HasYaDanDamageObserver(id);
     internal bool IsIssuedQingyaCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedQingyaCandidate(c, context);
     internal bool IsIssuedQingyaUse(long id) => _resolve().IsIssuedQingyaUse(id);
     internal bool IsQingyaDiscardQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsQingyaDiscardQuery(actor, id);
     internal bool IsQingyaSelectedDiscard(int actor, int id) => _resolve().IsQingyaSelectedDiscard(actor, id);
-    internal bool IsYaDanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsYaDanMovement(f, effect, pending);
     internal void NextQingyaHand(global::CardGame.Core.ProgramSkillFrame f) => _resolve().NextQingyaHand(f);
     internal void PublishYaDan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishYaDan(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.QingyaArc> QingyaArcs(int owner, int target, global::System.Collections.Generic.IReadOnlyList<int> living) => _resolve().QingyaArcs(owner, target, living);

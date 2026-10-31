@@ -356,22 +356,6 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         return deathIndex >= 0 && deathIndex < windowIndex && _resolutionStackOperations._resolutionStack[deathIndex] is DeathFrame death && death.VictimSeat == window.VictimSeat && death.KillerSeat == window.KillerSeat && death.VictimSeat != ownerSeat ? death : null;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 86200)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 86200)]
-    internal bool IsCommittedFilteredDeathClaimMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect is not { Op: SkillProgramEffectOp.ClaimDeathCleanupCards } || effect.Zones.Count == 0 || pending != frame.PendingMovementContinuation || pending.SubjectSeat != frame.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || frame.WindowContext is not { } context || FilteredDeathClaimParent(frame.OwnerSeat, context)is not { } death)
-            return false;
-        var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (rootIndex < 0 || rootIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[rootIndex + 1] is not CardsMovedTriggerWindowFrame moved || !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved))
-            return false;
-        var window = _resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
-        if (window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex] is not { } candidate || candidate.OwnerSeat != frame.OwnerSeat || candidate.SkillId != frame.SkillId || candidate.SkillInstanceId != frame.SkillInstanceId || candidate.GameplayHash != frame.GameplayHash || candidate.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame))
-            return false;
-        var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame))}.claim-death-cleanup");
-        return moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason == reason && death.CleanedUpCardIds.Contains(m.CardId) && _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault(prior => prior.CardId == m.CardId && prior.Sequence < m.Sequence)is { } cleanup && cleanup.From.OwnerSeat == death.VictimSeat && effect.Zones.Contains(cleanup.From.Zone) && cleanup.To == CardLocation.DiscardPile && (cleanup.From.Zone == CardZoneKind.Equipment ? cleanup.Reason == CardMoveReasons.DeathEquipmentDiscard : cleanup.From.Zone is CardZoneKind.Hand or CardZoneKind.Judgment && cleanup.Reason == CardMoveReasons.DeathDiscard));
-    }
-
     internal void ClaimProgramDeathCleanupCards(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

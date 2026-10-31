@@ -35,10 +35,6 @@ internal sealed partial class CoreGameEngineShanheS5YimieObserversRuntime
                 return root;
         return null;
     }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 5795)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 5795)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamagePrelude, 5795)]
-    internal bool HasShanheS5YimieObserver(long id) => ShanheS5YimieCostObserverRoot()is { } cost && (cost.ShanheS5YimieCost!.BeforeDamageWindowId == id || _resolutionStackOperations._resolutionStack.SkipWhile(f => f.Id != cost.Id).Any(f => f.Id == id)) || ShanheS5YimieRecoveryObserverRoot()is { } recovery && _resolutionStackOperations._resolutionStack.SkipWhile(f => f.Id != recovery.Id).Any(f => f.Id == id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 5795)]
     internal bool HasShanheS5YimieDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (ShanheS5YimieCostObserverRoot()is { } cost && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == cost.Id) || ShanheS5YimieRecoveryObserverRoot()is { } recovery && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == recovery.Id));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 5795)]

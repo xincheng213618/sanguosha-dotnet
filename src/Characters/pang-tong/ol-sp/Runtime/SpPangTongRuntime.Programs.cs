@@ -102,8 +102,6 @@ internal sealed partial class SpPangTongRuntime(IProgramRuntimeFrames frames, IP
   var drawn=draws.DrawCards(participants.At(seat),1,true,new(SpPangTongDrawReason),r.Source);f=frames.ActiveProgram(f.Id);frames.ReplaceTop(f=f with{SpPangTong=f.SpPangTong!with{After=movement.Sequence,ActualCount=drawn.Count}});IssueSpPangTongSegment(f);frames.AdvanceProgram(f.Id);
  }
  private void FinishSpPangTong(ProgramSkillFrame f){frames.ReplaceTop(f=f with{SpPangTong=null,PendingMovementContinuation=null});completion.Finish(f,true);}
- [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 290)]
- private bool IsSpPangTongMovement(ProgramSkillFrame f,SkillProgramEffect?e,ProgramMovementContinuation p)=>e is not null&&SpPangTongComposition.Own(e.Op)&&f.SpPangTong is{Stage:"exchange-children" or "draw-children"}&&p.SubjectSeat==f.OwnerSeat&&p.BeforeCount==0&&p.CoverageResultBind is null;
  [ProgramContinuation(ProgramContinuationKind.Movement,24700)] private bool ReturnSpPangTongMovement(ProgramSkillFrame f)=>f.SpPangTong is not null&&ResumeSpPangTong(f.Id);
  [ProgramContinuation(ProgramContinuationKind.Resume,24700)] private bool ResumeSpPangTong(long id)
  {

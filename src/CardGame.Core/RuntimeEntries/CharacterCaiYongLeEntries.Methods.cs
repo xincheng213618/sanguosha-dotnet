@@ -34,14 +34,11 @@ internal sealed partial class CharacterCaiYongLeEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> FeibaiSampleChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FeibaiSampleChoices(f);
     internal global::CardGame.Core.CardKind FeibaiSourceBoundEffectiveUseKind(global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent fact, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.IGameEvent> history, int prefixEnd, global::CardGame.Core.CurrentTurnCardUseKindsRecordedEvent current) => _resolve().FeibaiSourceBoundEffectiveUseKind(fact, history, prefixEnd, current);
     internal bool FeibaiWindowMatches(global::CardGame.Core.ProgramCardTriggerWindowFrame window, global::CardGame.Core.FeibaiQualification q) => _resolve().FeibaiWindowMatches(window, q);
-    internal bool HasFeibaiBeforeDamageObserver(long id) => _resolve().HasFeibaiBeforeDamageObserver(id);
-    internal bool HasFeibaiDamageObserver(long id) => _resolve().HasFeibaiDamageObserver(id);
     internal bool HasXianEntityMark(int cardId) => _resolve().HasXianEntityMark(cardId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeJiaowei(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeJiaowei(supplied);
     internal global::CardGame.Core.ProgramDamageInterception InterceptJiaoweiProtection(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, global::CardGame.Core.DamageNature nature) => _resolve().InterceptJiaoweiProtection(attack, amount, nature);
     internal bool IsExactFeibaiFallbackDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().IsExactFeibaiFallbackDraw(f, outcome);
     internal bool IsFeibaiDying() => _resolve().IsFeibaiDying();
-    internal bool IsFeibaiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFeibaiMovement(f, effect, pending);
     internal bool IsFeibaiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsFeibaiRecoveryParent(f, recovery);
     internal bool IsFeibaiTrueUse(global::CardGame.Core.CardActionContext action) => _resolve().IsFeibaiTrueUse(action);
     internal bool IsIssuedJiaoweiInitialCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedJiaoweiInitialCandidate(candidate, context);

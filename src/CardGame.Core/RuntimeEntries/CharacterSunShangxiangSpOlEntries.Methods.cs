@@ -19,8 +19,6 @@ internal sealed partial class CharacterSunShangxiangSpOlEntries
     internal global::CardGame.Core.ProgramSkillWindowContext CreateSpSunShangxiangRecoveryContext(global::CardGame.Core.HpChangeContext change, global::CardGame.Core.ProgramTriggerCandidate c) => _resolve().CreateSpSunShangxiangRecoveryContext(change, c);
     internal bool ExactSpSunShangxiangFanxiangParent(global::CardGame.Core.ProgramSkillFrame f, long id) => _resolve().ExactSpSunShangxiangFanxiangParent(f, id);
     internal void FinishSpSunShangxiangLiangzhu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSpSunShangxiangLiangzhu(f);
-    internal bool HasSpSunShangxiangLiangzhuBeforeDamage(long id) => _resolve().HasSpSunShangxiangLiangzhuBeforeDamage(id);
-    internal bool HasSpSunShangxiangLiangzhuDamage(long id) => _resolve().HasSpSunShangxiangLiangzhuDamage(id);
     internal bool IsSpSunShangxiangFanxiangTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsSpSunShangxiangFanxiangTrigger(t);
     internal bool IsSpSunShangxiangLiangzhuDying() => _resolve().IsSpSunShangxiangLiangzhuDying();
     internal bool IsSpSunShangxiangLiangzhuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsSpSunShangxiangLiangzhuMovement(f, e, p);

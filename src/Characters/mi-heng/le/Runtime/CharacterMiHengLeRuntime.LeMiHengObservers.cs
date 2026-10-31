@@ -16,9 +16,6 @@ internal sealed partial class CharacterMiHengLeRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 200)]
-    internal bool IsLeMiHengMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.Jigu is { Paid: true, Stage: JiguStage.DrawChildren, DrawOutcome: not null } && effect?.Op == SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool JiguDrawMovement(ProgramSkillFrame f, CardMovementRecord movement)
     {
         if (f.Jigu is not { Paid: true, Stage: JiguStage.DrawChildren, DrawOutcome: { } o } || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(movement) || movement.Sequence <= o.SequenceBefore || movement.Sequence > o.SequenceAfter)
@@ -43,22 +40,6 @@ internal sealed partial class CharacterMiHengLeRuntime
 
     internal bool JiguObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame { Zenrun: { Paid: true } } replacement && _characterSunHongOlOperations.ZenrunFirstChild(replacement, _resolutionStackOperations2._resolutionStack()[n]) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? JiguObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterMiHengLeOperations.JiguFirstChild(f, child), (index) => _characterMiHengLeOperations.JiguObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1130)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1240)]
-    internal bool HasLeMiHengDamageObserver(long id)
-    {
-        if (JiguObserverRoot()is not { Jigu: { Paid: true } r } root || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id)is not DamageTriggerWindowFrame window)
-            return false;
-        if (_resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id))
-            return true;
-        // A paid Jigu draw also suspends the original damage window directly
-        // below it. Its whole native draw/replacement/observer suffix must be
-        // proved before that exact mother can retain its outstanding cursor.
-        return r.DamageWindowId == window.Id && r.DamageFrameId == window.ParentFrameId && root.WindowContext?.ParentFrameId == window.Id && window.TriggerWindow == SkillProgramTriggerWindow.AfterDamageApplied && _coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(root, window);
-    }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1270)]
-    internal bool HasLeMiHengBeforeDamageObserver(long id) => JiguObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 360)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 350)]
     internal bool IsLeMiHengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

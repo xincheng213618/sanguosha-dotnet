@@ -20,8 +20,6 @@ internal sealed partial class CharacterBaoXinOlEntries
     internal global::CardGame.Core.ProgramSkillWindowContext CreateBaoXinYimouContext(global::CardGame.Core.DamageTriggerWindowFrame frame, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext ordinary) => _resolve().CreateBaoXinYimouContext(frame, candidate, ordinary);
     internal bool DrainBaoXin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainBaoXin(f);
     internal void FinishBaoXin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishBaoXin(f);
-    internal bool HasBaoXinBeforeDamageObserver(long id) => _resolve().HasBaoXinBeforeDamageObserver(id);
-    internal bool HasBaoXinDamageObserver(long id) => _resolve().HasBaoXinDamageObserver(id);
     internal bool IsBaoXinMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBaoXinMovement(f, effect, pending);
     internal bool IsIssuedBaoXinMutaoPile(global::CardGame.Core.PublicPersistentPileSource source) => _resolve().IsIssuedBaoXinMutaoPile(source);
     internal void MoveBaoXin(global::CardGame.Core.ProgramSkillFrame f, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.BaoXinEntity> entities, global::CardGame.Core.BaoXinStage stage, global::CardGame.Core.CardLocation destination, string reason) => _resolve().MoveBaoXin(f, entities, stage, destination, reason);

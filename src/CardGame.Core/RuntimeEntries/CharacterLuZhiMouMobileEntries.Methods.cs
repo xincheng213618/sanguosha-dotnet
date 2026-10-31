@@ -12,8 +12,6 @@ internal sealed partial class CharacterLuZhiMouMobileEntries
     internal bool ContinueAcceptedMouLuZhi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueAcceptedMouLuZhi(f);
     internal void ContinueMouLuZhi(long id) => _resolve().ContinueMouLuZhi(id);
     internal void FinishMouLuZhi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouLuZhi(f);
-    internal bool HasMouLuZhiBeforeDamageObserver(long id) => _resolve().HasMouLuZhiBeforeDamageObserver(id);
-    internal bool HasMouLuZhiDamageObserver(long id) => _resolve().HasMouLuZhiDamageObserver(id);
     internal bool IsMouLuZhiDying() => _resolve().IsMouLuZhiDying();
     internal bool IsMouLuZhiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouLuZhiMovement(f, e, pending);
     internal bool IsMouLuZhiRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouLuZhiRecoveryParent(f, recovery);

@@ -65,36 +65,6 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtDamageObserversRunt
         return child is ProgramSkillFrame observer && parent is ProgramLifecycleTriggerWindowFrame changed && changed.CandidateIndex >= 0 && changed.CandidateIndex < changed.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observer, changed.Candidates[changed.CandidateIndex]) && observer.WindowContext is { Window: SkillProgramTriggerWindow.CharacterTurnedOver } context && context.ParentFrameId == changed.Id && context.OwnerSeat == observer.OwnerSeat && context.TargetSeat == changed.OwnerSeat;
     }
 
-    internal bool HalfHandPaidObserverPrefix(int rootIndex, int lastIndex)
-    {
-        if (rootIndex < 0 || lastIndex <= rootIndex || lastIndex >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[rootIndex] is not ProgramSkillFrame root || !_coreHalfHandPhaseDebtObserversOperations.HalfHandPhaseFirstChild(root, _resolutionStackOperations._resolutionStack[rootIndex + 1]))
-            return false;
-        for (var i = rootIndex + 1; i <= lastIndex; i++)
-        {
-            if (!HalfHandPaidDamageObserverEdge(i))
-                return false;
-            if (_resolutionStackOperations._resolutionStack[i] is DyingFrame d && i < lastIndex && (_coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(i, d) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(i, d) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(i, d) || PaidObserverDamageVirtualAlcoholRide(i, d)))
-                return lastIndex == _resolutionStackOperations._resolutionStack.Count - 1;
-        }
-
-        return true;
-    }
-
-    // A new gain/HP observer may suspend the original Slash only when the
-    // actual recipient's one-card support has already been delivered once.
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1750)]
-    internal bool HasHalfHandPaidDamageObserver(long damageWindowId)
-    {
-        var windowIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == damageWindowId && f is DamageTriggerWindowFrame);
-        if (windowIndex < 2 || _resolutionStackOperations._resolutionStack[windowIndex] is not DamageTriggerWindowFrame window || _resolutionStackOperations._resolutionStack[windowIndex - 1] is not DamageFrame damage || damage.Id != window.ParentFrameId || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == damage.ParentFrameId)is not { AttackAttempt: not null, AttackReturn: not null } attack || _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId != attack.Id)
-            return false;
-        var attackIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == attack.Id);
-        for (var index = 0; index < attackIndex; index++)
-            if (HalfHandPaidObserverPrefix(index, _resolutionStackOperations._resolutionStack.Count - 1))
-                return true;
-        return false;
-    }
-
     internal bool PaidObserverDamageVirtualAlcoholRide(int dyingIndex, DyingFrame dying)
     {
         if (dyingIndex < 0 || dyingIndex + 3 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[dyingIndex + 1] is not ProgramSkillFrame program || !PaidObserverDamageDyingProgramMatches(program, dying) || program.WindowContext?.Window != SkillProgramTriggerWindow.SelfDyingResponse || program.OwnerSeat != dying.VictimSeat || program.InstructionIndex < 1 || ProgramInstructionResolver.Default.Resolve(program, _contentRegistryOperations._contentRegistry.GetSkill(program.SkillId).Program!).GetPausedInstruction(program.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.UseVirtualDyingAlcohol, Target: SkillProgramEffectTarget.Owner } || _resolutionStackOperations._resolutionStack[dyingIndex + 2] is not CardUseFrame use || use.CardId != 0 || use.CardKind != CardKind.Alcohol || use.SourceSeat != dying.VictimSeat || !use.TargetSeats.SequenceEqual([dying.VictimSeat]) || use.Action is not null || use.DyingResponse is not null || use.VirtualBasicReturn is not null || use.PhysicalCardIds is not { Count: 0 } || _resolutionStackOperations._resolutionStack[dyingIndex + 3] is not RecoveryReplacementFrame recovery || recovery.ParentFrameId != use.Id || recovery.Return.ResumeFrameId != use.Id || recovery.Return.Continuation != PostEventContinuation.RecoveryProducer || recovery.Attempt.SourceSeat != dying.VictimSeat || recovery.Attempt.TargetSeat != dying.VictimSeat || recovery.Attempt.Amount != 1 || recovery.Attempt.HpBefore > 0 || recovery.Attempt.Completion is not { Producer: RecoveryAttemptProducer.DyingVirtualAlcohol, InstructionIndex: 0, CardId: 0, CardKind: CardKind.Alcohol } producer || producer.ProgramFrameId != program.Id || producer.DyingFrameId != dying.Id || producer.SkillId != program.SkillId || producer.SkillOwnerSeat != program.OwnerSeat || producer.MoveReason is not null || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == CardKind.Alcohol && e.SourceSeat == dying.VictimSeat) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Any(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual([dying.VictimSeat])))

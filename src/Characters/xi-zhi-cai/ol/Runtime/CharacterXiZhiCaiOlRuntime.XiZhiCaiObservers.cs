@@ -11,8 +11,6 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 140)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 140)]
     internal bool CanContinueIssuedXiZhiCai(ProgramSkillFrame f) => ValidXianfuEcho(f) || ValidChouce(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 150)]
-    internal bool IsXiZhiCaiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => p.BeforeCount == 0 && p.CoverageResultBind is null && (e?.Op == SkillProgramEffectOp.SettleXianfuNativeEcho && f.XianfuPending is { Receipt.Kind: XianfuEchoKind.Recovery } && p.SubjectSeat == f.OwnerSeat && ValidXianfuEcho(f) || e?.Op == SkillProgramEffectOp.ResolveChouceFrozenJudgment && f.Chouce is { Stage: ChouceStage.NativeChildren, TargetSeat: { } target } && p.SubjectSeat == target && ValidChouce(f));
     internal bool XiZhiCaiFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (ValidXianfuEcho(root) && root.XianfuPending is { } echo)
@@ -68,11 +66,6 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     }
 
     internal ProgramSkillFrame? XiZhiCaiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXiZhiCaiOlOperations.XiZhiCaiFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterXiZhiCaiOlOperations.XiZhiCaiObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 120)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 230)]
-    internal bool HasXiZhiCaiDamageObserver(long id) => XiZhiCaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 320)]
-    internal bool HasXiZhiCaiBeforeDamageObserver(long id) => XiZhiCaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 210)]
     internal bool TryAdvanceXiZhiCaiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XiZhiCaiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

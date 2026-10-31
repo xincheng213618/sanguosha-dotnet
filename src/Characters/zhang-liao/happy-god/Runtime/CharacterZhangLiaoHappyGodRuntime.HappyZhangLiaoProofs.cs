@@ -32,8 +32,6 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(w.Id, w with { HappyZhangLiao = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyZlCounterspellEvent(receipt));
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 40980)]
     internal bool HappyZlMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
     {
         if (f.HappyZhangLiao is not { } r || e?.Op != r.Op || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null || r.Stage is not (HappyZlStage.GainChildren or HappyZlStage.SlotChildren or HappyZlStage.RestoreChildren or HappyZlStage.DrawChildren or HappyZlStage.DiscardChildren))
@@ -56,11 +54,6 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
     }
 
     internal ProgramSkillFrame? HappyZlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangLiaoHappyGodOperations.HappyZlFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 40980)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 40980)]
-    internal bool HappyZlDamageObserver(long id) => HappyZlObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 40980)]
-    internal bool HappyZlBeforeDamageObserver(long id) => HappyZlObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40980)]
     internal bool HappyZlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HappyZlObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40980)]

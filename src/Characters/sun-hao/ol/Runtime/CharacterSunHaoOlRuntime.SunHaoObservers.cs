@@ -9,8 +9,6 @@ internal sealed partial class CharacterSunHaoOlRuntime
 {
 
     internal bool IsSunHaoPaymentMovement(ProgramSkillFrame f, CardMovementRecord m) => f.SunHaoCanshi is { Payment: { } p } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > p.Before && m.Sequence <= p.After && (m.CardId == p.CardId && m.From == p.From && m.To == p.To && m.Reason.Value == SunHaoCanshiDiscardReason || p.Kind == CardKind.WoodenOx && p.From == CardLocation.Equipment(f.OwnerSeat) && r.WoodenOxGrain.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 310)]
-    internal bool IsSunHaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && (f.SunHaoCanshi is { Stage: SunHaoCanshiStage.DiscardChildren, Payment: not null } && e?.Op == SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard || f.MobileSunHaoDraw is { Outcome: not null } && e?.Op == SkillProgramEffectOp.GrantSunHaoCanshiDrawObligation);
     internal bool SunHaoLion(ProgramSkillFrame f) => f.SunHaoCanshi is { Payment: { Kind: CardKind.SilverLion, From.Zone: CardZoneKind.Equipment } };
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 110)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 100)]
@@ -31,11 +29,6 @@ internal sealed partial class CharacterSunHaoOlRuntime
     }
 
     internal ProgramSkillFrame? SunHaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterSunHaoOlOperations.SunHaoFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 790)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 900)]
-    internal bool HasSunHaoDamageObserver(long id) => SunHaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 930)]
-    internal bool HasSunHaoBeforeDamageObserver(long id) => SunHaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27330)]
     internal bool AdvanceSunHaoObserver() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SunHaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

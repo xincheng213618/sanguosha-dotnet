@@ -19,15 +19,6 @@ internal sealed partial class CharacterQianZhaoOlRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 150)]
-    internal bool IsQianZhaoMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
-    {
-        var matches = p is { BeforeCount: 0, CoverageResultBind: null } && p.SubjectSeat == f.OwnerSeat && (e?.Op == SkillProgramEffectOp.ResolveWeifuJudgment && f.Weifu is { Stage: not WeifuStage.Judging } || e?.Op == SkillProgramEffectOp.ResolveKuansaiTargetChoice && f.Kuansai is { Stage: KuansaiStage.Children });
-        if (matches)
-            ;
-        return matches;
-    }
-
     internal bool QianZhaoSilverLion(ProgramSkillFrame f, int target, CardMoveReason? reason) => f.Weifu is { Stage: WeifuStage.PaymentChildren, CostFrom.Zone: CardZoneKind.Equipment } w && target == f.OwnerSeat && reason?.Value == WeifuDiscardReason && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == w.CostCardId && m.CardKind == CardKind.SilverLion && m.From == w.CostFrom && m.Reason.Value == WeifuDiscardReason) || f.Kuansai is { Stage: KuansaiStage.Children, Gift: true, From: { Zone: CardZoneKind.Equipment } } k && target == k.ChooserSeat && reason?.Value == KuansaiGiftReason && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > k.Before && m.Sequence <= k.After && m.CardId == k.CardId && m.CardKind == CardKind.SilverLion && m.Reason.Value == KuansaiGiftReason);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 680)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 620)]
@@ -61,11 +52,6 @@ internal sealed partial class CharacterQianZhaoOlRuntime
     }
 
     internal ProgramSkillFrame? QianZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterQianZhaoOlOperations.QianZhaoFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 480)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 590)]
-    internal bool HasQianZhaoDamageObserver(long id) => QianZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 620)]
-    internal bool HasQianZhaoBeforeDamageObserver(long id) => QianZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26620)]
     internal bool AdvanceQianZhaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && QianZhaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 40750)]
     internal bool AnnZlMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (f.AnniversaryZhangLiao is not { } r || effect?.Op != r.Operation || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || r.Stage is not (AnniversaryZhangLiaoStage.PaymentChildren or AnniversaryZhangLiaoStage.DiscardChildren or AnniversaryZhangLiaoStage.SlotChildren or AnniversaryZhangLiaoStage.DrawChildren))
@@ -30,11 +28,6 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
     }
 
     internal ProgramSkillFrame? AnnZlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangLiaoAnniversaryGodOperations.AnnZlFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 40750)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 40750)]
-    internal bool AnnZlDamageObserver(long id) => AnnZlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 40750)]
-    internal bool AnnZlBeforeDamageObserver(long id) => AnnZlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40750)]
     internal bool AnnZlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnnZlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40750)]

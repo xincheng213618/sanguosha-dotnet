@@ -64,14 +64,6 @@ internal sealed partial class MoZhangFeiRuntime
             if (current.Id == root.Id) return true;
         return false;
     }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 33700)]
-    internal bool OwnsHealthDamageObserver(long windowId)
-    {
-        if (frames.Find(windowId) is not DamageTriggerWindowFrame || HealthObserverRoot() is not { } root) return false;
-        for (ResolutionFrame? current = root; current is not null; current = frames.ParentOf(current.Id))
-            if (current.Id == windowId) return true;
-        return false;
-    }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 33700)]
     internal bool AdvanceHealthChildren() => HealthObserverRoot() is not null && healthOperations.AdvanceObserverSubtree();
 }

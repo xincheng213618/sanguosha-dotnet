@@ -17,7 +17,6 @@ internal sealed partial class CharacterSunQuanAnniversaryGodEntries
     internal global::CardGame.Core.ProgramTriggerCandidate AnniversaryMingReturnCandidate(int holder, string binding) => _resolve().AnniversaryMingReturnCandidate(holder, binding);
     internal bool AnniversaryMingTriggerEligible(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().AnniversaryMingTriggerEligible(c, t, w);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> AnniversarySunQuanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AnniversarySunQuanChoices(f);
-    internal bool AnniversarySunQuanMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().AnniversarySunQuanMovementProof(f, effect, pending);
     internal void AnswerAnniversarySunQuan(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerAnniversarySunQuan(selected);
     internal void AppendAnniversarySunQuanMingMovementCandidates(global::CardGame.Core.CardMovementBatchContext batch, global::System.Collections.Generic.List<global::CardGame.Core.ProgramTriggerCandidate> candidates) => _resolve().AppendAnniversarySunQuanMingMovementCandidates(batch, candidates);
     internal bool BanUnavailableAnniversaryChouxi(global::CardGame.Core.ProgramConfiguredViewAsQuery q) => _resolve().BanUnavailableAnniversaryChouxi(q);

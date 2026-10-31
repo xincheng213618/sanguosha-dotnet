@@ -25,11 +25,9 @@ internal sealed partial class CharacterSunJunMobileShiEntries
     internal void ReturnShiSjDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShiSjDraw(f, outcome);
     internal bool ReturnShiSjMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiSjMovement(f);
     internal void SealShiSj(long id) => _resolve().SealShiSj(id);
-    internal bool ShiSjBeforeDamageChild(long id) => _resolve().ShiSjBeforeDamageChild(id);
     internal bool ShiSjCanDiscardRevealed(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiSjCanDiscardRevealed(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiSjChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiSjChoices(f);
     internal bool ShiSjDamageBenefitEligible(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().ShiSjDamageBenefitEligible(owner, instance, c);
-    internal bool ShiSjDamageChild(long id) => _resolve().ShiSjDamageChild(id);
     internal bool ShiSjDyingChild() => _resolve().ShiSjDyingChild();
     internal bool ShiSjEdge(int i) => _resolve().ShiSjEdge(i);
     internal bool ShiSjFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiSjFirstChild(f, child);

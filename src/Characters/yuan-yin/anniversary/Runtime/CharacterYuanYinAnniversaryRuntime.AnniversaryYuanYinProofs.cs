@@ -48,11 +48,6 @@ internal sealed partial class CharacterYuanYinAnniversaryRuntime
             return false;
         return r.Stage != "recovery-children" || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYuanYinBenefitIssuedEvent>().Count(e => e == new AnniversaryYuanYinBenefitIssuedEvent(f.Id, "recovery", f.OwnerSeat, 1)) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49300)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 49300)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49300)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 49300)]
     internal bool YuanYinMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryYuanYin is { Stage: "draw-children" or "gift-children" } && e?.Op is SkillProgramEffectOp.ResolveAnniversaryYuanYinMoshou or SkillProgramEffectOp.ResolveAnniversaryYuanYinYunjiu && p == f.PendingMovementContinuation && ValidYuanYin(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 49300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 49300)]
@@ -76,11 +71,6 @@ internal sealed partial class CharacterYuanYinAnniversaryRuntime
 
     internal bool YuanYinObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && YuanYinFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal ProgramSkillFrame? YuanYinObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterYuanYinAnniversaryOperations.YuanYinFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterYuanYinAnniversaryOperations.YuanYinObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 49300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 49300)]
-    internal bool YuanYinDamageObserver(long id) => YuanYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49300)]
-    internal bool YuanYinBeforeDamageObserver(long id) => YuanYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49300)]
     internal bool YuanYinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && YuanYinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49300)]

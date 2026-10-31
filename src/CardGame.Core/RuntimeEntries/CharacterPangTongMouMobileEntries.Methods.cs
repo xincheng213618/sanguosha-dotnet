@@ -14,11 +14,8 @@ internal sealed partial class CharacterPangTongMouMobileEntries
     internal void FilterMouPtConversion(global::System.Collections.Generic.List<global::CardGame.Core.LegalAction> actions, global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> playable, int? selectedPhysicalCardId = default) => _resolve().FilterMouPtConversion(actions, actor, playable, selectedPhysicalCardId);
     internal bool FinishMouPtDeadSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouPtDeadSource(f);
     internal bool HasMouPangTongExpandedTargets(global::CardGame.Core.CharacterState owner) => _resolve().HasMouPangTongExpandedTargets(owner);
-    internal bool HasMouPtBeforeDamageObserver(long id) => _resolve().HasMouPtBeforeDamageObserver(id);
-    internal bool HasMouPtDamageObserver(long id) => _resolve().HasMouPtDamageObserver(id);
     internal bool IsIssuedMouPtTargets(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().IsIssuedMouPtTargets(candidate, c);
     internal bool IsMouPtDying() => _resolve().IsMouPtDying();
-    internal bool IsMouPtMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouPtMovement(f, effect, pending);
     internal bool IsMouPtRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouPtRecoveryParent(f, recovery);
     internal bool MouPtFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouPtFirstChild(f, child);
     internal bool MouPtLateNotification(global::CardGame.Core.ProgramSkillWindowContext c, global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardConversionSource source, string hash) => _resolve().MouPtLateNotification(c, use, source, hash);

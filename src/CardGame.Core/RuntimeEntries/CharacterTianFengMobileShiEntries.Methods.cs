@@ -17,7 +17,6 @@ internal sealed partial class CharacterTianFengMobileShiEntries
     internal bool ReturnShiTfMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiTfMovement(f);
     internal int ShiTfBackwaters(int owner) => _resolve().ShiTfBackwaters(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiTfChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiTfChoices(f);
-    internal bool ShiTfMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().ShiTfMovement(f, effect, p);
     internal bool ShiTfNobodyDying() => _resolve().ShiTfNobodyDying();
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.MobileShiTianFengGiftEvent> ShiTfOutstandingGifts(int owner, string instance, string hash) => _resolve().ShiTfOutstandingGifts(owner, instance, hash);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.MobileShiTianFengDebtIssuedEvent> ShiTfUseDebts(int owner, string instance, string hash, long action, int actor) => _resolve().ShiTfUseDebts(owner, instance, hash, action, actor);

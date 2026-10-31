@@ -199,9 +199,6 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
     }
 
     internal bool PublicPileCashOutPaymentDestination(ProgramSkillFrame frame, CardMovementRecord movement, CardLocation destination) => movement.To == destination || frame.PublicPileCashOut is { Operation: SkillProgramEffectOp.StoreBoundCardsInPublicPile } receipt && destination == receipt.Pile.Location && movement.From == CardLocation.Equipment(frame.OwnerSeat) && movement.Sequence > receipt.Before && movement.Sequence <= receipt.After && movement.Reason.Value == PublicPileCashOutReason(frame, "payment") && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId && fact.MovementSequence == movement.Sequence && fact.ParentFrameId == frame.Id) == 1;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 10)]
-    internal bool IsPublicPileCashOutMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.PublicPileCashOut is { } receipt && effect?.Op == receipt.Operation && pending == frame.PendingMovementContinuation && ValidPublicPileCashOut(frame);
     internal bool PublicPileCashOutFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (frame.PublicPileCashOut is not { } receipt || !ValidPublicPileCashOut(frame))
@@ -228,7 +225,5 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
     internal ProgramSkillFrame? PublicPileCashOutObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePublicPileCashOutOperations.PublicPileCashOutFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 260)]
     internal bool IsPublicPileCashOutProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PublicPileCashOutObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1920)]
-    internal bool HasPublicPileCashOutDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == id && frame is DamageTriggerWindowFrame) && PublicPileCashOutObserverRoot()is not null;
     SkillProgramStepOutcome global::CardGame.Core.IPublicPileCashOutHost.ExecutePublicPileCashOut(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginPublicPileCashOut(effect, frame);
 }

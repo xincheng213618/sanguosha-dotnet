@@ -36,9 +36,6 @@ internal sealed partial class CoreGameEngineCappedConversionBenefitObserversRunt
 
         return null;
     }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1840)]
-    internal bool HasCappedConversionBenefitObserver(long damageWindowId) => CappedConversionObserverRoot(damageWindowId)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 690)]
     internal bool IsCappedConversionBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is not null && CappedConversionObserverRoot()is not null;
 }

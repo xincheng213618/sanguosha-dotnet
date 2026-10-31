@@ -84,29 +84,6 @@ internal sealed partial class CoreGameEngineDamageColorDuelProgramsRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    internal ProgramSkillFrame? DamageAppearanceDrawObserverRoot(long windowId)
-    {
-        for (var index = 1; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
-        {
-            if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame f || f.DamageAppearanceReceipt is not { DrawIssued: true, RecipientSeat: { } recipient } p || f.WindowContext is not { Window: SkillProgramTriggerWindow.DamageAppliedBeforeDying } c || c.ParentFrameId != windowId || p.DamageWindowFrameId != windowId || p.DamageFrameId != c.DamageFrameId || p.OwnerSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.Id != windowId || w.ParentFrameId != p.DamageFrameId || w.TargetSeat != f.OwnerSeat || f.InstructionIndex != 1 || p.InstructionIndex != 1 || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.DrawByDamageCardColor }] || _resolutionStackOperations._resolutionStack[index + 1] is not CardsMovedTriggerWindowFrame movement || movement.Batch.ParentFrameId != f.Id || movement.Batch.AwaitingProgramFrameId is { } awaiting && awaiting != f.Id || movement.Batch.OriginOwnerSeat != f.OwnerSeat || movement.Batch.OriginSkillId != f.SkillId || movement.Batch.OriginSkillInstanceId != f.SkillInstanceId || movement.Batch.Movements is not [var actual] || actual.From != CardLocation.DrawPile || actual.To != CardLocation.Hand(recipient) || actual.Reason != CardMoveReasons.Draw || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m == actual))
-                continue;
-            return f;
-        }
-
-        return null;
-    }
-
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 50)]
-    internal bool HasDamageAppearanceDrawObserver(long windowId)
-    {
-        if (DamageAppearanceDrawObserverRoot(windowId)is not { } root)
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.Count - 1;
-        while (index >= 1 && _resolutionStackOperations._resolutionStack[index].Id != root.Id && (_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) || _corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1])))
-            index--;
-        return _resolutionStackOperations._resolutionStack[index].Id == root.Id;
-    }
-
     SkillProgramStepOutcome global::CardGame.Core.IDamageColorDuelProgramHost.DrawByDamageCardColor(ProgramSkillFrame frame) => BeginDamageAppearanceDraw(frame);
     SkillProgramStepOutcome global::CardGame.Core.IDamageColorDuelProgramHost.UseSelectedActorDuel(ProgramSkillFrame frame) => BeginSelectedActorDuel(frame);
 }

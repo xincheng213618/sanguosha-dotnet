@@ -49,9 +49,6 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
 
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 54400)]
-    internal bool BoundaryWjMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation continuation) => effect is not null && ValidBoundaryWj(frame) && frame.BoundaryWangJi is { } receipt && effect.Op == receipt.Op && continuation == frame.PendingMovementContinuation && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null && (receipt.Stage == BoundaryWangJiStage.DiscardChildren && continuation.SubjectSeat == receipt.Targets[receipt.Cursor] || receipt.Stage == BoundaryWangJiStage.DrawChildren && continuation.SubjectSeat == receipt.Draw!.RecipientSeat);
     internal bool BoundaryWjChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (!ValidBoundaryWj(frame))
@@ -70,11 +67,6 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
 
     internal bool BoundaryWjSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _resolutionStackOperations2._resolutionStack()[i - 1] is ProgramSkillFrame frame && _characterWangJiBoundaryMobileOperations.BoundaryWjChild(frame, _resolutionStackOperations2._resolutionStack()[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? BoundaryWjRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterWangJiBoundaryMobileOperations.BoundaryWjChild(frame, child), (index) => _characterWangJiBoundaryMobileOperations.BoundaryWjSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 54400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 54400)]
-    internal bool BoundaryWjDamage(long id) => BoundaryWjRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == id && child is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 54400)]
-    internal bool BoundaryWjBeforeDamage(long id) => BoundaryWjRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == id && child is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 54400)]
     internal bool BoundaryWjDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && BoundaryWjRoot()is { } frame && _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(child => child.Id == frame.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 54400)]

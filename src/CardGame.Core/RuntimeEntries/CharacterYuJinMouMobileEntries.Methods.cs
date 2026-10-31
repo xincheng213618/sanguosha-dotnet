@@ -9,8 +9,6 @@ internal sealed partial class CharacterYuJinMouMobileEntries
     internal void CompleteMouJieyue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompleteMouJieyue(f);
     internal void ContinueMouJieyue(long id) => _resolve().ContinueMouJieyue(id);
     internal (global::CardGame.Core.ProgramAiEstimate Estimate, int? TargetSeat) EstimateMouXiayuanForAi(global::CardGame.Core.CharacterState owner, global::CardGame.Core.ProgramAiPublicContext context, global::CardGame.Core.ProgramSkillWindowContext? window) => _resolve().EstimateMouXiayuanForAi(owner, context, window);
-    internal bool HasMouYuJinBeforeDamageObserver(long id) => _resolve().HasMouYuJinBeforeDamageObserver(id);
-    internal bool HasMouYuJinDamageObserver(long id) => _resolve().HasMouYuJinDamageObserver(id);
     internal bool IsMouYuJinDying() => _resolve().IsMouYuJinDying();
     internal bool IsMouYuJinRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouYuJinRecoveryParent(f, recovery);
     internal bool KeepPaidMouYuJin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidMouYuJin(f);

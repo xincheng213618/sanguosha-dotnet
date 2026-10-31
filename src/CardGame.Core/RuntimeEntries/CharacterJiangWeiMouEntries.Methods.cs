@@ -4,8 +4,6 @@ internal sealed partial class CharacterJiangWeiMouEntries
 {
     internal bool IsMouJiangWeiFuzhanExitContext(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().IsMouJiangWeiFuzhanExitContext(c, w);
     internal bool MouJiangWeiAnniversaryAdvanceChildren() => _resolve().MouJiangWeiAnniversaryAdvanceChildren();
-    internal bool MouJiangWeiAnniversaryBeforeDamage(long id) => _resolve().MouJiangWeiAnniversaryBeforeDamage(id);
-    internal bool MouJiangWeiAnniversaryDamageWindow(long id) => _resolve().MouJiangWeiAnniversaryDamageWindow(id);
     internal bool MouJiangWeiAnniversaryDying() => _resolve().MouJiangWeiAnniversaryDying();
     internal bool MouJiangWeiAnniversaryEdge(int i) => _resolve().MouJiangWeiAnniversaryEdge(i);
     internal bool MouJiangWeiAnniversaryFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouJiangWeiAnniversaryFirstChild(f, child);

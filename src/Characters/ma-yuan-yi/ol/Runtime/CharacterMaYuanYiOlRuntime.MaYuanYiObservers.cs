@@ -7,9 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaYuanYiOlRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 320)]
-    internal bool IsMaYuanYiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.MaYuanYi is { Stage: MaYuanYiStage.StoreChildren or MaYuanYiStage.OpponentDrawChildren or MaYuanYiStage.JudgmentChildren } r && e?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MaYuanYiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.MaYuanYi is not { } r)
@@ -28,11 +25,6 @@ internal sealed partial class CharacterMaYuanYiOlRuntime
     }
 
     internal ProgramSkillFrame? MaYuanYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterMaYuanYiOlOperations.MaYuanYiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 830)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 940)]
-    internal bool HasMaYuanYiDamageObserver(long id) => MaYuanYiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 970)]
-    internal bool HasMaYuanYiBeforeDamageObserver(long id) => MaYuanYiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27370)]
     internal bool AdvanceMaYuanYiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MaYuanYiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -305,8 +305,6 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 540)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 560)]
     internal bool CanContinueCompletedUndamagedTargetReveal(ProgramSkillFrame f) => f.CompletedUndamagedTargetReveal is { SelectionIssued: true } && _coreCompletedUndamagedTargetRevealObserversOperations.ValidCompletedUndamagedTargetRevealReceipt(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 150)]
-    internal bool IsCompletedUndamagedTargetRevealMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.RevealUndamagedUseTargetHandAndDiscardSameColor && f.CompletedUndamagedTargetReveal is { MovementIssued: true, Stage: CompletedUndamagedTargetRevealStage.MovementChildren } r && pending.SubjectSeat == r.TargetSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && f.PendingMovementContinuation == pending && _coreCompletedUndamagedTargetRevealObserversOperations.ValidCompletedUndamagedTargetRevealReceipt(f);
     SkillProgramStepOutcome global::CardGame.Core.ICompletedUndamagedTargetRevealProgramHost.CompletedUndamagedTargetReveal(ProgramSkillFrame f) => BeginCompletedUndamagedTargetReveal(f);
     [PublicHandRevealReturn("completed-target-hand-reveal")]
     internal void ContinueCompletedTargetPublicReveal(ProgramSkillFrame f)

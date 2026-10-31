@@ -13,9 +13,7 @@ internal sealed partial class CharacterZhenJiHappyGodEntries
     internal global::CardGame.Core.PromptChoice HappyZjAiReturn(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZjAiReturn(p, f);
     internal global::CardGame.Core.PromptChoice HappyZjAiShenfu(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZjAiShenfu(p, f);
     internal global::CardGame.Core.PromptChoice HappyZjAiStore(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZjAiStore(p, f);
-    internal bool HappyZjBeforeDamageObserver(long id) => _resolve().HappyZjBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyZjChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZjChoices(f);
-    internal bool HappyZjDamageObserver(long id) => _resolve().HappyZjDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyZjDiscards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyZjDiscards(f);
     internal bool HappyZjDying() => _resolve().HappyZjDying();
     internal bool HappyZjEligible(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().HappyZjEligible(c, t, w);

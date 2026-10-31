@@ -64,8 +64,6 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
         var moved = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.SequenceBefore && m.Sequence <= receipt.SequenceAfter && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseHandSeizureRuntime.PhaseHandDebtReturnReason(frame)).ToArray();
         return moving.Length == 0 ? receipt.SequenceBefore == receipt.SequenceAfter && moved.Length == 0 : moved.Length == moving.Length && moving.All(p => moved.Count(m => m.CardId == p.id && m.From == p.from && m.To == CardLocation.Hand(receipt.TargetSeat)) == 1);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 10)]
     internal bool IsPhaseHandSeizureMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (effect?.Op == SkillProgramEffectOp.DiscardTurnOverAndTakeHand && frame.PhaseHandSeizure?.Stage is PhaseHandSeizureStage.PaymentChildren or PhaseHandSeizureStage.TakeChildren && ValidPhaseHandSeizureReceipt(frame) || effect?.Op == SkillProgramEffectOp.ReturnIssuedPhaseHandDebt && frame.PhaseHandDebtReturn?.Stage == PhaseHandDebtReturnStage.MovementChildren && ValidPhaseHandDebtReturnReceipt(frame));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 700)]
     internal bool CanContinuePhaseHandSeizure(ProgramSkillFrame frame)

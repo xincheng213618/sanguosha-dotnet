@@ -17,7 +17,6 @@ internal sealed partial class CharacterPangTongFriendEntries
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.CardSnapshot> FriendPangTongPublicCards() => _resolve().FriendPangTongPublicCards();
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> FriendYangmingActions(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().FriendYangmingActions(frame);
     internal bool HasFriendYangmingQuota(global::CardGame.Core.CharacterState owner) => _resolve().HasFriendYangmingQuota(owner);
-    internal bool IsFriendPangTongMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFriendPangTongMovement(frame, effect, pending);
     internal bool IsFriendYangmingOriginalUseChoice(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind) => _resolve().IsFriendYangmingOriginalUseChoice(owner, card, kind);
     internal bool IsFriendYangmingOriginalUseFrame(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardKind kind) => _resolve().IsFriendYangmingOriginalUseFrame(frame, owner, card, kind);
     internal bool IsFriendYangmingOriginalUseParent(global::CardGame.Core.CardUseFrame use) => _resolve().IsFriendYangmingOriginalUseParent(use);

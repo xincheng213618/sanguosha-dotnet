@@ -4,8 +4,6 @@ internal sealed partial class CharacterDianWeiMouEntries
 {
     internal bool IsMouDianWeiSlashUse(long id) => _resolve().IsMouDianWeiSlashUse(id);
     internal bool MouDianWeiAdvanceChildren() => _resolve().MouDianWeiAdvanceChildren();
-    internal bool MouDianWeiBeforeDamage(long id) => _resolve().MouDianWeiBeforeDamage(id);
-    internal bool MouDianWeiDamageWindow(long id) => _resolve().MouDianWeiDamageWindow(id);
     internal bool MouDianWeiDying() => _resolve().MouDianWeiDying();
     internal bool MouDianWeiEdge(int i) => _resolve().MouDianWeiEdge(i);
     internal bool MouDianWeiFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouDianWeiFirstChild(f, child);

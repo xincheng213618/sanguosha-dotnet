@@ -33,10 +33,6 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
             _ => false
         };
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 50300)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 50300)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 50300)]
     internal bool ShiDaMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.ShiDengAi is { Paid: true } r && ValidShiDa(f) && effect?.Op == r.Op && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && r.Stage is ShiDaStage.DrawChildren or ShiDaStage.RewardChildren or ShiDaStage.HeartChildren or ShiDaStage.CostChildren or ShiDaStage.NativeChildren;
     internal bool ShiDaFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -74,11 +70,6 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     internal bool ShiDaChildEdge(int i) => _characterHuaTuoAnniversaryGodOperations.SkillInvocationStructuralEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || ShiDaNativeEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && ShiDaFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool ShiDaChildSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterDengAiMobileShiOperations.ShiDaChildEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? ShiDaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterDengAiMobileShiOperations.ShiDaFirstChild(f, child), (i) => _characterDengAiMobileShiOperations.ShiDaChildSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 50300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 50300)]
-    internal bool ShiDaDamageObserver(long id) => ShiDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 50300)]
-    internal bool ShiDaBeforeDamageObserver(long id) => ShiDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50300)]
     internal bool ShiDaDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShiDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 50300)]

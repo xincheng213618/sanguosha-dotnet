@@ -53,8 +53,6 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26320)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26320)]
     internal bool ContinueIssuedXunyi(ProgramSkillFrame frame) => ValidXunyi(frame);
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 100)]
-    internal bool IsXunyiMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation continuation) => effect?.Op == SkillProgramEffectOp.SettleXunyiDamagePoint && frame.Xunyi is { Stage: XunyiStage.Children } pending && continuation is { BeforeCount: 0, CoverageResultBind: null } && continuation.SubjectSeat == XunyiStep(pending).Seat && ValidXunyi(frame);
     internal bool XunyiFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (!ValidXunyi(frame) || frame.Xunyi is not { Stage: XunyiStage.Children } pending)
@@ -74,11 +72,6 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 70)]
     internal bool IsXunyiRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame child) => XunyiFirstChild(frame, child);
     internal ProgramSkillFrame? XunyiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterWangFuZhaoLeiMobileOperations.XunyiFirstChild(frame, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 390)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 500)]
-    internal bool HasXunyiDamageObserver(long id) => XunyiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 530)]
-    internal bool HasXunyiBeforeDamageObserver(long id) => XunyiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26320)]
     internal bool AdvanceXunyiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XunyiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -175,9 +175,6 @@ internal sealed partial class CharacterDuFuRenOlRuntime
         ContinueDuFuRen(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 130)]
-    internal bool IsDuFuRenAwaitedMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.DuFuRen is { } r && r.Stage is DuFuRenStage.GiftChildren or DuFuRenStage.RecoveryChildren && (e is null || DuFuRenComposition.IsOperation(e.Op)) && p.BeforeCount == 0 && p.CoverageResultBind is null && p.SubjectSeat == (r.Stage == DuFuRenStage.GiftChildren ? f.OwnerSeat : r.RecipientSeat);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26520)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26520)]
     internal bool ContinuePaidDuFuRen(ProgramSkillFrame f) => f.DuFuRen is { } r && (r.Stage == DuFuRenStage.RecoveryChildren || r.Stage == DuFuRenStage.GiftChildren && r.GiftSequence > 0) && _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;

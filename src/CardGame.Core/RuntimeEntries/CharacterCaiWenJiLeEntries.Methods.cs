@@ -32,7 +32,6 @@ internal sealed partial class CharacterCaiWenJiLeEntries
     internal bool HasIssuedBeifenUse(long useId, int actorSeat) => _resolve().HasIssuedBeifenUse(useId, actorSeat);
     internal bool HasShuangjiaEntityMark(int cardId) => _resolve().HasShuangjiaEntityMark(cardId);
     internal global::CardGame.Core.SkillProgramStepOutcome InitializeShuangjia(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().InitializeShuangjia(supplied);
-    internal bool IsBeifenMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBeifenMovement(f, effect, pending);
     internal bool IsBeifenOwnedLoss(global::CardGame.Core.CardMovementRecord m, int owner) => _resolve().IsBeifenOwnedLoss(m, owner);
     internal bool IsIssuedBeifenCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedBeifenCandidate(c, context);
     internal bool IsIssuedShuangjiaCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedShuangjiaCandidate(candidate, context);

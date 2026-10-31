@@ -44,14 +44,4 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtReceiptsRuntime
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
         return plan.Instructions.Count == 3 && plan.Instructions[0].Op == SkillProgramEffectOp.SelectFrozenHandExchangeDebtPayment && plan.Instructions[0].StateId == paid.StateId && plan.Instructions[0].ResultBind == paid.ResultBind && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseHandExchangeDebtPaymentStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.ExchangeProgramFrameId == paid.ExchangeProgramFrameId && e.Source == _coreHalfHandPhaseDebtProgramsOperations.HalfHandDebtSource(f) && e.GameplayHash == f.GameplayHash && e.StateId == paid.StateId && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.OwnerSeat == f.OwnerSeat && e.PhaseInstanceId == paid.PhaseInstanceId && e.FrozenDifference == paid.FrozenDifference && e.RequiredPaymentCount == paid.RequiredPaymentCount) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 510)]
-    internal bool IsHalfHandPhaseMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && (effect?.Op switch
-    {
-        SkillProgramEffectOp.DrawExtraAndArmHalfHandSupport => ValidHalfHandDraw(f),
-        SkillProgramEffectOp.GiveHalfHandAndIssueTargetSupport => ValidHalfHandGift(f),
-        SkillProgramEffectOp.ExchangeHandsAndArmPhaseDebt => f.PhaseHandExchange is { Issued: true } && ValidPhaseHandExchange(f),
-        SkillProgramEffectOp.OfferHalfHandRecipientSupport => f.HalfHandSupport is { Paid: true } && _resolutionStackOperations._resolutionStack.FirstOrDefault(frame => frame.Id == f.WindowContext?.ParentFrameId)is ActualUseTargetWindowFrame window && _coreHalfHandTargetSupportOperations.HalfHandSupportPaymentMatches(f, window, true),
-        _ => false
-    });
 }

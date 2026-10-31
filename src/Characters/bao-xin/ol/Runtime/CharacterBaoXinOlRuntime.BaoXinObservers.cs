@@ -67,8 +67,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
             return false;
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 390)]
     internal bool IsBaoXinMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.BaoXin is { Paid: true } r && effect?.Op == r.Op && pending == f.PendingMovementContinuation && pending.SubjectSeat == r.Recipient && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool BaoXinMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
     {
@@ -101,11 +99,6 @@ internal sealed partial class CharacterBaoXinOlRuntime
     }
 
     internal ProgramSkillFrame? BaoXinObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterBaoXinOlOperations.BaoXinFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 900)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1010)]
-    internal bool HasBaoXinDamageObserver(long id) => BaoXinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1040)]
-    internal bool HasBaoXinBeforeDamageObserver(long id) => HasBaoXinDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27450)]
     internal bool AdvanceBaoXinChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BaoXinObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

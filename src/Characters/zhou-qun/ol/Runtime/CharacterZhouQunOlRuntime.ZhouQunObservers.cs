@@ -7,9 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouQunOlRuntime
 {
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 510)]
-    internal bool IsZhouQunMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.ZhouQun is { Paid: true } r && effect?.Op == r.Op && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is ZhouQunStage.RevealChildren or ZhouQunStage.GainChildren or ZhouQunStage.ViewChildren or ZhouQunStage.ExchangeChildren or ZhouQunStage.CleanupChildren or ZhouQunStage.JudgmentChildren;
     internal bool ZhouQunMovementMatches(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.ZhouQun!;
@@ -50,11 +47,6 @@ internal sealed partial class CharacterZhouQunOlRuntime
     }
 
     internal ProgramSkillFrame? ZhouQunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhouQunOlOperations.ZhouQunFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1030)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1140)]
-    internal bool HasZhouQunDamageObserver(long id) => ZhouQunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1170)]
-    internal bool HasZhouQunBeforeDamageObserver(long id) => ZhouQunObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 260)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 250)]
     internal bool IsZhouQunRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

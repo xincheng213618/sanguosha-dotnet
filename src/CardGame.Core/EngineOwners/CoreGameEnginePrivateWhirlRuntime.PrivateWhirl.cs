@@ -266,9 +266,6 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
         RequirePrivateWhirl(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 80)]
-    internal bool IsPrivateWhirlMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => CanContinuePrivateWhirl(f) && (effect?.Op is SkillProgramEffectOp.DepositPrivateWhirlUntilNextPlayEnding or SkillProgramEffectOp.DepositPersistentPrivateWhirl or SkillProgramEffectOp.ConsumePrivateWhirlForActualUse or SkillProgramEffectOp.ClearPrivateWhirlAtNextPlayEnding) && pending.SubjectSeat == f.OwnerSeat && pending.CoverageResultBind is null;
     internal void RequirePrivateWhirl(ProgramSkillFrame f)
     {
         if (f.PrivateWhirl is not { } r || r.Source != WhirlSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.WindowId != f.WindowContext?.ParentFrameId || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Count > _corePersistentPrivateWhirlOperations.PrivateWhirlMaximum(f.SkillId) || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.DrawCount < 0 || r.DrawCount > _corePersistentPrivateWhirlOperations.PrivateWhirlMaximum(f.SkillId))

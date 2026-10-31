@@ -11,7 +11,6 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsEntries
     internal global::CardGame.Core.JoinedTrickDamageBenefit? ExactJoinedTrickDamageRewardParent(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExactJoinedTrickDamageRewardParent(frame);
     internal bool HasIssuedJoinedTrickDamageRewardCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HasIssuedJoinedTrickDamageRewardCandidate(candidate, context);
     internal bool HasJoinedTrickOwnerDamage(global::CardGame.Core.CardUseFrame use, int owner) => _resolve().HasJoinedTrickOwnerDamage(use, owner);
-    internal bool IsJoinedTrickDamageRewardAwaitedMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsJoinedTrickDamageRewardAwaitedMovement(frame, effect, pending);
     internal bool ResumeJoinedTrickDamageReward(long id) => _resolve().ResumeJoinedTrickDamageReward(id);
     internal bool ReturnJoinedTrickDamageRewardMovement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnJoinedTrickDamageRewardMovement(frame);
     internal bool ValidJoinedTrickDamageReward(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidJoinedTrickDamageReward(frame);

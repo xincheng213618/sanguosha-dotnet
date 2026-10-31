@@ -30,8 +30,6 @@ internal sealed partial class CoreGameEngineUnequalHandHpObserversRuntime
     internal ProgramSkillFrame? UnequalHandHpObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreUnequalHandHpObserversOperations.UnequalHandHpFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 210)]
     internal bool IsUnequalHandHpDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && UnequalHandHpObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1760)]
-    internal bool HasUnequalHandHpDamageObserver(long id) => UnequalHandHpObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40)]
     internal bool TryAdvanceUnequalHandHpSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && UnequalHandHpObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

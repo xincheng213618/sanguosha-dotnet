@@ -8,9 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
 {
     internal static bool BoundaryZhongyongChildren(BoundaryZhongyongStage stage) => stage is BoundaryZhongyongStage.AcquireSlashChildren or BoundaryZhongyongStage.AcquireDodgeChildren or BoundaryZhongyongStage.GiveSlashChildren or BoundaryZhongyongStage.GiveDodgeChildren;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 53300)]
-    internal bool IsBoundaryZhongyongMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.BoundaryZhongyong is { } r && BoundaryZhongyongChildren(r.Stage) && e?.Op == SkillProgramEffectOp.ResolveBoundaryZhouCangZhongyong && p == f.PendingMovementContinuation && p.SubjectSeat == r.Recipient && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool BoundaryZhongyongFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.BoundaryZhongyong is not { } r || !BoundaryZhongyongChildren(r.Stage))
@@ -25,11 +22,6 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
     }
 
     internal ProgramSkillFrame? BoundaryZhongyongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhouCangBoundaryMobileOperations.BoundaryZhongyongFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 53300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 53300)]
-    internal bool BoundaryZhongyongDamageObserver(long id) => BoundaryZhongyongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 53300)]
-    internal bool BoundaryZhongyongBeforeDamageObserver(long id) => BoundaryZhongyongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 
     internal bool IsBoundaryZhouCangPhysicalClaim(long useId, int cardId)
     {

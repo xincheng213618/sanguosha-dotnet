@@ -187,8 +187,6 @@ internal sealed partial class CharacterBuZhiOlRuntime
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id))
             _coreRuntimeOperations.ReturnRuntimeProgramMovement(f.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 90)]
     internal bool IsBuZhiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op is SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit or SkillProgramEffectOp.ResolveRebelCountEquipmentChoice && f.BuZhi is { Stage: "movement" } r && r.InstructionIndex == f.InstructionIndex && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Movement, 22300)]
     internal bool ReturnBuZhiMovement(ProgramSkillFrame f)

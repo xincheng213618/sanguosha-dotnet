@@ -7,7 +7,6 @@ internal sealed partial class CharacterZhuHuanBoundaryMobileEntries
     internal global::CardGame.Core.PromptChoice BoundaryPingkouAi(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryPingkouAi(pending, frame);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryPingkouChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryPingkouChoices(frame);
     internal int BoundaryPingkouMaximum(int owner) => _resolve().BoundaryPingkouMaximum(owner);
-    internal bool BoundaryPingkouPaidMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().BoundaryPingkouPaidMovement(frame, effect, pending);
     internal bool CanOfferBoundaryZhuHuan(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().CanOfferBoundaryZhuHuan(gate);
     internal void CompleteBoundaryPingkou(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CompleteBoundaryPingkou(frame);
     internal bool ContinueBoundaryPingkou(long id) => _resolve().ContinueBoundaryPingkou(id);

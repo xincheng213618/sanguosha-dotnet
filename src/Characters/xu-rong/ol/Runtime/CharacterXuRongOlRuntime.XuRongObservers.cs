@@ -99,8 +99,6 @@ internal sealed partial class CharacterXuRongOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 190)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 190)]
     internal bool CanContinueIssuedXuRong(ProgramSkillFrame f) => ValidXuRong(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 190)]
-    internal bool IsXuRongMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e is not null && (e.Op is SkillProgramEffectOp.SettleXionghuoMarkedPlay or SkillProgramEffectOp.ReplenishShaJueAndClaimDyingCause) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && (f.XuRong?.Stage is "take-native" or "claim-native") && ValidXuRong(f);
     internal bool XuRongFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (!ValidXuRong(root) || root.XuRong is not { } r)
@@ -123,11 +121,6 @@ internal sealed partial class CharacterXuRongOlRuntime
     }
 
     internal ProgramSkillFrame? XuRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXuRongOlOperations.XuRongFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 150)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 260)]
-    internal bool HasXuRongDamageObserver(long id) => XuRongObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 350)]
-    internal bool HasXuRongBeforeDamageObserver(long id) => XuRongObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 260)]
     internal bool TryAdvanceXuRongSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XuRongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramContinuation(ProgramContinuationKind.Resume, 23600)]

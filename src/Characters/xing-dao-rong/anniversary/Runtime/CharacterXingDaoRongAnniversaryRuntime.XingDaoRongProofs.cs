@@ -44,9 +44,6 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
 
         return r.Draw is null && r.Discard is null && (r.Stage == XingDaoRongXuHeStage.Next || r.Stage == XingDaoRongXuHeStage.Card && r.Mode == "discard" || r.Stage == XingDaoRongXuHeStage.Drawing && r.Mode == "draw");
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 45700)]
-    internal bool XingDaoRongMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.XingDaoRongXuHe is { Stage: XingDaoRongXuHeStage.DiscardChildren or XingDaoRongXuHeStage.DrawChildren } && ValidXingDaoRong(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryXingDaoRongXuHe && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool XingDaoRongFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.XingDaoRongXuHe is not { } r || !ValidXingDaoRong(f))
@@ -72,11 +69,6 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 45700)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 45700)]
     internal bool XingDaoRongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame r) => XingDaoRongFirstChild(f, r);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 45700)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 45700)]
-    internal bool XingDaoRongDamageObserver(long id) => XingDaoRongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 45700)]
-    internal bool XingDaoRongBeforeDamageObserver(long id) => XingDaoRongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 45700)]
     internal bool AdvanceXingDaoRongObserver() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XingDaoRongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

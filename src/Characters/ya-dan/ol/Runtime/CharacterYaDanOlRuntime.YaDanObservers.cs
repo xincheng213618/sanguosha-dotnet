@@ -25,14 +25,6 @@ internal sealed partial class CharacterYaDanOlRuntime
         return IsIssuedQingyaCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 290)]
-    internal bool IsYaDanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (f.YaDan is not { Stage: QingyaStage.DiscardChildren or QingyaStage.NativeChildren } || !IsYaDanOperation(effect?.Op ?? default) || pending != f.PendingMovementContinuation)
-            return false;
-        return true;
-    }
-
     internal bool YaDanFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.YaDan is not { } r)
@@ -45,11 +37,6 @@ internal sealed partial class CharacterYaDanOlRuntime
     }
 
     internal ProgramSkillFrame? YaDanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterYaDanOlOperations.YaDanFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 750)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 860)]
-    internal bool HasYaDanDamageObserver(long id) => YaDanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 890)]
-    internal bool HasYaDanBeforeDamageObserver(long id) => YaDanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27260)]
     internal bool AdvanceYaDanObserver() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && YaDanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

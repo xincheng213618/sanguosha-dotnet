@@ -74,11 +74,6 @@ internal sealed partial class CharacterCaiMaoOlRuntime
     }
 
     internal ProgramSkillFrame? CaiMaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterCaiMaoOlOperations.CaiMaoFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 740)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 850)]
-    internal bool HasCaiMaoDamageObserver(long id) => CaiMaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 880)]
-    internal bool HasCaiMaoBeforeDamageObserver(long id) => HasCaiMaoDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27250)]
     internal bool AdvanceCaiMaoChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaiMaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

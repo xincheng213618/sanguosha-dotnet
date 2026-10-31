@@ -286,9 +286,6 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 200)]
-    internal bool IsOriginalHandEntityMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.OfferOriginalHandLossBenefit && f.OriginalHandBenefit is { Stage: OriginalHandBenefitStage.DrawChildren } r && f.PendingMovementContinuation == pending && pending.SubjectSeat == r.TargetSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && _coreOriginalHandEntityObserversOperations.ValidOriginalHandBenefitReceipt(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 590)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 610)]
     internal bool CanContinueOriginalHandEntityProgram(ProgramSkillFrame f) => f.OriginalHandBenefit is { DrawIssued: true } && _coreOriginalHandEntityObserversOperations.ValidOriginalHandBenefitReceipt(f) || f.OriginalHandInheritance is not null && _coreOriginalHandEntityObserversOperations.ValidOriginalHandInheritanceReceipt(f) || f.OriginalHandAwakening is not null && _coreOriginalHandAwakeningOperations.ValidOriginalHandAwakeningReceipt(f);

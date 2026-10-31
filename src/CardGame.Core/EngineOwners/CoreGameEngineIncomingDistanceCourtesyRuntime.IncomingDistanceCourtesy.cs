@@ -223,8 +223,6 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyRuntime
 
     [ProgramDistanceRule(ProgramDistanceStage.IncomingContributions, 10)]
     internal IEnumerable<RuleQueryContribution> IncomingDistanceCourtesyContributions(int target) => !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AdjustIncomingDistanceByLivingFactions) && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseEndingCourtesyBenefits) ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<IncomingDistanceChangedEvent>().Where(e => e.Source.OwnerSeat == target).Select(e => (RuleQueryContribution)new FiniteRuleQueryContribution($"incoming-distance:{(e.ProgramFrameId)}:{(e.StepIndex)}", SkillRuleOperation.Add, e.Amount));
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 420)]
-    internal bool IsIncomingDistanceCourtesyMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.IncomingDistanceCourtesy is { Stage: IncomingDistanceCourtesyStage.MovementChildren } r && e is not null && IncomingDistanceCourtesyContract.IsOperation(e.Op) && r.Movements.LastOrDefault()is { } m && p.SubjectSeat == m.SubjectSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 460)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 450)]
     internal bool CanContinueIncomingDistanceCourtesy(ProgramSkillFrame f)

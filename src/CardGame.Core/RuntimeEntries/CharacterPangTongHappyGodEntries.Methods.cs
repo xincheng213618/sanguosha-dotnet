@@ -22,7 +22,6 @@ internal sealed partial class CharacterPangTongHappyGodEntries
     internal bool HappyPtDrawOutcomeProof(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyPtDrawOutcomeProof(f);
     internal long[] HappyPtDue(int owner, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().HappyPtDue(owner, context);
     internal bool HappyPtIssuedPlanProof(global::CardGame.Core.HappyPangTongPlanIssuedEvent plan) => _resolve().HappyPtIssuedPlanProof(plan);
-    internal bool HappyPtMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().HappyPtMovement(f, effect, pending);
     internal bool HappyPtOriginalCandidate(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HappyPtOriginalCandidate(f);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.HappyPangTongPlanIssuedEvent> HappyPtOutstanding(int owner) => _resolve().HappyPtOutstanding(owner);
     internal global::CardGame.Core.HappyPangTongPlanIssuedEvent HappyPtPlan(long id) => _resolve().HappyPtPlan(id);

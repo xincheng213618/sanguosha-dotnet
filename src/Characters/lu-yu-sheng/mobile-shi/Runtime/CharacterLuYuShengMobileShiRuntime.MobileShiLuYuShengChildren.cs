@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuYuShengMobileShiRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 67400)]
     internal bool ShiLysMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MobileShiLuYuSheng is { Stage: 9 or 10 or 11 or 13 } r && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Source?.OwnerSeat == f.OwnerSeat && r.GameplayHash == f.GameplayHash && effect?.Op is SkillProgramEffectOp.ResolveMobileShiRunweiGrant or SkillProgramEffectOp.ResolveMobileShiRunweiPhaseEnd or SkillProgramEffectOp.ResolveMobileShiShuanghuaiGuard;
     internal bool ShiLysFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -35,11 +34,6 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
     internal ProgramSkillFrame? ShiLysObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLuYuShengMobileShiOperations.ShiLysFirstChild(f, c), (n) => _characterLuYuShengMobileShiOperations.ShiLysChildSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 67400)]
     internal bool ShiLysDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiLysObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 67400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 67400)]
-    internal bool ShiLysDamageChild(long id) => ShiLysObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 67400)]
-    internal bool ShiLysBeforeDamageChild(long id) => ShiLysObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 67400)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 67400)]
     internal bool ShiLysRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

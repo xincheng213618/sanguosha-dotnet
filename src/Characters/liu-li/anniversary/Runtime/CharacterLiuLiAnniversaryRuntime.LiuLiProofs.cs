@@ -62,8 +62,6 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             return false;
         return r.DrawCount == 0 ? r.Draw is null : r.Draw is { } draw && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.DrawCount && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiDrawReturnedEvent>().Count(e => e == new AnniversaryLiuLiDrawReturnedEvent(f.Id, r.DrawCount, draw.ActualDrawIds.Count, r.Before, r.After)) == 1;
     }
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 43300)]
-    internal bool LiuLiMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryLiuLi is { Stage: AnniversaryLiuLiStage.CostChildren or AnniversaryLiuLiStage.DrawChildren } && ValidLiuLi(f) && e?.Op == SkillProgramEffectOp.ResolveAnniversaryLiuLiFuli && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 43300)]
     internal bool KeepPaidLiuLi(ProgramSkillFrame f) => f.AnniversaryLiuLi is { Stage: AnniversaryLiuLiStage.CostChildren or AnniversaryLiuLiStage.Drawing or AnniversaryLiuLiStage.DrawChildren or AnniversaryLiuLiStage.RangeTarget or AnniversaryLiuLiStage.NativeUse or AnniversaryLiuLiStage.ReturnedUse or AnniversaryLiuLiStage.SkillChildren } && ValidLiuLi(f);
@@ -79,11 +77,6 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     }
 
     internal ProgramSkillFrame? LiuLiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLiuLiAnniversaryOperations.LiuLiFirstChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 43300)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 43300)]
-    internal bool LiuLiDamageObserver(long id) => LiuLiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 43300)]
-    internal bool LiuLiBeforeDamageObserver(long id) => LiuLiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 43300)]
     internal bool AdvanceLiuLiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuLiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

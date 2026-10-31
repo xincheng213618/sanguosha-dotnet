@@ -212,9 +212,6 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29050)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29050)]
     internal bool PermitPaidMouKurou(ProgramSkillFrame frame) => frame.MouHuangGaiKurou?.Gift is not null && ValidMouKurou(frame);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 400)]
-    internal bool IsMouKurouMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveMouHuangGaiKurouGift && frame.MouHuangGaiKurou is { Stage: MouHuangGaiKurouStage.GiftChildren or MouHuangGaiKurouStage.LossRequested or MouHuangGaiKurouStage.LossChildren } && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidMouKurou(frame);
     internal bool MouKurouFirstChild(ProgramSkillFrame frame, ResolutionFrame child)
     {
         if (frame.MouHuangGaiKurou is not { Gift: { } gift } receipt || !ValidMouKurou(frame))
@@ -234,11 +231,6 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
 
     internal bool MouKurouObserverSuffix(int index) => _resolutionStackOperations._resolutionStack[index + 1] is DyingFrame original && index + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index + 1, original) || _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame parent && _characterHuangGaiMouMobileOperations.MouKurouFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? MouKurouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterHuangGaiMouMobileOperations.MouKurouFirstChild(frame, child), (index) => _characterHuangGaiMouMobileOperations.MouKurouObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1380)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1490)]
-    internal bool HasMouKurouDamageObserver(long id) => MouKurouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1510)]
-    internal bool HasMouKurouBeforeDamageObserver(long id) => MouKurouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 730)]
     internal bool IsMouKurouDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouKurouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 600)]

@@ -16,8 +16,6 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> KongwuEffectiveEquipment2(int seat) => _resolve().KongwuEffectiveEquipment(seat);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> KongwuUsableWoodenOxGrain(global::CardGame.Core.CharacterState player) => _resolve().KongwuUsableWoodenOxGrain(player);
     internal bool MouHuCheErAdvanceChildren() => _resolve().MouHuCheErAdvanceChildren();
-    internal bool MouHuCheErBeforeDamage(long id) => _resolve().MouHuCheErBeforeDamage(id);
-    internal bool MouHuCheErDamageWindow(long id) => _resolve().MouHuCheErDamageWindow(id);
     internal int MouHuCheErDrawPenalty(global::CardGame.Core.CharacterState player) => _resolve().MouHuCheErDrawPenalty(player);
     internal bool MouHuCheErDying() => _resolve().MouHuCheErDying();
     internal bool MouHuCheErEdge(int i) => _resolve().MouHuCheErEdge(i);

@@ -29,10 +29,8 @@ internal sealed partial class CharacterWuFuAnniversaryEntries
     internal bool ValidWuFu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidWuFu(f);
     internal void ValidateWuFuUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateWuFuUse(use);
     internal bool WindowSettlement_IsAnniversaryWuFuSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsAnniversaryWuFuSettlementBatch(frame, batch);
-    internal bool WuFuBeforeDamageObserver(long id) => _resolve().WuFuBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> WuFuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WuFuChoices(f);
     internal int WuFuChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().WuFuChooser(f);
-    internal bool WuFuDamageObserver(long id) => _resolve().WuFuDamageObserver(id);
     internal bool WuFuDying() => _resolve().WuFuDying();
     internal bool WuFuFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().WuFuFirstChild(f, child);
     internal bool WuFuLegalUseBan(global::CardGame.Core.ProgramLegalActionQuery q) => _resolve().WuFuLegalUseBan(q);

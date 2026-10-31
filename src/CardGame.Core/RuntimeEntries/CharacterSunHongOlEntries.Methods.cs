@@ -21,8 +21,6 @@ internal sealed partial class CharacterSunHongOlEntries
     internal void FinishZenrun(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishZenrun(f);
     internal bool HasPrintedGeneralSkillTargetBan(global::CardGame.Core.CardConversionSource source, int target) => _resolve().HasPrintedGeneralSkillTargetBan(source, target);
     internal bool HasPrintedGeneralSkillTargetBan2(int owner, string skillId, int target, string? skillInstanceId = default) => _resolve().HasPrintedGeneralSkillTargetBan(owner, skillId, target, skillInstanceId);
-    internal bool HasSunHongBeforeDamageObserver(long id) => _resolve().HasSunHongBeforeDamageObserver(id);
-    internal bool HasSunHongDamageObserver(long id) => _resolve().HasSunHongDamageObserver(id);
     internal bool IsSunHongMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsSunHongMovement(f, effect, pending);
     internal bool IsSunHongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsSunHongRecoveryParent(f, recovery);
     internal global::CardGame.Core.ProgramSkillFrame PrepareXianbiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.XianbiStage stage) => _resolve().PrepareXianbiMovement(f, stage);

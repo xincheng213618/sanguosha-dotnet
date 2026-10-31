@@ -290,9 +290,6 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
         ContinueShenHuaTuo(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 38700)]
-    internal bool ShenHtMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ShenHuaTuo is { Stage: ShenHuaTuoStage.DrawChildren or ShenHuaTuoStage.DiscardChildren } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 38700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 38700)]
     internal bool ContinueIssuedShenHt(ProgramSkillFrame f) => f.ShenHuaTuo is not null;

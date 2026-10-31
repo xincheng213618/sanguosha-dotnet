@@ -27,7 +27,6 @@ internal sealed partial class CharacterDongZhaoMouOlEntries
     internal bool DrainMouDongZhao(long id) => _resolve().DrainMouDongZhao(id);
     internal bool ExactMouShunjiWindow(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactMouShunjiWindow(f);
     internal void GrantMouYishi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GrantMouYishi(f);
-    internal bool HasMouDongZhaoDamageObserver(long id) => _resolve().HasMouDongZhaoDamageObserver(id);
     internal bool IsIssuedMouYishiCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedMouYishiCandidate(candidate, context);
     internal bool IsMouDongZhaoDying() => _resolve().IsMouDongZhaoDying();
     internal bool IsMouDongZhaoMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouDongZhaoMovement(f, effect, pending);

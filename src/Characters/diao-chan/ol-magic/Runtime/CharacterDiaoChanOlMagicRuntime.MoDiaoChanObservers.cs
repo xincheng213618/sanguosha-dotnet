@@ -21,8 +21,6 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     }
 
     internal bool DrainMoDc(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 31400)]
-    internal bool IsMoDcMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e is not null && MoDiaoChanComposition.Handles(e.Op) && ValidMoDc(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MoDcLionChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.MoDiaoChan is not { Stage: MoDiaoChanStage.CostChildren } || !ValidMoDc(f))
@@ -55,11 +53,6 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
 
     internal bool MoDcObserverSuffix(int index) => _resolutionStackOperations._resolutionStack[index + 1] is DyingFrame d && index + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame f && _characterDiaoChanOlMagicOperations.MoDcFirstChild(f, _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? MoDcObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterDiaoChanOlMagicOperations.MoDcFirstChild(f, child), (n) => _characterDiaoChanOlMagicOperations.MoDcObserverSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 31400)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 31400)]
-    internal bool MoDcDamageObserver(long id) => MoDcObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 31400)]
-    internal bool MoDcBeforeDamageObserver(long id) => MoDcObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 31400)]
     internal bool MoDcDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MoDcObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 31400)]

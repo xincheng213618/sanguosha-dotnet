@@ -17,14 +17,6 @@ internal sealed partial class CharacterYangFengOlRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 580)]
-    internal bool IsYangFengMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
-    {
-        if (f.YangFeng is not { Movements.Count: > 0 } r || e?.Op != r.Op || p != f.PendingMovementContinuation)
-            return false;
-        return true;
-    }
-
     internal bool YangFengLionProof(ProgramSkillFrame f, int seat, CardMoveReason? reason)
     {
         var m = f.YangFeng!.Movements[^1];
@@ -55,11 +47,6 @@ internal sealed partial class CharacterYangFengOlRuntime
     }
 
     internal ProgramSkillFrame? YangFengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterYangFengOlOperations.YangFengFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 690)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 800)]
-    internal bool HasYangFengDamageObserver(long id) => YangFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 830)]
-    internal bool HasYangFengBeforeDamageObserver(long id) => YangFengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27150)]
     internal bool AdvanceYangFengSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && YangFengObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

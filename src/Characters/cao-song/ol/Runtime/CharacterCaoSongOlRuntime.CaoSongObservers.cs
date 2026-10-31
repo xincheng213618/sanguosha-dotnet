@@ -24,9 +24,6 @@ internal sealed partial class CharacterCaoSongOlRuntime
     }
 
     internal ProgramSkillFrame? CaoSongLiluObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCaoSongOlOperations.CaoSongLiluFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 310)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 420)]
-    internal bool HasCaoSongLiluDamageObserver(long id) => CaoSongLiluObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == id && frame is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26030)]
     internal bool TryAdvanceCaoSongLiluSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoSongLiluObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

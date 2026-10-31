@@ -10,7 +10,6 @@ internal sealed partial class CharacterLiuPiOlEntries
     internal bool ContinueIssuedLiuPiExchange(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueIssuedLiuPiExchange(f);
     internal void ContinueLiuPiExchange(long id) => _resolve().ContinueLiuPiExchange(id);
     internal bool DrainLiuPiChildren(long id) => _resolve().DrainLiuPiChildren(id);
-    internal bool HasLiuPiDamageObserver(long id) => _resolve().HasLiuPiDamageObserver(id);
     internal void IssueLiuPiExchange(global::CardGame.Core.ProgramSkillFrame f, bool full) => _resolve().IssueLiuPiExchange(f, full);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LiuPiTableEntry> LiuPiAvailableTable(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LiuPiAvailableTable(f);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> LiuPiChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LiuPiChoices(f);

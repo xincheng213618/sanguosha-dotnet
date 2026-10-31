@@ -219,9 +219,6 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 110)]
-    internal bool IsPairedColorDispositionMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.OfferPairedColorCardDisposition && f.PairedColorDisposition is { Stage: PairedColorDispositionStage.MovementChildren } r && f.PendingMovementContinuation == pending && pending.SubjectSeat == r.CounterpartSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ExactPairedColorDispositionParent(f, out _, out _, out var counterpart) && counterpart == r.CounterpartSeat;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 510)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 530)]
     internal bool CanContinuePairedColorDisposition(ProgramSkillFrame f) => f.PairedColorDisposition is { Stage: PairedColorDispositionStage.MovementChildren } && _corePairedColorResponseObserversOperations.ValidPairedColorDispositionReceipt(f);

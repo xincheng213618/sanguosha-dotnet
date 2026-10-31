@@ -319,9 +319,6 @@ internal sealed partial class CharacterLiuBeiSpOl664Runtime
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             CompleteOlSpAdjustment(frame);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 5431)]
-    internal bool IsOlSpJingleiMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation movement) => effect?.Op == SkillProgramEffectOp.ResolveOlSpLiuBeiJinglei && frame.OlSpLiuBei664 is { Stage: "discarding" or "giving" or "drawing-return" } && movement.SubjectSeat == frame.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Resume, 5431)]
     internal bool ResumeOlSpJingleiMovement(long id)
     {

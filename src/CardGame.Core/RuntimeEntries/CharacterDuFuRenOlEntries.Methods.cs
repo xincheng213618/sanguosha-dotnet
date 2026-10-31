@@ -31,8 +31,6 @@ internal sealed partial class CharacterDuFuRenOlEntries
     internal int DuFuRenPhaseBonus(int ownerSeat, global::CardGame.Core.SkillRuleQuery query) => _resolve().DuFuRenPhaseBonus(ownerSeat, query);
     internal int DuFuRenYiseDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().DuFuRenYiseDamageBonus(attack);
     internal bool ExcludeOrdinaryMovement_IsDuFuRenYiseTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsDuFuRenYiseTrigger(candidate, trigger);
-    internal bool HasDuFuRenDamageObserver(long id) => _resolve().HasDuFuRenDamageObserver(id);
-    internal bool IsDuFuRenAwaitedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsDuFuRenAwaitedMovement(f, e, p);
     internal bool IsDuFuRenGiftContext(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsDuFuRenGiftContext(c, context);
     internal bool IsDuFuRenRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDuFuRenRecoveryParent(f, recovery);
     internal void PrepareDuFuRenChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().PrepareDuFuRenChainAdvance(attack);

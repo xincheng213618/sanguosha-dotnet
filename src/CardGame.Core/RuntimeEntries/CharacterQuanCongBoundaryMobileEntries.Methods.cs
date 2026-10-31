@@ -12,7 +12,6 @@ internal sealed partial class CharacterQuanCongBoundaryMobileEntries
     internal (int Remaining, string? Pending) BoundaryYaomingState(int owner, string instance) => _resolve().BoundaryYaomingState(owner, instance);
     internal void CompleteBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CompleteBoundaryYaoming(frame);
     internal bool ContinueBoundaryYaoming(long id) => _resolve().ContinueBoundaryYaoming(id);
-    internal bool IsBoundaryYaomingPaidMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? paidEffect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBoundaryYaomingPaidMovement(frame, paidEffect, pending);
     internal bool KeepPaidBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepPaidBoundaryYaoming(frame);
     internal bool OriginalBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().OriginalBoundaryYaoming(frame);
     internal void PublishBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishBoundaryYaoming(frame);

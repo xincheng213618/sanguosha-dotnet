@@ -13,7 +13,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsEntries
     internal bool FirstSlashDuelDeclaredKindMatches(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.CardKind declaredKind) => _resolve().FirstSlashDuelDeclaredKindMatches(use, declaredKind);
     internal global::CardGame.Core.CardConversionSource FirstSlashDuelSource(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FirstSlashDuelSource(f);
     internal bool IsFirstSlashDuelAction(int owner, global::CardGame.Core.CardActionContext action, global::CardGame.Core.CardUseFrame use) => _resolve().IsFirstSlashDuelAction(owner, action, use);
-    internal bool IsFirstSlashDuelMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsFirstSlashDuelMovement(f, e, pending);
     internal void ObserveFirstSlashDuelDeclaration(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveFirstSlashDuelDeclaration(payload);
     internal void ResolveFirstSlashDuelChoice(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveFirstSlashDuelChoice(selected);
     internal bool ResumeFirstSlashDuelBenefit(long id) => _resolve().ResumeFirstSlashDuelBenefit(id);

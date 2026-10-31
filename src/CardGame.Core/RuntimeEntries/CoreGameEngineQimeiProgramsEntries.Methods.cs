@@ -17,7 +17,6 @@ internal sealed partial class CoreGameEngineQimeiProgramsEntries
     internal bool ExcludeOrdinaryMovement_IsQimeiEqualityTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsQimeiEqualityTrigger(candidate, trigger);
     internal bool HasQimeiHealthSubject(int seat) => _resolve().HasQimeiHealthSubject(seat);
     internal bool IsQimeiEqualityTrigger(global::CardGame.Core.SkillProgramTrigger t) => _resolve().IsQimeiEqualityTrigger(t);
-    internal bool IsQimeiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsQimeiMovement(f, e, p);
     internal void ObserveQimeiExpiry(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveQimeiExpiry(payload);
     internal bool? ProveQimeiHealth(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ProveQimeiHealth(trigger, candidate, context);
     internal bool? ProveQimeiMovement(global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().ProveQimeiMovement(trigger, candidate, context);

@@ -109,9 +109,6 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 650)]
     internal bool IsPrepDiscardProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PrepDiscardPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1810)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 190)]
-    internal bool HasPrepDiscardDamageObserver(long id) => PrepDiscardPaidObserverRoot(id)is not null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 20)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 20)]
     internal bool IsPrepDiscardRecoveryParent(ProgramSkillFrame root, RecoveryReplacementFrame recovery)

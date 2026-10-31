@@ -20,10 +20,7 @@ internal sealed partial class CharacterChengGongYingOlEntries
     internal void ContinueChengGongYing(long id) => _resolve().ContinueChengGongYing(id);
     internal bool ContinuePaidChengGongYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidChengGongYing(f);
     internal void FinishChengGongYing(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishChengGongYing(f);
-    internal bool HasChengGongYingBeforeDamageObserver(long id) => _resolve().HasChengGongYingBeforeDamageObserver(id);
-    internal bool HasChengGongYingDamageObserver(long id) => _resolve().HasChengGongYingDamageObserver(id);
     internal bool IsChengGongYingIssuedMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.CardMovementRecord m) => _resolve().IsChengGongYingIssuedMovement(f, m);
-    internal bool IsChengGongYingMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsChengGongYingMovement(f, effect, movement);
     internal void IssueChengGongYingDiscard(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueChengGongYingDiscard(f);
     internal void IssueChengGongYingDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueChengGongYingDraw(f);
     internal bool KuangxiangDrawGrantConsumed(long id) => _resolve().KuangxiangDrawGrantConsumed(id);

@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNamedHandChoiceObserversRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 30)]
     internal bool IsNamedHandChoiceMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement)
     {
         if (movement.SubjectSeat != f.OwnerSeat || movement.BeforeCount != 0 || movement.CoverageResultBind is not null)
@@ -58,8 +57,6 @@ internal sealed partial class CoreGameEngineNamedHandChoiceObserversRuntime
     }
 
     internal ProgramSkillFrame? NamedHandChoiceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreNamedHandChoiceObserversOperations.NamedHandChoiceFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1620)]
-    internal bool HasNamedHandChoiceDamageObserver(long id) => NamedHandChoiceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 80)]
     internal bool TryAdvanceNamedHandChoiceSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && NamedHandChoiceObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

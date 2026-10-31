@@ -53,12 +53,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     }
 
     internal ProgramSkillFrame? LvKuangLvXiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLvKuangLvXiangOlOperations.LvKuangLvXiangFirstChild(f, c), (i) => _characterLvKuangLvXiangOlOperations.LvKuangLvXiangObserverSuffix(i));
-
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 280)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 390)]
-    internal bool HasLvKuangLvXiangDamageObserver(long id) => LvKuangLvXiangObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 480)]
-    internal bool HasLvKuangLvXiangBeforeDamageObserver(long id) => LvKuangLvXiangObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 390)]
     internal bool TryAdvanceLvKuangLvXiangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LvKuangLvXiangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

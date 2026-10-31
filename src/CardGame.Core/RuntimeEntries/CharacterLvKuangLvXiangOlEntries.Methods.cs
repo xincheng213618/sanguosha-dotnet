@@ -18,9 +18,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlEntries
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteLvKuangLvXiang(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().ExecuteLvKuangLvXiang(supplied, op);
     internal void FinishLvKuangLvXiang(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishLvKuangLvXiang(f);
     internal bool FinishQigongFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => _resolve().FinishQigongFactionDeclined(id, pending);
-    internal bool HasLvKuangLvXiangBeforeDamageObserver(long id) => _resolve().HasLvKuangLvXiangBeforeDamageObserver(id);
-    internal bool HasLvKuangLvXiangDamageObserver(long id) => _resolve().HasLvKuangLvXiangDamageObserver(id);
-    internal bool IsLvKuangLvXiangMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsLvKuangLvXiangMovement(f, e, p);
     internal bool IsQigongDeclarationChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().IsQigongDeclarationChild(f, child);
     internal bool IsQigongDeclarationQuery(global::CardGame.Core.CharacterState actor, int? selectedId) => _resolve().IsQigongDeclarationQuery(actor, selectedId);
     internal bool IsQigongIssuedDistance(long? id, int actor) => _resolve().IsQigongIssuedDistance(id, actor);

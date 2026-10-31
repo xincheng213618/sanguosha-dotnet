@@ -1,6 +1,6 @@
 namespace CardGame.Core;
 
-[ProgramRuntimeModule, ProgramCapability]
+[ProgramRuntimeModule,ProgramCapability]
 internal sealed class BoundaryCaoCaoRuntime(IProgramRuntimeFrames frames, IProgramEventHistoryQueries history,
     ICardMovementHistoryQueries movements, ICardMovementBatchQueue batches, IProgramDamageCardMaterialQueries materials,
     IProgramDamageCardClaims claims, IBoundCardMovementContinuationHost movementReturns) : IBoundaryCaoCaoHost
@@ -9,24 +9,6 @@ internal sealed class BoundaryCaoCaoRuntime(IProgramRuntimeFrames frames, IProgr
     {
         claims.Claim(frame.Id, frame.OwnerSeat, new(BoundaryCaoCaoMobile.ClaimReason));
         return movementReturns.AwaitBoundCardMovements(frame.Id, frame.OwnerSeat);
-    }
-
-    // The ordinary claim owns material/group accounting; the committed claim
-    // and its original damage window prove the same paid movement return.
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 58700)]
-    private bool ClaimMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending)
-    {
-        if (effect?.Op != SkillProgramEffectOp.ClaimBoundaryCaoCaoJianxiongDamageCards ||
-            frame.SkillId != BoundaryCaoCaoMobile.Jianxiong || frame.InstructionIndex != 1 ||
-            pending != frame.PendingMovementContinuation || pending.SubjectSeat != frame.OwnerSeat || pending.BeforeCount != 0 ||
-            pending.CoverageResultBind is not null || CommittedClaim(frame) is not { } claim) return false;
-        var journal = movements.Read();
-        return Enumerable.Range(0, batches.PendingBatchCount).Select(batches.PendingBatchAt)
-            .Concat(frames.OfType<CardsMovedTriggerWindowFrame>().Select(window => window.Batch)).Any(batch =>
-            batch.ParentFrameId == frame.Id && batch.OriginSkillId == frame.SkillId && batch.OriginSkillInstanceId == frame.SkillInstanceId &&
-            batch.OriginOwnerSeat == frame.OwnerSeat && batch.Movements.Count == claim.CardIds.Count &&
-            batch.Movements.All(movement => claim.CardIds.Contains(movement.CardId) && movement.From == CardLocation.Processing &&
-                movement.To == CardLocation.Hand(frame.OwnerSeat) && movement.Reason.Value == BoundaryCaoCaoMobile.ClaimReason && journal.Contains(movement)));
     }
 
     private ProgramDamageCardsClaimedEvent? CommittedClaim(ProgramSkillFrame frame)

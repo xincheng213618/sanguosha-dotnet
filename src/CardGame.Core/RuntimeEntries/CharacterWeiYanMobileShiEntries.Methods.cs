@@ -17,7 +17,6 @@ internal sealed partial class CharacterWeiYanMobileShiEntries
     internal bool IsMobileShiZhuangshiUnrespondable(long id) => _resolve().IsMobileShiZhuangshiUnrespondable(id);
     internal bool MobileShiKuangguThresholdDrawMatches(global::CardGame.Core.ProgramSkillFrame producer, global::CardGame.Core.NativeDrawInvocationProof proof) => _resolve().MobileShiKuangguThresholdDrawMatches(producer, proof);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileShiWeiYanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileShiWeiYanChoices(f);
-    internal bool MobileShiWeiYanMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MobileShiWeiYanMovement(f, e, p);
     internal int MobileShiWeiYanPhaseSlashBonus(int seat) => _resolve().MobileShiWeiYanPhaseSlashBonus(seat);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> MobileShiWeiYanPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().MobileShiWeiYanPublicStates(owner, skillId);
     internal int MobileShiYinzhanDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().MobileShiYinzhanDamageBonus(attack);

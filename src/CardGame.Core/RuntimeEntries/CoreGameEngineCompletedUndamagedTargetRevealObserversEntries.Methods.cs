@@ -7,7 +7,6 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealObserv
     internal global::CardGame.Core.ProgramSkillFrame? CompletedUndamagedTargetRevealObserverRoot() => _resolve().CompletedUndamagedTargetRevealObserverRoot();
     internal bool CompletedUndamagedTargetRevealStructuralEdge(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.ResolutionFrame child) => _resolve().CompletedUndamagedTargetRevealStructuralEdge(parent, child);
     internal bool ExactCompletedUndamagedParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramSkillWindowContext context, global::CardGame.Core.CardUseFrame use) => _resolve().ExactCompletedUndamagedParent(f, context, use);
-    internal bool HasCompletedUndamagedTargetRevealDamageObserver(long windowId) => _resolve().HasCompletedUndamagedTargetRevealDamageObserver(windowId);
     internal bool IsCompletedUndamagedTargetRevealDying() => _resolve().IsCompletedUndamagedTargetRevealDying();
     internal bool TryAdvanceCompletedUndamagedTargetRevealSubtree() => _resolve().TryAdvanceCompletedUndamagedTargetRevealSubtree();
     internal bool ValidCompletedUndamagedTargetRevealReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidCompletedUndamagedTargetRevealReceipt(f);

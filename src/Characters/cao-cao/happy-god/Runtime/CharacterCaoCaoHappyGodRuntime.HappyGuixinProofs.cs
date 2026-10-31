@@ -44,7 +44,4 @@ internal sealed partial class CharacterCaoCaoHappyGodRuntime
             return r.Cursor == r.OtherSeats.Count && r.Stage is HappyGuixinStage.TurnoverChildren or HappyGuixinStage.Finished && HappyGuixinActualObtained(f) > 4 && r.FaceDownBefore == false && r.FaceDownAfter.HasValue && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyGuixinTurnoverIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var turn] && turn == new HappyGuixinTurnoverIssuedEvent(f.Id, HappyGuixinActualObtained(f), false, r.FaceDownAfter.Value);
         return r.FaceDownBefore is null && r.FaceDownAfter is null && r.Stage != HappyGuixinStage.TurnoverChildren && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyGuixinTurnoverIssuedEvent>().Any(e => e.FrameId == f.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 41400)]
-    internal bool HappyGuixinMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ResolveHappyShenCaoCaoGuixin && f.HappyGuixin is { Stage: HappyGuixinStage.MovementChildren } && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidHappyGuixin(f);
 }

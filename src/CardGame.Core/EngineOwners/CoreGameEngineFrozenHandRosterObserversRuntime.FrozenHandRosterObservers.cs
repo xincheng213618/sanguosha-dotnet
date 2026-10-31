@@ -17,10 +17,6 @@ internal sealed partial class CoreGameEngineFrozenHandRosterObserversRuntime
     }
 
     internal ProgramSkillFrame? FrozenHandRosterObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _coreFrozenHandRosterObserversOperations.FrozenHandRosterFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1740)]
-    internal bool HasFrozenHandRosterDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && FrozenHandRosterObserverRoot()is not null;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 260)]
-    internal bool HasFrozenHandRosterBeforeDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && FrozenHandRosterObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 520)]
     internal bool TryAdvanceFrozenHandRosterSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FrozenHandRosterObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 530)]

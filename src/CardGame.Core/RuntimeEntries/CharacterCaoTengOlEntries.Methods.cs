@@ -20,8 +20,6 @@ internal sealed partial class CharacterCaoTengOlEntries
     internal void ExpireCaoTengNextOwnTurn(global::CardGame.Core.TurnStartedEvent started) => _resolve().ExpireCaoTengNextOwnTurn(started);
     internal void FinishCaoTeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishCaoTeng(f);
     internal void GrantCaoTengSkill(global::CardGame.Core.ProgramSkillFrame f, int recipient) => _resolve().GrantCaoTengSkill(f, recipient);
-    internal bool HasCaoTengBeforeDamageObserver(long id) => _resolve().HasCaoTengBeforeDamageObserver(id);
-    internal bool HasCaoTengDamageObserver(long id) => _resolve().HasCaoTengDamageObserver(id);
     internal bool IsCaoTengFactionChange(global::CardGame.Core.ProgramSkillFrame f, string faction) => _resolve().IsCaoTengFactionChange(f, faction);
     internal bool IsCaoTengQingliuDyingExitContext(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsCaoTengQingliuDyingExitContext(candidate, context);
     internal bool IsCaoTengRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsCaoTengRecoveryParent(f, recovery);

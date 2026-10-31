@@ -22,23 +22,6 @@ internal sealed partial class CoreGameEngineRoundGainedEquipmentObserversRuntime
     internal ProgramSkillFrame? RoundGainedEquipmentDrawObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreRoundGainedEquipmentObserversOperations.RoundGainedEquipmentDrawFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 20)]
     internal bool IsRoundGainedEquipmentDrawDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RoundGainedEquipmentDrawObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1660)]
-    internal bool HasRoundGainedEquipmentDrawDamageObserver(long id) => HasRoundGainedEquipmentDrawObserver(id, false);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 240)]
-    internal bool HasRoundGainedEquipmentDrawBeforeDamageObserver(long id) => HasRoundGainedEquipmentDrawObserver(id, true);
-    internal bool HasRoundGainedEquipmentDrawObserver(long id, bool before)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && (before ? f is BeforeDamageProgramWindowFrame : f is DamageTriggerWindowFrame));
-        if (index < 0 || RoundGainedEquipmentDrawObserverRoot()is not { } root)
-            return false;
-        var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index > rootIndex)
-            return true;
-        for (var child = index + 1; child <= rootIndex; child++)
-            if (!RoundGainedEquipmentDrawStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreResponseCompletionOperations.ResponseCompletionStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]) && !_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]))
-                return false;
-        return index < rootIndex;
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 130)]
     internal bool TryAdvanceRoundGainedEquipmentDrawSubtree()

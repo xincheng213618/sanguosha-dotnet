@@ -4,11 +4,6 @@ internal sealed partial class MouXiaoQiaoOlRuntime
 {
     [ProgramContinuation(ProgramContinuationKind.Movement, 34000)]
     internal bool MovementReturned(ProgramSkillFrame f) => f.MouXiaoQiaoOl is not null && f.PendingMovementContinuation is not null && Resume(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 34000)]
-    internal bool MovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) =>
-        f.MouXiaoQiaoOl is { Paid: true, Stage: MouXiaoQiaoOlStage.GiftChildren or MouXiaoQiaoOlStage.DrawChildren or MouXiaoQiaoOlStage.NativeChildren } &&
-        Valid(f) && effect?.Op == f.MouXiaoQiaoOl.Operation && movement == f.PendingMovementContinuation &&
-        movement.BeforeCount == 0 && movement.CoverageResultBind is null;
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 34000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 34000)]
     internal bool RecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame child) => f.MouXiaoQiaoOl is not null && Valid(f) && (health.ProgramRecoveryChild(f, child)||facts.GiftRecoveryChild(f,child));
@@ -38,13 +33,6 @@ internal sealed partial class MouXiaoQiaoOlRuntime
     {
         if (health.ActiveDying is not { } d || ObserverRoot() is not { } root) return false;
         for (ResolutionFrame? p = d; p is not null; p = frames.ParentOf(p.Id)) if (p.Id == root.Id) return true;
-        return false;
-    }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 34000)]
-    internal bool ObserverDamage(long id)
-    {
-        if (ObserverRoot() is not { } root) return false;
-        for (ResolutionFrame? p = root; p is not null; p = frames.ParentOf(p.Id)) if (p.Id == id) return true;
         return false;
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 34000)]

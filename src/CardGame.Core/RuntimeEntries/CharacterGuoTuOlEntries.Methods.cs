@@ -36,10 +36,6 @@ internal sealed partial class CharacterGuoTuOlEntries
     internal bool FinishWeijieAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishWeijieAttack(attack, out paused);
     internal void FinishWeijieAttempt(global::CardGame.Core.ProgramSkillFrame f, bool success) => _resolve().FinishWeijieAttempt(f, success);
     internal bool HasAcceptedWeijieKeAction(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.LegalAction a) => _resolve().HasAcceptedWeijieKeAction(f, a);
-    internal bool HasQushiBeforeDamageObserver(long id) => _resolve().HasQushiBeforeDamageObserver(id);
-    internal bool HasQushiDamageObserver(long id) => _resolve().HasQushiDamageObserver(id);
-    internal bool HasWeijieBeforeDamageObserver(long id) => _resolve().HasWeijieBeforeDamageObserver(id);
-    internal bool HasWeijieDamageObserver(long id) => _resolve().HasWeijieDamageObserver(id);
     internal bool HasWeijieForcedSlash(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => _resolve().HasWeijieForcedSlash(actor, target, pending);
     internal bool HasWeijieForcedSlash2(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().HasWeijieForcedSlash(actor, target, pending);
     internal bool HasWeijieForcedSlash3(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target, bool qinglong) => _resolve().HasWeijieForcedSlash(actor, target, qinglong);
@@ -52,7 +48,6 @@ internal sealed partial class CharacterGuoTuOlEntries
     internal bool IsIssuedWeijieUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedWeijieUse(use);
     internal bool IsQushiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsQushiMovement(f, e, p);
     internal bool IsWeijieAnswer(global::CardGame.Core.ChoiceId id) => _resolve().IsWeijieAnswer(id);
-    internal bool IsWeijieMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWeijieMovement(f, effect, p);
     internal bool IsWeijieOrdinaryActivation(global::CardGame.Core.ProgramActivationLegalityContext context) => _resolve().IsWeijieOrdinaryActivation(context);
     internal bool IsWeijieOrdinaryAlcoholQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsWeijieOrdinaryAlcoholQuery(actor);
     internal bool IsWeijieUse(long id) => _resolve().IsWeijieUse(id);

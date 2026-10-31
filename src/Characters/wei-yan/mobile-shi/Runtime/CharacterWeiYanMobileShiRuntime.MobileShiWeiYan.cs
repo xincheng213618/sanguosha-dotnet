@@ -323,8 +323,6 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 47100)]
     internal bool ContinuePaidMobileShiWeiYan(ProgramSkillFrame f) => f.MobileShiWeiYan is { Stage: > 0 };
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 47100)]
-    internal bool MobileShiWeiYanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.MobileShiWeiYan is { Stage: > 0 } && e?.Op is SkillProgramEffectOp.ResolveMobileShiZhuangshi or SkillProgramEffectOp.ResolveMobileShiYinzhan or SkillProgramEffectOp.ResolveMobileShiKuanggu;
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiZhuangshi, SkillProgramEffectOp.ResolveMobileShiYinzhan, SkillProgramEffectOp.ResolveMobileShiKuanggu)]
     internal PromptChoice SelectMobileShiWeiYanAi(PendingDecision decision)

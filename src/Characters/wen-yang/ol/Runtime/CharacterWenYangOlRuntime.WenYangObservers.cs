@@ -85,11 +85,6 @@ internal sealed partial class CharacterWenYangOlRuntime
     }
 
     internal ProgramSkillFrame? WenYangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterWenYangOlOperations.WenYangFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 820)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 930)]
-    internal bool HasWenYangDamageObserver(long id) => WenYangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 960)]
-    internal bool HasWenYangBeforeDamageObserver(long id) => HasWenYangDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27360)]
     internal bool AdvanceWenYangChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WenYangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

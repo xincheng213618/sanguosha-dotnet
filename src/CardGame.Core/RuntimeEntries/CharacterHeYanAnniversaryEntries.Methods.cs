@@ -10,11 +10,9 @@ internal sealed partial class CharacterHeYanAnniversaryEntries
     internal bool ContinueHeYan(long id) => _resolve().ContinueHeYan(id);
     internal bool DrainHeYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainHeYan(f);
     internal void FinishHeYan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHeYan(f);
-    internal bool HeYanBeforeDamageObserver(long id) => _resolve().HeYanBeforeDamageObserver(id);
     internal global::CardGame.Core.PromptChoice HeYanChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default) => _resolve().HeYanChoice(f, branch, label, cards);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HeYanChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HeYanChoices(f);
     internal int HeYanChooser(global::CardGame.Core.AnniversaryHeYanReceipt r, int owner) => _resolve().HeYanChooser(r, owner);
-    internal bool HeYanDamageObserver(long id) => _resolve().HeYanDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HeYanDiscardChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HeYanDiscardChoices(f);
     internal bool HeYanDyingObserver() => _resolve().HeYanDyingObserver();
     internal bool HeYanFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HeYanFirstChild(f, child);

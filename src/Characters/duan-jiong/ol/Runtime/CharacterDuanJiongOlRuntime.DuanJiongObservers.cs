@@ -39,11 +39,6 @@ internal sealed partial class CharacterDuanJiongOlRuntime
     }
 
     internal ProgramSkillFrame? SaoguObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterDuanJiongOlOperations.SaoguFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 640)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 750)]
-    internal bool HasDuanJiongDamageObserver(long id) => SaoguObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 780)]
-    internal bool HasDuanJiongBeforeDamageObserver(long id) => HasDuanJiongDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27060)]
     internal bool AdvanceSaoguSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SaoguObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

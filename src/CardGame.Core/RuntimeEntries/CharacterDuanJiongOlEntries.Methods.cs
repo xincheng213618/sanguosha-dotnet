@@ -19,8 +19,6 @@ internal sealed partial class CharacterDuanJiongOlEntries
     internal bool DuanJiongSaoguSlashQuotaBeforeLimit(global::CardGame.Core.ProgramSlashQuotaQuery query) => _resolve().DuanJiongSaoguSlashQuotaBeforeLimit(query);
     internal global::CardGame.Core.Card? FindDuanJiongSaoguDiscardCard(global::CardGame.Core.CharacterState actor, int id) => _resolve().FindDuanJiongSaoguDiscardCard(actor, id);
     internal void FinishSaogu(global::CardGame.Core.ProgramSkillFrame f, string reason) => _resolve().FinishSaogu(f, reason);
-    internal bool HasDuanJiongBeforeDamageObserver(long id) => _resolve().HasDuanJiongBeforeDamageObserver(id);
-    internal bool HasDuanJiongDamageObserver(long id) => _resolve().HasDuanJiongDamageObserver(id);
     internal bool HasIssuedDuanJiongSaoguUnlimitedUse(long id, int actor) => _resolve().HasIssuedDuanJiongSaoguUnlimitedUse(id, actor);
     internal bool IsDuanJiongRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsDuanJiongRecoveryParent(f, recovery);
     internal bool IsDuanJiongSaoguDiscardQuery(global::CardGame.Core.CharacterState actor, int? id) => _resolve().IsDuanJiongSaoguDiscardQuery(actor, id);

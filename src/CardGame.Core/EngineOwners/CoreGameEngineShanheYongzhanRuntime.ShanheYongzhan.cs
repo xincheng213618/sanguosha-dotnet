@@ -32,12 +32,4 @@ internal sealed partial class CoreGameEngineShanheYongzhanRuntime
     }
 
     internal bool IsShanheYongzhanDyingExitReturn(ProgramSkillFrame frame) => frame.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(parent => parent.Id == context.ParentFrameId)is { } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]) && IsShanheYongzhanDyingExitContext(parent.Candidates[parent.CandidateIndex], context);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 62174)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 62174)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 62174)]
-    internal bool HasShanheYongzhanDyingExitDamageObserver(long id)
-    {
-        var root = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(IsShanheYongzhanDyingExitReturn);
-        return root is not null && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id && frame is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    }
 }

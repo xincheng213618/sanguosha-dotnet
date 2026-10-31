@@ -19,11 +19,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     }
 
     internal ProgramSkillFrame? AHuiNanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterAHuiNanOlOperations.AHuiNanFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 700)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 810)]
-    internal bool HasAHuiNanDamageObserver(long id) => AHuiNanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 840)]
-    internal bool HasAHuiNanBeforeDamageObserver(long id) => HasAHuiNanDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27200)]
     internal bool AdvanceAHuiNanChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && AHuiNanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveJuemanFirstBasicTurnEnd)]

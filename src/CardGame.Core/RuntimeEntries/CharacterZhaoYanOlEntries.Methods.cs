@@ -14,7 +14,6 @@ internal sealed partial class CharacterZhaoYanOlEntries
     internal void DrawForUniqueLeastTongxieHand(global::CardGame.Core.ProgramSkillFrame active, global::System.Collections.Generic.IReadOnlyList<int> members) => _resolve().DrawForUniqueLeastTongxieHand(active, members);
     internal global::CardGame.Core.SkillProgramStepOutcome FinalizeTongxieGuard(global::CardGame.Core.ProgramSkillFrame active, global::CardGame.Core.TongxieGuardState pending) => _resolve().FinalizeTongxieGuard(active, pending);
     internal global::CardGame.Core.TongxieChainUse? FindTongxieChainUse(global::CardGame.Core.CardMovementBatchContext batch, int movementIndex) => _resolve().FindTongxieChainUse(batch, movementIndex);
-    internal bool HasTongxieGuardDying(long beforeDamageId) => _resolve().HasTongxieGuardDying(beforeDamageId);
     internal bool IsTongxieProducedUse(long actionId) => _resolve().IsTongxieProducedUse(actionId);
     internal int[] MatchingTongxieSettledSlashIndexes(global::CardGame.Core.CardMovementBatchContext batch) => _resolve().MatchingTongxieSettledSlashIndexes(batch);
     internal global::CardGame.Core.SkillProgramStepOutcome PresentTongxieFollowUpPrompt(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PresentTongxieFollowUpPrompt(frame);

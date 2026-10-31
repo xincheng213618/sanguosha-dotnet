@@ -145,9 +145,6 @@ internal sealed partial class CharacterGuoSiOlRuntime
         RequireIssuedGuoSi(f);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 250)]
-    internal bool IsGuoSiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.GuoSi is { Stage: GuoSiStage.MovementChildren } && e?.Op == SkillProgramEffectOp.ChooseTanbeiTargetPact && CanContinueIssuedGuoSi(f) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal void RequireIssuedGuoSi(ProgramSkillFrame f)
     {
         if (f.GuoSi is not { } r || r.Source != GuoSiSource(f) || r.GameplayHash != f.GameplayHash || r.Instruction != f.InstructionIndex || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Phase <= 0 || (r.Stage is GuoSiStage.TargetChoice or GuoSiStage.SidaoChoice) && r.Phase != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)

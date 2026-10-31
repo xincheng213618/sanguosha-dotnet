@@ -154,8 +154,6 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 66600)]
     internal bool ReturnBoundaryZhangZhaoPhase(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is not null && ResumeBoundaryZhangZhaoPhase(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 66600)]
-    internal bool BoundaryZhangZhaoPhaseMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => op?.Op == SkillProgramEffectOp.CaptureBoundaryZhangZhaoPhaseDiscards && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && f.BoundaryZhangZhaoPhase is { Stage: "return-children" or "claim-children" } && KeepBoundaryZhangZhaoPaidReturn(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 66600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 66600)]
     internal bool KeepBoundaryZhangZhaoPaidReturn(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is { ReturnMovementSequence: > 0 } r && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhangZhaoReturnedEvent>().Count(e => e.FrameId == f.Id && e.PhaseOwnerSeat == r.PhaseOwnerSeat && e.CardId == r.ReturnedCardId && e.MovementSequence == r.ReturnMovementSequence) == 1;

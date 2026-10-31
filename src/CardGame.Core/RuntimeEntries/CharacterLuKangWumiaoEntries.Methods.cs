@@ -46,9 +46,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal void FinishWuLuKangShenduan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWuLuKangShenduan(f);
     internal bool HasIssuedWuLuKangDixianUse(long useId, int actorSeat) => _resolve().HasIssuedWuLuKangDixianUse(useId, actorSeat);
     internal bool HasWuLuKangBeforeDamageObserver(long id) => _resolve().HasWuLuKangBeforeDamageObserver(id);
-    internal bool HasWuLuKangDamageObserver(long id) => _resolve().HasWuLuKangDamageObserver(id);
-    internal bool HasWuLuKangDixianBeforeDamageObserver(long id) => _resolve().HasWuLuKangDixianBeforeDamageObserver(id);
-    internal bool HasWuLuKangDixianDamageObserver(long id) => _resolve().HasWuLuKangDixianDamageObserver(id);
     internal bool HasWuLuKangDixianGrant(int actorSeat) => _resolve().HasWuLuKangDixianGrant(actorSeat);
     internal bool HasWuLuKangDixianMaterialPrivilege(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int>? ids, global::CardGame.Core.CardConversionSource? source = default) => _resolve().HasWuLuKangDixianMaterialPrivilege(actor, kind, ids, source);
     internal bool HasWuLuKangDixianOriginalPayment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HasWuLuKangDixianOriginalPayment(f);
@@ -58,7 +55,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool IsIssuedWuLuKangCandidate(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWuLuKangCandidate(candidate, context);
     internal bool IsIssuedWuLuKangKegouUse(global::CardGame.Core.CardUseFrame use) => _resolve().IsIssuedWuLuKangKegouUse(use);
     internal bool IsWuLuKangAssignedPair(global::CardGame.Core.PindianFrame f, global::CardGame.Core.PindianResult result) => _resolve().IsWuLuKangAssignedPair(f, result);
-    internal bool IsWuLuKangDixianMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsWuLuKangDixianMovement(f, e, p);
     internal bool IsWuLuKangDixianRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWuLuKangDixianRecoveryParent(f, recovery);
     internal bool IsWuLuKangDying() => _resolve().IsWuLuKangDying();
     internal bool IsWuLuKangHistoricalPairAssignment(long contest, global::CardGame.Core.PindianResult result, int original) => _resolve().IsWuLuKangHistoricalPairAssignment(contest, result, original);

@@ -22,8 +22,6 @@ internal sealed partial class CharacterAHuiNanOlEntries
     internal void ExpireAHuiNanJuemanTurnEndWine() => _resolve().ExpireAHuiNanJuemanTurnEndWine();
     internal void FinishAHuiNan(global::CardGame.Core.ProgramSkillFrame f, string outcome) => _resolve().FinishAHuiNan(f, outcome);
     internal bool FinishAHuiNanJuemanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishAHuiNanJuemanAttack(attack, out paused);
-    internal bool HasAHuiNanBeforeDamageObserver(long id) => _resolve().HasAHuiNanBeforeDamageObserver(id);
-    internal bool HasAHuiNanDamageObserver(long id) => _resolve().HasAHuiNanDamageObserver(id);
     internal bool HasIssuedAHuiNanJuemanUse(long id) => _resolve().HasIssuedAHuiNanJuemanUse(id);
     internal bool IsAHuiNanJuemanEndingCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsAHuiNanJuemanEndingCandidate(c, context);
     internal bool IsAHuiNanJuemanSlashQuery(global::CardGame.Core.CharacterState actor) => _resolve().IsAHuiNanJuemanSlashQuery(actor);

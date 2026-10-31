@@ -61,8 +61,6 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
         foreach (var m in _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= after))
             SignMouXuHuangMovement(f, m);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 360)]
     internal bool IsMouXuHuangMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e is not null && MouXuHuangComposition.Handles(e.Op) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && (f.MouXuHuangDuanliang is { Stage: MouXuHuangDuanliangStage.RefillChildren or MouXuHuangDuanliangStage.ObtainChildren or MouXuHuangDuanliangStage.NativeChildren } && MouXuHuangDuanliangRoot(f) || f.MouXuHuangShipo is { Stage: MouXuHuangShipoStage.GiftChildren or MouXuHuangShipoStage.TransferChildren } && ValidMouXuHuangShipo(f));
     internal bool DrainMouXuHuangChildren(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     internal bool MouXuHuangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -106,11 +104,6 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
 
     internal bool MouXuHuangObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _characterXuHuangMouMobileOperations.MouXuHuangNativeWindowEdge(n) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame f && _characterXuHuangMouMobileOperations.MouXuHuangFirstChild(f, _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? MouXuHuangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterXuHuangMouMobileOperations.MouXuHuangFirstChild(f, child), (index) => _characterXuHuangMouMobileOperations.MouXuHuangObserverSuffix(index));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1340)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1450)]
-    internal bool HasMouXuHuangDamageObserver(long id) => MouXuHuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1480)]
-    internal bool HasMouXuHuangBeforeDamageObserver(long id) => MouXuHuangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 510)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 500)]
     internal bool IsMouXuHuangRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

@@ -6,7 +6,6 @@ internal sealed partial class CoreGameEngineMatchingRecastsEntries
     internal bool CanContinueMatchingRecast(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueMatchingRecast(f);
     internal bool DrainMatchingRecastChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMatchingRecastChildren(f);
     internal void FinishMatchingRecast(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMatchingRecast(f);
-    internal bool IsMatchingRecastMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMatchingRecastMovement(f, effect, pending);
     internal void IssueMatchingRecastCost(global::CardGame.Core.ProgramSkillFrame f, bool peer) => _resolve().IssueMatchingRecastCost(f, peer);
     internal void IssueMatchingRecastDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueMatchingRecastDraw(f);
     internal global::CardGame.Core.PromptChoice MatchingRecastChoice(global::CardGame.Core.ProgramSkillFrame f, string step, string label, int? card = default) => _resolve().MatchingRecastChoice(f, step, label, card);

@@ -82,9 +82,6 @@ internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > receipt.Before && move.Sequence <= receipt.After).ToArray();
         return receipt.Candidates.Contains(receipt.CardId.Value) && receipt.BatchId > 0 && moves is [var paid] && paid.CardId == receipt.CardId && paid.From == CardLocation.DiscardPile && paid.To == CardLocation.Hand(frame.OwnerSeat) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(paid.CardKind) && paid.Reason.Value == BoundaryLiaoHuaDiscardReason && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiaoHuaDiscardSlashObtainedEvent>().Count(fact => fact.FrameId == frame.Id && fact.InstructionIndex == receipt.InstructionIndex && fact.OwnerSeat == frame.OwnerSeat && fact.CardId == receipt.CardId && fact.BatchId == receipt.BatchId && fact.Before == receipt.Before && fact.After == receipt.After) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 55600)]
-    internal bool IsBoundaryLiaoHuaDiscardMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.ObtainBoundaryLiaoHuaDiscardSlash && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && frame.BoundaryLiaoHuaDiscardSlash?.CardId is not null && ValidBoundaryLiaoHuaDiscardSlash(frame);
     [ProgramContinuation(ProgramContinuationKind.Movement, 55600)]
     internal bool ReturnBoundaryLiaoHuaDiscardMovement(ProgramSkillFrame frame)
     {

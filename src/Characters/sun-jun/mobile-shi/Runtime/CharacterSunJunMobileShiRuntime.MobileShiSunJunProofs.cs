@@ -8,9 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunJunMobileShiRuntime
 {
     internal bool ValidShiSj(ProgramSkillFrame f) => f.ShiSunJun is { } r && f.SkillId == ShiSjXiongtu && f.InstructionIndex == 1 && r.Source == ShiSjSource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && Enum.IsDefined(r.Stage) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiSunJunStartedEvent>().Count(e => e == new ShiSunJunStartedEvent(f.Id, r.Source, r.Hash, r.Turn, r.Target)) == 1;
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 49200)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 49200)]
     internal bool ShiSjMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ShiSunJun is { } r && ValidShiSj(f) && r.Stage is ShiSunJunStage.DiscardChildren or ShiSunJunStage.CostChildren or ShiSunJunStage.DrawChildren && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && p == f.PendingMovementContinuation && e?.Op is SkillProgramEffectOp.ResolveMobileShiXiongtu or SkillProgramEffectOp.ResolveMobileShiXiongtuDamageBenefit;
     internal bool ShiSjFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -34,11 +31,6 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
     internal ProgramSkillFrame? ShiSjObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterSunJunMobileShiOperations.ShiSjFirstChild(f, c), (n) => _characterSunJunMobileShiOperations.ShiSjSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49200)]
     internal bool ShiSjDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiSjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 49200)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 49200)]
-    internal bool ShiSjDamageChild(long id) => ShiSjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 49200)]
-    internal bool ShiSjBeforeDamageChild(long id) => ShiSjObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49200)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 49200)]
     internal bool ShiSjRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

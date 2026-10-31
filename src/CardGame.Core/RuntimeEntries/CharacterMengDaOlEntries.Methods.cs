@@ -19,10 +19,7 @@ internal sealed partial class CharacterMengDaOlEntries
     internal global::System.Collections.Generic.IReadOnlyList<int> GoudeFactionSeats(int owner) => _resolve().GoudeFactionSeats(owner);
     internal global::System.Collections.Generic.IReadOnlyList<int> GoudeSlashTargets(int owner) => _resolve().GoudeSlashTargets(owner);
     internal int GoudeZeroSlashActor(global::CardGame.Core.GoudeZeroSlashDeclaredEvent observed, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.IGameEvent> history) => _resolve().GoudeZeroSlashActor(observed, history);
-    internal bool HasMengDaBeforeDamageObserver(long id) => _resolve().HasMengDaBeforeDamageObserver(id);
-    internal bool HasMengDaDamageObserver(long id) => _resolve().HasMengDaDamageObserver(id);
     internal bool IsGoudeSlashUse(long useId) => _resolve().IsGoudeSlashUse(useId);
-    internal bool IsMengDaMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMengDaMovement(f, e, p);
     internal void IssueGoudeSlashUse(long useId, global::CardGame.Core.ProgramSkillFrame parent, global::CardGame.Core.CardActionContext action) => _resolve().IssueGoudeSlashUse(useId, parent, action);
     internal bool MengDaFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MengDaFirstChild(f, child);
     internal global::CardGame.Core.ProgramSkillFrame? MengDaObserverRoot() => _resolve().MengDaObserverRoot();

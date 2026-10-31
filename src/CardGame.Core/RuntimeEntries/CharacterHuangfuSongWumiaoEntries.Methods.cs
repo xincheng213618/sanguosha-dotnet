@@ -17,8 +17,6 @@ internal sealed partial class CharacterHuangfuSongWumiaoEntries
     internal bool DrainWuHf(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainWuHf(f);
     internal void FinishWuHf(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishWuHf(f);
     internal bool HasIssuedWuHfUse(long id, int actor) => _resolve().HasIssuedWuHfUse(id, actor);
-    internal bool HasWuHfBeforeDamageObserver(long id) => _resolve().HasWuHfBeforeDamageObserver(id);
-    internal bool HasWuHfDamageObserver(long id) => _resolve().HasWuHfDamageObserver(id);
     internal bool HasWuHfMaterialPrivilege(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<int>? ids) => _resolve().HasWuHfMaterialPrivilege(actor, ids);
     internal bool HasWuHfOrDixianIssuedUse(long id, int actor) => _resolve().HasWuHfOrDixianIssuedUse(id, actor);
     internal bool HasWuHfOrDixianMaterialPrivilege(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int>? ids, global::CardGame.Core.CardConversionSource? source = default) => _resolve().HasWuHfOrDixianMaterialPrivilege(actor, kind, ids, source);
@@ -27,7 +25,6 @@ internal sealed partial class CharacterHuangfuSongWumiaoEntries
     internal bool HasWuHfPotential(int owner) => _resolve().HasWuHfPotential(owner);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> IncludeWuHfEndingItems(global::CardGame.Core.DeferredTurnEndFrame parent, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.TurnEndingBoundaryItem> ordinary) => _resolve().IncludeWuHfEndingItems(parent, ordinary);
     internal bool IsIssuedWuHfEnding(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWuHfEnding(c, context);
-    internal bool IsWuHfMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsWuHfMovement(f, effect, pending);
     internal bool IsWuHfRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame r) => _resolve().IsWuHfRecoveryParent(f, r);
     internal void ObserveWuHfUse(global::CardGame.Core.IGameEvent fact) => _resolve().ObserveWuHfUse(fact);
     internal void ProjectWuHuangFuSongCardSkillMark(int cardId, ref global::CardGame.Core.CardSkillMarkProjection projection) => _resolve().ProjectWuHuangFuSongCardSkillMark(cardId, ref projection);

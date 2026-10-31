@@ -23,7 +23,6 @@ internal sealed partial class CharacterCaoXiOlEntries
     internal void ExpireCaoXiGangshuUnits(int seat, string reason, long nativeId, global::System.Func<global::CardGame.Core.CaoXiGangshuIncreasedEvent, bool>? select = default) => _resolve().ExpireCaoXiGangshuUnits(seat, reason, nativeId, select);
     internal int FreezeAndCaptureCaoXiNativeDrawBase(global::CardGame.Core.CharacterState player, bool replaced = false) => _resolve().FreezeAndCaptureCaoXiNativeDrawBase(player, replaced);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CaoXiGangshuIncreasedEvent> FreezeCaoXiGangshuDrawUse(global::CardGame.Core.CharacterState player) => _resolve().FreezeCaoXiGangshuDrawUse(player);
-    internal bool HasCaoXiDamageObserver(long id) => _resolve().HasCaoXiDamageObserver(id);
     internal bool IsCaoXiDrawUnitEligible(global::CardGame.Core.CaoXiGangshuIncreasedEvent unit, global::CardGame.Core.ActualDiscardRecoveryPhaseKey? phase) => _resolve().IsCaoXiDrawUnitEligible(unit, phase);
     internal void IssueCaoXiDraw(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueCaoXiDraw(f);
     internal void ObserveCaoXiGangshuExpiry(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveCaoXiGangshuExpiry(payload);

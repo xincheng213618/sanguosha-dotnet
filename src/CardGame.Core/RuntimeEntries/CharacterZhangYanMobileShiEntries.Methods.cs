@@ -28,11 +28,9 @@ internal sealed partial class CharacterZhangYanMobileShiEntries
     internal void SealShiZy(long id) => _resolve().SealShiZy(id);
     internal bool ShiZyAddedSlashDistance(global::CardGame.Core.ProgramSlashDistanceQuery q) => _resolve().ShiZyAddedSlashDistance(q);
     internal bool ShiZyAddedTargetDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().ShiZyAddedTargetDistance(q);
-    internal bool ShiZyBeforeDamageChild(long id) => _resolve().ShiZyBeforeDamageChild(id);
     internal global::CardGame.Core.CardUseFrame? ShiZyCardWindow(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext w, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().ShiZyCardWindow(c, w, window);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiZyChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiZyChoices(f);
     internal int ShiZyChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiZyChooser(f);
-    internal bool ShiZyDamageChild(long id) => _resolve().ShiZyDamageChild(id);
     internal global::CardGame.Core.CardUseFrame? ShiZyDamageUse(int owner, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().ShiZyDamageUse(owner, w);
     internal bool ShiZyDyingChild() => _resolve().ShiZyDyingChild();
     internal bool ShiZyEdge(int i) => _resolve().ShiZyEdge(i);

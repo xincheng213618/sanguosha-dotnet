@@ -22,7 +22,6 @@ internal sealed partial class CharacterChenZhiMobileShiEntries
     internal int[]? SelectShiCzFirstDiscard(global::CardGame.Core.CardMovementBatchContext batch, global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramInstructionFeatures features) => _resolve().SelectShiCzFirstDiscard(batch, candidate, features);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiCzChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiCzChoices(f);
     internal global::System.Collections.Generic.IReadOnlyList<int> ShiCzDiscardTargets(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ShiCzDiscardTargets(frame);
-    internal bool ShiCzMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().ShiCzMovementProof(f, effect, movement);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiCzPaymentChoices(global::CardGame.Core.ProgramSkillFrame f, int holder) => _resolve().ShiCzPaymentChoices(f, holder);
     internal global::CardGame.Core.MobileShiChenZhiExtraGrantedEvent? ShiCzPendingExtra(int owner) => _resolve().ShiCzPendingExtra(owner);
     internal bool ShiCzUsedOrPlayedSlash(int seat) => _resolve().ShiCzUsedOrPlayedSlash(seat);

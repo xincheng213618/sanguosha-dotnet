@@ -13,9 +13,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
             return false;
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == r.CostSequence && m.CardId == r.CardId && m.CardKind == r.PrintedKind && m.From == r.CostFrom && m.To == r.CostTo && m.Reason.Value == WeiwanCostReason) == 1;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 220)]
-    internal bool IsWeiwanMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.Weiwan is { } r && HasPaidWeiwanSelection(f) && effect?.Op == SkillProgramEffectOp.ResolveWeiwanQinDiscardAndSuitObtain && pending == f.PendingMovementContinuation && pending.BeforeCount == 0 && pending.CoverageResultBind is null && pending.SubjectSeat == (r.Stage is WeiwanStage.CostChildren or WeiwanStage.ObtainChildren ? f.OwnerSeat : r.TargetSeat);
     internal bool WeiwanPrimaryMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.Weiwan!;

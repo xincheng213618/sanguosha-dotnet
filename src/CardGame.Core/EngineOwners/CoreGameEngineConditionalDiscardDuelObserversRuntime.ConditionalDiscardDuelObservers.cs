@@ -7,8 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineConditionalDiscardDuelObserversRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 40)]
-    internal bool IsConditionalDuelAwaitedMovement(ProgramSkillFrame root, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.DiscardSlashThenOtherCardAndUseDuel && root.ConditionalDiscardDuel is { Stage: ConditionalDiscardDuelStage.OwnerChildren or ConditionalDiscardDuelStage.TargetChildren } d && pending.BeforeCount == 0 && pending.CoverageResultBind is null && pending.SubjectSeat == (d.Stage == ConditionalDiscardDuelStage.OwnerChildren ? root.OwnerSeat : d.TargetSeat) && _coreConditionalDiscardDuelReturnsOperations.ValidConditionalDuelPayments(root);
     internal ProgramSkillFrame? ConditionalDuelPaidObserverRoot()
     {
         for (var rootIndex = 0; rootIndex + 1 < _resolutionStackOperations._resolutionStack.Count; rootIndex++)

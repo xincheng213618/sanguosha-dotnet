@@ -15,7 +15,6 @@ internal sealed partial class CoreGameEngineShanheYingxiangEntries
     internal bool HasShanheYingxiangNonUseLoss(int owner, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().HasShanheYingxiangNonUseLoss(owner, batch);
     internal bool IsIssuedShanheYingxiangMovement(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedShanheYingxiangMovement(candidate, context);
     internal bool IsShanheYingxiangBefore(int owner, int cardId, int before) => _resolve().IsShanheYingxiangBefore(owner, cardId, before);
-    internal bool IsShanheYingxiangDrawMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation movement) => _resolve().IsShanheYingxiangDrawMovement(frame, effect, movement);
     internal bool IsShanheYingxiangMovement(global::CardGame.Core.ProgramTriggerCandidate candidate) => _resolve().IsShanheYingxiangMovement(candidate);
     internal bool IsShanheYingxiangTrueUseLoss(global::CardGame.Core.CardMovementRecord move) => _resolve().IsShanheYingxiangTrueUseLoss(move);
     internal void PayShanheQingjue(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PayShanheQingjue(frame);

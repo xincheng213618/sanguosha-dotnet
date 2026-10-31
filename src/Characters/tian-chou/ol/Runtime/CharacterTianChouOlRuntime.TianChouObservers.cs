@@ -26,11 +26,6 @@ internal sealed partial class CharacterTianChouOlRuntime
     }
 
     internal ProgramSkillFrame? TianChouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterTianChouOlOperations.TianChouFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 650)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 760)]
-    internal bool HasTianChouDamageObserver(long id) => TianChouObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 790)]
-    internal bool HasTianChouBeforeDamageObserver(long id) => HasTianChouDamageObserver(id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27090)]
     internal bool AdvanceTianChouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && TianChouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

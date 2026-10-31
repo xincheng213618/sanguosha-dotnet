@@ -130,7 +130,6 @@ internal sealed partial class CoreGameEngineShanheSourceQingjianRuntime
     }
 
     internal SkillProgramEffect? SourceQingjianPausedEffect(ProgramSkillFrame frame) => frame.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 24750)]
     internal bool SourceQingjianMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => frame.ShanheSourceQingjian is { ReturningChild: true } receipt && receipt.InstructionIndex == frame.InstructionIndex && effect?.Op == SkillProgramEffectOp.DistributeShanheSourceQingjianGains && effect == SourceQingjianPausedEffect(frame) && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && receipt.OriginalCardIds.Contains(receipt.PaidCardId) && receipt.GivenCardIds.Contains(receipt.PaidCardId) && receipt.RecipientSeat != frame.OwnerSeat && receipt.After >= receipt.Before;
     internal void FinishSourceQingjian(ProgramSkillFrame frame)
     {

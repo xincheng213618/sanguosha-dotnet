@@ -28,10 +28,6 @@ internal sealed partial class CharacterHeJinOlRuntime
     }
 
     internal ProgramSkillFrame? HeJinObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHeJinOlOperations.HeJinFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 510)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 620)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 650)]
-    internal bool HasHeJinDamageObserver(long id) => HeJinObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26710)]
     internal bool AdvanceHeJinSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HeJinObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -66,7 +66,6 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
     }
 
     internal SkillProgramEffect? ZhaoXiangPausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 370)]
     internal bool IsZhaoXiangMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.DrawAfterPaidMeiYingConversion && f.ZhaoXiang is { Stage: "movement", ActionId: not null } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramContinuation(ProgramContinuationKind.Movement, 22602)]
     internal bool ReturnZhaoXiangMovement(ProgramSkillFrame f)

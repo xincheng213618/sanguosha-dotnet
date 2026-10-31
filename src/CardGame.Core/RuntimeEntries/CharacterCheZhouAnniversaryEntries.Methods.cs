@@ -9,11 +9,8 @@ internal sealed partial class CharacterCheZhouAnniversaryEntries
     internal bool CanOfferAnniversaryCheZhou(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().CanOfferAnniversaryCheZhou(candidate, trigger, c);
     internal void CaptureAnniversaryCheZhouAge(global::CardGame.Core.IGameEvent fact) => _resolve().CaptureAnniversaryCheZhouAge(fact);
     internal global::CardGame.Core.PromptChoice CheZhouAi(global::CardGame.Core.PendingDecision p) => _resolve().CheZhouAi(p);
-    internal bool CheZhouBeforeDamageObserver(long id) => _resolve().CheZhouBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> CheZhouChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CheZhouChoices(f);
-    internal bool CheZhouDamageObserver(long id) => _resolve().CheZhouDamageObserver(id);
     internal bool CheZhouFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().CheZhouFirstChild(f, child);
-    internal bool CheZhouMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().CheZhouMovement(f, e, p);
     internal global::CardGame.Core.ProgramSkillFrame? CheZhouObserverRoot() => _resolve().CheZhouObserverRoot();
     internal bool ContinueCheZhou(long id) => _resolve().ContinueCheZhou(id);
     internal bool ContinuePaidCheZhou(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidCheZhou(f);

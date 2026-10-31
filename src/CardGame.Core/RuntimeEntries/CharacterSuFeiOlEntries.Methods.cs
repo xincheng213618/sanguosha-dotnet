@@ -9,9 +9,6 @@ internal sealed partial class CharacterSuFeiOlEntries
     internal void CaptureSuFeiFinalizedUse(long nativeUseId, global::CardGame.Core.CardActionContext action) => _resolve().CaptureSuFeiFinalizedUse(nativeUseId, action);
     internal bool DrainSuFei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainSuFei(f);
     internal void FinishSuFei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishSuFei(f);
-    internal bool HasSuFeiBeforeDamageObserver(long id) => _resolve().HasSuFeiBeforeDamageObserver(id);
-    internal bool HasSuFeiDamageObserver(long id) => _resolve().HasSuFeiDamageObserver(id);
-    internal bool IsSuFeiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsSuFeiMovement(f, e, p);
     internal void ObserveSuFeiTurnOrDeath(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveSuFeiTurnOrDeath(payload);
     internal void PublishSuFeiChoice(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishSuFeiChoice(f);
     internal void RequireSuFei(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireSuFei(f);

@@ -17,10 +17,8 @@ internal sealed partial class CharacterLeiBoAnniversaryEntries
     internal bool IsAnniversaryLeiBoFixedSlash(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsAnniversaryLeiBoFixedSlash(f);
     internal bool IsAnniversaryLeiBoSelfLoot(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect e) => _resolve().IsAnniversaryLeiBoSelfLoot(f, e);
     internal void IssueLeiBoMovement(global::CardGame.Core.ProgramSkillFrame f, bool discard) => _resolve().IssueLeiBoMovement(f, discard);
-    internal bool LeiBoBeforeDamageObserver(long id) => _resolve().LeiBoBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> LeiBoChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LeiBoChoices(f);
     internal bool LeiBoDamage(global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().LeiBoDamage(c);
-    internal bool LeiBoDamageObserver(long id) => _resolve().LeiBoDamageObserver(id);
     internal bool LeiBoDamageParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().LeiBoDamageParent(f);
     internal bool LeiBoDyingObserver() => _resolve().LeiBoDyingObserver();
     internal bool LeiBoFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().LeiBoFirstChild(f, child);

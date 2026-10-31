@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoShuangMouRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 35500)]
     internal bool MouCaoShuangAnniversaryMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.MouCaoShuangAnniversary is { } r && effect?.Op == r.Operation && MouCaoShuangAnniversary.Valid(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouCaoShuangAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {

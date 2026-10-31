@@ -55,11 +55,6 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
 
         return f.PendingMovementContinuation is null;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 46600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 46600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 46600)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 46600)]
     internal bool WuFuMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.AnniversaryWuFu is { Stage: AnniversaryWuFuStage.AdjustChildren or AnniversaryWuFuStage.Children or AnniversaryWuFuStage.NativeChildren } && e?.Op == SkillProgramEffectOp.ResolveAnniversaryWuFuZhonge && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidWuFu(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 46600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 46600)]
@@ -96,11 +91,6 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
 
     internal bool WuFuObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || WuFuNativeEdge(i) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && WuFuFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal ProgramSkillFrame? WuFuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterWuFuAnniversaryOperations.WuFuFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterWuFuAnniversaryOperations.WuFuObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 46600)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 46600)]
-    internal bool WuFuDamageObserver(long id) => WuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 46600)]
-    internal bool WuFuBeforeDamageObserver(long id) => WuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46600)]
     internal bool WuFuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46600)]

@@ -10,8 +10,6 @@ internal sealed partial class CharacterZhenJiMouMobileEntries
     internal void ContinueMouZhenJiLuoshen(long id) => _resolve().ContinueMouZhenJiLuoshen(id);
     internal bool DrainMouZhenJiLuoshen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouZhenJiLuoshen(f);
     internal void FinishMouZhenJiLuoshen(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouZhenJiLuoshen(f);
-    internal bool HasMouZhenJiLuoshenBeforeDamageObserver(long id) => _resolve().HasMouZhenJiLuoshenBeforeDamageObserver(id);
-    internal bool HasMouZhenJiLuoshenDamageObserver(long id) => _resolve().HasMouZhenJiLuoshenDamageObserver(id);
     internal bool IsMouZhenJiLuoshenDying() => _resolve().IsMouZhenJiLuoshenDying();
     internal bool IsMouZhenJiLuoshenMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouZhenJiLuoshenMovement(f, e, p);
     internal bool IsMouZhenJiLuoshenRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouZhenJiLuoshenRecoveryParent(f, recovery);

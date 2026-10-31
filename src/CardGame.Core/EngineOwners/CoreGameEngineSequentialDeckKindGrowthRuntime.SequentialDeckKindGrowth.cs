@@ -103,8 +103,6 @@ internal sealed partial class CoreGameEngineSequentialDeckKindGrowthRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1244)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1244)]
     internal bool CanContinueSequentialDeckKindGrowth(ProgramSkillFrame frame) => frame.SequentialDeckKindGrowth is { Steps.Count: > 0 } && ValidSequentialDeckKindGrowth(frame);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 490)]
-    internal bool IsSequentialDeckKindGrowthMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.AcquireDeckKindSequentiallyAndGrowOnShortfall && frame.SequentialDeckKindGrowth is { Stage: SequentialDeckKindGrowthStage.GainChildren, Steps.Count: > 0 } && pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && ValidSequentialDeckKindGrowth(frame);
     internal static bool SameSequentialDeckKindGrowthStep(SequentialDeckKindGrowthStepReceipt left, SequentialDeckKindGrowthStepReceipt right) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SequentialDeckKindGrowth.SameSequentialDeckKindGrowthStep(left, right);
     internal bool ValidSequentialDeckKindGrowthStep(long frameId, int owner, CardKind kind, SequentialDeckKindGrowthStepReceipt step)
     {

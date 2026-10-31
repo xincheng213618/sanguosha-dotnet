@@ -200,9 +200,6 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 100)]
-    internal bool IsLastDamageSourceReciprocityMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.LastDamageSourceReciprocity is { } receipt && effect is { Op: SkillProgramEffectOp.LastDamageSourceReciprocity } && effect.StateId == receipt.StateId && f.PendingMovementContinuation == pending && pending.SubjectSeat == receipt.ParticipantSeat && _coreLastDamageSourceReciprocityObserversOperations.ValidLastDamageSourceReceipt(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 640)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 660)]
     internal bool CanContinueLastDamageSourceReciprocity(ProgramSkillFrame f) => f.LastDamageSourceReciprocity is { MovementIssued: true } && _coreLastDamageSourceReciprocityObserversOperations.ValidLastDamageSourceReceipt(f);

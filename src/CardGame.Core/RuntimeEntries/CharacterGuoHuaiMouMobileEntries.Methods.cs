@@ -18,10 +18,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileEntries
     internal bool ExcludeOrdinaryMovement_IsMouGuoHuaiGainTrigger(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_IsMouGuoHuaiGainTrigger(candidate, trigger);
     internal void FinishMouGh(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouGh(f);
     internal void FreezeMouGhActualStart(global::CardGame.Core.TurnStartedEvent turn) => _resolve().FreezeMouGhActualStart(turn);
-    internal bool HasMouGhBeforeDamage(long id) => _resolve().HasMouGhBeforeDamage(id);
-    internal bool HasMouGhDamage(long id) => _resolve().HasMouGhDamage(id);
     internal bool IsMouGhDying() => _resolve().IsMouGhDying();
-    internal bool IsMouGhMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouGhMovement(f, e, p);
     internal bool KeepMouGhPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepMouGhPaid(f);
     internal bool LiveMouGhSource(global::CardGame.Core.CardConversionSource source, string hash) => _resolve().LiveMouGhSource(source, hash);
     internal global::CardGame.Core.PromptChoice MouGhChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string description, int? card = default, int? target = default) => _resolve().MouGhChoice(f, branch, description, card, target);

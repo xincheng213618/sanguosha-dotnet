@@ -62,22 +62,6 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarkContinuationsRu
     internal ProgramSkillFrame? RecipientCategoryMarkObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreRecipientCategoryMarkObserversOperations.RecipientCategoryMarkFirstChild(root, child), (index) => _coreRecipientCategoryMarkContinuationsOperations.RecipientCategoryObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 610)]
     internal bool IsRecipientCategoryMarkProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RecipientCategoryMarkObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1840)]
-    internal bool HasRecipientCategoryMarkDamageObserver(long windowId)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == windowId && f is DamageTriggerWindowFrame);
-        if (index < 0 || RecipientCategoryMarkObserverRoot()is not { } root)
-            return false;
-        var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index > rootIndex)
-            return true; // The validated suffix contains this exact native descendant.
-        // An enclosing damage observer is accepted only if each edge from its
-        // actual candidate through the original Dying entry to this root agrees.
-        for (var child = index + 1; child <= rootIndex; child++)
-            if (!_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[child - 1], _resolutionStackOperations._resolutionStack[child]))
-                return false;
-        return index < rootIndex;
-    }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 10)]
     internal bool TryAdvanceRecipientCategoryMarkSubtree()

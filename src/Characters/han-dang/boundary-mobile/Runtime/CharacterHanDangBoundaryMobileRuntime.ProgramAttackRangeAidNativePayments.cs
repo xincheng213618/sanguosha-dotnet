@@ -81,9 +81,6 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
 
         _coreProgramAttackRangeAidOperations.PublishProgramAttackRangeAid(frame, ProgramAttackRangeAidReason(frame));
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 56900)]
-    internal bool ProgramAttackRangeAidMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation continuation) => effect?.Op == SkillProgramEffectOp.RequestAttackRangeAid && frame.AttackRangeAid?.Payment is { Stage: ProgramAttackRangeAidPaymentStage.MovementChildren } && continuation == frame.PendingMovementContinuation && continuation.SubjectSeat == frame.OwnerSeat && continuation.BeforeCount == 0 && continuation.CoverageResultBind is null && ValidProgramAttackRangeAid(frame);
     [ProgramContinuation(ProgramContinuationKind.Resume, 56900)]
     internal bool ResumeProgramAttackRangeAidPayment(long id)
     {

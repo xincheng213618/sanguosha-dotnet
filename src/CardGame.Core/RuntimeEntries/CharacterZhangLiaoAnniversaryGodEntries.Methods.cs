@@ -9,9 +9,7 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodEntries
     internal global::CardGame.Core.PromptChoice AiAnnZlZhiti(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiAnnZlZhiti(p, f);
     internal int AnnZlAbolished(int seat) => _resolve().AnnZlAbolished(seat);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.EquipmentSlot> AnnZlAvailable(int seat) => _resolve().AnnZlAvailable(seat);
-    internal bool AnnZlBeforeDamageObserver(long id) => _resolve().AnnZlBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> AnnZlChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AnnZlChoices(f);
-    internal bool AnnZlDamageObserver(long id) => _resolve().AnnZlDamageObserver(id);
     internal bool AnnZlDying() => _resolve().AnnZlDying();
     internal bool AnnZlEligible(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.SkillProgramTrigger t, global::CardGame.Core.ProgramSkillWindowContext w) => _resolve().AnnZlEligible(c, t, w);
     internal bool AnnZlFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().AnnZlFirstChild(f, child);

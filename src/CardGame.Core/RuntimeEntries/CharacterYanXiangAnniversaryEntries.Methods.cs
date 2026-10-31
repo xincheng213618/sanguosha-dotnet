@@ -37,13 +37,11 @@ internal sealed partial class CharacterYanXiangAnniversaryEntries
     internal bool WindowSettlement_IsAnniversaryYanXiangSettlementBatch(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.CardMovementBatchContext batch) => _resolve().WindowSettlement_IsAnniversaryYanXiangSettlementBatch(frame, batch);
     internal global::CardGame.Core.PromptChoice YanXiangAi(global::CardGame.Core.PendingDecision p) => _resolve().YanXiangAi(p);
     internal int[] YanXiangAvailableOptions(int owner, string instance) => _resolve().YanXiangAvailableOptions(owner, instance);
-    internal bool YanXiangBeforeDamage(long id) => _resolve().YanXiangBeforeDamage(id);
     internal global::CardGame.Core.PromptChoice YanXiangChoice(global::CardGame.Core.ProgramSkillFrame f, string verb, string suffix, string text, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().YanXiangChoice(f, verb, suffix, text, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> YanXiangChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().YanXiangChoices(f);
     internal int YanXiangChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().YanXiangChooser(f);
     internal bool YanXiangColorBanned(int actor, bool? color) => _resolve().YanXiangColorBanned(actor, color);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind> YanXiangDamageNames() => _resolve().YanXiangDamageNames();
-    internal bool YanXiangDamageObserver(long id) => _resolve().YanXiangDamageObserver(id);
     internal global::CardGame.Core.Card[] YanXiangDiscardableHand(int actor) => _resolve().YanXiangDiscardableHand(actor);
     internal bool YanXiangDying() => _resolve().YanXiangDying();
     internal bool YanXiangFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().YanXiangFirstChild(f, child);

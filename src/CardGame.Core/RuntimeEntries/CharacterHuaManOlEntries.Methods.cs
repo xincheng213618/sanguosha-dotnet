@@ -14,8 +14,6 @@ internal sealed partial class CharacterHuaManOlEntries
     internal global::CardGame.Core.SkillProgramStepOutcome ExecuteHuaMan(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().ExecuteHuaMan(supplied, op);
     internal void FinishHuaMan(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuaMan(f);
     internal bool HasActualSouyingObserver() => _resolve().HasActualSouyingObserver();
-    internal bool HasHuaManBeforeDamageObserver(long id) => _resolve().HasHuaManBeforeDamageObserver(id);
-    internal bool HasHuaManDamageObserver(long id) => _resolve().HasHuaManDamageObserver(id);
     internal bool HasHuaManDiscard(int seat) => _resolve().HasHuaManDiscard(seat);
     internal bool HasHuaManSouyingCancellation(global::CardGame.Core.CardUseFrame use) => _resolve().HasHuaManSouyingCancellation(use);
     internal bool HasRuntimeXili(int seat) => _resolve().HasRuntimeXili(seat);
@@ -28,7 +26,6 @@ internal sealed partial class CharacterHuaManOlEntries
     internal bool HuaManLionCost(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuaManLionCost(f);
     internal global::CardGame.Core.ProgramSkillFrame? HuaManObserverRoot() => _resolve().HuaManObserverRoot();
     internal bool IsHuaManClaimedEntity(long useId, int cardId) => _resolve().IsHuaManClaimedEntity(useId, cardId);
-    internal bool IsHuaManMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsHuaManMovement(f, effect, pending);
     internal bool IsHuaManSouyingMutationFact(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.SouyingNativeMutationEvent fact, global::System.Collections.Generic.IReadOnlyList<int> original) => _resolve().IsHuaManSouyingMutationFact(use, fact, original);
     internal void ObserveAcceptedHuaManUse(global::CardGame.Core.CardActionAcceptedEvent accepted) => _resolve().ObserveAcceptedHuaManUse(accepted);
     internal void ObserveHuaManAcceptedUse(global::CardGame.Core.CardActionContext action) => _resolve().ObserveHuaManAcceptedUse(action);

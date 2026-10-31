@@ -47,8 +47,6 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicObserversRunt
                 return paid;
         return null;
     }
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 10)]
-    internal bool HasDrawFundedDistinctBasicDamageObserver(long damageId) => DrawFundedDistinctBasicObserverRoot(damageId)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 120)]
     internal bool IsDrawFundedDistinctBasicProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (DrawFundedDistinctBasicObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id) || _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId)is var index && index >= 0 && (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(index, (DyingFrame)_resolutionStackOperations._resolutionStack[index]) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(index, (DyingFrame)_resolutionStackOperations._resolutionStack[index])));
 

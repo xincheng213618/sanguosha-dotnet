@@ -22,7 +22,4 @@ internal sealed partial class CharacterHuangGaiMouRuntime
         var c = p.Candidates[p.CandidateIndex];
         return c.OwnerSeat == f.OwnerSeat && c.SkillId == f.SkillId && c.TriggerId == f.TriggerId && c.SkillInstanceId == f.SkillInstanceId && c.GameplayHash == f.GameplayHash;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 35400)]
-    internal bool MouHgMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.MouHuangGai is { Stage: MouHgStage.RevealChildren or MouHgStage.ObtainChildren or MouHgStage.NativeChildren or MouHgStage.DiscardSlashChildren } && ValidMouHg(f) && e?.Op == SkillProgramEffectOp.ResolveMouHuangGaiQuzhou && p == f.PendingMovementContinuation && p.BeforeCount == 0 && p.CoverageResultBind is null;
 }

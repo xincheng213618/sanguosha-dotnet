@@ -10,9 +10,6 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
     internal bool ValidShiLs(ProgramSkillFrame f) => f.ShiLuSu is { } r && f.InstructionIndex == 1 && r.Source == ShiLsSource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && r.WindowId == f.WindowContext?.ParentFrameId && Enum.IsDefined(r.Stage) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsStartedEvent>().Count(e => e == new ShiLsStartedEvent(f.Id, r.Source, r.Hash, r.Turn, r.WindowId)) == 1;
     [ProgramCardLegality(ProgramCardLegalityStage.AfterLegalActionKind, 48900)]
     internal bool ShiLsRecastBan(ProgramLegalActionQuery q) => q.Action.Kind == LegalActionKind.Recast && q.Action.CardId is { } id && IsShiLsHandAccess(q.Actor, id);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 48900)]
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 48900)]
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 48900)]
     internal bool ShiLsMovementProof(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.ShiLuSu is { } r && ValidShiLs(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && r.Stage is ShiLsStage.ExchangeChildren or ShiLsStage.DiscardChildren or ShiLsStage.DrawChildren && e?.Op is SkillProgramEffectOp.ResolveMobileShiLuSuHaoshi or SkillProgramEffectOp.ResolveMobileShiLuSuDimeng or SkillProgramEffectOp.ResolveMobileShiLuSuHaoshiRefill;
     internal bool ShiLsFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -31,11 +28,6 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
 
     internal bool ShiLsChildSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (index) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(index), (index, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index, dying) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(index, dying) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(index, dying) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(index, dying));
     internal ProgramSkillFrame? ShiLsObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLuSuMobileShiOperations.ShiLsFirstChild(f, child), (i) => _characterLuSuMobileShiOperations.ShiLsChildSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 48900)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 48900)]
-    internal bool ShiLsDamageChild(long id) => ShiLsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 48900)]
-    internal bool ShiLsBeforeDamageChild(long id) => ShiLsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 48900)]
     internal bool ShiLsDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiLsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 48900)]

@@ -308,8 +308,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 630)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 650)]
     internal bool CanContinuePhaseNamePrediction(ProgramSkillFrame f) => f.PhaseNamePrediction is not null || f.WindowContext?.PhaseNamePrediction is { } p && _coreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess._phaseNamePredictions.Contains(p);
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 70)]
-    internal bool IsPhaseNamePredictionMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => e is not null && PhaseNamePredictionComposition.IsOperation(e.Op) && f.PendingMovementContinuation == pending && f.PhaseNamePrediction is { Stage: PhaseNamePredictionStage.CostChildren or PhaseNamePredictionStage.ClaimChildren };
 
     SkillProgramStepOutcome global::CardGame.Core.IPhaseNamePredictionHost.BeginPhaseNamePrediction(ProgramSkillFrame f, string state) => BeginPhaseNamePrediction(f, state);
     SkillProgramStepOutcome global::CardGame.Core.IPhaseNamePredictionHost.SettlePhaseNamePrediction(ProgramSkillFrame f, string state) => SettlePhaseNamePrediction(f, state);

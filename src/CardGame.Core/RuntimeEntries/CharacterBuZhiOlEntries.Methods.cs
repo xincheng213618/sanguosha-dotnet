@@ -17,8 +17,6 @@ internal sealed partial class CharacterBuZhiOlEntries
     internal global::CardGame.Core.GameEngine.NativeBuZhiDiscardInvocationDraft? CaptureNativeBuZhiDiscardInvocation(global::CardGame.Core.ProgramSkillFrame frame, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardZoneKind> zones, global::CardGame.Core.CardMoveReason reason) => _resolve().CaptureNativeBuZhiDiscardInvocation(frame, zones, reason);
     internal void CompleteNativeBuZhiDiscardInvocation(global::CardGame.Core.GameEngine.NativeBuZhiDiscardInvocationDraft? draft, global::System.Collections.Generic.IReadOnlyList<int> actualIds) => _resolve().CompleteNativeBuZhiDiscardInvocation(draft, actualIds);
     internal void FinishBuZhi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishBuZhi(f);
-    internal bool HasBuZhiBeforeDamageObserver(long id) => _resolve().HasBuZhiBeforeDamageObserver(id);
-    internal bool HasBuZhiDamageObserver(long id) => _resolve().HasBuZhiDamageObserver(id);
     internal bool IsBuZhiActivation(global::CardGame.Core.SkillProgramActivation a) => _resolve().IsBuZhiActivation(a);
     internal bool IsBuZhiMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsBuZhiMovement(f, e, p);
     internal void IssueBuZhiDamage(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IssueBuZhiDamage(f);

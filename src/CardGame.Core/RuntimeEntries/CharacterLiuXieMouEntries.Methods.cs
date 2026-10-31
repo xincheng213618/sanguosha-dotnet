@@ -3,8 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiuXieMouEntries
 {
     internal bool MouLiuXieAdvanceChildren() => _resolve().MouLiuXieAdvanceChildren();
-    internal bool MouLiuXieBeforeDamage(long id) => _resolve().MouLiuXieBeforeDamage(id);
-    internal bool MouLiuXieDamageWindow(long id) => _resolve().MouLiuXieDamageWindow(id);
     internal bool MouLiuXieDying() => _resolve().MouLiuXieDying();
     internal bool MouLiuXieFirstNativeChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouLiuXieFirstNativeChild(f, child);
     internal bool MouLiuXieMovementReturn(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouLiuXieMovementReturn(f, effect, p);

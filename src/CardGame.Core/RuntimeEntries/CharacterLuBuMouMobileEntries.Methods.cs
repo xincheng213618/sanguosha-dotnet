@@ -19,13 +19,10 @@ internal sealed partial class CharacterLuBuMouMobileEntries
     internal void IssueMouLbDuel(global::CardGame.Core.ProgramSkillFrame f, int target) => _resolve().IssueMouLbDuel(f, target);
     internal bool KeepPaidMouLb(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidMouLb(f);
     internal bool MatchesMouLbDuelParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramDamageTargetDuelOrigin o) => _resolve().MatchesMouLbDuelParent(f, o);
-    internal bool MouLbBeforeDamageObserver(long id) => _resolve().MouLbBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouLbChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouLbChoices(f);
-    internal bool MouLbDamageObserver(long id) => _resolve().MouLbDamageObserver(id);
     internal bool MouLbDying() => _resolve().MouLbDying();
     internal bool MouLbFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouLbFirstChild(f, child);
     internal bool MouLbLionChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouLbLionChild(f, child);
-    internal bool MouLbMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouLbMovement(f, e, p);
     internal bool MouLbNativeEdge(int index) => _resolve().MouLbNativeEdge(index);
     internal global::CardGame.Core.ProgramSkillFrame? MouLbObserverRoot() => _resolve().MouLbObserverRoot();
     internal bool MouLbObserverSuffix(int index) => _resolve().MouLbObserverSuffix(index);

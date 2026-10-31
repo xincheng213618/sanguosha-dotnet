@@ -35,7 +35,4 @@ internal sealed partial class CharacterZhuRongMouMobileRuntime
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.OutsideGame, CardLocation.Hand(recipient), new("skill-program.mou-mobile:juxiang.outside-gift"), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, f.OwnerSeat, recipient, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceDown);
         return _coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(f.Id, f.OwnerSeat);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 30400)]
-    internal bool IsMouZhuRongGiftMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation m) => e?.Op == SkillProgramEffectOp.GiftMouZhuRongOutsideAssault && f.InstructionIndex == 2 && f.SkillId == MouZhuRongComposition.Juxiang && m.SubjectSeat == f.OwnerSeat && m.CoverageResultBind is null && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhuRongAssaultGeneratedEvent>().SingleOrDefault(g => g.FrameId == f.Id)is { } generated && generated.Source == MouZhuRongSource(f) && f.SelectedTargetSeats.SequenceEqual([generated.RecipientSeat]) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == generated.CardId && move.From == CardLocation.OutsideGame && move.To == CardLocation.Hand(generated.RecipientSeat) && move.Reason.Value == "skill-program.mou-mobile:juxiang.outside-gift") == 1;
 }

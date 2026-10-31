@@ -268,8 +268,6 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 38200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 38200)]
     internal bool ContinuePaidShenTscPowei(ProgramSkillFrame f) => f.ShenTaishiCiPowei is { Stage: not ShenTaishiCiPoweiStage.Choice } || f.SkillId == ShenTscPowei && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiMissionEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 38200)]
-    internal bool ShenTscPoweiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op is (SkillProgramEffectOp.ResolveShenTaishiCiPowei or SkillProgramEffectOp.ResolveHappyTaishiCiChongwei) && f.ShenTaishiCiPowei is { Stage: ShenTaishiCiPoweiStage.MovementChildren } && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShenTaishiCiPowei)]
     internal PromptChoice ChooseShenTscPowei(PendingDecision p, ProgramSkillFrame f)

@@ -18,12 +18,9 @@ internal sealed partial class CharacterHuangGaiMouMobileEntries
     internal bool ExactMouKurouGiftParent(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExactMouKurouGiftParent(frame);
     internal void GrantMouKurouLossArmor(global::CardGame.Core.ProgramSkillFrame input) => _resolve().GrantMouKurouLossArmor(input);
     internal bool HasIssuedMouZhaJiangUse(long useId, int actorSeat) => _resolve().HasIssuedMouZhaJiangUse(useId, actorSeat);
-    internal bool HasMouKurouBeforeDamageObserver(long id) => _resolve().HasMouKurouBeforeDamageObserver(id);
-    internal bool HasMouKurouDamageObserver(long id) => _resolve().HasMouKurouDamageObserver(id);
     internal bool HasMouZhaJiangPreUsePrivilege(global::CardGame.Core.CharacterState actor) => _resolve().HasMouZhaJiangPreUsePrivilege(actor);
     internal bool HasMouZhaJiangUseDistance(global::CardGame.Core.CharacterState actor, long? useId = default) => _resolve().HasMouZhaJiangUseDistance(actor, useId);
     internal bool IsMouKurouDying() => _resolve().IsMouKurouDying();
-    internal bool IsMouKurouMovement(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsMouKurouMovement(frame, effect, pending);
     internal bool IsMouKurouRecoveryParent(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsMouKurouRecoveryParent(frame, recovery);
     internal bool IsMouZhaJiangUnrespondable(long useId) => _resolve().IsMouZhaJiangUnrespondable(useId);
     internal void IssueMouZhaJiangLegacyDuel(global::CardGame.Core.ProgramSkillFrame owner, int actorSeat) => _resolve().IssueMouZhaJiangLegacyDuel(owner, actorSeat);

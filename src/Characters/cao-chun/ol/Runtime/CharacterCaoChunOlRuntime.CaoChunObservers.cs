@@ -191,11 +191,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
     }
 
     internal ProgramSkillFrame? CaoChunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterCaoChunOlOperations.CaoChunFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 230)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 340)]
-    internal bool HasCaoChunDamageObserver(long id) => CaoChunObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 430)]
-    internal bool HasCaoChunBeforeDamageObserver(long id) => CaoChunObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 340)]
     internal bool TryAdvanceCaoChunSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoChunObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     internal void ExpireCaoChunPlayDebt(int owner, int phaseInstance)

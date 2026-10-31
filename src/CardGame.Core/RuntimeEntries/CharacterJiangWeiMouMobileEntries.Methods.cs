@@ -24,17 +24,14 @@ internal sealed partial class CharacterJiangWeiMouMobileEntries
     internal void IssueMouJwSlash(global::CardGame.Core.ProgramSkillFrame f, int index) => _resolve().IssueMouJwSlash(f, index);
     internal bool KeepMouJwPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepMouJwPaid(f);
     internal int MouJwAvailableCharge(int owner) => _resolve().MouJwAvailableCharge(owner);
-    internal bool MouJwBeforeDamage(long id) => _resolve().MouJwBeforeDamage(id);
     internal bool MouJwBeifaProhibits(global::CardGame.Core.ProgramDirectedTargetQuery q) => _resolve().MouJwBeifaProhibits(q);
     internal int MouJwCharge(int owner) => _resolve().MouJwCharge(owner);
     internal global::CardGame.Core.PromptChoice MouJwChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string text, int? card = default, int? target = default, int option = -1) => _resolve().MouJwChoice(f, branch, text, card, target, option);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouJwChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouJwChoices(f);
-    internal bool MouJwDamage(long id) => _resolve().MouJwDamage(id);
     internal bool MouJwDying() => _resolve().MouJwDying();
     internal bool MouJwFactionSupplyLegal(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, global::CardGame.Core.CardKind kind) => _resolve().MouJwFactionSupplyLegal(pending, kind);
     internal bool MouJwFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouJwFirstChild(f, child);
     internal bool MouJwLionChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouJwLionChild(f, child);
-    internal bool MouJwMovementProof(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouJwMovementProof(f, e, p);
     internal bool MouJwNativeEdge(int n) => _resolve().MouJwNativeEdge(n);
     internal global::CardGame.Core.ProgramSkillFrame? MouJwObserverRoot() => _resolve().MouJwObserverRoot();
     internal bool MouJwRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame child) => _resolve().MouJwRecoveryParent(f, child);

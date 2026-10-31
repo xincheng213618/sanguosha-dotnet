@@ -39,9 +39,6 @@ internal sealed partial class CharacterCaoCaoOlMagicRuntime
         var why = reason;
         return id > 0 && lower >= 0 && upper <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.From.OwnerSeat == seat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.Sequence > lower && m.Sequence <= upper && m.Reason.Value == why && (m.To == CardLocation.Hand(f.OwnerSeat) || m.To == CardLocation.OutsideGame));
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33800)]
-    internal bool MoCaoCaoMovementReturn(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => effect?.Op is SkillProgramEffectOp.ResolveMoCaoCaoBachao or SkillProgramEffectOp.ResolveMoCaoCaoBaibi && MoCaoCaoBachao.Valid(f) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MoCaoCaoFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!MoCaoCaoBachao.Valid(f))
@@ -65,11 +62,6 @@ internal sealed partial class CharacterCaoCaoOlMagicRuntime
     internal bool MoCaoCaoNativeEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MoCaoCaoFirstNativeChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool MoCaoCaoNativeSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterCaoCaoOlMagicOperations.MoCaoCaoNativeEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MoCaoCaoNativeRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterCaoCaoOlMagicOperations.MoCaoCaoFirstNativeChild(f, c), (n) => _characterCaoCaoOlMagicOperations.MoCaoCaoNativeSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 33800)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 33800)]
-    internal bool MoCaoCaoDamageWindow(long id) => MoCaoCaoNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33800)]
-    internal bool MoCaoCaoBeforeDamageWindow(long id) => MoCaoCaoNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33800)]
     internal bool MoCaoCaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MoCaoCaoNativeRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 33800)]

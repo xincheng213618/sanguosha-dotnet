@@ -392,8 +392,6 @@ internal sealed partial class CharacterCaoChunOlRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 24500)]
     internal bool ReturnCaoChunMovement(ProgramSkillFrame f) => f.CaoChun is not null && ResumeCaoChun(f.Id);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 270)]
-    internal bool IsCaoChunMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op is (SkillProgramEffectOp.DrawAndRequestShanjiaSlash or SkillProgramEffectOp.PayShanjiaHandUseDebt) && f.CaoChun?.Stage is (CaoChunStage.DrawChildren or CaoChunStage.DiscardChildren) && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && CanContinueCaoChun(f);
     internal void FinishCaoChun(ProgramSkillFrame f)
     {
         if (f.CaoChun?.Stage == CaoChunStage.InitialSlash && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShanjiaDebtArmedEvent>().Any(e => e.ActivationFrameId == f.Id))

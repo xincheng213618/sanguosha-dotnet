@@ -22,8 +22,6 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
     }
 
     internal bool DrainWuHf(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 381)]
-    internal bool IsWuHfMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect is not null && WuHuangFuSongComposition.Handles(effect.Op) && ValidWuHf(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
     internal bool WuHfFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (!ValidWuHf(f))
@@ -41,11 +39,6 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
 
     internal bool WuHfObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame f && _characterHuangfuSongWumiaoOperations.WuHfFirstChild(f, _resolutionStackOperations2._resolutionStack()[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? WuHfObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuangfuSongWumiaoOperations.WuHfFirstChild(f, c), (i) => _characterHuangfuSongWumiaoOperations.WuHfObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1361)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1471)]
-    internal bool HasWuHfDamageObserver(long id) => WuHfObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1491)]
-    internal bool HasWuHfBeforeDamageObserver(long id) => WuHfObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 930)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 870)]
     internal bool IsWuHfRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame r)

@@ -13,7 +13,6 @@ internal sealed partial class CharacterWangKuangOlEntries
     internal void ContinueWangKuang(long id) => _resolve().ContinueWangKuang(id);
     internal bool? DecideIssuedTrigger660(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger660(candidate, context);
     internal bool DrainWangKuangChildren(long id) => _resolve().DrainWangKuangChildren(id);
-    internal bool HasWangKuangDamageObserver(long id) => _resolve().HasWangKuangDamageObserver(id);
     internal bool IsIssuedWangKuangRenxiaCandidate(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().IsIssuedWangKuangRenxiaCandidate(c, context);
     internal bool IsWangKuangRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsWangKuangRecoveryParent(f, recovery);
     internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.ProgramTriggerCandidate> IssuedWangKuangRenxiaEndingCandidates(global::CardGame.Core.CharacterState owner) => _resolve().IssuedWangKuangRenxiaEndingCandidates(owner);

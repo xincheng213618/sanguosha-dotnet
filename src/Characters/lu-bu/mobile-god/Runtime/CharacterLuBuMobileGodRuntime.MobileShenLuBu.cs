@@ -95,9 +95,6 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 40325)]
     internal bool ReturnMobileLbMovement(ProgramSkillFrame f) => f.MobileLuBu is not null && ResumeMobileLb(f.Id);
-    internal bool ValidMobileLbGain(ProgramSkillFrame f) => f.MobileLuBu is { Op: SkillProgramEffectOp.GainMobileShenLuBuDamageCard, Cards: [var id] } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > r.Before && m.Sequence <= r.After && m.From.Zone is CardZoneKind.DrawPile or CardZoneKind.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MobileLbGainReason) == 1;
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 40325)]
-    internal bool ProveMobileLbGain(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.GainMobileShenLuBuDamageCard && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidMobileLbGain(f);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40325)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40325)]

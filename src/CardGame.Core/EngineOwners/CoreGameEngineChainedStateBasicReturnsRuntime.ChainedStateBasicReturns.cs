@@ -384,9 +384,6 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
                 return paid;
         return null;
     }
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1630)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 20)]
-    internal bool HasChainedStateBasicDamageObserver(long id) => ChainedStateBasicObserverRoot(id)is not null;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 130)]
     internal bool IsChainedStateBasicProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ChainedStateBasicObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

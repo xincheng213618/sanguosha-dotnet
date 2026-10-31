@@ -14,11 +14,9 @@ internal sealed partial class CharacterHaoMengAnniversaryEntries
     internal void FinishHaoMeng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHaoMeng(f);
     internal global::CardGame.Core.PromptChoice HaoMengAi(global::CardGame.Core.PendingDecision p) => _resolve().HaoMengAi(p);
     internal int[] HaoMengAvailableCards(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HaoMengAvailableCards(f);
-    internal bool HaoMengBeforeDamage(long id) => _resolve().HaoMengBeforeDamage(id);
     internal global::CardGame.Core.PromptChoice HaoMengChoice(global::CardGame.Core.ProgramSkillFrame f, string verb, string value, string label, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default) => _resolve().HaoMengChoice(f, verb, value, label, cards, targets);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HaoMengChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HaoMengChoices(f);
     internal global::CardGame.Core.CardUseFrame? HaoMengConsequenceUse(global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().HaoMengConsequenceUse(c);
-    internal bool HaoMengDamageObserver(long id) => _resolve().HaoMengDamageObserver(id);
     internal bool HaoMengDying() => _resolve().HaoMengDying();
     internal bool HaoMengFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HaoMengFirstChild(f, child);
     internal global::CardGame.Core.Suit HaoMengHandSuit(int owner, int id) => _resolve().HaoMengHandSuit(owner, id);

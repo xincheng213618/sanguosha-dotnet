@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenLinMouRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 37000)]
     internal bool MouChenLinMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => (f.MouChenLin is not null && ValidMouChenLin(f) && op?.Op is SkillProgramEffectOp.ResolveMouChenLinZhuanwen or SkillProgramEffectOp.ResolveMouChenLinYaozuo || f.MouChenLinInvitation is { Stage: MouChenLinInvitationStage.MovementChildren } && MouChenLinRules.ValidInvitation(f) && op?.Op == SkillProgramEffectOp.ResolveMouChenLinYaozuo) && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool MouChenLinFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -49,11 +48,6 @@ internal sealed partial class CharacterChenLinMouRuntime
     internal ProgramSkillFrame? MouChenLinRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterChenLinMouOperations.MouChenLinFirstChild(f, c), (n) => _characterChenLinMouOperations.MouChenLinSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 37000)]
     internal bool MouChenLinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouChenLinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 37000)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 37000)]
-    internal bool MouChenLinDamageWindow(long id) => MouChenLinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 37000)]
-    internal bool MouChenLinBeforeDamage(long id) => MouChenLinRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id && x is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 37000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 37000)]
     internal bool MouChenLinRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

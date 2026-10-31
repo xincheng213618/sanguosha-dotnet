@@ -29,8 +29,6 @@ internal sealed partial class CharacterBeiMiHuOlEntries
     internal bool DrainBeiMiHuChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainBeiMiHuChildren(f);
     internal bool ExactBeiMiHuLifecycleParent(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ExactBeiMiHuLifecycleParent(f);
     internal void FinishBeiMiHu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishBeiMiHu(f);
-    internal bool HasBeiMiHuBeforeDamageObserver(long id) => _resolve().HasBeiMiHuBeforeDamageObserver(id);
-    internal bool HasBeiMiHuDamageObserver(long id) => _resolve().HasBeiMiHuDamageObserver(id);
     internal bool HasBeiMiHuPreludeBindings(global::CardGame.Core.CharacterState player, global::CardGame.Core.SkillProgramTriggerWindow window, global::CardGame.Core.SkillProgramEffectOp operation) => _resolve().HasBeiMiHuPreludeBindings(player, window, operation);
     internal bool IsBeiMiHuMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation pending) => _resolve().IsBeiMiHuMovement(f, effect, pending);
     internal bool KuiAppendTargetFinalizedInstantTrickRequirementTargetWindow(global::CardGame.Core.ProgramTargetCardWindowQuery query) => _resolve().KuiAppendTargetFinalizedInstantTrickRequirementTargetWindow(query);

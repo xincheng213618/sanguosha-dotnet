@@ -7,6 +7,5 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicObserversEntr
     internal bool DrawFundedDistinctBasicLegacyAlcoholRide(global::CardGame.Core.DrawFundedDistinctBasicFrame paid, int dyingIndex, global::CardGame.Core.DyingFrame dying) => _resolve().DrawFundedDistinctBasicLegacyAlcoholRide(paid, dyingIndex, dying);
     internal global::CardGame.Core.DrawFundedDistinctBasicFrame? DrawFundedDistinctBasicObserverRoot(long? requestedId = default) => _resolve().DrawFundedDistinctBasicObserverRoot(requestedId);
     internal bool DrawFundedDistinctBasicPaidSuffix(int paidIndex) => _resolve().DrawFundedDistinctBasicPaidSuffix(paidIndex);
-    internal bool HasDrawFundedDistinctBasicDamageObserver(long damageId) => _resolve().HasDrawFundedDistinctBasicDamageObserver(damageId);
     internal bool IsDrawFundedDistinctBasicProgramDying() => _resolve().IsDrawFundedDistinctBasicProgramDying();
 }

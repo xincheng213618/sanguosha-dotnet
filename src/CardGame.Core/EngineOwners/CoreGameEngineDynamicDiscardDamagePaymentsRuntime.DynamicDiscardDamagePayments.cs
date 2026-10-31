@@ -112,8 +112,6 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsRuntime
             throw new InvalidOperationException("The discard drain lost its exact paid instruction and ledger.");
         return _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 30)]
     internal bool IsDynamicDiscardDamageMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => effect?.Op == SkillProgramEffectOp.DiscardTargetHpCardsAndDamage && f.DynamicDiscardDamage is { Stage: DynamicDiscardDamageStage.Paid } r && f.InstructionIndex == r.InstructionIndex && f.SelectedTargetSeats is [var target] && target == r.TargetSeat && movement.SubjectSeat == f.OwnerSeat && movement.BeforeCount == 0 && movement.CoverageResultBind is null && ValidDynamicDiscardDamagePayments(f);
     [ProgramContinuation(ProgramContinuationKind.Resume, 470)]
     internal bool ResumeDynamicDiscardDamage(long id)

@@ -13,9 +13,7 @@ internal sealed partial class CharacterHuCheErAnniversaryEntries
     internal void ContinueHuCheEr(long id) => _resolve().ContinueHuCheEr(id);
     internal bool DrainHuCheEr(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainHuCheEr(f);
     internal void FinishHuCheEr(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishHuCheEr(f);
-    internal bool HuCheErBeforeDamageObserver(long id) => _resolve().HuCheErBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HuCheErChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HuCheErChoices(f);
-    internal bool HuCheErDamageObserver(long id) => _resolve().HuCheErDamageObserver(id);
     internal bool HuCheErDyingObserver() => _resolve().HuCheErDyingObserver();
     internal bool HuCheErFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HuCheErFirstChild(f, child);
     internal global::CardGame.Core.CardUseFrame? HuCheErFirstWeapon(int owner, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().HuCheErFirstWeapon(owner, c);

@@ -116,7 +116,5 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 30)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30)]
     internal bool CanContinueDeathGrowthSkill(ProgramSkillFrame f) => f.DeathGrowthSkill is not null && _coreDeathGrowthSkillObserversOperations.ValidDeathGrowthSkill(f);
-    [ProgramMovementProof(ProgramMovementProofPhase.NativeCost, 40)]
-    internal bool IsDeathGrowthMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.DeathGrowthSkill is { Stage: DeathGrowthSkillStage.DrawChildren } r && r.InstructionIndex == f.InstructionIndex && effect?.Op == SkillProgramEffectOp.DrawAfterOtherDeathThenChooseMissingSkill && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     SkillProgramStepOutcome global::CardGame.Core.IDeathGrowthSkillHost.DrawAfterOtherDeathThenChooseMissingSkill(ProgramSkillFrame f, SkillProgramEffect e) => BeginDeathGrowthSkill(f, e);
 }

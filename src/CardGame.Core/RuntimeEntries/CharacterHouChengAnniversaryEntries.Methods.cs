@@ -11,9 +11,7 @@ internal sealed partial class CharacterHouChengAnniversaryEntries
     internal void ContinueHouCheng(long id) => _resolve().ContinueHouCheng(id);
     internal bool DrainHouCheng(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainHouCheng(f);
     internal global::CardGame.Core.PromptChoice HouChengAi(global::CardGame.Core.PendingDecision p) => _resolve().HouChengAi(p);
-    internal bool HouChengBeforeDamageObserver(long id) => _resolve().HouChengBeforeDamageObserver(id);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HouChengChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().HouChengChoices(f);
-    internal bool HouChengDamageObserver(long id) => _resolve().HouChengDamageObserver(id);
     internal bool HouChengDyingObserver() => _resolve().HouChengDyingObserver();
     internal bool HouChengFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().HouChengFirstChild(f, child);
     internal bool HouChengForeignDiscard(int owner, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().HouChengForeignDiscard(owner, c);

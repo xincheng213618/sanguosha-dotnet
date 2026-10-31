@@ -64,8 +64,6 @@ internal sealed partial class CoreGameEngineActualHandGainObserversRuntime
     internal ProgramSkillFrame? ActualHandGainObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreActualHandGainObserversOperations.ActualHandGainFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 190)]
     internal bool IsActualHandGainProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ActualHandGainObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1720)]
-    internal bool HasActualHandGainDamageObserver(long window) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == window && f is DamageTriggerWindowFrame) && ActualHandGainObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 500)]
     internal bool TryAdvanceActualHandGainSubtree()
     {

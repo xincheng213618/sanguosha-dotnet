@@ -12,11 +12,8 @@ internal sealed partial class CharacterGanNingMouMobileEntries
     internal bool DrainMouGn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMouGn(f);
     internal void DrawMouGn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrawMouGn(f);
     internal void FinishMouGn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishMouGn(f);
-    internal bool HasMouGnBeforeDamage(long id) => _resolve().HasMouGnBeforeDamage(id);
-    internal bool HasMouGnDamage(long id) => _resolve().HasMouGnDamage(id);
     internal bool IsIssuedMouGanNingPile(global::CardGame.Core.PublicPersistentPileSource p) => _resolve().IsIssuedMouGanNingPile(p);
     internal bool IsMouGnDying() => _resolve().IsMouGnDying();
-    internal bool IsMouGnMovement(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? e, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().IsMouGnMovement(f, e, p);
     internal bool KeepMouGnAccepted(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepMouGnAccepted(f);
     internal global::CardGame.Core.PromptChoice MouGnChoice(global::CardGame.Core.ProgramSkillFrame f, string branch, string description, global::System.Collections.Generic.IReadOnlyList<int>? cards = default, global::System.Collections.Generic.IReadOnlyList<int>? targets = default, string? suit = default) => _resolve().MouGnChoice(f, branch, description, cards, targets, suit);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MouGnChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MouGnChoices(f);

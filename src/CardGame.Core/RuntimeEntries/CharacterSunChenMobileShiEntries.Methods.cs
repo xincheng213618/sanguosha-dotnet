@@ -23,14 +23,12 @@ internal sealed partial class CharacterSunChenMobileShiEntries
     internal bool ReturnShiScMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShiScMovement(f);
     internal void SetShiScChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt a, int amount) => _resolve().SetShiScChainAmount(a, amount);
     internal void SetShiScDamageState(long id, global::CardGame.Core.ShiScDamageReceipt? r) => _resolve().SetShiScDamageState(id, r);
-    internal bool ShiScBeforeDamageObserver(long id) => _resolve().ShiScBeforeDamageObserver(id);
     internal bool ShiScChildEdge(int i) => _resolve().ShiScChildEdge(i);
     internal bool ShiScChildSuffix(int n) => _resolve().ShiScChildSuffix(n);
     internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShiScChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiScChoices(f);
     internal int ShiScChooser(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShiScChooser(f);
     internal global::CardGame.Core.GameEngine.ShiScCompletedUse? ShiScCompleted(global::CardGame.Core.ProgramSkillWindowContext w, int owner) => _resolve().ShiScCompleted(w, owner);
     internal int ShiScDamageCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => _resolve().ShiScDamageCursor(a);
-    internal bool ShiScDamageObserver(long id) => _resolve().ShiScDamageObserver(id);
     internal global::CardGame.Core.ShiScDamageReceipt? ShiScDamageState(long id) => _resolve().ShiScDamageState(id);
     internal bool ShiScDyingObserver() => _resolve().ShiScDyingObserver();
     internal bool ShiScFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ShiScFirstChild(f, child);

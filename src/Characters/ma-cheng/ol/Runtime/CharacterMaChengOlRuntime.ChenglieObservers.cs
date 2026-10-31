@@ -8,9 +8,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaChengOlRuntime
 {
     internal static bool ChenglieChildren(ChenglieStage s) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ma_cheng_ol_ChenglieObservers.ChenglieChildren(s);
-
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 490)]
-    internal bool IsMaChengMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => f.Chenglie is { } r && ChenglieChildren(r.Stage) && pending == f.PendingMovementContinuation && pending.BeforeCount == 0 && pending.CoverageResultBind is null && e?.Op == (r.Outcome ? SkillProgramEffectOp.ResolveChenglieRedHolderOutcome : SkillProgramEffectOp.ResolveChenglieExtraTargetsAndHiddenCards);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 250)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 240)]
     internal bool IsMaChengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
@@ -50,11 +47,6 @@ internal sealed partial class CharacterMaChengOlRuntime
     }
 
     internal ProgramSkillFrame? MaChengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterMaChengOlOperations.MaChengFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 1010)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 1120)]
-    internal bool HasMaChengDamageObserver(long id) => MaChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 1150)]
-    internal bool HasMaChengBeforeDamageObserver(long id) => MaChengObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27560)]
     internal bool AdvanceMaChengSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MaChengObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 

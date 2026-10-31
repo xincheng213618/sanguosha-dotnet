@@ -7,7 +7,6 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoMouOlRuntime
 {
-    [ProgramMovementProof(ProgramMovementProofPhase.EffectPayments, 33500)]
     internal bool IsMouDongZhaoMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect is not null && MouDongZhaoComposition.Handles(effect.Op) && ValidMouDongZhao(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && f.MouDongZhao!.Stage is MouDongZhaoStage.DrawChildren or MouDongZhaoStage.GiftChildren or MouDongZhaoStage.DiscardChildren or MouDongZhaoStage.MoveChildren;
     internal bool MouDongZhaoFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -27,10 +26,6 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     internal bool MouDongZhaoObserverEdge(int index) => _coreObserverSubtreesOperations.IsMovementObserverEdge(index) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(index) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(index) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[index - 1], _resolutionStackOperations._resolutionStack[index]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]);
     internal bool MouDongZhaoObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _characterDongZhaoMouOlOperations.MouDongZhaoObserverEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? MouDongZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterDongZhaoMouOlOperations.MouDongZhaoFirstChild(f, c), (n) => _characterDongZhaoMouOlOperations.MouDongZhaoObserverSuffix(n));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 33500)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 33500)]
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 33500)]
-    internal bool HasMouDongZhaoDamageObserver(long id) => MouDongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33500)]
     internal bool IsMouDongZhaoDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouDongZhaoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 33500)]

@@ -17,14 +17,6 @@ internal sealed partial class CharacterMengDaOlRuntime
         return true;
     }
 
-    [ProgramMovementProof(ProgramMovementProofPhase.BoundEquipment, 280)]
-    internal bool IsMengDaMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
-    {
-        if (f.Goude is not { Stage: GoudeStage.MovementChildren or GoudeStage.NativeChildren } || e?.Op != SkillProgramEffectOp.ResolveGoudeActualTurnEnd || p != f.PendingMovementContinuation)
-            return false;
-        return true;
-    }
-
     internal bool MengDaFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.Goude is not { } r)
@@ -37,11 +29,6 @@ internal sealed partial class CharacterMengDaOlRuntime
     }
 
     internal ProgramSkillFrame? MengDaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterMengDaOlOperations.MengDaFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 730)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 840)]
-    internal bool HasMengDaDamageObserver(long id) => MengDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is DamageTriggerWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 870)]
-    internal bool HasMengDaBeforeDamageObserver(long id) => MengDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27240)]
     internal bool AdvanceMengDaSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MengDaObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

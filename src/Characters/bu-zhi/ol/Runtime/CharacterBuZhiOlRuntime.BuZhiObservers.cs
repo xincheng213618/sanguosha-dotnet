@@ -17,11 +17,6 @@ internal sealed partial class CharacterBuZhiOlRuntime
     }
 
     internal ProgramSkillFrame? BuZhiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterBuZhiOlOperations.BuZhiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
-    [ProgramObserverProof(ProgramObserverProofPhase.PaidDamage, 50)]
-    [ProgramObserverProof(ProgramObserverProofPhase.NestedDamage, 160)]
-    internal bool HasBuZhiDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is DamageTriggerWindowFrame) && BuZhiObserverRoot()is not null;
-    [ProgramObserverProof(ProgramObserverProofPhase.BeforeDamage, 270)]
-    internal bool HasBuZhiBeforeDamageObserver(long id) => _resolutionStackOperations._resolutionStack.Any(f => f.Id == id && f is BeforeDamageProgramWindowFrame) && BuZhiObserverRoot()is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 130)]
     internal bool TryAdvanceBuZhiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BuZhiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 70)]

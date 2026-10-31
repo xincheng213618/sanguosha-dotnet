@@ -230,9 +230,6 @@ internal sealed partial class CoreGameEngineMatchingRecastsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
     }
-
-    [ProgramMovementProof(ProgramMovementProofPhase.PrivatePayments, 220)]
-    internal bool IsMatchingRecastMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => effect?.Op == SkillProgramEffectOp.RecastMatchingCardsThenPeerChoice && f.MatchingRecast is { Stage: MatchingRecastStage.OwnerCostChildren or MatchingRecastStage.OwnerDrawChildren or MatchingRecastStage.PeerCostChildren or MatchingRecastStage.PeerDrawChildren } r && f.PendingMovementContinuation == pending && pending.SubjectSeat == CurrentMatchingRecast(r).Seat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && _coreMatchingRecastObserversOperations.ValidMatchingRecastReceipt(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 610)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 630)]
     internal bool CanContinueMatchingRecast(ProgramSkillFrame f) => f.MatchingRecast is { Owner.CostIssued: true } && _coreMatchingRecastObserversOperations.ValidMatchingRecastReceipt(f);
