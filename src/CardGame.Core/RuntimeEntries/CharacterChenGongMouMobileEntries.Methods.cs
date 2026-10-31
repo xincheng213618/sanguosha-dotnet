@@ -5,7 +5,6 @@ internal sealed partial class CharacterChenGongMouMobileEntries
     internal bool AdvanceMouChenGongChildren() => _resolve().AdvanceMouChenGongChildren();
     internal PromptChoice AiMouChenGongGift(PendingDecision pending, ProgramSkillFrame f) => _resolve().AiMouChenGongGift(pending, f);
     internal PromptChoice AiMouChenGongRelease(PendingDecision pending, ProgramSkillFrame f) => _resolve().AiMouChenGongRelease(pending, f);
-    internal void AnswerMouChenGongBranch(PromptChoice selected) => _resolve().AnswerMouChenGongBranch(selected);
     internal void AnswerMouChenGongGift(PromptChoice selected) => _resolve().AnswerMouChenGongGift(selected);
     internal void AnswerMouChenGongRelease(PromptChoice selected) => _resolve().AnswerMouChenGongRelease(selected);
     internal ProgramSkillWindowContext AttachMouChenGongProtection(BeforeDamageProgramCandidate item, ProgramSkillWindowContext context) => _resolve().AttachMouChenGongProtection(item, context);
@@ -13,7 +12,6 @@ internal sealed partial class CharacterChenGongMouMobileEntries
     internal SkillProgramStepOutcome BeginMouChenGongRelease(ProgramSkillFrame supplied) => _resolve().BeginMouChenGongRelease(supplied);
     internal bool CanOfferMouChenGongRelease(ProgramTriggerLegalityContext c) => _resolve().CanOfferMouChenGongRelease(c);
     internal bool CanStartMouChenGongGift(CharacterState owner) => _resolve().CanStartMouChenGongGift(owner);
-    internal void CaptureMouChenGongLoss(IGameEvent fact) => _resolve().CaptureMouChenGongLoss(fact);
     internal void ChangeMouChenGongCe(ProgramSkillFrame f, int delta) => _resolve().ChangeMouChenGongCe(f, delta);
     internal IEnumerable<BeforeDamageProgramCandidate> CollectIssuedMouChenGongZhichiCandidates(int source, int target, bool rangeChainOnly) => _resolve().CollectIssuedMouChenGongZhichiCandidates(source, target, rangeChainOnly);
     internal void ContinueMouChenGongGift(long id) => _resolve().ContinueMouChenGongGift(id);
@@ -21,14 +19,12 @@ internal sealed partial class CharacterChenGongMouMobileEntries
     internal MouChenGongZhichiProtection? CurrentMouChenGongProtection(int owner) => _resolve().CurrentMouChenGongProtection(owner);
     internal bool DrainMouChenGongChildren(ProgramSkillFrame f) => _resolve().DrainMouChenGongChildren(f);
     internal bool ExactMouChenGongBeforeFrame(ProgramSkillFrame f, bool allowPrevented) => _resolve().ExactMouChenGongBeforeFrame(f, allowPrevented);
-    internal void FinishMouChenGongGift(ProgramSkillFrame f) => _resolve().FinishMouChenGongGift(f);
     internal bool GateMouChenGongZhichi(ProgramTriggerLegalityContext gate) => _resolve().GateMouChenGongZhichi(gate);
     internal bool IsIssuedMouChenGongZhichiCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsIssuedMouChenGongZhichiCandidate(candidate, context);
     internal bool IsMouChenGongDying() => _resolve().IsMouChenGongDying();
     internal bool IsMouChenGongMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => _resolve().IsMouChenGongMovement(f, e, p);
     internal bool IsMouChenGongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsMouChenGongRecoveryParent(f, recovery);
     internal bool IsMouChenGongZhichiBeforeCandidate(ProgramTriggerCandidate candidate) => _resolve().IsMouChenGongZhichiBeforeCandidate(candidate);
-    internal IReadOnlyList<PromptChoice> MouChenGongBranchChoices(ProgramSkillFrame f) => _resolve().MouChenGongBranchChoices(f);
     internal bool MouChenGongFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouChenGongFirstChild(f, child);
     internal IReadOnlyList<PromptChoice> MouChenGongGiftChoices(ProgramSkillFrame f) => _resolve().MouChenGongGiftChoices(f);
     internal bool MouChenGongGiftRoot(ProgramSkillFrame f) => _resolve().MouChenGongGiftRoot(f);
@@ -47,7 +43,6 @@ internal sealed partial class CharacterChenGongMouMobileEntries
     internal bool PermitMouChenGongZhichiAfterLoss(ProgramSkillFrame f) => _resolve().PermitMouChenGongZhichiAfterLoss(f);
     internal void PublishMouChenGong(ProgramSkillFrame f, int chooser, IReadOnlyList<PromptChoice> choices, string text) => _resolve().PublishMouChenGong(f, chooser, choices, text);
     internal bool ResumeMouChenGong(long id) => _resolve().ResumeMouChenGong(id);
-    internal void ReturnMouChenGongDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => _resolve().ReturnMouChenGongDraw(f, outcome);
     internal bool ReturnMouChenGongMovement(ProgramSkillFrame f) => _resolve().ReturnMouChenGongMovement(f);
     internal void SealMouChenGongMovements(long id, long before) => _resolve().SealMouChenGongMovements(id, before);
     internal bool ValidMouChenGongGift(ProgramSkillFrame f) => _resolve().ValidMouChenGongGift(f);

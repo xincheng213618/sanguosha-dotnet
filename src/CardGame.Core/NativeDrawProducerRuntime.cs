@@ -32,7 +32,7 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
             _ => throw new InvalidOperationException("Draw has an unsupported amount instruction.")
         };
         if (requested is null) return SkillProgramStepOutcome.Continue;
-        if (!queries.HasAttemptCapability && !starting.IsExactGameStartingDrawProgram(frame) && !starting.IsExactGameStartingGainDrawProgram(frame) && !queries.IsLiushiClearDraw(frame) &&
+        if (!instruction.AwaitMovementTriggers && !queries.HasAttemptCapability && !starting.IsExactGameStartingDrawProgram(frame) && !starting.IsExactGameStartingGainDrawProgram(frame) && !queries.IsLiushiClearDraw(frame) &&
             !MobileZhugeJinComposition.IsHongyuanDrawCursor(frame, queries.ResolvePlan(frame)))
         {
             if (selected) operations.DrawSelectedTargets(frame.Id, requested.Value, reason);

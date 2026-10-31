@@ -68,10 +68,9 @@
             "amount": 1
           },
           "effects": [
-            {
-              "op": "offerHappySimaJilueFirstDraw",
-              "target": "owner"
-            },
+            {"op":"offerHappySimaJilueFirstDraw","target":"owner","resultBind":"first-jilue-use"},
+            {"op":"chooseOption","target":"owner","resultBind":"first-jilue-reward","condition":{"kind":"expression","expr":["==",["number","first-jilue-use"],1]},"options":[{"id":"draw"},{"id":"decline"}]},
+            {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"first-jilue-reward","optionId":"draw"}},
             {
               "op": "grantTurnSkills",
               "target": "owner",
@@ -109,18 +108,9 @@
               ],
               "oldCardDestination": "discardPile"
             },
-            {
-              "op": "offerHappySimaJilueFirstDraw",
-              "target": "owner",
-              "replacementSuits": [
-                "spade",
-                "club",
-                "heart",
-                "diamond"
-              ],
-              "minimumReplacementRank": 1,
-              "maximumReplacementRank": 13
-            }
+            {"op":"offerHappySimaJilueFirstDraw","target":"owner","replacementSuits":["spade","club","heart","diamond"],"minimumReplacementRank":1,"maximumReplacementRank":13,"resultBind":"first-jilue-use"},
+            {"op":"chooseOption","target":"owner","resultBind":"first-jilue-reward","condition":{"kind":"expression","expr":["==",["number","first-jilue-use"],1]},"options":[{"id":"draw"},{"id":"decline"}],"replacementSuits":["spade","club","heart","diamond"],"minimumReplacementRank":1,"maximumReplacementRank":13},
+            {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"first-jilue-reward","optionId":"draw"},"replacementSuits":["spade","club","heart","diamond"],"minimumReplacementRank":1,"maximumReplacementRank":13}
           ]
         },
         {
@@ -134,10 +124,9 @@
             "amount": 1
           },
           "effects": [
-            {
-              "op": "offerHappySimaJilueFirstDraw",
-              "target": "owner"
-            },
+            {"op":"offerHappySimaJilueFirstDraw","target":"owner","resultBind":"first-jilue-use"},
+            {"op":"chooseOption","target":"owner","resultBind":"first-jilue-reward","condition":{"kind":"expression","expr":["==",["number","first-jilue-use"],1]},"options":[{"id":"draw"},{"id":"decline"}]},
+            {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"first-jilue-reward","optionId":"draw"}},
             {
               "op": "selectTarget",
               "target": "owner",
@@ -167,10 +156,9 @@
             "amount": 1
           },
           "effects": [
-            {
-              "op": "offerHappySimaJilueFirstDraw",
-              "target": "owner"
-            },
+            {"op":"offerHappySimaJilueFirstDraw","target":"owner","resultBind":"first-jilue-use"},
+            {"op":"chooseOption","target":"owner","resultBind":"first-jilue-reward","condition":{"kind":"expression","expr":["==",["number","first-jilue-use"],1]},"options":[{"id":"draw"},{"id":"decline"}]},
+            {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"first-jilue-reward","optionId":"draw"}},
             {
               "op": "draw",
               "target": "owner",
@@ -191,10 +179,9 @@
             "amount": 1
           },
           "effects": [
-            {
-              "op": "offerHappySimaJilueFirstDraw",
-              "target": "owner"
-            },
+            {"op":"offerHappySimaJilueFirstDraw","target":"owner","resultBind":"first-jilue-use"},
+            {"op":"chooseOption","target":"owner","resultBind":"first-jilue-reward","condition":{"kind":"expression","expr":["==",["number","first-jilue-use"],1]},"options":[{"id":"draw"},{"id":"decline"}]},
+            {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"first-jilue-reward","optionId":"draw"}},
             {
               "op": "draw",
               "target": "owner",
@@ -212,10 +199,9 @@
             "amount": 1
           },
           "effects": [
-            {
-              "op": "offerHappySimaJilueFirstDraw",
-              "target": "owner"
-            },
+            {"op":"offerHappySimaJilueFirstDraw","target":"owner","resultBind":"first-jilue-use"},
+            {"op":"chooseOption","target":"owner","resultBind":"first-jilue-reward","condition":{"kind":"expression","expr":["==",["number","first-jilue-use"],1]},"options":[{"id":"draw"},{"id":"decline"}]},
+            {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"first-jilue-reward","optionId":"draw"}},
             {
               "op": "grantTurnSkills",
               "target": "owner",

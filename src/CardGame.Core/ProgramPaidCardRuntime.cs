@@ -18,6 +18,9 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     bool HasSkillInstance(int seat, string skillId, string instanceId);
     ContentSkillDefinition Skill(string skillId);
     PlayerSkillContext SkillContext(int seat);
+    bool CanContinueAfterOwnerDeath(ProgramSkillFrame frame);
+    bool CanContinueAfterSkillLoss(ProgramSkillFrame frame);
+    bool? EvaluateOptionExpression(ProgramSkillFrame frame, ProgramExpression expression);
     IReadOnlyList<Card> Hand(int seat);
     IReadOnlyList<Card> Equipment(int seat);
     IReadOnlyList<Card> Judgment(int seat);

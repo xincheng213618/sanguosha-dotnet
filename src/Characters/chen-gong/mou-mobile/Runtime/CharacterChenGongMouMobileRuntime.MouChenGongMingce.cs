@@ -5,7 +5,7 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenGongMouMobileRuntime
 {
-    internal const string MouChenGongGiftReason = "skill-program.mou-mobile:mingce.give", MouChenGongDrawReason = "skill-program.mou-mobile:mingce.Draw";
+    internal const string MouChenGongGiftReason = "skill-program.mou-mobile:mingce.give";
     internal bool HasMouChenGongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouChenGongMingceGift) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouChenGongMingceRelease) || _contentRegistryOperations._contentRegistry.Skills.ContainsKey(MouChenGongComposition.Zhichi);
 
     internal static CardConversionSource MouChenGongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_chen_gong_mou_mobile_MouChenGongMingce.MouChenGongSource(f);
@@ -70,138 +70,47 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
         ContinueMouChenGongGift(f.Id);
     }
 
-    internal IReadOnlyList<PromptChoice> MouChenGongBranchChoices(ProgramSkillFrame f) => Array.AsReadOnly(new[] { ("lose-hp", "失去1点体力，令明策发动者摸两张牌并获得一个策"), ("draw", "摸一张牌") }.Select(p => new PromptChoice(new($"mou-chen-gong.{(f.Id)}.{(p.Item1)}"), p.Item2, [], [], new Dictionary<string, string> { ["program-action"] = "mou-chen-gong-mingce", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = p.Item1 })).ToArray());
-    [ProgramAnswer("mou-chen-gong-mingce")]
-    internal void AnswerMouChenGongBranch(PromptChoice selected)
+    internal void ContinueMouChenGongGift(long id)
     {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        var r = f.MouChenGongGift!;
-        if (!MouChenGongGiftRoot(f) || r.Stage != MouChenGongGiftStage.RecipientChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.RecipientSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouChenGongBranchChoices(f).Where(c => c.Id == selected.Id).ToArray()))
-            throw new InvalidOperationException("Mingce accepts only its actual recipient's current private branch.");
-        _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        var branch = selected.Parameters["branch"];
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = r with { Branch = branch, Stage = branch == "lose-hp" ? MouChenGongGiftStage.LosingHp : MouChenGongGiftStage.Drawing }, PendingMovementContinuation = branch == "lose-hp" ? new(f.OwnerSeat, 0, null) : null });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenGongBranchAcceptedEvent(f.Id, r.RecipientSeat, branch));
-        if (branch == "draw")
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault() is not ProgramSkillFrame { MouChenGongGift: { Stage: MouChenGongGiftStage.GiftChildren } r } f || f.Id != id || DrainMouChenGongChildren(f))
+            return;
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = null, PendingMovementContinuation = null });
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
         {
-            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, r.RecipientSeat, 1, new(MouChenGongDrawReason));
+            _coreSkillProgramsOperations.FinishProgramSkill(f, true);
             return;
         }
-
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenGongLossIssuedEvent(f.Id, r.RecipientSeat, 1));
-        var result = _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(f.Id, f.SkillId, r.RecipientSeat, 1);
-        if (result == SkillProgramStepOutcome.Continue && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id)
-            ContinueMouChenGongGift(f.Id);
+        var host = _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost();
+        new SkillProgramExecutor().Run(id, host, host);
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 29600)]
-    internal void CaptureMouChenGongLoss(IGameEvent fact)
+    internal void RecordMouChenGongProgramFacts(IGameEvent fact)
     {
-        if (fact is not ProgramSkillHpLostEvent lost || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouChenGongGift: { Stage: MouChenGongGiftStage.LosingHp } r } f || lost.FrameId != f.Id)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault() is not ProgramSkillFrame { SkillId: MouChenGongComposition.Mingce, ActivationId: "gift-and-plan", TriggerId: null } f)
             return;
-        var change = _coreGameEngineHpChangeProgramsPendingHpChangesAccess._pendingHpChanges.SingleOrDefault(c => c.ParentFrameId == f.Id && c.Kind == HpChangeKind.Loss && c.TargetSeat == r.RecipientSeat);
-        if (!MouChenGongGiftRoot(f) || lost.SkillId != f.SkillId || lost.TargetSeat != r.RecipientSeat || change is null || change.SourceSeat is not null || change.Amount != Math.Min(change.HpBefore, 1) || lost.Amount != change.Amount || lost.RemainingHp != change.HpAfter || r.Loss is not null)
-            throw new InvalidOperationException("Mingce's recipient loss must be its one actual native HP deduction.");
-        var paid = new MouChenGongLossPayment(change.Id, change.HpBefore, change.HpAfter, change.Amount);
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouChenGongGift = r with { Stage = MouChenGongGiftStage.LossChildren, Loss = paid } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenGongLossReturnedEvent(f.Id, r.RecipientSeat, paid.ChangeId, paid.HpBefore, paid.HpAfter, paid.ActualAmount, false));
+        if (fact is ProgramSkillResolvedEvent done && done.FrameId == f.Id && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongGiftPaidEvent>().SingleOrDefault(e => e.FrameId == f.Id) is { } paid)
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenGongMingceCompletedEvent(f.Id, paid.RecipientSeat, f.ChoiceBindings.SingleOrDefault(b => b.Name == "mingce-branch")?.OptionId, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongCeChangedEvent>().Any(e => e.FrameId == f.Id && e.After > e.Before)));
     }
 
-    internal void ContinueMouChenGongGift(long id)
+    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 29600)]
+    internal void RecordMouChenGongCe(IGameEvent fact)
     {
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouChenGongGift: { } r } f || f.Id != id)
-            return;
-        if (r.Stage is MouChenGongGiftStage.GiftChoice or MouChenGongGiftStage.RecipientChoice or MouChenGongGiftStage.Drawing)
-            return;
-        if (DrainMouChenGongChildren(f))
-            return;
-        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-        r = f.MouChenGongGift!;
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
-        {
-            FinishMouChenGongGift(f);
-            return;
-        }
-
-        if (r.Stage == MouChenGongGiftStage.GiftChildren)
-        {
-            if (!_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
-            {
-                FinishMouChenGongGift(f);
-                return;
-            }
-
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = r with { Stage = MouChenGongGiftStage.RecipientChoice }, PendingMovementContinuation = null });
-            PublishMouChenGong(f, r.RecipientSeat, MouChenGongBranchChoices(f), "明策：选择失去体力以助发动者，或自己摸一张牌。");
-            return;
-        }
-
-        if (r.Stage == MouChenGongGiftStage.LosingHp)
-        {
-            var appeared = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<IdentityGeneralAppearedEvent>().SingleOrDefault(e => e.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && e.Receipt.ParentFrameId == id && e.Receipt.OwnerSeat == r.RecipientSeat && e.Receipt.RequestedDeduction == 1 && e.Receipt.OriginalInstructionIndex == f.InstructionIndex);
-            if (appeared is null || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<IdentityAppearanceCompletedEvent>().Any(e => e.AppearanceFrameId == appeared.AppearanceFrameId))
-                throw new InvalidOperationException("Mingce cannot resume an unreturned native HP deduction.");
-            var paid = new MouChenGongLossPayment(0, appeared.Receipt.RestoredHp, appeared.Receipt.RestoredHp, 0, true);
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = r with { Stage = MouChenGongGiftStage.LossChildren, Loss = paid } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenGongLossReturnedEvent(f.Id, r.RecipientSeat, 0, paid.HpBefore, paid.HpAfter, 0, true));
-            r = f.MouChenGongGift!;
-        }
-
-        if (r.Stage == MouChenGongGiftStage.LossChildren)
-        {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            {
-                FinishMouChenGongGift(f);
-                return;
-            }
-
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = r with { Stage = MouChenGongGiftStage.Drawing }, PendingMovementContinuation = null });
-            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 2, new(MouChenGongDrawReason));
-            return;
-        }
-
-        if (r.Stage != MouChenGongGiftStage.DrawChildren)
-            throw new InvalidOperationException("Mingce cannot replay its accepted branch.");
-        if (r.Branch == "lose-hp" && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && !r.CeGained)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = r with { CeGained = true } });
-            ChangeMouChenGongCe(f, 1);
-        }
-
-        FinishMouChenGongGift(_coreProgramLifecycleOperations.GetActiveProgramFrame(id));
-    }
-
-    [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouChenGongMingceGift)]
-    internal void ReturnMouChenGongDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
-    {
-        var r = f.MouChenGongGift!;
-        var seat = r.Branch == "lose-hp" ? f.OwnerSeat : r.RecipientSeat;
-        var count = r.Branch == "lose-hp" ? 2 : 1;
-        if (!MouChenGongGiftRoot(f) || r.Stage != MouChenGongGiftStage.Drawing || r.Draw is not null || outcome.RecipientSeat != seat || outcome.RequestedCount != count)
-            throw new InvalidOperationException("Mingce cannot replace or repeat its exact accepted native draw.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = r with { Stage = MouChenGongGiftStage.DrawChildren, Draw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenGongDrawReturnedEvent(f.Id, seat, count, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));
-        SealMouChenGongMovements(f.Id, outcome.SequenceBefore);
-        ContinueMouChenGongGift(f.Id);
-    }
-
-    internal void FinishMouChenGongGift(ProgramSkillFrame f)
-    {
-        var r = f.MouChenGongGift!;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenGongMingceCompletedEvent(f.Id, r.RecipientSeat, r.Branch, r.CeGained));
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = null, PendingMovementContinuation = null });
-        _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+        if (fact is PlayerMarkerChangedEvent { Marker: PlayerMarkerKind.MouChenGongCe, Delta: > 0, Reason: "program.participant-marker" } marker && _resolutionStackOperations._resolutionStack.LastOrDefault() is ProgramSkillFrame { SkillId: MouChenGongComposition.Mingce } f && marker.ResolutionId == f.Id)
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenGongCeChangedEvent(f.Id, f.OwnerSeat, marker.Count - marker.Delta, marker.Count));
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouChenGongMingceGift)]
-    internal PromptChoice AiMouChenGongGift(PendingDecision pending, ProgramSkillFrame f)
+    internal PromptChoice AiMouChenGongGift(PendingDecision pending, ProgramSkillFrame f) => pending.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+
+    [ProgramAiChoice(SkillProgramEffectOp.ChooseOption, SkillId = "mou-mobile:mingce")]
+    internal PromptChoice AiMouChenGongBranch(PendingDecision pending, ProgramSkillFrame f)
     {
-        if (f.MouChenGongGift!.Stage == MouChenGongGiftStage.GiftChoice)
-            return pending.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(pending.PlayerSeat);
         var friendly = _coreAiBrainsAiBrainsAccess._aiBrains[pending.PlayerSeat].ScoreProgramTarget(view, f.OwnerSeat, new(OwnerDraw: 0, OwnerRecovery: 0, OwnerHpLoss: 0, TargetDraw: 1, TargetRecovery: 0, TargetHpLoss: 0, GivesSelected: false, DiscardsSelected: false)) > 0;
         var branch = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && view.Players[pending.PlayerSeat].Hp >= 4 && friendly ? "lose-hp" : "draw";
-        return pending.Choices.Single(c => c.Parameters["branch"] == branch);
+        return pending.Choices.Single(c => c.Parameters["option-id"] == branch);
     }
 
     SkillProgramStepOutcome IMouChenGongHost.Gift(ProgramSkillFrame frame) => BeginMouChenGongGift(frame);

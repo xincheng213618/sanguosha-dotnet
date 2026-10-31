@@ -3,6 +3,9 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramPaidCardRuntimeRuntime
 {
+    bool IProgramPaidCardFacts.CanContinueAfterOwnerDeath(ProgramSkillFrame frame) => _continuationPermissions.Value.CanContinueProgramAfterOwnerDeath(frame);
+    bool IProgramPaidCardFacts.CanContinueAfterSkillLoss(ProgramSkillFrame frame) => _continuationPermissions.Value.CanContinueProgramAfterSkillLoss(frame);
+    bool? IProgramPaidCardFacts.EvaluateOptionExpression(ProgramSkillFrame frame, ProgramExpression expression) => ProgramExpressions.EvaluateBool(expression, _expressionWorld.CreateProgramExpressionWorld(frame));
     int IProgramPaidCardFacts.PlayerCount => _coreMatchDefinitionPlayerCountAccess._playerCount;
 
     IReadOnlyList<int> IProgramPaidCardFacts.Seats => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Select(player => player.Seat).ToArray());

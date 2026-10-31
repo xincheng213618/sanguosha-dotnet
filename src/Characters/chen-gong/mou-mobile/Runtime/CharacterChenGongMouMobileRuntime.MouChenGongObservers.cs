@@ -9,36 +9,10 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
             return false;
         var gifts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongGiftPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (r.Gift is not { } gift)
-            return r.Stage == MouChenGongGiftStage.GiftChoice && gifts.Length == 0 && r.Branch is null && r.Loss is null && r.Draw is null && !r.CeGained;
+            return r.Stage == MouChenGongGiftStage.GiftChoice && gifts.Length == 0;
         if (gift.From.OwnerSeat != f.OwnerSeat || gift.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || gift.Sequence <= 0 || gifts is not [var paid] || paid != new MouChenGongGiftPaidEvent(f.Id, r.RecipientSeat, gift.CardId, gift.PrintedKind, gift.From, gift.To, gift.Sequence) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == gift.Sequence && m.CardId == gift.CardId && m.CardKind == gift.PrintedKind && m.From == gift.From && m.To == gift.To && m.Reason.Value == MouChenGongGiftReason) != 1)
             return false;
-        var branches = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongBranchAcceptedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Branch is null)
-            return r.Stage is MouChenGongGiftStage.GiftChildren or MouChenGongGiftStage.RecipientChoice && branches.Length == 0 && r.Loss is null && r.Draw is null && !r.CeGained;
-        if (r.Branch is not ("lose-hp" or "draw") || branches is not [var branch] || branch != new MouChenGongBranchAcceptedEvent(f.Id, r.RecipientSeat, r.Branch))
-            return false;
-        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongLossIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        var losses = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongLossReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Branch == "draw" && (r.Stage is not (MouChenGongGiftStage.Drawing or MouChenGongGiftStage.DrawChildren) || r.Loss is not null || losses.Length != 0 || issued.Length != 0 || r.CeGained))
-            return false;
-        if (r.Branch == "lose-hp")
-        {
-            if (issued is not [var issue] || issue != new MouChenGongLossIssuedEvent(f.Id, r.RecipientSeat, 1))
-                return false;
-            if (r.Loss is not { } loss)
-                return r.Stage == MouChenGongGiftStage.LosingHp && losses.Length == 0 && r.Draw is null && !r.CeGained;
-            if (loss.HpBefore < 0 || loss.HpAfter < 0 || loss.ActualAmount != loss.HpBefore - loss.HpAfter || loss.ActualAmount is < 0 or > 1 || losses is not [var returned] || returned != new MouChenGongLossReturnedEvent(f.Id, r.RecipientSeat, loss.ChangeId, loss.HpBefore, loss.HpAfter, loss.ActualAmount, loss.IdentityPrevented))
-                return false;
-            if (loss.IdentityPrevented ? loss.ChangeId != 0 || loss.ActualAmount != 0 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<IdentityGeneralAppearedEvent>().Any(e => e.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && e.Receipt.ParentFrameId == f.Id && e.Receipt.OwnerSeat == r.RecipientSeat && e.Receipt.RequestedDeduction == 1 && e.Receipt.OriginalInstructionIndex == f.InstructionIndex && e.Receipt.RestoredHp == loss.HpBefore) : loss.ChangeId <= 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == r.RecipientSeat && e.Amount == loss.ActualAmount && e.RemainingHp == loss.HpAfter) != 1)
-                return false;
-        }
-
-        var draws = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongDrawReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (r.Draw is not { } draw)
-            return draws.Length == 0 && !r.CeGained && r.Stage is MouChenGongGiftStage.LossChildren or MouChenGongGiftStage.Drawing;
-        var seat = r.Branch == "lose-hp" ? f.OwnerSeat : r.RecipientSeat;
-        var count = r.Branch == "lose-hp" ? 2 : 1;
-        return r.Stage == MouChenGongGiftStage.DrawChildren && draw.RecipientSeat == seat && draw.RequestedCount == count && draws is [var returnedDraw] && returnedDraw == new MouChenGongDrawReturnedEvent(f.Id, seat, count, draw.ActualDrawIds.Count, draw.ReplacementGainedIds.Count, draw.SequenceBefore, draw.SequenceAfter, draw.AttemptFrameId) && (!r.CeGained || r.Branch == "lose-hp");
+        return r.Stage == MouChenGongGiftStage.GiftChildren;
     }
 
     internal bool ValidMouChenGongRelease(ProgramSkillFrame f)
@@ -59,6 +33,8 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     {
         if (f.MouChenGongGift is { Gift: not null })
             return ValidMouChenGongGift(f);
+        if (f.SkillId == MouChenGongComposition.Mingce && f.ActivationId == "gift-and-plan" && f.TriggerId is null && f.SelectedTargetSeats is [var recipient])
+            return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongMingceStartedEvent>().Any(e => e.FrameId == f.Id && e.Source == MouChenGongSource(f) && e.GameplayHash == f.GameplayHash && e.RecipientSeat == recipient) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongGiftPaidEvent>().Any(e => e.FrameId == f.Id && e.RecipientSeat == recipient);
         return f.MouChenGongRelease is { FrozenX: > 0 } && ValidMouChenGongRelease(f);
     }
 
@@ -78,22 +54,16 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     }
 
     internal bool MouChenGongMovementSigned(ProgramSkillFrame f, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongMovementSignedEvent>().Count(e => e == new MouChenGongMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1;
-    internal bool IsMouChenGongMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.ResolveMouChenGongMingceGift && f.MouChenGongGift is { Stage: MouChenGongGiftStage.GiftChildren or MouChenGongGiftStage.LosingHp or MouChenGongGiftStage.LossChildren or MouChenGongGiftStage.DrawChildren } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidMouChenGongGift(f);
+    internal bool IsMouChenGongMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => e?.Op == SkillProgramEffectOp.ResolveMouChenGongMingceGift && f.MouChenGongGift is { Stage: MouChenGongGiftStage.GiftChildren } && p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && ValidMouChenGongGift(f);
     internal bool DrainMouChenGongChildren(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     internal bool MouChenGongFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.MouChenGongGift is { Gift: not null } r && ValidMouChenGongGift(f))
         {
-            if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
-                return r.Stage == MouChenGongGiftStage.Drawing && f.NativeDraw is not null;
-            if (child is DyingFrame dying)
-                return r.Stage == MouChenGongGiftStage.LossChildren && r.Loss is { ActualAmount: > 0, HpAfter: 0 } && dying.ParentFrameId == f.Id && dying.VictimSeat == r.RecipientSeat && dying.KillerSeat is null && dying.Continuation == DyingContinuationKind.ProgramSkill;
-            if (child is IdentityAppearanceFrame identity)
-                return r.Stage == MouChenGongGiftStage.LosingHp && identity.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && identity.Receipt.ParentFrameId == f.Id && identity.Receipt.OwnerSeat == r.RecipientSeat && identity.Receipt.RequestedDeduction == 1 && identity.Receipt.OriginalInstructionIndex == f.InstructionIndex;
             if (_coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, f))
                 return true;
             if (child is HpChangedTriggerWindowFrame hp)
-                return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && (r.Stage == MouChenGongGiftStage.LossChildren && r.Loss?.ChangeId == hp.Change.Id && hp.Change.TargetSeat == r.RecipientSeat && hp.Change.Kind == HpChangeKind.Loss || r.Stage == MouChenGongGiftStage.GiftChildren && r.Gift is { PrintedKind: CardKind.SilverLion, From.Zone: CardZoneKind.Equipment } && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Kind == HpChangeKind.Recovery);
+                return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && r.Gift is { PrintedKind: CardKind.SilverLion, From.Zone: CardZoneKind.Equipment } && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Kind == HpChangeKind.Recovery;
             if (f.PendingMovementContinuation is { } pending && IsMouChenGongMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) && child is CardsMovedTriggerWindowFrame moved)
                 return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && MouChenGongMovementSigned(f, m));
         }

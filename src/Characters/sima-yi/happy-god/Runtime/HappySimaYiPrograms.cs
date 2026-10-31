@@ -1,30 +1,30 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
-internal interface IHappySimaYiHost { SkillProgramStepOutcome Execute(ProgramSkillFrame f, SkillProgramEffectOp op); }
+internal interface IHappySimaYiHost { SkillProgramStepOutcome Execute(ProgramSkillFrame f, SkillProgramEffectOp op, string? resultBind); }
 internal abstract class HappySimaYiDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
     public override ISkillProgramEffectHandler Handler => new HappySimaYiHandler(Op);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(1));
 }
-internal sealed class HappySimaFirstDrawDescriptor : HappySimaYiDescriptor
+internal sealed class HappySimaFirstQualificationDescriptor : HappySimaYiDescriptor
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.OfferHappySimaJilueFirstDraw;
-    public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
+    public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.CaptureNumber, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "condition", "replacementSuits", "minimumReplacementRank", "maximumReplacementRank");
+        r.AllowOnly("op", "target", "resultBind", "condition", "replacementSuits", "minimumReplacementRank", "maximumReplacementRank");
         var suits = r.OptionalEnumArray<Suit>("replacementSuits") ?? [];
         var minimum = r.Has("minimumReplacementRank") ? r.RequiredInt("minimumReplacementRank") : 0;
         var maximum = r.Has("maximumReplacementRank") ? r.RequiredInt("maximumReplacementRank") : 0;
         if (suits.Count == 0 ? minimum != 0 || maximum != 0 : suits.Count != 4 || !suits.ToHashSet().SetEquals([Suit.Spade, Suit.Club, Suit.Heart, Suit.Diamond]) || minimum != 1 || maximum != 13)
             throw new InvalidOperationException(r.Path + ": the unconditional Guicai reward must accept every real replacement suit and rank.");
-        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(),
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), resultBind: r.RequiredIdentifier("resultBind"),
             replacementSuits: suits, minimumReplacementRank: minimum, maximumReplacementRank: maximum);
         RequireAlways(effect, r.Path); return effect;
     }
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [];
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new CreateNumberBinding(e.ResultBind!)];
 }
 internal sealed class HappySimaRenjieDescriptor : HappySimaYiDescriptor
 {
@@ -36,19 +36,15 @@ internal sealed class HappySimaRenjieDescriptor : HappySimaYiDescriptor
 internal sealed class HappySimaYiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => op;
-    public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int seat, ISkillProgramEffectHost host) => host.GetCapability<IHappySimaYiHost>().Execute(f, Op);
+    public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int seat, ISkillProgramEffectHost host) => host.GetCapability<IHappySimaYiHost>().Execute(f, Op, e.ResultBind);
 }
-public enum HappySimaYiStage { Choice, Drawing, Children }
-public sealed record HappySimaYiReceipt(CardConversionSource Source, string Hash, long Parent, int Turn, int Instruction, long Payment, HappySimaYiStage Stage)
-{ public NativeDrawOutcome? Draw { get; init; } }
+public sealed record HappySimaYiReceipt(CardConversionSource Source, string Hash, long Parent, int Turn, int Instruction, long Payment);
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public HappySimaYiReceipt? HappySimaYi { get; init; } }
-public sealed record HappySimaJilueFirstOfferedEvent(long FrameId, CardConversionSource Source, string Hash, long Parent, int Turn, int Instruction, long Payment) : IGameEvent;
-public sealed record HappySimaJilueFirstChosenEvent(long FrameId, bool Draw) : IGameEvent;
-public sealed record HappySimaJilueDrawReturnedEvent(long FrameId, int Actual, long Before, long After, long? Attempt) : IGameEvent;
 
 internal static class HappySimaYiComposition
 {
+    internal const string FirstNumber = "first-jilue-use", FirstChoice = "first-jilue-reward";
     [ProgramCatalogValidation(41840)]
     internal static void Validate(string path, SkillProgram p)
     {
@@ -93,24 +89,25 @@ internal static class HappySimaYiComposition
                 UsesPerTurn: null, MarkerCost: { Marker: PlayerMarkerKind.Ren, Amount: 1 } } activation] || !WanshaEffects(activation.Effects) ||
             !p.Triggers.Select(t => t.Id).SequenceEqual(["replace-judgment", "injury-exile", "trick-used", "nullification-used", "dying-wansha"]) ||
             p.Triggers.Any(t => !t.Optional || !t.IsSkillInvocation || t.MarkerCost is not { Marker: PlayerMarkerKind.Ren, Amount: 1 } ||
-                t.UsageScope is not null || t.Condition.Kind != SkillProgramTriggerConditionKind.Always || t.Effects.Any(e => e.Condition.Kind != SkillProgramConditionKind.Always)))
+                t.UsageScope is not null || t.Condition.Kind != SkillProgramTriggerConditionKind.Always))
             throw new InvalidOperationException(path + ": Happy Jilue requires all four real one-Ren entry points and one accepted-first-use reward.");
         var judgment = p.Triggers[0]; var exile = p.Triggers[1]; var trick = p.Triggers[2]; var counter = p.Triggers[3]; var dying = p.Triggers[4];
         if (judgment.Window != SkillProgramTriggerWindow.JudgmentReplacing || judgment.Subject != SkillProgramTriggerSubject.Any ||
-            judgment.ExcludedReasons.Count != 0 || judgment.Effects is not [{ Op: SkillProgramEffectOp.ReplaceJudgment, Target: SkillProgramEffectTarget.Owner,
-                OldCardDestination: SkillProgramOldJudgmentCardDestination.DiscardPile } replacement, { Op: SkillProgramEffectOp.OfferHappySimaJilueFirstDraw, Target: SkillProgramEffectTarget.Owner }] ||
+            judgment.ExcludedReasons.Count != 0 || judgment.Effects.Count != 4 || !HasFirstReward(judgment.Effects, 1) ||
+            judgment.Effects[0] is not { Op: SkillProgramEffectOp.ReplaceJudgment, Target: SkillProgramEffectTarget.Owner,
+                OldCardDestination: SkillProgramOldJudgmentCardDestination.DiscardPile, Condition.Kind: SkillProgramConditionKind.Always } replacement ||
             !replacement.Zones.ToHashSet().SetEquals([CardZoneKind.Hand, CardZoneKind.Equipment]) || !replacement.Suits.ToHashSet().SetEquals([Suit.Spade, Suit.Club, Suit.Heart, Suit.Diamond]))
             throw new InvalidOperationException(path + ": Happy Guicai requires the real HE judgment replacement before its first-use reward continuation.");
-        var judgmentReward = judgment.Effects[1];
-        if (judgmentReward.ReplacementSuits.Count != 4 || !judgmentReward.ReplacementSuits.ToHashSet().SetEquals([Suit.Spade, Suit.Club, Suit.Heart, Suit.Diamond]) ||
-            judgmentReward.MinimumReplacementRank != 1 || judgmentReward.MaximumReplacementRank != 13 ||
+        if (judgment.Effects.Skip(1).Any(effect => effect.ReplacementSuits.Count != 4 ||
+                !effect.ReplacementSuits.ToHashSet().SetEquals([Suit.Spade, Suit.Club, Suit.Heart, Suit.Diamond]) ||
+                effect.MinimumReplacementRank != 1 || effect.MaximumReplacementRank != 13) ||
             p.Triggers.Skip(1).SelectMany(t => t.Effects).Concat(activation.Effects).Any(e => e.ReplacementSuits.Count != 0))
             throw new InvalidOperationException(path + ": the accepted Guicai tail requires the complete native replacement-result gate, while other entries have none.");
         if (exile.Window != SkillProgramTriggerWindow.AfterDamageApplied || exile.Subject != SkillProgramTriggerSubject.Owner || exile.DamageOccurrence != SkillProgramDamageOccurrence.PerDamage ||
-            exile.Effects is not [{ Op: SkillProgramEffectOp.OfferHappySimaJilueFirstDraw, Target: SkillProgramEffectTarget.Owner },
-                { Op: SkillProgramEffectOp.SelectTarget, Target: SkillProgramEffectTarget.Owner, TargetKind: SkillProgramTargetKind.OtherLiving },
-                { Op: SkillProgramEffectOp.TurnOver, Target: SkillProgramEffectTarget.SelectedTarget },
-                { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.SelectedTarget, Amount: 1, NumberExpression: null }])
+            !HasFirstReward(exile.Effects, 0) || exile.Effects.Skip(3).ToArray() is not
+            [{ Op: SkillProgramEffectOp.SelectTarget, Target: SkillProgramEffectTarget.Owner, TargetKind: SkillProgramTargetKind.OtherLiving, Condition.Kind: SkillProgramConditionKind.Always },
+                { Op: SkillProgramEffectOp.TurnOver, Target: SkillProgramEffectTarget.SelectedTarget, Condition.Kind: SkillProgramConditionKind.Always },
+                { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.SelectedTarget, Amount: 1, NumberExpression: null, Condition.Kind: SkillProgramConditionKind.Always }])
             throw new InvalidOperationException(path + ": Happy Fangzhu must flip one other actual character then draw exactly one, independent of lost HP.");
         if (trick.Window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || trick.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor ||
             !trick.CardCategories.SequenceEqual([SkillProgramCardCategory.InstantTrick]) || trick.CardKinds.Count != 0 || !JizhiEffects(trick.Effects) ||
@@ -119,10 +116,20 @@ internal static class HappySimaYiComposition
             dying.Window != SkillProgramTriggerWindow.DyingEntering || dying.Subject != SkillProgramTriggerSubject.Any || !WanshaEffects(dying.Effects))
             throw new InvalidOperationException(path + ": Happy Jilue requires actual ordinary-trick/Nullification uses and an own-turn paid Wansha entry.");
     }
-    private static bool WanshaEffects(IReadOnlyList<SkillProgramEffect> effects) => effects is
-        [{ Op: SkillProgramEffectOp.OfferHappySimaJilueFirstDraw, Target: SkillProgramEffectTarget.Owner },
-            { Op: SkillProgramEffectOp.GrantTurnSkills, Target: SkillProgramEffectTarget.Owner, SkillIds: ["happy:jilue-wansha"] }];
-    private static bool JizhiEffects(IReadOnlyList<SkillProgramEffect> effects) => effects is
-        [{ Op: SkillProgramEffectOp.OfferHappySimaJilueFirstDraw, Target: SkillProgramEffectTarget.Owner },
-            { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Amount: 1, NumberExpression: null }];
+    private static bool WanshaEffects(IReadOnlyList<SkillProgramEffect> effects) => effects.Count == 4 && HasFirstReward(effects, 0) &&
+        effects[3] is { Op: SkillProgramEffectOp.GrantTurnSkills, Target: SkillProgramEffectTarget.Owner,
+            SkillIds: ["happy:jilue-wansha"], Condition.Kind: SkillProgramConditionKind.Always };
+    private static bool JizhiEffects(IReadOnlyList<SkillProgramEffect> effects) => effects.Count == 4 && HasFirstReward(effects, 0) &&
+        effects[3] is { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Amount: 1,
+            NumberExpression: null, Condition.Kind: SkillProgramConditionKind.Always };
+    internal static bool HasFirstReward(IReadOnlyList<SkillProgramEffect> effects, int start) => effects.Count >= start + 3 &&
+        effects[start] is { Op: SkillProgramEffectOp.OfferHappySimaJilueFirstDraw, Target: SkillProgramEffectTarget.Owner,
+            ResultBind: FirstNumber, Condition.Kind: SkillProgramConditionKind.Always } &&
+        effects[start + 1] is { Op: SkillProgramEffectOp.ChooseOption, Target: SkillProgramEffectTarget.Owner, ResultBind: FirstChoice,
+            ChooserRef: null, Options: [{ Id: "draw", Condition.Kind: SkillProgramConditionKind.Always }, { Id: "decline", Condition.Kind: SkillProgramConditionKind.Always }],
+            Condition: { Kind: SkillProgramConditionKind.Expression, Expression: { Op: "==", Args:
+                [{ Op: "number", Name: FirstNumber }, { Op: "int", Literal: 1 }] } } } &&
+        effects[start + 2] is { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Amount: 1,
+            AwaitMovementTriggers: true, NumberExpression: null, AmountExpression: null, ResultBind: null,
+            Condition: { Kind: SkillProgramConditionKind.ChoiceIs, SourceBind: FirstChoice, OptionId: "draw" } };
 }

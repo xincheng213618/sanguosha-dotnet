@@ -18,7 +18,7 @@ internal sealed record DrawProgramInstruction(
     ProgramAmount Amount,
     string? ResultBind,
     SkillProgramCardSetVisibility Visibility,
-    ProgramParticipantReference? TargetReference) : ProgramSkillInstruction;
+    ProgramParticipantReference? TargetReference, bool AwaitMovementTriggers = false) : ProgramSkillInstruction;
 
 internal sealed record RecoverProgramInstruction(
     SkillProgramEffectTarget Target,

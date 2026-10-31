@@ -19,7 +19,8 @@ internal enum ProgramContextCapability
     PhaseOwner = 2048,
     MovementSource = 4096,
     ActualUseSource = 8192,
-    VirtualSlashUse = 16384
+    VirtualSlashUse = 16384,
+    HealthChange = 32768
 }
 
 internal static class ProgramEntryCapabilities
@@ -101,6 +102,7 @@ internal static class ProgramEntryCapabilities
 
     private static ProgramContextCapability ExistingCapabilities(SkillProgramTriggerWindow? window) => window switch
     {
+        SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged => Common | ProgramContextCapability.HealthChange,
         // The owning ActualPhaseEndFrame supplies the completed phase actor and
         // turn context. It supplies neither a draw plan nor a phase insertion or
         // substitution window: the native phase has already completed.

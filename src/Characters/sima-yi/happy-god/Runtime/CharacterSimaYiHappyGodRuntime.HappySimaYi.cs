@@ -25,7 +25,7 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 41840, SkillProgramEffectOp.OfferHappySimaJilueFirstDraw)]
     internal bool AllowsHappySimaActivation(ProgramActivationLegalityContext g) => g.SkillId != HappySimaJilue || !_coreNationalSkillsOperations.HasRuntimeSkill(g.Owner, HappySimaWansha);
-    SkillProgramStepOutcome IHappySimaYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.GainHappySimaRenjie ? GainHappySimaRen(f) : BeginHappySimaFirstDraw(f);
+    SkillProgramStepOutcome IHappySimaYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op, string? resultBind) => op == SkillProgramEffectOp.GainHappySimaRenjie ? GainHappySimaRen(f) : CaptureHappySimaFirstDraw(f, resultBind!);
     internal SkillProgramStepOutcome GainHappySimaRen(ProgramSkillFrame f)
     {
         if (f.SkillId != HappySimaRenjie || f.InstructionIndex != 1 || f.WindowContext is not { } context)
@@ -65,102 +65,35 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
         return start < 0 ? null : history.Take(start).OfType<PlayerMarkerChangedEvent>().LastOrDefault(e => e.PlayerSeat == f.OwnerSeat && e.Marker == PlayerMarkerKind.Ren && e.Delta == -1 && e.Reason == $"skill-program.{(f.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.cost");
     }
 
-    internal SkillProgramStepOutcome BeginHappySimaFirstDraw(ProgramSkillFrame supplied)
+    internal SkillProgramStepOutcome CaptureHappySimaFirstDraw(ProgramSkillFrame supplied, string resultBind)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.SkillId != HappySimaJilue || f.HappySimaYi is not null || HappySimaPaidRen(f)is not { } paid)
             throw new InvalidOperationException("Happy Jilue's reward requires its original accepted one-Ren payment.");
-        if (HappySimaFirstAcceptedFrame(f.OwnerSeat) != f.Id)
-            return SkillProgramStepOutcome.Continue;
-        var r = new HappySimaYiReceipt(HappySimaSource(f), f.GameplayHash, f.WindowContext?.ParentFrameId ?? 0, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, f.InstructionIndex, paid.ResolutionId, HappySimaYiStage.Choice);
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappySimaYi = r });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappySimaJilueFirstOfferedEvent(f.Id, r.Source, r.Hash, r.Parent, r.Turn, r.Instruction, r.Payment));
-        PublishHappySimaFirstDraw(f);
-        return SkillProgramStepOutcome.AwaitChoice;
+        var first = HappySimaFirstAcceptedFrame(f.OwnerSeat) == f.Id;
+        if (first)
+            _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappySimaYi = new(HappySimaSource(f), f.GameplayHash,
+                f.WindowContext?.ParentFrameId ?? 0, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber,
+                f.InstructionIndex, paid.ResolutionId) });
+        _coreProgramExpressionsOperations.CaptureProgramExpressionNumber(f.Id, resultBind, first ? 1 : 0);
+        return SkillProgramStepOutcome.Continue;
     }
 
-    internal IReadOnlyList<PromptChoice> HappySimaFirstChoices(ProgramSkillFrame f) => new[]
-    {
-        ("draw", "本回合首次发动极略，摸一张牌"),
-        ("decline", "不摸牌，继续原极略")
-    }.Select(pair => new PromptChoice(new("happy-sima.first." + f.Id + "." + pair.Item1), pair.Item2, [], [], new Dictionary<string, string> { ["program-action"] = "happy-sima-first-draw", ["frame-id"] = f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["mode"] = pair.Item1 })).ToArray();
-    internal void PublishHappySimaFirstDraw(ProgramSkillFrame f)
-    {
-        var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
-        var choices = HappySimaFirstChoices(f);
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { Step = ResolutionFrameStep.AwaitingResponse });
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, "极略：本实际回合首次发动，可摸一张牌。", [], [], f.OwnerSeat)
-        {
-            PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
-            IsPrivate = true,
-            Choices = Array.AsReadOnly(choices.ToArray()),
-            SkillPrompt = new(f.SkillId, skill.Name, skill.Name, skill.Description)
-        };
-        _coreMatchOutcomeStatusAccess._status = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    }
-
-    [ProgramAnswer("happy-sima-first-draw")]
-    internal void AnswerHappySimaFirstDraw(PromptChoice choice)
-    {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappySimaYi: { Stage: HappySimaYiStage.Choice } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappySimaFirstChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
-            throw new InvalidOperationException("Happy Jilue requires the exact original first-use choice.");
-        _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        var take = choice.Parameters["mode"] == "draw";
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappySimaJilueFirstChosenEvent(f.Id, take));
-        if (!take)
-        {
-            CompleteHappySimaFirst(f);
-            return;
-        }
-
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect, HappySimaYi = f.HappySimaYi!with { Stage = HappySimaYiStage.Drawing } });
-        _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 1, HappySimaDrawReason);
-    }
-
-    internal static CardMoveReason HappySimaDrawReason => new("skill.happy.jilue.first-draw");
-
-    internal void CompleteHappySimaFirst(ProgramSkillFrame f)
-    {
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { Step = ResolutionFrameStep.ResolvingEffect, HappySimaYi = null, PendingMovementContinuation = null });
-        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
-    }
-
-    [ProgramContinuation(ProgramContinuationKind.Resume, 41840)]
-    internal bool ResumeHappySimaFirst(long id)
-    {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappySimaYi: { } r } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
-            return false;
-        if (r.Stage == HappySimaYiStage.Choice)
-        {
-            PublishHappySimaFirstDraw(f);
-            return true;
-        }
-
-        if (r.Stage == HappySimaYiStage.Drawing)
-            return true;
-        if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id))
-            return true;
-        CompleteHappySimaFirst(_coreProgramLifecycleOperations.GetActiveProgramFrame(id));
-        return true;
-    }
-
-    [ProgramContinuation(ProgramContinuationKind.Movement, 41840)]
-    internal bool ReturnHappySimaFirstMovement(ProgramSkillFrame f) => f.HappySimaYi is not null && ResumeHappySimaFirst(f.Id);
-    [ProgramNativeDrawReturn(SkillProgramEffectOp.OfferHappySimaJilueFirstDraw)]
-    internal void ReturnHappySimaFirstDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
-    {
-        var r = f.HappySimaYi!;
-        if (r.Stage != HappySimaYiStage.Drawing || r.Draw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
-            throw new InvalidOperationException("Happy Jilue lost its once-requested one-card native draw.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappySimaYi = r with { Stage = HappySimaYiStage.Children, Draw = outcome }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappySimaJilueDrawReturnedEvent(f.Id, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));
-        ResumeHappySimaFirst(f.Id);
-    }
-
-    [ProgramAiChoice(SkillProgramEffectOp.OfferHappySimaJilueFirstDraw)]
-    internal PromptChoice ChooseHappySimaFirst(PendingDecision p) => p.Choices.First();
+    [ProgramAiChoice(SkillProgramEffectOp.ChooseOption, SkillId = "happy:jilue")]
+    internal PromptChoice ChooseHappySimaFirst(PendingDecision prompt) => prompt.Choices.First(choice => choice.Parameters.GetValueOrDefault("option-id") == "draw");
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 41840)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41840)]
-    internal bool RetainHappySimaFirst(ProgramSkillFrame f) => f.HappySimaYi is not null;
+    internal bool RetainHappySimaFirst(ProgramSkillFrame f)
+    {
+        if (f.HappySimaYi is not { } accepted)
+            return false;
+        var drawIndex = accepted.Instruction + 2;
+        if (f.NativeDraw?.InstructionIndex == drawIndex)
+            return true;
+        if (f.InstructionIndex < accepted.Instruction || f.InstructionIndex > drawIndex ||
+            f.ChoiceBindings.Any(choice => choice.Name == HappySimaYiComposition.FirstChoice && choice.OptionId == "decline"))
+            return false;
+        return !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDrawCompletedEvent>()
+            .Any(draw => draw.FrameId == f.Id && draw.InstructionIndex == drawIndex);
+    }
 }

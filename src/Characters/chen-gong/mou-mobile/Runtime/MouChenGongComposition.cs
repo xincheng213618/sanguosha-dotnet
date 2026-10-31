@@ -24,7 +24,7 @@ internal static class MouChenGongComposition
         a.SourceZones.SequenceEqual([CardZoneKind.Hand]) && a.UsageGroup == a.Id && a.MarkerCost is null && !a.ContinueAfterOwnerDeath && !a.OtherCharactersOnly &&
         !a.SelectedCardsSameSuit && !a.SelectedCardsDistinctSuits && !a.TargetRequiresEmptyEquipmentSlot && a.EquipmentSlots.Count == 0 && a.CardCountExpression is null &&
         a.CardKinds.Count == 0 && a.CardSuits.Count == 0 && a.CardCategories.Count == 0 && a.CategoryTargetLedgerId is null && a.TargetPhaseLedgerId is null &&
-        a.Effects is [var gift] && Plain(gift, SkillProgramEffectOp.ResolveMouChenGongMingceGift) && p.Triggers is [var t] &&
+        a.Effects is [var gift, ..] && Plain(gift, SkillProgramEffectOp.ResolveMouChenGongMingceGift) && a.Effects.Count(e => Handles(e.Op)) == 1 && p.Triggers is [var t] &&
         t.Id == "release-plan" && t.Window == SkillProgramTriggerWindow.PlayPhaseStarting && t.Subject == SkillProgramTriggerSubject.Owner && t.Optional &&
         t.TurnOwnerScope == SkillProgramTurnOwnerScope.Own && t.DamageOccurrence is null && Unfiltered(t) &&
         t.Effects is [var release] && Plain(release, SkillProgramEffectOp.ResolveMouChenGongMingceRelease);

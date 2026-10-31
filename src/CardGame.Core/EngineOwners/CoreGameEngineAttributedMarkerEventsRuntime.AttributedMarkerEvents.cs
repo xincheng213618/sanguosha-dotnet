@@ -40,8 +40,10 @@ internal sealed partial class CoreGameEngineAttributedMarkerEventsRuntime
         if (delta > 0)
         {
             var key = (marker, frame.OwnerSeat);
-            target.MarkerSourceCounts[key] = target.MarkerSourceCounts.GetValueOrDefault(key) + delta;
-            target.Markers[marker] = target.Markers.GetValueOrDefault(marker) + delta;
+            var sourceCount = checked(target.MarkerSourceCounts.GetValueOrDefault(key) + delta);
+            var totalCount = checked(target.Markers.GetValueOrDefault(marker) + delta);
+            target.MarkerSourceCounts[key] = sourceCount;
+            target.Markers[marker] = totalCount;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(frame.Id, seat, marker, delta, target.Markers[marker], frame.OwnerSeat, "program.participant-marker"));
             return;
         }
@@ -74,8 +76,17 @@ internal sealed partial class CoreGameEngineAttributedMarkerEventsRuntime
     internal void ApplyAttributedEvent(ProgramSkillFrame frame, SkillProgramEffect effect, int targetSeat)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (active.SkillId != frame.SkillId || active.SkillInstanceId != frame.SkillInstanceId || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (active.SkillId != frame.SkillId || active.SkillInstanceId != frame.SkillInstanceId || (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_continuationPermissions.Value.CanContinueProgramAfterSkillLoss(active)))
             throw new InvalidOperationException("Attributed event lost its exact source.");
+        if (active.WindowContext is null && effect.Op == SkillProgramEffectOp.ChangeParticipantMarker)
+        {
+            if (active.ActivationId is null || effect.Target != SkillProgramEffectTarget.Owner || effect.TargetReference is not null || targetSeat != active.OwnerSeat)
+                throw new InvalidOperationException("An activation marker mutation requires its original owner.");
+            var ownerMarker = effect.Marker!.Value;
+            MutateParticipantMarker(active, targetSeat, ownerMarker,
+                effect.ClearMarker ? -_coreMatchParticipantsPlayersAccess._players[targetSeat].Markers.GetValueOrDefault(ownerMarker) : effect.Amount);
+            return;
+        }
         var context = active.WindowContext ?? throw new InvalidOperationException("Attributed marker operation lost its lifecycle.");
         var marker = effect.Marker!.Value;
         if (effect.Op == SkillProgramEffectOp.ChangeParticipantMarker)

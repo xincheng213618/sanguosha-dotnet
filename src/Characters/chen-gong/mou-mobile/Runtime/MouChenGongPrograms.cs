@@ -73,7 +73,7 @@ internal sealed class ResolveMouChenGongMingceGiftDescriptor : ProgramOperationD
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [];
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (e, c) =>
-    { c.PublicControlValue(4); c.Draw(new(SkillProgramEffectOp.Draw, SkillProgramEffectTarget.SelectedTarget, 1, e.Condition)); });
+    { c.PublicControlValue(4); });
     public override ISkillProgramEffectHandler Handler { get; } = new MouChenGongGiftHandler();
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);

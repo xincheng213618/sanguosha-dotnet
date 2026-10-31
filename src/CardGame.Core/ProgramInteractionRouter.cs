@@ -25,6 +25,7 @@ internal sealed class ProgramAnswerBeforeAttribute(int order) : Attribute
 internal sealed class ProgramAiChoiceAttribute(params SkillProgramEffectOp[] operations) : Attribute
 {
     internal IReadOnlyList<SkillProgramEffectOp> Operations { get; } = Array.AsReadOnly(operations);
+    public string? SkillId { get; set; }
 }
 
 // Shared metadata contains no game instance. Registration lives beside the actual
@@ -37,7 +38,7 @@ internal sealed class ProgramInteractionCatalog
     internal static ProgramInteractionCatalog Default => BuiltIn.Value;
     internal IReadOnlyDictionary<string, MethodInfo> Answers { get; }
     internal IReadOnlyDictionary<string, MethodInfo> Prefixes { get; }
-    internal IReadOnlyDictionary<SkillProgramEffectOp, MethodInfo> AiChoices { get; }
+    internal IReadOnlyDictionary<(SkillProgramEffectOp Op, string? SkillId), MethodInfo> AiChoices { get; }
     internal IReadOnlyList<MethodInfo> BeforeAnswers { get; }
 
     internal IReadOnlyList<ModePromptAnswerRegistration> FreezeModeAnswers(IEnumerable<ModePromptAnswerRegistration> registrations)
@@ -54,12 +55,12 @@ internal sealed class ProgramInteractionCatalog
     }
 
     private ProgramInteractionCatalog(Dictionary<string, MethodInfo> answers,
-        Dictionary<string, MethodInfo> prefixes, Dictionary<SkillProgramEffectOp, MethodInfo> ai,
+        Dictionary<string, MethodInfo> prefixes, Dictionary<(SkillProgramEffectOp Op, string? SkillId), MethodInfo> ai,
         SortedDictionary<int, MethodInfo> before)
     {
         Answers = new ReadOnlyDictionary<string, MethodInfo>(answers);
         Prefixes = new ReadOnlyDictionary<string, MethodInfo>(prefixes);
-        AiChoices = new ReadOnlyDictionary<SkillProgramEffectOp, MethodInfo>(ai);
+        AiChoices = new ReadOnlyDictionary<(SkillProgramEffectOp Op, string? SkillId), MethodInfo>(ai);
         BeforeAnswers = Array.AsReadOnly(before.Values.ToArray());
     }
 
@@ -67,7 +68,7 @@ internal sealed class ProgramInteractionCatalog
     {
         var answers = new Dictionary<string, MethodInfo>(StringComparer.Ordinal);
         var prefixes = new Dictionary<string, MethodInfo>(StringComparer.Ordinal);
-        var ai = new Dictionary<SkillProgramEffectOp, MethodInfo>();
+        var ai = new Dictionary<(SkillProgramEffectOp Op, string? SkillId), MethodInfo>();
         var before = new SortedDictionary<int, MethodInfo>();
         foreach (var method in methods.OrderBy(method => method.DeclaringType?.FullName, StringComparer.Ordinal)
                      .ThenBy(method => method.Name, StringComparer.Ordinal))
@@ -104,10 +105,10 @@ internal sealed class ProgramInteractionCatalog
                     !parameters.SequenceEqual(new[] { typeof(PendingDecision), typeof(ProgramSkillFrame) }) &&
                     !parameters.SequenceEqual(new[] { typeof(PendingDecision), typeof(ProgramSkillFrame), typeof(SkillProgramEffect) }))
                     throw InvalidSignature(method);
-                if (choice.Operations.Count == 0) throw InvalidSignature(method);
+                if (choice.Operations.Count == 0 || choice.SkillId is { } skillId && string.IsNullOrWhiteSpace(skillId)) throw InvalidSignature(method);
                 foreach (var op in choice.Operations)
-                    if (!Enum.IsDefined(op) || !ai.TryAdd(op, method))
-                        throw new InvalidOperationException($"Invalid or duplicate program AI operation '{op}'.");
+                    if (!Enum.IsDefined(op) || !ai.TryAdd((op, choice.SkillId), method))
+                        throw new InvalidOperationException($"Invalid or duplicate program AI operation '{op}/{choice.SkillId ?? "*"}'.");
             }
         }
         foreach (var prefix in prefixes.Keys)
@@ -141,7 +142,6 @@ internal sealed class ProgramInteractionRouter
     private readonly Dictionary<MethodInfo, Delegate> _answers = new();
     private readonly Dictionary<MethodInfo, Func<PromptChoice, bool>> _before = new();
     private readonly Dictionary<MethodInfo, Func<PendingDecision, ProgramSkillFrame, SkillProgramEffect, PromptChoice>> _ai = new();
-    private readonly ProgramAiChoiceSelector _selector;
 
     internal ProgramInteractionRouter(ProgramInteractionCatalog catalog,
         Func<MethodInfo, Type, Delegate> bind, Action<PromptChoice> activation,
@@ -152,7 +152,6 @@ internal sealed class ProgramInteractionRouter
         _activation = activation;
         _modeAnswers = new ReadOnlyDictionary<string, Action<PromptChoice>>(catalog.FreezeModeAnswers(modeAnswers ?? [])
             .ToDictionary(registration => registration.Action, registration => registration.Handler, StringComparer.Ordinal));
-        _selector = new(ResolveAi);
     }
 
     internal void Resolve(PromptChoice selected)
@@ -189,7 +188,7 @@ internal sealed class ProgramInteractionRouter
     }
 
     internal PromptChoice SelectAi(PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) =>
-        _selector.Select(decision, frame, effect);
+        (ResolveAi(effect.Op, frame.SkillId) ?? throw ProgramAiChoiceSelector.UnsupportedInstruction(effect))(decision, frame, effect);
 
     private void InvokeAnswer(MethodInfo method, PromptChoice selected, string action)
     {
@@ -202,9 +201,10 @@ internal sealed class ProgramInteractionRouter
         else ((Action<PromptChoice, string>)handler)(selected, action);
     }
 
-    private Func<PendingDecision, ProgramSkillFrame, SkillProgramEffect, PromptChoice>? ResolveAi(SkillProgramEffectOp op)
+    private Func<PendingDecision, ProgramSkillFrame, SkillProgramEffect, PromptChoice>? ResolveAi(SkillProgramEffectOp op, string skillId)
     {
-        if (!_catalog.AiChoices.TryGetValue(op, out var method)) return null;
+        if (!_catalog.AiChoices.TryGetValue((op, skillId), out var method) &&
+            !_catalog.AiChoices.TryGetValue((op, null), out method)) return null;
         if (_ai.TryGetValue(method, out var existing)) return existing;
         var parameters = method.GetParameters();
         Func<PendingDecision, ProgramSkillFrame, SkillProgramEffect, PromptChoice> handler;

@@ -1776,7 +1776,6 @@ public enum SkillProgramEffectOp
     ResolveMouLuBuLiyu = 31601,
     ResolveMouDiaoChanLijian = 31700,
     ResolveMouDiaoChanBiyue = 31701,
-    ResolveSpSunShangxiangLiangzhu = 32300,
     CompleteSpSunShangxiangFanxiang = 32301,
     IssueMouFaZhengXuanhuo = 31800,
     TakeMouFaZhengXuanhuoGain = 31801,
@@ -2126,6 +2125,8 @@ public sealed class SkillProgramCondition
                 boundCardsMatchCategories: boundCardsMatchCategories),
             _ => Evaluate(context)
         };
+
+    internal bool ContainsExpression() => Kind == SkillProgramConditionKind.Expression || Children.Any(child => child.ContainsExpression());
 
     internal bool ContainsHasClaimableDamageCards() => Kind == SkillProgramConditionKind.HasClaimableDamageCards ||
         Children.Any(child => child.ContainsHasClaimableDamageCards());
@@ -6175,7 +6176,8 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 SkillProgramTriggerWindow.PlayPhaseStarting or SkillProgramTriggerWindow.PlayEnding or SkillProgramTriggerWindow.TurnStartBeforeNormalFlow or
                 SkillProgramTriggerWindow.JudgmentPhaseStarting or SkillProgramTriggerWindow.CharacterTurnedOver or SkillProgramTriggerWindow.CharacterTurnedFaceUp or
                 SkillProgramTriggerWindow.CharacterEnteredChain or SkillProgramTriggerWindow.CardUseCompleted or
-                SkillProgramTriggerWindow.DiscardPhaseEnded or SkillProgramTriggerWindow.TurnEnding) &&
+                SkillProgramTriggerWindow.DiscardPhaseEnded or SkillProgramTriggerWindow.TurnEnding or
+                SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged) &&
             effects.SelectMany(EnumerateParticipantReferences)
                 .Any(reference => reference.Kind == ProgramParticipantRef.EventTarget))
             Fail(path + ".effects", "eventTarget requires a target-related card-action owner relation");
@@ -6192,8 +6194,8 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             Fail(path + ".effects", "eventSource requires a damage-applied, judgment or discard-phase-ended trigger");
         if (window == SkillProgramTriggerWindow.JudgmentReplacing &&
             (effects[0].Op is not (SkillProgramEffectOp.ReplaceJudgment or SkillProgramEffectOp.DelegateJudgmentReplacement or SkillProgramEffectOp.ReplaceJudgmentFromPublicRice) ||
-             !(skillId == "happy:jilue" && effects is [{ Op: SkillProgramEffectOp.ReplaceJudgment },
-                 { Op: SkillProgramEffectOp.OfferHappySimaJilueFirstDraw }]) && effects.Skip(1).Any(effect => effect.Op is not
+             !(skillId == "happy:jilue" && effects.Count == 4 && effects[0].Op == SkillProgramEffectOp.ReplaceJudgment &&
+                 HappySimaYiComposition.HasFirstReward(effects, 1)) && effects.Skip(1).Any(effect => effect.Op is not
                  (SkillProgramEffectOp.Draw or SkillProgramEffectOp.Recover) ||
                  effect.Target != SkillProgramEffectTarget.Owner ||
                  effect.ReplacementSuits.Count == 0)))

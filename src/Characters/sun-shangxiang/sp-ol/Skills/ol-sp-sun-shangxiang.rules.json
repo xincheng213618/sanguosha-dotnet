@@ -13,8 +13,29 @@
           "hpChangeOccurrence": "perEvent",
           "effects": [
             {
-              "op": "resolveSpSunShangxiangLiangzhu",
-              "target": "owner"
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "liangzhu-benefit",
+              "options": [
+                { "id": "self" },
+                { "id": "help", "condition": { "kind": "expression", "expr": ["alive", "eventTarget"] } },
+                { "id": "decline" }
+              ]
+            },
+            {
+              "op": "draw",
+              "target": "owner",
+              "amount": 1,
+              "awaitMovementTriggers": true,
+              "condition": { "kind": "choiceIs", "sourceBind": "liangzhu-benefit", "optionId": "self" }
+            },
+            {
+              "op": "draw",
+              "target": "owner",
+              "targetRef": { "kind": "eventTarget" },
+              "amount": 2,
+              "awaitMovementTriggers": true,
+              "condition": { "kind": "choiceIs", "sourceBind": "liangzhu-benefit", "optionId": "help" }
             }
           ]
         }

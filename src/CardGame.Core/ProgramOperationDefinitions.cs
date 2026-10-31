@@ -456,7 +456,7 @@ internal abstract class ProgramOperationDescriptorBase : IProgramOperationDescri
                 new ProgramResourceOperation[] { new RequireContext(ProgramContextCapability.CardAction) },
             ProgramParticipantRef.EventTarget =>
                 new ProgramResourceOperation[] { new RequireAnyContext(ProgramContextCapability.CardAction |
-                    ProgramContextCapability.Damage | ProgramContextCapability.Judgment | ProgramContextCapability.PhaseOwner) },
+                    ProgramContextCapability.Damage | ProgramContextCapability.Judgment | ProgramContextCapability.PhaseOwner | ProgramContextCapability.HealthChange) },
             ProgramParticipantRef.EventSource =>
                 new ProgramResourceOperation[] { new RequireAnyContext(ProgramContextCapability.Damage | ProgramContextCapability.MovementSource | ProgramContextCapability.ActualUseSource | ProgramContextCapability.CardAction) },
             ProgramParticipantRef.SelectedTarget =>
@@ -474,6 +474,7 @@ internal abstract class ProgramOperationDescriptorBase : IProgramOperationDescri
 internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.Draw;
+    public override bool AllowsDeadTarget(in ProgramEffectContinuationContext c) => c.Effect.AwaitMovementTriggers && c.Effect.Target == SkillProgramEffectTarget.Owner && c.Effect.TargetReference is null && c.State.CanContinueAfterOwnerDeath(c.Frame);
     public override ISkillProgramEffectHandler Handler { get; } = new DrawSkillProgramEffectHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,
         static (effect, context) => context.Draw(effect));
@@ -487,11 +488,11 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
                 new PhaseSkillUsageProgramAmount(effect.SourceBind!),
             { } expression => new ExpressionProgramAmount(expression),
             null => new FixedProgramAmount(effect.Amount)
-        }, effect.ResultBind, effect.Visibility, effect.TargetReference);
+        }, effect.ResultBind, effect.Visibility, effect.TargetReference, effect.AwaitMovementTriggers);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
         r.AllowOnly("op", "target", "amount", "amountExpr", "onUnknownAmount", "numberExpression", "sourceBind", "resultBind", "targetRef", "condition",
-            "replacementSuits", "minimumReplacementRank", "maximumReplacementRank", "ownerKillsOnly");
+            "replacementSuits", "minimumReplacementRank", "maximumReplacementRank", "ownerKillsOnly", "awaitMovementTriggers");
         var amountExpr = r.AmountExpression();
         var onUnknown = r.UnknownAmountBehavior();
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
@@ -533,7 +534,8 @@ internal sealed class DrawProgramOperationDescriptor : ProgramOperationDescripto
         var effect = new SkillProgramEffect(Op, target, amount, r.Condition(), numberExpression: expression,
             sourceBind: source, resultBind: bind, targetReference: targetRef,
             replacementSuits: replacementSuits, minimumReplacementRank: minimumReplacementRank,
-            maximumReplacementRank: maximumReplacementRank)
+            maximumReplacementRank: maximumReplacementRank,
+            awaitMovementTriggers: r.Has("awaitMovementTriggers") && r.RequiredBool("awaitMovementTriggers"))
         { AmountExpression = amountExpr, OnUnknownAmount = onUnknown, ActualTurnDeathOwnerKillsOnly = r.Has("ownerKillsOnly") ? r.RequiredBool("ownerKillsOnly") : null };
         if (r.Has("ownerKillsOnly") && expression != SkillProgramNumberExpression.ActualTurnDeathBenefits)
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: ownerKillsOnly requires actualTurnDeathBenefits.");

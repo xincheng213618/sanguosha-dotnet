@@ -15,10 +15,25 @@
           "usesPerTurn": null,
           "usesPerPhase": 1,
           "effects": [
+            { "op": "resolveMouChenGongMingceGift", "target": "owner" },
             {
-              "op": "resolveMouChenGongMingceGift",
-              "target": "owner"
-            }
+              "op": "chooseOption", "target": "selectedTarget", "resultBind": "mingce-branch",
+              "options": [{ "id": "lose-hp" }, { "id": "draw" }]
+            },
+            { "op": "loseHp", "target": "selectedTarget", "amount": 1,
+              "condition": { "kind": "choiceIs", "sourceBind": "mingce-branch", "optionId": "lose-hp" } },
+            { "op": "draw", "target": "selectedTarget", "amount": 1, "awaitMovementTriggers": true,
+              "condition": { "kind": "choiceIs", "sourceBind": "mingce-branch", "optionId": "draw" } },
+            { "op": "draw", "target": "owner", "amount": 2, "awaitMovementTriggers": true,
+              "condition": { "kind": "all", "children": [
+                { "kind": "choiceIs", "sourceBind": "mingce-branch", "optionId": "lose-hp" },
+                { "kind": "expression", "expr": ["alive", "owner"] }
+              ] } },
+            { "op": "changeParticipantMarker", "target": "owner", "marker": "mouChenGongCe", "amount": 1,
+              "condition": { "kind": "all", "children": [
+                { "kind": "choiceIs", "sourceBind": "mingce-branch", "optionId": "lose-hp" },
+                { "kind": "expression", "expr": ["alive", "owner"] }
+              ] } }
           ]
         }
       ],

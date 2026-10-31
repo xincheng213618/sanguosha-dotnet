@@ -15,7 +15,7 @@ internal sealed class ProgramDrawRuntime(IProgramRuntimeFrames frames, IProgramC
         if (count is null) return;
         var before = frame.FixedRecipient is null ? 0 : facts.PairBenefitSequence;
         var drawn = operations.DrawCards(targetSeat, count.Value, log: true, reason);
-        CompleteProgramDrawCards(frameId, targetSeat, resultBind, visibility, reason, before, drawn);
+        CompleteProgramDrawCards(frameId, targetSeat, resultBind, visibility, reason, before, drawn, count.Value);
     }
 
     internal int? ResolveProgramDrawCount(ProgramSkillFrame frame, int targetSeat, int amount,
@@ -69,7 +69,7 @@ internal sealed class ProgramDrawRuntime(IProgramRuntimeFrames frames, IProgramC
 
     internal void CompleteProgramDrawCards(long frameId, int targetSeat, string? resultBind,
         SkillProgramCardSetVisibility visibility, CardMoveReason reason,
-        long fixedRecipientSequenceBefore, IReadOnlyList<int> drawn)
+        long fixedRecipientSequenceBefore, IReadOnlyList<int> drawn, int? requestedCount = null)
     {
         var frame = frames.ActiveProgram(frameId);
         if (frame.FixedRecipient is not null)
@@ -90,6 +90,8 @@ internal sealed class ProgramDrawRuntime(IProgramRuntimeFrames frames, IProgramC
             bindings.SetProgramCardSet(frameId, resultBind, drawn, visibility,
                 drawn.Select(_ => CardLocation.Hand(targetSeat)).ToArray());
         }
+        if ((frame.NativeDraw?.RequestedCount ?? requestedCount) is { } requested)
+            operations.PublishDrawCompleted(new(frame.Id, frame.InstructionIndex, targetSeat, requested, drawn.Count));
     }
 
     internal void DrawProgramSelectedTargets(long frameId, int amount, CardMoveReason reason)

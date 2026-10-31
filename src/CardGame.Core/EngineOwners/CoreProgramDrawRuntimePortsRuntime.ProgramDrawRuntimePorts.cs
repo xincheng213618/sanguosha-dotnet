@@ -20,4 +20,5 @@ internal sealed partial class CoreProgramDrawRuntimePortsRuntime
     IReadOnlyList<int> IProgramDrawOperations.DrawCards(int seat, int count, bool log, CardMoveReason reason) => _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[seat], count, log, reason);
     void IProgramDrawOperations.CaptureFixedRecipientDraw(long frameId, int targetSeat, CardMoveReason reason, long sequenceBefore, int actualCount) => _corePairBenefitObserversOperations.CaptureFixedRecipientDraw(frameId, targetSeat, reason, sequenceBefore, actualCount);
     int IProgramDrawOperations.FreezeNormalDrawBase(int seat) => _characterCaoXiOlOperations.FreezeAndCaptureCaoXiNativeDrawBase(_coreMatchParticipantsPlayersAccess._players[seat]);
+    void IProgramDrawOperations.PublishDrawCompleted(ProgramDrawCompletedEvent completed) => _ruleProgression.AdvanceEventRulesAndQueueFact(completed);
 }

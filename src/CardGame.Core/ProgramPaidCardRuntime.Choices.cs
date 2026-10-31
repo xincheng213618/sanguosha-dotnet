@@ -18,7 +18,7 @@ internal sealed partial class ProgramPaidCardRuntime
                     ["result-bind"] = resultBind,
                     ["option-id"] = option.Id
                 })).ToArray();
-        if (!_facts.IsAlive(chooser) || choices.Length == 0)
+        if ((!_facts.IsAlive(chooser) && !(chooserSeat == active.OwnerSeat && _facts.CanContinueAfterOwnerDeath(active))) || choices.Length == 0)
         {
             _operations.Cancel(active, "没有可用的效果选项，技能剩余步骤取消。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -61,11 +61,11 @@ internal sealed partial class ProgramPaidCardRuntime
             throw new InvalidOperationException("The selected option's required targets are no longer available.");
         if (!stillAvailable && (option.Condition.ContainsHasClaimableDamageCards() ||
             option.Condition.ContainsBoundCardCountAtLeast() || option.Condition.ContainsHasOwnedCardCategory() ||
-            option.Condition.ContainsBoundCardsMatchCategories()))
+            option.Condition.ContainsBoundCardsMatchCategories() || option.Condition.ContainsExpression()))
             throw new InvalidOperationException("The selected option's required cards are no longer available.");
         _prompts.Clear();
-        if (!_facts.IsAlive(chooserSeat) || !stillAvailable ||
-            !_facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId))
+        if ((!_facts.IsAlive(chooserSeat) && !(chooserSeat == frame.OwnerSeat && _facts.CanContinueAfterOwnerDeath(frame))) || !stillAvailable ||
+            (!_facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId) && !_facts.CanContinueAfterSkillLoss(frame)))
         {
             _operations.Cancel(frame, "效果选项或技能实例已失效，技能剩余步骤取消。");
             return;
@@ -92,18 +92,39 @@ internal sealed partial class ProgramPaidCardRuntime
         if (option is null) return true;
         if (option.RequiredTargetKind is null && !option.Condition.ContainsHasClaimableDamageCards() &&
             !option.Condition.ContainsBoundCardCountAtLeast() && !option.Condition.ContainsHasOwnedCardCategory() &&
-            !option.Condition.ContainsBoundCardsMatchCategories()) return true;
+            !option.Condition.ContainsBoundCardsMatchCategories() && !option.Condition.ContainsExpression()) return true;
         var chooserSeat = effect.ChooserRef is { } chooser
             ? ResolveProgramParticipant(frame, chooser)
             : ResolveProgramEffectTarget(frame, effect.Target);
         return IsProgramOptionAvailable(frame, chooserSeat, option);
     }
 
-    internal bool IsProgramOptionAvailable(ProgramSkillFrame frame, int chooserSeat, SkillProgramChoiceOption option) =>
-        (option.RequiredTargetKind is not { } requiredTargetKind ||
-         chooserSeat == frame.OwnerSeat && _facts.TargetSeats(chooserSeat, requiredTargetKind, frame.WindowContext)
-             .Any(seat => _facts.CanSelectPindianOpponent(frame, seat))) &&
-        option.Condition.EvaluateOption(_facts.SkillContext(chooserSeat),
+    internal bool IsProgramOptionAvailable(ProgramSkillFrame frame, int chooserSeat, SkillProgramChoiceOption option)
+    {
+        if (option.RequiredTargetKind is { } kind && (chooserSeat != frame.OwnerSeat ||
+            !_facts.TargetSeats(chooserSeat, kind, frame.WindowContext).Any(seat => _facts.CanSelectPindianOpponent(frame, seat)))) return false;
+        bool? Read(SkillProgramCondition condition)
+        {
+            if (condition.Kind == SkillProgramConditionKind.Expression)
+                return _facts.EvaluateOptionExpression(frame, condition.Expression!);
+            if (condition.Kind is SkillProgramConditionKind.All or SkillProgramConditionKind.Any)
+            {
+                var any = condition.Kind == SkillProgramConditionKind.Any;
+                var unknown = false;
+                foreach (var child in condition.Children)
+                {
+                    if (Read(child) is not { } value) unknown = true;
+                    else if (value == any) return value;
+                }
+                return unknown ? null : !any;
+            }
+            if (condition.Kind == SkillProgramConditionKind.Not && condition.ContainsExpression())
+            {
+                var chooser = _facts.SkillContext(chooserSeat);
+                return !(chooser.HpUndefined && condition.ReferencesOwnerHp) && !condition.MissingEquipmentPresence(chooser)
+                    ? !Read(condition.Children[0]) : false;
+            }
+            return condition.EvaluateOption(_facts.SkillContext(chooserSeat),
             () => _facts.ClaimableDamageCards(frame).Length > 0,
             bind => IsProgramAttackRangeCoverageDecreased(frame, bind),
             hasOwnedCardCategory: (zones, categories, kinds) =>
@@ -114,6 +135,9 @@ internal sealed partial class ProgramPaidCardRuntime
                 _facts.FrozenSuitMatchesChoice(frame, cardBind, choiceBind),
             boundCardsMatchCategories: (bind, categories) =>
                 _facts.BoundCardsMatchCategories(frame, bind, categories));
+        }
+        return Read(option.Condition) == true;
+    }
 
     internal int CountChooserProgramBoundCards(ProgramSkillFrame frame, string bind, int chooserSeat)
     {

@@ -3,7 +3,8 @@
   "skills": {
     "ol:liangzhu": {
       "name": "良助",
-      "description": "当一名角色于其出牌阶段内回复体力后，你可以选择一项：1.摸一张牌；2.令其摸两张牌。"
+      "description": "当一名角色于其出牌阶段内回复体力后，你可以选择一项：1.摸一张牌；2.令其摸两张牌。",
+      "optionLabels": { "self": "自己摸一张牌", "help": "令回复体力的角色摸两张牌", "decline": "不发动良助" }
     },
     "ol:fanxiang": {
       "name": "返乡",

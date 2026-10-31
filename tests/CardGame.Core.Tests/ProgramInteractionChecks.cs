@@ -63,6 +63,46 @@ internal static class ProgramInteractionChecks
             "Without a coverage binding, selection must return the first published choice without sorting or querying cards.");
         Require(decision.Choices.Zip(original).All(pair => ReferenceEquals(pair.First, pair.Second)),
             "AI ranking must neither replace published choices nor reorder the prompt's original collection.");
+        CheckSkillScopedAiChoices();
+    }
+
+    private static void CheckSkillScopedAiChoices()
+    {
+        var catalog = ProgramInteractionCatalog.Discover(Methods(typeof(ScopedAiChoices)));
+        var bindings = 0;
+        var router = new ProgramInteractionRouter(catalog, (method, type) =>
+        { bindings++; return method.CreateDelegate(type); }, _ => throw new Exception("AI selection reached activation."));
+        var decision = Decision(Choice("generic", "unused"), Choice("first-skill", "unused"), Choice("second-skill", "unused"));
+        var effect = Effect(SkillProgramEffectOp.ChooseOption);
+        Require(ReferenceEquals(router.SelectAi(decision, Frame(), effect), decision.Choices[1]) &&
+                ReferenceEquals(router.SelectAi(decision, Frame() with { SkillId = "fixture:other" }, effect), decision.Choices[2]) &&
+                ReferenceEquals(router.SelectAi(decision, Frame() with { SkillId = "fixture:unmatched" }, effect), decision.Choices[0]),
+            "Distinct skills can register one operation; a matching skill policy takes precedence over the generic fallback.");
+        Require(ReferenceEquals(router.SelectAi(decision, Frame(), effect), decision.Choices[1]) && bindings == 3,
+            "Each selected policy binds once per router without caching another skill's policy for that operation.");
+        Reject(() => ProgramInteractionCatalog.Discover(Methods(typeof(ScopedAiChoices)).Concat(Methods(typeof(DuplicateScopedAiChoice)))));
+        Reject(() => ProgramInteractionCatalog.Discover(Methods(typeof(ScopedAiChoices)).Append(Methods(typeof(ScopedAiChoices)).Single(m => m.Name == "Generic"))));
+        Reject(() => ProgramInteractionCatalog.Discover(Methods(typeof(EmptySkillAiChoice))));
+    }
+
+    private static class ScopedAiChoices
+    {
+        [ProgramAiChoice(SkillProgramEffectOp.ChooseOption)]
+        private static PromptChoice Generic(PendingDecision decision) => decision.Choices[0];
+        [ProgramAiChoice(SkillProgramEffectOp.ChooseOption, SkillId = "fixture:interaction")]
+        private static PromptChoice First(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices[1];
+        [ProgramAiChoice(SkillProgramEffectOp.ChooseOption, SkillId = "fixture:other")]
+        private static PromptChoice Second(PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) => decision.Choices[2];
+    }
+    private static class DuplicateScopedAiChoice
+    {
+        [ProgramAiChoice(SkillProgramEffectOp.ChooseOption, SkillId = "fixture:interaction")]
+        private static PromptChoice Duplicate(PendingDecision decision) => decision.Choices[0];
+    }
+    private static class EmptySkillAiChoice
+    {
+        [ProgramAiChoice(SkillProgramEffectOp.ChooseOption, SkillId = " ")]
+        private static PromptChoice Invalid(PendingDecision decision) => decision.Choices[0];
     }
 
     private static MethodInfo[] Methods(Type type) => type.GetMethods(

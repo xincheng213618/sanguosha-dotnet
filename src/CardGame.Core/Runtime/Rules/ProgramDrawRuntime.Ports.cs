@@ -1,5 +1,8 @@
 namespace CardGame.Core;
 
+public sealed record ProgramDrawCompletedEvent(long FrameId, int InstructionIndex, int RecipientSeat,
+    int RequestedCount, int ActualDrawCount) : IGameEvent;
+
 internal interface IProgramDrawFacts : IProgramSelectionQuery
 {
     bool HasHpValue(int seat);
@@ -23,4 +26,5 @@ internal interface IProgramDrawOperations : IProgramRuntimeOperations
     IReadOnlyList<int> DrawCards(int seat, int count, bool log, CardMoveReason reason);
     void CaptureFixedRecipientDraw(long frameId, int targetSeat, CardMoveReason reason, long sequenceBefore, int actualCount);
     int FreezeNormalDrawBase(int seat);
+    void PublishDrawCompleted(ProgramDrawCompletedEvent completed);
 }
