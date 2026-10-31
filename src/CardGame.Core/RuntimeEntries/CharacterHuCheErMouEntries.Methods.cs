@@ -6,7 +6,6 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal void BindMouHuCheErSlashUse(CardUseFrame supplied) => _resolve().BindMouHuCheErSlashUse(supplied);
     internal bool CanMouHuCheErSlash(ProgramSkillFrame f) => _resolve().CanMouHuCheErSlash(f);
     internal bool CanStartMouHuCheEr(CharacterState owner) => _resolve().CanStartMouHuCheEr(owner);
-    internal long CaptureMouHuCheErEquipmentQualificationStamp(long original) => _resolve().CaptureMouHuCheErEquipmentQualificationStamp(original);
     internal void ContinueMouHuCheEr(long id) => _resolve().ContinueMouHuCheEr(id);
     internal bool FinishMouHuCheErAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouHuCheErAttack(attack, out paused);
     internal bool IsIssuedMouHuCheErUse(CardUseFrame use) => _resolve().IsIssuedMouHuCheErUse(use);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal bool MouHuCheErDying() => _resolve().MouHuCheErDying();
     internal bool MouHuCheErEdge(int i) => _resolve().MouHuCheErEdge(i);
     internal bool MouHuCheErEquipmentDisabled(int target) => _resolve().MouHuCheErEquipmentDisabled(target);
-    internal bool MouHuCheErEquipmentGrantQualified(CharacterState owner, SkillGrant grant) => _resolve().MouHuCheErEquipmentGrantQualified(owner, grant);
     internal bool MouHuCheErFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouHuCheErFirstChild(f, child);
     internal bool MouHuCheErMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => _resolve().MouHuCheErMovement(f, op, p);
     internal bool MouHuCheErRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().MouHuCheErRecoveryParent(f, recovery);

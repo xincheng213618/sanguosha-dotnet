@@ -26,6 +26,14 @@ internal static partial class WushuangModeChecks
         // Use the current production offers. The shared Start helper defaults
         // to no historical preset; it never bypasses these pool restrictions.
         var (game, content) = Start(false, 33);
+        var admitted = game.WushuangEntries.SkillAvailabilityAllowedIds;
+        Require(admitted is System.Collections.Frozen.FrozenSet<string> &&
+            ReferenceEquals(admitted, game.WushuangEntries.SkillAvailabilityAllowedIds) &&
+            admitted.SetEquals(content.Skills.Values.Where(WushuangCatalogue.IsSkillAllowed).Select(skill => skill.Id)),
+            "The actual Wushuang match compiles one immutable admission set from all registered skill definitions, independently of shop offer eligibility.");
+        var ordinary = GameEngine.CreateStandard(new GameOptions(), ContentRegistry.Build(new StandardContentPackage()));
+        Require(ordinary.WushuangEntries.SkillAvailabilityAllowedIds is null,
+            "An ordinary match has no Wushuang content-admission restriction.");
         Drive(game, () => Shop(game) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
         var opening = Shop(game);
         Require(opening.Offers.Count == 3 && opening.Offers.All(offer => offer.Kind == WushuangOfferKind.Tactic &&

@@ -12,7 +12,7 @@ internal readonly record struct SkillBindingIndexStamp(
     bool HasSecondary,
     bool SecondarySelected,
     bool SecondaryRevealed, long ProjectionRevision = 0, Role? OwnerRole = null,
-    long DerivedProjectionRevision = 0, bool OwnerAlive = true);
+    long DerivedProjectionRevision = 0, bool OwnerAlive = true, bool IdentityConcealed = false);
 
 internal sealed record IndexedSkillProgramInstance(
     string SkillId,
@@ -227,11 +227,13 @@ internal sealed class MatchSkillBindingIndex
         IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
         RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
         EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
-        IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null)
+        IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null,
+        IReadOnlySet<string>? allowedEffectiveSkillIds = null)
     {
         ArgumentNullException.ThrowIfNull(resolveDefinition);
         _availability = new(resolveDefinition, isNationalWarMode, dualGenerals,
-            grantQualification, participants, cards, phases, frames, health, turnState, healthChildren, cardMarks);
+            grantQualification, participants, cards, phases, frames, health, turnState, healthChildren, cardMarks,
+            allowedEffectiveSkillIds);
         _hasHpSensitiveSources = hasHpSensitiveSources;
         _health = health;
         _projectionStamp = projectionStamp;
@@ -271,7 +273,7 @@ internal sealed class MatchSkillBindingIndex
         player.GeneralRevealed,
         player.SecondaryGeneral is not null,
         player.SecondaryGeneralSelected,
-        player.SecondaryGeneralRevealed);
+        player.SecondaryGeneralRevealed, IdentityConcealed: player.IdentityConcealed);
 
     private SkillBindingShard BuildShard(CharacterState player, SkillBindingIndexStamp stamp)
     {

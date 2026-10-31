@@ -527,6 +527,7 @@ var tests = new (string Name, Action Body)[]
     ("rule query actual-round use distance requires captured outgoing count", RuleQueryReducerChecks.ActualRoundUseDistanceRequiresCapturedCountAndOutgoingAddition),
     ("character skills retain separate sources and stable ownership", CharacterSkillSetChecks.GrantsRetainSourcesAndStableOwnership),
     ("skill availability separates possession from effective sources", CharacterSkillSetChecks.AvailabilitySeparatesPossessionFromEffectiveSources),
+    ("Mou Hu Che Er: accepted debt later equipment source loss and exact expiry cold", MouHuCheErChecks.AcceptedDebtSuppressesLaterEquipmentUntilItsExactTurnEndCold),
     ("Skill state: ownership choices instances and expiry cold", SkillStateChecks.StateChangesPreserveOwnershipChoicesInstancesAndExpiryCold),
     ("Skill state events: native turn and dying declarations cold", SkillStateEventChecks.NativeTurnAndDyingDeclarationsFollowOriginalWindowsCold),
     ("Physical card marks: opening bindings zones and cold", CardEntityMarkChecks.OpeningMarksBindingsAndZoneCountsKeepTheirPhysicalIdentityCold),

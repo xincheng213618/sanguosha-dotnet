@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
-internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouHuCheErHost
+internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws, RuntimeEntries.CoreGameEngineProgramSkillChangesEntries skillChanges) : IMouHuCheErHost
 {
     internal const string MouHuCheErAction = "mou-hu-che-er-kongwu",MouHuCheErDiscardReason = "skill-program.mou:kongwu.discard",MouHuCheErDrawReason = "skill-program.mou:kongwu.draw";
     private static CardConversionSource MouHuCheErSource(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
@@ -103,6 +103,18 @@ internal sealed class MouHuCheErRuntime(IMouHuCheErFacts facts, IMouHuCheErNativ
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 35800)] [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 35800)] private bool PaidMouHuCheEr(ProgramSkillFrame f) => f.MouHuCheEr is not null && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuCheErKongwu)] private PromptChoice AiMouHuCheEr(PendingDecision p, ProgramSkillFrame f) => f.MouHuCheEr!.Stage == MouHuCheErStage.Target ? p.Choices.OrderBy(c => facts.Friendly(f.OwnerSeat, c.Targets.Single()) ? 1 : 0).First() : p.Choices.First();
     private IEnumerable<MouHuCheErDebtEvent> ActiveDebts(int target) => facts.History<MouHuCheErDebtEvent>().Where(d => d.Target == target && !facts.History<MouHuCheErDebtExpiredEvent>().Any(e => e.FrameId == d.FrameId));
+    private static SkillStateOrigin EquipmentDebtOrigin(MouHuCheErCompletedEvent paid) =>
+        new(paid.FrameId, 0, new(paid.Source.SkillId, paid.Source.BindingId, paid.Source.OwnerSeat, paid.Source.SkillInstanceId));
+    // The original journal predicate changed only after QueueFact. Apply the
+    // shared restriction before other AfterEvent readers can observe that fact.
+    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 1)] private void ObserveEquipmentDebt(IGameEvent payload)
+    {
+        if (payload is MouHuCheErDebtEvent debt)
+            skillChanges.IssueSkillState(EquipmentDebtOrigin(facts.History<MouHuCheErCompletedEvent>().Single(paid => paid.FrameId == debt.FrameId)),
+                debt.Target, new(SkillStateAction.Suppress, new(filter: new("not", ProgramExpressionType.Bool, [SkillStateFilters.Character]))));
+        else if (payload is MouHuCheErDebtExpiredEvent expired)
+            skillChanges.RevokeSkillStateOrigin(EquipmentDebtOrigin(facts.History<MouHuCheErCompletedEvent>().Single(paid => paid.FrameId == expired.FrameId)));
+    }
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 35800)] private void ObserveDamage(IGameEvent payload)
     {
         if (facts.Damage(payload) is not { } damage || frames.Find(damage.FrameId) is not ProgramSkillFrame { MouHuCheEr: { } r } f) return;

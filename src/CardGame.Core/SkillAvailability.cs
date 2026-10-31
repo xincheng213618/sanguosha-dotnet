@@ -11,8 +11,12 @@ internal sealed class SkillAvailability(
     IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
     RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
     EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
-    IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null)
+    IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null,
+    IReadOnlySet<string>? allowedEffectiveSkillIds = null)
 {
+    private readonly IReadOnlySet<string>? _allowedEffectiveSkillIds =
+        allowedEffectiveSkillIds?.ToFrozenSet(StringComparer.Ordinal);
+
     internal SkillAvailabilitySnapshot Query(CharacterState owner)
     {
         var owned = new List<SkillGrant>();
@@ -38,13 +42,15 @@ internal sealed class SkillAvailability(
             new ReadOnlyDictionary<string, ContentSkillDefinition>(effectiveDefinitions));
     }
 
-    /// <summary>Enabled and selected/revealed origin. Printed-lord rights and derived relationships have their own stages.</summary>
+    /// <summary>Raw origin admission, including visibility and immutable mode content policy. Printed-lord rights and derived relationships have their own stages.</summary>
     internal bool IsRawSourceAdmitted(CharacterState owner, SkillGrant grant) => RawSourceAdmission(owner, grant).Effective;
 
     private (bool Owned, bool Effective) RawSourceAdmission(CharacterState owner, SkillGrant grant)
     {
         var owned = grant.IsEnabled && CanOwnSource(owner, grant.SourceId);
-        return (owned, owned && IsSourceRevealed(owner, grant.SourceId));
+        return (owned, owned && IsSourceRevealed(owner, grant.SourceId) &&
+            (grant.IsModeRule || !owner.IdentityConcealed) &&
+            (_allowedEffectiveSkillIds is null || _allowedEffectiveSkillIds.Contains(grant.SkillId)));
     }
 
     private bool CanOwnSource(CharacterState owner, string source) => source switch

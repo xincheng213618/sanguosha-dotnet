@@ -157,8 +157,6 @@ public sealed partial class GameEngine
     // This preserves scoped runtime state even when an independent shared grant
     // disappears while the conditional grant is absent. Replay reconstructs it.
     private ref readonly Dictionary<(int OwnerSeat, EquipmentSuitSkillGrantSource Source), string> _equipmentSuitSkillInstances => ref _characterHeQiOl.ReferenceToEquipmentSuitSkillInstances;
-    private ref readonly Dictionary<long, (int Events, long Stamp)> _mouHuCheErQualificationDependencies => ref _characterHuCheErMou.ReferenceToMouHuCheErQualificationDependencies;
-    private ref long _mouHuCheErQualificationStamp => ref _characterHuCheErMou.ReferenceToMouHuCheErQualificationStamp;
     // Durable private courses, rather than pending choices. Commands rebuild
     // these immutable accepted orders on replay; public facts reveal no future animal.
     private ref readonly Dictionary<long, MobileWulingCourse> _mobileWulingCourses => ref _characterHuaTuoMobileGod.ReferenceToMobileWulingCourses;

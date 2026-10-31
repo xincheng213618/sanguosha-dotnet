@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.Collections.Frozen;
+
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangRuntime
 {
@@ -7,7 +9,9 @@ internal sealed partial class CoreGameEngineWushuangRuntime
     internal IWushuangModeFeature? WushuangFeature => _modeRuntimeOperations._modeRuntime.Wushuang;
     internal IWushuangModeFeature RequireWushuangFeature => WushuangFeature ?? throw new InvalidOperationException("The current match has no Wushuang feature.");
 
-    internal bool IsWushuangSkillGrantQualified(SkillGrant grant) => !_coreWushuangModeProjectionOperations.IsWushuangMode || _contentRegistryOperations._contentRegistry.Skills.TryGetValue(grant.SkillId, out var skill) && WushuangCatalogue.IsSkillAllowed(skill);
+    internal IReadOnlySet<string>? SkillAvailabilityAllowedIds { get; } = _modeRuntimeOperations._modeRuntime.Wushuang is null ? null :
+        _contentRegistryOperations._contentRegistry.Skills.Values.Where(WushuangCatalogue.IsSkillAllowed)
+            .Select(skill => skill.Id).ToFrozenSet(StringComparer.Ordinal);
     internal WushuangIntermissionFrame? ActiveWushuangWindow(int seat) => WushuangFeature?.ActiveWushuangWindow(seat);
     internal bool CanUseWushuangShop(int seat) => WushuangFeature?.CanUseWushuangShop(seat) ?? false;
     internal void AdvanceWushuangShopSeat(WushuangIntermissionFrame frame) => RequireWushuangFeature.AdvanceWushuangShopSeat(frame);

@@ -25,7 +25,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CharacterDingYuanOlState _characterDingYuanOl = new();
     private readonly EngineStates.CharacterDuXiOlState _characterDuXiOl = new();
     private readonly EngineStates.CharacterHeQiOlState _characterHeQiOl = new();
-    private readonly EngineStates.CharacterHuCheErMouState _characterHuCheErMou = new();
     private readonly EngineStates.CharacterHuaTuoMobileGodState _characterHuaTuoMobileGod = new();
     private readonly EngineStates.CharacterHuangChengYanOlState _characterHuangChengYanOl = new();
     private readonly EngineStates.CharacterHuangChongMobileShiState _characterHuangChongMobileShi = new();
@@ -179,7 +178,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICharacterDingYuanOlSynchronizingAdoptedChildGrantsAccess), _characterDingYuanOl),
         new(typeof(EngineStates.Contracts.ICharacterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess), _characterDuXiOl),
         new(typeof(EngineStates.Contracts.ICharacterHeQiOlEquipmentSuitSkillInstancesSynchronizingEquipmentSuitSkillGrantsAccess), _characterHeQiOl),
-        new(typeof(EngineStates.Contracts.ICharacterHuCheErMouMouHuCheErQualificationDependenciesMouHuCheErQualificationStampAccess), _characterHuCheErMou),
         new(typeof(EngineStates.Contracts.ICharacterHuaTuoMobileGodMobileWulingCoursesAccess), _characterHuaTuoMobileGod),
         new(typeof(EngineStates.Contracts.ICharacterHuangChengYanOlJiezhenConversionsAccess), _characterHuangChengYanOl),
         new(typeof(EngineStates.Contracts.ICharacterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess), _characterHuangChongMobileShi),

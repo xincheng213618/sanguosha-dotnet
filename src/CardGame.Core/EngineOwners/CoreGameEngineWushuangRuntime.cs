@@ -2,6 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineWushuangRuntime(IKernelContentRegistryAccess _contentRegistryOperations, IKernelMatchModeRuntimeAccess _modeRuntimeOperations, ICoreWushuangCoreWushuangModeProjectionOperations _coreWushuangModeProjectionOperations, IKernelRejectOperations _kernelCoreMainOperations)
+internal sealed partial class CoreGameEngineWushuangRuntime(IKernelContentRegistryAccess _contentRegistryOperations, IKernelMatchModeRuntimeAccess _modeRuntimeOperations, IKernelRejectOperations _kernelCoreMainOperations)
 {
 }

@@ -125,6 +125,30 @@ internal static class CharacterSkillSetChecks
         owner.SkillGrants.RemoveRestriction("empty");
         RawSourceAdmissionPreservesSelectionVisibilityAndQualificationStages();
         PrintedLordQualificationsUseExactGrantsForSetupAndPrograms();
+        ContentAdmissionLimitsEffectiveSourcesWithoutChangingPossession();
+    }
+
+    private static void ContentAdmissionLimitsEffectiveSourcesWithoutChangingPossession()
+    {
+        const string allowed = "fixture:allowed-content", denied = "fixture:denied-content";
+        var definitions = new Dictionary<string, ContentSkillDefinition>
+        { [allowed] = new(allowed, "Allowed", ""), [denied] = new(denied, "Denied", "") };
+        var owner = Character(new GeneralDefinition("fixture:content-owner", "Owner", "", []));
+        owner.SkillGrants.Grant(new("allowed", allowed, "allowed-instance", "acquired:fixture"));
+        owner.SkillGrants.Grant(new("denied", denied, "denied-instance", "acquired:fixture"));
+        owner.SkillGrants.Grant(new("mode-denied", denied, "mode-instance", "mode:fixture") { IsModeRule = true });
+        var ids = new HashSet<string>(StringComparer.Ordinal) { allowed };
+        var restricted = new MatchSkillBindingIndex(id => definitions[id], false, allowedEffectiveSkillIds: ids);
+        var answer = restricted.GetShard(owner);
+        Require(answer.OwnedGrants.Count == 3 && answer.HasOwnedInstance(denied, "denied-instance") &&
+            answer.HasOwnedInstance(denied, "mode-instance") && answer.HasInstance(allowed, "allowed-instance") &&
+            !answer.HasInstance(denied, "denied-instance") && !answer.HasInstance(denied, "mode-instance"),
+            "Immutable content admission affects effectiveness, retains actual possession and applies equally to ordinary and mode-rule sources.");
+        ids.Add(denied);
+        restricted.Invalidate(owner.Seat);
+        Require(!restricted.GetShard(owner).HasSkill(denied) && new MatchSkillBindingIndex(id => definitions[id], false)
+            .GetShard(owner).HasInstance(denied, "mode-instance"),
+            "The admission set is frozen for the match, while an unrestricted mode retains both sources' ordinary effectiveness.");
     }
 
     private static void RawSourceAdmissionPreservesSelectionVisibilityAndQualificationStages()
@@ -174,6 +198,49 @@ internal static class CharacterSkillSetChecks
         owner.SkillGrants.Grant(printedLord);
         Require(ordinary.IsRawSourceAdmitted(owner, printedLord) && !ordinary.Query(owner).HasOwnedInstance(lord, printedLord.SkillInstanceId),
             "Raw admission does not replace the existing printed-lord ownership decision or grant its rights to a non-lord.");
+        IdentityConcealmentPreservesPossessionAndIndependentEffectiveLimits();
+    }
+
+    private static void IdentityConcealmentPreservesPossessionAndIndependentEffectiveLimits()
+    {
+        const string skill = "fixture:concealed-source", mode = "fixture:visible-mode", deniedMode = "fixture:denied-mode";
+        var definitions = new Dictionary<string, ContentSkillDefinition>
+        { [skill] = new(skill, "Source", ""), [mode] = new(mode, "Mode", ""), [deniedMode] = new(deniedMode, "Denied mode", "") };
+        var owner = Character(new GeneralDefinition("fixture:concealed-owner", "Owner", "", []));
+        var printed = new SkillGrant("printed", skill, "printed-instance", CharacterState.PrimarySkillSource);
+        var equipment = new SkillGrant("equipment", skill, "equipment-instance", "equipment:fixture");
+        var acquired = new SkillGrant("acquired", skill, "acquired-instance", "acquired:fixture");
+        var visible = new SkillGrant("visible-mode", mode, "mode-instance", "mode:visible") { IsModeRule = true };
+        var denied = new SkillGrant("denied-mode", deniedMode, "denied-mode-instance", "mode:denied") { IsModeRule = true };
+        foreach (var grant in new[] { printed, equipment, acquired, visible, denied }) owner.SkillGrants.Grant(grant);
+        IReadOnlySet<string> allowed = new HashSet<string>(StringComparer.Ordinal) { skill, mode };
+        var index = new MatchSkillBindingIndex(id => definitions[id], false, allowedEffectiveSkillIds: allowed);
+        var before = index.GetShard(owner);
+        var grants = owner.SkillGrants.Grants;
+        var revision = owner.SkillGrants.GrantRevision;
+        Require(before.HasInstance(skill, printed.SkillInstanceId) && before.HasInstance(mode, visible.SkillInstanceId) &&
+                before.HasOwnedInstance(deniedMode, denied.SkillInstanceId) && !before.HasInstance(deniedMode, denied.SkillInstanceId),
+            "An independent effective allow-set preserves possession and also limits real mode-rule grants.");
+        owner.IdentityConcealment = new(owner.General.Id, owner.Hp);
+        var concealed = index.GetShard(owner);
+        Require(!ReferenceEquals(before, concealed) && concealed.OwnedGrants.SequenceEqual(before.OwnedGrants) &&
+                new[] { printed, equipment, acquired }.All(grant => concealed.HasOwnedInstance(skill, grant.SkillInstanceId) &&
+                    !concealed.HasInstance(skill, grant.SkillInstanceId)) &&
+                concealed.HasInstance(mode, visible.SkillInstanceId) && !concealed.HasInstance(deniedMode, denied.SkillInstanceId),
+            "Identity concealment disables printed, equipment and acquired effects without losing ownership; mode grants bypass concealment but not the effective allow-set.");
+        var raw = new SkillAvailability(_ => throw new InvalidOperationException("Raw concealment resolved a definition."), false, false,
+            (_, _) => throw new InvalidOperationException("Raw concealment entered derived qualification."), allowedEffectiveSkillIds: allowed);
+        Require(new[] { printed, equipment, acquired }.All(grant => !raw.IsRawSourceAdmitted(owner, grant)) &&
+                raw.IsRawSourceAdmitted(owner, visible),
+            "Raw concealment and the real mode exemption read no skill definition or derived qualification callback.");
+        owner.IdentityConcealment = null;
+        var restored = index.GetShard(owner);
+        Require(!ReferenceEquals(concealed, restored) &&
+                new[] { printed, equipment, acquired }.All(grant => restored.HasInstance(skill, grant.SkillInstanceId)) &&
+                restored.HasInstance(mode, visible.SkillInstanceId) && !restored.HasInstance(deniedMode, denied.SkillInstanceId) &&
+                owner.SkillGrants.GrantRevision == revision && owner.SkillGrants.Grants.SequenceEqual(grants) &&
+                !concealed.HasInstance(skill, printed.SkillInstanceId) && before.HasInstance(skill, printed.SkillInstanceId),
+            "Clearing concealment refreshes cached availability with the same grant instances, retains the independent effective limit, and leaves old snapshots frozen.");
     }
 
     private static void PrintedLordQualificationsUseExactGrantsForSetupAndPrograms()
