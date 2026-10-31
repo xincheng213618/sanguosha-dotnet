@@ -24,7 +24,7 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? ZhaoXiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterZhaoXiangOlOperations.ZhaoXiangFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? ZhaoXiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.ZhaoXiangFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 120)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 120)]
     internal bool CanContinueZhaoXiang(ProgramSkillFrame f) => f.ZhaoXiang is not null && ValidZhaoXiang(f);

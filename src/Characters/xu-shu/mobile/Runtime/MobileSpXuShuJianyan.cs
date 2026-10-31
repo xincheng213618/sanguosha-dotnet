@@ -40,7 +40,3 @@ internal sealed class MobileSpXuShuJianyanHandler : ISkillProgramEffectHandler
     public SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMobileSpXuShuJianyan;
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost host) => host.GetCapability<IMobileSpXuShuJianyanHost>().Begin(f);
 }
-
-public sealed partial class GameEngine
-{
-}

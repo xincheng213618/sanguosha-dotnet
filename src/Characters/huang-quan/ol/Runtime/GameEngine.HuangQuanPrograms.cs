@@ -24,7 +24,3 @@ public sealed partial record CardUseFrame
 {[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public JianjiNativeReceipt? JianjiUse{get;init;}}
 
 public sealed record JianjiOrdinaryAlcoholPaidEvent(long NativeUseId,long ActionId,int ActualTurn,int ActorSeat,bool CountsQuota,long? JianjiProgramFrameId):IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

@@ -116,8 +116,3 @@ public sealed record HellFanshiDamageCountedEvent(int ActualTurn, int OwnerSeat,
 public sealed record HellCurrentHpExchangedEvent(long ProgramFrameId, int OwnerSeat, int OtherSeat,
     int OwnerBefore, int OtherBefore, int OwnerAfter, int OtherAfter) : IGameEvent;
 public sealed record HellRandomCardDiscardedEvent(long ProgramFrameId, int OwnerSeat, int CardOwnerSeat, int CardId) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-
-}

@@ -22,7 +22,3 @@ internal sealed class LiushiTopdeckSelectionValidator : IProgramSelectionValidat
         queries.Get<ILiushiTopdeckSelectionQuery>().CanTopdeck(request.Context.OwnerSeat, card)
             ? null : new(CommandErrorCode.IllegalAction, "流矢材料必须能实际置于牌堆顶。");
 }
-
-public sealed partial class GameEngine
-{
-}

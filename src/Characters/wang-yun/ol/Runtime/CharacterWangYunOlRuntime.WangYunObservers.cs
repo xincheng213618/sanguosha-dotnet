@@ -229,7 +229,7 @@ internal sealed partial class CharacterWangYunOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? WangYunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterWangYunOlOperations.WangYunFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? WangYunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.WangYunFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 190)]
     internal bool TryAdvanceWangYunSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WangYunObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

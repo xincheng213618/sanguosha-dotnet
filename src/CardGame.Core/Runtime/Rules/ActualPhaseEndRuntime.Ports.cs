@@ -51,7 +51,3 @@ internal interface IActualPhaseEndNativeReturns : IProgramRuntimeOperations
     void AdvanceRulesAndPublishState();
     bool ResumeScheduledProgramPhase();
 }
-
-public sealed partial class GameEngine
-{
-}

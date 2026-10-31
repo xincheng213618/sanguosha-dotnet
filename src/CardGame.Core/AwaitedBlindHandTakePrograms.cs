@@ -6,6 +6,3 @@ public interface IAwaitedBlindHandTakeProgramHost
 {
     SkillProgramStepOutcome TakeRandomHandCardsAndAwait(ProgramSkillFrame frame, int amountPerTarget, CardMoveReason reason);
 }
-public sealed partial class GameEngine
-{
-}

@@ -34,7 +34,7 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? AnniversaryXuJingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterXuJingAnniversaryOperations.AnniversaryXuJingFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? AnniversaryXuJingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.AnniversaryXuJingFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 43100)]
     internal bool AnniversaryXuJingDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryXuJingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43100)]

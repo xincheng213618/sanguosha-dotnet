@@ -46,7 +46,7 @@ internal sealed partial class CharacterYangFengOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? YangFengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterYangFengOlOperations.YangFengFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? YangFengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.YangFengFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27150)]
     internal bool AdvanceYangFengSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && YangFengObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

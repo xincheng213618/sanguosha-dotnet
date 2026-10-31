@@ -3,10 +3,7 @@ namespace CardGame.Core;
 // The original foreign-turn frame owns the frozen candidate roster and cursor.
 // This runtime only retains match-local primitives and typed native returns.
 [ProgramRuntimeModule]
-internal sealed class ForeignActualTurnWindowRuntime(IProgramRuntimeFrames frames, INativeFrameRoutingFacts nativeFrames,
-    IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramContentQueries content,
-    IProgramTurnQueries turn, ISelectionParticipantQueries participants, IProgramBindingFacts bindings,
-    IProgramBindingActions actions, IForeignActualTurnWindowFacts facts, IForeignActualTurnWindowReturns returns)
+internal sealed class ForeignActualTurnWindowRuntime(IProgramRuntimeFrames frames,    IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramContentQueries content,    IProgramTurnQueries turn,ISelectionParticipantQueries participants,IProgramBindingFacts bindings,    IProgramBindingActions actions,IForeignActualTurnWindowFacts facts,IForeignActualTurnWindowReturns returns)
 {
     private bool HasForeignTurnContests =>
         content.HasTriggerWindow(SkillProgramTriggerWindow.OtherActualTurnStarted) ||

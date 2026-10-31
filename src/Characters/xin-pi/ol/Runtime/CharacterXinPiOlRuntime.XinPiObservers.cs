@@ -29,7 +29,7 @@ internal sealed partial class CharacterXinPiOlRuntime
     }
 
     internal bool IsXinPiRecoveryCompletion(ProgramSkillFrame f, RecoveryAttempt attempt) => f.XinPi is { Stage: XinPiStage.RecoveryChildren, Relation: { } relation } r && attempt.SourceSeat == f.OwnerSeat && attempt.TargetSeat == relation.TargetSeat && attempt.Amount == r.Requested && attempt.Completion.Producer == RecoveryAttemptProducer.Program && attempt.Completion.InstructionIndex == f.InstructionIndex && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<YinjuRecoveryPaidEvent>().Count(e => e.FrameId == f.Id && e.Relation == relation && e.TargetSeat == attempt.TargetSeat && e.SourceSeat == attempt.SourceSeat && e.HpBefore == attempt.HpBefore && e.RequestedRecovery == attempt.Amount && e.DamageAttemptId == r.DamageAttemptId) == 1;
-    internal ProgramSkillFrame? XinPiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXinPiOlOperations.XinPiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? XinPiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.XinPiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 400)]
     internal bool TryAdvanceXinPiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XinPiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

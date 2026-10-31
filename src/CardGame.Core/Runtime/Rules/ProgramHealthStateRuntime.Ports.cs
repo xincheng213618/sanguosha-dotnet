@@ -26,7 +26,3 @@ internal interface IProgramHealthStateNativeEntries : IProgramRuntimeOperations
     void RecordCharacterTurnedOver(int targetSeat, bool wasFaceDown);
     void AddLog(string category, string message, int ownerSeat, int targetSeat);
 }
-
-public sealed partial class GameEngine
-{
-}

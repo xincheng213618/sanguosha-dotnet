@@ -13,7 +13,3 @@ internal static class ProgramExpressionAmounts
         frame.NumberBindings.Where(binding => binding.Name == Key(frame.InstructionIndex)).ToArray() is [var issued] && issued.Value >= 0
             ? issued.Value : -1;
 }
-
-public sealed partial class GameEngine
-{
-}

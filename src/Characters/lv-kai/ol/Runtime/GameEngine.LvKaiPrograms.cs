@@ -21,10 +21,3 @@ public sealed record BijingPunishState(int TurnOwnerSeat, int OwnerSeat, IReadOn
     public long Before { get; init; }
     public long After { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-    // 闭境 marks survive across turns until the owner's next preparation phase
-    // recasts them; replay reconstructs the map from the accepted commands.
-    private ref readonly global::System.Collections.Generic.Dictionary<int, int> _bijingMarkedCardIds => ref _characterLvKaiOl.ReferenceToBijingMarkedCardIds;
-}

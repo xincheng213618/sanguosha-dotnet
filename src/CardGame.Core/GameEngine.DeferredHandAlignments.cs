@@ -24,9 +24,3 @@ public sealed record DeferredTurnEndFrame(long Id, int OwnerSeat, int TurnNumber
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SoleTargetQuarantineReturnCursor? SoleTargetQuarantineReturns { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-    private ref readonly global::System.Collections.Generic.List<global::CardGame.Core.DeferredHandAlignment> _deferredHandAlignments => ref _deferredHandAlignments2.ReferenceToDeferredHandAlignments;
-    private ref long _deferredHandAlignmentSequence => ref _deferredHandAlignments2.ReferenceToDeferredHandAlignmentSequence;
-}

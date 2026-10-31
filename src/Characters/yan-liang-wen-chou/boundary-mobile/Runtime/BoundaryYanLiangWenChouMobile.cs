@@ -46,7 +46,3 @@ internal static class BoundaryYanLiangWenChouComposition
                 throw new InvalidOperationException(path + ": mobile Shuangxiong requires one optional original Duel damage-recipient response claim.");
     }
 }
-
-public sealed partial class GameEngine
-{
-}

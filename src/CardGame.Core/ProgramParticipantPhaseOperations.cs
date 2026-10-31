@@ -66,9 +66,3 @@ public sealed class GrantTurnBoundSuitUseProhibitionHandler : ISkillProgramEffec
         return SkillProgramStepOutcome.Continue;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ref readonly global::System.Collections.Generic.List<global::CardGame.Core.Suit> _fullDiscardPhaseSuits => ref _programParticipantPhaseOperations.ReferenceToFullDiscardPhaseSuits;
-    private ref int _fullDiscardPhaseSuitTurn => ref _programParticipantPhaseOperations.ReferenceToFullDiscardPhaseSuitTurn;
-}

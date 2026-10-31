@@ -18,7 +18,3 @@ public sealed record SettledActionCardDiscardEvent(long BatchId, int MovementSeq
     int ActorSeat, int TurnNumber) : IGameEvent;
 public sealed record ProgramXunxianGiftEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int RecipientSeat, int CardId, int DiscardMovementSequence) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

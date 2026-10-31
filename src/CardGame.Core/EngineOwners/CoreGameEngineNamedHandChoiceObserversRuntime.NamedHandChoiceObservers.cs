@@ -56,7 +56,7 @@ internal sealed partial class CoreGameEngineNamedHandChoiceObserversRuntime
         return child is DamageFrame damage && damage.ParentFrameId == root.Id && damage.SourceSeat == attack.SourceSeat && damage.TargetSeat == attack.TargetSeat && damage.Amount == attack.DamageAmount && damage.Nature == attack.Nature;
     }
 
-    internal ProgramSkillFrame? NamedHandChoiceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreNamedHandChoiceObserversOperations.NamedHandChoiceFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? NamedHandChoiceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.NamedHandChoiceFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 80)]
     internal bool TryAdvanceNamedHandChoiceSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && NamedHandChoiceObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

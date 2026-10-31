@@ -71,7 +71,7 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 80)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 70)]
     internal bool IsXunyiRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame child) => XunyiFirstChild(frame, child);
-    internal ProgramSkillFrame? XunyiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterWangFuZhaoLeiMobileOperations.XunyiFirstChild(frame, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? XunyiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.XunyiFirstChild(frame, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26320)]
     internal bool AdvanceXunyiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XunyiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

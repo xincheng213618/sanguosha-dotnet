@@ -4,7 +4,3 @@ public interface IAvailableBoundSubsetProgramEffectHost
 {
     SkillProgramStepOutcome SelectAvailableBoundSubset(ProgramSkillFrame frame, SkillProgramEffect effect);
 }
-
-public sealed partial class GameEngine
-{
-}

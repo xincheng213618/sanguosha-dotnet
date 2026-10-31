@@ -36,7 +36,7 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? AnniversaryFuPairObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterFuRongFuQianAnniversaryOperations.AnniversaryFuPairFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? AnniversaryFuPairObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.AnniversaryFuPairFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 44700)]
     internal bool HasAnniversaryFuPairDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryFuPairObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 44700)]

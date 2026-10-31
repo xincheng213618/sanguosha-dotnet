@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineFrozenHandRosterObserversRuntime
         return r.Stage == "damage-issued" && r.DamageIssued && f.AttackAttempt is { } attack && f.AttackReturn is not null && attack.SourceSeat == f.OwnerSeat && attack.TargetSeat == r.DamageTarget && !attack.SourceLess && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
     }
 
-    internal ProgramSkillFrame? FrozenHandRosterObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _coreFrozenHandRosterObserversOperations.FrozenHandRosterFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? FrozenHandRosterObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.FrozenHandRosterFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 520)]
     internal bool TryAdvanceFrozenHandRosterSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FrozenHandRosterObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 530)]

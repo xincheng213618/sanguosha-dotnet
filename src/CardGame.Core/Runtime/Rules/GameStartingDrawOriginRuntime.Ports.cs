@@ -40,7 +40,3 @@ internal interface IGameStartingDrawNativeReceipts : IProgramRuntimeOperations
 {
     IReadOnlyList<TangTangGain>? CurrentTangTangGains(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
 }
-
-public sealed partial class GameEngine
-{
-}

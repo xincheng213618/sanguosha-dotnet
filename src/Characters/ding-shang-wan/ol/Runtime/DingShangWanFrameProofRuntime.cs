@@ -1,9 +1,7 @@
 namespace CardGame.Core;
 
 [ProgramRuntimeModule,ProgramCapability]
-internal sealed class DingShangWanFrameProofRuntime(IProgramRuntimeFrames frames, INativeFrameRoutingFacts nativeFrames,
-    IDingShangWanNativeFacts facts, IProgramTurnQueries turn, IProgramPhaseQueries phase,
-    IMatchParticipantStateAccess participants, IProgramEventHistoryQueries history, ICardMovementHistoryQueries movements) : IDingShangWanRuntimeQueries
+internal sealed class DingShangWanFrameProofRuntime(IProgramRuntimeFrames frames,INativeFrameRoutingFacts nativeFrames,    IDingShangWanNativeFacts facts,IProgramPhaseQueries phase,    IMatchParticipantStateAccess participants,IProgramEventHistoryQueries history,ICardMovementHistoryQueries movements) : IDingShangWanRuntimeQueries
 {
     private const string DingShangWanDrawReason="skill-program.ding-shang-wan.draw",FudaoGiftReason="skill-program.ding-shang-wan.fudao.give",        FudaoDiscardReason=global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FudaoDiscardReason,FengyanGiftReason="skill-program.ding-shang-wan.fengyan.give",FengyanDiscardReason=global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FengyanDiscardReason;
     private long PhysicalMovementSequence=>movements.Last()?.Sequence??0;

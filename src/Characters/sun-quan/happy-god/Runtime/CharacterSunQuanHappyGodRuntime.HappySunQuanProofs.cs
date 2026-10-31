@@ -30,7 +30,7 @@ internal sealed partial class CharacterSunQuanHappyGodRuntime
         return child is DyingFrame dying && r.Stage == HappySunQuanStage.HpLoss && r.Branch == 2 && dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.Continuation == DyingContinuationKind.ProgramSkill;
     }
 
-    internal ProgramSkillFrame? HappySunQuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterSunQuanHappyGodOperations.HappySunQuanFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? HappySunQuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HappySunQuanFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40940)]
     internal bool HappySunQuanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HappySunQuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40940)]

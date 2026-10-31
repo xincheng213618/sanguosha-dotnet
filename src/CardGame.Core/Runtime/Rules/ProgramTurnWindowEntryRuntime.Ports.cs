@@ -38,7 +38,3 @@ internal interface IProgramTurnWindowPhaseReceipts : IProgramSelectionQuery
     bool TracksPhaseNamePredictions { get; }
     int PhaseInstanceId { get; }
 }
-
-public sealed partial class GameEngine
-{
-}

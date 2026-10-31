@@ -83,7 +83,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
             var root = parent as CardUseFrame;
             if (r.Kind == NativeEquipmentInvocationKind.FactionBagua && index > 0 && parent is ResponseWindowFrame response && response.ParentFrameId == attackId && _resolutionStackOperations._resolutionStack[index - 1] is CardUseFrame responseRoot)
                 root = responseRoot;
-            if (root is null || root.Id != attackId || !NativeEquipmentHostMatches(parent, root, r) || !_coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreNativeEquipmentInvocationsOperations.NativeEquipmentObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)))
+            if (root is null || root.Id != attackId || !NativeEquipmentHostMatches(parent, root, r) || !_coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => this.NativeEquipmentObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)))
                 continue;
             return new(parent, root, invocation, r, index);
         }

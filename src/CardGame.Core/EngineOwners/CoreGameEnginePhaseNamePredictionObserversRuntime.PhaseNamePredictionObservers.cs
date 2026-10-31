@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionObserversRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == armorOwner && recovery.Attempt.TargetSeat == armorOwner && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason?.Value == reason;
     }
 
-    internal ProgramSkillFrame? PhaseNamePredictionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePhaseNamePredictionObserversOperations.PhaseNamePredictionFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
+    internal ProgramSkillFrame? PhaseNamePredictionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PhaseNamePredictionFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 70)]
     internal bool TryAdvancePhaseNamePredictionSubtree()
     {

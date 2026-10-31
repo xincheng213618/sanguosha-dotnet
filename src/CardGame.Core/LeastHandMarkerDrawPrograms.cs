@@ -33,10 +33,3 @@ internal sealed class GrantLeastHandMarkerOrDrawDescriptor : ProgramOperationDes
 
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new RequireTriggerWindow(SkillProgramTriggerWindow.DrawPhaseSkipped), new ReadTargetSet(1, 1)];
 }
-
-public sealed partial class GameEngine
-{
-    // Issued permanent obligations are independent of later source availability;
-    // resolution progress itself remains only on the exact draw owning frame.
-    private ref readonly global::System.Collections.Generic.Dictionary<(int Target, global::CardGame.Core.PlayerMarkerKind Marker), global::CardGame.Core.ProgramMarkerExtraDrawPolicy> _markerExtraDrawPolicies => ref _leastHandMarkerDrawPrograms.ReferenceToMarkerExtraDrawPolicies;
-}

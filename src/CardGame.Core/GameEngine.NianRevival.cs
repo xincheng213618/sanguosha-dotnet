@@ -86,8 +86,3 @@ internal sealed class NianRevivalSelectionSource : IProgramSelectionSourceProvid
         IProgramSelectionQueries queries) =>
         candidates.Targets = queries.Get<INianRevivalSelectionQuery>().DeadAllies(context.OwnerSeat).ToArray();
 }
-
-public sealed partial class GameEngine
-{
-
-}

@@ -222,7 +222,7 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, frame) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == frame.OwnerSeat && recovery.Attempt.TargetSeat == frame.OwnerSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == reason;
     }
 
-    internal ProgramSkillFrame? PublicPileCashOutObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePublicPileCashOutOperations.PublicPileCashOutFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
+    internal ProgramSkillFrame? PublicPileCashOutObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PublicPileCashOutFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 260)]
     internal bool IsPublicPileCashOutProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PublicPileCashOutObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     SkillProgramStepOutcome global::CardGame.Core.IPublicPileCashOutHost.ExecutePublicPileCashOut(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginPublicPileCashOut(effect, frame);

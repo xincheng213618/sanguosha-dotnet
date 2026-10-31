@@ -26,11 +26,3 @@ public sealed record ZhuihuanRetaliateState(int ChosenSeat, IReadOnlyList<int> P
     public IReadOnlyList<int> DamagedSeats { get => _damagedSeats; init => _damagedSeats = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<int> DiscardedSeats { get => _discardedSeats; init => _discardedSeats = Array.AsReadOnly(value.ToArray()); }
 }
-
-public sealed partial class GameEngine
-{
-    // Private 追还 arm choices: arm frame id → secretly chosen seat. The map is
-    // runtime trusted state; replay rebuilds it from the accepted choice
-    // commands exactly like the 闭境 marked-card map.
-    private ref readonly global::System.Collections.Generic.Dictionary<long, int> _zhuihuanArmChoices => ref _characterYangWanOl.ReferenceToZhuihuanArmChoices;
-}

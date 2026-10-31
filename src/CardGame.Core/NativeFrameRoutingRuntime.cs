@@ -48,7 +48,3 @@ internal sealed class NativeFrameRoutingRuntime(IProgramRuntimeFrames frames,
         programs.Execute(frame.Id);
     }
 }
-
-public sealed partial class GameEngine
-{
-}

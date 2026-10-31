@@ -62,7 +62,7 @@ internal sealed partial class CharacterZhangWenAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? ZhangWenObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterZhangWenAnniversaryOperations.ZhangWenFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? ZhangWenObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.ZhangWenFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 45100)]
     internal bool AdvanceZhangWenSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangWenObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

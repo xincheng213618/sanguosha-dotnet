@@ -10,7 +10,3 @@ public interface IPopulationTopReorderProgramEffectHost
     SkillProgramStepOutcome ReorderTopCardsByPopulation(ProgramSkillFrame frame, int maximumCards,
         ProgramPopulationThresholdCount population, string? allBottomStateId);
 }
-
-public sealed partial class GameEngine
-{
-}

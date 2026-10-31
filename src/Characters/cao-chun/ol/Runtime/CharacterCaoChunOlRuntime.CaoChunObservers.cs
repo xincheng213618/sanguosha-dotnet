@@ -190,7 +190,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason is { Value: ShanjiaDiscardReason };
     }
 
-    internal ProgramSkillFrame? CaoChunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterCaoChunOlOperations.CaoChunFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? CaoChunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.CaoChunFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 340)]
     internal bool TryAdvanceCaoChunSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoChunObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     internal void ExpireCaoChunPlayDebt(int owner, int phaseInstance)

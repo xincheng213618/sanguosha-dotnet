@@ -63,7 +63,3 @@ public sealed partial record JudgmentFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public HellDayuanJudgmentOverride? HellDayuanOverride { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-}

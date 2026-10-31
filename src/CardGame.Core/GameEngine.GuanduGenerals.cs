@@ -32,7 +32,3 @@ public sealed partial record ProgramSkillFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public GuanduGeneralReceipt? GuanduGeneral { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-}

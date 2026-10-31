@@ -76,7 +76,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && r.Stage == AnniversaryLiuLiStage.SkillChildren && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? LiuLiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLiuLiAnniversaryOperations.LiuLiFirstChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? LiuLiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.LiuLiFirstChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 43300)]
     internal bool AdvanceLiuLiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuLiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

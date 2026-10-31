@@ -65,7 +65,7 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillObserversRuntime
         return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == "skill-program.other-death-growth.draw");
     }
 
-    internal ProgramSkillFrame? DeathGrowthObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreDeathGrowthSkillObserversOperations.DeathGrowthFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? DeathGrowthObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.DeathGrowthFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 440)]
     internal bool TryAdvanceDeathGrowthSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DeathGrowthObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

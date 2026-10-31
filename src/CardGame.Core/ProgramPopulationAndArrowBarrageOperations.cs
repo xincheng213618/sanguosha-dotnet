@@ -62,6 +62,3 @@ public sealed class RemoveSelectedCurrentArrowBarrageTargetHandler : ISkillProgr
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int targetSeat, ISkillProgramEffectHost host)
     { host.GetCapability<IPopulationAndArrowBarrageProgramHost>().RemoveSelectedCurrentArrowBarrageTarget(f); return SkillProgramStepOutcome.Continue; }
 }
-public sealed partial class GameEngine
-{
-}

@@ -51,6 +51,3 @@ internal sealed class MobileShiXieDistanceHandler(SkillProgramEffectOp op) : ISk
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost host)
         => host.GetCapability<IMobileShiXieHost>().Change(f, op);
 }
-public sealed partial class GameEngine
-{
-}

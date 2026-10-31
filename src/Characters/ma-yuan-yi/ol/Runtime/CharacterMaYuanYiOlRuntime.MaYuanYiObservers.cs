@@ -24,7 +24,7 @@ internal sealed partial class CharacterMaYuanYiOlRuntime
         return r.Stage == MaYuanYiStage.DamageChildren && f.AttackAttempt is { SourceSeat: var source, TargetSeat: var target, DamageAmount: 1, SourceLess: false, Nature: DamageNature.Thunder } && source == f.OwnerSeat && target == r.TargetSeat && f.AttackReturn is not null && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
     }
 
-    internal ProgramSkillFrame? MaYuanYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterMaYuanYiOlOperations.MaYuanYiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? MaYuanYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.MaYuanYiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27370)]
     internal bool AdvanceMaYuanYiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MaYuanYiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

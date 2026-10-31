@@ -16,7 +16,7 @@ internal sealed partial class CharacterHaoPuOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? ZhenyingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterHaoPuOlOperations.ZhenyingFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? ZhenyingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.ZhenyingFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26500)]
     internal bool AdvanceZhenyingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhenyingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

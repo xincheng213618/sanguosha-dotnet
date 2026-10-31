@@ -10,7 +10,3 @@ public sealed partial record ProgramSkillFrame
 // asks for one field equipment, stage two for one field delayed trick; each
 // stage may be skipped ("至多").
 public sealed record PanShuZhirenFieldState(bool AwaitingDelayedTrick, int NameLength);
-
-public sealed partial class GameEngine
-{
-}

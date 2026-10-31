@@ -142,7 +142,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
         return child is HpChangedTriggerWindowFrame hp && r.Stage == AnniversaryYangBiaoStage.CostChildren && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount == 1;
     }
 
-    internal ProgramSkillFrame? YangBiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterYangBiaoAnniversaryOperations.YangBiaoFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? YangBiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.YangBiaoFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 43700)]
     internal bool AdvanceYangBiaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && YangBiaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43700)]

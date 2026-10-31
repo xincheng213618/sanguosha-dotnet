@@ -58,7 +58,3 @@ internal sealed class RecipientHpGiftSelectionAi : IProgramSelectionAiDecorator
         return hint with { OwnerDraw = checked(hint.OwnerDraw + (int)Math.Round(expected, MidpointRounding.AwayFromZero)), GivesSelected = true };
     }
 }
-
-public sealed partial class GameEngine
-{
-}

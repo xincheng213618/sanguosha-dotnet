@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineJiqiaoObserversRuntime
     }
 
     internal bool HasPaidJiqiaoSilverLion(ProgramSkillFrame f) => f.JiqiaoPaid is { } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.Invoice.CostBefore && m.Sequence <= r.Invoice.CostAfter && m.From == CardLocation.Equipment(f.OwnerSeat) && IsJiqiaoPaidCostDestination(f, m) && m.Reason.Value == "program.jiqiao.cost" && _coreJiqiaoProgramsOperations.JiqiaoCard(m.CardId).Kind == CardKind.SilverLion);
-    internal ProgramSkillFrame? JiqiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _coreJiqiaoObserversOperations.JiqiaoFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
+    internal ProgramSkillFrame? JiqiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.JiqiaoFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 150)]
     internal bool TryAdvanceJiqiaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && JiqiaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     SkillProgramStepOutcome global::CardGame.Core.IJiqiaoProgramHost.ExecutePaidJiqiao(ProgramSkillFrame f, SkillProgramEffect e) => _coreJiqiaoProgramsOperations.ExecutePaidJiqiao(f, e);

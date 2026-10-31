@@ -108,7 +108,3 @@ internal sealed partial class ResponseCompletionRuntime
             yield return _facts.PendingHpChangeAt(index);
     }
 }
-
-public sealed partial class GameEngine
-{
-}

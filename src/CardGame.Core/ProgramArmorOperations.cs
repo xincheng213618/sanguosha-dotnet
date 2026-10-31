@@ -39,7 +39,3 @@ public sealed class GrantArmorHandler : ISkillProgramEffectHandler
         return SkillProgramStepOutcome.Continue;
     }
 }
-
-public sealed partial class GameEngine
-{
-}

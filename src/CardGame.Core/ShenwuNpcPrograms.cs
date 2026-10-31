@@ -118,7 +118,3 @@ internal sealed class ShenwuNpcEffectHandler(SkillProgramEffectOp op) : ISkillPr
 /// <summary>Public actual-turn evidence; the target restriction is reconstructed from rule history.</summary>
 public sealed record ShenwuMingwanVictimRecordedEvent(int ActualTurn, int OwnerSeat, int VictimSeat, long DamageFrameId, long CardUseFrameId) : IGameEvent;
 public sealed record ShenwuYinzeiDiscardedEvent(long ProgramFrameId, int OwnerSeat, int SourceSeat, int CardId) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

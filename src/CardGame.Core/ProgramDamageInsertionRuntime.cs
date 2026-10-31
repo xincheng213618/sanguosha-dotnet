@@ -64,7 +64,3 @@ internal sealed class ProgramDamageInsertionRuntime(IProgramDamageInsertionFacts
         return true;
     }
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -118,7 +118,3 @@ internal interface IProgramTriggerDamageQuery : IProgramSelectionQuery
     CardKind? EffectiveDamageCardKind(DamageTriggerWindowFrame frame);
     IReadOnlyList<Card> PhysicalDamageCards(DamageTriggerWindowFrame frame);
 }
-
-public sealed partial class GameEngine
-{
-}

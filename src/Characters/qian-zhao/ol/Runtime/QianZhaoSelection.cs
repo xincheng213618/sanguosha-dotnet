@@ -46,7 +46,3 @@ internal sealed class WeifuSelectionAi : IProgramSelectionAiDecorator
         return hint with { ValueAdjustment = benefit - 12d };
     }
 }
-
-public sealed partial class GameEngine
-{
-}

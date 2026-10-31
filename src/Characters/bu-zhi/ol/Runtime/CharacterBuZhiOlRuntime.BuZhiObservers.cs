@@ -16,7 +16,7 @@ internal sealed partial class CharacterBuZhiOlRuntime
         return r.Stage == "damage-issued" && r.DamageIssued && f.AttackAttempt is { } attack && f.AttackReturn is not null && attack.SourceSeat == f.OwnerSeat && attack.TargetSeat == r.Target && !attack.SourceLess && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
     }
 
-    internal ProgramSkillFrame? BuZhiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterBuZhiOlOperations.BuZhiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? BuZhiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.BuZhiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 130)]
     internal bool TryAdvanceBuZhiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BuZhiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 70)]

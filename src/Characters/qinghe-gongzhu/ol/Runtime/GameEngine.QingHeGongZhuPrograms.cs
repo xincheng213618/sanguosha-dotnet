@@ -25,7 +25,3 @@ public sealed partial record ProgramSkillFrame
 // One prompt per discarded card; the receipt rides the owning program frame.
 public sealed record ChangjiDiscardState(int EndingSeat, int OwnerSeat, int Remaining,
     IReadOnlyList<int> DiscardedCardIds);
-
-public sealed partial class GameEngine
-{
-}

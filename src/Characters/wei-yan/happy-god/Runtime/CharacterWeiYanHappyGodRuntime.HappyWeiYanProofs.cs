@@ -36,7 +36,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         return receipt.Stage == HappyWeiYanStage.Damage && frame.AttackAttempt is { } attack && !attack.SourceLess && attack.SourceSeat == frame.OwnerSeat && attack.TargetSeat == receipt.Target && frame.AttackReturn is not null && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(frame, child);
     }
 
-    internal ProgramSkillFrame? HappyWeiYanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterWeiYanHappyGodOperations.HappyWeiYanFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? HappyWeiYanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.HappyWeiYanFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 42300)]
     internal bool HappyWeiYanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HappyWeiYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 42300)]

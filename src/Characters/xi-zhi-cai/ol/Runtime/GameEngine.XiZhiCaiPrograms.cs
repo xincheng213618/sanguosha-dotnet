@@ -27,6 +27,3 @@ public sealed partial record ProgramSkillFrame
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public XianfuEchoPending? XianfuPending{get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public ChoucePending? Chouce{get;init;}
 }
-public sealed partial class GameEngine
-{
-}

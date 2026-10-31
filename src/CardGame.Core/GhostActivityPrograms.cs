@@ -74,7 +74,3 @@ internal sealed class GhostActivityEffectHandler(SkillProgramEffectOp op) : ISki
 
 public sealed record RandomJudgmentDiscardedEvent(long ProgramFrameId, int OwnerSeat, int CardId) : IGameEvent;
 public sealed record DeathSourceCardsDiscardedEvent(long ProgramFrameId, int OwnerSeat, int SourceSeat, int Count) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

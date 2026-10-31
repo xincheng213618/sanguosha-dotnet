@@ -46,6 +46,3 @@ public sealed class OfferBoundCardsForDamagePreventionHandler : ISkillProgramEff
     public SkillProgramEffectOp Op=>SkillProgramEffectOp.OfferBoundCardsForDamagePrevention;
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect,ProgramSkillFrame frame,int seat,ISkillProgramEffectHost host)=>host.GetCapability<IPrivateOfferProgramEffectHost>().OfferBoundCardsForDamagePrevention(frame,effect.SourceBind!);
 }
-public sealed partial class GameEngine
-{
-}

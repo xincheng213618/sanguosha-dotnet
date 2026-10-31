@@ -27,7 +27,7 @@ internal sealed partial class CharacterDuXiOlRuntime
     }
 
     internal bool DuXiObserverSuffix(int rootIndex) => _coreObserverSubtreesOperations.HasObserverSuffix(rootIndex, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
-    internal ProgramSkillFrame? DuXiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterDuXiOlOperations.DuXiFirstChild(f, c), (i) => _characterDuXiOlOperations.DuXiObserverSuffix(i));
+    internal ProgramSkillFrame? DuXiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.DuXiFirstChild(f, c), (i) => this.DuXiObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26300)]
     internal bool AdvanceDuXiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DuXiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

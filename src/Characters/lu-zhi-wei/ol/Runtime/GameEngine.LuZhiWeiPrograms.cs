@@ -25,6 +25,3 @@ public sealed partial record ProgramSkillWindowContext
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public QingzhongPlayPhaseKey? QingzhongPhase{get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public QingzhongPlayDebt? QingzhongDebt{get;init;}
 }
-public sealed partial class GameEngine
-{
-}

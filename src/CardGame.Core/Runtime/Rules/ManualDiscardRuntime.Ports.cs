@@ -31,7 +31,3 @@ internal interface IManualDiscardCommands : IProgramRuntimeOperations
     CommandResult Accept(Action operation);
     CommandResult Reject(CommandErrorCode code, string message);
 }
-
-public sealed partial class GameEngine
-{
-}

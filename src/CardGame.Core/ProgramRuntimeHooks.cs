@@ -172,10 +172,3 @@ internal sealed partial class ProgramRuntimeHooks
         return false;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramRuntimeHooks? _runtimeHooks;
-    private ProgramRuntimeHooks RuntimeHooks => _runtimeHooks ??= new(global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksDefinitions.RuntimeHookMetadata.Value,
-        BindRuntimeHandler, _modeRuntime.RuntimeHooks);
-}

@@ -59,7 +59,7 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
         return child is HpChangedTriggerWindowFrame hp && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.ParentFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == target && hp.Change.TargetSeat == target && hp.Change.Amount == 1;
     }
 
-    internal ProgramSkillFrame? GaoXiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterGaoXiangAnniversaryOperations.GaoXiangFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? GaoXiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.GaoXiangFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 44900)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 44900)]
     internal bool GaoXiangRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => GaoXiangFirstChild(f, recovery);

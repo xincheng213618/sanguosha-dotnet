@@ -101,7 +101,3 @@ internal static class AlternativePhaseCostCompositionContract
                 effect.Visibility == SkillProgramCardSetVisibility.Public && effect.Condition.Kind == SkillProgramConditionKind.Always);
     }
 }
-
-public sealed partial class GameEngine
-{
-}

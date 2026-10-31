@@ -37,7 +37,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? FulueObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterPeiYuanShaoOlOperations.FulueFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? FulueObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.FulueFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27120)]
     internal bool AdvanceFulueSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FulueObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

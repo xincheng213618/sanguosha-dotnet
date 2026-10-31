@@ -81,7 +81,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         return r.Stage == MobileJiangWeiStage.ThunderIssued && f.AttackAttempt is not null && f.AttackReturn is not null && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
     }
 
-    internal ProgramSkillFrame? MobileJwObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterJiangWeiMobileGodOperations.MobileJwFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? MobileJwObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.MobileJwFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40600)]
     internal bool MobileJwDyingProof()
     {

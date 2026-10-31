@@ -90,7 +90,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? SimaHuiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterSimaHuiOlOperations.SimaHuiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? SimaHuiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.SimaHuiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 250)]
     internal bool TryAdvanceSimaHuiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SimaHuiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     internal IEnumerable<Card> SimaHuiPrivatelyViewedCards(int viewer) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnerSeat == viewer && f.SimaHui is { OriginalCards.Count: > 0 }).SelectMany(f => f.SimaHui!.OriginalCards).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Select(id => _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(c => c.Id == id));

@@ -29,7 +29,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
         return child is CardsMovedTriggerWindowFrame moved && (moved.ResumeProgramFrameId == f.Id || moved.Batch.AwaitingProgramFrameId == f.Id) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsMaMiDiStepMovement(r.Steps[^1], m));
     }
 
-    internal ProgramSkillFrame? MaMiDiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterMaMiDiOlOperations.MaMiDiFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? MaMiDiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.MaMiDiFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27070)]
     internal bool AdvanceMaMiDiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MaMiDiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -44,7 +44,7 @@ internal sealed partial class CharacterSunRuOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && CanContinuePaidSunRuOl(root);
     }
 
-    internal ProgramSkillFrame? SunRuOlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterSunRuOlOperations.SunRuOlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? SunRuOlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.SunRuOlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26110)]
     internal bool TryAdvanceSunRuOlSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SunRuOlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

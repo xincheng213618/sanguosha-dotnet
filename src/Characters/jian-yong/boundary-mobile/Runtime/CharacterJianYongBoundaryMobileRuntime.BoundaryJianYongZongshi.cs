@@ -275,7 +275,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
     }
 
     internal bool BoundaryZongshiSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
-    internal ProgramSkillFrame? BoundaryZongshiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterJianYongBoundaryMobileOperations.BoundaryZongshiFirstChild(f, c), (n) => _characterJianYongBoundaryMobileOperations.BoundaryZongshiSuffix(n));
+    internal ProgramSkillFrame? BoundaryZongshiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.BoundaryZongshiFirstChild(f, c), (n) => this.BoundaryZongshiSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 56500)]
     internal bool BoundaryZongshiDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BoundaryZongshiObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 56500)]

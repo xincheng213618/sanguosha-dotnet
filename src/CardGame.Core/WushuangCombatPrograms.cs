@@ -56,7 +56,3 @@ public sealed record WushuangCombatUseFactEvent(long CardUseFrameId, int Turn, i
     CardKind Kind, Suit Suit, int SlashOrdinal, bool Drunken) : IGameEvent;
 public sealed record WushuangLuckyNumberEvent(int OwnerSeat, int Number) : IGameEvent;
 public sealed record WushuangIncomingReductionIssuedEvent(long AttackFrameId, int TargetSeat, int Round, int Ordinal) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

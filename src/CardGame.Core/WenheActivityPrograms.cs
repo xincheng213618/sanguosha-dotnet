@@ -50,7 +50,3 @@ public sealed partial record ProgramSkillFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public WenheRuleFlowReceipt? WenheRuleFlow { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-}

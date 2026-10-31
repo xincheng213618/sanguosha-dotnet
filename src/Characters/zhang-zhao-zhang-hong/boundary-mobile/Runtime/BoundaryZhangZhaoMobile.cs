@@ -33,7 +33,3 @@ internal sealed class BoundaryZhangZhaoPhaseHandler : ISkillProgramEffectHandler
     public SkillProgramEffectOp Op => SkillProgramEffectOp.CaptureBoundaryZhangZhaoPhaseDiscards;
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost host) => host.GetCapability<IBoundaryZhangZhaoMobileHost>().Restore(f);
 }
-
-public sealed partial class GameEngine
-{
-}

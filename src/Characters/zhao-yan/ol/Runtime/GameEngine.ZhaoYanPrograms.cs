@@ -68,7 +68,3 @@ public sealed record TongxieGuardState(int ProtectedSeat, int PreventedAmount,
 // One completed single-target Slash action recovered from the exact settled
 // movement fact, so replay rebuilds the identical actor, target and chain.
 public sealed record TongxieChainUse(int ActorSeat, int TargetSeat, int CardId, long ActionId);
-
-public sealed partial class GameEngine
-{
-}

@@ -41,6 +41,3 @@ internal static class MobileGuYongComposition
             throw new InvalidOperationException(path + ": Bingyi must reveal its whole hand, complete a mixed hand, then choose optional recipients and draw.");
     }
 }
-public sealed partial class GameEngine
-{
-}

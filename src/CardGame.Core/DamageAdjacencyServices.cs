@@ -66,7 +66,3 @@ internal interface IDamageTriggerCompletion : IProgramRuntimeOperations
     bool TryBeginAfterDamage(long damageFrameId);
     void CompleteAttack();
 }
-
-public sealed partial class GameEngine
-{
-}

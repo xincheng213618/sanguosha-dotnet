@@ -64,7 +64,3 @@ internal sealed class MobileFenyinCommittedUseContract : IProgramCommittedUseCon
             throw new InvalidOperationException("Mobile Fenyin requires its own-turn mandatory committed actual-use grant followed by exactly one ordinary owner draw.");
     }
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -9,7 +9,3 @@ public sealed record CardUseAlcoholConsumptionCapturedEvent(long CardUseFrameId,
 public sealed record CurrentTurnOwnSkillSuppression(int TurnNumber, int TurnOwnerSeat, long ParentFrameId, int EffectIndex, CardUseEffectSource Source, string SuppressedSkillId, long CardUseFrameId, long CardActionId);
 public sealed record CurrentTurnOwnSkillSuppressionIssuedEvent(CurrentTurnOwnSkillSuppression Suppression) : IGameEvent;
 public sealed record CurrentTurnOwnSkillSuppressionsExpiredEvent(int TurnNumber, int TurnOwnerSeat) : IGameEvent;
-public sealed partial class GameEngine
-{
-    private ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CurrentTurnOwnSkillSuppression> _currentTurnOwnSkillSuppressions => ref _alcoholSlashSuppressions.ReferenceToCurrentTurnOwnSkillSuppressions;
-}

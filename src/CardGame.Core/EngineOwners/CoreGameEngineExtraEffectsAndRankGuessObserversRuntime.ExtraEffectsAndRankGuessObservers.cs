@@ -17,7 +17,7 @@ internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessObserversRun
         return child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? ExtraEffectsAndRankGuessObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreExtraEffectsAndRankGuessObserversOperations.ExtraEffectsAndRankGuessFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? ExtraEffectsAndRankGuessObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.ExtraEffectsAndRankGuessFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 90)]
     internal bool TryAdvanceExtraEffectsAndRankGuessSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ExtraEffectsAndRankGuessObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

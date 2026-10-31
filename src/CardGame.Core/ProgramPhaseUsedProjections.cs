@@ -54,10 +54,3 @@ internal sealed class ProgramPhaseUsedProjections
         return used;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramPhaseUsedProjections? _phaseUsedProjections;
-    private ProgramPhaseUsedProjections PhaseUsedProjections => _phaseUsedProjections ??= new(global::CardGame.Core.EngineOwners.CoreProgramPhaseUsedProjectionsDefinitions.PhaseUsedProjectionMetadata.Value,
-        method => (Func<int, string, int, int>)BindRuntimeHandler(method, typeof(Func<int, string, int, int>)));
-}

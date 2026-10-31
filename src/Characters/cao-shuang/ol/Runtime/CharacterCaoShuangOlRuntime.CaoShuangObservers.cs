@@ -25,7 +25,7 @@ internal sealed partial class CharacterCaoShuangOlRuntime
         return child is RecoveryReplacementFrame recovery && recovery.ParentFrameId == root.Id && recovery.Return == new RecoveryReplacementReturn(PostEventContinuation.Program, root.Id) && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason == new CardMoveReason(CaoShuangPlacementReason) && recovery.Attempt.SourceSeat == r.TargetSeat && recovery.Attempt.TargetSeat == r.TargetSeat && recovery.Attempt.Amount == 1;
     }
 
-    internal ProgramSkillFrame? CaoShuangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCaoShuangOlOperations.CaoShuangFirstChild(root, child), (child) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(child));
+    internal ProgramSkillFrame? CaoShuangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.CaoShuangFirstChild(root, child), (child) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(child));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26060)]
     internal bool TryAdvanceCaoShuangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoShuangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

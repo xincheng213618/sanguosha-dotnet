@@ -46,7 +46,3 @@ internal static class MobileJiyuComposition
             throw new InvalidOperationException(path + ": mobile Jiyu requires its original native discard, turn suit prohibition, turnover and HP loss in that order.");
     }
 }
-
-public sealed partial class GameEngine
-{
-}

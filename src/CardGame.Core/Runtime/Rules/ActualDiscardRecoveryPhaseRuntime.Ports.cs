@@ -33,7 +33,3 @@ internal interface IActualDiscardRecoveryPhaseFacts : IProgramSelectionQuery
     bool ModeTracksActualDiscardRecoveryPhases { get; }
     bool HasLishiCapability { get; }
 }
-
-public sealed partial class GameEngine
-{
-}

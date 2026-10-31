@@ -20,7 +20,3 @@ internal interface IProgramDrawDiscardWindowObservers : IProgramSelectionQuery
     IReadOnlyList<ProgramTriggerCandidate> IncludeHongjiPhaseCandidates(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> existing);
     IReadOnlyList<ProgramTriggerCandidate> AppendAnniversaryHanSongDrawEndedCandidates(CharacterState owner, IReadOnlyList<ProgramTriggerCandidate> existing);
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -34,7 +34,7 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
         SpZhangLiaoStage.CleanupChildren => "skill-program.ol:mubing.reveal-cleanup",
         _ => ""
     };
-    internal ProgramSkillFrame? SpZhangLiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterZhangLiaoOlSpOperations.SpZhangLiaoFirstChild(root, child), (child) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(child));
+    internal ProgramSkillFrame? SpZhangLiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.SpZhangLiaoFirstChild(root, child), (child) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(child));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26070)]
     internal bool TryAdvanceSpZhangLiaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SpZhangLiaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

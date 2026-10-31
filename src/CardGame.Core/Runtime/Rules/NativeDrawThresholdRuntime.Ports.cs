@@ -7,7 +7,3 @@ internal interface INativeDrawThresholdNativeOperations : IProgramRuntimeOperati
     SkillProgramStepOutcome BeginDamage(ProgramSkillFrame frame, int target, int amount);
     bool CompletedNativeDrawMatches(ProgramSkillFrame producer, NativeDrawInvocationProof proof);
 }
-
-public sealed partial class GameEngine
-{
-}

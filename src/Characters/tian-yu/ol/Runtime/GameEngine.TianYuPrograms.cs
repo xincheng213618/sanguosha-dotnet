@@ -16,7 +16,3 @@ public sealed record ProgramDirectedDistanceGrantedEvent(long FrameId, string Sk
 
 public sealed record ProgramDirectedDistanceRevokedEvent(long FrameId, string SkillId, string BindingId,
     string SkillInstanceId, int OwnerSeat, int TargetSeat) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

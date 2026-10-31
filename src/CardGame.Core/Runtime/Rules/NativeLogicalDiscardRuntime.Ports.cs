@@ -50,7 +50,3 @@ internal interface INativeLogicalDiscardAdmissions : IProgramRuntimeOperations
     void AdmitMaterials(NativeLogicalDiscardInvocationDraft draft);
     void Close(NativeLogicalDiscardInvocationDraft? draft);
 }
-
-public sealed partial class GameEngine
-{
-}

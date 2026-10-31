@@ -7,8 +7,3 @@ public sealed record IssuedPlayPhaseSuitUseAllowance(int OwnerSeat, string Skill
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public int? ActualTurnOwnerSeat { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-    private ref readonly global::System.Collections.Generic.Dictionary<(int Turn, int Actor, string Skill, global::CardGame.Core.SkillProgramCardCategory Category), long> _firstTurnCategoryUses => ref _alternatingSuitAndCompletedTop.ReferenceToFirstTurnCategoryUses;
-}

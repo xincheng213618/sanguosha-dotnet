@@ -37,11 +37,3 @@ internal sealed class RecordEndHandCountAndGrantMarkerDescriptor : ProgramOperat
 
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new RequireTriggerWindow(SkillProgramTriggerWindow.TurnEnding), new RequireOwnTurnBoundary()];
 }
-
-public sealed partial class GameEngine
-{
-    private ref readonly global::System.Collections.Generic.Dictionary<(int Owner, string Skill, string Instance, string State), global::CardGame.Core.ProgramEndingHandCountHistory> _endingHandCountHistories => ref _endingHandCountPrograms.ReferenceToEndingHandCountHistories;
-
-    /// <summary>Trusted rule diagnostics, not a player projection. Returned nested collections are frozen.</summary>
-    public IReadOnlyList<ProgramEndingHandCountHistory> GetProgramEndingHandCountHistoryDiagnostics() => GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreEndingHandCountProgramsRuntime>().GetProgramEndingHandCountHistoryDiagnostics();
-}

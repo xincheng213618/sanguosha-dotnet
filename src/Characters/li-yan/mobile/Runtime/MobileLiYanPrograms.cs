@@ -40,6 +40,3 @@ internal sealed class MobileLiYanNextDrawHandler : ISkillProgramEffectHandler
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int seat, ISkillProgramEffectHost h)
     { h.GetCapability<IMobileLiYanNextDrawHost>().Issue(f, seat, e.Amount); return SkillProgramStepOutcome.Continue; }
 }
-public sealed partial class GameEngine
-{
-}

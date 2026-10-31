@@ -63,7 +63,7 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
         return r.Stage == ShenPangTongStage.DamageChildren && f.AttackAttempt is { Nature: DamageNature.Fire, SourceLess: false } a && a.SourceSeat == f.OwnerSeat && ShenPtActualDamageTarget(f, r, a) && f.AttackReturn is not null && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
     }
 
-    internal ProgramSkillFrame? ShenPtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterPangTongAnniversaryGodOperations.ShenPtFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? ShenPtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.ShenPtFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 39200)]
     internal bool ShenPtDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 39200)]

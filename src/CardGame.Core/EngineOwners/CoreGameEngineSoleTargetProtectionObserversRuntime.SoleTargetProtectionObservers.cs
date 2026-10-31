@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineSoleTargetProtectionObserversRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.ResumeProgramFrameId == f.Id && state.CharacterStateContinuation == CharacterStateContinuation.Program && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
     }
 
-    internal ProgramSkillFrame? SoleTargetProtectionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreSoleTargetProtectionObserversOperations.SoleTargetProtectionFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? SoleTargetProtectionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.SoleTargetProtectionFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 40)]
     internal bool TryAdvanceSoleTargetProtectionSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SoleTargetProtectionObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

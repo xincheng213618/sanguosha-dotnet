@@ -19,7 +19,7 @@ internal sealed partial class CoreGameEngineRoundGainedEquipmentObserversRuntime
     }
 
     internal bool RoundGainedEquipmentDrawStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => parent is ProgramSkillFrame root && RoundGainedEquipmentDrawFirstChild(root, child) || parent is ProgramCardTriggerWindowFrame window && child is ProgramSkillFrame { RoundGainedEquipmentDrawReceipt: not null } reward && reward.WindowContext?.ParentFrameId == window.Id && _coreRoundGainedEquipmentDrawsOperations.ValidRoundGainedEquipmentDraw(reward);
-    internal ProgramSkillFrame? RoundGainedEquipmentDrawObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreRoundGainedEquipmentObserversOperations.RoundGainedEquipmentDrawFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? RoundGainedEquipmentDrawObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.RoundGainedEquipmentDrawFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 20)]
     internal bool IsRoundGainedEquipmentDrawDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RoundGainedEquipmentDrawObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 

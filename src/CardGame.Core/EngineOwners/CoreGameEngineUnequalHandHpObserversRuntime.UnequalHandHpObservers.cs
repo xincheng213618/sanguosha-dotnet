@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineUnequalHandHpObserversRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason?.Value == global::CardGame.Core.EngineOwners.CoreGameEngineUnequalHandHpEndingRuntime.UnequalHandHpReason(root, p.Step);
     }
 
-    internal ProgramSkillFrame? UnequalHandHpObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreUnequalHandHpObserversOperations.UnequalHandHpFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
+    internal ProgramSkillFrame? UnequalHandHpObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.UnequalHandHpFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 210)]
     internal bool IsUnequalHandHpDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && UnequalHandHpObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40)]

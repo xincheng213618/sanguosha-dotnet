@@ -26,9 +26,3 @@ public sealed partial record ProgramSkillFrame
 // The suspension receipt of one 援资 payoff prompt: the armed recipient the
 // draw prompt belongs to.
 public sealed record YuanziDrawPendingState(int RecipientSeat);
-
-
-
-public sealed partial class GameEngine
-{
-}

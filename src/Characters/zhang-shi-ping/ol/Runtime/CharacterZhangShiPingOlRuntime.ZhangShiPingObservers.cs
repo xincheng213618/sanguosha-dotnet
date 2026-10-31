@@ -31,7 +31,7 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
     }
 
     internal bool ZhangShiPingObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
-    internal ProgramSkillFrame? ZhangShiPingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterZhangShiPingOlOperations.ZhangShiPingFirstChild(f, child), (i) => _characterZhangShiPingOlOperations.ZhangShiPingObserverSuffix(i));
+    internal ProgramSkillFrame? ZhangShiPingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.ZhangShiPingFirstChild(f, child), (i) => this.ZhangShiPingObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26610)]
     internal bool AdvanceZhangShiPingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangShiPingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -88,7 +88,3 @@ public sealed record PublicTeamTargetsBoundEvent(long ProgramFrameId, int OwnerS
 }
 public sealed record AutomaticExtraCardEffectIssuedEvent(long ProgramFrameId, CardConversionSource Source,
     long CardUseFrameId, long ActionId, string GameplayHash) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

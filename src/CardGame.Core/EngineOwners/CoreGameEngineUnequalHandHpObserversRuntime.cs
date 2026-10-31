@@ -15,9 +15,8 @@ internal sealed partial class CoreGameEngineUnequalHandHpObserversRuntime
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries _coreRecoveryReplacementDamageRidesOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineUnequalHandHpEndingEntries _coreUnequalHandHpEndingOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries _corePendingDecisionPolicyPipelineOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineUnequalHandHpObserversEntries _coreUnequalHandHpObserversOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CoreGameEngineUnequalHandHpObserversRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations,global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries coreDyingCursorRuntimeOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries coreObserverSubtreesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries coreRecoveryReplacementDamageRidesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineUnequalHandHpEndingEntries coreUnequalHandHpEndingOperations,global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineUnequalHandHpObserversEntries coreUnequalHandHpObserversOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    internal CoreGameEngineUnequalHandHpObserversRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations,global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries coreDyingCursorRuntimeOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries coreObserverSubtreesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries coreRecoveryReplacementDamageRidesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineUnequalHandHpEndingEntries coreUnequalHandHpEndingOperations,global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreDyingCursorRuntimeOperations = coreDyingCursorRuntimeOperations;
@@ -26,7 +25,6 @@ internal sealed partial class CoreGameEngineUnequalHandHpObserversRuntime
         this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
         this._coreUnequalHandHpEndingOperations = coreUnequalHandHpEndingOperations;
         this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
-        this._coreUnequalHandHpObserversOperations = coreUnequalHandHpObserversOperations;
         this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
     }
 }

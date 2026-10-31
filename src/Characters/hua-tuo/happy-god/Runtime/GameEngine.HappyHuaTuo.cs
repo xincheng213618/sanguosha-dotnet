@@ -7,6 +7,3 @@ public sealed partial record CardMovementRecord
 {
     [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public HappyMedicineHandLoss? HappyMedicineHandLoss{get;init;}
 }
-public sealed partial class GameEngine
-{
-}

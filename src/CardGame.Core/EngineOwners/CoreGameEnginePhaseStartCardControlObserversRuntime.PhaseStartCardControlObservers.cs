@@ -26,7 +26,7 @@ internal sealed partial class CoreGameEnginePhaseStartCardControlObserversRuntim
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == lionOwner && recovery.Attempt.TargetSeat == lionOwner && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason?.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseStartCardControlRuntime.PhaseStartControlReason(receipt.Kind);
     }
 
-    internal ProgramSkillFrame? PhaseStartCardControlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePhaseStartCardControlObserversOperations.PhaseStartCardControlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
+    internal ProgramSkillFrame? PhaseStartCardControlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PhaseStartCardControlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 220)]
     internal bool IsPhaseStartCardControlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PhaseStartCardControlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 50)]

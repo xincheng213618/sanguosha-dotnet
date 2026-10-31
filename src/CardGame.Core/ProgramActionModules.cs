@@ -158,10 +158,3 @@ internal sealed class ProgramActionRouter
         return false;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramActionRouter? _programActions;
-    private ProgramActionRouter ProgramActions => _programActions ??= new(global::CardGame.Core.EngineOwners.CoreProgramActionModulesDefinitions.ProgramActionMetadata.Value,
-        BindRuntimeHandler);
-}

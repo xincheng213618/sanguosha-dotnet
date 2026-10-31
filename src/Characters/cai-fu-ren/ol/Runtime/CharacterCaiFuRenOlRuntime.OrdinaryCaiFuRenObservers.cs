@@ -51,7 +51,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     }
 
     internal bool OrdinaryQietingObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
-    internal ProgramSkillFrame? OrdinaryQietingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterCaiFuRenOlOperations.OrdinaryQietingFirstChild(f, child), (index) => _characterCaiFuRenOlOperations.OrdinaryQietingObserverSuffix(index));
+    internal ProgramSkillFrame? OrdinaryQietingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.OrdinaryQietingFirstChild(f, child), (index) => this.OrdinaryQietingObserverSuffix(index));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 300)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 290)]
     internal bool IsOrdinaryCaiFuRenRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

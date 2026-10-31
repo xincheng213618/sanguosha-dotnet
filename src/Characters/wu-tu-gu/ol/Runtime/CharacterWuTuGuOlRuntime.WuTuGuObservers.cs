@@ -27,7 +27,7 @@ internal sealed partial class CharacterWuTuGuOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? WuTuGuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterWuTuGuOlOperations.WuTuGuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? WuTuGuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.WuTuGuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27320)]
     internal bool AdvanceWuTuGuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuTuGuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

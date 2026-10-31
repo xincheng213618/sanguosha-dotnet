@@ -17,7 +17,3 @@ internal interface IDistanceRuleRuntimeQueries : IProgramSelectionQuery
 
 internal readonly record struct ProgramDirectedDistanceLedgerEntry(
     int OwnerSeat, int TargetSeat, ProgramDirectedDistanceGrantedEvent? Grant);
-
-public sealed partial class GameEngine
-{
-}

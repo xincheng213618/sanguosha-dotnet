@@ -27,7 +27,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
     }
 
     internal bool ShiLsChildSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (index) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(index), (index, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index, dying) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(index, dying) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(index, dying) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(index, dying));
-    internal ProgramSkillFrame? ShiLsObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLuSuMobileShiOperations.ShiLsFirstChild(f, child), (i) => _characterLuSuMobileShiOperations.ShiLsChildSuffix(i));
+    internal ProgramSkillFrame? ShiLsObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.ShiLsFirstChild(f, child), (i) => this.ShiLsChildSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 48900)]
     internal bool ShiLsDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && ShiLsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 48900)]

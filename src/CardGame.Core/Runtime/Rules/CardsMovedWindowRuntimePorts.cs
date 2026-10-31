@@ -125,7 +125,3 @@ internal interface ICardsMovedWindowPipeline : IProgramRuntimeOperations
     IEnumerable<ProgramTriggerCandidate> CollectFirstDomainCandidates(CardMovementBatchContext batch);
     bool HasWenhePoisonDepartures(CardMovementBatchContext batch);
 }
-
-public sealed partial class GameEngine
-{
-}

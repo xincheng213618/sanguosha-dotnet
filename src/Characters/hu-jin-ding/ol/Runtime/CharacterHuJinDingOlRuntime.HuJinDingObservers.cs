@@ -29,7 +29,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 900)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 840)]
     internal bool IsHuJinDingRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => false;
-    internal ProgramSkillFrame? HuJinDingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuJinDingOlOperations.HuJinDingFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? HuJinDingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HuJinDingFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26820)]
     internal bool AdvanceHuJinDingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuJinDingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

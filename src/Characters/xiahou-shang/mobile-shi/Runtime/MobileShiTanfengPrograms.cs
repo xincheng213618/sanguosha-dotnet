@@ -45,7 +45,3 @@ internal sealed class MobileShiTanfengHandler : ISkillProgramEffectHandler
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int target, ISkillProgramEffectHost host) =>
         host.GetCapability<IMobileShiTanfengHost>().SelectTarget(frame, effect);
 }
-
-public sealed partial class GameEngine
-{
-}

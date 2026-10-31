@@ -1,9 +1,7 @@
 namespace CardGame.Core;
 
 [ProgramRuntimeModule,ProgramCapability]
-internal sealed class BoundaryCaoCaoRuntime(IProgramRuntimeFrames frames, IProgramEventHistoryQueries history,
-    ICardMovementHistoryQueries movements, ICardMovementBatchQueue batches, IProgramDamageCardMaterialQueries materials,
-    IProgramDamageCardClaims claims, IBoundCardMovementContinuationHost movementReturns) : IBoundaryCaoCaoHost
+internal sealed class BoundaryCaoCaoRuntime(IProgramRuntimeFrames frames,IProgramEventHistoryQueries history,    ICardMovementHistoryQueries movements,IProgramDamageCardMaterialQueries materials,    IProgramDamageCardClaims claims,IBoundCardMovementContinuationHost movementReturns) : IBoundaryCaoCaoHost
 {
     public SkillProgramStepOutcome ClaimDamageCards(ProgramSkillFrame frame)
     {

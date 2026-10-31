@@ -56,7 +56,7 @@ internal sealed partial class CharacterNiuFuOlRuntime
         return child is HpChangedTriggerWindowFrame recoveryHp && recoveryHp.Change.ParentFrameId == f.Id && recoveryHp.ResumeFrameId == f.Id && recoveryHp.Continuation == PostEventContinuation.AwaitedProgramMovement && recoveryHp.Change.Kind == HpChangeKind.Recovery && recoveryHp.Change.Amount == 1 && recoveryHp.Change.SourceSeat == recoveryHp.Change.TargetSeat && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > step.Before && m.Sequence <= step.After && m.From == CardLocation.Equipment(recoveryHp.Change.TargetSeat) && m.CardKind == CardKind.SilverLion);
     }
 
-    internal ProgramSkillFrame? NiuFuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterNiuFuOlOperations.NiuFuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? NiuFuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.NiuFuFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27050)]
     internal bool AdvanceNiuFuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && NiuFuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -10,7 +10,3 @@ public sealed record ProgramFengjiOptionChosenEvent(long FrameId, string SkillId
 // a character dies; the disable state derives from this fact versus deaths.
 public sealed record ProgramXuanhuiEffectsSwappedEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int RoundNumber, int SwappedOptionCount) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

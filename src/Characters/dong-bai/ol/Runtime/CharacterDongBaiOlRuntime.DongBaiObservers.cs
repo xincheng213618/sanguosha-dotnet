@@ -60,7 +60,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
         return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == LianZhuReason(r.Stage));
     }
 
-    internal ProgramSkillFrame? LianZhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterDongBaiOlOperations.LianZhuFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? LianZhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.LianZhuFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 140)]
     internal bool TryAdvanceLianZhuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LianZhuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramPipelineHook(ProgramPipelinePhase.ObserveCommittedMovement, 100)]

@@ -63,7 +63,3 @@ public sealed partial record ProgramSkillFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public GuanduEventFlowReceipt? GuanduEventFlow { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-}

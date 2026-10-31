@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEnginePairedColorResponseObserversRuntime
     }
 
     internal bool PairedColorDispositionStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => parent is ProgramSkillFrame root && PairedColorDispositionFirstChild(root, child) || parent is ProgramCardTriggerWindowFrame window && child is ProgramSkillFrame { PairedColorDisposition: not null } program && program.WindowContext?.ParentFrameId == window.Id && ValidPairedColorDispositionReceipt(program);
-    internal ProgramSkillFrame? PairedColorDispositionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePairedColorResponseObserversOperations.PairedColorDispositionFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? PairedColorDispositionObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PairedColorDispositionFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40)]
     internal bool IsPairedColorDispositionDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairedColorDispositionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 

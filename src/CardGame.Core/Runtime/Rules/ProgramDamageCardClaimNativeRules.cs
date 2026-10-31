@@ -14,7 +14,3 @@ internal interface IProgramDamageCardClaimNativeRules : IProgramRuntimeOperation
     void CaptureExtraEffectClaims(ProgramSkillFrame frame, DamageTriggerWindowFrame window, IReadOnlyList<Card> cards,
         long sequenceBefore, CardMoveReason reason);
 }
-
-public sealed partial class GameEngine
-{
-}

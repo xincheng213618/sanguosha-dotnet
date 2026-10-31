@@ -53,7 +53,3 @@ internal interface IProgramPhasePipelineHooks : IProgramRuntimeOperations
     bool CancelScheduledPhase();
     bool ContinueDetachedProgramBinding(ProgramSkillFrame frame);
 }
-
-public sealed partial class GameEngine
-{
-}

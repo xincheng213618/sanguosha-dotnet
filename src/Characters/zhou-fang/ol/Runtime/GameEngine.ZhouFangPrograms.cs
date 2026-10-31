@@ -10,7 +10,3 @@ public sealed record ProgramDuanfaRecycledEvent(long FrameId, string SkillId, st
 // draw count is public.
 public sealed record ProgramYoudiBaitEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int ChooserSeat, int DiscardedCardId, bool TookHandCard, int DrawnCount) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

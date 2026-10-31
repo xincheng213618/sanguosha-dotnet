@@ -27,7 +27,7 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
         return r.Stage == AnniversaryZhangLiaoStage.Damage && f.AttackAttempt is { SourceLess: false, Nature: DamageNature.Normal } a && a.SourceSeat == f.OwnerSeat && f.AttackReturn is not null && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
     }
 
-    internal ProgramSkillFrame? AnnZlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhangLiaoAnniversaryGodOperations.AnnZlFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? AnnZlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.AnnZlFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40750)]
     internal bool AnnZlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnnZlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40750)]

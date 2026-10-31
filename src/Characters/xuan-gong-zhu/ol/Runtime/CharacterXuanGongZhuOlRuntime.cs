@@ -15,9 +15,8 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime : global::CardGame.C
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries _coreTypedRecoveryDamageCursorOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineZhuijiProgramsEntries _coreZhuijiProgramsOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries _corePendingDecisionPolicyPipelineOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterXuanGongZhuOlEntries _characterXuanGongZhuOlOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CharacterXuanGongZhuOlRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineIdentityConcealmentEntries coreIdentityConcealmentOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries coreObserverSubtreesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineQimeiProgramsEntries coreQimeiProgramsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries coreTypedRecoveryDamageCursorOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineZhuijiProgramsEntries coreZhuijiProgramsOperations,global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations,global::CardGame.Core.RuntimeEntries.CharacterXuanGongZhuOlEntries characterXuanGongZhuOlOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    internal CharacterXuanGongZhuOlRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineIdentityConcealmentEntries coreIdentityConcealmentOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries coreObserverSubtreesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineQimeiProgramsEntries coreQimeiProgramsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries coreTypedRecoveryDamageCursorOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineZhuijiProgramsEntries coreZhuijiProgramsOperations,global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
     {
         this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
         this._coreIdentityConcealmentOperations = coreIdentityConcealmentOperations;
@@ -26,7 +25,6 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime : global::CardGame.C
         this._coreTypedRecoveryDamageCursorOperations = coreTypedRecoveryDamageCursorOperations;
         this._coreZhuijiProgramsOperations = coreZhuijiProgramsOperations;
         this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
-        this._characterXuanGongZhuOlOperations = characterXuanGongZhuOlOperations;
         this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
     }
 }

@@ -14,7 +14,7 @@ internal sealed partial class CoreGameEnginePrivateWhirlObserversRuntime
         return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value.StartsWith("skill-program.private-whirl.", StringComparison.Ordinal));
     }
 
-    internal ProgramSkillFrame? PrivateWhirlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _corePrivateWhirlObserversOperations.WhirlFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? PrivateWhirlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.WhirlFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 120)]
     internal bool TryAdvancePrivateWhirlSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && PrivateWhirlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

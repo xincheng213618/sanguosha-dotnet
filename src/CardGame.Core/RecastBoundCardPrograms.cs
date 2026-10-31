@@ -49,7 +49,3 @@ internal sealed class RecastBoundCardProgramOperationDescriptor : ProgramOperati
          new ReadSingleCardSet(effect.SourceBind!),
          new MoveCardSet(effect.SourceBind!, null, SkillProgramCardDestination.DiscardPile)];
 }
-
-public sealed partial class GameEngine
-{
-}

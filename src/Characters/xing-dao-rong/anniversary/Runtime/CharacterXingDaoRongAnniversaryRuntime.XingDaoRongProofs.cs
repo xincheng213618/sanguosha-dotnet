@@ -65,7 +65,7 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
     }
 
     internal bool XingDaoRongObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (j) => _coreObserverSubtreesOperations.IsMovementObserverEdge(j) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[j], _resolutionStackOperations2._resolutionStack()[j - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[j], _resolutionStackOperations2._resolutionStack()[j - 1]), (j, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(j, dying));
-    internal ProgramSkillFrame? XingDaoRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterXingDaoRongAnniversaryOperations.XingDaoRongFirstChild(f, child), (i) => _characterXingDaoRongAnniversaryOperations.XingDaoRongObserverSuffix(i));
+    internal ProgramSkillFrame? XingDaoRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.XingDaoRongFirstChild(f, child), (i) => this.XingDaoRongObserverSuffix(i));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 45700)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 45700)]
     internal bool XingDaoRongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame r) => XingDaoRongFirstChild(f, r);

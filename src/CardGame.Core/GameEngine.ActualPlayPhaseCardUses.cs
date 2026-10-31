@@ -10,8 +10,3 @@ public sealed record ActualPlayPhaseCardUseRecordedEvent(ActualPlayPhaseCardUseS
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public CardKind? EffectiveCardKind { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-    private ref readonly global::System.Collections.Generic.HashSet<long> _actualPlayPhaseUseActions => ref _actualPlayPhaseCardUses.ReferenceToActualPlayPhaseUseActions;
-}

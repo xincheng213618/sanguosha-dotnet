@@ -240,10 +240,3 @@ internal sealed class ProgramNativeReturns
         return false;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramNativeReturns? _nativeReturns;
-    private ProgramNativeReturns NativeReturns => _nativeReturns ??= new(global::CardGame.Core.EngineOwners.CoreProgramNativeReturnsDefinitions.NativeReturnMetadata.Value,
-        BindRuntimeHandler);
-}

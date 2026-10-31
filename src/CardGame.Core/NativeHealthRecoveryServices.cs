@@ -29,7 +29,3 @@ internal interface INativeHealthRecoveryProtocols : IProgramRuntimeOperations
         IReadOnlyList<IGameEvent> history);
     SkillProgramEffect? TypedRecoveryPausedEffect(ProgramSkillFrame producer);
 }
-
-public sealed partial class GameEngine
-{
-}

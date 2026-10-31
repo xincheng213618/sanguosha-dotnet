@@ -25,9 +25,3 @@ public sealed record NativeEquipmentInvocationIssuedEvent(long ParentFrameId, lo
     string OccurrenceKey, string Fingerprint) : IGameEvent;
 public sealed record NativeEquipmentInvocationReturnedEvent(long InvocationId, long ParentFrameId,
     long AttackId, NativeEquipmentInvocationKind Kind, string OccurrenceKey, bool Canceled) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-internal sealed record NativeEquipmentSuspensionProjection(ResolutionFrame Parent, CardUseFrame AttackRoot,
-        SkillInvocationFrame Invocation, NativeEquipmentInvocationReceipt Receipt, int ParentIndex);
-}

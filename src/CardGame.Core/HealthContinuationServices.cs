@@ -43,7 +43,3 @@ internal interface IHealthContinuationProtocols : IProgramRuntimeOperations
     bool DamageProgramMatchesWindow(ProgramSkillFrame root, DamageTriggerWindowFrame window);
     bool IsAmountSupportHealthChild(RecoveryReplacementFrame recovery, HpChangedTriggerWindowFrame hp);
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -26,7 +26,3 @@ internal sealed class BoundaryXiaoQiaoJudgmentHandler : ISkillProgramEffectHandl
     public SkillProgramEffectOp Op => SkillProgramEffectOp.RewriteBoundaryXiaoQiaoJudgment;
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost host) => host.GetCapability<IBoundaryXiaoQiaoMobileHost>().Rewrite(f);
 }
-
-public sealed partial class GameEngine
-{
-}

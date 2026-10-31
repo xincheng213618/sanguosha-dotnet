@@ -179,25 +179,3 @@ internal sealed class ProgramRuntimeModuleRegistry(ProgramRuntimeModuleCatalog c
     internal Delegate Bind(MethodInfo method, Type delegateType, object legacyHost) =>
         Bind(method, delegateType, (coreMethod, type) => coreMethod.CreateDelegate(type, legacyHost));
 }
-
-public sealed partial class GameEngine
-{
-internal static IReadOnlyList<MethodInfo> RuntimeModuleMethods => ProgramRuntimeModuleCatalog.Default.Methods;
-    private MatchRuntime? _matchRuntime;
-    private MatchRuntime MatchRuntime => _matchRuntime ??= new(ProgramRuntimeModuleCatalog.Default,
-        ProgramCapabilityCatalog.Default, new global::CardGame.Core.GameEngine.MatchRuntimeAdapterFactory(this),
-        global::System.Linq.Enumerable.ToArray(global::System.Linq.Enumerable.Concat(new MatchCoreCapabilityProvider(_cardZones, ProgramHistory, _cardMovementBatches, _contentRegistry,
-            _players, _cardMovements, _cardSnapshotCache, turnEffects: _turnCardUseEffects, random: _random,
-            skillObservations: _skillGrantRevisions).Bindings, __GeneratedActualStateOwnerBindings())),
-        resolutionScheduler: _resolutionScheduler);
-    internal object GetRuntimeModuleInstance(Type type) => MatchRuntime.GetModule(type);
-    internal T GetRuntimeModule<T>() where T : class => (T)GetRuntimeModuleInstance(typeof(T));
-    internal Delegate BindRuntimeHandler(MethodInfo method, Type delegateType) => MatchRuntime.BindHandler(method, delegateType);
-    private object? ResolveRuntimeHandlerTarget(MethodInfo method) => MatchRuntime.HandlerTarget(method);
-internal sealed class MatchRuntimeAdapterFactory(GameEngine engine) : IMatchRuntimeAdapterFactory
-    {
-        public object CreateAdapter(ProgramCapabilityCatalog.Registration registration) => registration.CreateAdapter(engine);
-        public Delegate BindCoreHandler(MethodInfo method, Type delegateType) => method.CreateDelegate(delegateType, engine);
-        public object CoreHandlerTarget(MethodInfo method) => engine;
-    }
-}

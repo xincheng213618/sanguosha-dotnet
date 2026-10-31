@@ -32,7 +32,3 @@ public sealed partial record ProgramSkillFrame
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public JielieGiftState? JielieGift { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-}

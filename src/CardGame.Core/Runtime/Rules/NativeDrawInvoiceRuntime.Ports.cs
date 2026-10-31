@@ -28,7 +28,3 @@ internal interface INativeDrawInvoiceCompletions : IProgramRuntimeOperations
     void CompleteTangTangNativeDrawQualification(NativeDrawInvocationProof proof);
     void CompleteLingkongNativeDrawQualification(NativeDrawInvocationProof proof);
 }
-
-public sealed partial class GameEngine
-{
-}

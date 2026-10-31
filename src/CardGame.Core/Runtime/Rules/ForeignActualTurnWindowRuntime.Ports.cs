@@ -16,7 +16,3 @@ internal interface IForeignActualTurnWindowReturns : IProgramRuntimeOperations
     void EndTurn();
     void AfterForeignActualContests(int ownerSeat);
 }
-
-public sealed partial class GameEngine
-{
-}

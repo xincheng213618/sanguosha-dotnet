@@ -80,7 +80,3 @@ internal sealed record HellShiyouTransferPlan
 }
 public sealed record HellShiyouInterceptedEvent(long PlanId, long MovementSequence,
     HellShiyouRedirectReceipt Receipt) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

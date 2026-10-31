@@ -192,10 +192,3 @@ internal sealed class ProgramTargetRules
         return false;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramTargetRules? _targetRules;
-    private ProgramTargetRules TargetRules => _targetRules ??= new(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesDefinitions.TargetRuleMetadata.Value,
-        BindRuntimeHandler);
-}

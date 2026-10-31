@@ -39,7 +39,7 @@ internal sealed partial class CharacterGuYongOlRuntime
     }
 
     internal bool OrdinaryBingyiObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
-    internal ProgramSkillFrame? OrdinaryBingyiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterGuYongOlOperations.OrdinaryBingyiFirstChild(f, child), (i) => _characterGuYongOlOperations.OrdinaryBingyiObserverSuffix(i));
+    internal ProgramSkillFrame? OrdinaryBingyiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.OrdinaryBingyiFirstChild(f, child), (i) => this.OrdinaryBingyiObserverSuffix(i));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 310)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 300)]
     internal bool IsOrdinaryGuYongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

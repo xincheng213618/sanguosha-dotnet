@@ -247,7 +247,3 @@ internal sealed class ProgramRandomSeatAcquisitionRuntime(IProgramRuntimeFrames 
     }
     private static bool IsArea(CardZoneKind zone) => zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment;
 }
-
-public sealed partial class GameEngine
-{
-}

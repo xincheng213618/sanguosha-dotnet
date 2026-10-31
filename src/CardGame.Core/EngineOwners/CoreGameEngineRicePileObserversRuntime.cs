@@ -13,16 +13,14 @@ internal sealed partial class CoreGameEngineRicePileObserversRuntime
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries _coreRecoveryReplacementDamageRidesOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRicePileReceiptsEntries _coreRicePileReceiptsOperations;
     private readonly global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries _corePendingDecisionPolicyPipelineOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRicePileObserversEntries _coreRicePileObserversOperations;
     private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CoreGameEngineRicePileObserversRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries coreObserverSubtreesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries coreRecoveryReplacementDamageRidesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineRicePileReceiptsEntries coreRicePileReceiptsOperations,global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineRicePileObserversEntries coreRicePileObserversOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    internal CoreGameEngineRicePileObserversRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries coreAlternatingBenefitsOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries coreObserverSubtreesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries coreRecoveryReplacementDamageRidesOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineRicePileReceiptsEntries coreRicePileReceiptsOperations,global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries corePendingDecisionPolicyPipelineOperations,global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
     {
         this._coreAlternatingBenefitsOperations = coreAlternatingBenefitsOperations;
         this._coreObserverSubtreesOperations = coreObserverSubtreesOperations;
         this._coreRecoveryReplacementDamageRidesOperations = coreRecoveryReplacementDamageRidesOperations;
         this._coreRicePileReceiptsOperations = coreRicePileReceiptsOperations;
         this._corePendingDecisionPolicyPipelineOperations = corePendingDecisionPolicyPipelineOperations;
-        this._coreRicePileObserversOperations = coreRicePileObserversOperations;
         this._coreCardMovementJournalCardMovementsAccess = coreCardMovementJournalCardMovementsAccess;
     }
 }

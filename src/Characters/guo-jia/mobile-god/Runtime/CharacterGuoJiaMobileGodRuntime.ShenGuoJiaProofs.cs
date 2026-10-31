@@ -67,7 +67,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == frame.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? ShenGuoJiaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterGuoJiaMobileGodOperations.ShenGuoJiaFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? ShenGuoJiaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.ShenGuoJiaFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 38000)]
     internal bool AdvanceShenGuoJiaSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ShenGuoJiaObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

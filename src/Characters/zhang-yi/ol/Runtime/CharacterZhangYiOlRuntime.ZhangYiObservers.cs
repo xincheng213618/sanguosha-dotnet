@@ -29,7 +29,7 @@ internal sealed partial class CharacterZhangYiOlRuntime
     }
 
     internal bool ZhangYiObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
-    internal ProgramSkillFrame? ZhangYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterZhangYiOlOperations.ZhangYiFirstChild(f, child), (i) => _characterZhangYiOlOperations.ZhangYiObserverSuffix(i));
+    internal ProgramSkillFrame? ZhangYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.ZhangYiFirstChild(f, child), (i) => this.ZhangYiObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26400)]
     internal bool AdvanceZhangYiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhangYiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

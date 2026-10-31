@@ -51,6 +51,3 @@ internal sealed class BoundarySunCeOwnChallengeUnavailable : IProgramSelectionCa
 {
     public bool Apply(ProgramSelectionContext c, ProgramSelectionCandidates p, IProgramSelectionQueries q) => false;
 }
-public sealed partial class GameEngine
-{
-}

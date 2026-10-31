@@ -32,7 +32,7 @@ internal sealed partial class CoreGameEngineRicePileObserversRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == continuation && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && recovery.Attempt.Amount == 1 && (lion ? recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == "skill-program.rice.store" : recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.Program && r.RecoveryIssued);
     }
 
-    internal ProgramSkillFrame? RiceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreRicePileObserversOperations.RiceFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? RiceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.RiceFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 470)]
     internal bool TryAdvanceRiceSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && RiceObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -8,7 +8,3 @@ public sealed record ProgramVirtualOrdinaryTrickOrigin(long ParentProgramFrameId
     CardKind OutputKind, SkillProgramConditionKind ConditionKind, string? PindianBind, bool? FrozenSourceWon,
     long CardActionId = 0);
 public sealed record ProgramVirtualOrdinaryAttackReturnedEvent(long UseId, ProgramVirtualOrdinaryTrickOrigin Origin) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

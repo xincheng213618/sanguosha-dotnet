@@ -46,8 +46,3 @@ internal interface IProgramTriggerActionFactQueries
     bool MatchesPreviousPlayCard(CardActionContext action);
     bool PreviousPlayCardIsBasic(CardActionContext action);
 }
-
-public sealed partial class GameEngine
-{
-
-}

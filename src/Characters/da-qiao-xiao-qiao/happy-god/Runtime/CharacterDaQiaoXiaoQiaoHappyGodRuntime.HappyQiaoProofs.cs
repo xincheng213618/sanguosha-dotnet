@@ -35,7 +35,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == frame.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? HappyQiaoSkillObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => _characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoFirstSkillChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? HappyQiaoSkillObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.HappyQiaoFirstSkillChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 42400)]
     internal bool HappyQiaoSkillDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HappyQiaoSkillObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 42400)]

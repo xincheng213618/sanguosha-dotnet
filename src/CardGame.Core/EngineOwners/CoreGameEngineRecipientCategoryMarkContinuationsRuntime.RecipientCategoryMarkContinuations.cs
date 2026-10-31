@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarkContinuationsRu
         return old.AttackOwnerFrameId is null && old.AttackOwnerHash is null && (dying.Continuation == DyingContinuationKind.ProgramSkill && parent is ProgramSkillFrame || _coreWenhePoisonOperations.IsWenhePoisonDyingChild(parent, dying) || dying.Continuation == DyingContinuationKind.AttackHpLoss && parent is ProgramSkillFrame or CardUseFrame or JudgmentFrame);
     }
 
-    internal bool RecipientCategoryObserverSuffix(int rootIndex) => _coreObserverSubtreesOperations.HasObserverSuffix(rootIndex, (child) => _coreRecipientCategoryMarkContinuationsOperations.IsRecipientCategoryObserverEdge(child), completedDyingSuffix: null);
+    internal bool RecipientCategoryObserverSuffix(int rootIndex) => _coreObserverSubtreesOperations.HasObserverSuffix(rootIndex, (child) => this.IsRecipientCategoryObserverEdge(child), completedDyingSuffix: null);
     internal bool IsRecipientCategoryObserverEdge(int child)
     {
         var parent = _resolutionStackOperations._resolutionStack[child - 1];
@@ -59,7 +59,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarkContinuationsRu
     }
 
     internal bool IsOriginalDyingSuspendedByRecipientCategoryMark(DyingFrame dying) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.RecipientCategoryMark is { Consumed: true, RecoveryIssued: true, Stage: not RecipientCategoryMarkStage.Complete } r && r.DyingFrameId == dying.Id && RecipientCategoryPureDyingPrefix(f));
-    internal ProgramSkillFrame? RecipientCategoryMarkObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreRecipientCategoryMarkObserversOperations.RecipientCategoryMarkFirstChild(root, child), (index) => _coreRecipientCategoryMarkContinuationsOperations.RecipientCategoryObserverSuffix(index));
+    internal ProgramSkillFrame? RecipientCategoryMarkObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreRecipientCategoryMarkObserversOperations.RecipientCategoryMarkFirstChild(root, child), (index) => this.RecipientCategoryObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 610)]
     internal bool IsRecipientCategoryMarkProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RecipientCategoryMarkObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 

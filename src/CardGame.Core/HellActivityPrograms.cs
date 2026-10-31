@@ -32,7 +32,3 @@ internal sealed class HellActivityEffectHandler(SkillProgramEffectOp operation) 
         h.GetCapability<IHellActivityProgramHost>().ExecuteHellActivity(f, Op);
 }
 public sealed record HellChongshengRefillIssuedEvent(long ProgramFrameId, int OwnerSeat, int RequestedCount) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

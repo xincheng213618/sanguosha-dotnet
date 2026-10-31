@@ -44,7 +44,3 @@ internal sealed class ShanheSourceZhaoranHandler(SkillProgramEffectOp op) : ISki
         return SkillProgramStepOutcome.Continue;
     }
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -25,7 +25,3 @@ internal sealed class RecordWushuangTiaoxinPhaseExpansionHandler : ISkillProgram
         return SkillProgramStepOutcome.Continue;
     }
 }
-
-public sealed partial class GameEngine
-{
-}

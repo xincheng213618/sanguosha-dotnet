@@ -120,7 +120,7 @@ internal sealed partial class CharacterXuRongOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? XuRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXuRongOlOperations.XuRongFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? XuRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.XuRongFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 260)]
     internal bool TryAdvanceXuRongSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XuRongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramContinuation(ProgramContinuationKind.Resume, 23600)]

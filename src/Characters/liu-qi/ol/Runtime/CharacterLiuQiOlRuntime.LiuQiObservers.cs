@@ -92,7 +92,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
         return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == (r.Stage == LiuQiStage.GiftChildren ? WenjiGiftReason : TunjiangDrawReason));
     }
 
-    internal ProgramSkillFrame? LiuQiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterLiuQiOlOperations.LiuQiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? LiuQiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.LiuQiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 220)]
     internal bool TryAdvanceLiuQiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuQiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

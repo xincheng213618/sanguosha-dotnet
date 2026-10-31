@@ -43,7 +43,3 @@ internal static class BoundaryHuaTuoComposition
             throw new InvalidOperationException(path + ": mobile Qingnang requires one native hand discard and one original-target recovery with its red-payment phase allowance.");
     }
 }
-
-public sealed partial class GameEngine
-{
-}

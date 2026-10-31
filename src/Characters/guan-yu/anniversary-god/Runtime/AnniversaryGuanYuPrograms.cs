@@ -43,7 +43,3 @@ internal static class AnniversaryGuanYuComposition
             throw new InvalidOperationException(path + ": anniversary Wuhun requires exact per-point source and incoming damage windows before dying.");
     }
 }
-
-public sealed partial class GameEngine
-{
-}

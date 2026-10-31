@@ -14,7 +14,3 @@ internal interface IProgramHealthChildOperations : IProgramRuntimeOperations
 {
     bool AdvanceObserverSubtree();
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -12,6 +12,3 @@ public sealed record XiashuClaimPaidEvent(long FrameId,long Before,long After,in
 public sealed record XiashuCompletedEvent(long FrameId,int GiftCount,int ClaimCount):IGameEvent;
 public sealed partial record ProgramSkillFrame
 {[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public XiashuPaidPending? XiashuPaid{get;init;}}
-public sealed partial class GameEngine
-{
-}

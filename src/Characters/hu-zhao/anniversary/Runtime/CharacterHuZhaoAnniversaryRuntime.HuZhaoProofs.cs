@@ -43,7 +43,7 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && r.Paid;
     }
 
-    internal ProgramSkillFrame? HuZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuZhaoAnniversaryOperations.HuZhaoFirstChild(f, c), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? HuZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HuZhaoFirstChild(f, c), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 43000)]
     internal bool AdvanceHuZhaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuZhaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

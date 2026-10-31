@@ -35,8 +35,3 @@ internal interface IProgramActivationWindows : IProgramRuntimeOperations
     bool TryResolveGroup(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, PromptChoice selected, string? action);
     void CompleteSkipped(ProgramTriggerCandidate candidate);
 }
-
-public sealed partial class GameEngine
-{
-
-}

@@ -43,7 +43,3 @@ internal interface IProgramWindowNativeReturns : IProgramRuntimeOperations
     void RestoreCompletedUseAttackAfterIssuedChild(ProgramSkillFrame frame, ProgramCardTriggerWindowFrame parent);
     void CompleteProgramJudgmentReplacementBinding(ProgramSkillFrame frame, bool completed);
 }
-
-public sealed partial class GameEngine
-{
-}

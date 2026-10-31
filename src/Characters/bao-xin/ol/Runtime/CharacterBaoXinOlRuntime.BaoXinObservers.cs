@@ -98,7 +98,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? BaoXinObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterBaoXinOlOperations.BaoXinFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? BaoXinObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.BaoXinFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27450)]
     internal bool AdvanceBaoXinChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BaoXinObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -24,7 +24,3 @@ public sealed record CharacterStateChangeContext(long Id, long? ParentFrameId, i
 }
 
 public sealed record CharacterStateChangedEvent(CharacterStateChangeContext Change) : IGameEvent;
-public sealed partial class GameEngine
-{
-    private ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CharacterStateChangeContext> _pendingCharacterStateChanges => ref _characterStatePrograms.ReferenceToPendingCharacterStateChanges;
-}

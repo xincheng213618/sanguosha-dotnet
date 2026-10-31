@@ -160,10 +160,3 @@ internal sealed class ProgramViewContributors
         return existing;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramViewContributors? _viewContributors;
-    private ProgramViewContributors ViewContributors => _viewContributors ??= new(global::CardGame.Core.EngineOwners.CoreProgramViewContributorsDefinitions.ViewContributionMetadata.Value,
-        row => BindRuntimeHandler(row.Method, row.DelegateType));
-}

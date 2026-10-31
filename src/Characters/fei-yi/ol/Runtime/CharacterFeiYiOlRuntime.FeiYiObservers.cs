@@ -21,7 +21,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? FeiYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterFeiYiOlOperations.FeiYiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
+    internal ProgramSkillFrame? FeiYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.FeiYiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26600)]
     internal bool AdvanceFeiYiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FeiYiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

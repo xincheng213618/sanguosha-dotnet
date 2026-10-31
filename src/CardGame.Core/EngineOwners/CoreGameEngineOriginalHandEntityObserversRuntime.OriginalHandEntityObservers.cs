@@ -106,7 +106,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntityObserversRuntime
         return child is ProgramSkillFrame observer && observer.WindowContext?.ParentFrameId == parent.Id && (observer.OriginalHandBenefit is not null && ValidOriginalHandBenefitReceipt(observer) || observer.OriginalHandInheritance is not null && ValidOriginalHandInheritanceReceipt(observer) || observer.OriginalHandAwakening is not null && _coreOriginalHandAwakeningOperations.ValidOriginalHandAwakeningReceipt(observer));
     }
 
-    internal ProgramSkillFrame? OriginalHandEntityObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreOriginalHandEntityObserversOperations.OriginalHandEntityFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreOriginalHandEntityObserversOperations.OriginalHandEntityObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
+    internal ProgramSkillFrame? OriginalHandEntityObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.OriginalHandEntityFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => this.OriginalHandEntityObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
     internal bool OriginalHandEntityObserverEdge(int child)
     {
         var parent = _resolutionStackOperations._resolutionStack[child - 1];

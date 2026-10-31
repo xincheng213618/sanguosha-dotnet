@@ -35,7 +35,3 @@ internal interface IProgramActivationWindowReturns : IProgramRuntimeOperations
     void AdvanceBeforeDamageProgramCandidate(BeforeDamageProgramWindowFrame frame, bool activated, bool completed);
     void AdvanceDamageTriggerCandidate(DamageTriggerWindowFrame frame);
 }
-
-public sealed partial class GameEngine
-{
-}

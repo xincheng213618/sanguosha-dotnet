@@ -4,7 +4,3 @@ internal interface IBoundCardMovementContinuationHost : IProgramRuntimeOperation
 {
     SkillProgramStepOutcome AwaitBoundCardMovements(long frameId, int ownerSeat);
 }
-
-public sealed partial class GameEngine
-{
-}

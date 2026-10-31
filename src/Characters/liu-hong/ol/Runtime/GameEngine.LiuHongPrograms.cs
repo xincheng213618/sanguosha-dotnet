@@ -30,7 +30,3 @@ public enum YujuePendingStage { SlotPaid, GiftPaid }
 public sealed record YujuePendingState(string AbolishedSlot, int? TargetSeat,
     CardConversionSource Source, string GameplayHash, int InstructionIndex,
     YujuePendingStage Stage = YujuePendingStage.SlotPaid, int? GivenCardId = null, int? GiftMovementSequence = null);
-
-public sealed partial class GameEngine
-{
-}

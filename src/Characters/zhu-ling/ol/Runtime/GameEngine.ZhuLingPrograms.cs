@@ -6,7 +6,3 @@ public sealed record ProgramZhanyiCategoryChosenEvent(long FrameId, string Skill
     int OwnerSeat, string Category, IReadOnlyList<int> DiscardedCardIds) : IGameEvent;
 public sealed record ProgramZhanyiEquipmentPunishEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int TargetSeat, int CardId, bool FromHand) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

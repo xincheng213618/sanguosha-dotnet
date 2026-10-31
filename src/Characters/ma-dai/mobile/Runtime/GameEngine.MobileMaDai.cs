@@ -59,7 +59,3 @@ internal static class MobileMaDaiComposition
 
 public sealed record MobileMaDaiMaximumReducedEvent(long ProgramFrameId, long BeforeDamageFrameId, long DamageOwnerFrameId,
     long JudgmentFrameId, int OwnerSeat, int TargetSeat, int MaximumBefore, int MaximumAfter) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

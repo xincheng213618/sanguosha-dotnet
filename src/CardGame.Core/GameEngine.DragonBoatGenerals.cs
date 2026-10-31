@@ -19,8 +19,3 @@ public sealed partial record ProgramSkillFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DragonBoatGeneralReceipt? DragonBoatGeneral { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-    private ref bool _synchronizingDragonBoatGrants => ref _dragonBoatGenerals.ReferenceToSynchronizingDragonBoatGrants;
-}

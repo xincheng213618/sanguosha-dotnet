@@ -24,7 +24,3 @@ internal interface IProgramDrawOperations : IProgramRuntimeOperations
     void CaptureFixedRecipientDraw(long frameId, int targetSeat, CardMoveReason reason, long sequenceBefore, int actualCount);
     int FreezeNormalDrawBase(int seat);
 }
-
-public sealed partial class GameEngine
-{
-}

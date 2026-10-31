@@ -93,7 +93,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
         return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == r.SelectedId && m.From == r.SelectedFrom && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == TanbeiGainReason);
     }
 
-    internal bool GuoSiObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterGuoSiOlOperations.GuoSiNativePaymentEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(i, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(i, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(i, d)));
+    internal bool GuoSiObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || this.GuoSiNativePaymentEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(i, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(i, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(i, d)));
     internal bool GuoSiNativePaymentEdge(int index)
     {
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not CardUseFrame { GuoSiNative: { } r, GuoSiCostDrained: false } use)
@@ -107,7 +107,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
         return child is RecoveryReplacementFrame recovery && recovery.ParentFrameId == use.Id && recovery.Return.ResumeFrameId == use.Id && recovery.Return.Continuation == PostEventContinuation.GuoSiCardUse;
     }
 
-    internal ProgramSkillFrame? GuoSiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterGuoSiOlOperations.GuoSiFirstChild(r, c), (i) => _characterGuoSiOlOperations.GuoSiObserverSuffix(i));
+    internal ProgramSkillFrame? GuoSiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.GuoSiFirstChild(r, c), (i) => this.GuoSiObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 320)]
     internal bool TryAdvanceGuoSiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && GuoSiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

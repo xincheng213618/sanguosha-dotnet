@@ -2,12 +2,6 @@ using System.Globalization;
 
 namespace CardGame.Core;
 
-public sealed partial class GameEngine
-{
-internal sealed record ChainedStateBasicNeed(ChainedStateBasicIntent Intent, long? ParentFrameId,
-        long? RequestFrameId, long? ParentActionId, int Cursor, int? FixedTargetSeat);
-}
-
 public sealed partial class SimpleAiBrain
 {
     private (double Score, string Reason) ScoreChainedStateBasicAction(GameSnapshot view, PlayerSnapshot self, Role role, LegalAction action)

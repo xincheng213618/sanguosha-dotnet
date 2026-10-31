@@ -32,7 +32,3 @@ internal interface IProgramJudgmentProducer : IProgramRuntimeOperations
     void Begin(long programFrameId, int targetSeat, string reason, CardKind? sourceCard, int sourceSeat,
         string resultBind, SkillProgramCardSetVisibility visibility);
 }
-
-public sealed partial class GameEngine
-{
-}

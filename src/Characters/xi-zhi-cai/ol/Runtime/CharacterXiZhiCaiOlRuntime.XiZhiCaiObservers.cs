@@ -65,7 +65,7 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
         return _coreObserverSubtreesOperations.IsMovementObserverEdge(index);
     }
 
-    internal ProgramSkillFrame? XiZhiCaiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXiZhiCaiOlOperations.XiZhiCaiFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterXiZhiCaiOlOperations.XiZhiCaiObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
+    internal ProgramSkillFrame? XiZhiCaiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.XiZhiCaiFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => this.XiZhiCaiObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 210)]
     internal bool TryAdvanceXiZhiCaiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XiZhiCaiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

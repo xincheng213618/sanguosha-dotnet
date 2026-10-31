@@ -18,7 +18,3 @@ public sealed partial record ProgramSkillFrame
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public DaoshuGuessState? DaoshuGuess { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-}

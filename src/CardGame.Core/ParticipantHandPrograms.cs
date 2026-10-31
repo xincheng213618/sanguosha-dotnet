@@ -81,7 +81,3 @@ internal sealed class ParticipantHandProgramHandler(SkillProgramEffectOp op) : I
             ? host.GetCapability<IParticipantHandProgramHost>().ViewAndTakeHand(frame, targetSeat, effect.Amount)
             : host.GetCapability<IParticipantHandProgramHost>().RequestHandRepayment(frame, targetSeat);
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -49,7 +49,3 @@ public sealed partial record CardUseFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public WushuangCiweiNullifiedEvent? WushuangCiweiNullification { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-}

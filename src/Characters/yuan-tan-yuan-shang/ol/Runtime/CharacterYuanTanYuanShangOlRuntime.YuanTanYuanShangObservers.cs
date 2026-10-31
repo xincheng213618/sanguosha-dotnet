@@ -30,7 +30,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == victim && recovery.Attempt.TargetSeat == victim && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.From == from && m.Sequence > paid.Before && m.Sequence <= paid.After && m.Reason == recovery.Attempt.Completion.MoveReason);
     }
 
-    internal ProgramSkillFrame? NeifaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterYuanTanYuanShangOlOperations.NeifaFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? NeifaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.NeifaFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 370)]
     internal bool TryAdvanceNeifaSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && NeifaObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

@@ -9,6 +9,3 @@ public sealed record AlternatingChoiceDrawBenefitIssuedEvent(long ProgramFrameId
 public sealed record AlternatingChoiceDrawPhaseAssignedEvent(long ProgramFrameId, int InstructionIndex,
     ActualDiscardRecoveryPhaseKey Phase) : IGameEvent;
 public sealed record ConsecutiveTargetDeckGiftEvent(int OwnerSeat,string SkillId,string SkillInstanceId,string StateId,int TargetSeat,int OwnerTurnOrdinal,int? CardId,bool Consecutive) : IGameEvent;
-public sealed partial class GameEngine
-{
-}

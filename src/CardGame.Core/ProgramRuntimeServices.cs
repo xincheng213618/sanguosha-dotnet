@@ -32,7 +32,3 @@ internal interface IProgramRuntimePrompts : IProgramRuntimeOperations
     void Clear();
     void Set(PendingDecision decision, bool isHuman);
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -51,7 +51,3 @@ internal interface IProgramLifecycleReturns : IProgramRuntimeOperations
     void AfterNormalDraw(int seat);
     void DiscardPhase(int seat);
 }
-
-public sealed partial class GameEngine
-{
-}

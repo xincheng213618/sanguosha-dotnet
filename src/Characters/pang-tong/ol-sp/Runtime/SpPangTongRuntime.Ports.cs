@@ -24,7 +24,3 @@ internal interface ISpPangTongNativeEntries : IProgramRuntimeOperations
     void ChangeMaximumHp(ProgramSkillFrame frame, int amount);
     void PublishState();
 }
-
-public sealed partial class GameEngine
-{
-}

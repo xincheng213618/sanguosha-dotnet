@@ -266,10 +266,3 @@ internal sealed class ProgramCardLegality
         return query.Fallback;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramCardLegality? _cardLegality;
-    private ProgramCardLegality CardLegality => _cardLegality ??= new(global::CardGame.Core.EngineOwners.CoreProgramCardLegalityDefinitions.CardLegalityMetadata.Value,
-        BindRuntimeHandler);
-}

@@ -43,6 +43,3 @@ public sealed partial record ProgramSkillWindowContext
 {
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public XuRongDyingProof? XuRongDying{get;init;}
 }
-public sealed partial class GameEngine
-{
-}

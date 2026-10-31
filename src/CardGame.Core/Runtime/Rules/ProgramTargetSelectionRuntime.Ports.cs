@@ -49,7 +49,3 @@ internal interface IProgramTargetSelectionProtocols : IProgramRuntimeOperations
     void ResolveNamedBoundTargets(ProgramSkillFrame frame, SkillProgramEffect effect, PromptChoice selected);
     int[] OrderSupportTargets(ProgramSkillFrame frame, int[] targets);
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -32,7 +32,3 @@ public sealed record MobileZhuHuanPingkouSealedEvent(long FrameId, int Count) : 
 public sealed record MobileZhuHuanPingkouDamageIssuedEvent(long FrameId, int Index, int Target) : IGameEvent;
 public sealed record MobileZhuHuanPingkouDamageReturnedEvent(long FrameId, int Index, int Target) : IGameEvent;
 public sealed record MobileZhuHuanPingkouCompletedEvent(long FrameId) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

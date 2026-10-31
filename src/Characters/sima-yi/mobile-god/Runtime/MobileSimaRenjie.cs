@@ -17,7 +17,3 @@ public sealed record MobileSimaResponseRequiredEvent(MobileSimaResponseRequireme
 public sealed record MobileSimaRenjieStartedEvent(long FrameId, long ParentFrameId, long UseFrameId, CardConversionSource Source,
     MobileSimaRenjieReturnKind ReturnKind, string OccurrenceKey, int RoundNumber) : IGameEvent;
 public sealed record MobileSimaRenjieAppliedEvent(long FrameId, int OwnerSeat, int RoundNumber, bool Gained) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

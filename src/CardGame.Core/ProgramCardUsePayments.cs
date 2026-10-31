@@ -164,10 +164,3 @@ internal sealed class ProgramCardUsePayments
         foreach (var pay in Handlers<Action<CardActionContext>>(ProgramCardUsePaymentStage.AcceptedConversionCost)) pay(action);
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramCardUsePayments? _cardUsePayments;
-    private ProgramCardUsePayments CardUsePayments => _cardUsePayments ??= new(global::CardGame.Core.EngineOwners.CoreProgramCardUsePaymentsDefinitions.CardUsePaymentMetadata.Value,
-        row => BindRuntimeHandler(row.Method, row.DelegateType));
-}

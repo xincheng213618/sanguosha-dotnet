@@ -7,7 +7,7 @@ using global::CardGame.Core;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoOlRuntime
 {
-    internal ProgramSkillFrame? DongZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterDongZhaoOlOperations.DongZhaoFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? DongZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.DongZhaoFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 430)]
     internal bool TryAdvanceDongZhaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DongZhaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     internal bool ValidIssuedZaowang(ProgramSkillFrame f)

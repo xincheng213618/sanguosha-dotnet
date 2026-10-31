@@ -112,7 +112,7 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
         return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
     }
 
-    internal ProgramSkillFrame? DamageCardColorHealthObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.DamageCardColorHealth is not null && _coreDamageCardColorHealthOperations.DamageCardColorHealthFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreDamageCardColorHealthOperations.DamageCardColorHealthObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
+    internal ProgramSkillFrame? DamageCardColorHealthObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.DamageCardColorHealth is not null && this.DamageCardColorHealthFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => this.DamageCardColorHealthObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30)]
     internal bool IsDamageCardColorHealthRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery)
     {
@@ -120,7 +120,7 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
             return false;
         var parent = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
         var child = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == recovery.Id);
-        return parent >= 0 && child > parent + 1 && DamageCardColorHealthFirstChild(frame, _resolutionStackOperations._resolutionStack[parent + 1]) && _coreObserverSubtreesOperations.HasObserverSuffix(parent, (index) => _coreDamageCardColorHealthOperations.DamageCardColorHealthObserverEdge(index), (index, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index, dying)) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[child - 1]);
+        return parent >= 0 && child > parent + 1 && DamageCardColorHealthFirstChild(frame, _resolutionStackOperations._resolutionStack[parent + 1]) && _coreObserverSubtreesOperations.HasObserverSuffix(parent, (index) => this.DamageCardColorHealthObserverEdge(index), (index, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index, dying)) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[child - 1]);
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 2403)]

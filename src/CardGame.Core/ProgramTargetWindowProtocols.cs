@@ -109,10 +109,3 @@ internal sealed class ProgramTargetWindowProtocols
         return false;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramTargetWindowProtocols? _targetWindowProtocols;
-    private ProgramTargetWindowProtocols TargetWindowProtocols => _targetWindowProtocols ??= new(global::CardGame.Core.EngineOwners.CoreProgramTargetWindowProtocolsDefinitions.TargetWindowMetadata.Value,
-        BindRuntimeHandler);
-}

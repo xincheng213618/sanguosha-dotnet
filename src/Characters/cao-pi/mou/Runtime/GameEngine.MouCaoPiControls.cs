@@ -6,10 +6,3 @@ public sealed partial record PlayerSnapshot
 
     private readonly IReadOnlyList<MouCaoPiControl>? _mouCaoPiControls;
 }
-
-public sealed partial class GameEngine
-{
-    // Issued lasting restrictions, independent of the source skill and pending
-    // instruction. Normal command replay rebuilds this per-match state.
-    private ref readonly global::System.Collections.Generic.List<global::CardGame.Core.MouCaoPiControl> _mouCaoPiControls => ref _characterCaoPiMou.ReferenceToMouCaoPiControls;
-}

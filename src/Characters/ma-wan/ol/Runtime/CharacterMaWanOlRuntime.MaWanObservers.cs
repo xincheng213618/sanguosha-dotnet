@@ -19,7 +19,7 @@ internal sealed partial class CharacterMaWanOlRuntime
     }
 
     internal bool MaWanObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
-    internal ProgramSkillFrame? MaWanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterMaWanOlOperations.MaWanFirstChild(f, child), (i) => _characterMaWanOlOperations.MaWanObserverSuffix(i));
+    internal ProgramSkillFrame? MaWanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.MaWanFirstChild(f, child), (i) => this.MaWanObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26510)]
     internal bool AdvanceMaWanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MaWanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

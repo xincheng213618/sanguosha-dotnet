@@ -11,7 +11,3 @@ internal sealed class MobileZhongYaoZuodingTargetResolver : IProgramTargetResolv
     public IReadOnlyList<int> Resolve(ProgramTargetResolverContext context, IProgramSelectionQueries queries) =>
         queries.Get<IMobileZhongYaoSelectionQueries>().EligibleTargets(context.OwnerSeat);
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -115,8 +115,3 @@ internal sealed class AdoptedChildTargetResolver : IProgramTargetResolver
 {
     public IReadOnlyList<int> Resolve(ProgramTargetResolverContext context, IProgramSelectionQueries queries) => Array.AsReadOnly(queries.Get<IAdoptedChildSelectionQuery>().Participants.Where(player => player.Alive && (context.TargetKind == SkillProgramTargetKind.AdoptedChildSuccessor ? !player.HasMark && (player.Seat != context.OwnerSeat || queries.Get<IAdoptedChildSelectionQuery>().Participants.Any(person => person.Alive && person.HasMark)) : player.Seat != context.OwnerSeat && player.HasCixiao)).Select(player => player.Seat).ToArray());
 }
-
-public sealed partial class GameEngine
-{
-    private ref bool _synchronizingAdoptedChildGrants => ref _characterDingYuanOl.ReferenceToSynchronizingAdoptedChildGrants;
-}

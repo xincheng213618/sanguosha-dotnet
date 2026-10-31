@@ -25,8 +25,3 @@ public sealed partial record ProgramSkillFrame
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public JuanxiaRetaliationState? JuanxiaRetaliate { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-
-}

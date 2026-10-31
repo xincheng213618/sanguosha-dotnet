@@ -70,7 +70,3 @@ internal interface IProgramBoundCardPaymentOperations : IProgramRuntimeOperation
     void CommitLostHpChained(long frameId);
     void CommitPhaseAlcohol(long frameId);
 }
-
-public sealed partial class GameEngine
-{
-}

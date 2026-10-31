@@ -26,7 +26,3 @@ internal sealed class AbolishPublicTeamEnemyEquipmentSlotsHandler : ISkillProgra
         return SkillProgramStepOutcome.Continue;
     }
 }
-
-public sealed partial class GameEngine
-{
-}

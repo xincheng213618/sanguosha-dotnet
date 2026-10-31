@@ -127,7 +127,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == pair.Id);
         if (index < 0 || pair.DouyuContest is null || !ValidDouyuContest(pair) || index + 1 >= _resolutionStackOperations._resolutionStack.Count || !DouyuPindianChildRidesOn(_resolutionStackOperations._resolutionStack[index + 1], pair))
             return false;
-        return _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _characterPangJiOlOperations.DouyuPindianChildRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _characterPangJiOlOperations.DouyuObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
+        return _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => this.DouyuPindianChildRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || this.DouyuObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     }
 
     internal void AssertDouyuPairSubtreeProcessing(PindianFrame pair)

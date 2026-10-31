@@ -48,7 +48,7 @@ internal sealed partial class CharacterRuanHuiOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? RuanHuiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterRuanHuiOlOperations.RuanHuiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? RuanHuiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.RuanHuiFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27080)]
     internal bool AdvanceRuanHuiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && RuanHuiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

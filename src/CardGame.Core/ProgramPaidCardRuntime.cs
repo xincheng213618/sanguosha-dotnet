@@ -91,7 +91,3 @@ internal sealed partial class ProgramPaidCardRuntime
         frame.CardSetBindings.SingleOrDefault(binding => binding.Name == bind) ??
         throw new InvalidOperationException($"Program card-set binding '{bind}' is unavailable.");
 }
-
-public sealed partial class GameEngine
-{
-}

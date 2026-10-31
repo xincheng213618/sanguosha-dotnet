@@ -54,7 +54,7 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
         return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == r.GainedCardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == QirangGainReason);
     }
 
-    internal ProgramSkillFrame? ZhugeGuoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterZhugeGuoOlOperations.ZhugeGuoFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? ZhugeGuoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.ZhugeGuoFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 200)]
     internal bool TryAdvanceZhugeGuoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhugeGuoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
     [ProgramPipelineHook(ProgramPipelinePhase.ObserveCommittedMovement, 200)]

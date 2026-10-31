@@ -26,7 +26,3 @@ public sealed class DrawAllHandSelectedBonusProgramHandler : ISkillProgramEffect
         return SkillProgramStepOutcome.Continue;
     }
 }
-
-public sealed partial class GameEngine
-{
-}

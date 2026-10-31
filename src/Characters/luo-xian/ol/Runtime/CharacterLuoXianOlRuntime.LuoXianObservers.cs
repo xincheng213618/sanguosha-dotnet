@@ -37,7 +37,7 @@ internal sealed partial class CharacterLuoXianOlRuntime
         return pending.Stage == DailiStage.DrawChildren && child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > pending.Before && m.Sequence <= pending.After && m.Reason.Value == "skill-program.daili.draw");
     }
 
-    internal ProgramSkillFrame? DailiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterLuoXianOlOperations.DailiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? DailiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.DailiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26420)]
     internal bool AdvanceDailiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DailiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

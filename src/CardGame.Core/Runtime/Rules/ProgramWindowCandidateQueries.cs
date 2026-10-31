@@ -11,7 +11,3 @@ internal interface IProgramWindowCandidateQueries : IProgramSelectionQuery
     IReadOnlyList<ProgramTriggerCandidate> IncludeIssuedReturns(CharacterState owner, SkillProgramTriggerWindow window,
         IReadOnlyList<ProgramTriggerCandidate> ordinary);
 }
-
-public sealed partial class GameEngine
-{
-}

@@ -35,7 +35,3 @@ internal sealed class NativeFrameAutomaticRuntime(INativeFrameAutomaticFacts fac
         return false;
     }
 }
-
-public sealed partial class GameEngine
-{
-}

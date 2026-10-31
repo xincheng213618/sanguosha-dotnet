@@ -53,7 +53,7 @@ internal sealed partial class CharacterLiFengOlRuntime
     }
 
     internal bool LiFengObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
-    internal ProgramSkillFrame? LiFengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLiFengOlOperations.LiFengFirstChild(f, child), (index) => _characterLiFengOlOperations.LiFengObserverSuffix(index));
+    internal ProgramSkillFrame? LiFengObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.LiFengFirstChild(f, child), (index) => this.LiFengObserverSuffix(index));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 290)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 280)]
     internal bool IsLiFengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

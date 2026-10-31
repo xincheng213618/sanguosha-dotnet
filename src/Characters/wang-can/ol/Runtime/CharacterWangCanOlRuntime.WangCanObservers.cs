@@ -82,8 +82,8 @@ internal sealed partial class CharacterWangCanOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? WangCanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterWangCanOlOperations.WangCanFirstChild(r, c), (i) => _characterWangCanOlOperations.WangCanObserverSuffix(i));
-    internal bool WangCanObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterWangCanOlOperations.DenglouNativePaymentEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(i, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(i, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(i, d)));
+    internal ProgramSkillFrame? WangCanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.WangCanFirstChild(r, c), (i) => this.WangCanObserverSuffix(i));
+    internal bool WangCanObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || this.DenglouNativePaymentEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(i, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(i, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(i, d)));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 350)]
     internal bool TryAdvanceWangCanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WangCanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

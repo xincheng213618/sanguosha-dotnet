@@ -20,7 +20,3 @@ internal sealed class ProgramChildWindowRuntime(IProgramChildWindowEntries entri
         entries.Recovery(frameId, continuation) || entries.CharacterState(frameId) ||
         entries.HpChanged(frameId, continuation) || movement.Begin(frameId) || skills.Begin(frameId);
 }
-
-public sealed partial class GameEngine
-{
-}

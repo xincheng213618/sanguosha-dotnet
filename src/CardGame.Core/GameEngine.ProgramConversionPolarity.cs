@@ -19,6 +19,3 @@ public sealed class CommitConversionPolarityHandler : ISkillProgramEffectHandler
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int seat, ISkillProgramEffectHost host)
     { host.GetCapability<IConversionPolarityProgramHost>().CommitConversionPolarity(frame); return SkillProgramStepOutcome.Continue; }
 }
-public sealed partial class GameEngine
-{
-}

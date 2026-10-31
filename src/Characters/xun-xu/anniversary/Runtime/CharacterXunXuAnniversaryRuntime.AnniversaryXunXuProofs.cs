@@ -60,7 +60,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.CharacterStateContinuation == CharacterStateContinuation.Program);
     }
 
-    internal ProgramSkillFrame? XunXuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterXunXuAnniversaryOperations.XunXuFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? XunXuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.XunXuFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46100)]
     internal bool XunXuDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && XunXuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 46100)]

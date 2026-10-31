@@ -28,7 +28,7 @@ internal sealed partial class CharacterHuoJunOlRuntime
     }
 
     internal bool HuoJunFenruiObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
-    internal ProgramSkillFrame? HuoJunFenruiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterHuoJunOlOperations.HuoJunFenruiFirstChild(f, child), (i) => _characterHuoJunOlOperations.HuoJunFenruiObserverSuffix(i));
+    internal ProgramSkillFrame? HuoJunFenruiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.HuoJunFenruiFirstChild(f, child), (i) => this.HuoJunFenruiObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26210)]
     internal bool AdvanceHuoJunFenruiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuoJunFenruiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

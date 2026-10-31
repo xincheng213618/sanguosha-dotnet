@@ -37,7 +37,7 @@ internal sealed partial class CharacterLiWanOlRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 700)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 640)]
     internal bool IsLiWanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => false;
-    internal ProgramSkillFrame? LiWanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterLiWanOlOperations.LiWanFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? LiWanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.LiWanFirstChild(f, child), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26720)]
     internal bool AdvanceLiWanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiWanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

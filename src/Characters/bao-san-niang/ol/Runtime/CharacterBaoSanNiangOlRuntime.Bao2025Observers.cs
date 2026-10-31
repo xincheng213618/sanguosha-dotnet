@@ -102,7 +102,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
     }
 
     internal bool HasBaoSilverLionPayment(ProgramSkillFrame f, int seat) => f.Bao2025 is { } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.From == CardLocation.Equipment(seat) && m.CardKind == CardKind.SilverLion && (m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoGainReason || m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoCostReason || m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoOutcomeReason));
-    internal ProgramSkillFrame? BaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterBaoSanNiangOlOperations.BaoFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? BaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.BaoFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 450)]
     internal bool TryAdvanceBaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramAiChoice(SkillProgramEffectOp.TakeConvertedSlashTargetAndResetLimitedSkill, SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes, SkillProgramEffectOp.DyingRecipientChooseReplaceOrGrantThenRecover)]

@@ -33,7 +33,3 @@ internal interface IDingShangWanNativeOperations : IProgramRuntimeOperations
 {
     void Give(long frameId, int giver, int recipient, IReadOnlyList<int> cards, CardMoveReason reason);
 }
-
-public sealed partial class GameEngine
-{
-}

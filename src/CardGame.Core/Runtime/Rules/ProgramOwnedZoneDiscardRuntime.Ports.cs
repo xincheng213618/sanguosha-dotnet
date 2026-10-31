@@ -16,7 +16,3 @@ internal interface IProgramOwnedZoneDiscardReceipts : IProgramRuntimeOperations
         IReadOnlyList<CardZoneKind> zones, CardMoveReason reason);
     void Complete(IProgramOwnedZoneDiscardInvocation? invocation, IReadOnlyList<int> actualIds);
 }
-
-public sealed partial class GameEngine
-{
-}

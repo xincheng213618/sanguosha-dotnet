@@ -40,7 +40,7 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? CheZhouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterCheZhouAnniversaryOperations.CheZhouFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? CheZhouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.CheZhouFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46400)]
     internal bool AdvanceCheZhouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CheZhouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

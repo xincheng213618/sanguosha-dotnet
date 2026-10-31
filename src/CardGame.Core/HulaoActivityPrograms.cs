@@ -88,7 +88,3 @@ public sealed record HulaoXiuluoPaidEvent(long ProgramFrameId, int OwnerSeat, in
 public sealed record HulaoXiuluoJudgmentDiscardedEvent(long ProgramFrameId, int OwnerSeat, int Iteration, int CardId) : IGameEvent;
 public sealed record HulaoPeachIssuedEvent(HulaoPeachOrigin Origin) : IGameEvent;
 public sealed record HulaoPeachReturnedEvent(HulaoPeachOrigin Origin) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

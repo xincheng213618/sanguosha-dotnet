@@ -31,7 +31,7 @@ internal sealed partial class CharacterFanChouOlRuntime
         return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == victim && recovery.Attempt.TargetSeat == victim && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == r.SelectedId && m.From == r.From && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason == recovery.Attempt.Completion.MoveReason);
     }
 
-    internal ProgramSkillFrame? FanChouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterFanChouOlOperations.FanChouFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? FanChouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.FanChouFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 310)]
     internal bool TryAdvanceFanChouSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FanChouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

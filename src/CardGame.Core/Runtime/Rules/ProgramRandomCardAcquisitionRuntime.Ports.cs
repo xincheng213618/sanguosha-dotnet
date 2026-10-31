@@ -15,7 +15,3 @@ internal interface IProgramRandomCardAcquisitionNativeEntries : IProgramRuntimeO
     bool MoveProcessingUnlessDestroyed(Card card, CardLocation destination, CardMoveReason reason);
     void AddLog(string category, string message, int ownerSeat);
 }
-
-public sealed partial class GameEngine
-{
-}

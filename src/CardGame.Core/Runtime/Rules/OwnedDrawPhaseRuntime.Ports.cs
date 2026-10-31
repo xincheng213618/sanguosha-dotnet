@@ -27,7 +27,3 @@ internal interface IOwnedDrawPhaseNativeOperations : IProgramRuntimeOperations
     bool CompleteShanheSourceChunlaoJudgmentDraw(DrawPhaseObligationFrame frame);
     void CompleteTurnStartAfterDraw(CharacterState owner, int delayedEffects);
 }
-
-public sealed partial class GameEngine
-{
-}

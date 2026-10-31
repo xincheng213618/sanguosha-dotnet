@@ -48,7 +48,3 @@ internal static class AnniversaryZhuZhiComposition
         }
     }
 }
-
-public sealed partial class GameEngine
-{
-}

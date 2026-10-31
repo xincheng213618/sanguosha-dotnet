@@ -30,7 +30,3 @@ internal interface IForeignTurnContestSlashProducer : IProgramRuntimeOperations
         CardConversionSource source, ForeignTurnPindianOrigin origin);
     void Commit(ForeignTurnContestSlashIssue issue);
 }
-
-public sealed partial class GameEngine
-{
-}

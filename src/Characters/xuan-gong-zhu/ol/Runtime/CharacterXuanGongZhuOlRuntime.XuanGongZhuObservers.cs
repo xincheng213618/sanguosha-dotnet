@@ -38,7 +38,7 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime
         return false;
     }
 
-    internal ProgramSkillFrame? XuanGongZhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => _characterXuanGongZhuOlOperations.XuanGongZhuFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
+    internal ProgramSkillFrame? XuanGongZhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.XuanGongZhuFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 420)]
     internal bool TryAdvanceXuanGongZhuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XuanGongZhuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     SkillProgramStepOutcome global::CardGame.Core.IXuanGongZhuProgramHost.ArmQimeiPair(ProgramSkillFrame f) => _coreQimeiProgramsOperations.ArmQimeiPair(f);

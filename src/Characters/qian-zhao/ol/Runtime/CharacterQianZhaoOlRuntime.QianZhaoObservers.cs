@@ -51,7 +51,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
         return f.Kuansai is { Stage: KuansaiStage.Children, Gift: false } && hp.Change.SourceSeat == f.OwnerSeat && hp.Change.TargetSeat == f.OwnerSeat || hp.Change.SourceSeat == hp.Change.TargetSeat && QianZhaoSilverLion(f, hp.Change.TargetSeat, new(f.Weifu is not null ? WeifuDiscardReason : KuansaiGiftReason));
     }
 
-    internal ProgramSkillFrame? QianZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterQianZhaoOlOperations.QianZhaoFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
+    internal ProgramSkillFrame? QianZhaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.QianZhaoFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26620)]
     internal bool AdvanceQianZhaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && QianZhaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

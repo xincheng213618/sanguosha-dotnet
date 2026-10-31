@@ -155,9 +155,3 @@ internal sealed class ProgramDamageHooks(ProgramDamageHookCatalog catalog, Func<
             handler(attack);
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramDamageHooks? _damageHooks;
-    private ProgramDamageHooks DamageHooks => _damageHooks ??= new(global::CardGame.Core.EngineOwners.CoreProgramDamageHooksDefinitions.DamageHookMetadata.Value, row => BindRuntimeHandler(row.Method, row.DelegateType), _modeRuntime.DamageRules, attack => this.ProgramDamageHooksEntries.CaptureModeDamageFacts((global::CardGame.Core.GameEngine.IDamageAttempt)attack));
-}

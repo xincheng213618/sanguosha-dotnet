@@ -11,7 +11,3 @@ internal interface INativeDrawOrdinalSkillInstances : IProgramSelectionQuery
 {
     bool HasRuntimeSkillInstance(CharacterState owner, string skillId, string skillInstanceId);
 }
-
-public sealed partial class GameEngine
-{
-}

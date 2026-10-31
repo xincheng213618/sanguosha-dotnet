@@ -19,6 +19,3 @@ internal sealed class MobileBuLianShiAnxuHandler : ISkillProgramEffectHandler
 }
 public sealed record MobileBuLianShiAnxuComparedEvent(long FrameId, int RecipientSeat, int DonorSeat, int RecipientHand, int DonorHand, bool Equal) : IGameEvent;
 public sealed record MobileBuLianShiAnxuDeliveredEvent(long FrameId, string SkillInstanceId, string GameplayHash, int RecipientSeat, int DonorSeat, int CardId, long BatchId, long MovementSequence) : IGameEvent;
-public sealed partial class GameEngine
-{
-}

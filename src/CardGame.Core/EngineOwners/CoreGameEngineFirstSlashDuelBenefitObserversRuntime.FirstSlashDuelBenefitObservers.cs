@@ -39,7 +39,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitObserversRuntim
         return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == "skill-program.first-slash-duel.draw");
     }
 
-    internal ProgramSkillFrame? FirstSlashDuelObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreFirstSlashDuelBenefitObserversOperations.FirstSlashDuelFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? FirstSlashDuelObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.FirstSlashDuelFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 100)]
     internal bool TryAdvanceFirstSlashDuelSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FirstSlashDuelObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

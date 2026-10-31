@@ -41,7 +41,3 @@ internal sealed class UseShanheWarElephantCounterSlashHandler : ISkillProgramEff
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat, ISkillProgramEffectHost host) =>
         host.GetCapability<IShanheWarElephantProgramHost>().CounterSlash(frame);
 }
-
-public sealed partial class GameEngine
-{
-}

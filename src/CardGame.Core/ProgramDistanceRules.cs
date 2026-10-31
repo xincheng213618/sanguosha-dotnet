@@ -186,10 +186,3 @@ internal sealed class ProgramDistanceRules
         return false;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramDistanceRules? _distanceRules;
-    private ProgramDistanceRules DistanceRules => _distanceRules ??= new(global::CardGame.Core.EngineOwners.CoreProgramDistanceRulesDefinitions.DistanceRuleMetadata.Value,
-        BindRuntimeHandler);
-}

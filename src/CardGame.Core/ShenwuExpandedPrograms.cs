@@ -79,7 +79,3 @@ public sealed partial record ProgramSkillFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ShenwuExpandedResolution? ShenwuExpanded { get; init; }
 }
-
-public sealed partial class GameEngine
-{
-}

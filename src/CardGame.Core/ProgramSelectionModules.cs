@@ -204,11 +204,3 @@ internal sealed class ProgramSelectionRegistry(ProgramSelectionCatalog catalog, 
         return hint;
     }
 }
-
-public sealed partial class GameEngine
-{
-    private ProgramSelectionRegistry? _programSelections;
-    private ProgramSelectionRegistry ProgramSelections => _programSelections ??= new(global::CardGame.Core.EngineOwners.CoreProgramSelectionModulesDefinitions.ProgramSelectionMetadata.Value, ProgramSelectionQueries);
-    private IProgramSelectionQueries? _programSelectionQueries;
-    private IProgramSelectionQueries ProgramSelectionQueries => _programSelectionQueries ??= this.ComposeNativeSelectionQueries();
-}

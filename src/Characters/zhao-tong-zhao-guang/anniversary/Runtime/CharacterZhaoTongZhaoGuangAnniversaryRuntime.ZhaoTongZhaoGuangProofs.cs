@@ -39,7 +39,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
     }
 
     internal bool AnniversaryQingrenObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
-    internal ProgramSkillFrame? AnniversaryQingrenObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => _characterZhaoTongZhaoGuangAnniversaryOperations.AnniversaryQingrenFirstChild(f, child), (i) => _characterZhaoTongZhaoGuangAnniversaryOperations.AnniversaryQingrenObserverSuffix(i));
+    internal ProgramSkillFrame? AnniversaryQingrenObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.AnniversaryQingrenFirstChild(f, child), (i) => this.AnniversaryQingrenObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 44600)]
     internal bool AnniversaryQingrenDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryQingrenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 44600)]

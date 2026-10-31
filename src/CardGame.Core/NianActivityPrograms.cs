@@ -72,8 +72,3 @@ public sealed partial record CardMovementBatchContext
     public IReadOnlyList<NianOwnedTransferProof>? NianOwnedTransfers
     { get => _nianOwnedTransfers; init => _nianOwnedTransfers = value is null ? null : Array.AsReadOnly(value.ToArray()); }
 }
-
-public sealed partial class GameEngine
-{
-
-}

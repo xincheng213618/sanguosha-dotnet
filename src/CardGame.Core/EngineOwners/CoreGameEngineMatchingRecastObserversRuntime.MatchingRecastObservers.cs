@@ -92,7 +92,7 @@ internal sealed partial class CoreGameEngineMatchingRecastObserversRuntime
         return decision.ValidCardIds.SequenceEqual(choices.SelectMany(c => c.Cards).Distinct()) && decision.Choices.Count == choices.Count && decision.Choices.Zip(choices).All(pair => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(pair.First, pair.Second));
     }
 
-    internal ProgramSkillFrame? MatchingRecastObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _coreMatchingRecastObserversOperations.MatchingRecastFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
+    internal ProgramSkillFrame? MatchingRecastObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.MatchingRecastFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 90)]
     internal bool IsMatchingRecastDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MatchingRecastObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 50)]

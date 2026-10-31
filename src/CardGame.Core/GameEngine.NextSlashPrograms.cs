@@ -4,8 +4,3 @@ public sealed record NamedSlashCancellation(string SkillId, int OwnerSeat, int T
 public sealed record NextSlashDamageReservedEvent(int OwnerSeat, string SkillId, int TurnNumber, int TurnSeat, long CardUseFrameId, int TargetSeat, int Amount) : IGameEvent;
 public sealed record NextSlashDamageConsumedEvent(int OwnerSeat, int TurnNumber, int TurnSeat, long CardUseFrameId, int Amount) : IGameEvent;
 public sealed record NextSlashDamageExpiredEvent(int OwnerSeat, string SkillId, int TurnNumber, int TurnSeat, int Amount) : IGameEvent;
-public sealed partial class GameEngine
-{
-    internal sealed record NamedNextSlashReserve(int OwnerSeat, string SkillId, int TurnNumber, int TurnSeat, int Amount);
-    private ref readonly global::System.Collections.Generic.List<global::CardGame.Core.GameEngine.NamedNextSlashReserve> _namedNextSlashReserves => ref _nextSlashPrograms.ReferenceToNamedNextSlashReserves;
-}

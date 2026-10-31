@@ -46,7 +46,3 @@ internal sealed class QueueShanheLuanxinNextDrawHandler : ISkillProgramEffectHan
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat, ISkillProgramEffectHost host)
     { host.GetCapability<IShanheLuanxinProgramHost>().QueueNextDraw(frame); return SkillProgramStepOutcome.Continue; }
 }
-
-public sealed partial class GameEngine
-{
-}

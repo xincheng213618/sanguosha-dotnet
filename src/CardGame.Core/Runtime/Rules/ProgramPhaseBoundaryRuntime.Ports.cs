@@ -40,7 +40,3 @@ internal interface IProgramPhaseBoundaryProtocols : IProgramRuntimeOperations
     void PublishState();
     void FinalizeEndTurn(CharacterState owner);
 }
-
-public sealed partial class GameEngine
-{
-}

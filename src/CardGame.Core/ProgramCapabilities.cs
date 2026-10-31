@@ -203,11 +203,3 @@ internal sealed class ProgramCapabilityRegistry(ProgramCapabilityCatalog catalog
         return true;
     }
 }
-
-public sealed partial class GameEngine
-{
-    // Legacy nested adapters and explicit independent modules share one contract
-    // directory; independent hook/capability entry points share one match instance.
-    private ProgramCapabilityRegistry? _programCapabilities;
-    private ProgramCapabilityRegistry ProgramCapabilities =>_programCapabilities ??= MatchRuntime.Capabilities;
-}

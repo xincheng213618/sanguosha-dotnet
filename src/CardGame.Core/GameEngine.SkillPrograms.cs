@@ -1,14 +1,4 @@
 namespace CardGame.Core;
-public sealed partial class GameEngine
-{
-    private ProgramLegalityRouter? _programLegality;
-    private ProgramLegalityRouter ProgramLegality => _programLegality ??= new(global::CardGame.Core.EngineOwners.CoreGameEngineSkillProgramsDefinitions.ProgramLegalityMetadata.Value, this, ResolveRuntimeHandlerTarget);
-    // The journal rebuilds these counters through accepted commands. They are
-    // keyed by content identities, never by translated presentation text.
-    private ref readonly global::System.Collections.Generic.Dictionary<(int Seat, string Skill, string Activation), int> _programUses => ref _skillPrograms.ReferenceToProgramUses;
-    private ref readonly global::System.Collections.Generic.Dictionary<(int Seat, string Skill, string Activation), int> _programPhaseUses => ref _skillPrograms.ReferenceToProgramPhaseUses;
-    private ref readonly global::System.Collections.Generic.Dictionary<(int ProviderSeat, int SkillOwnerSeat, string Skill, string Contribution), int> _programContributionUses => ref _skillPrograms.ReferenceToProgramContributionUses;
-}
 
 public sealed record ProgramSkillStartedEvent(long FrameId, int OwnerSeat, string SkillId, string ActivationId) : IGameEvent;
 public sealed record ProgramSkillResolvedEvent(long FrameId, int OwnerSeat, string SkillId, string ActivationId, bool Completed) : IGameEvent;

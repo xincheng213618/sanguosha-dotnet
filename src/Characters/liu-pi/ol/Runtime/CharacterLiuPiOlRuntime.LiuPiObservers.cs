@@ -16,7 +16,7 @@ internal sealed partial class CharacterLiuPiOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } changed && changed.ResumeProgramFrameId == root.Id && changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal ProgramSkillFrame? LiuPiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => _characterLiuPiOlOperations.LiuPiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
+    internal ProgramSkillFrame? LiuPiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.LiuPiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 26120)]
     internal bool AdvanceLiuPiSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LiuPiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

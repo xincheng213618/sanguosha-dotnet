@@ -32,7 +32,3 @@ internal sealed class CaptureExpressionNumberDescriptor : ProgramOperationDescri
         }
     }
 }
-
-public sealed partial class GameEngine
-{
-}

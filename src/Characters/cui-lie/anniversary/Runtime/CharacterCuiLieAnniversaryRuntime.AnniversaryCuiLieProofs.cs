@@ -89,8 +89,8 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         return parent is ProgramSkillFrame f && CuiLieFirstChild(f, child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i);
     }
 
-    internal bool CuiLieObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterCuiLieAnniversaryOperations.CuiLieObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d));
-    internal ProgramSkillFrame? CuiLieObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterCuiLieAnniversaryOperations.CuiLieFirstChild(f, c), (i) => _characterCuiLieAnniversaryOperations.CuiLieObserverSuffix(i));
+    internal bool CuiLieObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => this.CuiLieObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d));
+    internal ProgramSkillFrame? CuiLieObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.CuiLieFirstChild(f, c), (i) => this.CuiLieObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46900)]
     internal bool CuiLieDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && CuiLieObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46900)]

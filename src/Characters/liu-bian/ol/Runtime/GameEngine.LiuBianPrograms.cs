@@ -11,7 +11,3 @@ public sealed record ProgramYuWeiActiveTurnEvent(long FrameId, string SkillId, s
 // 毒逝 evidence: the dead owner's chosen heir for the transferred skill.
 public sealed record ProgramDuShiGrantEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int RecipientSeat) : IGameEvent;
-
-public sealed partial class GameEngine
-{
-}

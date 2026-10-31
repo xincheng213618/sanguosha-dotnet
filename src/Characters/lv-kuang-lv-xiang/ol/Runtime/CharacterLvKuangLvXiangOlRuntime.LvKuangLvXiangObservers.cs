@@ -49,10 +49,10 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
             return _coreDrawFundedDistinctBasicObserversOperations.DrawFundedDistinctBasicPaidSuffix(index + 1);
         if (index + 1 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[index + 1] is ChainedStateBasicFrame)
             return _coreChainedStateBasicReturnsOperations.ChainedStateBasicPaidSuffix(index + 1);
-        return _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterLvKuangLvXiangOlOperations.QigongDeclarationObserverEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(i, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(i, d)) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(i, d));
+        return _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || this.QigongDeclarationObserverEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d) || (_coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(i, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(i, d)) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(i, d));
     }
 
-    internal ProgramSkillFrame? LvKuangLvXiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterLvKuangLvXiangOlOperations.LvKuangLvXiangFirstChild(f, c), (i) => _characterLvKuangLvXiangOlOperations.LvKuangLvXiangObserverSuffix(i));
+    internal ProgramSkillFrame? LvKuangLvXiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.LvKuangLvXiangFirstChild(f, c), (i) => this.LvKuangLvXiangObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 390)]
     internal bool TryAdvanceLvKuangLvXiangSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && LvKuangLvXiangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

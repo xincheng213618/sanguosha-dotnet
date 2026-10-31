@@ -30,7 +30,3 @@ public sealed record LuochongPendingState(string OptionId, int TargetSeat, int R
     public IReadOnlyList<int> DiscardedCardIds
     { get => _discardedCardIds; init => _discardedCardIds = Array.AsReadOnly(value.ToArray()); }
 }
-
-public sealed partial class GameEngine
-{
-}
