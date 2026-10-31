@@ -17,7 +17,7 @@ Builds an isolated test scope once, then registers bulky outputs for manual clea
 .EXAMPLE
 ./tools/Test-Changed.ps1 -Full
 #>
-[CmdletBinding()]
+[CmdletBinding(PositionalBinding = $false)]
 param(
     [string[]] $CoreFilter,
     [string[]] $WpfFilter,
