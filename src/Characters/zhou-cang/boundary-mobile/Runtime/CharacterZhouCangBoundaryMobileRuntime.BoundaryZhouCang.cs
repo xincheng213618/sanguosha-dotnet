@@ -190,7 +190,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
     internal void MoveBoundaryZhongyong(ProgramSkillFrame f, BoundaryZhongyongStage stage, int recipient, IReadOnlyList<int> ids)
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var r = f.BoundaryZhongyong!with
         {
             Stage = stage,

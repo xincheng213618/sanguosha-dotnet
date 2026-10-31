@@ -15,6 +15,7 @@ internal interface IProgramContentQueries : IProgramSelectionQuery
     bool UsesAnyLivingTurnStart { get; }
     bool RequiresFact(ProgramTrackedFact fact);
     bool UsesDrawPhaseDrawCountHandLimit { get; }
+    bool UsesSkillStatePhaseEnds { get; }
     bool UsesEqualNameLengthUse { get; }
     bool HasCardPolicy(SkillProgramCardPolicyKind policy);
     string SkillName(string skillId);
@@ -41,6 +42,7 @@ public sealed partial class ContentRegistry : IProgramContentQueries
     bool IProgramContentQueries.UsesAnyLivingTurnStart => ProgramDependencies.UsesAnyLivingTurnStart;
     bool IProgramContentQueries.RequiresFact(ProgramTrackedFact fact) => ProgramDependencies.RequiresFact(fact);
     bool IProgramContentQueries.UsesDrawPhaseDrawCountHandLimit => ProgramDependencies.UsesDrawPhaseDrawCountHandLimit;
+    bool IProgramContentQueries.UsesSkillStatePhaseEnds => ProgramDependencies.UsesSkillStatePhaseEnds;
     bool IProgramContentQueries.UsesEqualNameLengthUse => ProgramDependencies.UsesEqualNameLengthUse;
     bool IProgramContentQueries.HasCardPolicy(SkillProgramCardPolicyKind policy) => ProgramDependencies.HasCardPolicy(policy);
     string IProgramContentQueries.SkillName(string skillId) => GetSkill(skillId).Name;

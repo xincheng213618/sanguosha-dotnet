@@ -328,7 +328,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
         if (r.Operation != SkillProgramEffectOp.ResolveShenJiangWeiPingxiang || r.Stage != ShenJiangWeiStage.SlashChoice || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiPingxiangCompletedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Pingxiang's then-clause requires its completed native Slash sequence.");
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var grants = p.SkillGrants.Grants.Where(g => g.SkillId == ShenJiangWeiComposition.Jiufa).ToArray();
         foreach (var g in grants)
             p.SkillGrants.RemoveGrant(g.GrantId);

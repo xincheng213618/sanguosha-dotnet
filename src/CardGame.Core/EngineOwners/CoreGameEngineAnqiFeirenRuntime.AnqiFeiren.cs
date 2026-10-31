@@ -22,8 +22,8 @@ internal sealed partial class CoreGameEngineAnqiFeirenRuntime
             return SkillProgramStepOutcome.Continue;
         var index = _randomOperations._random.Next(candidates.Length);
         _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, target,
-            new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.UntilTurnEndOf)
-            { CharacterOnly = false, ExcludeLocked = true, UntilTurnEndOf = new(ProgramParticipantRef.EventTarget) }, [candidates[index]]);
+            new(SkillStateAction.Suppress, new SkillStateMatch([candidates[index]], SkillStateFilters.NonLocked),
+                [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Target)]));
         return SkillProgramStepOutcome.Continue;
     }
 

@@ -40,10 +40,8 @@
             {
               "op": "skillState",
               "target": "owner",
-              "action": "suppress", "scope": "named", "duration": "currentTurn", "characterOnly": false,
-              "skillIds": [
-                "boundary:benghuai-current"
-              ]
+              "action": "suppress", "match": { "skillIds": ["boundary:benghuai-current"] },
+              "until": [{ "event": "turnCleanup", "participant": { "kind": "turnOwner" }, "timing": "before" }]
             }
           ]
         }

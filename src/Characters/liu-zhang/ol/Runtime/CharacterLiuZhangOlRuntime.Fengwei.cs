@@ -51,7 +51,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Fengwei = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FengweiStartedEvent(f.Id, source, f.GameplayHash, w.Id, _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber));
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         PublishFengwei(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }

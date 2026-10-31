@@ -68,7 +68,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
                 foreach (var stale in owner.SkillGrants.Grants.Where(g => g.DaQiaoXiaoQiaoLuoyanSource is not null && !desired.ContainsKey(g.GrantId)).ToArray())
                 {
                     foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-                        _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+                        _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
                     if (owner.SkillGrants.RemoveGrant(stale.GrantId))
                         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DaQiaoXiaoQiaoLuoyanChangedEvent(owner.Seat, stale.GrantId, stale.SkillId, stale.SkillInstanceId, stale.DaQiaoXiaoQiaoLuoyanSource!, false));
                 }
@@ -76,7 +76,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
                 foreach (var grant in desired.Values)
                 {
                     foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-                        _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+                        _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
                     if (owner.SkillGrants.Grant(grant))
                         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DaQiaoXiaoQiaoLuoyanChangedEvent(owner.Seat, grant.GrantId, grant.SkillId, grant.SkillInstanceId, grant.DaQiaoXiaoQiaoLuoyanSource!, true));
                 }

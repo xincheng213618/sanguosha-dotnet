@@ -30,8 +30,6 @@ public sealed record WushuangTairanDrawnEvent(long FrameId, int Owner, string In
     public IReadOnlyList<int> CardIds { get => _ids; init => _ids = Array.AsReadOnly(value.ToArray()); }
 }
 public sealed record WushuangTairanSettledEvent(long ProducerId, int Owner, long SettlingFrame) : IGameEvent;
-public sealed record WushuangYashiSuppressedEvent(long FrameId, int Owner, int Target, int ActualTurn) : IGameEvent;
-public sealed record WushuangYashiExpiredEvent(long ProducerId, int Target) : IGameEvent;
 public sealed record WushuangLingrenGuessedEvent(long FrameId, int Owner, int Target, int ActualTurn,
     long UseId, long ActionId, int Correct) : IGameEvent;
 public sealed record WushuangChoufaRewrittenEvent(long FrameId, int Owner, int Target, int ActualTurn,

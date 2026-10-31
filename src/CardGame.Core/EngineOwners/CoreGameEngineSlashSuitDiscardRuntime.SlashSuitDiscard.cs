@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame);
         _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { JudgmentSuitDodgeRestriction = new(frame.Id, attack.TargetSeat) });
         _coreProgramSkillChangesOperations.ApplyProgramSkillState(frame, attack.TargetSeat,
-            new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
+            new(SkillStateAction.Suppress, SkillStateMatch.NonLocked, [new(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before)]));
         return _coreProgramLifecycleOperations.StartProgramJudgment(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), frame.OwnerSeat, effect.JudgmentReason!, effect.ResultBind!, SkillProgramCardSetVisibility.Public, frame.OwnerSeat);
     }
 

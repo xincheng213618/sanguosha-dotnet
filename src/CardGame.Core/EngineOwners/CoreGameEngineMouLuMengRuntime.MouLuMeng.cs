@@ -15,9 +15,12 @@ internal sealed partial class CoreGameEngineMouLuMengRuntime
         {
             if (!_coreRoundEndingOperations.Value.TracksRoundEnding || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<RoundEndedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber))
                 _characterGuanYuRuntimeOperations.ReturnDemonRoundHolds();
+            _roundSkillStates.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.RoundAdvanced, null,
+                SkillStateBoundaryTiming.Before, _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber + 1));
             _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber++;
             _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Clear();
-            _roundSkillStates.ExpireCurrentRoundSkillStates(_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber);
+            _roundSkillStates.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.RoundAdvanced, null,
+                SkillStateBoundaryTiming.After, _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber));
             _skillRuntimeStateOperations._skillRuntimeState.ResetRound();
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundStartedEvent(_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, current.Seat));
             _coreShanheSourceDifficultyOperations.Value.RestoreShanheSourceRoundArmor();

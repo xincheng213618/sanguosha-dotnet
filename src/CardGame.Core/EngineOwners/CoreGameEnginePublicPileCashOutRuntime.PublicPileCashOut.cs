@@ -84,7 +84,7 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
         }
 
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var before = PublicPileCashOutSequence;
         var receipt = new PublicPileCashOutReceipt
         {

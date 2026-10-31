@@ -150,7 +150,7 @@ internal sealed partial class CharacterSunHongOlRuntime
     internal ProgramSkillFrame PrepareXianbiMovement(ProgramSkillFrame f, XianbiStage stage)
     {
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var r = f.Xianbi!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Xianbi = r with { Stage = stage, MovementStep = r.MovementStep + 1, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, ActualCount = 0 }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         return f;

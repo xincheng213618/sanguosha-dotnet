@@ -154,7 +154,7 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PairedColorDisposition = r with { Stage = PairedColorDispositionStage.MovementChildren, PaidCardId = card.Id, PaidKind = card.Kind, PaidFrom = from, PaidGeneralWeapon = card.IsGeneralWeapon, SequenceBefore = PairedColorSequence, SequenceAfter = PairedColorSequence }, PendingMovementContinuation = new(r.CounterpartSeat, 0, null) });
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var logicalDiscard = r.Obtain ? null : _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(f.OwnerSeat, f.OwnerSeat, [card.Id], new(PairedColorDiscardReason), f.Id);
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], to, new(r.Obtain ? PairedColorObtainReason : PairedColorDiscardReason), (batch, records) =>
         {

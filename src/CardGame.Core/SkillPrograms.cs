@@ -6950,7 +6950,6 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         if (effect.ActorReference is not null) yield return effect.ActorReference;
         if (effect.TargetReference is not null) yield return effect.TargetReference;
         if (effect.SourceRef is not null) yield return effect.SourceRef;
-        if (effect.SkillState?.UntilTurnEndOf is not null) yield return effect.SkillState.UntilTurnEndOf;
     }
 
     private static SkillProgramTriggerValue ParseTriggerValue(JsonElement node, string path)

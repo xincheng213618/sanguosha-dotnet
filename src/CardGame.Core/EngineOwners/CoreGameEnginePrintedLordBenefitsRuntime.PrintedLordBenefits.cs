@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
         if (f.PrintedLordBenefit is not null || f.InstructionIndex != 1 || !ExactPrintedLordStart(f))
             throw new InvalidOperationException("Printed lord qualification requires the exact own actual-start candidate.");
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PrintedLordBenefit = new(1, CoreGameEngineBlackGiftContestsRuntime.RecipientConsequencesSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, f.WindowContext!.ParentFrameId, PrintedLordBenefitStage.ChoosingBeneficiary) });
         PublishPrintedLordChoice(f);
         return SkillProgramStepOutcome.AwaitChoice;

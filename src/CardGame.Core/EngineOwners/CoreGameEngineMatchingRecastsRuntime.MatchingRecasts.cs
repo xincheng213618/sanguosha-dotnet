@@ -72,7 +72,7 @@ internal sealed partial class CoreGameEngineMatchingRecastsRuntime
         r = WithCurrentMatchingRecast(r, p with { CostIssued = true, CostBefore = before, CostAfter = before });
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MatchingRecast = r, PendingMovementContinuation = new(p.Seat, 0, null) });
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         // Recast bypasses discard eligibility. All physical costs commit before equipment removal hooks run.
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(p.Materials.Select(m => m.CardId).ToArray(), CardLocation.DiscardPile, CardMoveReasons.RecastDiscard, (batch, records) =>
         {

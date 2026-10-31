@@ -19,7 +19,7 @@ internal sealed partial class CharacterLiYiOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Chanshuang = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChanshuangStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.ActualTurn, r.ActualTurnOwner, r.PeerSeat, mask));
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         if (ending)
             ContinueChanshuang(f.Id);
         else

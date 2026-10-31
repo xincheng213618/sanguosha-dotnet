@@ -262,7 +262,7 @@ internal sealed partial class CharacterMaChengOlRuntime
     internal void StartChenglieMovement(ref ProgramSkillFrame f, ChenglieStage stage, int participant)
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var r = f.Chenglie!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Chenglie = r with { Stage = stage, Paid = true, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Count = 0 }, PendingMovementContinuation = new(participant, 0, null) });
     }

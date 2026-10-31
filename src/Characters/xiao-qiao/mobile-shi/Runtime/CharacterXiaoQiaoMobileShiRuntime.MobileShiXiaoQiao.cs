@@ -160,7 +160,7 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
         if (r.Stage == ShiXqStage.LoseSkill)
         {
             foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiXiaoQiao = r with { SelectedSkill = id, Paid = true, Stage = ShiXqStage.LossChildren, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiXqHeyunPaidEvent(f.Id, r.Source, r.Target, id));
             _coreProgramSkillChangesOperations.ReplaceProgramSkills(f, [id], [], ProgramSkillSourceRemoval.NonModePreserveProjections, acquireFirst: false);

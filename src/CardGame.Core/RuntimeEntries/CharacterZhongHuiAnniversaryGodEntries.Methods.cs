@@ -17,7 +17,6 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodEntries
     internal bool HasHappyLishiActualUseParticipant(int actor) => _resolve().HasHappyLishiActualUseParticipant(actor);
     internal bool IsLishiJudgment(JudgmentFrame j, ProgramSkillFrame f) => _resolve().IsLishiJudgment(j, f);
     internal bool IsLishiPaidDiscardMovement(CardMovementRecord move, CardLocation expectedSource, CardMoveReason expectedReason) => _resolve().IsLishiPaidDiscardMovement(move, expectedSource, expectedReason);
-    internal bool IsLishiPhaseSuppressed(int seat) => _resolve().IsLishiPhaseSuppressed(seat);
     internal bool IsLishiResponseUse(int actor, CardKind kind) => _resolve().IsLishiResponseUse(actor, kind);
     internal int LinCold(int seat) => _resolve().LinCold(seat);
     internal IReadOnlyList<Card> LinjieDiscardCards(int owner, int target) => _resolve().LinjieDiscardCards(owner, target);

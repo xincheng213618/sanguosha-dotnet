@@ -60,7 +60,7 @@ internal sealed class ModeEncounterHost(EngineStates.CoreGameLogState gameLogSta
                 gameEngineSkillProgramsState.ReferenceToProgramContributionUses.Remove(key);
             foreach (var key in gameEngineProgramPersistentStateState.ReferenceToProgramBooleanStates.Keys.Where(key => key.OwnerSeat == replacement.Seat).ToArray())
                 gameEngineProgramPersistentStateState.ReferenceToProgramBooleanStates.Remove(key);
-            getDictionary()[replacement.Seat] = replacement.SkillGrants.Revision;
+            getDictionary()[replacement.Seat] = replacement.SkillGrants.GrantRevision;
         }
 
         if (request.ArmorOverride is { } armor)

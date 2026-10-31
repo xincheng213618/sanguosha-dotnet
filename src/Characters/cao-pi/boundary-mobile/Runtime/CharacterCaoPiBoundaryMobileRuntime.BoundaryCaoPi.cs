@@ -134,7 +134,7 @@ internal sealed partial class CharacterCaoPiBoundaryMobileRuntime
         if (branch != "discard" || r.Selected.Count != r.X)
             throw new InvalidOperationException("Fangzhu must choose its full exact HE cost or its frozen-X draw.");
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryFangzhu = r = r with { Stage = BoundaryFangzhuStage.DiscardChildren, Outcome = "discarded", Before = before, After = before }, PendingMovementContinuation = new(r.Target, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, r.Target, r.Selected, new(BoundaryFangzhuDiscard));
         var invoice = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == f.Id && e.Reason.Value == BoundaryFangzhuDiscard && e.SequenceBefore == before);

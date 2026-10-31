@@ -30,7 +30,8 @@ internal sealed partial class CoreGameEngineNoDamageSkillDisableRuntime
         var source = policy.Source;
         _coreProgramSkillChangesOperations.IssueSkillState(new(use.Id, 0,
             new(source.SkillId, source.BindingId, source.OwnerSeat, source.SkillInstanceId), use.Id, policy.ActionId), source.OwnerSeat,
-            new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, [source.SkillId]);
+            new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([source.SkillId]),
+                [new(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before)]));
     }
 
     internal void AssertNoDamageSkillDisablePolicy(CardUseFrame use)

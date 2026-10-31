@@ -18,7 +18,7 @@
       "id": "boundary:duanchang", "revision": 1,
       "triggers": [
         { "id": "killer-loses-skills", "window": "ownerDied", "subject": "owner", "optional": false,
-          "effects": [ { "op": "skillState", "target": "owner", "targetRef": { "kind": "eventSource" }, "action": "lose", "scope": "all", "duration": "permanent", "characterOnly": true } ] }
+          "effects": [ { "op": "skillState", "target": "owner", "targetRef": { "kind": "eventSource" }, "action": "lose", "match": { "filter": ["==", ["number", "skill.character"], 1] }, "until": [] } ] }
       ]
     }
   ]

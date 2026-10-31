@@ -6,10 +6,11 @@ internal sealed partial class CharacterCaoPiMouRuntime
     internal IReadOnlyList<MouCaoPiControl>? MouCaoPiControlsSnapshot(int seat)
     {
         var controls = ActiveMouCaoPiControls(seat).ToList();
-        foreach (var grant in _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants)
-            if (grant.SkillState is { Acquisition: false, Action: SkillStateAction.Suppress, Scope: SkillStateScope.All,
-                Duration: SkillStateDuration.UntilTurnEndOf, Origin: { } origin } state && origin.Source.SkillId == "mou:fangzhu")
-                controls.Add(new(origin.FrameId, origin.Source.OwnerSeat, seat, state.IssuedTurn, MouCaoPiControlKind.SkillsInvalid));
+        foreach (var restriction in _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Restrictions)
+            if (restriction.Action == SkillStateAction.Suppress && restriction.Match.StructurallyEquals(SkillStateMatch.CharacterSkills) &&
+                restriction.Lifetime.Origin is { } origin && origin.Source.SkillId == "mou:fangzhu" &&
+                restriction.Lifetime.Until.Any(end => end.Event == SkillStateBoundaryEvent.TurnEnded && end.Seat == seat))
+                controls.Add(new(origin.FrameId, origin.Source.OwnerSeat, seat, origin.IssuedTurn, MouCaoPiControlKind.SkillsInvalid));
         return controls.Count == 0 ? null : Array.AsReadOnly(controls.OrderBy(c => c.FrameId).ToArray());
     }
 

@@ -51,7 +51,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MoQiangang = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoQiangangStartedEvent(f.Id, r.Source, r.GameplayHash, r.Phase, r.ActualTurn, r.TurnOwner, grants.Length, before));
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         // All actual grants are removed before any public payment fact can run observers.
         foreach (var grant in grants)
             if (!owner.SkillGrants.RemoveGrant(grant.GrantId))

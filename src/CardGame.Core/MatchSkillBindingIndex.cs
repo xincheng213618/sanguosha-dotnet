@@ -223,11 +223,13 @@ internal sealed class MatchSkillBindingIndex
         Func<CharacterState, bool>? hasHpSensitiveSuppression = null,
         Func<CharacterState, SkillGrant, bool>? grantQualification = null, Func<long>? projectionStamp = null, Func<CharacterState,IReadOnlySet<string>>? suppressionInputs = null,
         Func<CharacterState, long>? derivedProjectionStamp = null, bool dualGenerals = false,
-        Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification = null)
+        Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification = null,
+        EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
+        IActualDiscardRecoveryPhaseQueries? phases = null)
     {
         ArgumentNullException.ThrowIfNull(resolveDefinition);
         _availability = new(resolveDefinition, isNationalWarMode, dualGenerals,
-            grantQualification, suppressionInputs, additionalPrintedLordQualification);
+            grantQualification, suppressionInputs, additionalPrintedLordQualification, participants, cards, phases);
         _hasHpSensitiveSuppression = hasHpSensitiveSuppression;
         _projectionStamp = projectionStamp;
         _derivedProjectionStamp = derivedProjectionStamp;
@@ -251,7 +253,8 @@ internal sealed class MatchSkillBindingIndex
             OwnerAlive = player.IsAlive,
             PrimaryGeneralId = _tracksPrintedLordQualification ? player.General.Id : null
         };
-        if (_shards.TryGetValue(player.Seat, out var existing) && existing.Shard.Stamp == stamp)
+        if (!player.SkillGrants.Restrictions.Any(restriction => restriction.While is not null) &&
+            _shards.TryGetValue(player.Seat, out var existing) && existing.Shard.Stamp == stamp)
             return existing.Shard;
 
         var rebuilt = BuildShard(player, stamp);

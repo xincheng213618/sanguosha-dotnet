@@ -69,7 +69,7 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
                 throw new InvalidOperationException("Shiwu bequest requires the real death and its actual surviving other killer.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryXiahouEn = new(XiahouEnSource(f), f.GameplayHash, operation, context.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, AnniversaryXiahouEnStage.SkillChildren, Before: before, After: before) });
             foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
             _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[killer], $"anniversary-shiwu-bequest:{(f.OwnerSeat)}:{(f.SkillInstanceId)}:{(f.Id)}", [AnniversaryXiahouEnComposition.Chijian]);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiahouEnChijianGrantedEvent(f.Id, f.OwnerSeat, killer, true));
             ContinueAnniversaryXiahouEn(f.Id);
@@ -100,7 +100,7 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
         {
             // The period follows only the owner's loss clause. The opponent's new independent source is permanent.
             foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
             _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[source], $"anniversary-shiwu-duel:{(f.OwnerSeat)}:{(f.SkillInstanceId)}:{(damageOrigin.FrameId)}", [AnniversaryXiahouEnComposition.Chijian]);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiahouEnChijianGrantedEvent(f.Id, f.OwnerSeat, source, false));
             var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];

@@ -14,13 +14,13 @@ internal sealed class SkillGrantRevisionStore : ISkillGrantRevisionObservations
 
     public void Capture(IEnumerable<CharacterState> players)
     {
-        foreach (var player in players) Revisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+        foreach (var player in players) Revisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
     }
 
     public bool Observe(CharacterState owner)
     {
-        var changed = Revisions.TryGetValue(owner.Seat, out var revision) && revision != owner.SkillGrants.Revision;
-        Revisions[owner.Seat] = owner.SkillGrants.Revision;
+        var changed = Revisions.TryGetValue(owner.Seat, out var revision) && revision != owner.SkillGrants.GrantRevision;
+        Revisions[owner.Seat] = owner.SkillGrants.GrantRevision;
         return changed;
     }
 }

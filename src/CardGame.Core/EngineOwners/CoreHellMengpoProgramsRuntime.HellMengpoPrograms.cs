@@ -23,7 +23,7 @@ internal sealed partial class CoreHellMengpoProgramsRuntime
             return (Seat: seat, Skill: skill, Grants: grants.Where(g => g.SkillId == skill).ToArray());
         }).ToArray();
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var skills = picked.Count(p => p.Skill is not null);
         var removed = picked.Sum(p => p.Grants.Length);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { HellWanghun = new(frame.InstructionIndex, death.Id, window.Id, HellWanghunStage.LossChildren, skills, removed) });

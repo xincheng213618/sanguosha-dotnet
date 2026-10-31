@@ -32,7 +32,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { YuanJi = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YuanJiStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.ParentId, r.Window, r.ActualTurn, r.TurnOwner, r.Round, r.LoserSeat, r.OpportunityIndex));
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         ContinueYuanJi(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }

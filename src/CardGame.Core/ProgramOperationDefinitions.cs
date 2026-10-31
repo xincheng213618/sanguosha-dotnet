@@ -234,6 +234,7 @@ internal sealed class ProgramOperationNodeReader
     }
 
     internal string Path { get; }
+    internal JsonElement Node => _node;
     internal bool AllowZeroDraw { get; }
     internal bool Has(string name) => _node.TryGetProperty(name, out _);
     internal bool IsNull(string name) => _node.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Null;

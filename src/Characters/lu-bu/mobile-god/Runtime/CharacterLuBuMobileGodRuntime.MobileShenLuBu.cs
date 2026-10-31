@@ -36,7 +36,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
             var grantId = grantSource + ":" + MobileLbWushuang;
             var instance = _coreNationalSkillsOperations.GetSkillBindingShard(owner).ActiveGrants.FirstOrDefault(g => g.SkillId == MobileLbWushuang)?.SkillInstanceId ?? $"mobile-wuqian-shared:{(owner.Seat)}";
             foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileLuBuWuqianIssuedEvent(f.Id, source, target, grantId, instance, grantSource));
             if (!owner.SkillGrants.Grant(new SkillGrant(grantId, MobileLbWushuang, instance, grantSource)))
                 throw new InvalidOperationException("One Wuqian issue cannot grant twice.");
@@ -119,7 +119,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
             {
                 var owner = _coreMatchParticipantsPlayersAccess._players[issue.Source.OwnerSeat];
                 foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-                    _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                    _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
                 owner.SkillGrants.RemoveGrant(issue.GrantId);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileLuBuWushuangRevokedEvent(owner.Seat, issue.GrantId, MobileLbWushuang, issue.SkillInstanceId, issue.SourceId, completed.Id));
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileLuBuWuqianEndedEvent(issue.FrameId, completed.Id));

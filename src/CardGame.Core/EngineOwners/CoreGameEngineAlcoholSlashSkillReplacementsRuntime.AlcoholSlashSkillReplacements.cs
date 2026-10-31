@@ -73,7 +73,7 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AlcoholSlashSkillReplacement = r });
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         foreach (var grant in removed)
             if (!owner.SkillGrants.RemoveGrant(grant.GrantId))
                 throw new InvalidOperationException("Permanent skill loss was paid twice or changed its grant.");

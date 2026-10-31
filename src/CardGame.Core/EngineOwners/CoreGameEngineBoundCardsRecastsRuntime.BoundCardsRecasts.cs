@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineBoundCardsRecastsRuntime
         // Record the complete original group before any equipment-removal hook can run.
         // Recast is not a discard cost and deliberately bypasses discard prohibitions.
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(source.CardIds, CardLocation.DiscardPile, CardMoveReasons.RecastDiscard, (batch, records) =>
         {
             if (records.Count != materials.Length || !records.Zip(materials).All(pair => IsBoundCardsRecastPayment(pair.First, pair.Second)))

@@ -147,7 +147,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuLi = r with { Stage = AnniversaryLiuLiStage.SkillChildren } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiDehuaCompletedEvent(f.Id, f.OwnerSeat, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Count(e => e.OwnerSeat == f.OwnerSeat)));
             foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
             foreach (var grant in _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].SkillGrants.Grants.Where(g => g.SkillId == AnniversaryLiuLiComposition.Dehua).ToArray())
                 _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].SkillGrants.RemoveGrant(grant.GrantId);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CharacterSkillsLostEvent(f.OwnerSeat, f.OwnerSeat, Array.AsReadOnly(new[] { AnniversaryLiuLiComposition.Dehua })));

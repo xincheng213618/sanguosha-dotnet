@@ -89,7 +89,7 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
             return (Loss: loss, Outcome: outcome);
         }).ToArray();
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var count = decisions.Count(d => d.Outcome == "restored");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { HellSoulRestore = new(frame.InstructionIndex, target.Seat, count) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HellSoulRestoreIssuedEvent(frame.Id, returned.CardUseFrameId, target.Seat, count));

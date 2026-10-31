@@ -3,26 +3,28 @@ using System.Collections.ObjectModel;
 
 namespace CardGame.Core;
 
-/// <summary>Answers possession and effectiveness; invocation legality remains with its own window.</summary>
+/// <summary>Possession and effectiveness have one answer; invocation belongs to its window.</summary>
 internal sealed class SkillAvailability(
     Func<string, ContentSkillDefinition> resolveDefinition, bool nationalWar, bool dualGenerals,
     Func<CharacterState, SkillGrant, bool>? effectiveQualification,
     Func<CharacterState, IReadOnlySet<string>>? suppressionInputs,
-    Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification)
+    Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification,
+    EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
+    IActualDiscardRecoveryPhaseQueries? phases = null)
 {
     internal SkillAvailabilitySnapshot Query(CharacterState owner)
     {
         var owned = new List<SkillGrant>();
         var effective = new List<SkillGrant>();
         var definitions = new Dictionary<string, ContentSkillDefinition>(StringComparer.Ordinal);
-        var restrictions = Restrictions(owner).ToArray();
+        var restrictions = ActiveRestrictions(owner, participants, cards, phases).ToArray();
         foreach (var grant in owner.SkillGrants.Grants)
         {
-            if (!grant.IsEnabled || grant.SkillState is { Acquisition: false } || !CanOwnSource(owner, grant.SourceId)) continue;
+            if (!grant.IsEnabled || !CanOwnSource(owner, grant.SourceId)) continue;
             if (!definitions.TryGetValue(grant.SkillId, out var definition))
                 definitions[grant.SkillId] = definition = resolveDefinition(grant.SkillId);
             if (!OwnsPrintedLord(owner, grant, definition)) continue;
-            var state = InterpretRestrictions(grant, definition, restrictions);
+            var state = InterpretRestrictions(owner, grant, definition, restrictions);
             if (!state.Owned) continue;
             owned.Add(grant);
             if (state.Effective && IsSourceRevealed(owner, grant.SourceId) &&
@@ -55,29 +57,29 @@ internal sealed class SkillAvailability(
     };
 
     private bool OwnsPrintedLord(CharacterState owner, SkillGrant grant, ContentSkillDefinition skill) =>
-        !SkillStateQuery.IsPrinted(grant) || !skill.Tags.HasFlag(SkillTag.Lord) || owner.Role == Role.Lord ||
+        !SkillStateMatcher.IsPrinted(grant) || !skill.Tags.HasFlag(SkillTag.Lord) || owner.Role == Role.Lord ||
         PrintedLordSkillQualifications.Matches(owner, grant) || additionalPrintedLordQualification?.Invoke(owner, grant) == true;
 
-    internal static bool IsEffectiveUnderRestrictions(CharacterState owner, SkillGrant grant, ContentSkillDefinition skill) =>
-        InterpretRestrictions(grant, skill, Restrictions(owner)).Effective;
+    internal static bool IsEffectiveUnderRestrictions(CharacterState owner, SkillGrant grant, ContentSkillDefinition skill,
+        EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
+        IActualDiscardRecoveryPhaseQueries? phases = null) =>
+        InterpretRestrictions(owner, grant, skill, ActiveRestrictions(owner, participants, cards, phases)).Effective;
 
-    private static IEnumerable<SkillGrant> Restrictions(CharacterState owner) =>
-        owner.SkillGrants.Grants.Where(grant => grant.SkillState is { Acquisition: false });
+    private static IEnumerable<SkillStateRestriction> ActiveRestrictions(CharacterState owner,
+        EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants, CardZoneStore? cards,
+        IActualDiscardRecoveryPhaseQueries? phases) =>
+        owner.SkillGrants.Restrictions.Where(restriction => restriction.While is null ||
+            ProgramExpressions.EvaluateBool(restriction.While,
+                new SkillStateConditionWorld(restriction.Context, owner, participants, cards, phases)) == true);
 
-    private static (bool Owned, bool Effective) InterpretRestrictions(SkillGrant grant, ContentSkillDefinition skill,
-        IEnumerable<SkillGrant> restrictions)
+    private static (bool Owned, bool Effective) InterpretRestrictions(CharacterState owner, SkillGrant grant,
+        ContentSkillDefinition skill, IEnumerable<SkillStateRestriction> restrictions)
     {
-        if (!grant.IsEnabled || grant.SkillState is { Acquisition: false }) return (false, false);
-        var matching = restrictions.Where(restriction => Matches(restriction.SkillState!, grant, skill)).ToArray();
-        return (!matching.Any(restriction => restriction.SkillState!.Action == SkillStateAction.Lose), matching.Length == 0);
+        if (!grant.IsEnabled) return (false, false);
+        var matching = restrictions.Where(restriction => SkillStateMatcher.Matches(restriction.Match,
+            grant, owner, skill, restriction.Lifetime.Origin.Source.SkillId)).ToArray();
+        return (!matching.Any(restriction => restriction.Action == SkillStateAction.Lose), matching.Length == 0);
     }
-
-    internal static bool Matches(SkillStateLease state, SkillGrant grant, ContentSkillDefinition skill) =>
-        !grant.IsModeRule && (!state.CharacterOnly || SkillStateQuery.IsCharacter(grant)) &&
-        (state.TargetGrantId is null || state.TargetGrantId == grant.GrantId) &&
-        (!state.PrintedOnly || SkillStateQuery.IsPrinted(grant)) &&
-        (!state.ExcludeLocked && state.Scope != SkillStateScope.NonLocked || !skill.Tags.HasFlag(SkillTag.Locked)) &&
-        (state.NamedSkill is null || state.NamedSkill == grant.SkillId);
 }
 
 internal sealed class SkillAvailabilitySnapshot(

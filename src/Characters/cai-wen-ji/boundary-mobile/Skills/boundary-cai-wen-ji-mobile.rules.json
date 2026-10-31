@@ -19,6 +19,6 @@
           { "op": "moveBoundCards", "target": "owner", "sourceBind": "beige-card", "destination": "discardPile" }
         ]
       }] },
-    { "id": "boundary:duanchang-mobile", "revision": 1, "triggers": [{ "id": "killer-loses-general-skills", "window": "ownerDied", "subject": "owner", "optional": false, "effects": [{ "op": "skillState", "target": "owner", "targetRef": { "kind": "eventSource" }, "action": "lose", "scope": "all", "duration": "permanent", "characterOnly": true }] }] }
+    { "id": "boundary:duanchang-mobile", "revision": 1, "triggers": [{ "id": "killer-loses-general-skills", "window": "ownerDied", "subject": "owner", "optional": false, "effects": [{ "op": "skillState", "target": "owner", "targetRef": { "kind": "eventSource" }, "action": "lose", "match": { "filter": ["==", ["number", "skill.character"], 1] }, "until": [] }] }] }
   ]
 }

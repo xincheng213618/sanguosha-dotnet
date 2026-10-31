@@ -232,8 +232,9 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
                 {
                     _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
                         new(r.Source.SkillId, r.Source.BindingId, r.Source.OwnerSeat, r.Source.SkillInstanceId), r.UseId, r.ActionId), r.Target,
-                        new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.UntilTurnEndOf)
-                            { AfterCurrentTurn = true, CharacterOnly = false, ExpireOnDeath = true }, [], r.Target);
+                        new(SkillStateAction.Suppress, SkillStateMatch.NonLocked,
+                            [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Target, SkipIssued: true),
+                             new(SkillStateBoundaryEvent.Death, SkillStateSubject.Target)]));
                 }
                 else if (option == 2)
                     _coreRuntimeOperations.ReplaceRuntimeTop(f with { MobileShenMaChao = f.MobileShenMaChao!with { Stage = MobileMaChaoStage.Gift } });

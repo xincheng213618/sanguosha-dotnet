@@ -38,15 +38,15 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
                     continue;
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LishiPhaseAppliedEvent(issue.FrameId, issue.TargetSeat, issue.Option, phase));
                 if (issue.Option == 1)
-                    _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
+                    _coreProgramSkillChangesOperations.IssueSkillState(new(issue.FrameId, (int)phase.Kind,
+                        new(issue.Source.SkillId, issue.Source.BindingId, issue.Source.OwnerSeat, issue.Source.SkillInstanceId)),
+                        issue.TargetSeat, new(SkillStateAction.Suppress, SkillStateMatch.NonLocked,
+                            [new(SkillStateBoundaryEvent.PhaseEnded, SkillStateSubject.Target, SkillStateBoundaryTiming.After, Phase: phase.Kind)],
+                            new("inIssuedPhase", ProgramExpressionType.Bool, [new("selectedTarget", ProgramExpressionType.Participant, [])])));
             }
         }
-
-        if (payload is ActualPhaseEndedEvent ended && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiPhaseAppliedEvent>().Any(a => a.Option == 1 && a.Phase == ended.Phase))
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
     }
 
-    internal bool IsLishiPhaseSuppressed(int seat) => HasLishiCapability && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { } phase && phase.ActorSeat == seat && phase.Kind is ActualDiscardRecoveryPhaseKind.Preparation or ActualDiscardRecoveryPhaseKind.Ending && LishiActiveEffects(phase).Any(e => e.Option == 1);
     internal static string LishiCategory(CardKind kind) => CardUseCategoryCatalog.Get(kind) switch
     {
         CardUseCategories.Basic => "basic",

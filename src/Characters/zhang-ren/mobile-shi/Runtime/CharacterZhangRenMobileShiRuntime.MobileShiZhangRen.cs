@@ -134,8 +134,8 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
         var source = ShiZrSource(f);
         _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
             new(source.SkillId, source.BindingId, source.OwnerSeat, source.SkillInstanceId), r.UseId, r.ActionId), r.TargetSeat,
-            new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.UntilTurnEndOf)
-                { AfterCurrentTurn = true, CharacterOnly = false }, [], r.TargetSeat);
+            new(SkillStateAction.Suppress, SkillStateMatch.NonLocked,
+                [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Target, SkipIssued: true)]));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Name)} 令 {(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].Name)} 的技能失效直至其下个回合结束前（伏暗）。", f.OwnerSeat, r.TargetSeat);
     }
 

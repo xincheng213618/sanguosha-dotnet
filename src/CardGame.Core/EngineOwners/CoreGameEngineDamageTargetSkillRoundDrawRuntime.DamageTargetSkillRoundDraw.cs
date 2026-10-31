@@ -52,7 +52,7 @@ internal sealed partial class CoreGameEngineDamageTargetSkillRoundDrawRuntime
         if (grant is not null)
         {
             foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
             target.SkillGrants.Grant(grant);
             _coreConversionStatesOperations.RegisterTaggedConversionSkill(target, skill);
         }

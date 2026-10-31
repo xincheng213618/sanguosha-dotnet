@@ -168,6 +168,8 @@
 
 ### 第二批：有限期限的五簇消费者
 
+第二至第四批保留当时的迁移记录；其中旧字段名称均已由末节统一结构替代，不再作为当前 JSON 接口。
+
 | 消费者 | 统一状态与保留的差异 |
 | --- | --- |
 | 移动神马超霆威、势张任伏暗 | NonLocked、含装备、目标严格下次回合末（afterCurrentTurn）；霆威在目标死亡时解除，伏暗不提前解除 |
@@ -208,3 +210,110 @@ OL 王观谬焰失败后改为 Named、本轮、包含全部非模式来源且�
 src C# +31/-56，净 **-25 行**；人物 Runtime throw 5498 → 5498、history accessor 4844 → 4842、直接 IGameEvent record 3537 → 3536；bao-xin、liao-hua、xun-yu 大小不变。
 
 未把同文案的局部资格禁用伪装成整技失效：界夏侯氏樵拾只拦发动，势于吉道转只拦转换，乐祢衡激鼓禁伤害触发却仍保留免手牌上限被动，无双震胆只拦转换/专属摸牌。它们需要区分调用资格和有效性，直接改成整技 Suppress 会改变行为，保留现状。
+
+
+## 下一主线盘点：有效性、限制存储、统一匹配（只读普查）
+
+用户要求的终点是删除资格回调和全局技能查询中的人物分支，不是把回调换成注册表、接口列表或新回调。以下盘点先于该批源代码修改；在途雅士期限归入统一期限批次，不再单独增加一种执行模型。
+
+### 每个判断的类别
+
+| 入口/来源 | 类别 | 必须声明或读取的事实 |
+| --- | --- | --- |
+| 无双技能名单 | 模式/内容资格 | 模式许可、排除的定义；不是人物 Suppress |
+| 隐匿、主副将选择/亮明 | 来源归属 | 实际将牌槽、模式、选择/亮明、身份 |
+| 胡车儿孔武 | 已签发有限期 | 装备来源、真实债务、首次自身回合结束；还影响装备实体/木牛，不能只迁技能半边 |
+| 官渡浮势 | 持续条件 | 来源资格、当前存活魏/群人数、有效阵营 |
+| 主公技投影 | 来源归属 | 双方存活/角色、模式许可、精确能力及主公 grant/instance |
+| 化身库 | 来源归属 | 能力 grant、库初始化、当前化身与所声明技能 |
+| 豹变/兴棹派生 | 持续条件和来源 | 能力 grant、HP 区间、按规则受伤人数 |
+| 装备花色派生 | 持续条件和来源 | 当前有效装备花色集合、能力 grant |
+| 星舞/落雁派生 | 持续条件和来源 | 公开牌堆状态、精确派生来源 |
+| 两版缠怨 | 持续条件 | HP=1；排除源技能自身/装备/模式，锁定技仍受影响 |
+| 山河印刷主公技许可 | 来源授权 | 现有 general/slot/grant/instance 的结构化许可；不是持续 Suppress |
+| 封冻 | 持续条件 | 当前实际回合/阶段、源能力资格；回合拥有者自身豁免 |
+| 两版砺誓 | 有限实际阶段和适用条件 | 发出后实际准备/结束阶段及 phase token，不能按回合名猜期限 |
+| 阴鸷 | 有限期和临时持续例外 | 目标实际自身回合计数、真实 prelude；奖励/新牌义务仍需原业务记录 |
+| 完杀 | 持续条件 | 当前 dying 游标/濒死者/回合者、源能力资格，两者豁免 |
+| 昀政 | 持续条件 | 手中带标记实体牌、另一存活且满足来源资格的源 |
+| 移动神夺锐 | 有限期和借入来源 | 借出者回合末/死亡、具名限制、借入实例的真实租期 |
+| 刻铭三条 fallback | 本窗口调用授权 | 原伤害窗口、当前 candidate、binding/instance/hash、原结算及已支付子返回；不是技能持有/有效 |
+
+当前化身参与时的 HP 抑制源采用 base 来源筛选，默认路径采用 effective grants；主公投影也有本地 base/HP 筛选。必须把问题和事实口径明确下来，不能用一个新的 HasEffective 回调掩盖差异。
+
+### 限制混入真实授予的实证
+
+扫描 src C#（排 bin/obj/artifacts）：`SkillGrants.Grants` 有 178 次表达式、177 个物理行、110 个文件；同一行精确 SkillId token 的 105 行中有 77 行无同行 IsEnabled。较宽的“81”还匹配了四个 `*SkillIds` 名称。这是入口计数，不是漏洞数，不靠统一补 IsEnabled 修复。
+
+| 已核实路径 | 当前具体风险 |
+| --- | --- |
+| OwnedAndRestorableRoundSkillGrants → GrantDamageTargetSkillAndDrawByRound | 假限制被当 ExistingGrant，跳过真实授予并冻结假身份 |
+| 夏侯恩失去/恢复完整 grant | 把限制当技能保存；到期后又恢复旧限制 |
+| 鲍三娘整体换技 | 整表 RemoveGrant 会一并删无关限制 |
+| 卑弥呼/谋曹爽/王允等按名撤技 | 假项被删除或进入撤销事实 |
+| 无双 native facts | 整表冻结把假授予送过模式的授予事实边界 |
+
+真实 live grant 字典只有 `CharacterSkillSet._grants` 一处。限制表归同一个角色技能集合对象，不能放按 seat 的旁路；Transfer 的正向获得是真 grant，临时失去/可恢复的 disabled 真 grant 也仍是真 grant。模式换人复用/替换该对象的既有生命周期要保留。
+
+有效性缓存必须感知限制变化；持有变更观察只反映真实授予集合变化，不能继续产生伪 SkillsChanged。
+
+### 三处匹配的重复与缺陷
+
+Issue、Candidates、Matches 重复 Mode/人物来源/印刷来源/Locked。Filter 目前只在候选端执行，随后按 SkillId 去重，Issue 再捞全部同名 grant：`skill.printed` 过滤掉的 acquired 来源可能被捞回。必须保留真实 GrantId/SkillInstanceId/SourceId，不在展示去重时丢掉规则范围。
+
+统一纯数据匹配函数只接 selector、真实 grant、定义和只读来源上下文。Mode 保护无条件；可见性只在选择外层处理，不进入有效性或 while。NonLocked、ExcludeLocked 归一为同一种过滤表达式；不能在三处各保留分支。
+
+### 持续条件与调用授权边界
+
+复用现表达式的 HP、数量、存活、翻面/横置、参与者集合和技能元数据。缺少的角色/阵营、标记手牌、有效花色、phase/dying/prelude、来源关系按真实消费者补共享原始读取，不先建大全。
+
+`handLimit` 会回查技能数值贡献，Owned/Effective 也回到 shard，不能在 while 中这样递归。while 必须来自原始事实；确需“有效源”时由同一求值器按明确依赖计算，不能偷换成 raw enabled。while false 不等于删限制，条件再次成立应重新生效。持续规则没有原帧时不能保存或查找已结束 ProgramSkillFrame；帧内普通 number/card 绑定不擅自变成持久上下文。
+
+第一版对有 while 的状态实时求值/重建；不能只按命令 Revision 缓存，因为同一个命令的子帧也会改变事实。
+
+刻铭复用原 DamageTriggerWindow 当前 candidate 上的窗口/binding/instance/hash/occurrence 授权，在 ProgramTriggerRuntime 准入、ProgramBindingRuntime 开始、原 ProgramSkillFrame 执行及支付子回程认可本次调用。删除 NationalSkills 的三条 fallback；不生成 grant、不把授权塞进 Owned/Effective。
+
+### 统一期限结构与格式边界（已确认实施）
+
+内部期限归一为一组结束边界，任一命中即结束；永久状态是空集合。每条边界含事件、主体、事件前/后、发出时的 occurrence 锚点及是否跳过该次，不再由 Duration/EndSeat/AfterCurrentTurn/ExpireOnDeath 的组合各写一份分支。
+
+边界包括原生回合清理、实际 TurnStarted/TurnEnded、轮号推进、实际阶段开始/结束及死亡。原生回合清理与 TurnEnded 之前不是同一位置，不能合并到一个模糊的 before；轮号推进不依赖可选 RoundEnded。阶段期限以真实 phase occurrence 为锚，不把准备/结束阶段等同回合。
+
+本批采用的新 JSON 形状：
+
+```json
+{"op":"skillState","action":"suppress","target":"selectedTarget",
+ "match":{"filter":["==",["number","skill.locked"],0]},
+ "until":[
+   {"event":"turnStarted","participant":{"kind":"target"},"timing":"before","skipIssued":true},
+   {"event":"death","participant":{"kind":"target"},"timing":"after"}
+ ]}
+```
+
+持续条件另以 `while` 接现有 expression，限制表保存声明和已解析主体，不保存帧或人物判断委托。事件主体 `owner` 是发出者，`target` 是受影响者，`turnOwner` 是发出时的实际回合者。`match.filter` 中的帧绑定仅用于签发时筛选，随后冻结真实 GrantId；只读技能元数据的过滤保留为声明，才能覆盖以后新获得的同名来源。第一版持续条件支持失效/失去，不接受尚未定义借入正来源条件语义的 `transfer + while`。
+
+用户已明确更正为**只保留新写法**：同一批迁移全部 7 份人物 JSON 和内嵌程序，删除旧字段解析，不加兼容别名和旧指纹保留层。旧存档可以因内容指纹变化无法重放；按既有桌面恢复规则初始化新局，不能立即覆盖原文件。该节点仍在本轮开发中，不另加玩法 epoch 或 checkpoint RulesVersion。
+
+已核实 `Replay.cs:30` 与 `Session/CommandSession.cs`：checkpoint 是配置、内容签名及接受命令前缀；Restore 重放命令，没有直接序列化 live SkillGrant/限制表，故内部负限制分表本身不需要修改存档记录或版本。回放恢复、命令失败后的可信前缀、事件集合冻结仍须验证。
+
+### 统一结构与砺誓的落地结果
+
+- 期限只执行 `SkillStateLifetime.Until` 的边界集合；旧 Scope/Duration/EndTiming/Lease 模型和 JSON 字段解析删除。回合清理的前后、TurnStarted/TurnEnded 的前后、实际阶段及死亡均接原边界；轮号推进仍独立于可选 RoundEnded。同步规则事实栈只提供发出时的 occurrence，不记录另一份历史或 pending。
+- `CharacterSkillSet.Restrictions` 保存负状态；`Grants` 只保存真实来源。有效性缓存用综合 `Revision`，真实技能变更观察用 `GrantRevision`，62 处原生观察基线一起更新。可恢复的 disabled 真技能仍保留在技能表，没有用过滤 IsEnabled 掩盖混表问题。
+- 签发、选择及有效性统一调用 `SkillStateMatcher`。选择界面按名字合并展示，但每个选项保留真实 GrantId；`skill.printed` 不再误伤同名 acquired 来源。只有瞬时帧绑定筛选需要冻结，持续元数据条件仍是数据。
+- 周年/欢乐神钟会砺誓的第一项在原实际阶段应用处签发 NonLocked，至该种实际阶段结束；`while: ["inIssuedPhase", "target"]` 比较完整的发出阶段 key。插入子阶段时暂停，恢复原 key 后继续生效。删除 `IsLishiPhaseSuppressed`、对应转发及专属 revision 更新，其余四项惩罚和规则所需的已应用记录保留。
+- 原生回合清理的 after 即该清理方法完成之后、返回暂存牌之前；即使没有普通用牌效果过期，也会经过这个边界。此机制位置保留在本地图，不进入 AGENTS。
+
+技能有效性整体仍是**部分完成**：上述两版砺誓和雅士已退出旧资格链；封冻、阴鸷、完杀、昀政、借入来源以及外层来源资格/刻铭调用授权仍按前表继续迁移。没有用注册表、接口列表或新资格回调替代它们。共享条件世界只读原始参与者、牌区和实际阶段，不查询技能有效性或手牌上限。
+
+本批集中验证：64 项相关 Core 检查通过（定向组 63 项，新增阶段检查修正同步 Draw→Play 检查点后复跑通过），4 项例行检查通过。共享检查覆盖真实阶段前后时点、主体/token、skipIssued、OR 结束、借入两边先一起删除、默认清理 after、嵌套事实锚点、持续 HP 变化及阶段插入/恢复；沿用现有 executor/冷恢复/人物检查，没有全量或剪测试。定向构建 29.313 秒、依赖验证 2.274 秒、Core 进程 49.805 秒；最终共享检查进程 16.740 秒。例行构建 2.870 秒、依赖验证 0.210 秒、检查进程 1.400 秒。
+
+额外尝试的 WPF `saved UI boundaries restore and continue through actual files` 仍失败：旧夹具调用已退休的普通 SaveGameCommand，再读取不存在的 manual.json。已在改动前的 `7fdc994cc` 独立副本只跑该项，重现同一 `PersistenceChecks.cs:43` 异常；本批未改变保存产品行为，也未删除该检查。现有恢复失败分支仍停止自动保存、初始化新局并保留原文件。
+
+诊断数字（本批前后）：人物 Runtime throw **5498 → 5498**，history accessor **4842 → 4841**，直接 IGameEvent record **3536 → 3536**。人物 C# 净 +2 行；src C# +777/-398，净 **+379 行**，src 全格式净 +378。新增主要是统一边界、分表及单一匹配，不能把这一批称为减行批。53 个人物版本有改动，绝大多数只是观察基线口径转换。
+
+| 样本人物目录 C# | 行数 | 字节数 |
+| --- | ---: | ---: |
+| bao-xin | 650 | 54,900 |
+| liao-hua | 159 | 13,767 |
+| xun-yu | 1,130 | 127,203 |

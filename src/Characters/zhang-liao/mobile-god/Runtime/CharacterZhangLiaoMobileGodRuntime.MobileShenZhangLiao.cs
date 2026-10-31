@@ -119,7 +119,7 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
             var grant = source + ":" + value;
             var instance = _coreNationalSkillsOperations.GetSkillBindingShard(owner).ActiveGrants.FirstOrDefault(g => g.SkillId == value)?.SkillInstanceId ?? source + ":instance:" + value;
             foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
             owner.SkillGrants.Grant(new(grant, value, instance, source));
             _coreConversionStatesOperations.RegisterTaggedConversionSkill(owner, value);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileDuoruiIssuedEvent(f.Id, r.Source, r.GameplayHash, r.TargetSeat, value, grant, instance, _coreActualTurnProgressTurnNumberAccess._turnNumber, r.PaidSlot.Value));

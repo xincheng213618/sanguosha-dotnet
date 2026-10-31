@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CardGame.Core;
 
 internal static class CharacterSkillSetChecks
@@ -81,33 +82,36 @@ internal static class CharacterSkillSetChecks
         owner.SkillGrants.Grant(new("mode", "fixture:mode", "mode-instance", "mode:fixture") { IsModeRule = true });
         var index = new MatchSkillBindingIndex(id => definitions[id], isNationalWarMode: true);
         var original = index.GetShard(owner);
-        owner.SkillGrants.Grant(new("suppress", "fixture:plain", "restriction", "fixture:restriction", false)
-        {
-            SkillState = new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn, 1, owner.Seat)
-        });
+        var observations = new SkillGrantRevisionStore();
+        observations.Capture([owner]);
+        var grants = owner.SkillGrants.Grants;
+        var grantRevision = owner.SkillGrants.GrantRevision;
+        var revision = owner.SkillGrants.Revision;
+        owner.SkillGrants.SetRestriction(Restriction("suppress", SkillStateAction.Suppress, SkillStateMatch.NonLockedCharacters, owner.Seat));
         var suppressed = index.GetShard(owner);
+        Require(owner.SkillGrants.Grants.SequenceEqual(grants) && owner.SkillGrants.GrantRevision == grantRevision &&
+                owner.SkillGrants.Revision > revision && !observations.Observe(owner) && !ReferenceEquals(original, suppressed),
+            "Restrictions occupy a separate table, refresh availability, and do not invent a real skill-grant observation.");
         Require(suppressed.HasOwnedInstance("fixture:plain", "printed-instance") &&
                 !suppressed.HasInstance("fixture:plain", "printed-instance") &&
                 suppressed.HasInstance("fixture:plain", "equipment-instance") &&
                 suppressed.HasInstance("fixture:locked", "locked-instance") && suppressed.HasInstance("fixture:mode", "mode-instance"),
             "Suppression preserves possession, protects excluded sources, and never substitutes a different instance.");
-        owner.SkillGrants.Grant(new("lose", "fixture:plain", "loss-restriction", "fixture:restriction", false)
-        {
-            SkillState = new(SkillStateAction.Lose, SkillStateScope.Named, SkillStateDuration.CurrentTurn, 1, owner.Seat, "fixture:plain")
-        });
+        owner.SkillGrants.SetRestriction(Restriction("lose", SkillStateAction.Lose,
+            new(["fixture:plain"], Expression("[\"==\",[\"number\",\"skill.character\"],1]")), owner.Seat));
         Require(!index.GetShard(owner).HasOwnedInstance("fixture:plain", "printed-instance") &&
                 index.GetShard(owner).HasOwnedInstance("fixture:plain", "equipment-instance"),
             "Temporary loss removes possession for its matching source scope while equipment retains its independent grant.");
-        owner.SkillGrants.Grant(new("equipment-suppress", "fixture:plain", "equipment-restriction", "fixture:restriction", false)
-        {
-            SkillState = new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentTurn, 1, owner.Seat,
-                "fixture:plain", CharacterOnly: false)
-        });
+        owner.SkillGrants.SetRestriction(Restriction("equipment-suppress", SkillStateAction.Suppress,
+            new(["fixture:plain"]), owner.Seat));
         Require(index.GetShard(owner).HasOwnedSkill("fixture:plain") && !index.GetShard(owner).HasSkill("fixture:plain"),
             "An explicitly inclusive restriction can suppress equipment without losing that source's possession.");
-        owner.SkillGrants.RemoveGrant("suppress");
-        owner.SkillGrants.RemoveGrant("lose");
-        owner.SkillGrants.RemoveGrant("equipment-suppress");
+        owner.SkillGrants.RemoveRestriction("suppress");
+        owner.SkillGrants.RemoveRestriction("lose");
+        owner.SkillGrants.RemoveRestriction("equipment-suppress");
+        Require(owner.SkillGrants.GrantRevision == grantRevision && !observations.Observe(owner) &&
+                owner.SkillGrants.Grants.SequenceEqual(grants) && index.GetShard(owner).HasSkill("fixture:plain"),
+            "Removing restrictions restores cached availability without changing real grants or producing a SkillsChanged observation.");
         owner.GeneralRevealed = false;
         Require(index.GetShard(owner).HasOwnedInstance("fixture:plain", "printed-instance") &&
                 !index.GetShard(owner).HasInstance("fixture:plain", "printed-instance"),
@@ -116,7 +120,18 @@ internal static class CharacterSkillSetChecks
         Require(index.GetShard(owner).HasInstance("fixture:plain", "printed-instance") &&
                 original.HasInstance("fixture:plain", "printed-instance") && suppressed.OwnedGrants.Count == 4,
             "Expiry and reveal restore the same instance while earlier availability snapshots remain frozen.");
+        owner.SkillGrants.SetRestriction(Restriction("empty", SkillStateAction.Suppress, SkillStateMatch.All.Freeze([]), owner.Seat));
+        Require(index.GetShard(owner).HasInstance("fixture:plain", "printed-instance"), "An explicitly empty skill selection must not become an all-skills restriction.");
+        owner.SkillGrants.RemoveRestriction("empty");
     }
+
+    private static SkillStateRestriction Restriction(string id, SkillStateAction action, SkillStateMatch match, int seat) =>
+        new(id, "fixture:restriction", action, match, new(seat, seat),
+            new(new SkillStateOrigin(1, 0, new("fixture:plain", "audit", seat, "printed-instance")),
+                [new(SkillStateBoundaryEvent.TurnCleanup, seat, SkillStateBoundaryTiming.Before, 1, false)]));
+
+    private static ProgramExpression Expression(string json)
+    { using var document = JsonDocument.Parse(json); return ProgramExpressions.Parse(document.RootElement, "fixture"); }
 
     private static CharacterState Character(GeneralDefinition template) => new()
     {

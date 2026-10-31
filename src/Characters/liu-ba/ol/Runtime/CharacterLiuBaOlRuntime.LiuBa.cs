@@ -209,7 +209,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
     internal void PrepareLiuBaMovement(ref ProgramSkillFrame f, LiuBaStage stage, IReadOnlyList<LiuBaEntity> entities)
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var r = f.LiuBa!;
         var grain = entities.Where(e => e.Kind == CardKind.WoodenOx && e.From.Zone == CardZoneKind.Equipment).SelectMany(e => _cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(e.From.OwnerSeat!.Value))).Select(c => c.Id).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LiuBa = r with { Paid = true, Stage = stage, Entities = entities, Grain = grain, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Step = r.Step + 1, BatchId = null, ActualCount = 0 }, PendingMovementContinuation = new(r.Recipient, 0, null) });

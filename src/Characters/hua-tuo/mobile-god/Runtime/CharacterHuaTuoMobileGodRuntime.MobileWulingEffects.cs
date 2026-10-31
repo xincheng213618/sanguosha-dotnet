@@ -38,7 +38,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
         if (p.SkillGrants.Grants.Any(g => g.GrantId == grantId))
             return;
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         p.SkillGrants.Grant(new(grantId, skill, grantId, "acquired:mobile-wuling:" + course.CourseId));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileWulingGrantEvent(course.CourseId, p.Seat, skill, grantId, true));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SkillsAcquiredEvent(p.Seat, MobileHtWuling, Array.AsReadOnly(new[] { skill })));
@@ -50,7 +50,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
         var grantId = MobileHtCourseGrantId(course.CourseId, skill);
         var grants = _coreDamageTargetSkillRoundDrawOperations.OwnedAndRestorableRoundSkillGrants(p, skill).Where(g => g.GrantId == grantId).ToArray();
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         foreach (var g in grants)
         {
             p.SkillGrants.RemoveGrant(g.GrantId);

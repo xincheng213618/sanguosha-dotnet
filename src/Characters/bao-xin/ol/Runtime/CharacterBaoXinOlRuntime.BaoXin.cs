@@ -59,7 +59,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
     internal void PrepareBaoXinMove(ref ProgramSkillFrame f, IReadOnlyList<BaoXinEntity> entities, BaoXinStage stage)
     {
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var r = f.BaoXin!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BaoXin = r with { Stage = stage, Step = r.Step + 1, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, ActualCount = 0, Moving = entities }, PendingMovementContinuation = new(r.Recipient, 0, null) });
     }

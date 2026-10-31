@@ -30,7 +30,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
             return;
         if (moved.From is { Zone: CardZoneKind.Equipment, OwnerSeat: { } old })
         {
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(old, _coreMatchParticipantsPlayersAccess._players[old].SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(old, _coreMatchParticipantsPlayersAccess._players[old].SkillGrants.GrantRevision);
             _coreMatchParticipantsPlayersAccess._players[old].SkillGrants.RemoveGrant(DagongGrant(moved.CardId));
             if (moved.To != CardLocation.OutsideGame || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DagongCheDestroyedEvent>().Any(e => e.CardId == moved.CardId))
                 throw new InvalidOperationException("A real Dagong Che must be destroyed exactly once on leaving Equipment.");
@@ -40,7 +40,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
 
         if (moved.To is { Zone: CardZoneKind.Equipment, OwnerSeat: { } holder })
         {
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(holder, _coreMatchParticipantsPlayersAccess._players[holder].SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(holder, _coreMatchParticipantsPlayersAccess._players[holder].SkillGrants.GrantRevision);
             _coreMatchParticipantsPlayersAccess._players[holder].SkillGrants.Grant(new(DagongGrant(moved.CardId), ZhangFenComposition.Cart, DagongGrant(moved.CardId), DagongGrant(moved.CardId)));
         }
     }

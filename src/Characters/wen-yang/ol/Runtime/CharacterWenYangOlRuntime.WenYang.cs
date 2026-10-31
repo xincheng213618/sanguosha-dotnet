@@ -59,7 +59,7 @@ internal sealed partial class CharacterWenYangOlRuntime
         if (!CanOfferWenYang(candidate, _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
             throw new InvalidOperationException("Wen Yang lost his unpaid eligibility or exact issued Ending debt.");
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var level = op == SkillProgramEffectOp.ResolveWenYangAwakening ? (f.SkillId == "ol:choujue" ? 1 : 2) : 0;
         var debt = op == SkillProgramEffectOp.ResolveQingjiaoIssuedEndingDiscard ? CurrentWenYangDebt(candidate, c) : null;

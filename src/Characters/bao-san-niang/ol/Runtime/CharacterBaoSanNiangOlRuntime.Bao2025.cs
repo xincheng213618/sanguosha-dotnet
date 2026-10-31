@@ -196,7 +196,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
         var replace = branch == "replace";
         var grants = replace ? recipient.SkillGrants.Grants.ToArray() : [];
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         foreach (var grant in grants)
             if (!recipient.SkillGrants.RemoveGrant(grant.GrantId))
                 throw new InvalidOperationException("A recipient's skill grant changed before replacement.");

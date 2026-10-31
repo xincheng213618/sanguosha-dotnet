@@ -298,7 +298,7 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == frame.Payment.Cost.CardId);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardDeclarationRevealedEvent(frame.Id, seat, _coreSnapshotValueProjectionOperations.ToSnapshot(card), success));
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         if (success)
             _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[seat], $"declaration:{(frame.Payment.Source.SkillId)}:{(frame.Payment.Source.SkillInstanceId)}", [_corePlayCardHistoryOperations.ViewAsRule(frame.Payment.Source)!.DeclarationValidation!.ChallengeGrantSkillId]);
         else

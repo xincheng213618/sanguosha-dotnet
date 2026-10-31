@@ -74,7 +74,6 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 61010)]
     internal bool AllowsWushuangOriginalActivation(ProgramActivationLegalityContext gate) => gate.SkillId is not ("wushuang:skill-3282" or "wushuang:skill-3283") || _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != gate.OwnerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0);
-    internal bool WushuangYashiGrantQualified(CharacterState owner, SkillGrant grant) => _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYashiSuppressedEvent>().Any(e => e.Target == owner.Seat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYashiExpiredEvent>().Any(expired => expired.ProducerId == e.FrameId));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 61009)]
     internal void RecordWushuangTairanRecovery(IGameEvent payload)
     {
@@ -89,17 +88,11 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangTairanHealedEvent(tairan.Id, tairan.OwnerSeat, tairan.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, applied.Amount));
     }
 
-    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 61010)]
+    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 61011)]
     internal void ExpireWushuangOriginalPolicies(IGameEvent payload)
     {
         if (payload is TurnStartedEvent start)
         {
-            foreach (var issued in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYashiSuppressedEvent>().Where(e => e.Target == start.ActorSeat && e.ActualTurn < start.TurnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYashiExpiredEvent>().Any(x => x.ProducerId == e.FrameId)).ToArray())
-            {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangYashiExpiredEvent(issued.FrameId, issued.Target));
-                _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
-            }
-
             foreach (var player in _coreMatchParticipantsPlayersAccess._players)
                 foreach (var grant in player.SkillGrants.Grants.Where(g => g.SourceId.StartsWith("acquired:wushuang-lingren:", StringComparison.Ordinal)).ToArray())
                 {

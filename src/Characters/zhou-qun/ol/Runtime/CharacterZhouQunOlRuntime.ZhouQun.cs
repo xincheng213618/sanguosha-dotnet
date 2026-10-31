@@ -273,7 +273,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
     internal void BeginZhouQunMovement(ref ProgramSkillFrame f, ZhouQunStage stage)
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhouQun = f.ZhouQun!with { Stage = stage, Step = f.ZhouQun.Step + 1, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
     }
 

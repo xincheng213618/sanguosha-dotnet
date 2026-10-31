@@ -18,9 +18,18 @@ internal static class SkillStateChecks
             ("overlapping expiry", OverlappingExpiryPreservesTheExistingInstance),
             ("next owner turn expiry", AfterCurrentTurnWaitsForTheNextOwnerTurnEnd),
             ("current round expiry", CurrentRoundExpiresWithoutRoundEndingTracking),
+            ("next turn start expiry", UntilTurnStartOfWaitsForTheSpecifiedOwnersNextTurn),
             ("existing transfer", TransferReusesAnAlreadyOwnedInstance),
             ("named future source", NamedSuppressionCoversAnIndependentlyAcquiredSource),
             ("filter resources", FiltersShareExpressionResourcesAndReadSkillFacts),
+            ("printed source filter", PrintedFilterDoesNotLoseAnAcquiredSourceOfTheSameSkill),
+            ("continuous HP condition", WhileTracksHpWithoutRemovingItsRestriction),
+            ("legacy JSON rejection", LegacySkillStateFieldsAreRejected),
+            ("native phase boundaries", PhaseBoundariesUseActualTokensAndSelectedTiming),
+            ("boundary OR and atomic cleanup", BoundarySkipAndAlternativesClearBorrowedStateBeforeFacts),
+            ("default cleanup timing", DefaultAfterCleanupExpiresOnTheNativeClock),
+            ("nested boundary issuance", NestedFactIssuanceSkipsTheOriginalPhaseOccurrence),
+            ("issued phase condition", IssuedPhaseConditionSurvivesInsertionAndRestoration),
             ("permanent death expiry", PermanentRestrictionExpiresOnItsTargetDeath),
             ("consumed Alcohol Slash", ConsumedAlcoholSlashQualifiesOnlyItsOriginalDamage)
         })
@@ -37,8 +46,8 @@ internal static class SkillStateChecks
         Require(s.Owns(0, Counter) && s.Owns(0, Driver) && s.Owns(0, Locked) &&
             !s.CanUse(0, Counter, "pulse") && !s.CanUse(0, Driver, "choose") && s.CanUse(0, Locked, "pulse"),
             "Non-locked suppression retains owned printed skills while removing their activations; a locked skill remains effective.");
-        Require(!s.LegacyGrantQualified(0, Counter) && s.LegacyGrantQualified(0, Locked),
-            "The legacy grant-qualification entry shares the same restriction decision and locked exemption.");
+        Require(!s.GrantQualified(0, Counter) && s.GrantQualified(0, Locked),
+            "Shared source-instance qualification follows the same restriction decision and locked exemption.");
         s.Cold();
         Require(s.Owns(0, Counter) && !s.CanUse(0, Counter, "pulse") && s.CanUse(0, Locked, "pulse"),
             "Cold replay retains the ownership/effectiveness distinction.");
@@ -149,6 +158,29 @@ internal static class SkillStateChecks
             "Cold replay reaches the owner's next play with the current-round restriction already removed.");
     }
 
+    private static void UntilTurnStartOfWaitsForTheSpecifiedOwnersNextTurn()
+    {
+        var s = Scene.Start();
+        var turn = s.G.State.TurnNumber;
+        s.Use(0, Driver, "until-next-owner-start", 1); s.Play(0);
+        var source = s.E<SkillStateChangedEvent>().Single(e => e.Seat == 1 && e.SkillId == Counter).SourceId;
+        s.Play(1);
+        Require(s.Owns(1, Counter) && !s.CanUse(1, Counter, "pulse") && s.CanUse(1, Locked, "pulse") &&
+            !s.E<SkillStateExpiredEvent>().Any(e => e.SourceId == source),
+            "The affected target's unrelated turn start leaves the owner's next-start restriction active.");
+        s.Cold();
+        Require(s.Owns(1, Counter) && !s.Effective(1, Counter) && s.StateLeases(1) == 1,
+            "Cold replay retains the non-locked restriction while waiting for its specified owner.");
+        s.Reach(() => s.E<TurnStartedEvent>().Any(e => e.ActorSeat == 0 && e.TurnNumber > turn));
+        var started = s.G.Events.Single(e => e.Payload is TurnStartedEvent next && next.ActorSeat == 0 && next.TurnNumber > turn).Sequence;
+        var expired = s.G.Events.Single(e => e.Payload is SkillStateExpiredEvent expiry && expiry.SourceId == source).Sequence;
+        Require(expired < started && s.StateLeases(1) == 0 && s.Owns(1, Counter) && s.Effective(1, Counter),
+            "The restriction expires before the specified owner's strictly later TurnStarted fact.");
+        s.Cold(); s.Play(1);
+        Require(s.CanUse(1, Counter, "pulse") && s.E<SkillStateExpiredEvent>().Count(e => e.SourceId == source) == 1,
+            "The target's next play restores the original ability after cold replay without a repeated expiry.");
+    }
+
     private static void TransferReusesAnAlreadyOwnedInstance()
     {
         var s = Scene.Start();
@@ -180,13 +212,13 @@ internal static class SkillStateChecks
         s.Play(1); s.Play(0);
         Require(s.Owns(0, Counter) && s.Effective(0, Counter) && s.CanUse(0, Counter, "pulse") &&
             s.CounterGrants(0).Any(g => g.SourceId.StartsWith("acquired:", StringComparison.Ordinal) && g.IsEnabled) &&
-            s.CounterGrants(0).Where(SkillStateQuery.IsPrinted).All(g => !g.IsEnabled),
+            s.CounterGrants(0).Where(g => g.SourceId is CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource).All(g => !g.IsEnabled),
             "Expiry restores only the later acquired source; the permanently lost printed source stays disabled.");
     }
 
     private static void FiltersShareExpressionResourcesAndReadSkillFacts()
     {
-        foreach (var fact in new[] { "skill.locked", "skill.limited", "skill.awakening", "skill.lord", "skill.printed", "skill.ordinal" })
+        foreach (var fact in new[] { "skill.locked", "skill.limited", "skill.awakening", "skill.lord", "skill.printed", "skill.ordinal", "skill.character" })
             LoadFilter(JsonSerializer.Serialize(new object[] { "==", new object[] { "number", fact }, 0 }));
         LoadFilter("[\"==\",[\"number\",\"threshold\"],0]", captureThreshold: true);
         foreach (var filter in new[] { "[\"==\",[\"number\",\"missing-number\"],0]", "[\"==\",[\"boundCount\",\"missing-cards\"],0]" })
@@ -205,15 +237,258 @@ internal static class SkillStateChecks
             "Skill-fact expression selection cold-replays without converting possession into effectiveness.");
     }
 
-    private static void LoadFilter(string filter, bool captureThreshold = false)
+    private static void PrintedFilterDoesNotLoseAnAcquiredSourceOfTheSameSkill()
+    {
+        var s = Scene.Start();
+        s.Use(0, Driver, "grant-own-counter"); s.Play(0);
+        var printed = s.CounterGrants(0).Single(g => g.SourceId == CharacterState.PrimarySkillSource);
+        var acquired = s.CounterGrants(0).Single(g => g.SourceId.StartsWith("acquired:", StringComparison.Ordinal));
+        s.Use(0, Driver, "lose-printed-counter"); s.Play(0);
+        Require(!s.OwnsInstance(0, Counter, printed.SkillInstanceId) && s.OwnsInstance(0, Counter, acquired.SkillInstanceId) &&
+            s.Owns(0, Counter) && s.Effective(0, Counter) && s.CounterGrants(0).Count == 2,
+            "A printed filter removes only the printed source's possession while its same-named acquisition stays effective.");
+        s.Cold(); s.Play(1); s.Play(0);
+        Require(s.OwnsInstance(0, Counter, printed.SkillInstanceId) && s.OwnsInstance(0, Counter, acquired.SkillInstanceId),
+            "Expiry restores the exact printed instance without replacing or revoking the independent acquired source.");
+    }
+
+    private static void WhileTracksHpWithoutRemovingItsRestriction()
+    {
+        var s = Scene.Start();
+        var grants = s.RealGrants(1).ToArray();
+        s.Use(0, Driver, "while-wounded", 1); s.Play(0);
+        Require(s.Owns(1, Counter) && s.Effective(1, Counter) && s.StateLeases(1) == 1 && s.RealGrants(1).SequenceEqual(grants),
+            "A false continuous condition retains an inactive restriction separately from the original real grants.");
+        s.Use(0, Driver, "injure-one", 1); s.Play(0);
+        Require(s.Owns(1, Counter) && !s.Effective(1, Counter) && s.StateLeases(1) == 1,
+            "A genuine HP change immediately enables the same restriction without a new skill grant or re-issue.");
+        s.Cold();
+        Require(!s.Effective(1, Counter), "Cold replay preserves an active continuous HP condition.");
+        s.Use(0, Driver, "heal-one", 1); s.Play(0);
+        Require(s.Owns(1, Counter) && s.Effective(1, Counter) && s.StateLeases(1) == 1 &&
+            s.RealGrants(1).SequenceEqual(grants) && s.E<SkillStateExpiredEvent>().Length == 0,
+            "When the condition becomes false again the skill immediately recovers; its restriction is retained rather than expired.");
+        s.Cold();
+        Require(s.Effective(1, Counter) && s.StateLeases(1) == 1, "Inactive continuous state cold-replays without recreating a grant.");
+    }
+
+    private static void LegacySkillStateFieldsAreRejected()
+    {
+        foreach (var legacy in new[] { "\"scope\":\"all\"", "\"duration\":\"permanent\"", "\"filter\":true", "\"skillIds\":[\"fixture:skill-state-counter\"]", "\"characterOnly\":true", "\"printedOnly\":true",
+            "\"excludeLocked\":true", "\"expireOnDeath\":true", "\"untilTurnEndOf\":{\"kind\":\"owner\"}",
+            "\"untilTurnStartOf\":{\"kind\":\"owner\"}", "\"afterCurrentTurn\":true", "\"endTiming\":\"beforeTurnEnded\"" })
+        {
+            var field = legacy.Split(':')[0].Trim('"');
+            var rejected = false;
+            try { LoadFilter("true", legacyProperty: legacy); }
+            catch (InvalidOperationException error) when (error.Message.Contains(field, StringComparison.Ordinal)) { rejected = true; }
+            Require(rejected, "The loader must explicitly reject retired skill-state property " + field + ".");
+        }
+    }
+
+    private static void LoadFilter(string filter, bool captureThreshold = false, string? legacyProperty = null)
     {
         var capture = captureThreshold ? "{\"op\":\"captureNumber\",\"target\":\"owner\",\"resultBind\":\"threshold\",\"valueExpr\":0}," : "";
+        var legacy = legacyProperty is null ? "" : "," + legacyProperty;
         _ = SkillProgramCatalog.Load($$$"""
             {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{Driver}}}","revision":1,
               "activations":[{"id":"filter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
-                "effects":[{{{capture}}}{"op":"skillState","target":"owner","action":"suppress","scope":"expression","duration":"currentTurn","filter":{{{filter}}}}]}]}]}
+                "effects":[{{{capture}}}{"op":"skillState","target":"owner","action":"suppress","match":{"filter":{{{filter}}}},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}]{{{legacy}}}}]}]}]}
             """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
                 skills = new Dictionary<string, object> { [Driver] = new { name = "Filter", description = "Shared expression resources" } } }));
+    }
+
+    private static void PhaseBoundariesUseActualTokensAndSelectedTiming()
+    {
+        foreach (var atStart in new[] { true, false })
+        {
+            var s = Scene.Start();
+            s.Use(0, Driver, atStart ? "until-target-play-start" : "until-target-play-end", 1); s.Play(0);
+            var restriction = s.Restriction(1);
+            var end = restriction.Lifetime.Until.Single();
+            s.Reach(() => s.E<ActualPhaseEndedEvent>().Any(e => e.Phase.ActorSeat == 1 && e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Draw));
+            var drawEnded = s.G.Events.Single(e => e.Payload is ActualPhaseEndedEvent ended &&
+                ended.Phase.ActorSeat == 1 && ended.Phase.Kind == ActualDiscardRecoveryPhaseKind.Draw).Sequence;
+            var expirySoFar = s.G.Events.SingleOrDefault(e => e.Payload is SkillStateExpiredEvent expiry && expiry.SourceId == restriction.SourceId);
+            // One native step can finish Draw and begin Play synchronously.
+            Require(expirySoFar is null ? !s.Effective(1, Counter) && s.StateLeases(1) == 1 :
+                atStart && expirySoFar.Sequence > drawEnded && s.StateLeases(1) == 0,
+                "Other participants' Play boundaries and the target's earlier phases cannot end a target-Play restriction.");
+            s.Cold(); s.Play(1);
+            var phase = s.E<ActualDiscardRecoveryPhaseStartedEvent>().Single(e => e.Phase.ActorSeat == 1 && e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play).Phase;
+            Require(phase.Token > end.IssuedOccurrence && end.Seat == 1 && end.Phase == phase.Kind && s.Effective(1, Counter) == atStart,
+                "The target's actual Play token admits a before-start expiry while an after-end restriction remains active.");
+            if (!atStart) { s.Cold(); s.Play(2); }
+            var boundary = s.G.Events.Single(e => atStart
+                ? e.Payload is ActualDiscardRecoveryPhaseStartedEvent started && started.Phase == phase
+                : e.Payload is ActualPhaseEndedEvent ended && ended.Phase == phase).Sequence;
+            var expired = s.G.Events.Single(e => e.Payload is SkillStateExpiredEvent expiry && expiry.SourceId == restriction.SourceId).Sequence;
+            Require((atStart ? expired < boundary : expired > boundary) && s.StateLeases(1) == 0 && s.Effective(1, Counter),
+                "Phase expiry uses the same real phase key and the requested side of its Started/Ended fact.");
+            s.Cold();
+            Require(s.StateLeases(1) == 0 && s.Effective(1, Counter), "Cold replay preserves native phase expiry and restored availability.");
+        }
+    }
+
+    private static void BoundarySkipAndAlternativesClearBorrowedStateBeforeFacts()
+    {
+        var s = Scene.Start();
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", flags)!.GetValue(s.G)!;
+        var operations = DispatchProxy.Create<IProgramSkillChangeOperations, ExpiryOperationsProbe>();
+        var probe = (ExpiryOperationsProbe)operations;
+        probe.Actual = capabilities.Get<IProgramSkillChangeOperations>();
+        var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IProgramSkillChangeFacts>(), operations,
+            capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
+            capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>());
+        var token = s.E<ActualDiscardRecoveryPhaseStartedEvent>().Last().Phase.Token;
+        var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
+        var permanent = s.CounterGrants(0).Single().GrantId;
+        var spec = new SkillStateSpec(SkillStateAction.Transfer, new([Counter]),
+            [new(SkillStateBoundaryEvent.PhaseStarted, SkillStateSubject.Target, SkillStateBoundaryTiming.Before, true, ActualDiscardRecoveryPhaseKind.Play),
+             new(SkillStateBoundaryEvent.PhaseEnded, SkillStateSubject.Target, SkillStateBoundaryTiming.After, false, ActualDiscardRecoveryPhaseKind.Draw)]);
+        foreach (var alternative in new[] { true, false })
+        {
+            var origin = new SkillStateOrigin(900100, alternative ? 0 : 1, new(Driver, "transfer", 0, source.SkillInstanceId));
+            runtime.IssueSkillState(origin, 1, spec);
+            var restriction = s.Restriction(1);
+            var borrowed = s.CounterGrants(0).Single(grant => grant.Lifetime is not null).GrantId;
+            var before = s.RealGrants(0).ToArray();
+            var revisions = (s.SkillRevision(0), s.SkillRevision(1), probe.AdvancedFacts);
+            var rejected = false;
+            try { runtime.IssueSkillState(origin, 1, new(SkillStateAction.Transfer, new([Counter]),
+                [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Owner)])); }
+            catch (InvalidOperationException) { rejected = true; }
+            Require(rejected && ReferenceEquals(s.Restriction(1), restriction) && s.RealGrants(0).SequenceEqual(before) &&
+                (s.SkillRevision(0), s.SkillRevision(1), probe.AdvancedFacts) == revisions,
+                "Reissuing a transfer source cannot replace the donor lifetime while retaining a different borrowed-grant lifetime.");
+            var observed = probe.ExpiredFacts;
+            probe.BeforeExpiry = fact =>
+            {
+                if (fact.SourceId != restriction.SourceId) return;
+                Require(s.StateLeases(1) == 0 && s.CounterGrants(0).All(grant => grant.GrantId != borrowed),
+                    "Before the first expiry rule fact both the target restriction and the borrowed positive grant must already be gone.");
+            };
+            foreach (var boundary in new[]
+            {
+                new SkillStateBoundary(SkillStateBoundaryEvent.PhaseStarted, 2, SkillStateBoundaryTiming.Before, token + 1, ActualDiscardRecoveryPhaseKind.Play),
+                new SkillStateBoundary(SkillStateBoundaryEvent.PhaseStarted, 1, SkillStateBoundaryTiming.Before, token + 1, ActualDiscardRecoveryPhaseKind.Draw),
+                new SkillStateBoundary(SkillStateBoundaryEvent.PhaseStarted, 1, SkillStateBoundaryTiming.After, token + 1, ActualDiscardRecoveryPhaseKind.Play),
+                new SkillStateBoundary(SkillStateBoundaryEvent.PhaseStarted, 1, SkillStateBoundaryTiming.Before, token, ActualDiscardRecoveryPhaseKind.Play)
+            }) runtime.ProcessSkillStateBoundary(boundary);
+            Require(s.StateLeases(1) == 1 && s.CounterGrants(0).Any(grant => grant.GrantId == borrowed) && probe.ExpiredFacts == observed,
+                "Participant, phase, timing and strictly later occurrence all qualify a boundary; skipIssued must retain the same token.");
+            runtime.ProcessSkillStateBoundary(alternative
+                ? new(SkillStateBoundaryEvent.PhaseEnded, 1, SkillStateBoundaryTiming.After, token, ActualDiscardRecoveryPhaseKind.Draw)
+                : new(SkillStateBoundaryEvent.PhaseStarted, 1, SkillStateBoundaryTiming.Before, token + 1, ActualDiscardRecoveryPhaseKind.Play));
+            Require(probe.ExpiredFacts == observed + 2 && s.Effective(1, Counter) && s.CounterGrants(0).Single().GrantId == permanent,
+                "Either endpoint independently expires the borrowed pair while retaining the recipient's permanent source.");
+        }
+    }
+
+    public class ExpiryOperationsProbe : DispatchProxy
+    {
+        internal object Actual = null!;
+        internal Action<SkillStateExpiredEvent> BeforeExpiry = _ => { };
+        internal Func<IEnumerable<IGameEvent>>? ReadAdvancing;
+        internal int ExpiredFacts;
+        internal int AdvancedFacts;
+        protected override object? Invoke(MethodInfo? method, object?[]? args)
+        {
+            if (method!.Name == "get_AdvancingFacts" && ReadAdvancing is not null) return ReadAdvancing();
+            if (method.Name == nameof(IProgramSkillChangeOperations.AdvanceFact))
+            { AdvancedFacts++; if (args![0] is SkillStateExpiredEvent fact) { BeforeExpiry(fact); ExpiredFacts++; } }
+            return method.Invoke(Actual, args);
+        }
+    }
+
+    private static void DefaultAfterCleanupExpiresOnTheNativeClock()
+    {
+        var s = Scene.Start();
+        s.Use(0, Driver, "cleanup-default-after", 1); s.Play(0);
+        Require(!s.Effective(1, Counter), "The default-after cleanup restriction is active in its issuing turn.");
+        s.Cold(); s.Play(1);
+        Require(s.StateLeases(1) == 0 && s.CanUse(1, Counter, "pulse") && s.E<TurnCardUseEffectsExpiredEvent>().Length == 0,
+            "Native cleanup emits its default After boundary even when there are no expiring card-use grants.");
+    }
+
+    private static void NestedFactIssuanceSkipsTheOriginalPhaseOccurrence()
+    {
+        var s = Scene.Start();
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
+        var facts = DispatchProxy.Create<IProgramSkillChangeFacts, ExpiryOperationsProbe>();
+        var probe = (ExpiryOperationsProbe)facts; probe.Actual = capabilities.Get<IProgramSkillChangeFacts>();
+        var runtime = new ProgramSkillChangeRuntime(facts, capabilities.Get<IProgramSkillChangeOperations>(),
+            capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
+            capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>());
+        var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
+        var nested = new NestedPhaseIssuer { Runtime = runtime,
+            Origin = new(900200, 0, new(Driver, "transfer", 0, source.SkillInstanceId)),
+            Spec = new(SkillStateAction.Suppress, new([Counter]),
+                [new(SkillStateBoundaryEvent.PhaseStarted, SkillStateSubject.Target, SkillStateBoundaryTiming.After, true, ActualDiscardRecoveryPhaseKind.Play)]) };
+        var methods = typeof(NestedPhaseIssuer).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Where(method => method.IsDefined(typeof(ProgramRuleObserverAttribute)))
+            .Concat(typeof(ProgramSkillChangeRuntime).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+                .Where(method => method.Name is "BeforeBoundaryEvent" or "AfterBoundaryEvent"));
+        var observers = new ProgramRuleObservers(ProgramRuleObserverCatalog.Discover(methods),
+            (method, type) => method.CreateDelegate(type, method.DeclaringType == typeof(NestedPhaseIssuer) ? nested : runtime));
+        nested.Progression = new(observers, new FactSink()); probe.ReadAdvancing = () => nested.Progression.AdvancingFacts;
+        var old = s.E<ActualDiscardRecoveryPhaseStartedEvent>().Last().Phase;
+        var phase = old with { Token = old.Token + 100, ActorSeat = 1 };
+        nested.Progression.AdvanceFact(new ActualDiscardRecoveryPhaseStartedEvent(phase));
+        Require(s.Restriction(1).Lifetime.Until.Single().IssuedOccurrence == phase.Token && !s.Effective(1, Counter) &&
+            !nested.Progression.AdvancingFacts.Any(),
+            "A nested ordinary fact retains its enclosing phase token for skipIssued, and the synchronous fact stack unwinds.");
+        runtime.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.PhaseStarted, 1, SkillStateBoundaryTiming.After, phase.Token + 1, phase.Kind));
+        Require(s.StateLeases(1) == 0 && s.Effective(1, Counter), "Only a strictly later matching occurrence expires the nested issuance.");
+    }
+
+    private sealed class NestedPhaseIssuer
+    {
+        internal RuleProgressionRuntime Progression = null!;
+        internal ProgramSkillChangeRuntime Runtime = null!;
+        internal SkillStateOrigin Origin = null!;
+        internal SkillStateSpec Spec = null!;
+        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 40)]
+        private void Nested(ActualDiscardRecoveryPhaseStartedEvent _) => Progression.AdvanceFact(new GameStartedEvent(4));
+        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)]
+        private void Issue(GameStartedEvent _) => Runtime.IssueSkillState(Origin, 1, Spec);
+        [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 1)]
+        private void State() { }
+    }
+
+    private sealed class FactSink : IRuleProgressionOperations
+    {
+        public void QueueFact(IGameEvent payload) { }
+        public bool BeginCharacterStateWindow() => false;
+        public bool BeginHpChangedWindow() => false;
+        public bool BeginCardsMovedWindow() => false;
+        public void RequestStatePublication() { }
+    }
+
+    private static void IssuedPhaseConditionSurvivesInsertionAndRestoration()
+    {
+        var s = Scene.Start();
+        var issued = s.E<ActualDiscardRecoveryPhaseStartedEvent>().Last().Phase;
+        var player = ((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!)[0];
+        var phases = new MutablePhase { Value = issued };
+        using var document = JsonDocument.Parse("[\"inIssuedPhase\",\"target\"]");
+        var condition = ProgramExpressions.Parse(document.RootElement, "fixture");
+        var world = new SkillStateConditionWorld(new(0, 0, issued), player, phases: phases);
+        Require(ProgramExpressions.EvaluateBool(condition, world) == true, "The original actor is in its exact issued phase.");
+        phases.Value = issued with { Token = issued.Token + 1, Kind = ActualDiscardRecoveryPhaseKind.Draw };
+        Require(ProgramExpressions.EvaluateBool(condition, world) == false, "An inserted phase suspends the original phase condition.");
+        phases.Value = issued;
+        Require(ProgramExpressions.EvaluateBool(condition, world) == true, "Restoring the original key reactivates the same condition.");
+        phases.Value = issued with { Token = issued.Token + 2 };
+        Require(ProgramExpressions.EvaluateBool(condition, world) == false, "A later same-kind phase cannot impersonate the original phase token.");
+    }
+
+    private sealed class MutablePhase : IActualDiscardRecoveryPhaseQueries
+    {
+        internal ActualDiscardRecoveryPhaseKey? Value;
+        public ActualDiscardRecoveryPhaseKey? Current() => Value;
+        public bool IsRecorded(ActualDiscardRecoveryPhaseKey phase) => phase == Value;
     }
 
     private static void PermanentRestrictionExpiresOnItsTargetDeath()
@@ -271,14 +546,18 @@ internal static class SkillStateChecks
             .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(G)!)[seat];
         public bool Owns(int seat, string skill) => G.NationalSkillsEntries.HasOwnedRuntimeSkill(Player(seat), skill);
         public bool Effective(int seat, string skill) => G.NationalSkillsEntries.HasRuntimeSkill(Player(seat), skill);
-        public bool LegacyGrantQualified(int seat, string skill)
+        public bool GrantQualified(int seat, string skill)
         {
             var player = Player(seat);
-            var grant = player.SkillGrants.Grants.Single(g => g.SkillId == skill && g.IsEnabled && g.SkillState is null);
-            return G.CurrentTurnSkillSuppressionsEntries.IsCurrentTurnSkillGrantQualified(player, grant);
+            var grant = player.SkillGrants.Grants.Single(g => g.SkillId == skill && g.IsEnabled);
+            return G.NationalSkillsEntries.HasRuntimeSkillInstance(player, grant.SkillId, grant.SkillInstanceId);
         }
-        public int StateLeases(int seat) => Player(seat).SkillGrants.Grants.Count(g => g.SkillState is not null);
-        public IReadOnlyList<SkillGrant> CounterGrants(int seat) => Player(seat).SkillGrants.Grants.Where(g => g.SkillId == Counter && g.SkillState is null).ToArray();
+        public bool OwnsInstance(int seat, string skill, string instance) => G.NationalSkillsEntries.HasOwnedRuntimeSkillInstance(Player(seat), skill, instance);
+        public int StateLeases(int seat) => Player(seat).SkillGrants.Restrictions.Count;
+        public long SkillRevision(int seat) => Player(seat).SkillGrants.Revision;
+        public SkillStateRestriction Restriction(int seat) => Player(seat).SkillGrants.Restrictions.Single();
+        public IReadOnlyList<SkillGrant> RealGrants(int seat) => Player(seat).SkillGrants.Grants;
+        public IReadOnlyList<SkillGrant> CounterGrants(int seat) => Player(seat).SkillGrants.Grants.Where(g => g.SkillId == Counter).ToArray();
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
         public bool CanUse(int seat, string skill, string activation) => G.GetLegalActions(seat).Any(a => a.ProgramSkillId == skill && a.ProgramActivationId == activation);
         public ProgramBooleanStateSnapshot CounterState(int seat) => View(seat).SkillRuntimeStates!.Single(s => s.SkillId == Counter).BooleanStates!.Single(s => s.StateId == "marked");
@@ -358,39 +637,56 @@ internal static class SkillStateChecks
                     {"id":"fire-slash","inputKinds":["dodge"],"inputSuits":[],"sourceZones":["hand"],"outputKind":"fireSlash","forPlay":true,"forResponse":false,"useOnly":true}
                   ],"activations":[
                     {"id":"suppress-self","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"owner","action":"suppress","scope":"nonLocked","duration":"currentTurn"}]},
+                      {"op":"skillState","target":"owner","action":"suppress","match":{"filter":["and",["==",["number","skill.character"],1],["==",["number","skill.locked"],0]]},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}]}]},
                     {"id":"choose","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"lose","scope":"chosenFromTarget","duration":"currentTurn","excludeLocked":true},
+                      {"op":"skillState","target":"selectedTarget","action":"lose","match":{"filter":["and",["==",["number","skill.character"],1],["==",["number","skill.locked"],0]]},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}],"chooseOne":true},
                       {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]},
                     {"id":"overlap-now","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"}}]},
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Counter}}}"],"filter":["==",["number","skill.character"],1]},"until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after"}]}]},
                     {"id":"overlap-through-target","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"selectedTarget"}}]},
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Counter}}}"],"filter":["==",["number","skill.character"],1]},"until":[{"event":"turnEnded","participant":{"kind":"target"},"timing":"after"}]}]},
                     {"id":"through-next-owner-end","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"nonLocked","duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"},"afterCurrentTurn":true}]},
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"filter":["and",["==",["number","skill.character"],1],["==",["number","skill.locked"],0]]},"until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after","skipIssued":true}]}]},
                     {"id":"through-next-owner-before-end","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"nonLocked","duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"},"afterCurrentTurn":true,"endTiming":"beforeTurnEnded"}]},
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"filter":["and",["==",["number","skill.character"],1],["==",["number","skill.locked"],0]]},"until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"before","skipIssued":true}]}]},
                     {"id":"through-current-round","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"currentRound"}]},
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Counter}}}"],"filter":["==",["number","skill.character"],1]},"until":[{"event":"roundAdvanced"}]}]},
+                    {"id":"until-next-owner-start","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"filter":["and",["==",["number","skill.character"],1],["==",["number","skill.locked"],0]]},"until":[{"event":"turnStarted","participant":{"kind":"owner"},"timing":"before","skipIssued":true}]}]},
                     {"id":"transfer","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"transfer","scope":"named","skillIds":["{{{Counter}}}"],"duration":"currentTurn"}]},
+                      {"op":"skillState","target":"selectedTarget","action":"transfer","match":{"skillIds":["{{{Counter}}}"],"filter":["==",["number","skill.character"],1]},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}]}]},
                     {"id":"lose-own-counter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"owner","action":"lose","scope":"named","skillIds":["{{{Counter}}}"],"duration":"permanent"}]},
+                      {"op":"skillState","target":"owner","action":"lose","match":{"skillIds":["{{{Counter}}}"],"filter":["==",["number","skill.character"],1]},"until":[]}]},
                     {"id":"suppress-absent-and-grant","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"owner","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"}},
+                      {"op":"skillState","target":"owner","action":"suppress","match":{"skillIds":["{{{Counter}}}"],"filter":["==",["number","skill.character"],1]},"until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after"}]},
                       {"op":"grantSkills","target":"owner","skillIds":["{{{Counter}}}"]}]},
+                    {"id":"grant-own-counter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                      {"op":"grantSkills","target":"owner","skillIds":["{{{Counter}}}"]}]},
+                    {"id":"lose-printed-counter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"owner","action":"lose","match":{"skillIds":["{{{Counter}}}"],"filter":["==",["number","skill.printed"],1]},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}]}]},
+                    {"id":"while-wounded","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Counter}}}"]},"until":[],"while":["<",["hp","target"],["maxHp","target"]]}]},
+                    {"id":"injure-one","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"loseHp","target":"selectedTarget","amount":1}]},
+                    {"id":"heal-one","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"recover","target":"selectedTarget","amount":1}]},
+                    {"id":"until-target-play-start","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Counter}}}"]},"until":[{"event":"phaseStarted","participant":{"kind":"target"},"timing":"before","skipIssued":true,"phase":"play"}]}]},
+                    {"id":"until-target-play-end","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Counter}}}"]},"until":[{"event":"phaseEnded","participant":{"kind":"target"},"timing":"after","phase":"play"}]}]},
+                    {"id":"cleanup-default-after","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Counter}}}"]},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"}}]}]},
                     {"id":"filter","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"expression","duration":"currentTurn",
-                       "filter":["and",["==",["number","skill.locked"],0],["==",["number","skill.printed"],1],["==",["number","skill.ordinal"],1]]}]},
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"filter":["and",["==",["number","skill.character"],1],["and",["==",["number","skill.locked"],0],["==",["number","skill.printed"],1],["==",["number","skill.ordinal"],1]]]},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}]}]},
                     {"id":"permanent-until-death","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
-                      {"op":"skillState","target":"selectedTarget","action":"lose","scope":"named","skillIds":["{{{Counter}}}"],"duration":"permanent","expireOnDeath":true}]},
+                      {"op":"skillState","target":"selectedTarget","action":"lose","match":{"skillIds":["{{{Counter}}}"],"filter":["==",["number","skill.character"],1]},"until":[{"event":"death","participant":{"kind":"target"}}]}]},
                     {"id":"kill-target","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"loseHp","target":"selectedTarget","amount":20}]},
                     {"id":"chain","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"setChainedState","target":"selectedTarget","chained":true}]}
                   ],"triggers":[{"id":"alcohol-state","window":"afterDamageApplied","subject":"damageSource","optional":false,
                     "damageOccurrence":"perDamage","requiresConsumedAlcoholSlash":true,"effects":[
-                      {"op":"skillState","target":"owner","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"currentTurn","characterOnly":false}]}]},
+                      {"op":"skillState","target":"owner","action":"suppress","match":{"skillIds":["{{{Counter}}}"]},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}]}]}]},
                   {"id":"{{{Counter}}}","revision":1,"states":[{"id":"marked","initialValue":false,"visibility":"public","resetScope":"game","reacquirePolicy":"preserveUntilGameEnd"}],"activations":[
                     {"id":"mark","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"usesPerGame":1,"effects":[{"op":"setBooleanState","target":"owner","stateId":"marked","value":true}]},
                     {"id":"pulse","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"usesPerGame":1,"effects":[{"op":"draw","target":"owner","amount":1}]}]},

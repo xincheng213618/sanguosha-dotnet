@@ -100,7 +100,7 @@ internal sealed partial class CharacterXunYuMouRuntime
         {
             _coreProgramSkillChangesOperations.IssueSkillState(new(grant.FrameId, 0,
                 new(grant.Source.SkillId, grant.Source.BindingId, grant.Source.OwnerSeat, grant.Source.SkillInstanceId)), target,
-                new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, [], grant.Beneficiary);
+                new(SkillStateAction.Suppress, SkillStateMatch.NonLocked, [new(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before)]));
         }
     }
 

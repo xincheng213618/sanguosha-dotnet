@@ -28,20 +28,37 @@ public sealed partial record SkillGrant(
 public sealed class CharacterSkillSet
 {
     private readonly Dictionary<string, SkillGrant> _grants = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, SkillStateRestriction> _restrictions = new(StringComparer.Ordinal);
+    private long _restrictionsSnapshotRevision = -1;
+    private long _restrictionRevision;
+    private IReadOnlyList<SkillStateRestriction> _restrictionsSnapshot = [];
     private long _grantsSnapshotRevision = -1;
     private IReadOnlyList<SkillGrant> _grantsSnapshot = Array.Empty<SkillGrant>();
     private bool _hasProjectedGrants;
     public long Revision { get; private set; }
+    public long GrantRevision { get; private set; }
+    public IReadOnlyList<SkillStateRestriction> Restrictions
+    {
+        get
+        {
+            if (_restrictionsSnapshotRevision != _restrictionRevision)
+            {
+                _restrictionsSnapshot = Array.AsReadOnly(_restrictions.Values.OrderBy(value => value.Id, StringComparer.Ordinal).ToArray());
+                _restrictionsSnapshotRevision = _restrictionRevision;
+            }
+            return _restrictionsSnapshot;
+        }
+    }
     public IReadOnlyList<SkillGrant> Grants
     {
         get
         {
-            if (_grantsSnapshotRevision != Revision)
+            if (_grantsSnapshotRevision != GrantRevision)
             {
                 _grantsSnapshot = Array.AsReadOnly(_grants.Values.OrderBy(grant => grant.GrantId, StringComparer.Ordinal).ToArray());
                 _hasProjectedGrants = _grants.Values.Any(grant =>
                     grant.LordProjection is not null || grant.GeneralLibraryProjection is not null);
-                _grantsSnapshotRevision = Revision;
+                _grantsSnapshotRevision = GrantRevision;
             }
             return _grantsSnapshot;
         }
@@ -69,7 +86,7 @@ public sealed class CharacterSkillSet
         ArgumentException.ThrowIfNullOrWhiteSpace(grant.SourceId);
         _ = new ContentId(grant.SkillId);
         if (grant.IsModeRule && (!grant.SourceId.StartsWith("mode:", StringComparison.Ordinal) || !grant.IsEnabled ||
-            grant.TurnExpiry is not null || grant.NextActualTurnStartExpiry is not null || grant.PhaseExpiry is not null || grant.LordProjection is not null ||
+            grant.Lifetime is not null || grant.TurnExpiry is not null || grant.NextActualTurnStartExpiry is not null || grant.PhaseExpiry is not null || grant.LordProjection is not null ||
             grant.GeneralLibraryProjection is not null || grant.PrintedLordQualification is not null ||
             grant.HpConditionalSource is not null || grant.EquipmentSuitSource is not null))
             throw new InvalidOperationException("A mode-rule grant requires an enabled permanent mode source without character projections.");
@@ -92,7 +109,7 @@ public sealed class CharacterSkillSet
             throw new InvalidOperationException($"Skill grant '{grant.GrantId}' conflicts with an existing grant.");
         }
         _grants.Add(grant.GrantId, grant);
-        Revision++;
+        GrantsChanged();
         return true;
     }
 
@@ -101,7 +118,7 @@ public sealed class CharacterSkillSet
         ArgumentException.ThrowIfNullOrWhiteSpace(grantId);
         if (_grants.TryGetValue(grantId, out var protectedGrant) && protectedGrant.IsModeRule) return false;
         if (!_grants.Remove(grantId)) return false;
-        Revision++;
+        GrantsChanged();
         return true;
     }
 
@@ -115,7 +132,7 @@ public sealed class CharacterSkillSet
             throw new InvalidOperationException("Printed-lord qualification requires its exact original template grant.");
         if (grant.PrintedLordQualification == qualification) return false;
         _grants[grantId] = grant with { PrintedLordQualification = qualification };
-        Revision++; return true;
+        GrantsChanged(); return true;
     }
 
     public bool SetEnabled(string grantId, bool enabled)
@@ -126,7 +143,32 @@ public sealed class CharacterSkillSet
         if (grant.IsModeRule && !enabled) return false;
         if (grant.IsEnabled == enabled) return false;
         _grants[grantId] = grant with { IsEnabled = enabled };
+        GrantsChanged();
+        return true;
+    }
+
+    public bool SetRestriction(SkillStateRestriction restriction)
+    {
+        ArgumentNullException.ThrowIfNull(restriction);
+        ArgumentException.ThrowIfNullOrWhiteSpace(restriction.Id);
+        if (_restrictions.TryGetValue(restriction.Id, out var existing) && existing == restriction) return false;
+        _restrictions[restriction.Id] = restriction;
+        _restrictionRevision++;
         Revision++;
         return true;
+    }
+
+    public bool RemoveRestriction(string id)
+    {
+        if (!_restrictions.Remove(id)) return false;
+        _restrictionRevision++;
+        Revision++;
+        return true;
+    }
+
+    private void GrantsChanged()
+    {
+        GrantRevision++;
+        Revision++;
     }
 }

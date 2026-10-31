@@ -40,7 +40,7 @@ internal sealed partial class CharacterCaoTengOlRuntime
         // grant a skill. Preserve known revisions and their unobserved changes.
         if (y)
             foreach (var player in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var r = new CaoTengReceipt(CaoTengSource(f), f.GameplayHash, op, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, f.WindowContext!.ParentFrameId, q ? CaoTengStage.FactionChoice : y ? CaoTengStage.YongzuTarget : CaoTengStage.JianxiongDrawChildren)
         {
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,

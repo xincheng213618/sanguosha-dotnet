@@ -119,8 +119,8 @@ internal sealed partial class CharacterCaoPiMouRuntime
         else if (option == "skills")
             _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
                 new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId)), target,
-                new(SkillStateAction.Suppress, SkillStateScope.All, SkillStateDuration.UntilTurnEndOf)
-                { CharacterOnly = true, AfterCurrentTurn = true, EndTiming = SkillStateEndTiming.BeforeTurnEnded }, [], target);
+                new(SkillStateAction.Suppress, SkillStateMatch.CharacterSkills,
+                    [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Target, SkillStateBoundaryTiming.Before, true)]));
         else
         {
             var kind = option switch

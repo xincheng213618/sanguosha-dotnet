@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEngineAdvancedLifecycleRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         switch (effect.Op)
         {
             case SkillProgramEffectOp.BalanceHandAttackTricks:

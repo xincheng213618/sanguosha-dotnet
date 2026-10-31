@@ -15,7 +15,7 @@
           "optional": false, "priority": 100, "damageOccurrence": "perDamage", "requiresConsumedAlcoholSlash": true,
           "condition": { "kind": "all", "children": [ { "kind": "damageSourceIsOwner" }, { "kind": "damageCardIsSlash" } ] },
           "effects": [
-            { "op": "skillState", "target": "owner", "action": "suppress", "scope": "named", "duration": "currentTurn", "characterOnly": false, "skillIds": ["boundary:benghuai-current"] }
+            { "op": "skillState", "target": "owner", "action": "suppress", "match": { "skillIds": ["boundary:benghuai-current"] }, "until": [{ "event": "turnCleanup", "participant": { "kind": "turnOwner" }, "timing": "before" }] }
           ]
         }
       ]

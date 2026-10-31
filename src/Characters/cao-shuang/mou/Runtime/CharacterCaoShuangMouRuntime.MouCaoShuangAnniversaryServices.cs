@@ -119,7 +119,7 @@ internal sealed partial class CharacterCaoShuangMouRuntime
         if (!MouCaoShuangAnniversary.Valid(f) || f.MouCaoShuangAnniversary is not { Stage: MouCaoShuangAnniversaryStage.Grant })
             throw new InvalidOperationException("Fanshi grant requires its completed native repeats and recovery.");
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         foreach (var grant in owner.SkillGrants.Grants.Where(g => g.SkillId == MouCaoShuangAnniversaryRuntime.Jianzhuan).ToArray())
             owner.SkillGrants.RemoveGrant(grant.GrantId);

@@ -29,7 +29,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SunYuan = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SunYuanStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.WindowId, r.ActualTurn, r.TurnOwner, holder, r.DamageFrameId, r.DamageSource, r.DamageAmount, lost, required));
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         if (!saying && required == 0)
             PayDongxin(f);
         else

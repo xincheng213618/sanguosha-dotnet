@@ -48,7 +48,7 @@ internal static class ProgramExpressions
     public static readonly string[] Participants = ["owner", "selectedTarget", "selectedFirst", "selectedSecond", "eventSource", "eventTarget"];
     public static readonly string[] Sets = ["living", "livingOthers"];
     private static readonly string[] Stats = ["hp", "maxHp", "lostHp", "handCount", "handLimit", "equipmentCount"];
-    private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained"];
+    private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained", "inIssuedPhase"];
     private static readonly string[] Comparisons = ["<", "<=", ">", ">=", "==", "!="];
 
     public static ProgramExpression Parse(JsonElement node, string path) =>
@@ -76,6 +76,7 @@ internal static class ProgramExpressions
 
     private static ProgramExpression ParseName(string name, string path, bool iteratorInScope)
     {
+        if (name == "target") name = "selectedTarget";
         if (name == Iterator)
         {
             if (!iteratorInScope) Fail(path, "'it' is only available inside all, any or count");

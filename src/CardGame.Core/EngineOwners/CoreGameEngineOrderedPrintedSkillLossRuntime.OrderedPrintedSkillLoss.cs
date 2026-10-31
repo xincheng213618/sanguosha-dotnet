@@ -62,7 +62,7 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossRuntime
         // A first ownership change must be observable even before any earlier
         // program has initialized the revision baseline.
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         foreach (var grant in grants)
             if (!owner.SkillGrants.RemoveGrant(grant.GrantId))
                 throw new InvalidOperationException("An ordered skill-loss payment changed before its atomic removal.");

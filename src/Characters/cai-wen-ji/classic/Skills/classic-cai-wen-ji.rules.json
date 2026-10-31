@@ -210,7 +210,7 @@
           "effects": [
             {
               "op": "skillState", "target": "owner", "targetRef": { "kind": "eventSource" },
-              "action": "lose", "scope": "all", "duration": "permanent", "characterOnly": true
+              "action": "lose", "match": { "filter": ["==", ["number", "skill.character"], 1] }, "until": []
             }
           ]
         }

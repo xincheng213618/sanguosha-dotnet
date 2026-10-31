@@ -41,7 +41,8 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         }
 
         _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, f.OwnerSeat,
-            new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, [AnniversaryCuiLieComposition.Chibi]);
+            new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([AnniversaryCuiLieComposition.Chibi]),
+                [new(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before)]));
         if (!CuiLieAdditionalEligible(use, f.OwnerSeat))
         {
             FinishCuiLie(f);

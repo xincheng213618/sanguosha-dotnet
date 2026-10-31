@@ -24,6 +24,10 @@ internal sealed class SkillProgramDependencies
         var definitions = skills.ToArray();
         var programs = definitions.Select(skill => skill.Program).OfType<SkillProgram>().ToArray();
         var triggers = programs.SelectMany(program => program.Triggers).ToArray();
+        var skillStateBoundaries = triggers.SelectMany(trigger => trigger.Effects)
+            .Concat(programs.SelectMany(program => program.Activations).SelectMany(activation => activation.Effects))
+            .SelectMany(effect => effect.SkillState?.Until ?? []).ToArray();
+        UsesSkillStatePhaseEnds = skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseEnded);
         UsesConsumedAlcoholSlash = triggers.Any(trigger => trigger.RequiresConsumedAlcoholSlash);
         HpSensitiveSkillIds = definitions.Where(skill => skill.SuppressionRule is not null || skill.Program?.HpSkillGrants.Count > 0)
             .Select(skill => skill.Id).ToFrozenSet(StringComparer.Ordinal);
@@ -50,6 +54,8 @@ internal sealed class SkillProgramDependencies
             programs.SelectMany(program => program.Activations).Aggregate(ProgramTrackedFact.None,
                 (facts, activation) => facts | resolver.Features(activation).FactRequirements.Activated) |
             ProgramPassiveFactRequirementsAttribute.ForSkills(definitions) |
+            (UsesSkillStatePhaseEnds || skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseStarted)
+                ? ProgramTrackedFact.ActualDiscardRecoveryPhase : ProgramTrackedFact.None) |
             (programs.Any(program => program.DamageModifiers.Any(modifier =>
                 modifier.Condition == SkillProgramDamageModifierCondition.OwnerUsedHeartSlash))
                 ? ProgramTrackedFact.NativeActionAppearance : ProgramTrackedFact.None);
@@ -128,8 +134,7 @@ internal sealed class SkillProgramDependencies
             HasTriggerOperation(SkillProgramEffectOp.ResolveMouYuJinXiayuan) || HasSourceRoundDamageModifiers || HasTriggerOperation(SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw) || HasCardPolicy(SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss) || UsesLeiluanBasicUse || HasTriggerWindow(SkillProgramTriggerWindow.RoundStarting) || HasTriggerWindow(SkillProgramTriggerWindow.RoundEnding) || HasTriggerOperation(SkillProgramEffectOp.ResolveSayingPlayStartObtainAndReply) || HasTriggerOperation(SkillProgramEffectOp.ResolveFengweiRoundStartDraw) || HasTriggerOperation(SkillProgramEffectOp.ResolveZonghuRequiredUseRequest) || HasActivationOperation(SkillProgramEffectOp.ResolveZonghuRequiredUseRequest) || HasActivationOperation(SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse) || HasTriggerOperation(SkillProgramEffectOp.ResolveGongjieRoundFirstGifts) || HasTriggerOperation(SkillProgramEffectOp.ResolveQiejianLastHandLoss) || HasTriggerOperation(SkillProgramEffectOp.ResolveHuiyunCompletedFireAttack) || HasTriggerOperation(SkillProgramEffectOp.ArmHanyongNativeGroupDamage) || TracksCurrentRoundActualUses || HasTriggerOperation(SkillProgramEffectOp.ResolveMiuyanCompletedUse) || HasTriggerOperation(SkillProgramEffectOp.ResolveXianyingDrawDiscard) || HasTriggerOperation(SkillProgramEffectOp.GiveCardSkipDrawForEnding) || HasTriggerOperation(SkillProgramEffectOp.DrawDyingExitRoundDistance) || HasTriggerOperation(SkillProgramEffectOp.TransferQuxiAtRoundOrDeath) || UsesTriggerValue(SkillProgramTriggerValueKind.RoundTurnSeatCount) || HasTriggerOperation(SkillProgramEffectOp.HoldRoundFocusCards) || HasTriggerOperation(SkillProgramEffectOp.AdjustOneRoundGainedOrdinaryTrickTarget) || HasTriggerOperation(SkillProgramEffectOp.BeginPhaseNamePrediction) || HasTriggerOperation(SkillProgramEffectOp.DrawThenDiscardSuitsForDyingPeach) || UsesTieredRoundConversions || UsesRoundOnceCardlessBasics || HasTriggerWindow(SkillProgramTriggerWindow.TurnBeforeStart) || UsesRoundDistinctBasicUse || UsesRoundGainedRedHandOnly || UsesDynamicRoundUsage || HasActivationOperation(SkillProgramEffectOp.ScheduleFirstRoundGameUsageRefund) || HasTriggerOperation(SkillProgramEffectOp.UseRoundPricedPileDyingAlcohol) || HasTriggerOperation(SkillProgramEffectOp.DrawEndingPairThenBlockRoundIfUnequal) || HasTriggerOperation(SkillProgramEffectOp.ZecaiRoundSettlement) || HasTriggerOperation(SkillProgramEffectOp.FengjiRoundChoice) || HasTriggerOperation(SkillProgramEffectOp.KanggeHealVictim) || HasTriggerOperation(SkillProgramEffectOp.QualifyFirstRoundDamage) || HasTriggerOperation(SkillProgramEffectOp.ArmHongjiNextPhase);
         UsesRoundTracking |= HasTriggerOperation(SkillProgramEffectOp.PayAndDrawWushuangJinzhi) || programs.Any(program => program.Activations.Any(a => a.UsesPerPhaseExpression is not null));
         UsesRoundTracking |= HasActivationOperation(SkillProgramEffectOp.ResolveShanheS5Qiangxi);
-        UsesRoundTracking |= triggers.SelectMany(trigger => trigger.Effects).Concat(programs.SelectMany(program => program.Activations).SelectMany(activation => activation.Effects))
-            .Any(effect => effect.SkillState?.Duration == SkillStateDuration.CurrentRound);
+        UsesRoundTracking |= skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.RoundAdvanced);
         UsesRoundTracking |= programs.Any(program => program.Modifiers.Any(modifier => modifier.MinimumRound is not null) ||
             program.DamageModifiers.Any(modifier => modifier.MinimumRound is not null));
         UsesRoundTracking |= HasTriggerOperation(SkillProgramEffectOp.ResolveMouDongZhaoShunji);
@@ -219,6 +224,7 @@ internal sealed class SkillProgramDependencies
     internal bool UsesRoundGainedRedHandOnly { get; }
     internal bool UsesOwnPublicPileConversions { get; }
     internal bool UsesRoundTracking { get; }
+    internal bool UsesSkillStatePhaseEnds { get; }
     internal bool CapturesCompletedResponseSuit { get; }
     internal bool TracksPlayCardHistory { get; }
     internal bool UsesTriggerCondition(SkillProgramTriggerConditionKind kind) => _conditions.Contains(kind);

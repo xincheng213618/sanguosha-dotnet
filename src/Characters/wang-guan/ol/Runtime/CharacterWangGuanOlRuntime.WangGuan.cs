@@ -49,8 +49,8 @@ internal sealed partial class CharacterWangGuanOlRuntime
                 _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
                     new(invoice.Source.SkillId, invoice.Source.BindingId, invoice.Source.OwnerSeat, invoice.Source.SkillInstanceId),
                     native, invoice.ActionId), invoice.Source.OwnerSeat,
-                    new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.CurrentRound)
-                        { CharacterOnly = false }, ["ol:miuyan"]);
+                    new(SkillStateAction.Suppress, SkillStateMatch.ForSkills(["ol:miuyan"]),
+                        [new(SkillStateBoundaryEvent.RoundAdvanced, null)]));
                 FinishWangGuan(f);
                 return SkillProgramStepOutcome.AwaitChild;
             }

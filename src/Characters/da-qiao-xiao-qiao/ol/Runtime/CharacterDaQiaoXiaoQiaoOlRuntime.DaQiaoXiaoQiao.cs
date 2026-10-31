@@ -24,7 +24,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
         if (f.SkillId != "ol:xingwu" || f.TriggerId != "discard-start-dance" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.DaQiaoXiaoQiao is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !DaQiaoXiaoQiaoParent(f))
             throw new InvalidOperationException("Xingwu requires its exact unpaid actual Discard starting frame.");
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var pile = _corePublicPileSourcesOperations.EnsurePublicPileSource(f, int.MaxValue);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DaQiaoXiaoQiao = new(DaQiaoXiaoQiaoSource(f), f.GameplayHash, f.WindowContext!.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, pile, DaQiaoXiaoQiaoStage.Deposit) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DaQiaoXiaoQiaoStartedEvent(f.Id, DaQiaoXiaoQiaoSource(f), f.GameplayHash, f.WindowContext!.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber));

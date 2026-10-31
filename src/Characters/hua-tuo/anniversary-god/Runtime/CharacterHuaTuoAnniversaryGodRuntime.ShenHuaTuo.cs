@@ -201,7 +201,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
         }
 
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         if (!target.SkillGrants.Grant(new(grantId!, selected, grantId!, sourceId)))
             throw new InvalidOperationException("Huandao cannot grant twice.");
         _coreConversionStatesOperations.RegisterTaggedConversionSkill(target, selected);
@@ -220,7 +220,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
         if (grants.Length == 0 || skill == r.SelectedSkillId)
             throw new InvalidOperationException("Huandao lost its chosen other skill.");
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         foreach (var g in grants)
         {
             if (target.SkillGrants.Grants.Any(live => live.GrantId == g.GrantId))

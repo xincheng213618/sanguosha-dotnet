@@ -38,11 +38,11 @@ internal sealed partial class CharacterZhangFeiOlMagicRuntime
     void IMoZhangFeiOperations.Recover(ProgramSkillFrame f, int amount) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, amount, null, null);
     void IMoZhangFeiOperations.LoseHp(ProgramSkillFrame f, int seat, int amount) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(f.Id, f.SkillId, seat, amount);
     void IMoZhangFeiOperations.Suppress(ProgramSkillFrame f, int seat) => _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, seat,
-        new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
+        new(SkillStateAction.Suppress, SkillStateMatch.NonLocked, [new(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before)]));
     void IMoZhangFeiOperations.ObserveSkillRevisions()
     {
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
     }
 
     bool IMoZhangFeiOperations.RemoveSkillGrant(int owner, string id) => _coreMatchParticipantsPlayersAccess._players[owner].SkillGrants.RemoveGrant(id);

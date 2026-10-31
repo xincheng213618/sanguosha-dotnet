@@ -283,7 +283,7 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
         foreach (var grant in owner.SkillGrants.Grants.Where(grant => grant.IsEnabled && grant.SkillId == lostSkillId).ToArray())
             owner.SkillGrants.SetEnabled(grant.GrantId, false);
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CharacterSkillsLostEvent(f.OwnerSeat, f.OwnerSeat, Array.AsReadOnly(new[] { lostSkillId })));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 失去技能{((lostSkillId == ShiCaoShuangComposition.DianYiSkill ? "“典易”" : "“奢权”"))}。", f.OwnerSeat);
         if (!ShiCaoShuangHasSkill(f.OwnerSeat, ShiCaoShuangComposition.NiZunSkill))

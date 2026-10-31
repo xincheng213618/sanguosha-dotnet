@@ -68,7 +68,7 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
         if (effect.Op == SkillProgramEffectOp.RemovePublicPileAfterAttackDamage && (pile is null || _corePublicPileSourcesOperations.PublicPileCards(pile).Count == 0))
             return SkillProgramStepOutcome.Continue;
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         var issuer = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicPilePreparation = new() { InstructionIndex = 1, Operation = effect.Op, Issuer = issuer, GameplayHash = f.GameplayHash, ActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, ParentId = f.WindowContext!.ParentFrameId, Stage = PublicPilePreparationStage.Choosing, Pile = pile } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PublicPilePreparationStartedEvent(f.Id, effect.Op, issuer, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, f.WindowContext.ParentFrameId, pile));

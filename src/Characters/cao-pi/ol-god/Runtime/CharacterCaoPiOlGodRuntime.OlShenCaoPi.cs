@@ -28,7 +28,7 @@ internal sealed partial class CharacterCaoPiOlGodRuntime
     void IOlShenCaoPiOperations.ObserveSkillRevisions()
     {
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
     }
 
     bool IOlShenCaoPiOperations.RemoveGrant(int owner, string grantId) => _coreMatchParticipantsPlayersAccess._players[owner].SkillGrants.RemoveGrant(grantId);

@@ -63,16 +63,18 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
     {
         _coreProgramBooleanStateExpirationOperations.ExpireProgramBooleanStateLeases2(turnNumber, turnSeat);
         _coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess._currentTurnHeartSlashBonuses.RemoveAll(b => b.TurnNumber == turnNumber && b.TurnOwnerSeat == turnSeat);
-        _stateChanges.ExpireCurrentTurnSkillStates(turnNumber, turnSeat);
+        _stateChanges.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnCleanup, turnSeat,
+            SkillStateBoundaryTiming.Before, turnNumber));
         _coreNextSlashProgramsOperations.ExpireNextSlashDamage(turnNumber, turnSeat);
         _coreDirectedTurnCardPoliciesOperations.ExpireDirectedTurnCardPolicies(turnNumber, turnSeat);
         _coreOriginalTargetAdditionsOperations.ExpireOriginalTargetAdditionGrants(turnNumber, turnSeat);
         _coreFixedDistanceOneDebtOperations.Value.ExpireFixedDistanceOneGrants(turnNumber, turnSeat);
         _coreBoundDiscardSlashBenefitsOperations.ResolveFirstRoundGameUsageRefunds(turnNumber, turnSeat);
         var expired = _turnCardUseEffectsOperations._turnCardUseEffects.ExpireTurn(turnNumber, turnSeat);
-        if (expired.Count == 0)
-            return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnCardUseEffectsExpiredEvent(turnNumber, turnSeat, expired));
+        if (expired.Count > 0)
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnCardUseEffectsExpiredEvent(turnNumber, turnSeat, expired));
+        _stateChanges.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnCleanup, turnSeat,
+            SkillStateBoundaryTiming.After, turnNumber));
     }
 
     internal void ExpireOwnerTurnStartDamageModifiers(int ownerSeat)

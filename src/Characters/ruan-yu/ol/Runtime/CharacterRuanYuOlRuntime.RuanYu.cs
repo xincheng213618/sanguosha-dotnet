@@ -168,7 +168,7 @@ internal sealed partial class CharacterRuanYuOlRuntime
     internal void PrepareRuanYuMovement(ref ProgramSkillFrame f, RuanYuStage stage, IReadOnlyList<RuanYuEntity> entities)
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var r = f.RuanYu!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RuanYu = r with { Paid = true, Stage = stage, Step = r.Step + 1, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, ActualCount = 0, Entities = entities }, PendingMovementContinuation = new(r.Recipient, 0, null) });
     }

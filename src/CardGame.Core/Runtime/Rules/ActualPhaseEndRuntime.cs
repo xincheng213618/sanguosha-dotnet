@@ -14,7 +14,7 @@ internal sealed class ActualPhaseEndRuntime(IProgramRuntimeFrames frames, INativ
     IQuHuangPhaseEndQueries quHuang)
     : IActualPhaseEndQueries, IActualPhaseEndOperations
 {
-    public bool Tracks => facts.HasLishiCapability || facts.HasMouSimaShi || facts.HasMouHuCheEr ||
+    public bool Tracks => content.UsesSkillStatePhaseEnds || facts.HasLishiCapability || facts.HasMouSimaShi || facts.HasMouHuCheEr ||
         facts.ModeTracksActualPhaseEnds || facts.HasOlLuShi ||
         content.HasTriggerOperation(SkillProgramEffectOp.ResolveQingyaNextActualPhaseUse) ||
         content.HasTriggerOperation(SkillProgramEffectOp.ResolveNishouIssuedCurrentPhaseSwap) ||

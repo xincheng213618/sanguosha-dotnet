@@ -50,7 +50,7 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
         if (cured)
         {
             foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
             for (var i = 0; i < revoked.Length; i++)
             {
                 var identity = revoked[i];

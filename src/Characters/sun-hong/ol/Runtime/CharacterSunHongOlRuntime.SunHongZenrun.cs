@@ -153,7 +153,7 @@ internal sealed partial class CharacterSunHongOlRuntime
             for (var i = 0; i < materials.Length; i++)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZenrunMaterialCommittedEvent(f.Id, i, materials[i].CardId, materials[i].Kind, materials[i].From));
             foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+                _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
             var frameId = f.Id;
             var step = r.Step;
             var before = r.Before;

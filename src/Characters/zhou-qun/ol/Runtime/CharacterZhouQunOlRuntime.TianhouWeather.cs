@@ -6,7 +6,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
     internal void ExpireTianhouWeather(ProgramSkillFrame f)
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var expired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TianhouWeatherExpiredEvent>().Select(e => e.GrantId).ToHashSet(StringComparer.Ordinal);
         foreach (var old in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TianhouWeatherGrantedEvent>().Where(e => e.Source.OwnerSeat == f.OwnerSeat && !expired.Contains(e.GrantId)).ToArray())
         {
@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
         if (r.Stage != ZhouQunStage.ChooseWeatherRecipient || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !r.Viewed.Contains(r.ChosenCard) || _cardZonesOperations._cardZones.GetLocation(r.ChosenCard) != CardLocation.DrawPile || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TianhouCardShownEvent>().Count(e => e.FrameId == f.Id && e.CardId == r.ChosenCard) != 1)
             throw new InvalidOperationException("Tianhou lost its publicly chosen exact top card or real living recipient.");
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhouQun = r with { Stage = ZhouQunStage.GrantChildren, Peer = recipient } });
         var weather = ZhouQunWeather(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.ChosenCard).Suit);
         if (weather.Id.Length == 0)

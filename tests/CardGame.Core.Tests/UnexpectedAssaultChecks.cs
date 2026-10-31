@@ -138,7 +138,7 @@ internal static class UnexpectedAssaultChecks
             "A physical loss and regrant cannot refresh the failed skill inside the same actual turn.");
         var owner = ((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine.GetField("_players",
             System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(g)!)[0];
-        var suppression = owner.SkillGrants.Grants.Single(grant => grant.SkillState?.Origin?.CardUseFrameId == use.Id).SkillState!;
+        var suppression = owner.SkillGrants.Restrictions.Single(restriction => restriction.Lifetime.Origin.CardUseFrameId == use.Id);
         Use(g, Driver, "extra"); Play(g); End(g);
         Until(g, e => F<TurnStartedEvent>(e).Count(t => t.ActorSeat == 0) == 2 && P(e) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
         var restoredActions = g.GetHumanLegalActions().Where(a => a.ConversionSource?.SkillId == Pochu).ToArray();
@@ -149,8 +149,10 @@ internal static class UnexpectedAssaultChecks
             a.TargetSeats.SequenceEqual([1]) && a.ConversionSource == oldSource);
         var policy = use.NoDamageSkillDisablePolicy!;
         var expiry = F<SkillStateExpiredEvent>(g).Where(e => e.Origin?.CardUseFrameId == use.Id).ToArray();
-        var exactOldTurnExpired = expiry is [var ended] && ended.Origin == suppression.Origin &&
-            suppression.IssuedTurn == policy.TurnNumber && suppression.EndSeat == policy.TurnOwnerSeat;
+        var exactOldTurnExpired = expiry is [var ended] && ended.Origin == suppression.Lifetime.Origin &&
+            suppression.Lifetime.Origin.IssuedTurn == policy.TurnNumber && suppression.Lifetime.Until.Any(boundary =>
+                boundary.Event == SkillStateBoundaryEvent.TurnCleanup && boundary.Seat == policy.TurnOwnerSeat &&
+                boundary.IssuedOccurrence == policy.TurnNumber);
         var newActualTurn = F<TurnStartedEvent>(g).Last(e => e.ActorSeat == 0).TurnNumber > policy.TurnNumber;
         Require(stableSourceRestored && exactOldTurnExpired && newActualTurn,
             "The same stable acquired source becomes usable only after the old actual turn ends, including an immediate extra turn: " +

@@ -48,8 +48,10 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillChoicesRuntime
             var target = choice.Targets.Single();
             if (target != f.WindowContext?.SourceSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
                 throw new InvalidOperationException("Yashi's non-locked suppression lost its actual damage source.");
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangYashiSuppressedEvent(f.Id, f.OwnerSeat, target, _coreActualTurnProgressTurnNumberAccess._turnNumber));
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
+            _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
+                new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId)), target,
+                new(SkillStateAction.Suppress, SkillStateMatch.NonLocked,
+                    [new(SkillStateBoundaryEvent.TurnStarted, SkillStateSubject.Target, SkillStateBoundaryTiming.Before, true)]));
             _coreWushuangOriginalSkillsOperations.FinishWushuangOriginal(f);
             return;
         }

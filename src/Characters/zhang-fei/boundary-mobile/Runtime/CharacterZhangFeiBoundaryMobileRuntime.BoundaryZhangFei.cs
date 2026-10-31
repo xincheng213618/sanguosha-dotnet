@@ -68,7 +68,7 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         {
             var target = context.TargetSeat!.Value;
             _coreProgramSkillChangesOperations.ApplyProgramSkillState(frame, target,
-                new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
+                new(SkillStateAction.Suppress, SkillStateMatch.NonLocked, [new(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before)]));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiyongTargetIssuedEvent(frame.Id, use.Id, use.Action!.ActionId, target));
         }
 

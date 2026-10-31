@@ -105,7 +105,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     internal void StartQushiMovement(ref ProgramSkillFrame f, QushiStage stage, int participant)
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         var r = f.Qushi!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Qushi = r with { Paid = true, Stage = stage, Step = r.Step + 1, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, HolderSeat = stage == QushiStage.SealChildren ? participant : r.HolderSeat }, PendingMovementContinuation = new(participant, 0, null) });
     }

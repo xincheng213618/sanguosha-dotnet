@@ -27,8 +27,8 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
             if (_resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } ended || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(ended) || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(ended)))
                 throw new InvalidOperationException("Zhuangdan lost its actual end-of-turn candidate.");
             _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, f.OwnerSeat,
-                new(SkillStateAction.Suppress, SkillStateScope.Named, SkillStateDuration.UntilTurnEndOf)
-                { CharacterOnly = false, UntilTurnEndOf = new(ProgramParticipantRef.Owner) }, [AnniversaryXiahouJieComposition.Liedan]);
+                new(SkillStateAction.Suppress, SkillStateMatch.ForSkills([AnniversaryXiahouJieComposition.Liedan]),
+                    [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Owner)]));
             return SkillProgramStepOutcome.Continue;
         }
 

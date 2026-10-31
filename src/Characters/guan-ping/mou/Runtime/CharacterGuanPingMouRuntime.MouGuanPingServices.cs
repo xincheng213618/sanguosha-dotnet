@@ -73,7 +73,7 @@ internal sealed partial class CharacterGuanPingMouRuntime
         if (!MouGuanPing.Valid(f) || f.MouGuanPing is not { Stage: MouGuanPingStage.Children } r || !r.Targets.Contains(target))
             throw new InvalidOperationException("Wuwei suppression requires an actual original Slash target.");
         _coreProgramSkillChangesOperations.ApplyProgramSkillState(f, target,
-            new(SkillStateAction.Suppress, SkillStateScope.NonLocked, SkillStateDuration.CurrentTurn) { CharacterOnly = false }, []);
+            new(SkillStateAction.Suppress, SkillStateMatch.NonLocked, [new(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before)]));
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 35000)]

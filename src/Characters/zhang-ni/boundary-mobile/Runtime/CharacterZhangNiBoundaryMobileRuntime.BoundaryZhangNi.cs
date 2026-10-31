@@ -144,7 +144,7 @@ internal sealed partial class CharacterZhangNiBoundaryMobileRuntime
             throw new InvalidOperationException("Wurong must pay its complete current owned HE set once.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryWurong = r = r with { Stage = BoundaryWurongStage.GiftChildren, Before = before, After = before }, PendingMovementContinuation = new(r.Giver, 0, null) });
         foreach (var group in r.Selected.GroupBy(id => _cardZonesOperations._cardZones.GetLocation(id)))
             _corePhysicalMovementFacadesOperations.MoveCards(group.Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray(), group.Key, CardLocation.Hand(r.Recipient), new(BoundaryWurongGift));

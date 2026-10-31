@@ -71,7 +71,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         }
 
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         PublishZonghu(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }

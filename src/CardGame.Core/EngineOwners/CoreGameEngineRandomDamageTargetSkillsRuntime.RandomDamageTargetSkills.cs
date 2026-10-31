@@ -79,7 +79,7 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RandomDamageTargetSkill = receipt });
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
-            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
+            _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.GrantRevision);
         if (!owner.SkillGrants.Grant(receipt.GrantedGrant))
             throw new InvalidOperationException("Random damage-target skill acquisition cannot issue the same grant twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramRandomDamageTargetSkillAcquiredEvent(receipt));
