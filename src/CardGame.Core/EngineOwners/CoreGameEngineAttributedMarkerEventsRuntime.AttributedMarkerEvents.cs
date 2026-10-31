@@ -76,7 +76,7 @@ internal sealed partial class CoreGameEngineAttributedMarkerEventsRuntime
     internal void ApplyAttributedEvent(ProgramSkillFrame frame, SkillProgramEffect effect, int targetSeat)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (active.SkillId != frame.SkillId || active.SkillInstanceId != frame.SkillInstanceId || (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_continuationPermissions.Value.CanContinueProgramAfterSkillLoss(active)))
+        if (active.SkillId != frame.SkillId || active.SkillInstanceId != frame.SkillInstanceId || (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_continuationPermissions.Value.CanContinueProgramAfterSkillLoss(active)))
             throw new InvalidOperationException("Attributed event lost its exact source.");
         if (active.WindowContext is null && effect.Op == SkillProgramEffectOp.ChangeParticipantMarker)
         {

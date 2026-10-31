@@ -115,7 +115,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.Wuyou;
-        if (r is null || !ValidWuyouFrame(f, false) || f.InstructionIndex != 1 || r.ContributionPaid || WuyouPlay(r.DonorSeat) != r.Phase || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(r.ContributionCardId) != CardLocation.Hand(r.DonorSeat))
+        if (r is null || !ValidWuyouFrame(f, false) || f.InstructionIndex != 1 || r.ContributionPaid || WuyouPlay(r.DonorSeat) != r.Phase || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _cardZonesOperations._cardZones.GetLocation(r.ContributionCardId) != CardLocation.Hand(r.DonorSeat))
             throw new InvalidOperationException("Wuyou requires its once-only original donor Hand entity and actual Play.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (r.DonorSeat == f.OwnerSeat)

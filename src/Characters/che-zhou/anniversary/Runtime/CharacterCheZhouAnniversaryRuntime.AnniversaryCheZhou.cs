@@ -76,7 +76,7 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
             throw new InvalidOperationException("Pigua requires its published opaque Hand slot and unpaid original frame.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreSkillProgramsOperations.FinishProgramSkill(f, false);
             return;

@@ -93,7 +93,7 @@ internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime
         if (receipt.Paid || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || !GrantedPhaseSlashChoices(f).Any(c => c.Id == choice.Id))
             throw new InvalidOperationException("A phase claim choice is not currently published.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !IsGrantedEntityPhaseActive(f.OwnerSeat) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || choice.Parameters["option"] == "skip")
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !IsGrantedEntityPhaseActive(f.OwnerSeat) || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || choice.Parameters["option"] == "skip")
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { GrantedPhaseSlashClaim = null });
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

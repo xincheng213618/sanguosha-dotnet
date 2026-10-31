@@ -19,7 +19,7 @@ internal sealed partial class CharacterZhuRanMouMobileRuntime
     SkillProgram? IMouZhuRanFacts.Program(string skill) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(skill)?.Program;
     bool IMouZhuRanFacts.ExactStart(ProgramSkillFrame f, SkillProgramEffectOp operation)
     {
-        if (f.InstructionIndex < 1 || ((IMouZhuRanFacts)this).Program(f.SkillId)?.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != operation || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.InstructionIndex < 1 || ((IMouZhuRanFacts)this).Program(f.SkillId)?.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != operation || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return false;
         if (operation == SkillProgramEffectOp.ResolveMouZhuRanZhenwei)
             return f.SkillId == MouZhuRanRuntime.Zhenwei && f.ActivationId == "sealed-discard" && f.TriggerId is null && f.WindowContext is null && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats is [var target] && target != f.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && ((IMouZhuRanFacts)this).Phase is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == f.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p) && !((IMouZhuRanFacts)this).History<MouZhuRanStartedEvent>().Any(x => x.Source.OwnerSeat == f.OwnerSeat && x.Phase == p && x.Operation == operation);

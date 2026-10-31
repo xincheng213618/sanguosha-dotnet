@@ -39,7 +39,7 @@ internal sealed partial class CoreGameEngineNamedCardAcquisitionsRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.NamedCardAcquisition is not null || e.OutputKind is not { } kind || e.SkillIds.Contains(f.SkillId))
             throw new InvalidOperationException("A named-card acquisition cannot replace itself or overwrite an issued draft.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var grants = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].SkillGrants.Grants.Where(g => e.SkillIds.Contains(g.SkillId)).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { NamedCardAcquisition = new(f.InstructionIndex, kind, NamedCardAcquisitionStage.Selecting, true) });
@@ -84,7 +84,7 @@ internal sealed partial class CoreGameEngineNamedCardAcquisitionsRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { NamedCardAcquisition: { Stage: NamedCardAcquisitionStage.Selecting } d } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !NamedCardAcquisitionChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards)) || !Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone))
             throw new InvalidOperationException("Named-card acquisition requires its exact currently published source choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { NamedCardAcquisition = null });
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), "指定牌收益尚未发行，原来源已失效。");
@@ -138,7 +138,7 @@ internal sealed partial class CoreGameEngineNamedCardAcquisitionsRuntime
         AssertNamedCardAcquisition(f);
         if (d.Stage == NamedCardAcquisitionStage.Selecting)
         {
-            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 _coreNativePromptBoundaryOperations.ClearPendingDecision();
                 _coreRuntimeOperations.ReplaceRuntimeTop(f with { NamedCardAcquisition = null });
@@ -157,7 +157,7 @@ internal sealed partial class CoreGameEngineNamedCardAcquisitionsRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { NamedCardAcquisition = null });
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), "指定牌的已发行移动与子结算已结清。");
         else
             _coreRuntimeOperations.AdvanceRuntimeProgram(id);

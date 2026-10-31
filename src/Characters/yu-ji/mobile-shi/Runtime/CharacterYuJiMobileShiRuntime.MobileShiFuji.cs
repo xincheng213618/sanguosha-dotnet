@@ -17,7 +17,7 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         if (f.ActivationId != MobileShiYuJiComposition.FujiGiftActivation || f.TriggerId is not null || f.WindowContext is not null || f.SelectedTargetSeats is not [var recipient] || recipient == f.OwnerSeat)
             throw new InvalidOperationException("Fuji gift requires its own activation frame and one exact other recipient.");
-        if (f.SelectedCardIds.Count == 0 || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (f.SelectedCardIds.Count == 0 || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var program = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!;
         var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
@@ -75,7 +75,7 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         if (f.TriggerId != MobileShiYuJiComposition.FujiUseEffectsTrigger || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } })
             throw new InvalidOperationException("Fuji use effects require their exact committed card-use window.");
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         // The committed window freezes its exact action on the owning window frame;
         // the accepted fact only enters history after that window completes.
@@ -128,7 +128,7 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         // The window's own completed-response fact carries the accepted action identity;
         // a finished response answers exactly one accepted action.
         var completedFact = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardResponseCompletedEvent>().SingleOrDefault(item => item.ActionId == use.CardActionId);
-        if (completedFact is null || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (completedFact is null || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var user = _coreMatchParticipantsPlayersAccess._players[completedFact.ActorSeat];
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();

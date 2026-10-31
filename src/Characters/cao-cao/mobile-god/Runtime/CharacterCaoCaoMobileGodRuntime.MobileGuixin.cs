@@ -14,7 +14,7 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.MobileGuixin is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreOrderedPrintedSkillLossObserversOperations.ExactOrderedPrintedSkillLossParent(f, out var window, out var damage, out _) || damage.TargetSeat != f.OwnerSeat || f.WindowContext!.OccurrenceIndex < 0 || f.WindowContext.OccurrenceIndex >= damage.Amount)
             throw new InvalidOperationException("Mobile Guixin requires its actual positive original damage-point owner candidate.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var r = new MobileGuixinReceipt(MobileGuixinSource(f), f.GameplayHash, window.Id, damage.Id, f.WindowContext.OccurrenceIndex, damage.Amount)
         {
@@ -48,7 +48,7 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, MobileGuixin = r = r with { Stage = MobileGuixinStage.Choosing, Cursor = r.Cursor + 1 } });
             }
 
-            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Payments.Count == 0 && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Payments.Count == 0 && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 FinishMobileGuixin(f, true);
                 return true;
@@ -105,7 +105,7 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
         var r = f.MobileGuixin!;
         var exact = MobileGuixinChoices(f).SingleOrDefault(c => c.Id == chosen.Id && c.Cards.SequenceEqual(chosen.Cards) && c.Targets.SequenceEqual(chosen.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(chosen.Parameters.OrderBy(p => p.Key))) ?? throw new InvalidOperationException("Mobile Guixin requires its exact current public card or opaque hand slot.");
         var target = r.OtherSeats[r.Cursor];
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || r.Payments.Count == 0 && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || r.Payments.Count == 0 && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Mobile Guixin lost an unpaid live participant or its original instance.");
         var zone = Enum.Parse<CardZoneKind>(exact.Parameters["source-zone"]);
         var slot = int.Parse(exact.Parameters["slot-index"], CultureInfo.InvariantCulture);

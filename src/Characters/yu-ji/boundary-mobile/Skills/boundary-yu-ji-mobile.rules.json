@@ -269,7 +269,10 @@
     {
       "id": "boundary:chanyuan-mobile",
       "revision": 1,
-      "cannotChallengeDeclarations": true
+      "cannotChallengeDeclarations": true,
+      "skillStates": [{ "target": "owner", "action": "suppress",
+        "match": { "filter": ["and", ["==", ["number", "skill.character"], 1], ["==", ["number", "skill.isSource"], 0]] },
+        "while": ["==", ["hp", "owner"], 1] }]
     }
   ]
 }

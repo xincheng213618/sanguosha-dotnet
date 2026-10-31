@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime
         var source = _coreProgramLifecycleOperations.GetProgramCardSet(frame, bind);
         if (frame.BoundDiscardSlashBenefits is not null)
             throw new InvalidOperationException("A paid discard cannot run twice.");
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || frame.TriggerId is not null || _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || frame.OwnerSeat != _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || source.CardIds is not [var cardId] || source.SourceLocations is not [var from] || from.OwnerSeat != frame.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _cardZonesOperations._cardZones.GetLocation(cardId) != from)
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || frame.TriggerId is not null || _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || frame.OwnerSeat != _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || source.CardIds is not [var cardId] || source.SourceLocations is not [var from] || from.OwnerSeat != frame.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _cardZonesOperations._cardZones.GetLocation(cardId) != from)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "弃牌成本或技能来源已失效，未授予回合收益。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -34,7 +34,7 @@ internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id))
             return true;
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && owner.IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             var source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
             var range = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, id, paid.InstructionIndex - 1, source, SkillRuleQuery.AttackRange, SkillRuleOperation.Unlimited, 0);

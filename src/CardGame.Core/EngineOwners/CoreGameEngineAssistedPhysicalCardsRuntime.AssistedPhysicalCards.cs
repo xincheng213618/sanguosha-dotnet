@@ -135,7 +135,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         if (effect.Op != SkillProgramEffectOp.RequestSlashAgainstChosenTarget || selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (draft.TargetSeat is null && !draft.ActorChoosesTarget ? frame.OwnerSeat : draft.ActorSeat) || !AssistedPhysicalSlashChoices(frame).Any(choice => choice.Id == selected.Id))
             throw new InvalidOperationException("Assisted Slash choice changed its frozen instruction or participants.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.ActorSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(frame))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.ActorSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "受令角色或技能实例已失效。");
             return;
@@ -218,7 +218,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         if (effect.Op != SkillProgramEffectOp.TakeSelectedTargetCards || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !OtherCardSelectionChoices(frame).Any(choice => choice.Id == selected.Id))
             throw new InvalidOperationException("Other-card selection changed its frozen source or slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.SourceSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.SourceSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "获得牌的参与者或技能实例已失效。");
             return;

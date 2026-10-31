@@ -144,7 +144,7 @@ internal sealed partial class CoreGameEngineFriendEventsRuntime
             return true;
         }
 
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             if (flow.Stage == FriendEventFlowStage.RecastCost)
                 f = _coreNativeRecastInvocationsOperations.CompleteFrameNativeRecastInvocation(f, 0);

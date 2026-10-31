@@ -260,7 +260,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
     internal void PayRecipientCategoryGift(ProgramSkillFrame f, int id)
     {
         var r = f.RecipientCategoryMark!;
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.HolderSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreGameEngineRecipientCategoryMarksRecipientCategoryMarkLedgerStartedRecipientCategoryMarksAccess._recipientCategoryMarks.ContainsKey(new(r.HolderSeat, r.SourceSkillId, r.StateId)) || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(r.HolderSeat))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.HolderSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _coreGameEngineRecipientCategoryMarksRecipientCategoryMarkLedgerStartedRecipientCategoryMarksAccess._recipientCategoryMarks.ContainsKey(new(r.HolderSeat, r.SourceSkillId, r.StateId)) || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(r.HolderSeat))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "赠牌前来源、手牌或无标记条件已失效。");
             return;

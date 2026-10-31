@@ -67,7 +67,7 @@ internal sealed class ProgramHealthStateRuntime(IProgramRuntimeFrames frames, IP
         var owner = participants.At(recipientSeat);
         var previous = owner.MaxHp;
         if (sourceSkillId is not null && sourceSkillId != frame.SkillId &&
-            !facts.HasRuntimeSkillInstance(owner, sourceSkillId, facts.GetRuntimeSkillInstanceId(owner, sourceSkillId)))
+            !facts.HasEffectiveSkillInstance(owner, sourceSkillId, facts.GetRuntimeSkillInstanceId(owner, sourceSkillId)))
             throw new InvalidOperationException("Maximum-HP attribution requires the owner's actual source skill instance.");
         var newMaximum = facts.HasWushuangTactic(owner.Seat, 2020) ? 7 : Math.Max(1, checked(owner.MaxHp + amount));
         if (native.TryApplyHappyQiaoMaximumHp(frame.Id, owner.Seat, newMaximum, sourceSkillId ?? frame.SkillId)) return;

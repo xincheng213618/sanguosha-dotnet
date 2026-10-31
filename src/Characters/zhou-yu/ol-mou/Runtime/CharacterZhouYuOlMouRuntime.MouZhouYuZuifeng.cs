@@ -38,7 +38,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (f.SkillId != MouZuifengSkill || f.ActivationId != MouZuifengBinding || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || MouZuifengPlay(f.OwnerSeat)is not { } phase || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || MouZuifengUses(f.OwnerSeat, phase) >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp || MouZuifengCosts(f.OwnerSeat).Count == 0 || MouZuifengTargets(f).Length == 0)
+        if (f.SkillId != MouZuifengSkill || f.ActivationId != MouZuifengBinding || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || MouZuifengPlay(f.OwnerSeat)is not { } phase || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || MouZuifengUses(f.OwnerSeat, phase) >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp || MouZuifengCosts(f.OwnerSeat).Count == 0 || MouZuifengTargets(f).Length == 0)
             throw new InvalidOperationException("Zuifeng requires its current true Play, dynamic MaxHP allowance and one legally discardable unique-suit Hand entity.");
         var r = new MouZuifengReceipt(MouZuifengSource(f), f.GameplayHash, phase, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat)
         {
@@ -59,7 +59,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         var choices = new List<PromptChoice>();
         if (r.Stage is MouZuifengStage.CostChoice or MouZuifengStage.TargetChoice)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || MouZuifengPlay(f.OwnerSeat) != r.Phase || MouZuifengUses(f.OwnerSeat, r.Phase) >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp)
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || MouZuifengPlay(f.OwnerSeat) != r.Phase || MouZuifengUses(f.OwnerSeat, r.Phase) >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp)
                 return[];
             if (r.Stage == MouZuifengStage.CostChoice)
                 choices.AddRange(MouZuifengCosts(f.OwnerSeat).Select(c => C("cost", $"弃置【{(c.DisplayName)}】", c.Id)));

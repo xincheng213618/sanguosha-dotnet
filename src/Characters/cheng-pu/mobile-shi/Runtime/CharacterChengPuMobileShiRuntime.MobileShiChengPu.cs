@@ -34,7 +34,7 @@ internal sealed partial class CharacterChengPuMobileShiRuntime
         if (f.TriggerId != MobileShiChengPuComposition.DuzuoGrantTrigger || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, MovementBatch: not null })
             throw new InvalidOperationException("Duzuo requires its exact excluded hand-gain window.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId) || MobileShiChengPuFireSlash()is null)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || MobileShiChengPuFireSlash()is null)
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiChengPu = new("duzuo", _coreActualTurnProgressTurnNumberAccess._turnNumber) });
         ContinueMobileShiDuzuo(f.Id);
@@ -118,7 +118,7 @@ internal sealed partial class CharacterChengPuMobileShiRuntime
         if (f.TriggerId != MobileShiChengPuComposition.BihanGuardTrigger || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, TargetSeat: { } victim })
             throw new InvalidOperationException("Bihan requires its exact slash-damage window.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiChengPu = new("bihan", _coreActualTurnProgressTurnNumberAccess._turnNumber, DamageTargetSeat: victim) });
         ContinueMobileShiBihan(f.Id);

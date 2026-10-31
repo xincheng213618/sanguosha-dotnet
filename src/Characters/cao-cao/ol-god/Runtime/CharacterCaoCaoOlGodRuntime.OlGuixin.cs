@@ -19,7 +19,7 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.OlGuixin is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreOrderedPrintedSkillLossObserversOperations.ExactOrderedPrintedSkillLossParent(f, out var window, out var damage, out _) || damage.TargetSeat != f.OwnerSeat || f.WindowContext!.OccurrenceIndex < 0 || f.WindowContext.OccurrenceIndex >= damage.Amount)
             throw new InvalidOperationException("OL Guixin requires its exact original positive damage-point candidate.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var r = new OlGuixinReceipt(OlGuixinSource(f), f.GameplayHash, window.Id, damage.Id, f.WindowContext.OccurrenceIndex, damage.Amount)
         {
@@ -59,7 +59,7 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, OlGuixin = r = r with { Stage = OlGuixinStage.Visiting, Cursor = r.Cursor + 1 } });
             }
 
-            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Payments.Count == 0 && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Payments.Count == 0 && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 FinishOlGuixin(f, true);
                 return true;

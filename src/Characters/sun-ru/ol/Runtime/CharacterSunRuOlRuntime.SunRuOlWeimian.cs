@@ -80,7 +80,7 @@ internal sealed partial class CharacterSunRuOlRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         if (choice.Parameters["branch"] == "slots")
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 CompleteSunRuOl(f, false);
                 return;
@@ -137,7 +137,7 @@ internal sealed partial class CharacterSunRuOlRuntime
                 return;
             }
 
-            if (!r.Paid && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)))
+            if (!r.Paid && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f)))
             {
                 CompleteSunRuOl(f, false);
                 return;

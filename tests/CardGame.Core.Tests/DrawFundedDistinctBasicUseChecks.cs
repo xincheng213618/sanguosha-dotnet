@@ -340,7 +340,7 @@ internal static class DrawFundedBasicFixture
             });
             var catalog = SkillProgramCatalog.Load(root.ToJsonString(), JsonSerializer.Serialize(new { schemaVersion = 3, skills = labels }));
             foreach (var id in catalog.Programs.Keys) b.AddSkill(new(id, id, "真实小夹具") { Program = catalog.Programs[id] });
-            b.AddSkill(new(Suppress, "真实资格抑制", "只抑制资格，不物理删除旧实例") { SuppressionRule = new(6) });
+            b.AddSkill(new(Suppress, "真实资格抑制", "只抑制资格，不物理删除旧实例") { Program = CharacterFixtureContent.SuppressionProgram(Suppress, 6) });
             b.AddSkill(new("fixture:dfb-noop", "来源替换", "无运行能力"));
             b.AddSkill(new("fixture:dfb-selection", "固定候选", "固定小夹具") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 100d) });
             var ownerSkills = new List<string> { Driver, Gain, Completed };

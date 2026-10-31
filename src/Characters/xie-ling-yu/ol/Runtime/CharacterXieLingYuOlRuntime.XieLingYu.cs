@@ -71,7 +71,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
         }
         else if (r.Stage == XieLingYuStage.Cost)
         {
-            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 foreach (var card in XinyouCostCards(f.OwnerSeat).Where(c => !r.Selected.Contains(c.Id)))
                     choices.Add(Choice("cost", $"选择弃置【{(card.DisplayName)}】", [card.Id]));
@@ -143,7 +143,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
             return;
         }
 
-        if (branch != "pay" || r.Selected.Count == 0 || r.PlayPhase is not { } phase || XinyouActualPlay(f.OwnerSeat) != phase || XinyouPhaseSpent(f.OwnerSeat, phase) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (branch != "pay" || r.Selected.Count == 0 || r.PlayPhase is not { } phase || XinyouActualPlay(f.OwnerSeat) != phase || XinyouPhaseSpent(f.OwnerSeat, phase) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Xinyou cannot pay a canceled, stale or already spent draft.");
         var current = XinyouCostCards(f.OwnerSeat);
         var materials = r.Selected.Select(id => current.Single(c => c.Id == id)).Select(c => new XieLingYuMaterial(c.Id, c.Kind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)), CardLocation.Hand(f.OwnerSeat))).ToArray();
@@ -197,7 +197,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
         {
             if (r.Stage is XieLingYuStage.Cost or XieLingYuStage.RemoveName)
             {
-                if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+                if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
                 {
                     FinishXieLingYu(f);
                     return;

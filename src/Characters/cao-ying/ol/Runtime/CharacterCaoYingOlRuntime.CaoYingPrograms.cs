@@ -7,7 +7,7 @@ internal sealed partial class CharacterCaoYingOlRuntime
 {
     internal CardConversionSource CaoYingSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
     internal bool IsMobileCaoYing(ProgramSkillFrame frame) => _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.CaoYingPolicy == CaoYingRulePolicy.MobileOrdinary;
-    internal bool CaoYingSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool CaoYingSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 330)]
     internal bool CanOfferCaoYing(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c)
     {

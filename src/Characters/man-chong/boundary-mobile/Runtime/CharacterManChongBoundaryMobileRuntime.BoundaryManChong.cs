@@ -102,7 +102,7 @@ internal sealed partial class CharacterManChongBoundaryMobileRuntime
         if (_coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(frame))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { BoundaryManChongJunxing = null, PendingMovementContinuation = null });
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "峻刑付款响应后技能来源失效。");
         else
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);

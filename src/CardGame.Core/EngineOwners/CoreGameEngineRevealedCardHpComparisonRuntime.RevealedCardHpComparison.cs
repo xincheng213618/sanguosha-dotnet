@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineRevealedCardHpComparisonRuntime
             return SkillProgramStepOutcome.Continue;
         if (cards.CardIds is not [var id] || cards.Visibility != SkillProgramCardSetVisibility.Public || _coreNeighborDiscardOpportunitiesOperations.Value.NeighborDiscardHistory().OfType<ProgramCardsRevealedEvent>().LastOrDefault(e => e.FrameId == frame.Id && e.SkillId == frame.SkillId && e.BindingId == frame.TriggerId && e.OwnerSeat == frame.OwnerSeat && e.Bind == bind)is not { Cards: [var revealed] } || revealed.Id != id)
             throw new InvalidOperationException("The comparison requires its exact frozen publicly revealed draw entity.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "展示后的角色或技能来源已失效，未付后继体力成本。");
             return SkillProgramStepOutcome.AwaitChild;

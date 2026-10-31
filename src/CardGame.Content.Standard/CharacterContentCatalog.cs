@@ -86,7 +86,7 @@ internal sealed class CharacterContentCatalog
                     var entry = Object(element, "registrationOrder", "programBundle", "includeProgramPresentation", "definition");
                     var definitionElement = Required(entry, "definition");
                     Object(definitionElement, "id", "name", "description", "implementationStatus", "pendingImplementation",
-                        "tags", "executionForms", "actionForms", "suppressionRule", "selectionWeights", "revealWeights",
+                        "tags", "executionForms", "actionForms", "selectionWeights", "revealWeights",
                         "program", "programPresentation");
                     foreach (var property in new[] { "program", "programPresentation" })
                         if (definitionElement.TryGetProperty(property, out var value) && value.ValueKind != JsonValueKind.Null)

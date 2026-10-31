@@ -273,7 +273,7 @@ internal sealed partial class CoreGameEngineProgramHandControlRuntime
         if (draft.Stage == "color" && !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Select(card => card.Id).SequenceEqual(draft.RevealedCardIds!))
             throw new InvalidOperationException("The revealed hand changed before color payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "技能实例或角色已失效。");
             return;

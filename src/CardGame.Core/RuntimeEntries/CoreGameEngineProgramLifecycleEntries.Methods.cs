@@ -2,6 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramLifecycleEntries
 {
+    internal bool CanInvokeProgramSkill(ProgramSkillFrame frame) => _resolve().CanInvokeProgramSkill(frame);
     internal void AdjustProgramNormalDraw(ProgramSkillFrame frame, int amount) => _resolve().AdjustProgramNormalDraw(frame, amount);
     internal void AdvanceProgramLifecycleCursor(ProgramLifecycleTriggerWindowFrame frame) => _resolve().AdvanceProgramLifecycleCursor(frame);
     internal void AdvanceTurnEndingBoundaryCandidate(TurnEndingBoundaryFrame frame, ProgramTriggerCandidate candidate, bool activated, bool completed) => _resolve().AdvanceTurnEndingBoundaryCandidate(frame, candidate, activated, completed);

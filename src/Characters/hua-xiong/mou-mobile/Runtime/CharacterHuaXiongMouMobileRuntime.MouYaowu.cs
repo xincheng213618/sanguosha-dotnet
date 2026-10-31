@@ -81,7 +81,7 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
         if (!MouYaowuRoot(f) || f.InstructionIndex != 1 || f.MouHuaXiongYaowu is not { IsRed: true, Benefit: null, SourceSeat: { } source } || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != source || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouYaowuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Yaowu only accepts its actual damage source's canonical available reward.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[source].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[source].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             CommitMouYaowuChoice(f, "none", null);
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

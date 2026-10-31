@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     internal static bool BBasic(CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind is CardKind.Dodge or CardKind.Peach or CardKind.Alcohol;
     internal static bool BOrdinaryTrick(CardKind kind) => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(kind, SkillProgramCardCategory.Trick) && !CoreNativeCardClassificationsRuntime.IsDelayedCard(kind);
     internal CardConversionSource BSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal bool BSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    internal bool BSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     internal bool BZhendanDisabled(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangZhendanDisabledEvent>().Any(e => e.OwnerSeat == seat && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
     internal IEnumerable<ProgramTriggerCandidate> CollectWushuangBChunlaoLossCandidates(HpChangeContext change)
     {

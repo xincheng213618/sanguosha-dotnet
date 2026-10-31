@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineShanheS5SimayiRuntime
     internal SkillProgramStepOutcome GrantShanheS5Baiyin(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (active.SkillId != "shanhe:s5-baiyin-14193" || active.TriggerId != "awakening" || active.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId))
+        if (active.SkillId != "shanhe:s5-baiyin-14193" || active.TriggerId != "awakening" || active.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             throw new InvalidOperationException("S5 Baiyin requires its original owner preparation frame.");
         // The source body already prints Jilue. Awakening must not create a
         // second independently usable instance, including while the first is suppressed.

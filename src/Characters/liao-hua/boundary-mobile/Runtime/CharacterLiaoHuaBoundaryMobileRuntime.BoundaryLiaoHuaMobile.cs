@@ -44,7 +44,7 @@ internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryLiaoHuaDiscardSlash.CardId: null } frame || !ValidBoundaryLiaoHuaDiscardSlash(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BoundaryLiaoHuaDiscardChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Mobile Dangxian requires its current original owner's published actual discarded Slash.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "当先获得杀之前原技能来源已失效。");
             return;

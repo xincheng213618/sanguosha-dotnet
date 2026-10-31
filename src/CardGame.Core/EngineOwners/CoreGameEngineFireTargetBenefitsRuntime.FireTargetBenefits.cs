@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.FireTargetBenefit is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.TargetSeat is not { } target || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } damage || damage.Id != c.ParentFrameId || damage.ParentFrameId != c.DamageFrameId || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || !CanRunFireTargetBenefit(damage.Candidates[damage.CandidateIndex].ToProgramCandidate(), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
             throw new InvalidOperationException("The fire-target benefit lost its exact actual applied-damage candidate.");
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var before = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FireTargetBenefit = new(f.InstructionIndex, damage.Id, damage.ParentFrameId, f.OwnerSeat, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, before, before, 0, 0, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)), PendingMovementContinuation = new(target, 0, null) });
@@ -59,7 +59,7 @@ internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { FireTargetBenefit = null });
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), "火焰伤害收益已结清，原技能来源已失效。");
         else
             _coreRuntimeOperations.AdvanceRuntimeProgram(id);

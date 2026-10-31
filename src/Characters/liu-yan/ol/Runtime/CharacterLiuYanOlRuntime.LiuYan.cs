@@ -16,7 +16,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
     internal SkillProgramStepOutcome BeginLiuYan(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.LiuYan is not null || f.InstructionIndex != 1 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.LiuYan is not null || f.InstructionIndex != 1 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Liu Yan requires his exact living, unissued native operation.");
         if (op == SkillProgramEffectOp.DrawTusheForActualNonEquipmentTargets)
         {

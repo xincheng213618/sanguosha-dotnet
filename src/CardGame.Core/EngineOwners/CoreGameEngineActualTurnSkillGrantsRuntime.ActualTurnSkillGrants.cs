@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineActualTurnSkillGrantsRuntime
             throw new InvalidOperationException("A turn skill grant requires an actual ongoing turn.");
         // A paid movement child may have killed its recipient. The payment stays paid;
         // a dead participant receives no new capability and opens no second cost window.
-        if (!_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return;
         var recipient = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         var granted = skillIds.Distinct(StringComparer.Ordinal).ToArray();

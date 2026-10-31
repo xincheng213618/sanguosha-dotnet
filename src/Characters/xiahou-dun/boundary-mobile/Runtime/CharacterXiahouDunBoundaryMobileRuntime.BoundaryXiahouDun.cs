@@ -65,7 +65,7 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
     [ProgramAnswer(BoundaryXiahouDunAction)]
     internal void AnswerBoundaryXiahouDun(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryXiahouDun: { } r } f || !ValidBoundaryXiahouDun(f) || !BoundaryXiahouDunChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || r.Stage == BoundaryXiahouDunStage.Selecting && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryXiahouDun: { } r } f || !ValidBoundaryXiahouDun(f) || !BoundaryXiahouDunChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || r.Stage == BoundaryXiahouDunStage.Selecting && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Qingjian's exact private selection or issued distribution changed.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

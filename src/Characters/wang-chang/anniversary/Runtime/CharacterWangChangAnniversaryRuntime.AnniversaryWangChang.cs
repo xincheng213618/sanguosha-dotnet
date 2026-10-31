@@ -16,7 +16,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
     internal SkillProgramStepOutcome BeginWangChang(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.AnniversaryWangChang is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !WangChangOriginal(f, operation))
+        if (f.AnniversaryWangChang is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !WangChangOriginal(f, operation))
             throw new InvalidOperationException("Wang Chang lost his original phase activation or own Ending candidate.");
         var kaiji = operation == SkillProgramEffectOp.ResolveAnniversaryWangChangKaiji;
         var polarity = kaiji ? _coreProgramConversionPolarityOperations.GetProgramConversionPolarity(f.OwnerSeat, f.SkillId) : SkillPolarity.Yang;

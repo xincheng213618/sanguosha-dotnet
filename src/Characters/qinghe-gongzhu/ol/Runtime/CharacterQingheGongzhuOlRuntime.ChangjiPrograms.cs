@@ -7,7 +7,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, TargetSeat: { } endingSeat } || !_coreMatchParticipantsPlayersAccess._players[endingSeat].IsAlive)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, TargetSeat: { } endingSeat } || !_coreMatchParticipantsPlayersAccess._players[endingSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         var damages = _corePlayCardHistoryOperations.EventsSinceLastBoundary(item => item is TurnStartedEvent).OfType<DamageAppliedEvent>().Where(item => item.Amount > 0).ToArray();
         var dealt = damages.Any(item => !item.SourceLess && item.SourceSeat == owner.Seat);

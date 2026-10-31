@@ -48,7 +48,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         }
 
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[state.TargetSeat].IsAlive || state.UsedCount >= MaximumJuanxiaTrickCount)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || !_coreMatchParticipantsPlayersAccess._players[state.TargetSeat].IsAlive || state.UsedCount >= MaximumJuanxiaTrickCount)
         {
             FinishJuanxiaLaunch(active);
             return SkillProgramStepOutcome.AwaitChild;
@@ -329,7 +329,7 @@ internal sealed partial class CharacterYangYiOlRuntime
     internal SkillProgramStepOutcome JuanxiaProgramRetaliation(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (frame.WindowContext is not { SourceSeat: { } turnOwner } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(turnOwner) || turnOwner == active.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[turnOwner].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId))
+        if (frame.WindowContext is not { SourceSeat: { } turnOwner } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(turnOwner) || turnOwner == active.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[turnOwner].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return SkillProgramStepOutcome.Continue;
         var debts = OutstandingJuanxiaDebts(active.OwnerSeat, turnOwner).ToArray();
         if (debts.Length == 0)
@@ -351,7 +351,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         var state = active.JuanxiaRetaliate ?? throw new InvalidOperationException("The Juanxia retaliation lost its frame state.");
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
         var debtor = _coreMatchParticipantsPlayersAccess._players[state.DebtorSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !debtor.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !debtor.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
         {
             FinishJuanxiaRetaliation(active);
             return SkillProgramStepOutcome.AwaitChild;

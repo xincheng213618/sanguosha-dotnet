@@ -9,7 +9,7 @@ internal sealed partial class CharacterTangJiOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || GetKanggeMarkedSeat(owner.Seat)is not null)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || GetKanggeMarkedSeat(owner.Seat)is not null)
             return SkillProgramStepOutcome.Continue;
         var candidates = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != owner.Seat).Select(player => player.Seat).ToArray();
         if (candidates.Length == 0)
@@ -49,7 +49,7 @@ internal sealed partial class CharacterTangJiOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, TargetSeat: { } gainer } || !IsKanggeMarkedSeat(gainer, owner.Seat) || gainer == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, TargetSeat: { } gainer } || !IsKanggeMarkedSeat(gainer, owner.Seat) || gainer == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
             return SkillProgramStepOutcome.Continue;
         var drawnThisTurn = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramKanggeGainedDrawEvent>().Where(item => item.OwnerSeat == owner.Seat && item.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber).Sum(item => item.DrawnCount);
         var drawn = Math.Min(1, Math.Max(0, ProgramKanggeTurnDrawCap - drawnThisTurn));
@@ -66,7 +66,7 @@ internal sealed partial class CharacterTangJiOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering, TargetSeat: { } victim } || victim == owner.Seat || !IsKanggeMarkedSeat(victim, owner.Seat) || _coreMatchParticipantsPlayersAccess._players[victim].Hp > 0 || KanggeHealUsedThisRound(owner.Seat))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering, TargetSeat: { } victim } || victim == owner.Seat || !IsKanggeMarkedSeat(victim, owner.Seat) || _coreMatchParticipantsPlayersAccess._players[victim].Hp > 0 || KanggeHealUsedThisRound(owner.Seat))
             return SkillProgramStepOutcome.Continue;
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
         var choices = new[]
@@ -125,7 +125,7 @@ internal sealed partial class CharacterTangJiOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CharacterDied, TargetSeat: { } victim } || !IsKanggeMarkedSeat(victim, owner.Seat))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CharacterDied, TargetSeat: { } victim } || !IsKanggeMarkedSeat(victim, owner.Seat))
             return SkillProgramStepOutcome.Continue;
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).ToArray();
         var equipment = _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).ToArray();

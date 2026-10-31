@@ -7,7 +7,7 @@ internal sealed partial class CharacterZhangChangPuOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return;
         var alive = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).ToArray();
         var minimumHand = alive.Min(player => _corePhysicalOwnedCardQueriesOperations.GetHand(player).Count);

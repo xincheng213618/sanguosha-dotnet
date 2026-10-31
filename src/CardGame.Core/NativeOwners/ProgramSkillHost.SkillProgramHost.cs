@@ -30,6 +30,7 @@ internal sealed partial class ProgramSkillHost(Func<RuntimeEntries.CoreGameEngin
     public bool IsGameOver => matchOutcomeState.ReferenceToWinner != Winner.None;
 
     public bool OwnsSkillInstance(int ownerSeat, string skillId, string skillInstanceId) => getCoreGameEngineNationalSkillsRuntime().HasRuntimeSkillInstance(matchParticipantsState.ReferenceToPlayers[ownerSeat], skillId, skillInstanceId);
+    public bool CanInvokeProgramSkill(ProgramSkillFrame frame) => getCoreGameEngineProgramLifecycleRuntime().CanInvokeProgramSkill(frame);
     public bool OwnsCards(int ownerSeat, IReadOnlyList<int> cardIds, IReadOnlyList<CardZoneKind> sourceZones) => cardIds.All(id => sourceZones.Any(zone => getCardZoneStore().Contains(new CardLocation(zone, ownerSeat), id)));
     public bool EvaluateCondition(ProgramSkillFrame frame, SkillProgramCondition condition, PlayerSkillContext context)
     {

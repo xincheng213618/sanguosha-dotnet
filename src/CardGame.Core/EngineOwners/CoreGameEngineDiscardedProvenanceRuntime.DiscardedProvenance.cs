@@ -62,7 +62,7 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
         var origin = DiscardedProvenanceOrigin(movement);
         if (origin is null || origin.SourceSeat == f.OwnerSeat || movement.To != CardLocation.DiscardPile || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(movement))
             throw new InvalidOperationException("A provenance claim lost its captured discard/judgment origin.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(movement.CardId) != CardLocation.DiscardPile)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _cardZonesOperations._cardZones.GetLocation(movement.CardId) != CardLocation.DiscardPile)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "落英实体或来源已失效，未领取牌。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -103,7 +103,7 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
         return receipt.Stage == ProgramProvenanceClaimStage.Choosing;
     }
 
-    internal bool ProvenanceThresholdQualified(ProgramSkillFrame f, ProgramProvenanceClaimReceipt receipt) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsFaceDown && _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != f.OwnerSeat && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse).Any(p => p.Policy.Id == receipt.ProvenanceId) && GetOutsideProvenanceCount(f.OwnerSeat, f.SkillId, f.SkillInstanceId, receipt.ProvenanceId) >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp;
+    internal bool ProvenanceThresholdQualified(ProgramSkillFrame f, ProgramProvenanceClaimReceipt receipt) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsFaceDown && _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != f.OwnerSeat && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse).Any(p => p.Policy.Id == receipt.ProvenanceId) && GetOutsideProvenanceCount(f.OwnerSeat, f.SkillId, f.SkillInstanceId, receipt.ProvenanceId) >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp;
     internal int GetOutsideProvenanceCount(int seat, string skill, string instance, string tag)
     {
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();

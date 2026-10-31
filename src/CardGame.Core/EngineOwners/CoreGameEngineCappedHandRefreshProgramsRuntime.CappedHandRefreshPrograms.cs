@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineCappedHandRefreshProgramsRuntime
     SkillProgramStepOutcome ICappedHandRefreshProgramHost.DrawThenDiscardHandToMaximumHp(ProgramSkillFrame frame, int targetSeat, int cap) => BeginCappedHandRefresh(frame, targetSeat, cap);
     internal bool CappedHandRefreshSourceCurrent(ProgramSkillFrame frame)
     {
-        if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return false;
         if (_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             return true;

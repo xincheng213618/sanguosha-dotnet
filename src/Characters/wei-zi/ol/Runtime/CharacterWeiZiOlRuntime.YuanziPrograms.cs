@@ -7,7 +7,7 @@ internal sealed partial class CharacterWeiZiOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SourceSeat: { } boundarySeat } || boundarySeat == active.OwnerSeat || boundarySeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !owner.IsAlive || !_coreMatchParticipantsPlayersAccess._players[boundarySeat].IsAlive)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SourceSeat: { } boundarySeat } || boundarySeat == active.OwnerSeat || boundarySeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !owner.IsAlive || !_coreMatchParticipantsPlayersAccess._players[boundarySeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).OrderBy(card => card.Id).ToArray();
         if (hand.Length == 0)
@@ -25,7 +25,7 @@ internal sealed partial class CharacterWeiZiOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } sourceSeat, Amount: > 0 } || sourceSeat == active.OwnerSeat || sourceSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(sourceSeat) || !_coreMatchParticipantsPlayersAccess._players[sourceSeat].IsAlive)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } sourceSeat, Amount: > 0 } || sourceSeat == active.OwnerSeat || sourceSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(sourceSeat) || !_coreMatchParticipantsPlayersAccess._players[sourceSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         var invocation = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramYuanziInvokedEvent>().LastOrDefault(fact => fact.OwnerSeat == active.OwnerSeat && fact.RecipientSeat == sourceSeat && fact.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
         if (invocation is null || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[sourceSeat]).Count < _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count)

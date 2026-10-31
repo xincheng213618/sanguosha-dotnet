@@ -62,7 +62,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         var r = f.MouLixian!;
         var choices = new List<PromptChoice>();
         PromptChoice C(string branch, string suffix, string label, int? card = null, CardKind? kind = null, IReadOnlyList<int>? targets = null) => new(new($"mou-lixian.{(f.Id)}.{(branch)}.{(suffix)}"), label, card is { } id ? [id] : [], targets ?? [], new Dictionary<string, string> { ["program-action"] = "mou-lixian", ["branch"] = branch, ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["output-kind"] = kind?.ToString() ?? "" });
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return[];
         var materials = MouLixianMaterials(f.OwnerSeat);
         if (r.Stage == MouLixianStage.NameChoice)

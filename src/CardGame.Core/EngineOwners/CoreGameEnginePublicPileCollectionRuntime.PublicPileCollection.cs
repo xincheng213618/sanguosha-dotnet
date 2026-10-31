@@ -68,7 +68,7 @@ internal sealed partial class CoreGameEnginePublicPileCollectionRuntime
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Public pile collection lost its frame.");
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.CollectPublicPile || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (effect.Op != SkillProgramEffectOp.CollectPublicPile || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             throw new InvalidOperationException("Public pile collection lost its enabled source.");
         selected = PublicPileCollectionChoices(frame, effect).SingleOrDefault(choice => choice.Id == selected.Id) ?? throw new InvalidOperationException("Public pile collection no longer matches published slots.");
         var count = int.Parse(selected.Parameters["slot-count"]);

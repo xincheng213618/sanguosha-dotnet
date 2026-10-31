@@ -24,7 +24,7 @@ internal sealed partial class CharacterSunHongOlRuntime
     internal SkillProgramStepOutcome BeginXianbi(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.Xianbi is not null || f.InstructionIndex != 1 || f.SkillId != "ol:xianbi" || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "adjust-and-return" || f.TriggerId is not null || f.WindowContext is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanActivateXianbi(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.Xianbi is not null || f.InstructionIndex != 1 || f.SkillId != "ol:xianbi" || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "adjust-and-return" || f.TriggerId is not null || f.WindowContext is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanActivateXianbi(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Xianbi needs its own real live Play activation and an unequal legal role.");
         var r = new XianbiReceipt(XianbiSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, XianbiStage.Target)
         {

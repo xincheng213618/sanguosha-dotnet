@@ -184,7 +184,10 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         return true;
     }
 
-    internal bool CanChallengeDeclaration(int seat, int owner) => seat != owner && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && !_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[seat]).ProgramInstances.Any(instance => instance.Program.CannotChallengeDeclarations);
+    internal bool CanChallengeDeclaration(int seat, int owner) => seat != owner && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive &&
+        !_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[seat]).ProgramInstances.Any(instance => instance.Program.CannotChallengeDeclarations) &&
+        !SkillStateApplications.AppliedDefinitions(_coreMatchParticipantsPlayersAccess._players[seat].SkillGrants,
+            _contentRegistryOperations._contentRegistry).Any(skill => skill.Program?.CannotChallengeDeclarations == true);
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.AfterDeclarationChallenge, 0, NativeFrameAutomaticPending.Ignore, NativeFrameAutomaticPublish.AfterAdvance)]
     [NativeFrameRoute(typeof(CardDeclarationFrame), 190)]
     internal void ContinueCardDeclaration(long id)

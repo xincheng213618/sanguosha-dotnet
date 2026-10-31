@@ -67,7 +67,7 @@ internal sealed partial class CoreGameEngineHpDamageShieldsRuntime
             throw new InvalidOperationException("The shield choice differs from its frozen owning prompt.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!owner.IsAlive || owner.Hp != draft.HpBefore || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber != draft.TurnNumber || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != draft.TurnOwnerSeat || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId) || choice.Targets.Any(s => !_coreMatchParticipantsPlayersAccess._players[s].IsAlive))
+        if (!owner.IsAlive || owner.Hp != draft.HpBefore || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber != draft.TurnNumber || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != draft.TurnOwnerSeat || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || choice.Targets.Any(s => !_coreMatchParticipantsPlayersAccess._players[s].IsAlive))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "付款前体力、目标或技能实例失效，剩余结算取消。");
             return;

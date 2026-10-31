@@ -281,7 +281,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         if (f.LeCaoZhiWenlan is not { Stage: WenlanStage.SelectingHand } r || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WenlanHandChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Wenlan only accepts its currently published private Hand choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishWenlan(f);
             return;
@@ -346,7 +346,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         var r = f.LeCaoZhiWenlan!;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenlanCompletedEvent(f.Id, f.OwnerSeat, r.Qualification.FirstEntryId, r.Qualification.SecondEntryId, r.CommonName, r.CommonName ? r.ObtainedIds.Count : r.SelectedIds.Count));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { LeCaoZhiWenlan = null, PendingMovementContinuation = null });
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), "文澜已发行的标记或实体获得及其子结算已结清。");
         else
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

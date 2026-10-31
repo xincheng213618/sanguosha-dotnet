@@ -33,7 +33,7 @@ internal sealed partial class CharacterLiuHongOlRuntime
             return SkillProgramStepOutcome.AwaitChoice;
         }
 
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || !CanRunYujueResolve(active.OwnerSeat))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || !CanRunYujueResolve(active.OwnerSeat))
             return SkillProgramStepOutcome.Continue;
         return PresentYujueSlotPrompt(active);
     }

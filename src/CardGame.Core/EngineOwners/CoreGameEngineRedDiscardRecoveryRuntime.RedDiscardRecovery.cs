@@ -26,7 +26,7 @@ internal sealed partial class CoreGameEngineRedDiscardRecoveryRuntime
         }
     }
 
-    internal bool RedDiscardRecoverySourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId);
+    internal bool RedDiscardRecoverySourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId);
     internal Dictionary<string, string> RedDiscardRecoveryParameters(ProgramSkillFrame f, string mode) => new()
     {
         ["program-action"] = "red-discard-recovery",

@@ -28,7 +28,7 @@ internal sealed partial class CharacterLuZhiMouMobileRuntime
     internal SkillProgramStepOutcome StartMouLuZhi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.MouLuZhi is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.MouLuZhi is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Mou Lu Zhi requires its live owning native entry.");
         var ren = MatchingMouLuZhiRen(f.OwnerSeat, f.SkillInstanceId);
         ActualDiscardRecoveryPhaseKey? phase = null;
@@ -151,7 +151,7 @@ internal sealed partial class CharacterLuZhiMouMobileRuntime
             return;
         }
 
-        if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !ids.All(id => MouLuZhiCostCards(f.OwnerSeat, r.IsRed, f.SkillInstanceId).Any(c => c.Id == id)))
+        if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !ids.All(id => MouLuZhiCostCards(f.OwnerSeat, r.IsRed, f.SkillInstanceId).Any(c => c.Id == id)))
             throw new InvalidOperationException("Zhenliang lost its exact accepted HE cost before payment.");
         _coreProgramConversionPolarityOperations.CommitProgramConversionPolarity(f);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);

@@ -53,7 +53,7 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
 
     internal bool IsAlternativePhaseCostChoiceLegal(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.AlternativePhaseCost is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.AlternativePhaseCost is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return false;
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
         return effect.Op == SkillProgramEffectOp.PayOwnedCardOrMarker && BuildAlternativePhaseCostChoices(frame, effect).Any(current => current.Id == choice.Id && current.Cards.SequenceEqual(choice.Cards) && current.Targets.SequenceEqual(choice.Targets) && current.Parameters.Count == choice.Parameters.Count && current.Parameters.All(pair => choice.Parameters.GetValueOrDefault(pair.Key) == pair.Value));
@@ -96,7 +96,7 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { AlternativePhaseCost = null });
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), "已付费用的回复和移牌结清后，剩余阶段替代结算取消。");
             return true;

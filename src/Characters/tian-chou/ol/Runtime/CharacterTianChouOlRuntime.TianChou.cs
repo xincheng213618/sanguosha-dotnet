@@ -14,7 +14,7 @@ internal sealed partial class CharacterTianChouOlRuntime
     internal SkillProgramStepOutcome BeginTianChou(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.TianChouShandao is not null || f.SkillId != "ol:shandao" || f.ActivationId != "top-and-two-tricks" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.TianChouShandao is not null || f.SkillId != "ol:shandao" || f.ActivationId != "top-and-two-tricks" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Shandao requires its own actual once-per-Play living source.");
         var candidates = Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(i => _coreTableOrderOperations.TableStepSeat(f.OwnerSeat, i)).Where(TianChouHasCards).ToArray();
         if (candidates.Length == 0)
@@ -78,7 +78,7 @@ internal sealed partial class CharacterTianChouOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TianChouShandao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !TianChouChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shandao requires the owner's exact currently published target or private card slot.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Tops.Count == 0 && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Tops.Count == 0 && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("An unpaid Shandao choice lost its living source.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == TianChouShandaoStage.Targets)

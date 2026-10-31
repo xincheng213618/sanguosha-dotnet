@@ -81,7 +81,7 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.OutsidePhaseDrawDiscard is not null || !IsOutsidePhaseOperation(op))
             throw new InvalidOperationException("An outside-phase obligation cannot be issued twice.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var context = f.WindowContext ?? throw new InvalidOperationException("Outside-phase draw/discard needs its real movement parent.");
         var parent = _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
@@ -158,7 +158,7 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
         if (r.Stage != OutsidePhaseDrawDiscardStage.Choosing || !OutsidePhaseDrawDiscardChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(choice.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Outside-phase choice changed its exact published opaque material or target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "卫戍在发行摸牌或弃牌前失去原技能资格。");
             return;

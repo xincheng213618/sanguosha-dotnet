@@ -52,7 +52,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
         else
         {
             MaMiDiResponseLinkedEvent? response = null;
-            if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
                 throw new InvalidOperationException("An unpaid maximum-HP instruction requires its live original source.");
             if (op == SkillProgramEffectOp.GrowZhengdingMatchingResponse && !TryGetMaMiDiResponse(candidate, c, out _, out response))
                 throw new InvalidOperationException("Zhengding lost its frozen real response.");

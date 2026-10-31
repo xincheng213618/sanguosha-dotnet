@@ -34,7 +34,7 @@ internal sealed partial class CharacterLiuHongOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || !IsTuxingDamageArmPending(active.OwnerSeat))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || !IsTuxingDamageArmPending(active.OwnerSeat))
             return SkillProgramStepOutcome.Continue;
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】生效：所有装备栏均已废除，本局游戏接下来造成的伤害+1。", active.OwnerSeat);
         ArmProgramGameDamageBonus(active, active.SkillId, active.OwnerSeat, 1);

@@ -21,7 +21,7 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.ForeignSelectedCardSlash is not null || frame.TriggerId is not null || frame.WindowContext is not null || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || !frame.SelectedTargetSeats.SequenceEqual([actorSeat]) || frame.PendingMovementContinuation is not null || _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId <= 0 || !IsSelectedForeignSlashActivation(frame))
             throw new InvalidOperationException("A selected foreign-card Slash requires its own zero-card activation and one exact selected actor.");
-        if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || !CanStartSelectedForeignCardSlash(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], actorSeat))
+        if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || !CanStartSelectedForeignCardSlash(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], actorSeat))
             return SkillProgramStepOutcome.Continue;
         var receipt = new ForeignSelectedCardSlashReceipt(frame.InstructionIndex, SelectedForeignSlashSource(frame), frame.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, actorSeat, ForeignSelectedCardSlashStage.ChoosingCard);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ForeignSelectedCardSlash = receipt });
@@ -80,7 +80,7 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashRuntime
         if (slot < 0 || slot >= cards.Count)
             throw new InvalidOperationException("The selected foreign-card Slash slot no longer exists.");
         var card = cards[slot];
-        if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || !CanUseSelectedForeignSlashMaterial(frame.OwnerSeat, receipt.ActorSeat, card, from))
+        if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || !CanUseSelectedForeignSlashMaterial(frame.OwnerSeat, receipt.ActorSeat, card, from))
             throw new InvalidOperationException("The selected foreign-card Slash is no longer a legal actual Use.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ForeignSelectedCardSlash = receipt with { Stage = ForeignSelectedCardSlashStage.IssuingUse, CardId = card.Id, PrintedKind = card.Kind, From = from, GeneralWeapon = card.IsGeneralWeapon, PaymentBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

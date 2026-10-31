@@ -74,7 +74,7 @@ internal sealed partial class CoreGameEngineSuitDamagePreventionBenefitsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.SuitPreventionBenefit is not { } r || r.Stage is not (SuitPreventionBenefitStage.ChoosingCost or SuitPreventionBenefitStage.ChoosingRecipient) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [SuitPreventionBenefitChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Suit prevention answer lost its private owning choice.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "防伤付款前来源失效，原伤害继续。");

@@ -43,7 +43,7 @@ internal sealed partial class CharacterWangKuangOlRuntime
             var phase = _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(w => w.Id == f.WindowContext.ParentFrameId).WangKuangRenxiaEndingPhase!;
             promise = WangKuangOutstanding(phase).Single(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId && e.GameplayHash == f.GameplayHash);
         }
-        else if (f.WindowContext is not null || f.TriggerId is not null || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        else if (f.WindowContext is not null || f.TriggerId is not null || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("An unpaid Renxia activation cannot borrow an ending entitlement or lost source.");
         var receipt = new WangKuangRenxiaReceipt(WangKuangSource(f), f.GameplayHash, f.InstructionIndex, promise?.Phase ?? WangKuangCurrentPhase(f.OwnerSeat), ending, promise?.ActiveFrameId, WangKuangRenxiaStage.BranchChoice);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangKuangRenxia = receipt });

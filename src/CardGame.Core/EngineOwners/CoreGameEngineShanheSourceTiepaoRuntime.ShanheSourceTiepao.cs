@@ -68,7 +68,7 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceTiepao: { UseId: null, Issuing: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !SourceTiepaoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Source14075 lost its original private physical material choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (selected.Parameters["branch"] == "decline" || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (selected.Parameters["branch"] == "decline" || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheSourceTiepao = null });
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

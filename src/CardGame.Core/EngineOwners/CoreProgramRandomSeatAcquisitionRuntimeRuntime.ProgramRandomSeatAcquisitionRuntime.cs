@@ -15,7 +15,7 @@ internal sealed partial class CoreProgramRandomSeatAcquisitionRuntimeRuntime
     bool IProgramSeatAcquisitionFacts.IsAlive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     bool IProgramSeatAcquisitionFacts.IsFaceDown(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsFaceDown;
     bool IProgramSeatAcquisitionFacts.CannotTurnOver(int seat) => _coreShenwuNpcProgramsOperations.ShenwuCannotTurnOver(_coreMatchParticipantsPlayersAccess._players[seat]);
-    bool IProgramSeatAcquisitionFacts.HasSkillInstance(int seat, string skill, string instance) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skill, instance);
+    bool IProgramSeatAcquisitionFacts.CanInvokeProgramSkill(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
     uint IProgramSeatAcquisitionFacts.RandomState => _randomOperations._random.State;
 
     long IProgramSeatAcquisitionFacts.MovementSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;

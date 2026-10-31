@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineShanheSourceNamanRuntime
     internal SkillProgramStepOutcome ClaimShanheSourceNamanResponseCards(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return SkillProgramStepOutcome.Continue;
         var materials = ShanheSourceNamanMaterials(frame.WindowContext, frame.OwnerSeat);
         if (materials.Length == 0)

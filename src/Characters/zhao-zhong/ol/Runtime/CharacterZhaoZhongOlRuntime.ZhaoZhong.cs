@@ -123,7 +123,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     internal void PublishZhaoZhong(ProgramSkillFrame f)
     {
         var r = f.ZhaoZhong!;
-        if (!r.Paid && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)))
+        if (!r.Paid && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f)))
         {
             FinishZhaoZhong(f);
             return;

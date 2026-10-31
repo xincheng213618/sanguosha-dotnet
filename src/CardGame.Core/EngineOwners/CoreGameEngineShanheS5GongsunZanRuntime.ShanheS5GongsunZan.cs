@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
         var target = f.WindowContext!.TargetSeat!.Value;
         if (f.ShanheS5Qiaomeng is not null || f.InstructionIndex != 1)
             throw new InvalidOperationException("The range discard must begin once on its exact designated-target instruction.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var range = _coreNativeRuleQueriesOperations.GetAttackRange(f.OwnerSeat);
         var count = Math.Min(range, ShanheS5QiaomengCards(f.OwnerSeat, target).Length);
@@ -67,7 +67,7 @@ internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
         if (d.Paid || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheS5QiaomengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The range discard no longer matches a published private zone slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "趫猛的未支付来源或目标失效。");
             return;

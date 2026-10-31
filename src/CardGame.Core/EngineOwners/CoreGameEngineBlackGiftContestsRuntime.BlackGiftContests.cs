@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
         if (f.BlackGiftContest is not null || f.InstructionIndex != 1 || f.TriggerId is not null || f.WindowContext is not null || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || f.SelectedTargetSeats is not [var selected] || selected != recipient || recipient == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || f.SelectedCardIds is not [var id])
             throw new InvalidOperationException("A black gift contest lost its exact first other recipient/material.");
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !BlackGiftMaterialLegal(f.OwnerSeat, card))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !BlackGiftMaterialLegal(f.OwnerSeat, card))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "赠牌前来源、黑色手牌或接收者失效。");
             return SkillProgramStepOutcome.AwaitChild;

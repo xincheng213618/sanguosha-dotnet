@@ -81,7 +81,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
         var r = f.SignedDamagePayment!;
         var e = SignedDamageEffect(f);
         var p = CaptureSignedDamageProfile(f.OwnerSeat, e.Amount > 0 ? r.TargetSeat : r.SourceSeat, e);
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || p != SignedDamageFrozenProfile(r) || !p.WaiveHp && p.OtherHp < p.OwnerHp)
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || p != SignedDamageFrozenProfile(r) || !p.WaiveHp && p.OtherHp < p.OwnerHp)
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "付款前资格或原来源失效，原伤害继续。");

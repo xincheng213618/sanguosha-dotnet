@@ -11,23 +11,14 @@ public sealed record ShenCaoPiReceipt(CardConversionSource Source, string Gamepl
     public IReadOnlyList<KemingBorrowOption> Options { get => _options; init => _options = Array.AsReadOnly(value.ToArray()); }
 }
 public sealed record KemingBorrowOption(string GeneralId, string SkillId, string BindingId, string GameplayHash);
-public sealed record KemingBorrowReceipt(long IssuerFrameId, CardConversionSource Source, string SourceHash,
-    long DamageFrameId, int BorrowerSeat, KemingBorrowOption Selected, DamageTriggerCandidate Candidate);
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ShenCaoPiReceipt? ShenCaoPi { get; init; } }
-public sealed partial record DamageTriggerWindowFrame
-{
-    private IReadOnlyList<KemingBorrowReceipt>? _kemingBorrows;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<KemingBorrowReceipt>? KemingBorrows
-    { get => _kemingBorrows; init => _kemingBorrows = value is null ? null : Array.AsReadOnly(value.ToArray()); }
-}
 public sealed record YinzhiIssuedEvent(long FrameId, CardConversionSource Source, string GameplayHash, int TargetSeat,
     int Count, int ActualTurn, int TargetOwnTurns) : IGameEvent;
 public sealed record YinzhiActivatedEvent(long FrameId, CardConversionSource Source, string GameplayHash, int TargetSeat,
     int Count, int ActualTurn, int TargetOwnTurns) : IGameEvent;
 public sealed record YinzhiTurnRestrictionReleasedEvent(long IssueFrameId, long DamageFrameId) : IGameEvent;
 public sealed record YinzhiHandRewardRequestedEvent(long FrameId, long IssueFrameId, long ActionId, int Count) : IGameEvent;
-public sealed record KemingBorrowIssuedEvent(long WindowId, KemingBorrowReceipt Receipt) : IGameEvent;
 public sealed record KemingEchoArmedEvent(long FrameId, CardConversionSource Source, string GameplayHash, int TargetSeat, long InvocationCutoff) : IGameEvent;
 internal interface IShenCaoPiHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation); }
 internal abstract class ShenCaoPiDescriptor(SkillProgramEffectOp op) : ProgramOperationDescriptorBase

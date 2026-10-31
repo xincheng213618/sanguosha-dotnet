@@ -18,7 +18,7 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
         return history.OfType<PrivateWhirlDepositedEvent>().Select(e => e.Deposit).Where(d => d.Source.OwnerSeat == owner && (skill is null || d.Source.SkillId == skill) && (instance is null || d.Source.SkillInstanceId == instance) && !removed.Contains((d.DepositId, d.Source, d.CardId)) && _cardZonesOperations._cardZones.GetLocation(d.CardId) == d.Location).ToArray();
     }
 
-    internal bool WhirlSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool WhirlSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 340)]
     internal bool CanOfferPrivateWhirl(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {

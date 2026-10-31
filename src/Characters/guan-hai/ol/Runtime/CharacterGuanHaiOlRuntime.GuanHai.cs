@@ -33,7 +33,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         }
         else if (op == SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian)
         {
-            if (f.TriggerId is not null || f.ActivationId != "minimum-bait-pindian" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var peer] || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, peer) || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !YouquePhaseActive(f.OwnerSeat) || !YouqueBaits(f.OwnerSeat).Any() || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (f.TriggerId is not null || f.ActivationId != "minimum-bait-pindian" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var peer] || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, peer) || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !YouquePhaseActive(f.OwnerSeat) || !YouqueBaits(f.OwnerSeat).Any() || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
                 throw new InvalidOperationException("Youque requires a real Play, original hand-bearing participants and actual bait.");
             r = r with
             {

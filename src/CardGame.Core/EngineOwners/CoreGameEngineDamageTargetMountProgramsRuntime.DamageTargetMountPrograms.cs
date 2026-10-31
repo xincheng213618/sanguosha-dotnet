@@ -77,7 +77,7 @@ internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
         if (draft.Receipt is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !DamageTargetMountChoices(f.Id, f.OwnerSeat, draft.TargetSeat, f.SkillId).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(choice.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Mount discard must name its exact published opaque slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CanOfferDamageTargetMount(f.OwnerSeat, f.WindowContext!, f.SkillId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CanOfferDamageTargetMount(f.OwnerSeat, f.WindowContext!, f.SkillId))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "付款前技能来源或伤害目标已失效。");
             return;

@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCurrentTurnSkillSuppressionsRuntime
 {
 
-    internal bool IsCurrentTurnSkillGrantQualified(CharacterState owner, SkillGrant grant) => SkillAvailability.IsEffectiveUnderRestrictions(owner, grant, _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId), _coreMatchParticipantsPlayersAccess, _cardZonesOperations._cardZones, _phases) && _coreShenwuExpandedPoliciesOperations.ShenwuFengdongQualifiesGrant(owner, grant) && (!_characterCaoPiAnniversaryGodOperations.IsYinzhiSkillSuppressed(owner.Seat) || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked)) && _coreDyingWindowSkillPoliciesOperations.IsDyingWindowGrantQualified(owner, grant) && _characterZouShiLeOperations.YunzhengNonLockedGrantQualified(owner, grant) && _characterZhangLiaoMobileGodOperations.IsMobileDuoruiGrantQualified(owner, grant);
+    internal bool IsCurrentTurnSkillGrantQualified(CharacterState owner, SkillGrant grant) => _skillBindingIndexOperations._skillBindingIndex.Availability.IsGrantEffectiveUnderStates(owner, grant) && _coreShenwuExpandedPoliciesOperations.ShenwuFengdongQualifiesGrant(owner, grant) && _coreDyingWindowSkillPoliciesOperations.IsDyingWindowGrantQualified(owner, grant) && _characterZouShiLeOperations.YunzhengNonLockedGrantQualified(owner, grant) && _characterZhangLiaoMobileGodOperations.IsMobileDuoruiGrantQualified(owner, grant);
     internal long CaptureCurrentTurnQualificationStamp()
     {
         // Upstream owners affect derived grants only. Their separate shard stamp

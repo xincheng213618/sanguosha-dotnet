@@ -53,42 +53,23 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         var trigger = program.Triggers.Single(t => t.Id == option.BindingId);
         var count = trigger.DamageOccurrence == SkillProgramDamageOccurrence.PerDamagePoint ? context.Amount : 1;
         var instance = $"keming:{(f.OwnerSeat)}:{(f.SkillInstanceId)}:{(option.SkillId)}";
-        var receipts = Enumerable.Range(0, count).Select(i =>
+        var additions = Enumerable.Range(0, count).Select(i => new DamageTriggerCandidate(f.OwnerSeat,
+            $"keming:{(f.Id)}:{(option.SkillId)}:{(option.BindingId)}:{(i)}", trigger.Priority, trigger.Optional,
+            option.SkillId, option.BindingId, instance, option.GameplayHash, i))
+            .Where(candidate => !window.Candidates.Any(c => c.OwnerSeat == f.OwnerSeat && c.ProgramId == option.SkillId &&
+                c.ProgramTriggerId == option.BindingId && c.OccurrenceIndex == candidate.OccurrenceIndex)).ToArray();
+        var candidates = window.Candidates.Take(window.CandidateIndex + 1).Concat(additions).Concat(window.Candidates.Skip(window.CandidateIndex + 1)).ToArray();
+        var authorizations = additions.Select(candidate => new ProgramInvocationAuthorization(window.Id,
+            damageId, context.Window, candidate.ToProgramCandidate()));
+        _coreRuntimeOperations.ReplaceRuntimeFrame(window.Id, window with
         {
-            var candidate = new DamageTriggerCandidate(f.OwnerSeat, $"keming:{(f.Id)}:{(option.SkillId)}:{(option.BindingId)}:{(i)}", trigger.Priority, trigger.Optional, option.SkillId, option.BindingId, instance, option.GameplayHash, i);
-            return new KemingBorrowReceipt(f.Id, r.Source, r.GameplayHash, damageId, f.OwnerSeat, option, candidate);
-        }).Where(r => !window.Candidates.Any(c => c.OwnerSeat == f.OwnerSeat && c.ProgramId == option.SkillId && c.ProgramTriggerId == option.BindingId && c.OccurrenceIndex == r.Candidate.OccurrenceIndex)).ToArray();
-        var candidates = window.Candidates.Take(window.CandidateIndex + 1).Concat(receipts.Select(r => r.Candidate)).Concat(window.Candidates.Skip(window.CandidateIndex + 1)).ToArray();
-        _coreRuntimeOperations.ReplaceRuntimeFrame(window.Id, window with { Candidates = Array.AsReadOnly(candidates), KemingBorrows = (window.KemingBorrows ?? []).Concat(receipts).ToArray() });
-        foreach (var receipt in receipts)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KemingBorrowIssuedEvent(window.Id, receipt));
+            Candidates = Array.AsReadOnly(candidates),
+            InvocationAuthorizations = (window.InvocationAuthorizations ?? []).Concat(authorizations).ToArray()
+        });
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         FinishShenCaoPi(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveKemingDamagedSkill)]
     internal PromptChoice ChooseKemingBorrowAi(PendingDecision p, ProgramSkillFrame f) => p.Choices[0];
-    internal KemingBorrowReceipt? ActiveKemingBorrow(int owner, string skill, string? instance = null)
-    {
-        if (!HasShenCaoPiCapability)
-            return null;
-        foreach (var window in _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Reverse())
-        {
-            if (window.KemingBorrows is not { } borrows || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
-                continue;
-            var candidate = window.Candidates[window.CandidateIndex];
-            if (candidate.OwnerSeat != owner || candidate.ProgramId != skill || instance is not null && candidate.SkillInstanceId != instance)
-                continue;
-            var receipt = borrows.SingleOrDefault(r => r.Candidate == candidate);
-            if (receipt is null || receipt.BorrowerSeat != owner || receipt.Selected.SkillId != skill || receipt.Selected.GameplayHash != candidate.GameplayHash || receipt.DamageFrameId != window.ParentFrameId || window.TargetSeat != owner || receipt.Source.OwnerSeat != owner || candidate.SkillInstanceId != $"keming:{(owner)}:{(receipt.Source.SkillInstanceId)}:{(skill)}" || _contentRegistryOperations._contentRegistry.GetSkill(skill).Program?.GameplayHash != candidate.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KemingBorrowIssuedEvent>().Count(e => e.WindowId == window.Id && e.Receipt == receipt) != 1)
-                continue;
-            return receipt;
-        }
-
-        return null;
-    }
-
-    internal bool HasKemingBorrowedSkillInstance(CharacterState owner, string skill, string instance) => ActiveKemingBorrow(owner.Seat, skill, instance)is not null;
-    internal bool HasKemingBorrowedSkill(CharacterState owner, string skill) => ActiveKemingBorrow(owner.Seat, skill)is not null;
-    internal string? KemingBorrowedSkillInstance(CharacterState owner, string skill) => ActiveKemingBorrow(owner.Seat, skill)?.Candidate.SkillInstanceId;
 }

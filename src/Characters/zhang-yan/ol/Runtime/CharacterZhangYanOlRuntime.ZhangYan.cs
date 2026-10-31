@@ -146,7 +146,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
         {
             var target = choice.Targets.Single();
             var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId!.Value);
-            if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CanZhangYanSujiMaterial(f.OwnerSeat, card, r.From!.Value, target))
+            if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CanZhangYanSujiMaterial(f.OwnerSeat, card, r.From!.Value, target))
             {
                 FinishZhangYan(f, false);
                 return;

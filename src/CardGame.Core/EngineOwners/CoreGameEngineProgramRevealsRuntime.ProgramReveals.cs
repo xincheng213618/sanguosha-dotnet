@@ -76,7 +76,7 @@ internal sealed partial class CoreGameEngineProgramRevealsRuntime
         var decline = selected.Parameters.GetValueOrDefault("program-action") == "reveal-target-hand-card-decline";
         if (effect.Op != SkillProgramEffectOp.RevealTargetHandCard || effect.ResultBind != draft.ResultBind || selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || selected.Parameters.GetValueOrDefault("result-bind") != draft.ResultBind || decline && (!draft.AllowDecline || selected.Cards.Count != 0) || !decline && (selected.Cards.Count != 1 || !draft.EligibleCardIds.Contains(selected.Cards[0])))
             throw new InvalidOperationException("The reveal choice does not match its suspended instruction.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.HolderSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || draft.CandidateCardIds.Any(cardId => _cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Hand(draft.HolderSeat)))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.HolderSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || draft.CandidateCardIds.Any(cardId => _cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Hand(draft.HolderSeat)))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "观看参与者或技能实例已失效，技能结算已取消。");

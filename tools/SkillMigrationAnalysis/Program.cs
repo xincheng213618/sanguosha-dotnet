@@ -36,6 +36,11 @@ if (historyMode)
     HistoryQueryAnalysis.Run(root, output, trees, CreateCompilation(trees, parseOptions), json);
     return;
 }
+if (args.Contains("--frame-invocations"))
+{
+    FrameInvocationAnalysis.Run(root, output, trees, CreateCompilation(trees, parseOptions), json);
+    return;
+}
 var methods = trees.Where(t => t.FilePath.StartsWith(characterRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) &&
         !new[] { "Contracts", "DependencyAdapters", "StateContracts", "NativeOwners" }.Any(s => t.FilePath.Contains(s, StringComparison.OrdinalIgnoreCase)))
     .SelectMany(tree => tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>()
@@ -183,7 +188,7 @@ static string FindRoot()
         if (Directory.Exists(Path.Combine(d.FullName, "src", "Characters"))) return d.FullName;
     throw new InvalidOperationException("Run inside the Card checkout or pass --root <checkout>.");
 }
-static bool IsBuildPath(string p) => p.Split(Path.DirectorySeparatorChar).Any(x => x is "bin" or "obj" or ".artifacts");
+bool IsBuildPath(string p) => Path.GetRelativePath(root, p).Split(Path.DirectorySeparatorChar).Any(x => x is "bin" or "obj" or ".artifacts");
 static CSharpCompilation CreateCompilation(SyntaxTree[] trees, CSharpParseOptions options)
 {
     var refs = Directory.GetDirectories(@"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref", "8.*")

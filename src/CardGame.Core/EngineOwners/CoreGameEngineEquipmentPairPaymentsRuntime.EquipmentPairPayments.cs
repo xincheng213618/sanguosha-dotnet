@@ -61,7 +61,7 @@ internal sealed partial class CoreGameEngineEquipmentPairPaymentsRuntime
         if (effect.Op != SkillProgramEffectOp.SelectEquipmentPairAndPayment)
             throw new InvalidOperationException("The equipment pair choice belongs to another instruction.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || !IsPayableEquipmentPair(frame.OwnerSeat, first, second, frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || !IsPayableEquipmentPair(frame.OwnerSeat, first, second, frame.SkillId, frame.SkillInstanceId))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "交换对象或足额付款已失效，尚未移动牌。");
             return;
@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineEquipmentPairPaymentsRuntime
     }
 
     internal CardLocation OwnedPaymentDiscardDestination(int cardId) => (_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(cardId)).Single(c => c.Id == cardId).IsGeneralWeapon || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouCarrierDestroyedEvent>().Any(e => e.CardId == cardId && _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial2(cardId, e.From, CardLocation.OutsideGame))) ? CardLocation.OutsideGame : CardLocation.DiscardPile;
-    internal bool CanResumePaidEquipmentPair(ProgramSkillFrame frame) => EquipmentPairCostIsPaid(frame) && frame.EquipmentPairPayment is { } paid && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[paid.FirstSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[paid.SecondSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId);
+    internal bool CanResumePaidEquipmentPair(ProgramSkillFrame frame) => EquipmentPairCostIsPaid(frame) && frame.EquipmentPairPayment is { } paid && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[paid.FirstSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[paid.SecondSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
     internal ProgramSkillFrame FreezePaidEquipmentExchangeStart(ProgramSkillFrame frame)
     {
         if (frame.EquipmentPairPayment is not { } p)

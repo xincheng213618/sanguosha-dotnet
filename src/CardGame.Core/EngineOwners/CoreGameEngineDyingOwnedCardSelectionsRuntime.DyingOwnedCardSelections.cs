@@ -62,7 +62,7 @@ internal sealed partial class CoreGameEngineDyingOwnedCardSelectionsRuntime
             throw new InvalidOperationException("The dying card choice changed its published zone or slot.");
         var expected = DyingOwnedCardChoices(frame, effect, dying.VictimSeat).SingleOrDefault(c => c.Id == choice.Id);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || expected is null || !expected.Cards.SequenceEqual(choice.Cards))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || expected is null || !expected.Cards.SequenceEqual(choice.Cards))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "濒死状态、牌位或来源实例失效，未移动任何牌。");
             return;

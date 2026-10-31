@@ -44,7 +44,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
         }
         else if (context is null || !CanOfferLiuBa(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Liu Ba lost the exact native preparation, PlayEnding debt or holder Ending entitlement.");
-        if (!issued && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!issued && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Liu Ba cannot start an unpaid operation after source loss.");
         var stage = op switch
         {
@@ -141,7 +141,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
             throw new InvalidOperationException("Liu Ba requires the exact current participant's private answer.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (r.Op is SkillProgramEffectOp.IssueTongduHandGift or SkillProgramEffectOp.RecastZhubiAndMarkActualDraw) && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (r.Op is SkillProgramEffectOp.IssueTongduHandGift or SkillProgramEffectOp.RecastZhubiAndMarkActualDraw) && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishLiuBa(f);
             return;

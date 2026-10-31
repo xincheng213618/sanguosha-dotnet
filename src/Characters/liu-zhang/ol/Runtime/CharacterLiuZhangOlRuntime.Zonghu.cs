@@ -119,7 +119,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     internal void PublishZonghu(ProgramSkillFrame f)
     {
         var r = f.Zonghu!;
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !ZonghuNativeNeedCurrent(r) || r.Stage != ZonghuStage.Declare && !ZonghuNativeLegal(r.Need, r.OutputKind!.Value, r.TargetSeat!.Value))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !ZonghuNativeNeedCurrent(r) || r.Stage != ZonghuStage.Declare && !ZonghuNativeLegal(r.Need, r.OutputKind!.Value, r.TargetSeat!.Value))
         {
             FinishZonghuAttempt(f, false);
             return;

@@ -191,7 +191,7 @@ internal static partial class PairedHandRecastChecks
                 SelectionWeights = scenario == Scenario.MoveMaterial && id == Material
                     ? Enum.GetValues<Role>().ToDictionary(role => role, _ => 10000d) : null
             });
-            b.AddSkill(new(Suppress, "真实资格抑制", "固定真实HP触发") { SuppressionRule = new(5) });
+            b.AddSkill(new(Suppress, "真实资格抑制", "固定真实HP触发") { Program = CharacterFixtureContent.SuppressionProgram(Suppress, 5) });
             b.AddSkill(new("fixture:paired-recast-selection", "固定其他候选", "无运行技能")
             { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 100d) });
             b.AddGeneral(new("fixture:paired-recast-owner", "真实双人重铸拥有者", "supporter", Driver, "jin", 4,

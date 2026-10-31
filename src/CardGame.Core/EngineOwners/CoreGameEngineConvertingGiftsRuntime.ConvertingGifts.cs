@@ -166,7 +166,7 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
         if (choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString() || !ConvertingGiftChoices(f).Any(c => c.Id == choice.Id))
             throw new InvalidOperationException("Gift choice is stale.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishConvertingGift(f);
             return;
@@ -229,7 +229,7 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
             return true;
         if (f.AttackAttempt is not null)
             return false;
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishConvertingGift(f);
             return true;

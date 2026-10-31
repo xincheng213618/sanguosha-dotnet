@@ -20,7 +20,7 @@ internal sealed partial class CoreHellDizangProgramsRuntime
     internal SkillProgramStepOutcome ExecuteHellDizang(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.TriggerId is null || frame.InstructionIndex < 1 || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (frame.TriggerId is null || frame.InstructionIndex < 1 || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             throw new InvalidOperationException("Dizang requires an actual enabled owner trigger.");
         if (operation == SkillProgramEffectOp.DamageHellBufoAdjacent)
         {

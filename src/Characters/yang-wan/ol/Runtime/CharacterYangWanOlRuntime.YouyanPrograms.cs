@@ -11,7 +11,7 @@ internal sealed partial class CharacterYangWanOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (ActualOwnYouyanDiscard(active.OwnerSeat, active.WindowContext)is not { } phase || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch } || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId))
+        if (ActualOwnYouyanDiscard(active.OwnerSeat, active.WindowContext)is not { } phase || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch } || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return SkillProgramStepOutcome.Continue;
         var usage = YouyanPhaseUsage(phase);
         if (!_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(active.OwnerSeat, active.SkillId, usage, SkillUsageScope.Turn, 1))

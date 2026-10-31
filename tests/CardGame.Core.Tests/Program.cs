@@ -125,6 +125,8 @@ var tests = new (string Name, Action Body)[]
     ("Wushuang mode: foreign Zuoxing native fixed seven maximum payment cold", WushuangModeChecks.HappyZuoxingForeignRecipientPaysNativeFixedSevenMaximumCold),
     ("Mobile Shen Jiang Wei: Shenpei exact nested dying and original entry cold", MobileShenJiangWeiChecks.ShenpeiThunderOwnsNestedDyingAndReturnsOriginalEntryCold),
     ("Shen Cao Pi: Yinzhi Spear complete material pair cold", CardGame.Core.Tests.ShenCaoPiChecks.YinzhiZhangbaUsesOnlyPublishedCompleteNewMaterialPairCold),
+    ("Shen Cao Pi: Yinzhi prelude cancellation and actual start expiry", CardGame.Core.Tests.ShenCaoPiChecks.YinzhiPreludeExemptionRestoresAfterCancellationAndEndsAfterRealStart),
+    ("Program invocation: borrowed damage draw scope cold", CardGame.Core.Tests.ShenCaoPiChecks.BorrowedDamageInvocationStaysWindowBoundThroughNativeDrawCold),
     ("Wushuang mode: max HP base yields to real Jigong and expires cold", WushuangModeChecks.MaxHpBaseYieldsToRealJigongTurnDamageAndExpiresCold),
     ("Wushuang mode: Xianniang real shop destruction receipt cold", WushuangModeChecks.XianniangCountsOnlyReceivedCardsWhenNativeShopEquipmentIsDestroyedCold),
     ("Wushuang mode: Suishi exact destroyed shop material return cold", WushuangModeChecks.SuishiReturnsItsExactDestroyedNativeShopMaterialCold),

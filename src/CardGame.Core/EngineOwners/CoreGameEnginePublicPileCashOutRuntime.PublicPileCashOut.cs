@@ -56,7 +56,7 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         if (frame.PublicPileCashOut is not null || frame.PendingMovementContinuation is not null || !ExactPublicPileCashOutParent(frame, effect.Op) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PublicPileCashOutStartedEvent>().Any(fact => fact.FrameId == frame.Id))
             throw new InvalidOperationException("Public pile cash-out requires its exact real owner window and unpaid instruction.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return SkillProgramStepOutcome.Continue;
         PublicPersistentPileSource pile;
         int[] ids;

@@ -50,7 +50,7 @@ internal sealed partial class CharacterQinLangOlRuntime
             if (!IsIssuedQinLangXianyingCandidate(c, context))
                 throw new InvalidOperationException("Xianying lost its exact frozen ending candidate.");
         }
-        else if (context.Window is not (SkillProgramTriggerWindow.TurnStartBeforeNormalFlow or SkillProgramTriggerWindow.AfterDamageApplied) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        else if (context.Window is not (SkillProgramTriggerWindow.TurnStartBeforeNormalFlow or SkillProgramTriggerWindow.AfterDamageApplied) || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Unpaid Xianying requires its living original source and actual trigger.");
         var r = new QinLangXianyingReceipt(QinLangSource(f), f.GameplayHash, 1, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber, ending ? QinLangXianyingStage.EndChoice : QinLangXianyingStage.DrawChildren)
         {

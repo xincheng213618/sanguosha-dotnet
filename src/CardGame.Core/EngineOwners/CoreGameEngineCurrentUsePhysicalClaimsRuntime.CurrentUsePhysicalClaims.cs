@@ -14,7 +14,7 @@ internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
     {
         var owner = CurrentFinalTargetSlashOwner(frame);
         var target = frame.WindowContext!.TargetSeat!.Value;
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_characterPangDeBoundaryMobileOperations.Value.HasBoundaryPangDePaidDiscard(frame))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_characterPangDeBoundaryMobileOperations.Value.HasBoundaryPangDePaidDiscard(frame))
             return SkillProgramStepOutcome.Continue;
         var effectIndex = frame.InstructionIndex - 1;
         var claims = owner.CurrentUsePhysicalClaims ?? [];

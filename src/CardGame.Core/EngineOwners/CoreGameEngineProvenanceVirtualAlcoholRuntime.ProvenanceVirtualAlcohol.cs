@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineProvenanceVirtualAlcoholRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         if (f.ProvenanceAlcohol is not null || f.VirtualBasicDraft is not null)
             throw new InvalidOperationException("A virtual Alcohol instruction cannot pay twice.");
-        if (!CanStartProvenanceAlcohol(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!CanStartProvenanceAlcohol(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "当前不能翻背使用酒，未支付成本。");
             return SkillProgramStepOutcome.AwaitChild;

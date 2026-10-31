@@ -78,7 +78,7 @@ internal sealed partial class CoreGameEnginePhaseStartCardControlRuntime
     internal void ResolvePhaseStartCardControlChoice(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("No phase-starting control frame.");
-        if (!HasExactPhaseStartCardControl(f) || f.PhaseStartCardControl!.Stage != PhaseStartCardControlStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], PhaseStartCardControlChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!HasExactPhaseStartCardControl(f) || f.PhaseStartCardControl!.Stage != PhaseStartCardControlStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], PhaseStartCardControlChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Phase-starting control lost its exact unpaid choice and source.");
         var r = f.PhaseStartCardControl;
         var branch = selected.Parameters["branch"];

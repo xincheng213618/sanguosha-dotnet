@@ -124,7 +124,7 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
             {
                 if (!paid.AttemptReturned && attempts.TryBegin(frame)) return true;
                 if (queries.IsLiushiClearDraw(frame) && (!queries.IsAlive(frame.OwnerSeat) ||
-                    !queries.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId)))
+                    !queries.CanInvokeProgramSkill(frame)))
                 {
                     frames.ReplaceTop(frame with { NativeDraw = null });
                     operations.CancelBinding(frames.ActiveProgram(id), "摸牌付款前斩腕来源已失效。");

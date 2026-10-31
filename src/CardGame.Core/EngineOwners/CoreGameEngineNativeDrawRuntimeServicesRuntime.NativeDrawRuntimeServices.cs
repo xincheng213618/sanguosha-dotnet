@@ -12,6 +12,7 @@ internal sealed partial class CoreGameEngineNativeDrawRuntimeServicesRuntime
     bool INativeDrawProducerQueries.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool INativeDrawProducerQueries.IsAlive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     bool INativeDrawProducerQueries.HasSkillInstance(int seat, string skillId, string skillInstanceId) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skillId, skillInstanceId);
+    bool INativeDrawProducerQueries.CanInvokeProgramSkill(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
     bool INativeDrawProducerQueries.CanApplyPrepDiscardImmediateDraw(ProgramSkillFrame frame) => _corePrepDiscardImmediateDrawOperations.Value.CanApplyPrepDiscardImmediateDraw(frame);
     Winner INativeDrawProducerQueries.Winner => _coreMatchOutcomeWinnerAccess._winner;
 

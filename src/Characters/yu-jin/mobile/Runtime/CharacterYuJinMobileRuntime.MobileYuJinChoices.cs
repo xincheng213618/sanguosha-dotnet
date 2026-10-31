@@ -86,7 +86,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileYuJinChoice: { } draft } frame || !ValidMobileYuJinChoice(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !MobileYuJinChoices(frame).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Jieyue's answer must match the exact original participant and still-legal transfer.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "节钺参与者或原技能实例已失效。");
             return;

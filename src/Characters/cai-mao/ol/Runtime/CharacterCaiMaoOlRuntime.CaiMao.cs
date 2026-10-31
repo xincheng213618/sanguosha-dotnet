@@ -12,7 +12,7 @@ internal sealed partial class CharacterCaiMaoOlRuntime
     internal SkillProgramStepOutcome BeginCaiMao(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.CaiMao is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.CaiMao is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Cai Mao requires an original living, unpaid binding.");
         long parent = 0;
         if (op == SkillProgramEffectOp.ResolveZuolianWholeRevealExchange)
@@ -36,7 +36,7 @@ internal sealed partial class CharacterCaiMaoOlRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal bool CaiMaoSourceLive(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    internal bool CaiMaoSourceLive(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     internal IReadOnlyList<PromptChoice> CaiMaoChoices(ProgramSkillFrame f)
     {
         var r = f.CaiMao!;

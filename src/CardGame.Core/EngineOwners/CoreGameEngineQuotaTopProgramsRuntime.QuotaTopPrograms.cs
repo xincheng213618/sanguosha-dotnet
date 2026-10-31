@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEngineQuotaTopProgramsRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal bool QuotaTopSourceValid(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(program => program.Id == frame.SkillId && program.GameplayHash == frame.GameplayHash);
+    internal bool QuotaTopSourceValid(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(program => program.Id == frame.SkillId && program.GameplayHash == frame.GameplayHash);
     internal void PublishQuotaTop(ProgramSkillFrame frame)
     {
         var draft = frame.QuotaTop!;

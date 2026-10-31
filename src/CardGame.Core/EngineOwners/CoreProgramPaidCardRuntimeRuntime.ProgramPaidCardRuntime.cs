@@ -20,7 +20,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     bool IProgramPaidCardFacts.JudgmentAreaAbolished(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].JudgmentAreaAbolished;
     int IProgramPaidCardFacts.EquipmentSlotCapacity(int seat, EquipmentSlot slot) => _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(slot);
     EquipmentSlot IProgramPaidCardFacts.FieldEquipmentSlot(Card card) => _coreFieldEquipmentOperations.FieldEquipmentSlot(card);
-    bool IProgramPaidCardFacts.HasSkillInstance(int seat, string skillId, string instanceId) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skillId, instanceId);
+    bool IProgramPaidCardFacts.CanInvokeProgramSkill(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
     ContentSkillDefinition IProgramPaidCardFacts.Skill(string skillId) => _contentRegistryOperations._contentRegistry!.GetSkill(skillId);
     PlayerSkillContext IProgramPaidCardFacts.SkillContext(int seat) => _coreNativeSkillContextQueriesOperations.CreateSkillContext(_coreMatchParticipantsPlayersAccess._players[seat]);
     IReadOnlyList<Card> IProgramPaidCardFacts.Hand(int seat) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).ToArray());

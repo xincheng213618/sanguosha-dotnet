@@ -74,7 +74,7 @@ internal sealed partial class CoreParticipantHandProgramsRuntime
         var effect = ParticipantHandPaused(frame);
         if (selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture))
             throw new InvalidOperationException("The participant hand choice lost its owning frame.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "技能拥有者或技能实例已失效，未支付未完成的成本。");
@@ -125,7 +125,7 @@ internal sealed partial class CoreParticipantHandProgramsRuntime
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         ValidateBoundParticipantGiftWindow(frame);
         var source = _coreProgramLifecycleOperations.GetProgramCardSet(frame, bind);
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || target.OwnerSeat is not { } recipient || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_corePindianHandReturnsOperations.HasPaidPindianHandReturn(frame) || !ids.All(id => source.CardIds.Contains(id)) || ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != source.SourceLocations[source.CardIds.ToList().IndexOf(id)]))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || target.OwnerSeat is not { } recipient || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_corePindianHandReturnsOperations.HasPaidPindianHandReturn(frame) || !ids.All(id => source.CardIds.Contains(id)) || ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != source.SourceLocations[source.CardIds.ToList().IndexOf(id)]))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "赠牌参与者或冻结来源已失效，未交出牌且不继续请求杀。");
             return SkillProgramStepOutcome.AwaitChild;

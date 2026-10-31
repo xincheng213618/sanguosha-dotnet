@@ -36,7 +36,7 @@ internal sealed partial class CoreGameEngineDamageTargetSkillRoundDrawRuntime
             throw new InvalidOperationException("A damage target skill grant requires its exact positive native source segment and public enemy.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[damage.TargetSeat];
-        if (!owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+        if (!owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return SkillProgramStepOutcome.Continue;
         var effect = _coreProgramLifecycleOperations.GetProgramTrigger(frame).Effects.Single();
         var skill = effect.SkillIds.Single();

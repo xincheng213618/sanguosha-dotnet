@@ -60,7 +60,7 @@ internal sealed class NativeDrawThresholdRuntime(IProgramRuntimeFrames frames,
             MatchingNativeDrawThresholdProgress(batch, window.Candidates[window.CandidateIndex]) is not { } progress || progress.Threshold != threshold)
             throw new InvalidOperationException("Native draw-threshold damage lost its exact paid invoice and current occurrence.");
         if (draws.Winner != Winner.None || !participants.At(active.OwnerSeat).IsAlive ||
-            !draws.HasSkillInstance(active.OwnerSeat, active.SkillId, active.SkillInstanceId)) return SkillProgramStepOutcome.Continue;
+            !draws.CanInvokeProgramSkill(active)) return SkillProgramStepOutcome.Continue;
         var enemies = participants.Players.Where(player => player.IsAlive && player.Seat != active.OwnerSeat && targets.PublicTeamEnemy(active.OwnerSeat, player))
             .OrderBy(player => player.Seat).ToArray();
         if (enemies.Length == 0) return SkillProgramStepOutcome.Continue;

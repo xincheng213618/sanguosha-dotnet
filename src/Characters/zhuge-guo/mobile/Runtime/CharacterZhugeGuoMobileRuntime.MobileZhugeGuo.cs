@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
     internal SkillProgramStepOutcome BeginMobileZhugeGuo(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.MobileQirangGain is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.MobileQirangGain is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Mobile Zhuge Guo lost her clean actual issuing source.");
         if (op == SkillProgramEffectOp.InspectMobileYuhuaTop)
         {

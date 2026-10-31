@@ -43,7 +43,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         PromptChoice C(string branch, string label, int? card = null, CardKind? kind = null) => new(new($"mou-bingcai.{(f.Id)}.{(branch)}.{(card?.ToString(CultureInfo.InvariantCulture) ?? kind?.ToString() ?? "none")}"), label, card is { } id ? [id] : [], [], new Dictionary<string, string> { ["program-action"] = "mou-bingcai", ["branch"] = branch, ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["output-kind"] = kind?.ToString() ?? "" });
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return[];
-        if (r.Stage == MouBingcaiStage.MaterialChoice && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (r.Stage == MouBingcaiStage.MaterialChoice && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             choices.AddRange(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Select(c => C("material", $"重铸【{(c.DisplayName)}】", c.Id)));
             choices.Add(C("cancel", "取消并才"));

@@ -181,7 +181,7 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
         if (r.Operation != SkillProgramEffectOp.GiveSameCategoryFromDeck || r.Stage != ActualHandGainProgramStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ActualHandGainChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Category gift choice lost its exact private owner and current living targets.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (choice.Parameters["branch"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (choice.Parameters["branch"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishActualHandGain(f);
             return;
@@ -251,7 +251,7 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
 
         if (f.ActualHandGain.Stage != ActualHandGainProgramStage.Choosing)
             throw new InvalidOperationException("An issued actual gain lost its typed return.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             FinishActualHandGain(f);

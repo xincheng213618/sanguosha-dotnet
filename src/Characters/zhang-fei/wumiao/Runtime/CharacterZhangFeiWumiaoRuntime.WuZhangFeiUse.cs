@@ -169,7 +169,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         if (f.WuZhangFeiUse is not { Stage: WuZhangFeiUseStage.Selecting } r || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuZhangFeiSampleChoices(f).Where(item => item.Id == choice.Id).ToArray()) || choice.Cards is not [var id] || choice.Targets.Count != 0 || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DrawPile)
             throw new InvalidOperationException("Zisheng sample must be one of its original real private deck entities.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishWuZhangFeiUse(f);
             return;

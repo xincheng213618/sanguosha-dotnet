@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEnginePaidHpLossProgramsRuntime
             throw new InvalidOperationException("The quantity does not match its owning prompt.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (!owner.IsAlive || owner.Hp != d.Maximum || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber != d.TurnNumber || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != d.TurnOwnerSeat || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (!owner.IsAlive || owner.Hp != d.Maximum || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber != d.TurnNumber || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != d.TurnOwnerSeat || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "技能实例或体力在付款前失效，剩余步骤取消。");
             return;

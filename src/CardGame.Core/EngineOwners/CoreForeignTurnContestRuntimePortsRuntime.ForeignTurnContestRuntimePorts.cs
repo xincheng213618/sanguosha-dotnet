@@ -7,7 +7,7 @@ internal sealed partial class CoreForeignTurnContestRuntimePortsRuntime
 
     bool IForeignTurnContestFacts.HasHpValue(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].HasHpValue;
     bool IForeignTurnContestFacts.IsRuleWounded(int seat) => _coreTreatedWoundedOperations.IsRuleWounded(_coreMatchParticipantsPlayersAccess._players[seat]);
-    bool IForeignTurnContestFacts.HasSkillInstance(int seat, string skillId, string instanceId) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skillId, instanceId);
+    bool IForeignTurnContestFacts.CanInvokeProgramSkill(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
     bool IForeignTurnContestContinuations.BeginRecoveryReplacement(long frameId) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frameId, PostEventContinuation.AwaitedProgramMovement);
     bool IForeignTurnContestContinuations.BeginHpChanged(long frameId) => _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frameId, PostEventContinuation.AwaitedProgramMovement);
     void IForeignTurnContestContinuations.GrantSelfOnly(ProgramSkillFrame frame, int subjectSeat) => _coreCardUseModulesOperations.GrantProgramTurnCardTargetRestriction(frame, SkillProgramCardTargetRestriction.SelfOnly, subjectSeat);

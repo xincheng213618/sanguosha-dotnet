@@ -116,7 +116,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
             return;
         if (r.Stage is OrdinaryQietingStage.Choice or OrdinaryQietingStage.Viewing)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 FinishOrdinaryQieting(f);
                 return;

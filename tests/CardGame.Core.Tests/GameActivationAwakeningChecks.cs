@@ -217,7 +217,7 @@ internal static class GameActivationAwakeningChecks
             var catalog = SkillProgramCatalog.Load(rules.ToJsonString(), JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = presentations }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, "真实支付与觉醒来源")
                 { Program = program, ProgramPresentation = catalog.Presentations[id], Tags = id == Awake ? SkillTag.Awakening : SkillTag.None });
-            b.AddSkill(new(Suppressor, "实际HP4资格抑制", "资格抑制不物理删除grant") { SuppressionRule = new(4) });
+            b.AddSkill(new(Suppressor, "实际HP4资格抑制", "资格抑制不物理删除grant") { Program = CharacterFixtureContent.SuppressionProgram(Suppressor, 4) });
             b.AddSkill(new(Granted, "实际觉醒授予", "独立真实runtime grant"));
             b.AddSkill(new("fixture:activation-awakening-selection", "固定原生选将", "小模式") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 100d) });
             b.AddGeneral(new("fixture:activation-awakening-owner", "发动计数拥有者", "supporter", Driver, "jin", 20, [HpChild]));

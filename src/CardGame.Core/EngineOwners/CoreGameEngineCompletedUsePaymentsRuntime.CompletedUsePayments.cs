@@ -54,7 +54,7 @@ internal sealed partial class CoreGameEngineCompletedUsePaymentsRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.CompletedUsePayment is not { Stage: CompletedUsePaymentStage.Choosing } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Targets.Count != 0)
             throw new InvalidOperationException("Completion payment lost its exact unpublished owner.");
         AssertCompletedUsePayment(f);
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "结算付款者或未付费技能来源失效。");

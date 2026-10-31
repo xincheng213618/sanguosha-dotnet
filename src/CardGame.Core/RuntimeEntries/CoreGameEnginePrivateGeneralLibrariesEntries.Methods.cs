@@ -19,7 +19,6 @@ internal sealed partial class CoreGameEnginePrivateGeneralLibrariesEntries
     internal IEnumerable<string> PrivateGeneralCandidates() => _resolve().PrivateGeneralCandidates();
     internal IReadOnlyList<string> PrivateGeneralDeclarableSkills(string generalId, PrivateGeneralLibraryPolicy policy) => _resolve().PrivateGeneralDeclarableSkills(generalId, policy);
     internal IReadOnlyList<PromptChoice> PrivateGeneralLibraryChoices(ProgramSkillFrame f) => _resolve().PrivateGeneralLibraryChoices(f);
-    internal IReadOnlySet<string> PrivateGeneralLibrarySuppressionInputs(CharacterState owner) => _resolve().PrivateGeneralLibrarySuppressionInputs(owner);
     internal IReadOnlyList<PrivateGeneralLibrarySnapshot>? ProjectPrivateGeneralLibraries(CharacterState owner, int viewerSeat, bool revealAll) => _resolve().ProjectPrivateGeneralLibraries(owner, viewerSeat, revealAll);
     internal void PublishPrivateGeneralLibraryChoice(ProgramSkillFrame f) => _resolve().PublishPrivateGeneralLibraryChoice(f);
     internal void ResolvePrivateGeneralLibraryChoice(PromptChoice choice) => _resolve().ResolvePrivateGeneralLibraryChoice(choice);

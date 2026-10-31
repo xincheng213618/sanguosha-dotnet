@@ -27,7 +27,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { MouHuangGaiKurou = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHuangGaiKurouStartedEvent(frame.Id, receipt.Source, receipt.GameplayHash, receipt.OriginalParentId, receipt.ActualTurnNumber, receipt.ActualTurnOwnerSeat));
         var choices = MouKurouChoices(frame);
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || choices.Count == 0)
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || choices.Count == 0)
         {
             CompleteMouKurou(frame);
             return SkillProgramStepOutcome.AwaitChild;
@@ -61,7 +61,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         if (!ValidMouKurou(frame) || frame.MouHuangGaiKurou is not { Stage: MouHuangGaiKurouStage.Choosing } || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouKurouChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()) || selected.Cards is not [var cardId] || selected.Targets is not [var recipient])
             throw new InvalidOperationException("KuRou must name its exact currently owned entity and living recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             CompleteMouKurou(frame);
             return;
@@ -257,7 +257,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         if (!ExactMouKurouArmorFrame(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangGaiKurouArmorGrantedEvent>().Any(fact => fact.FrameId == frame.Id))
             throw new InvalidOperationException("KuRou armor needs one actual positive Loss point and its original candidate.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        if (!owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+        if (!owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return;
         var before = owner.Armor;
         const int actual = 2;

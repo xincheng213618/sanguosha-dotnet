@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
         if (f.PrepPoisonOutcome is not null || !HasPrepPoisonParent(f))
             throw new InvalidOperationException("Preparation poison requires its exact own preparation and terminal judgment instruction.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (!owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (!owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(f);
         var terminal = trigger.Effects[2];

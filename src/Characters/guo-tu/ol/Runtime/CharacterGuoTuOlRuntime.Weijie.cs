@@ -91,7 +91,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     internal void PublishWeijie(ProgramSkillFrame f)
     {
         var r = f.Weijie!;
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !WeijieNativeNeedCurrent(r) || r.Stage != WeijieStage.Declare && !WeijieNativeLegal(r.Need, r.OutputKind!.Value, r.TargetSeat!.Value))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !WeijieNativeNeedCurrent(r) || r.Stage != WeijieStage.Declare && !WeijieNativeLegal(r.Need, r.OutputKind!.Value, r.TargetSeat!.Value))
         {
             FinishWeijieAttempt(f, false);
             return;

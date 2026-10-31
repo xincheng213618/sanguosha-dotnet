@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.InstructionIndex != 1 || f.DyingSuits is not null || !_coreDyingOwnedCardSelectionsOperations.ExactDyingOwnedCardEntry(f, out var dying, out var entry))
             throw new InvalidOperationException("Dying suits must start on the exact original entry/candidate/victim.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0 || HasIssuedDyingSuitsRound(f.OwnerSeat, f.SkillId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0 || HasIssuedDyingSuitsRound(f.OwnerSeat, f.SkillId))
         {
             _coreSkillProgramsOperations.FinishProgramSkill(f, false);
             return SkillProgramStepOutcome.AwaitChild;
@@ -100,7 +100,7 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
         if (r.Stage == DyingSuitsStage.Recipient)
         {
             var seat = choice.Targets.Single();
-            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].Hp > 0 || HasIssuedDyingSuitsRound(f.OwnerSeat, f.SkillId))
+            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].Hp > 0 || HasIssuedDyingSuitsRound(f.OwnerSeat, f.SkillId))
             {
                 _coreSkillProgramsOperations.FinishProgramSkill(f, false);
                 return;

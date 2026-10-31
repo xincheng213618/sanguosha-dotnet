@@ -151,7 +151,7 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
         if (instruction.Op != SkillProgramEffectOp.OfferCompletedCardGift || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (draft.RecipientSeat ?? frame.OwnerSeat))
             throw new InvalidOperationException("Completed gift lost its frozen instruction or chooser.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (selected.Parameters["gift-option"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (selected.Parameters["gift-option"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             CompleteProgramCardGift(frame);
             return;

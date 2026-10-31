@@ -78,7 +78,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
     internal void PublishTaoQian(ProgramSkillFrame f)
     {
         var r = f.TaoQian!;
-        if (!r.Paid && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)))
+        if (!r.Paid && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f)))
         {
             FinishTaoQian(f);
             return;

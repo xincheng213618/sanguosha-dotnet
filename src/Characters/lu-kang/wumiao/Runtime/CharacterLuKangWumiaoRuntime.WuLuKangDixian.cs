@@ -39,7 +39,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     [ProgramAnswer("wu-lu-kang-dixian")]
     internal void AnswerWuLuKangDixian(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuKangDixian: { Stage: WuLuKangDixianStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HasWuLuKangDixianOriginalPayment(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuLuKangDixianChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuKangDixian: { Stage: WuLuKangDixianStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HasWuLuKangDixianOriginalPayment(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuLuKangDixianChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Dixian accepts only its owner's current declared-rank choice.");
         RequireWuLuKangDixian(f);
         var rank = int.Parse(choice.Parameters["rank"], CultureInfo.InvariantCulture);

@@ -121,7 +121,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } || active.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } || active.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
             return SkillProgramStepOutcome.Continue;
         var others = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != owner.Seat).Select(player => player.Seat).Order().ToArray();
         if (others.Length == 0)
@@ -195,7 +195,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return SkillProgramStepOutcome.Continue;
         if (frame.TongxieFollowUp is { } pending)
             return ContinueTongxieFollowUp(active, pending);
@@ -310,7 +310,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return SkillProgramStepOutcome.Continue;
         if (frame.TongxieGuard is { } pending)
             return pending.AcceptedPreventer is not null ? FinalizeTongxieGuard(active, pending) : SkillProgramStepOutcome.Continue;

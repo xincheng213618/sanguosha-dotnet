@@ -11,6 +11,115 @@ internal static class ShenCaoPiChecks
     private const string Hero = "anniversary:shen-cao-pi", Driver = "fixture:shen-cp-driver", Pulse = "fixture:shen-cp-pulse",
         Probe = "fixture:shen-cp-probe", Quiet = "fixture:shen-cp-quiet", NoDraw = "fixture:shen-cp-no-draw", Watch = "fixture:shen-cp-watch",
         Ally = "fixture:shen-cp-ally", Enemy = "fixture:shen-cp-enemy", Cao = "fixture:shen-cp-cao", Deck = "fixture:shen-cp-deck", PlayHold = "fixture:shen-cp-play-hold";
+    public static void YinzhiPreludeExemptionRestoresAfterCancellationAndEndsAfterRealStart()
+    {
+        var s = Scene.Start(); s.Play();
+        s.Use("anniversary:yinzhi", "edict", [2]); s.Play();
+        var issue = s.E<YinzhiIssuedEvent>().Single();
+        var player = s.Player(2);
+        var restriction = player.SkillGrants.Restrictions.Single(r => r.Lifetime.Origin.FrameId == issue.FrameId);
+        bool Effective() => s.G.NationalSkillsEntries.HasRuntimeSkill(player, Probe);
+        s.Need(!Effective() && s.G.NationalSkillsEntries.HasOwnedRuntimeSkill(player, Probe) &&
+            restriction.Match.StructurallyEquals(SkillStateMatch.NonLocked) && s.G.ResolutionStack.Count == 0,
+            "The real paid Yinzhi continuation issues a non-locked restriction before its target's next actual turn.");
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
+        var frames = capabilities.Get<IProgramRuntimeFrames>();
+        var round = s.G.Events.LastOrDefault(e => e.Payload is RoundStartedEvent);
+        const long preludeId = 900397001;
+        var proof = new BeiMiHuBeforeTurnProof(preludeId, s.G.State.TurnNumber + 1,
+            (round?.Payload as RoundStartedEvent)?.RoundNumber ?? 0, 2, round?.Sequence ?? 0);
+        frames.Push(new BeiMiHuTurnPreludeFrame(preludeId, proof, false));
+        try
+        {
+            s.Need(Effective() && player.SkillGrants.Restrictions.Contains(restriction),
+                "The real root prelude frame temporarily exempts its upcoming owner without expiring the paid restriction.");
+            frames.Replace(preludeId, new BeiMiHuTurnPreludeFrame(preludeId, proof with { UpcomingOwnerSeat = 1 }, false));
+            s.Need(!Effective(), "Another upcoming owner's prelude does not exempt the restricted target.");
+        }
+        finally { frames.Pop(preludeId, ResolutionFrameKind.BeiMiHuTurnPrelude); }
+        s.Need(!Effective() && player.SkillGrants.Restrictions.Contains(restriction) &&
+            !s.E<SkillStateExpiredEvent>().Any(e => e.SourceId == restriction.SourceId),
+            "Cancelling the prelude restores suppression while preserving the same unexpired restriction.");
+        var issuer = s.Player(0);
+        var source = issuer.SkillGrants.Grants.Single(grant => grant.SkillId == "anniversary:yinzhi");
+        issuer.SkillGrants.RemoveGrant(source.GrantId);
+        try
+        {
+            s.Need(!Effective() && player.SkillGrants.Restrictions.Contains(restriction),
+                "Losing the original issuing skill does not retract its already applied state.");
+            issuer.IsAlive = false;
+            s.Need(!Effective() && player.SkillGrants.Restrictions.Contains(restriction),
+                "The issuer's death does not retract the target's restriction before its declared deadline.");
+        }
+        finally { issuer.IsAlive = true; issuer.SkillGrants.Grant(source); }
+        s.End();
+        s.Reach(() => s.E<TurnStartedEvent>().Any(e => e.ActorSeat == 2 && e.TurnNumber > issue.ActualTurn));
+        var started = s.G.Events.Single(e => e.Payload is TurnStartedEvent turn && turn.ActorSeat == 2 && turn.TurnNumber > issue.ActualTurn);
+        var expired = s.G.Events.Single(e => e.Payload is SkillStateExpiredEvent state && state.SourceId == restriction.SourceId);
+        s.Need(expired.Sequence > started.Sequence && !player.SkillGrants.Restrictions.Contains(restriction) && Effective() &&
+            s.E<YinzhiIssuedEvent>().Single() == issue,
+            "Only the real target TurnStarted enters history before expiry; the skill restores and the reward/new-card obligation remains issued.");
+    }
+
+    public static void BorrowedDamageInvocationStaysWindowBoundThroughNativeDrawCold()
+    {
+        const string borrowedSkill = "boundary:jianxiong";
+        var s = Scene.Start(borrowScenario: true, invocation: true); s.Play();
+        s.Use(Driver, "opponent-duel", [2]);
+        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondSlash });
+        s.Answer(choice => choice.Cards.Count == 0);
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == "anniversary:keming");
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
+        s.Reach(() => s.P?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "keming-borrow") == true);
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("program-action") == "keming-borrow");
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == borrowedSkill);
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
+        s.Reach(() => s.P?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "draw") == true);
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "draw");
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Watch);
+        var frame = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == borrowedSkill);
+        var window = s.G.ResolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == frame.WindowContext!.ParentFrameId);
+        var draw = s.G.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single(f => f.Context.ParentFrameId == frame.Id);
+        bool CanInvoke(ProgramSkillFrame value) => s.G.ProgramLifecycleEntries.CanInvokeProgramSkill(value);
+        bool OwnedOrEffective()
+        {
+            var player = s.Player(0);
+            return s.G.NationalSkillsEntries.HasOwnedRuntimeSkill(player, borrowedSkill) ||
+                s.G.NationalSkillsEntries.HasRuntimeSkill(player, borrowedSkill) ||
+                s.G.NationalSkillsEntries.HasRuntimeSkillInstance(player, borrowedSkill, frame.SkillInstanceId);
+        }
+        s.Need(!OwnedOrEffective() && CanInvoke(frame) && frame.InvocationAuthorization is { } authorization &&
+            authorization.ProgramFrameId == frame.Id && authorization.WindowId == window.Id &&
+            authorization.NativeFrameId == window.ParentFrameId &&
+            authorization.Candidate == window.Candidates[window.CandidateIndex].ToProgramCandidate(),
+            "A genuinely borrowed damaged trigger remains unowned and ineffective, while its original window authorizes the one suspended native draw.");
+        foreach (var changed in new[]
+        {
+            frame with { Id = frame.Id + 1 }, frame with { TriggerId = frame.TriggerId + "-wrong" },
+            frame with { SkillInstanceId = frame.SkillInstanceId + "-wrong" }, frame with { GameplayHash = frame.GameplayHash + "-wrong" },
+            frame with { WindowContext = frame.WindowContext! with { ParentFrameId = window.Id + 1 } },
+            frame with { WindowContext = frame.WindowContext! with { OccurrenceIndex = frame.WindowContext.OccurrenceIndex + 1 } }
+        })
+            s.Need(!CanInvoke(changed), "The invocation permission cannot be reused by another frame, binding, instance, definition, window or occurrence.");
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
+        var frames = capabilities.Get<IProgramRuntimeFrames>();
+        frames.Replace(window.Id, window with { CandidateIndex = window.CandidateIndex + 1 });
+        try { s.Need(!CanInvoke(frame), "Advancing the original window cursor immediately retires its previous candidate's invocation permission."); }
+        finally { frames.Replace(window.Id, window); }
+        var hand = s.V(0).HandCount;
+        s.Cold();
+        s.Need(!OwnedOrEffective() && CanInvoke(frame) && s.P?.SkillPrompt?.SkillId == Watch,
+            "Cold recovery preserves invocation permission on the original pending frame without creating a skill grant.");
+        s.Skip(); s.Play();
+        s.Need(s.V(0).HandCount == hand + 1 && !OwnedOrEffective() && !CanInvoke(frame) &&
+            s.E<NativeDrawAttemptStartedEvent>().Count(e => e.Context.ParentFrameId == frame.Id) == 1 &&
+            s.E<ProgramDrawCompletedEvent>().Count(e => e.FrameId == frame.Id && e.ActualDrawCount == 1) == 1 &&
+            s.E<ProgramBindingResolvedEvent>().Count(e => e.FrameId == frame.Id && e.Activated && e.Completed) == 1 &&
+            s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 2 && e.TargetSeat == 0 && e.Amount == 1) == 1 &&
+            s.E<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == draw.Id) == 1,
+            "The paid damage and borrowed draw finish once after recovery, and the completed native window cannot authorize another invocation.");
+    }
+
     public static void YinzhiZhangbaUsesOnlyPublishedCompleteNewMaterialPairCold()
     {
         var s = Scene.Start(spear: true); s.Play();
@@ -65,12 +174,12 @@ internal static class ShenCaoPiChecks
             "Cold native resolution pays both real materials once, finishes once and retains the genuinely equipped source weapon.");
         s.Cold(); s.Replay();
     }
-    private sealed class Fixture(bool nativeEquipment = false, bool aiEcho = false, bool spear = false) : IGameContentPackage
+    private sealed class Fixture(bool nativeEquipment = false, bool aiEcho = false, bool spear = false, bool invocation = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-shen-cp", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            CharacterFixtureContent.Register(b, Hero);
+            CharacterFixtureContent.Register(b, invocation ? [Hero, "boundary:cao-cao"] : [Hero]);
             b.AddCard(new("fixture:shen-cp-cixiong", "雌雄双股剑", "装备牌", "攻击范围2，使用杀指定异性角色为目标后，其弃一张手牌或令你摸一张牌。", CardKind.CixiongDoubleSwords));
             if (spear)
             {
@@ -90,7 +199,7 @@ internal static class ShenCaoPiChecks
               {"id":"{{Watch}}","revision":1,"triggers":[{"id":"watch","isSkillInvocation":false,"window":"nativeDrawStarting","subject":"owner","optional":true,"effects":[{"op":"setChainedState","target":"owner","chained":true}]}]}]}
             """;
             var labels = new[] { Driver, Pulse, Probe, Quiet, NoDraw, Watch, PlayHold }.ToDictionary(id => id, id => new { name = id, description = "神曹丕真实原生小局", optionLabels = id == PlayHold ? new Dictionary<string, string> { ["continue"] = "继续原生出牌阶段" } : new Dictionary<string, string>() });
-            if (aiEcho)
+            if (aiEcho || invocation)
             {
                 var definition = JsonNode.Parse(rules)!;
                 var actions = definition["skills"]![0]!["activations"]!.AsArray();
@@ -101,7 +210,7 @@ internal static class ShenCaoPiChecks
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, p) in catalog.Programs) b.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description) { Program = p, ProgramPresentation = catalog.Presentations[id], Tags = id is NoDraw or Quiet or PlayHold ? SkillTag.Locked : SkillTag.None });
             b.AddGeneral(new(Ally, "实际技能来源", "", nativeEquipment ? Probe : Pulse, "wei", 12, Gender: GeneralGender.Male));
-            b.AddGeneral(new(Cao, "原生奸雄来源", "", "standard:jianxiong", "wei", 12, [Probe, PlayHold], nativeEquipment ? GeneralGender.Female : GeneralGender.Male) { CharacterId = "character:cao-cao", RulesetId = "sanguosha-anniversary" });
+            b.AddGeneral(new(Cao, "原生奸雄来源", "", invocation ? "boundary:jianxiong" : "standard:jianxiong", "wei", 12, [Probe, PlayHold], nativeEquipment ? GeneralGender.Female : GeneralGender.Male) { CharacterId = "character:cao-cao", RulesetId = "sanguosha-anniversary" });
             b.AddGeneral(new(Enemy, "安静同桌", "", Quiet, "wei", 12, Gender: GeneralGender.Female));
             b.AddDeck(new(Deck, "固定同名实体牌堆", 0, 2, []) { PhysicalCards = Enumerable.Range(0, 96).Select(_ => new ContentDeckPhysicalCard(spear ? "standard:dodge" : "standard:slash", Suit.Club, 7)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "神曹丕真实小局", 4, 4, new Dictionary<string, int>(), Deck, GeneralPoolIds: [Hero, Ally, Cao, Enemy], ModeKind: ContentModeKind.Team,
@@ -115,6 +224,7 @@ internal static class ShenCaoPiChecks
         public PlayerSnapshot V(int seat) => G.CreateSnapshot(seat).Players[seat];
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
         private System.Collections.IList Players => (System.Collections.IList)global::FixtureRuntimeAccess.Engine.GetField("_players", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(G)!;
+        public CharacterState Player(int seat) => (CharacterState)Players[seat]!;
         public int Limit(int seat) => (int)global::FixtureRuntimeAccess.Engine.GetMethod("GetHandLimit", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [Players[seat]])!;
         public IReadOnlyList<LegalAction> Actions(int seat) => (IReadOnlyList<LegalAction>)global::FixtureRuntimeAccess.Engine.GetMethod("BuildLegalActions", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(G, [Players[seat], true, null])!;
         public void Use(string skill, string activation, IReadOnlyList<int> targets) => Accept(new UseProgramSkillCommand(0, skill, activation, [], targets, G.Revision, P!.PromptId));
@@ -140,9 +250,9 @@ internal static class ShenCaoPiChecks
         public void Replay() { var before = State(); G = GameReplay.Replay(G.CreateCheckpoint().Options, G.AcceptedCommands, registry); Need(before == State(), "Accepted-command replay preserves original damage, reserved invocation and matching entity payments."); }
         public void Accept(GameCommand c) { var r = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()); Need(r.Accepted, r.Error?.Message ?? "Rejected command."); }
         public void Need(bool ok, string reason) { if (!ok) throw new InvalidOperationException(reason + JsonSerializer.Serialize(new { G.State.CurrentSeat, G.State.TurnNumber, P, Facts = G.Events.TakeLast(8).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())) })); }
-        public static Scene Start(bool nativeEquipment = false, bool borrowScenario = false, bool aiEcho = false, bool spear = false)
+        public static Scene Start(bool nativeEquipment = false, bool borrowScenario = false, bool aiEcho = false, bool spear = false, bool invocation = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nativeEquipment, aiEcho, spear));
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nativeEquipment, aiEcho, spear, invocation));
             var setup = new ShanheBattleSetup(37, 1, "anniversary-cp", aiEcho ? Ally : Hero, 4, 0, 0, 0, 0, [Driver, NoDraw, Watch],
                 spear ? [new(CardKind.ZhangbaSerpentSpear, Suit.Spade, 12)] : nativeEquipment ? [new(CardKind.CixiongDoubleSwords, Suit.Spade, 2)] : [new(CardKind.Slash, Suit.Heart, 8), new(CardKind.Duel, Suit.Spade, 1)], [],
                 [new(Cao, Hp: borrowScenario ? 1 : null) { StartingHand = spear ? [new(CardKind.Crossbow, Suit.Spade, 1), new(CardKind.Crossbow, Suit.Club, 2)] : nativeEquipment ? [] : [new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Slash, Suit.Spade, 3)] }, new(Enemy) { StartingHand = [] }],

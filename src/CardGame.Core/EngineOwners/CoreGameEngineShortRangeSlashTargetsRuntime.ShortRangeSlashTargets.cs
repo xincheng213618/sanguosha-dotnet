@@ -98,7 +98,7 @@ internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime
         var use = ShortRangeSlashUse(frame.OwnerSeat, frame.WindowContext!)!;
         var source = ShortRangeSlashSource(frame);
         ShortRangeSlashTargetReceipt? receipt = null;
-        if (selected.Targets is [var target] && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (selected.Targets is [var target] && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             receipt = new(frame.Id, source, frame.GameplayHash, use.Id, use.Action?.ActionId, use.SourceSeat, target, use.TargetSeats);
             var targets = Array.AsReadOnly(use.TargetSeats.Append(target).ToArray());

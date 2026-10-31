@@ -10,7 +10,7 @@ internal sealed partial class CharacterWangCanOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var source = WangCanSource(f);
-        if (f.WangCan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } w || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.WangCan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } w || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Wang Can requires its actual unpaid native source and window.");
         var initial = op switch
         {

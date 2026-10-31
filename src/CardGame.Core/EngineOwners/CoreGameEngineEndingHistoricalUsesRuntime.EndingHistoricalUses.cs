@@ -34,7 +34,7 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
         var r = f.EndingHistoricalUses!;
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var result = new List<LegalAction>();
-        if (r.Complete || r.UseReturn is not null || r.SlotIndex >= r.Slots.Count || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !actor.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(actor, f.SkillId, f.SkillInstanceId))
+        if (r.Complete || r.UseReturn is not null || r.SlotIndex >= r.Slots.Count || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !actor.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return[];
         var kind = r.Slots[r.SlotIndex].EffectiveKind;
         if (kind is CardKind.Dodge or CardKind.Nullification || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))

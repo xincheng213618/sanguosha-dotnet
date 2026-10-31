@@ -5,7 +5,7 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
 {
-    internal bool PrintedLordUnissuedSource(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None;
+    internal bool PrintedLordUnissuedSource(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None;
     internal bool ExactPrintedLordStart(ProgramSkillFrame f)
     {
         if (f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, Continuation: ProgramLifecycleContinuation.NormalTurnStart } parent || parent.OwnerSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))

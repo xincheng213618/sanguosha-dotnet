@@ -88,7 +88,7 @@ internal sealed partial class CharacterWuJingOlRuntime
 
     internal IReadOnlyList<PromptChoice> WuJingChoices(ProgramSkillFrame f)
     {
-        if (f.WuJing is not { Stage: WuJingStage.UseChoice } r || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.WuJing is not { Stage: WuJingStage.UseChoice } r || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return[];
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var result = new List<PromptChoice>();

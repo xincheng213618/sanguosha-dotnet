@@ -62,7 +62,7 @@ internal sealed partial class CharacterMiHengLeRuntime
     internal SkillProgramStepOutcome InitializeJigu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != "le:jigu" || f.TriggerId != "mark-initial-entities" || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiguInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
+        if (f.SkillId != "le:jigu" || f.TriggerId != "mark-initial-entities" || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiguInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Jigu initialization requires its original game-start binding exactly once.");
         // The native game-start mother freezes the final opening Hand before
         // any game-start skill can move it, including real opening replacements.

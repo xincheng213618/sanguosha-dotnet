@@ -8,7 +8,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     internal static CardConversionSource ShenCaoPiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int YinzhiOwnTurns(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == seat);
     internal bool YinzhiAwaitingOwnTurn(YinzhiIssuedEvent e) => YinzhiOwnTurns(e.TargetSeat) == e.TargetOwnTurns && !(_resolutionStackOperations._resolutionStack.FirstOrDefault()is BeiMiHuTurnPreludeFrame prelude && prelude.Proof.UpcomingOwnerSeat == e.TargetSeat && prelude.Proof.UpcomingTurnNumber > e.ActualTurn);
-    internal bool IsYinzhiSkillSuppressed(int seat) => HasShenCaoPiCapability && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.TargetSeat == seat && YinzhiAwaitingOwnTurn(e));
     internal bool IsYinzhiTurnRestricted(int actor) => HasShenCaoPiCapability && actor == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.TargetSeat == actor && YinzhiOwnTurns(actor) == e.TargetOwnTurns + 1 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiTurnRestrictionReleasedEvent>().Any(r => r.IssueFrameId == e.FrameId));
     internal bool YinzhiNewCardsForbidden(int actor, IEnumerable<int> ids)
     {
@@ -23,8 +22,6 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     {
         if (!HasShenCaoPiCapability)
             return;
-        if (payload is TurnStartedEvent)
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
         if (payload is DamageAppliedEvent { SourceLess: false, Amount: > 0 } damage)
             foreach (var issue in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Where(e => e.TargetSeat == damage.SourceSeat && e.Source.OwnerSeat == damage.TargetSeat && damage.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && YinzhiOwnTurns(e.TargetSeat) == e.TargetOwnTurns + 1 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiTurnRestrictionReleasedEvent>().Any(r => r.IssueFrameId == e.FrameId)).ToArray())
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YinzhiTurnRestrictionReleasedEvent(issue.FrameId, _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Last(d => d.SourceSeat == damage.SourceSeat && d.TargetSeat == damage.TargetSeat).Id));
@@ -145,7 +142,13 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         {
             var activation = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiActivatedEvent>().Single(e => e.FrameId == id);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YinzhiIssuedEvent(id, activation.Source, activation.GameplayHash, activation.TargetSeat, activation.Count, activation.ActualTurn, activation.TargetOwnTurns));
-            _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
+            if (YinzhiOwnTurns(activation.TargetSeat) == activation.TargetOwnTurns)
+                _coreProgramSkillChangesOperations.IssueSkillState(new(id, r.InstructionIndex - 1,
+                    new(activation.Source.SkillId, activation.Source.BindingId, activation.Source.OwnerSeat, activation.Source.SkillInstanceId)),
+                    activation.TargetSeat, new(SkillStateAction.Suppress, SkillStateMatch.NonLocked,
+                        [new(SkillStateBoundaryEvent.TurnStarted, SkillStateSubject.Target, SkillStateBoundaryTiming.After, SkipIssued: true)],
+                        new("not", ProgramExpressionType.Bool,
+                            [new("inUpcomingTurnPrelude", ProgramExpressionType.Bool, [new("selectedTarget", ProgramExpressionType.Participant, [], name: "selectedTarget")])])));
         }
 
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

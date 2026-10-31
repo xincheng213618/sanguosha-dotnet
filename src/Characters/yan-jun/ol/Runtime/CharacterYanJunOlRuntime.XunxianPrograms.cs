@@ -7,7 +7,7 @@ internal sealed partial class CharacterYanJunOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(batch.Movements[index].CardId) != CardLocation.DiscardPile)
+        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || _cardZonesOperations._cardZones.GetLocation(batch.Movements[index].CardId) != CardLocation.DiscardPile)
             return SkillProgramStepOutcome.Continue;
         var recipients = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != active.OwnerSeat && (_corePhysicalOwnedCardQueriesOperations.GetHand(player).Count > _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count || player.Hp > owner.Hp)).Select(player => player.Seat).ToArray();
         if (recipients.Length == 0)

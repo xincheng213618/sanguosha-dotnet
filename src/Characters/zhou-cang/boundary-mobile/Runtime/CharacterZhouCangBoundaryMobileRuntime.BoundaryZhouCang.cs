@@ -121,7 +121,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
         var r = f.BoundaryZhongyong!;
         var result = new List<PromptChoice>();
         PromptChoice Choice(string branch, string label, IReadOnlyList<int> ids, int? target = null) => new(new($"boundary-zhongyong.{(f.Id)}.{(branch)}.{(target)}"), label, ids, target is { } t ? [t] : [], new Dictionary<string, string> { ["program-action"] = "boundary-zhongyong", ["branch"] = branch, ["frame-id"] = f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) });
-        if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (r.Paid || _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)))
+        if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (r.Paid || _coreProgramLifecycleOperations.CanInvokeProgramSkill(f)))
         {
             if (r.Stage == BoundaryZhongyongStage.Choose)
             {

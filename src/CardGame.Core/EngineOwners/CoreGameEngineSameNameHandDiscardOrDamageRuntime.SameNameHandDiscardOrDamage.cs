@@ -95,7 +95,7 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == SameNameHandStage.ChoosingTarget)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 FinishSameNameHand(f);
                 return;

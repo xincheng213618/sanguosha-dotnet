@@ -63,7 +63,7 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
         var origin = AdjacentDiscardOrigin(move);
         if (origin is null || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) || move.To != CardLocation.DiscardPile || !CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(origin.EffectiveKind) || f.OwnerSeat != origin.SourceSeat && f.OwnerSeat != origin.PreviousLivingSeat && f.OwnerSeat != origin.NextLivingSeat)
             throw new InvalidOperationException("Adjacent storage lost its frozen identity or neighbor proof.");
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(move.CardId) != CardLocation.DiscardPile)
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _cardZonesOperations._cardZones.GetLocation(move.CardId) != CardLocation.DiscardPile)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "弃牌实体或持久区来源失效，未储存牌。");
             return SkillProgramStepOutcome.AwaitChild;

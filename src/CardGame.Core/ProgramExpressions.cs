@@ -48,7 +48,7 @@ internal static class ProgramExpressions
     public static readonly string[] Participants = ["owner", "selectedTarget", "selectedFirst", "selectedSecond", "eventSource", "eventTarget"];
     public static readonly string[] Sets = ["living", "livingOthers"];
     private static readonly string[] Stats = ["hp", "maxHp", "lostHp", "handCount", "handLimit", "equipmentCount"];
-    private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained", "inIssuedPhase"];
+    private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained", "inIssuedPhase", "inUpcomingTurnPrelude"];
     private static readonly string[] Comparisons = ["<", "<=", ">", ">=", "==", "!="];
 
     public static ProgramExpression Parse(JsonElement node, string path) =>

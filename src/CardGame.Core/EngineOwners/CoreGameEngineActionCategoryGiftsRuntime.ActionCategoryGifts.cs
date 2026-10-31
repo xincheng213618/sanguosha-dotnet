@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineActionCategoryGiftsRuntime
         if (effect.Op != SkillProgramEffectOp.ChooseDifferentActionCategoryGift || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString() || choice.Parameters.GetValueOrDefault("result-bind") != effect.ResultBind || frame.ChoiceBindings.Any(binding => binding.Name == effect.ResultBind) || frame.SelectedTargetSeats.Count != 1 || frame.WindowContext?.CardUse is not { } use)
             throw new InvalidOperationException("The category gift does not match its suspended real action.");
         var provider = frame.SelectedTargetSeats.Single();
-        if (provider == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[provider].IsAlive || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (provider == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[provider].IsAlive || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             throw new InvalidOperationException("The gift participants or exact skill instance are no longer available.");
         Card? card = null;
         CardLocation? location = null;

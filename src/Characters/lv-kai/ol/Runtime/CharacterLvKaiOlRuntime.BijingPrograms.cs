@@ -47,7 +47,7 @@ internal sealed partial class CharacterLvKaiOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var ownerSeat = active.OwnerSeat;
-        if (frame.WindowContext is not { SourceSeat: { } turnOwner } || turnOwner == ownerSeat || !_coreMatchParticipantsPlayersAccess._players[turnOwner].IsAlive || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[ownerSeat], active.SkillId, active.SkillInstanceId))
+        if (frame.WindowContext is not { SourceSeat: { } turnOwner } || turnOwner == ownerSeat || !_coreMatchParticipantsPlayersAccess._players[turnOwner].IsAlive || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return SkillProgramStepOutcome.Continue;
         var lost = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(movement => movement.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && movement.From == CardLocation.Hand(ownerSeat) && _characterLvKaiOlBijingMarkedCardIdsAccess._bijingMarkedCardIds.TryGetValue(movement.CardId, out var seat) && seat == ownerSeat).Select(movement => movement.CardId).Distinct().ToArray();
         if (lost.Length == 0)

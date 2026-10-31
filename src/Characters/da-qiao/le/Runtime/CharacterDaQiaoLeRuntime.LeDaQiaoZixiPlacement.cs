@@ -61,7 +61,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
-        if (f.ZixiPlacement is not null || !ZixiPlacementMother(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || phase is not { Kind: ActualDiscardRecoveryPhaseKind.Play } || phase.ActorSeat != f.OwnerSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase))
+        if (f.ZixiPlacement is not null || !ZixiPlacementMother(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || phase is not { Kind: ActualDiscardRecoveryPhaseKind.Play } || phase.ActorSeat != f.OwnerSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase))
             throw new InvalidOperationException("Zixi placement requires its exact real Play boundary and original source.");
         var r = new ZixiPlacementReceipt(ZixiPlacementSource(f), f.GameplayHash, f.WindowContext!.ParentFrameId, phase, f.InstructionIndex);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZixiPlacement = r, Step = ResolutionFrameStep.AwaitingResponse });
@@ -109,7 +109,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZixiPlacement: { Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZixiPlacementChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Zixi placement lost its exact private published source, target or independent free slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             CompleteZixiPlacement(f, false);
             return;

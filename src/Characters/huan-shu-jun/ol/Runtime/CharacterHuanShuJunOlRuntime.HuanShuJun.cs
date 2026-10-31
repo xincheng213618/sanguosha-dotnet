@@ -114,7 +114,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     internal void PublishHuanShuJun(ProgramSkillFrame f)
     {
         var r = f.HuanShuJun!;
-        if (!r.Paid && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)))
+        if (!r.Paid && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f)))
         {
             FinishHuanShuJun(f);
             return;

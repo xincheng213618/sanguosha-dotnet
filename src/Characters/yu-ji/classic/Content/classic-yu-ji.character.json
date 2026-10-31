@@ -23,10 +23,7 @@
         "name": "缠怨",
         "description": "你不能质疑“蛊惑”；当你的体力值为1时，你的其他技能失效。",
         "tags": "Locked",
-        "executionForms": "State",
-        "suppressionRule": {
-          "ownerHpEquals": 1
-        }
+        "executionForms": "State"
       }
     }
   ],

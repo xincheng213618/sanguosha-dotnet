@@ -15,7 +15,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
             return;
         }
 
-        if (!r.Paid && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!r.Paid && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishSunYuan(f, false);
             return;

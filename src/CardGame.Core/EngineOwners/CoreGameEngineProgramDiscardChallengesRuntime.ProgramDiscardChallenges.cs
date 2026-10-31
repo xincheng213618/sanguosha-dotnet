@@ -105,7 +105,7 @@ internal sealed partial class CoreGameEngineProgramDiscardChallengesRuntime
         var branch = choice.Parameters.GetValueOrDefault("branch");
         if (choice.Parameters.GetValueOrDefault("program-action") != "discard-challenge" || effect.Op is not (SkillProgramEffectOp.ChooseCategoryAlternativeDiscard or SkillProgramEffectOp.EscalatingDiscardOrDamage) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.ChooserSeat)
             throw new InvalidOperationException("Mismatched discard challenge choice.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.ChooserSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.ChooserSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "弃牌参与者或技能实例失效。");

@@ -16,7 +16,7 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     bool JudgmentAreaAbolished(int seat);
     int EquipmentSlotCapacity(int seat, EquipmentSlot slot);
     EquipmentSlot FieldEquipmentSlot(Card card);
-    bool HasSkillInstance(int seat, string skillId, string instanceId);
+    bool CanInvokeProgramSkill(ProgramSkillFrame frame);
     ContentSkillDefinition Skill(string skillId);
     PlayerSkillContext SkillContext(int seat);
     bool CanContinueAfterOwnerDeath(ProgramSkillFrame frame);

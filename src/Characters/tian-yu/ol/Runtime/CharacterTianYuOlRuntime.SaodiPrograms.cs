@@ -7,7 +7,7 @@ internal sealed partial class CharacterTianYuOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || active.WindowContext?.CardUse is null)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || active.WindowContext?.CardUse is null)
             return SkillProgramStepOutcome.Continue;
         var use = _coreCurrentCardEnhancementsOperations.EnhancementCardUse(active);
         if (use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != active.OwnerSeat || action.EffectiveDesignatedTargetSeats is not [var anchor] || anchor == active.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(anchor) || !_coreMatchParticipantsPlayersAccess._players[anchor].IsAlive)

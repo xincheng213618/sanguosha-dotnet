@@ -6,7 +6,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBuZhiOlRuntime
 {
     internal const string BuZhiDrawReason = "program.bu-zhi.draw", BuZhiMoveReason = "program.bu-zhi.equipment";
-    internal bool BuZhiCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId && p.GameplayHash == f.GameplayHash) || BuZhiPaidEquipmentEntitlement(f));
+    internal bool BuZhiCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId && p.GameplayHash == f.GameplayHash) || BuZhiPaidEquipmentEntitlement(f));
     internal SkillProgramEffect? BuZhiPausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
     internal bool BuZhiInitialParentMatches(ProgramSkillFrame f, bool gainLoss)
     {

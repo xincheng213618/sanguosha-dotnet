@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var context = active.WindowContext ?? throw new InvalidOperationException("Damage judgment lost its original window.");
         var use = ActualDamageJudgmentUse(context);
-        if (active.DamageJudgmentSuitPayment is not null || use is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame damage || damage.Id != context.ParentFrameId || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId) || context.TargetSeat is not { } target || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
+        if (active.DamageJudgmentSuitPayment is not null || use is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame damage || damage.Id != context.ParentFrameId || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || context.TargetSeat is not { } target || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             throw new InvalidOperationException("Damage judgment requires its exact actual Slash candidate and living source.");
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { DamageJudgmentSuitPayment = new(active.InstructionIndex, damage.Id, damage.ParentFrameId, use.Id, use.Action?.ActionId, active.OwnerSeat, use.SourceSeat, target, context.OccurrenceIndex, _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1, effect.JudgmentReason!, effect.ResultBind!, LegacyVirtualProducerFrameId: use.Action is null ? LegacyDamageJudgmentVirtualProducer(use, target) : null) });
         return _coreProgramLifecycleOperations.StartProgramJudgment(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id), target, effect.JudgmentReason!, effect.ResultBind!, SkillProgramCardSetVisibility.Public, use.SourceSeat);
@@ -111,7 +111,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         if (!_coreDamageJudgmentSuitPaymentObserversOperations.Value.IsValidDamageJudgmentSuitPayment(frame) || !sourceDiscard && draft.Stage != ProgramDamageJudgmentPaymentStage.ChoosingPayment || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (sourceDiscard ? draft.SourceSeat : frame.OwnerSeat) || !DamageJudgmentPaymentChoices(frame, sourceDiscard).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Damage judgment payment changed its published actor, slot or original result.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!sourceDiscard && (selected.Parameters["payment-kind"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId)))
+        if (!sourceDiscard && (selected.Parameters["payment-kind"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame)))
         {
             BeginDamageJudgmentCleanup(frame);
             return;
@@ -164,7 +164,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
             return true;
         if (draft.Stage == ProgramDamageJudgmentPaymentStage.ChoosingPayment)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || DamageJudgmentPaymentChoices(frame, false).Count == 1)
+            if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || DamageJudgmentPaymentChoices(frame, false).Count == 1)
             {
                 BeginDamageJudgmentCleanup(frame);
                 return true;

@@ -101,7 +101,7 @@ internal sealed partial class CoreGameEngineCurrentSlashFireOffersRuntime
         var branch = selected.Parameters["branch"];
         var action = use.Action!;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (branch != "skip" && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (branch != "skip" && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
             var converted = use.CardKind != CardKind.FireSlash;

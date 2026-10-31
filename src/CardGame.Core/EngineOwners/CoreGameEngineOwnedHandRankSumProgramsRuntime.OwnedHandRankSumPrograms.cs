@@ -75,7 +75,7 @@ internal sealed partial class CoreGameEngineOwnedHandRankSumProgramsRuntime
         if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], OwnedHandRankSumChoices(frame).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The rank-sum choice is not an exact published, completable selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "手牌选择的当事人或技能实例已失效，未移动任何牌。");
             return;

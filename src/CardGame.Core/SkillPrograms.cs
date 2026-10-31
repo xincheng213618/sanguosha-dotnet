@@ -3390,13 +3390,15 @@ public sealed class SkillProgram
         IReadOnlyList<SkillProgramDamageModifier>? damageModifiers = null,
         IReadOnlyList<SkillProgramCardPolicy>? cardPolicies = null, bool lordSkillProjection = false, bool cannotChallengeDeclarations = false,
         IReadOnlyList<SkillProgramHpSkillGrant>? hpSkillGrants = null,
-        IReadOnlyList<EquipmentSuitSkillGrantRule>? equipmentSuitSkillGrants = null) =>
+        IReadOnlyList<EquipmentSuitSkillGrantRule>? equipmentSuitSkillGrants = null,
+        IReadOnlyList<SkillStateDeclaration>? skillStates = null) =>
         (Id, Revision, GameplayHash, RuntimeVersion, MinimumRulesVersion, Modifiers, ViewAs, Activations, Triggers,
-            Contributions, CardIdentities, BooleanStates, DamageModifiers, CardPolicies, LordSkillProjection, CannotChallengeDeclarations, HpSkillGrants, EquipmentSuitSkillGrants) =
+            Contributions, CardIdentities, BooleanStates, DamageModifiers, CardPolicies, LordSkillProjection, CannotChallengeDeclarations, HpSkillGrants, EquipmentSuitSkillGrants, SkillStates) =
         (id, revision, gameplayHash, runtimeVersion, minimumRulesVersion, modifiers, viewAs, activations, triggers,
-            contributions, cardIdentities, booleanStates ?? [], damageModifiers ?? [], cardPolicies ?? [], lordSkillProjection, cannotChallengeDeclarations, hpSkillGrants ?? [], equipmentSuitSkillGrants ?? []);
+            contributions, cardIdentities, booleanStates ?? [], damageModifiers ?? [], cardPolicies ?? [], lordSkillProjection, cannotChallengeDeclarations, hpSkillGrants ?? [], equipmentSuitSkillGrants ?? [], Array.AsReadOnly((skillStates ?? []).ToArray()));
     public IReadOnlyList<SkillProgramHpSkillGrant> HpSkillGrants { get; }
     public IReadOnlyList<EquipmentSuitSkillGrantRule> EquipmentSuitSkillGrants { get; }
+    public IReadOnlyList<SkillStateDeclaration> SkillStates { get; }
     public bool LordSkillProjection { get; }
     public bool CannotChallengeDeclarations { get; }
     public string Id { get; }
@@ -3513,7 +3515,7 @@ public sealed class SkillProgramCatalog
             RequireObject(skill, path);
             CheckProperties(skill, path, "id", "revision", "minimumRulesVersion", "modifiers",
                 "damageModifiers", "viewAs", "activations", "triggers", "contributions",
-                "cardIdentities", "states", "cardPolicies", "lordSkillProjection", "cannotChallengeDeclarations", "hpSkillGrants", "equipmentSuitSkillGrants");
+                "cardIdentities", "states", "cardPolicies", "lordSkillProjection", "cannotChallengeDeclarations", "hpSkillGrants", "equipmentSuitSkillGrants", "skillStates");
             var id = Identifier(skill, "id", path);
             var skillPath = $"skill '{id}' ({path})";
             if (result.ContainsKey(id)) Fail(skillPath, $"duplicate skill id '{id}'");
@@ -3544,7 +3546,8 @@ public sealed class SkillProgramCatalog
             var booleanStates = ReadArray(skill, "states", skillPath, ParseBooleanState, optional: true);
             var hpSkillGrants = HpConditionalSkillGrantParser.Parse(skill, skillPath);
             var equipmentSuitSkillGrants = EquipmentSuitSkillGrantParser.Parse(skill, skillPath);
-            if (equipmentSuitSkillGrants.Count == 0 && hpSkillGrants.Count == 0 && modifiers.Count == 0 && viewAs.Count == 0 && activations.Count == 0 && triggers.Count == 0 &&
+            var skillStates = ReadArray(skill, "skillStates", skillPath, SkillStateDeclarationParser.Parse, optional: true);
+            if (skillStates.Count == 0 && equipmentSuitSkillGrants.Count == 0 && hpSkillGrants.Count == 0 && modifiers.Count == 0 && viewAs.Count == 0 && activations.Count == 0 && triggers.Count == 0 &&
                 contributions.Count == 0 && cardIdentities.Count == 0 && damageModifiers.Count == 0 &&
                 cardPolicies.Count == 0 && !(skill.TryGetProperty("lordSkillProjection", out _) && RequiredBool(skill, "lordSkillProjection", skillPath)) && !(skill.TryGetProperty("cannotChallengeDeclarations", out _) && RequiredBool(skill, "cannotChallengeDeclarations", skillPath)))
                 Fail(skillPath, "must define at least one modifier, viewAs rule, activation, trigger, contribution, or card identity");
@@ -3688,7 +3691,7 @@ public sealed class SkillProgramCatalog
                 modifiers, viewAs, activations, triggers, contributions, cardIdentities,
                 booleanStates: booleanStates,
                 damageModifiers: damageModifiers,
-                cardPolicies: cardPolicies, lordSkillProjection: (skill.TryGetProperty("lordSkillProjection", out _) && RequiredBool(skill, "lordSkillProjection", skillPath)), cannotChallengeDeclarations: (skill.TryGetProperty("cannotChallengeDeclarations", out _) && RequiredBool(skill, "cannotChallengeDeclarations", skillPath)), hpSkillGrants: hpSkillGrants, equipmentSuitSkillGrants: equipmentSuitSkillGrants));
+                cardPolicies: cardPolicies, lordSkillProjection: (skill.TryGetProperty("lordSkillProjection", out _) && RequiredBool(skill, "lordSkillProjection", skillPath)), cannotChallengeDeclarations: (skill.TryGetProperty("cannotChallengeDeclarations", out _) && RequiredBool(skill, "cannotChallengeDeclarations", skillPath)), hpSkillGrants: hpSkillGrants, equipmentSuitSkillGrants: equipmentSuitSkillGrants, skillStates: skillStates));
         }
         var conversionStates = result.Values.SelectMany(program => program.ViewAs)
             .Where(rule => rule.ConversionStateId is not null).Select(rule => rule.ConversionStateId!).ToHashSet(StringComparer.Ordinal);

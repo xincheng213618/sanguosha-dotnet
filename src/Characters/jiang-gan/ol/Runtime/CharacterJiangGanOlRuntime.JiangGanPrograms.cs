@@ -16,7 +16,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (!_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "盗书的技能拥有者已失效，技能结算取消。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -61,7 +61,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat)
             throw new InvalidOperationException("The Daoshu guesser changed while suspended.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        if (!owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+        if (!owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "盗书的技能拥有者已失效，剩余结算取消。");
@@ -154,7 +154,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
             throw new InvalidOperationException("The Daoshu giver changed while suspended.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[state.TargetSeat];
-        if (!owner.IsAlive || !target.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Hand(owner.Seat))
+        if (!owner.IsAlive || !target.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || _cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Hand(owner.Seat))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "盗书的参与者或所选手牌已失效，剩余结算取消。");

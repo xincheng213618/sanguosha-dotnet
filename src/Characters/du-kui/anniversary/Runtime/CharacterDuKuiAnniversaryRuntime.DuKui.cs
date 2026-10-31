@@ -35,7 +35,7 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
         var pile = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile);
         var rank = r.Iteration == 0 ? pile.Where(c => c.Rank is >= 1 and <= 13).Select(c => c.Rank).DefaultIfEmpty(0).Min() : r.Rank * 2;
         var candidates = pile.Where(c => c.Rank == rank && rank is >= 1 and <= 13).ToArray();
-        if (candidates.Length == 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (candidates.Length == 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishDuKui(f);
             return;
@@ -89,7 +89,7 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
             r = f.DuKui!;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 FinishDuKui(f);
                 return true;

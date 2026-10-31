@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineProgramTargetCommitRuntime
 {
     SkillProgramStepOutcome IProgramTargetCommitHost.SelectRelativeZoneDemandTarget(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginRelativeZoneDemand(effect, frame);
     SkillProgramStepOutcome IProgramTargetCommitHost.DrawOnFirstProgramTargetEncounter(SkillProgramEffect effect, ProgramSkillFrame frame) => DrawFirstProgramTargetReward(effect, frame);
-    internal bool ProgramTargetSourceValid(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(item => item.Id == frame.SkillId);
+    internal bool ProgramTargetSourceValid(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(item => item.Id == frame.SkillId);
     internal SkillProgramStepOutcome BeginRelativeZoneDemand(SkillProgramEffect effect, ProgramSkillFrame frame)
     {
         var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);

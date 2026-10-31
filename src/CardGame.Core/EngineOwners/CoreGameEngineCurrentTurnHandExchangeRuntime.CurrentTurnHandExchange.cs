@@ -26,7 +26,7 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var parent = RequireCurrentTurnHandExchangeParent(frame);
-        if (frame.CurrentTurnHandExchange is not null || frame.PendingMovementContinuation is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+        if (frame.CurrentTurnHandExchange is not null || frame.PendingMovementContinuation is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             throw new InvalidOperationException("Current-turn hand exchange cannot offer twice or replace its living original skill instance.");
         var receipt = new ProgramCurrentTurnHandExchangeReceipt(1, CurrentTurnHandExchangeSource(frame), frame.GameplayHash, parent.Id, parent.TurnNumber, parent.OwnerSeat, CurrentTurnHandExchangeStage.Offered);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { CurrentTurnHandExchange = receipt });
@@ -94,7 +94,7 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
                 return;
             }
 
-            if (choice.Parameters["option"] != "accept" || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[receipt.ParticipantSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+            if (choice.Parameters["option"] != "accept" || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[receipt.ParticipantSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
                 throw new InvalidOperationException("Only the original living participant may accept an unpaid exchange.");
             var before = CurrentTurnHandExchangeSequence;
             receipt = receipt with
@@ -184,7 +184,7 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
                 return true;
             }
 
-            if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+            if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             {
                 CompleteCurrentTurnHandExchange(frame, "source-unavailable-before-gift");
                 return true;

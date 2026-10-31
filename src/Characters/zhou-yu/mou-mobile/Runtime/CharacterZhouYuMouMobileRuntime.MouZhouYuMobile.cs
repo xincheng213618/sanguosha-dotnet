@@ -115,7 +115,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
         var branch = selected.Parameters["branch"];
         if (r.Stage == MouZhouYuMobileStage.OwnerChoice)
         {
-            if (branch == "cancel" || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (branch == "cancel" || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 FinishMouZyMobile(f);
                 return;

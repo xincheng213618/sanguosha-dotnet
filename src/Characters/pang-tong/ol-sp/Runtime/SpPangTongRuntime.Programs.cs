@@ -18,7 +18,7 @@ internal sealed partial class SpPangTongRuntime(IProgramRuntimeFrames frames, IP
 {
  private const string GuolunExchangeReason="skill-program.guolun.exchange",SpPangTongDrawReason="skill-program.sp-pang-tong.draw";
  private static CardConversionSource SpPangTongSource(ProgramSkillFrame f)=>new(f.SkillId,GetProgramBindingId(f),f.OwnerSeat,f.SkillInstanceId);
- private bool SpPangTongCurrent(ProgramSkillFrame f)=>facts.Winner==Winner.None&&participants.Players[f.OwnerSeat].IsAlive&&skills.HasRuntimeSkillInstance(participants.Players[f.OwnerSeat],f.SkillId,f.SkillInstanceId)&&content.Skill(f.SkillId).Program?.GameplayHash==f.GameplayHash;
+ private bool SpPangTongCurrent(ProgramSkillFrame f)=>facts.Winner==Winner.None&&participants.Players[f.OwnerSeat].IsAlive&&skills.CanInvokeProgramSkill(f)&&content.Skill(f.SkillId).Program?.GameplayHash==f.GameplayHash;
  [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 510, SkillProgramEffectOp.ResolveSongsangLimitedOtherDeath, SkillProgramEffectOp.DrawAfterActualPlayDrawInvocation)]
  private bool CanOfferSpPangTong(ProgramTriggerCandidate c,SkillProgramTrigger t,ProgramSkillWindowContext w)
  {

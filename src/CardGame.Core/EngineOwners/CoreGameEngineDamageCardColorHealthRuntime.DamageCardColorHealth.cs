@@ -41,7 +41,7 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
         if (f.DamageCardColorHealth is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || !ExactDamageColorHealthParent(f, out var before, out var attack) || !TryGetDamageHealthCard(attack, out var kind, out var suit, out var red, out var use))
             throw new InvalidOperationException("Damage-card color health lost its exact positive native before-damage candidate.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (!owner.IsAlive || !owner.HasHpValue || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (!owner.IsAlive || !owner.HasHpValue || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var receipt = new ProgramDamageCardColorHealthReceipt(f.Id, f.InstructionIndex, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, before.Id, attack.ResolutionId, use?.Id, use?.Action?.ActionId, attack.Card?.Id, f.OwnerSeat, attack.IsSourceLess ? null : attack.SourceSeat, before.Amount, kind, suit, red, owner.Hp, owner.MaxHp, red ? checked(owner.MaxHp + before.Amount) : owner.MaxHp);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DamageCardColorHealth = receipt });

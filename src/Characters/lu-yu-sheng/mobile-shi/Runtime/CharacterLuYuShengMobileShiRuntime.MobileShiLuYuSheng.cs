@@ -67,7 +67,7 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
             throw new InvalidOperationException("Runwei requires its exact reveal-grant activation.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var pileCount = _cardZonesOperations._cardZones.Count(CardLocation.DrawPile);
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         if (pileCount == 0 || MobileShiRunweiRecipientSeats(f).Length == 0)
         {
@@ -358,7 +358,7 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
         if (f.SkillId != ShiLysShuanghuaiSkill || f.TriggerId != MobileShiLuYuShengComposition.ShuanghuaiGuardTrigger || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, TargetSeat: { } victim })
             throw new InvalidOperationException("Shuanghuai requires its exact before-damage window.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiLuYuSheng = new("shuanghuai", _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber, TargetSeat: victim) { Source = ShiLysSource(f), GameplayHash = f.GameplayHash } });
         ContinueMobileShiShuanghuai(f.Id);

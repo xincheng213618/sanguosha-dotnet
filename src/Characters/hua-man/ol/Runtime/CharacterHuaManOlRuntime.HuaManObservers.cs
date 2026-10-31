@@ -8,7 +8,7 @@ internal sealed partial class CharacterHuaManOlRuntime
     internal bool HasHuaManCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.PaySouyingDirectionalSoleTarget);
 
     internal static CardConversionSource HuaManSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_hua_man_ol_HuaManObservers.HuaManSource(f);
-    internal bool HuaManCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool HuaManCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 550)]
     internal void ObserveAcceptedHuaManUse(CardActionAcceptedEvent accepted) => ObserveHuaManAcceptedUse(accepted.Action);
     internal void ObserveHuaManAcceptedUse(CardActionContext action)

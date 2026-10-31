@@ -36,7 +36,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var context = f.WindowContext ?? throw new InvalidOperationException("Cui Yan requires its exact native trigger.");
         var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
-        if (f.CuiYan is not null || f.InstructionIndex != 1 || f.TriggerId is null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CanOfferCuiYan(c, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+        if (f.CuiYan is not null || f.InstructionIndex != 1 || f.TriggerId is null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CanOfferCuiYan(c, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Cui Yan lost its unpaid current source or actual boundary.");
         var r = new CuiYanReceipt(CuiYanSource(f), f.GameplayHash, op, context.ParentFrameId, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, op == SkillProgramEffectOp.ResolveShutongFinalizedUse ? CuiYanStage.DrawChildren : CuiYanStage.DamageChoice);
         if (op == SkillProgramEffectOp.ResolveShutongFinalizedUse)

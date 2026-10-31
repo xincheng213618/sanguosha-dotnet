@@ -35,7 +35,7 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var c = f.WindowContext ?? throw new InvalidOperationException("Zhang Qi Ying requires an actual native window.");
-        if (f.InstructionIndex != 1 || f.TriggerId is null || f.ZhangQiYing is not null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CanOfferZhangQiYing(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
+        if (f.InstructionIndex != 1 || f.TriggerId is null || f.ZhangQiYing is not null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CanOfferZhangQiYing(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
             throw new InvalidOperationException("Zhang Qi Ying lost its exact unpaid source and native window.");
         if (op == SkillProgramEffectOp.InitializeFaluSuitTokens)
         {

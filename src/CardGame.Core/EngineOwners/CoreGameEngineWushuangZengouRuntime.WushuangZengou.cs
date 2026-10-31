@@ -73,7 +73,7 @@ internal sealed partial class CoreGameEngineWushuangZengouRuntime
         if (f.WushuangZengou is not { Stage: "choosing" } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WushuangZengouChoices(f).Where(c => c.Id == selected.Id).ToArray()) || WushuangZengouWindow(f.WindowContext)?.Action.ActionId != r.ActionId)
             throw new InvalidOperationException("Zengou lost its exact unpaid Dodge use or published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, r.DodgerSeat))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, r.DodgerSeat))
         {
             CompleteWushuangZengou(f);
             return;

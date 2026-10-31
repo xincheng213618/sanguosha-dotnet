@@ -29,7 +29,7 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
     internal SkillProgramStepOutcome BeginZhugeGuo(ProgramSkillFrame supplied, SkillProgramEffect e)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.ZhugeGuo is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.ZhugeGuo is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("ZhugeGuo requires its clean actual source window.");
         var r = new ZhugeGuoReceipt(ZhugeGuoSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, context.ParentFrameId, ZhugeGuoStage.GainChildren);
         if (e.Op == SkillProgramEffectOp.InspectYuhuaTop)

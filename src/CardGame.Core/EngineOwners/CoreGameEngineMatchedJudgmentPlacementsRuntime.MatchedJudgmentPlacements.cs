@@ -79,7 +79,7 @@ internal sealed partial class CoreGameEngineMatchedJudgmentPlacementsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.MatchedJudgmentPlacement is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [MatchedJudgmentPlacementChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Judgment placement answer differs from its exact frozen result.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || r.Stage == MatchedJudgmentPlacementStage.ChoosingDestination && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || r.Stage == MatchedJudgmentPlacementStage.ChoosingDestination && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { MatchedJudgmentPlacement = null });

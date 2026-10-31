@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineUniqueHpPeerProgramsRuntime
     internal CardConversionSource RecipientContestSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal long RecipientContestSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal bool RecipientContestUnissuedSource(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    internal bool RecipientContestUnissuedSource(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     internal static string UniqueHpPeerCostReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_UniqueHpPeerPrograms.UniqueHpPeerCostReason(f);
     internal static string UniqueHpPeerDrawReason(ProgramSkillFrame f, int seat) => RuntimeSkills.RuntimeRules_Core_UniqueHpPeerPrograms.UniqueHpPeerDrawReason(f, seat);
     internal IEnumerable<(Card Card, CardLocation From)> UniqueHpPeerLegalCards(ProgramSkillFrame f, int actor) => new[]

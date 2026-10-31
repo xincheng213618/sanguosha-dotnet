@@ -61,7 +61,7 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == ActualDiscardRecoveryStage.SelectingReturn)
         {
-            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.DiscardOwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreActualDiscardRecoveryPhasesOperations.ActualDiscardRecoveryPhaseUsed(f.OwnerSeat, f.SkillId, r.StateId, r.Phase))
+            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.DiscardOwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _coreActualDiscardRecoveryPhasesOperations.ActualDiscardRecoveryPhaseUsed(f.OwnerSeat, f.SkillId, r.StateId, r.Phase))
             {
                 _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "交还前参与者、来源或阶段机会已失效。");
                 return;

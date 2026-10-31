@@ -23,11 +23,7 @@ internal sealed partial class CharacterZouShiLeRuntime
     {
         if (!owner.IsAlive)
             return false;
-        var candidates = owner.SkillGrants.Grants.Where(g => g.SkillId == "le:yunzheng" && YunzhengBaseGrantQualified(owner, g)).ToArray();
-        if (candidates.Length == 0)
-            return false;
-        var suppressors = _corePrivateGeneralLibrariesOperations.HasPrivateGeneralLibraryCapability ? _corePrivateGeneralLibrariesOperations.PrivateGeneralLibrarySuppressionInputs(owner) : owner.SkillGrants.Grants.Where(g => _contentRegistryOperations._contentRegistry.GetSkill(g.SkillId).SuppressionRule is { } policy && owner.Hp == policy.OwnerHpEquals && YunzhengBaseGrantQualified(owner, g)).Select(g => g.SkillId).ToHashSet(StringComparer.Ordinal);
-        return candidates.Any(g => suppressors.Count == 0 || g.IsModeRule || suppressors.Contains(g.SkillId) || g.SourceId.StartsWith("equipment:", StringComparison.Ordinal));
+        return owner.SkillGrants.Grants.Any(g => g.SkillId == "le:yunzheng" && YunzhengBaseGrantQualified(owner, g));
     }
 
     internal long CaptureYunzhengQualificationStamp(long inner)

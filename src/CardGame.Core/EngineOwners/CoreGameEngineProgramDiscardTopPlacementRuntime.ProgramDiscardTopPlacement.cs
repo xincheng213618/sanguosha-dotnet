@@ -52,7 +52,7 @@ internal sealed partial class CoreGameEngineProgramDiscardTopPlacementRuntime
         var state = frame.DiscardTopPlacement ?? throw new InvalidOperationException("Discard-top placement lost its draft.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat || !decision.Choices.Any(item => item.Id == choice.Id))
             throw new InvalidOperationException("Discard-top placement choice is not current.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || state.CandidateCardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || state.CandidateCardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "弃牌已变化，牌堆顶放置取消。");

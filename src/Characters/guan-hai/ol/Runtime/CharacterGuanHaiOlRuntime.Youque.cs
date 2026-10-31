@@ -18,7 +18,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
 
     internal void PublishYouque(ProgramSkillFrame f)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !YouquePhaseActive(f.OwnerSeat) || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, f.GuanHai!.OpponentSeat) || !YouqueBaits(f.OwnerSeat).Any())
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !YouquePhaseActive(f.OwnerSeat) || !_characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.OwnerSeat, f.GuanHai!.OpponentSeat) || !YouqueBaits(f.OwnerSeat).Any())
         {
             FinishGuanHai(f, false);
             return;

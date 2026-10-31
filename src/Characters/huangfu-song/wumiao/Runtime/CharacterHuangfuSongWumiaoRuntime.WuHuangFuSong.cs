@@ -101,7 +101,7 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
         if (!ValidWuHf(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuHfChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Wu Huangfu Song requires his current published private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && r.Operation != SkillProgramEffectOp.SettleWuHuangFuSongJiangxian && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && r.Operation != SkillProgramEffectOp.SettleWuHuangFuSongJiangxian && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishWuHf(f);
             return;

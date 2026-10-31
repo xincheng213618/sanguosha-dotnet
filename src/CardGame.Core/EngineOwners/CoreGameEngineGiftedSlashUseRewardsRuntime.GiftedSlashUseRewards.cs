@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
         var bound = _coreProgramLifecycleOperations.GetProgramCardSet(frame, effect.SourceBind!);
         if (bound.CardIds is not [var id] || bound.SourceLocations is not [var from] || from != CardLocation.Hand(frame.OwnerSeat) || bound.Visibility != SkillProgramCardSetVisibility.Private || bound.SelectionActorSeat is { } selector && selector != frame.OwnerSeat)
             throw new InvalidOperationException("A gifted Slash transfer requires exactly one privately selected original owner Hand card.");
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(id) != from)
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || _cardZonesOperations._cardZones.GetLocation(id) != from)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "原赠牌来源或受赠者已失效，未重复支付。");
             return SkillProgramStepOutcome.AwaitChild;

@@ -12,7 +12,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
             throw new InvalidOperationException("LianZhu lost its exact unpaid hand gift.");
         var dynamic = _coreLianZhuCountsOperations.UsesRecipientHpLianZhu(f);
         var from = _cardZonesOperations._cardZones.GetLocation(id);
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || (!dynamic ? from != CardLocation.Hand(f.OwnerSeat) : !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].HasHpValue || !_coreMatchParticipantsPlayersAccess._players[recipient].HasHpValue || _coreMatchParticipantsPlayersAccess._players[recipient].Hp <= 0 || !_coreLianZhuCountsOperations.CanDeliverLianZhuGift(f.OwnerSeat, recipient, id)))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || (!dynamic ? from != CardLocation.Hand(f.OwnerSeat) : !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].HasHpValue || !_coreMatchParticipantsPlayersAccess._players[recipient].HasHpValue || _coreMatchParticipantsPlayersAccess._players[recipient].Hp <= 0 || !_coreLianZhuCountsOperations.CanDeliverLianZhuGift(f.OwnerSeat, recipient, id)))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "连诛赠牌前来源失效。");
             return SkillProgramStepOutcome.AwaitChild;

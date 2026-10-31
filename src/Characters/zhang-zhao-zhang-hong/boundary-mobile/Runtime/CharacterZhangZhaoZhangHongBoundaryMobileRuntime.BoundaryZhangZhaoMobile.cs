@@ -71,7 +71,7 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == "return")
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.PhaseOwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.PhaseOwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 _coreSkillProgramsOperations.FinishProgramSkill(f, false);
                 return;

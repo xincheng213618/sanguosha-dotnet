@@ -130,15 +130,15 @@ internal static class UnexpectedAssaultChecks
             F<SkillStateChangedEvent>(g).Single(e => e.Action == SkillStateAction.Suppress && e.SkillId == Pochu).Origin?.Source.SkillInstanceId == oldSource.SkillInstanceId,
             "The accepted use settles one no-damage disable even after losing its live conversion qualification.");
         Use(g, Suppress, "retire"); Play(g);
-        Require(F<ProgramOwnerSkillsReplacedEvent>(g).Any(e => e.SkillId == Suppress && e.LostSkillIds.Contains(Pochu) && e.LostSkillIds.Contains(Suppress)),
-            "The suppressor's legal terminal activation physically removes both old grants before reacquisition.");
+        Require(V(g, 0).Hp == 4 && F<ProgramOwnerSkillsReplacedEvent>(g).Any(e => e.SkillId == Suppress && e.LostSkillIds.Contains(Pochu) && e.LostSkillIds.Contains(Suppress)),
+            "The suppressor's legal terminal activation changes the recipient's HP condition and physically removes both old grants before reacquisition.");
         Use(g, Driver, "regain"); Play(g);
         Require(F<SkillsAcquiredEvent>(g).Count(e => e.PlayerSeat == 0 && e.SourceSkillId == Driver && e.SkillIds.Contains(Pochu)) == 2 &&
             !g.GetHumanLegalActions().Any(a => a.ConversionSource?.SkillId == Pochu),
             "A physical loss and regrant cannot refresh the failed skill inside the same actual turn.");
         var owner = ((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine.GetField("_players",
             System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(g)!)[0];
-        var suppression = owner.SkillGrants.Restrictions.Single(restriction => restriction.Lifetime.Origin.CardUseFrameId == use.Id);
+        var suppression = owner.SkillGrants.Restrictions.Single(restriction => restriction.Lifetime.Origin?.CardUseFrameId == use.Id);
         Use(g, Driver, "extra"); Play(g); End(g);
         Until(g, e => F<TurnStartedEvent>(e).Count(t => t.ActorSeat == 0) == 2 && P(e) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
         var restoredActions = g.GetHumanLegalActions().Where(a => a.ConversionSource?.SkillId == Pochu).ToArray();
@@ -150,7 +150,7 @@ internal static class UnexpectedAssaultChecks
         var policy = use.NoDamageSkillDisablePolicy!;
         var expiry = F<SkillStateExpiredEvent>(g).Where(e => e.Origin?.CardUseFrameId == use.Id).ToArray();
         var exactOldTurnExpired = expiry is [var ended] && ended.Origin == suppression.Lifetime.Origin &&
-            suppression.Lifetime.Origin.IssuedTurn == policy.TurnNumber && suppression.Lifetime.Until.Any(boundary =>
+            suppression.Lifetime.Origin!.IssuedTurn == policy.TurnNumber && suppression.Lifetime.Until.Any(boundary =>
                 boundary.Event == SkillStateBoundaryEvent.TurnCleanup && boundary.Seat == policy.TurnOwnerSeat &&
                 boundary.IssuedOccurrence == policy.TurnNumber);
         var newActualTurn = F<TurnStartedEvent>(g).Last(e => e.ActorSeat == 0).TurnNumber > policy.TurnNumber;
@@ -229,7 +229,7 @@ internal static class UnexpectedAssaultChecks
               {"id":"fixture:unexpected-quiet","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
               {"id":"fixture:unexpected-counter","revision":1,"viewAs":[{"id":"counter","inputKinds":[],"inputSuits":[],"outputKind":"nullification","forPlay":false,"forResponse":true}]},
               {"id":"fixture:unexpected-committed","revision":1,"triggers":[{"id":"lose-source","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["unexpectedAssault"],"optional":false,"effects":[{"op":"grantSkills","target":"owner","skillIds":["fixture:unexpected-suppress"]}]}]},
-              {"id":"fixture:unexpected-suppress","revision":1,"activations":[{"id":"retire","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseOwnerSkillsAndGrant","target":"owner","skillIds":["fixture:unexpected-pochu","fixture:unexpected-suppress"],"sourceBind":"fixture:unexpected-noop"}]}]}
+              {"id":"fixture:unexpected-suppress","revision":1,"activations":[{"id":"retire","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"loseHp","target":"owner","amount":1},{"op":"loseOwnerSkillsAndGrant","target":"owner","skillIds":["fixture:unexpected-pochu","fixture:unexpected-suppress"],"sourceBind":"fixture:unexpected-noop"}]}]}
             ]}
             """)!;
             rules["schemaVersion"] = SkillProgramCatalog.RulesSchemaVersion;
@@ -255,7 +255,7 @@ internal static class UnexpectedAssaultChecks
             catch (InvalidOperationException) { rejected = true; }
             Require(rejected, "The accepted plain hand conversion cannot opt into the unsupported generic single-card-trick executor.");
             foreach (var program in catalog.Programs.Values)
-                b.AddSkill(new(program.Id, program.Id, "共享真实机制") { Program = program, SuppressionRule = program.Id == Suppress ? new(5) : null });
+                b.AddSkill(new(program.Id, program.Id, "共享真实机制") { Program = program.Id == Suppress ? CharacterFixtureContent.SuppressionProgram(program.Id, 5, program) : program });
             b.AddSkill(new("fixture:unexpected-noop", "真实替换", "无运行能力"));
             b.AddSkill(new("fixture:unexpected-selection", "固定候选", "固定小夹具") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 100d) });
             var owner = sourceLoss ? new List<string> { Completed } : new List<string> { Driver, Completed };

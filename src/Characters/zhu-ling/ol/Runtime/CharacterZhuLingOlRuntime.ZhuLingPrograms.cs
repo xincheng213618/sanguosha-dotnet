@@ -9,7 +9,7 @@ internal sealed partial class CharacterZhuLingOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || owner.Seat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId))
+        if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || owner.Seat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return SkillProgramStepOutcome.Continue;
         var options = new[]
         {
@@ -92,7 +92,7 @@ internal sealed partial class CharacterZhuLingOlRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
         if (active.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || batch.Movements[index].To != CardLocation.Equipment(active.OwnerSeat) || batch.Movements[index].From == batch.Movements[index].To)
             throw new InvalidOperationException("Zhanyi equipment punishment lost its exact actual equipment entry.");
-        if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || !_coreProgramPersistentStateOperations.GetProgramBooleanState(active, "zhanyi-equipment"))
+        if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || !_coreProgramPersistentStateOperations.GetProgramBooleanState(active, "zhanyi-equipment"))
             return SkillProgramStepOutcome.Continue;
         var candidates = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != active.OwnerSeat && (_corePhysicalOwnedCardQueriesOperations.GetHand(player).Count > 0 || _cardZonesOperations._cardZones.CardsAt(CardLocation.Equipment(player.Seat)).Any(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(active.OwnerSeat, card, CardLocation.Equipment(player.Seat), OwnedCardMoveIntent.Discard)))).Select(player => player.Seat).ToArray();
         if (candidates.Length == 0)

@@ -67,7 +67,7 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
             return;
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { PendingMovementContinuation = null, AttackRangeAid = frame.AttackRangeAid!with { Payment = null, ResponderIndex = aid.ResponderIndex + 1 } });
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { AttackRangeAid = null });
             _coreSkillProgramsOperations.FinishProgramSkill(frame, true);

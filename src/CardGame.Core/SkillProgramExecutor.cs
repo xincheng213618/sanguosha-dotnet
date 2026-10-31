@@ -28,6 +28,7 @@ public interface ISkillProgramExecutionHost
     bool CanContinueAfterOwnerDeath(ProgramSkillFrame frame) => false;
     bool CanContinueAfterSkillLoss(ProgramSkillFrame frame) => false;
     bool OwnsSkillInstance(int ownerSeat, string skillId, string skillInstanceId);
+    bool CanInvokeProgramSkill(ProgramSkillFrame frame) => OwnsSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId);
     bool OwnsCards(int ownerSeat, IReadOnlyList<int> cardIds, IReadOnlyList<CardZoneKind> sourceZones);
     bool EvaluateCondition(ProgramSkillFrame frame, SkillProgramCondition condition, PlayerSkillContext context);
     void UpdateFrame(ProgramSkillFrame frame);
@@ -1482,7 +1483,7 @@ public sealed class SkillProgramExecutor
             // cursor. The handler restores that cursor on entry; asking again in
             // between would reject this valid paid return as an unfinished frame.
             var paidImmediatePrepMayReturn = frame.PrepDiscard?.TargetPayment is not null && state.CanContinueAfterOwnerDeath(frame);
-            if (!state.OwnsSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId) && (actor.IsAlive || !allowsDeadOwner) &&
+            if (!state.CanInvokeProgramSkill(frame) && (actor.IsAlive || !allowsDeadOwner) &&
                 !state.CanContinueAfterSkillLoss(frame))
             {
                 state.Complete(frame, completed: false, "技能实例在结算前已失效，剩余步骤取消。");

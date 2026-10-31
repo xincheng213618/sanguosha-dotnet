@@ -34,7 +34,7 @@ internal sealed partial class CharacterCaoTengOlRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var q = op == SkillProgramEffectOp.ResolveQingliuFactionChoice;
         var y = op == SkillProgramEffectOp.ResolveYongzuDistinctBenefits;
-        if (f.CaoTeng is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CaoTengParentMatches(f) || f.SkillId != (q ? "ol:qingliu" : y ? "ol:yongzu" : "ol:caoteng-jianxiong") || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op)
+        if (f.CaoTeng is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CaoTengParentMatches(f) || f.SkillId != (q ? "ol:qingliu" : y ? "ol:yongzu" : "ol:caoteng-jianxiong") || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op)
             throw new InvalidOperationException("Cao Teng requires his exact living unpaid native binding.");
         // Prime only missing native ownership observations before any benefit can
         // grant a skill. Preserve known revisions and their unobserved changes.

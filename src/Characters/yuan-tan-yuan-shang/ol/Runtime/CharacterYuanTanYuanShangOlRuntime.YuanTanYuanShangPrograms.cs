@@ -5,7 +5,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
 {
     internal const string NeifaDrawReason = "skill-program.neifa.draw", NeifaFieldReason = "skill-program.neifa.field", NeifaDiscardReason = "skill-program.neifa.discard", NeifaEquipmentReason = "skill-program.neifa.equipment-draw";
     internal static CardConversionSource NeifaSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_yuan_tan_yuan_shang_ol_YuanTanYuanShangPrograms.NeifaSource(f);
-    internal bool NeifaSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool NeifaSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 520)]
     internal bool CanOfferNeifa(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {

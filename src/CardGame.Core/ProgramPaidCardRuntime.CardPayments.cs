@@ -178,7 +178,7 @@ internal sealed partial class ProgramPaidCardRuntime
         var chooserSeat = ResolveProgramParticipant(frame, effect.ChooserRef!);
         var ownerSeat = ResolveProgramParticipant(frame, effect.CardOwnerRef!);
         if (!_facts.IsAlive(frame.OwnerSeat) || !_facts.IsAlive(chooserSeat) || !_facts.IsAlive(ownerSeat) ||
-            !_facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId))
+            !_facts.CanInvokeProgramSkill(frame))
         {
             _prompts.Clear();
             _operations.Cancel(frame, "支付参与者或技能实例已失效，技能剩余步骤取消。");

@@ -44,7 +44,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
                 return;
             }
 
-            if (receipt.GiftCount == 0 && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+            if (receipt.GiftCount == 0 && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             {
                 CompleteCaoSongLilu(frame, false);
                 return;

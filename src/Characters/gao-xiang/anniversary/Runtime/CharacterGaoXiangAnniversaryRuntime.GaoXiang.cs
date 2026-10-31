@@ -148,7 +148,7 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, GaoXiangChiying = r = r with { Index = r.Index + 1, Stage = GaoXiangChiyingStage.Card } });
             }
 
-            if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || r.Actor >= 0 && !_coreMatchParticipantsPlayersAccess._players[r.Actor].IsAlive || !r.Committed && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)))
+            if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || r.Actor >= 0 && !_coreMatchParticipantsPlayersAccess._players[r.Actor].IsAlive || !r.Committed && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f)))
             {
                 _coreSkillProgramsOperations.FinishProgramSkill(f, true);
                 return true;

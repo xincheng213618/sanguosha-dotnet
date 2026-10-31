@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (active.NearestLegalSlashRequest is not null || active.AssistedSlashRequest is not null || actorSeat == active.OwnerSeat && !_coreWenheChaosOperations.Value.IsExactWenheChaos(active))
             throw new InvalidOperationException("A nearest legal Slash requires one clean other actor.");
-        if ((!_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId)) && !_coreWenheChaosOperations.Value.IsExactWenheChaos(active))
+        if ((!_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active)) && !_coreWenheChaosOperations.Value.IsExactWenheChaos(active))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "技能来源已失效，剩余结算取消。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -157,7 +157,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
         if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]))
             throw new InvalidOperationException("Nearest legal Slash answer changed its frozen payload.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.ActorSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.ActorSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "受令角色或技能来源已失效。");
             return;
@@ -246,7 +246,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
         if (effect.Op != SkillProgramEffectOp.OfferUnlimitedVirtualSlash || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], [canonical]))
             throw new InvalidOperationException("Unlimited Slash answer lost its exact frame or target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "虚拟杀的技能来源已失效。");
             return;

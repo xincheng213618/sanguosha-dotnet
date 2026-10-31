@@ -35,7 +35,7 @@ internal sealed partial class CharacterXuChuBoundaryMobileRuntime
     [ProgramContinuation(ProgramContinuationKind.Movement, 59900)]
     internal bool ReturnBoundaryXuChuCommittedMovement(ProgramSkillFrame f)
     {
-        if (!BoundaryXuChuCommittedDraw(f) || f.InstructionIndex is not (5 or 6) || _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!BoundaryXuChuCommittedDraw(f) || f.InstructionIndex is not (5 or 6) || _coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return false;
         if (f.PendingMovementContinuation is not { SubjectSeat: var owner, BeforeCount: 0, CoverageResultBind: null } || owner != f.OwnerSeat)
             throw new InvalidOperationException("Mobile Luoyi lost its original paid gain/cleanup movement return.");

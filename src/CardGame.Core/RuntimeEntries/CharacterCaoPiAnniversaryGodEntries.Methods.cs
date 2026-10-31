@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoPiAnniversaryGodEntries
 {
-    internal KemingBorrowReceipt? ActiveKemingBorrow(int owner, string skill, string? instance = default) => _resolve().ActiveKemingBorrow(owner, skill, instance);
     internal void AnswerKemingBorrow(PromptChoice selected) => _resolve().AnswerKemingBorrow(selected);
     internal void AnswerKemingEcho(PromptChoice choice) => _resolve().AnswerKemingEcho(choice);
     internal void AssertKemingEcho(KemingSkillEchoFrame f) => _resolve().AssertKemingEcho(f);
@@ -16,17 +15,13 @@ internal sealed partial class CharacterCaoPiAnniversaryGodEntries
     internal void ContinueKemingSkillEcho(KemingSkillEchoFrame supplied) => _resolve().ContinueKemingSkillEcho(supplied);
     internal bool DrainShenCaoPi(long id) => _resolve().DrainShenCaoPi(id);
     internal void FinishShenCaoPi(ProgramSkillFrame f) => _resolve().FinishShenCaoPi(f);
-    internal bool HasKemingBorrowedSkill(CharacterState owner, string skill) => _resolve().HasKemingBorrowedSkill(owner, skill);
-    internal bool HasKemingBorrowedSkillInstance(CharacterState owner, string skill, string instance) => _resolve().HasKemingBorrowedSkillInstance(owner, skill, instance);
     internal bool HasKemingCompletedCardEffect(CardActionContext action, SkillProgramTriggerWindow window) => _resolve().HasKemingCompletedCardEffect(action, window);
     internal bool HasKemingEchoPrompt() => _resolve().HasKemingEchoPrompt();
     internal bool IsIssuedShenCaoPiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => _resolve().IsIssuedShenCaoPiCandidate(c, w);
     internal bool IsKemingEchoMovement(KemingSkillEchoFrame f, CardMovementBatchContext b) => _resolve().IsKemingEchoMovement(f, b);
-    internal bool IsYinzhiSkillSuppressed(int seat) => _resolve().IsYinzhiSkillSuppressed(seat);
     internal bool IsYinzhiTurnRestricted(int actor) => _resolve().IsYinzhiTurnRestricted(actor);
     internal IReadOnlyList<PromptChoice> KemingBorrowChoices(ProgramSkillFrame f) => _resolve().KemingBorrowChoices(f);
     internal IReadOnlyList<KemingBorrowOption> KemingBorrowOptions(int borrower, int source) => _resolve().KemingBorrowOptions(borrower, source);
-    internal string? KemingBorrowedSkillInstance(CharacterState owner, string skill) => _resolve().KemingBorrowedSkillInstance(owner, skill);
     internal IReadOnlyList<PromptChoice> KemingEchoChoices(KemingSkillEchoFrame f) => _resolve().KemingEchoChoices(f);
     internal bool KemingEchoTypedParentMatches(KemingSkillEchoFrame f, ResolutionFrame parent) => _resolve().KemingEchoTypedParentMatches(f, parent);
     internal IReadOnlyList<KemingBorrowOption> KemingPrintedBorrowOptions(ContentGeneralDefinition general) => _resolve().KemingPrintedBorrowOptions(general);

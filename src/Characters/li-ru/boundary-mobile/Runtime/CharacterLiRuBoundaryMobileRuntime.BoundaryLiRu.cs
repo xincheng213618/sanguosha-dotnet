@@ -81,7 +81,7 @@ internal sealed partial class CharacterLiRuBoundaryMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryLiRuMieji: { } r } f || !ValidBoundaryLiRuMieji(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != r.TargetSeat || !p.Choices.Any(c => c.Id == choice.Id) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("stage") != r.Stage.ToString() || choice.Parameters.GetValueOrDefault("selection-index") != r.Cards.Count.ToString(System.Globalization.CultureInfo.InvariantCulture))
             throw new InvalidOperationException("Mieji's answer must belong to the exact original target and paused frame.");
-        if (!_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "灭计参与者或技能实例已失效。");
@@ -179,7 +179,7 @@ internal sealed partial class CharacterLiRuBoundaryMobileRuntime
         if (!ValidBoundaryLiRuMieji(f))
             throw new InvalidOperationException("Mieji returned without its exact committed gift/discard invoice.");
         var r = f.BoundaryLiRuMieji;
-        if (!r.Gift && r.Payments.Count < r.Required && _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && BoundaryLiRuMiejiCards(r.TargetSeat, false).Any())
+        if (!r.Gift && r.Payments.Count < r.Required && _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && BoundaryLiRuMiejiCards(r.TargetSeat, false).Any())
         {
             var next = f with
             {

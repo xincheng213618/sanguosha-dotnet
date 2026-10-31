@@ -171,7 +171,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
             throw new InvalidOperationException("Off-turn gift requires its exact published cards and recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var recipient = selected.Targets.Single();
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !OffTurnGiftRecipients(f.OwnerSeat).Contains(recipient) || selected.Cards.Count == 0 || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber != r.ActualTurnNumber || OffTurnGiftActualTurnOwner() != r.ActualTurnOwnerSeat)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !OffTurnGiftRecipients(f.OwnerSeat).Contains(recipient) || selected.Cards.Count == 0 || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber != r.ActualTurnNumber || OffTurnGiftActualTurnOwner() != r.ActualTurnOwnerSeat)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "本次使用的弃牌、技能来源或赠牌目标已失效。");
             return;

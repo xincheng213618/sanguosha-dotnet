@@ -105,7 +105,9 @@ internal sealed class ProgramTriggerRuntime
         if (query.DecideIssued(candidate, context) is { } issuedDecision) return issuedDecision;
         var owner = query.Players[candidate.OwnerSeat];
         if (context.Window != SkillProgramTriggerWindow.OwnerDied && !owner.IsAlive && query.DecideTriggerProof(ProgramTriggerProofPhase.OwnerException, new CandidateTriggerProofRequest(candidate, context)) != true ||
-            !query.HasRuntimeSkillInstance(owner, candidate.SkillId, candidate.SkillInstanceId) && query.DecideTriggerProof(ProgramTriggerProofPhase.InstanceException, new CandidateTriggerProofRequest(candidate, context)) != true ||
+            !query.HasRuntimeSkillInstance(owner, candidate.SkillId, candidate.SkillInstanceId) &&
+            ProgramInvocations.Find(query.Frames.FirstOrDefault(frame => frame.Id == context.ParentFrameId), candidate, context) is null &&
+            query.DecideTriggerProof(ProgramTriggerProofPhase.InstanceException, new CandidateTriggerProofRequest(candidate, context)) != true ||
             query.FindProgram(candidate.SkillId) is not { } program ||
             program.GameplayHash != candidate.GameplayHash)
             return false;

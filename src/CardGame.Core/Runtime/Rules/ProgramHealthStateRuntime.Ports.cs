@@ -6,7 +6,8 @@ internal interface IProgramHealthStateFacts : IProgramSelectionQuery
     int LivingPlayersMinHp { get; }
     bool HasCardPolicy(CharacterState player, SkillProgramCardPolicyKind policy);
     string GetRuntimeSkillInstanceId(CharacterState player, string skillId);
-    bool HasRuntimeSkillInstance(CharacterState player, string skillId, string instanceId);
+    bool HasEffectiveSkillInstance(CharacterState player, string skillId, string instanceId);
+    bool CanInvokeProgramSkill(ProgramSkillFrame frame);
     bool HasWushuangTactic(int seat, int tactic);
     bool HasQimeiHealthSubject(int seat);
     bool HasMouSunJianOlHpSubject(int seat);

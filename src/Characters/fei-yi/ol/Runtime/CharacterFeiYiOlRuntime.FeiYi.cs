@@ -8,7 +8,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
     internal const string FeiYiDrawReason = "skill-program.fei-yi.draw";
     internal const string FeiYiDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FeiYiDiscardReason;
     internal CardConversionSource FeiYiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal bool FeiYiSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    internal bool FeiYiSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     SkillProgramStepOutcome IFeiYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginFeiYi(f, op);
     internal SkillProgramStepOutcome BeginFeiYi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {

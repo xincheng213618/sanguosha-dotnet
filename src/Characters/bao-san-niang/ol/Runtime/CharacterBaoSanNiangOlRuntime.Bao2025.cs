@@ -7,7 +7,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
 {
     internal static bool IsBaoOperation(SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_bao_san_niang_ol_Bao2025.IsBaoOperation(op);
     internal CardConversionSource BaoSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
-    internal bool BaoSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    internal bool BaoSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 320)]
     internal bool CanOfferBao2025(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c)
     {

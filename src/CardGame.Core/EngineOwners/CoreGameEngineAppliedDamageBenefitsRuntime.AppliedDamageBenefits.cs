@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEngineAppliedDamageBenefitsRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var activation = ProgramInstructionResolver.Default.Resolve(active, AppliedDamageProgramDefinition(active.SkillId)).Activation;
-        if (active.TriggerId is not null || active.SelectedTargetSeats is not [var target] || activation is null || DistinctTurnTargetUsage(activation) != usageId || active.InstructionIndex != 1 || activation.Effects[0].Op != SkillProgramEffectOp.ConsumeDistinctTurnTarget || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId) || !CanActivateDistinctTurnTarget(active.OwnerSeat, active.SkillId, usageId, target))
+        if (active.TriggerId is not null || active.SelectedTargetSeats is not [var target] || activation is null || DistinctTurnTargetUsage(activation) != usageId || active.InstructionIndex != 1 || activation.Effects[0].Op != SkillProgramEffectOp.ConsumeDistinctTurnTarget || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || !CanActivateDistinctTurnTarget(active.OwnerSeat, active.SkillId, usageId, target))
             throw new InvalidOperationException("An actual-turn target commitment lost its exact active source, first instruction or unvisited target.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDistinctTurnTargetCommittedEvent(active.Id, active.OwnerSeat, active.SkillId, active.ActivationId, active.SkillInstanceId, active.GameplayHash, usageId, target, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId));
     }
@@ -32,7 +32,7 @@ internal sealed partial class CoreGameEngineAppliedDamageBenefitsRuntime
         var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         if (!attack.DamageWasApplied || attack.DamageAmount <= 0 || context.Amount != attack.DamageAmount)
             throw new InvalidOperationException("An applied-damage benefit requires positive actual applied damage.");
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return SkillProgramStepOutcome.Continue;
         var first = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { AppliedDamageBenefit = new(active.InstructionIndex, damage.Id, damage.ParentFrameId, active.OwnerSeat, damage.TargetSeat, context.SourceSeat, amount, first, first, 0), PendingMovementContinuation = new(active.OwnerSeat, 0, null) });

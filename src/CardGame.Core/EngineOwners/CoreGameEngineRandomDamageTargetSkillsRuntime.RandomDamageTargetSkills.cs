@@ -48,7 +48,7 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || f.RandomDamageTargetSkill is not null || f.InstructionIndex != 1 || !AcquireRandomDamageTargetSkillDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)) || !_coreOrderedPrintedSkillLossObserversOperations.ExactOrderedPrintedSkillLossParent(f, out var window, out var damage, out var attack) || attack.SourceSeat != f.OwnerSeat || !TryGetRandomSkillDirectSlashUse(attack, out var use))
             throw new InvalidOperationException("Random skill acquisition requires its exact already-paid direct native Slash damage candidate.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (!owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+        if (!owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var owned = OwnedAndRestorableRandomSkillIds(owner);
         var candidates = _coreNationalSkillsOperations.EnabledContentSkillIds(_coreMatchParticipantsPlayersAccess._players[damage.TargetSeat]).Where(id => !owned.Contains(id) && !_contentRegistryOperations._contentRegistry.GetSkill(id).Tags.HasFlag(SkillTag.Locked)).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();

@@ -5,7 +5,7 @@ internal sealed partial class CharacterLiJueOlRuntime
 {
     internal const string YisuanGainReason = "skill-program.yisuan.actual-used-trick";
     internal static CardConversionSource LiJueSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_li_jue_ol_LiJuePrograms.LiJueSource(f);
-    internal bool LiJueCurrentSource(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].HasHpValue && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool LiJueCurrentSource(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].HasHpValue && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 440)]
     internal bool CanOfferLiJue(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {

@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || frame.RandomAreaAcquisition is not null || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || !ExactRandomAreaParent(frame, out var window, out var damage))
             throw new InvalidOperationException("Random area acquisition needs its exact positive native damage-point owner candidate.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return SkillProgramStepOutcome.Continue;
         var receipt = new ProgramRandomAreaAcquisitionReceipt(frame.Id, frame.InstructionIndex, RandomAreaSource(frame), frame.GameplayHash, window.Id, damage.Id, frame.WindowContext!.OccurrenceIndex, damage.Amount)
         {
@@ -58,7 +58,7 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionRuntime
             }
 
             var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-            if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || receipt.Steps.Count == 0 && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+            if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || receipt.Steps.Count == 0 && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             {
                 FinishRandomAreaAcquisition(frame, true);
                 return true;

@@ -18,7 +18,7 @@ internal sealed partial class CharacterZhouFangOlRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (!_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "诱敌的技能拥有者已失效，剩余结算取消。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -58,7 +58,7 @@ internal sealed partial class CharacterZhouFangOlRuntime
             throw new InvalidOperationException("The Youdi bait chooser changed while suspended.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner);
-        if (!_coreMatchParticipantsPlayersAccess._players[chooserSeat].IsAlive || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[chooserSeat].IsAlive || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "诱敌的参与者或技能实例已失效，剩余结算取消。");

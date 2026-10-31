@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
     internal SkillProgramStepOutcome StartSourceMou(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!IsSourceMouMode || f.ShanheSourceMou is not null || f.InstructionIndex != 1 || !SourceMouParent(f) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != operation || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!IsSourceMouMode || f.ShanheSourceMou is not null || f.InstructionIndex != 1 || !SourceMouParent(f) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != operation || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Source Mou Dong Zhuo lost its exact unpaid native binding.");
         var threshold = operation == SkillProgramEffectOp.ResolveShanheSourceZhibing ? _coreShanheSourceMouDongZhuoZhibingOperations.SourceMouThreshold(f.OwnerSeat, f.WindowContext!) : null;
         if (operation == SkillProgramEffectOp.ResolveShanheSourceZhibing && threshold is null)

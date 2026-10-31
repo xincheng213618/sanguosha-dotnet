@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEngineCapturedEquipmentDrawsRuntime
         var set = _coreProgramLifecycleOperations.GetProgramCardSet(f, bind);
         if (f.CapturedEquipmentDraw is not null || f.TriggerId is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || set.CardIds is not [var id] || set.SourceLocations is not [var from] || !set.CardIds.SequenceEqual(f.SelectedCardIds) || f.SelectedTargetSeats is not [var target] || target != recipient || target == f.OwnerSeat || from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
             throw new InvalidOperationException("Captured equipment placement lost its unpaid exact active source/material/recipient.");
-        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !CanPlaceCapturedEquipmentCost(f.OwnerSeat, recipient, id) || _cardZonesOperations._cardZones.GetLocation(id) != from || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !CanPlaceCapturedEquipmentCost(f.OwnerSeat, recipient, id) || _cardZonesOperations._cardZones.GetLocation(id) != from || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "直置前参与者、所选实体或技能来源已失效，未支付装备。");
             return SkillProgramStepOutcome.AwaitChild;

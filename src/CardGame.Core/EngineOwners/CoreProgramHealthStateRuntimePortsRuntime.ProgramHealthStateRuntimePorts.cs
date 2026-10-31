@@ -9,7 +9,8 @@ internal sealed partial class CoreProgramHealthStateRuntimePortsRuntime
 
     bool IProgramHealthStateFacts.HasCardPolicy(CharacterState player, SkillProgramCardPolicyKind policy) => _coreProgramCardPoliciesOperations.HasCardPolicy(player, policy);
     string IProgramHealthStateFacts.GetRuntimeSkillInstanceId(CharacterState player, string skillId) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(player, skillId);
-    bool IProgramHealthStateFacts.HasRuntimeSkillInstance(CharacterState player, string skillId, string instanceId) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(player, skillId, instanceId);
+    bool IProgramHealthStateFacts.CanInvokeProgramSkill(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
+    bool IProgramHealthStateFacts.HasEffectiveSkillInstance(CharacterState player, string skillId, string instanceId) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(player, skillId, instanceId);
     bool IProgramHealthStateFacts.HasWushuangTactic(int seat, int tactic) => _coreWushuangTacticRulesOperations.HasWushuangTactic(seat, tactic);
     bool IProgramHealthStateFacts.HasQimeiHealthSubject(int seat) => _coreQimeiProgramsOperations.HasQimeiHealthSubject(seat);
     bool IProgramHealthStateFacts.HasMouSunJianOlHpSubject(int seat) => _characterSunJianMouOlOperations.HasMouSunJianOlHpSubject(seat);

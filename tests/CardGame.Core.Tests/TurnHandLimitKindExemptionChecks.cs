@@ -117,7 +117,7 @@ internal static class TurnHandLimitKindExemptionChecks
             builder.AddSkill(new(Driver, "真实驱动", "真实驱动") { Program = Load(Driver,
                 [Activation("negative", Rule(-1)), Activation("positive", Rule(2)),
                  Activation("suppress", """{"op":"loseHp","target":"owner","amount":2}""")]) });
-            builder.AddSkill(new("fixture:turn-kind-suppress", "来源抑制", "HP1抑制其他技能") { SuppressionRule = new(1) });
+            builder.AddSkill(new("fixture:turn-kind-suppress", "来源抑制", "HP1抑制其他技能") { Program = CharacterFixtureContent.SuppressionProgram("fixture:turn-kind-suppress", 1) });
             builder.AddSkill(new("fixture:turn-kind-selection", "固定选将", "无运行技能")
                 { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 100d) });
             builder.AddGeneral(new("fixture:turn-kind-owner", "策略源", "supporter", Source, "wei", 2,

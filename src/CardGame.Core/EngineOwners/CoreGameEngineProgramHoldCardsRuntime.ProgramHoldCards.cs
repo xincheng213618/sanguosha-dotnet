@@ -85,7 +85,7 @@ internal sealed partial class CoreGameEngineProgramHoldCardsRuntime
         if (draft.ResultBind != selected.Parameters.GetValueOrDefault("result-bind") || selected.Parameters.GetValueOrDefault("selection-index") != draft.SelectedCardIds.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) || (finish ? draft.SelectedCardIds.Count < draft.MinimumCount || selected.Cards.Count != 0 : chosenCard is not { } cardId || cardId < 0 || !draft.CandidateCardIds.Contains(cardId) || draft.SelectedCardIds.Contains(cardId)))
             throw new InvalidOperationException("The card-hold choice does not match its suspended instruction.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.HolderSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || draft.CandidateCardIds.Where((id, index) => _cardZonesOperations._cardZones.GetLocation(id) != draft.CandidateLocations[index]).Any())
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.HolderSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || draft.CandidateCardIds.Where((id, index) => _cardZonesOperations._cardZones.GetLocation(id) != draft.CandidateLocations[index]).Any())
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "扣置参与者、技能实例或冻结来源已失效，未移动任何牌。");
             return;

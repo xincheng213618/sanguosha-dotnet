@@ -61,7 +61,7 @@ internal sealed partial class CoreGameEngineDamageTargetObtainProgramsRuntime
 
         if (d.Stage != ProgramDamageTargetObtainStage.SelectingCard || d.Receipt is not null)
             throw new InvalidOperationException("Obtain payment was already resolved.");
-        if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CanOfferDamageTargetObtain(f.OwnerSeat, f.WindowContext!))
+        if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CanOfferDamageTargetObtain(f.OwnerSeat, f.WindowContext!))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "获得前技能来源或参与者已失效。");
             return;

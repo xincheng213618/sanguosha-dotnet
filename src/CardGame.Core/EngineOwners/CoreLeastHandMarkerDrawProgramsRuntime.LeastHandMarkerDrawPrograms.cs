@@ -11,7 +11,7 @@ internal sealed partial class CoreLeastHandMarkerDrawProgramsRuntime
             throw new InvalidOperationException("A least-hand marker benefit lost its actual skipped-draw parent.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !target.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !target.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return SkillProgramStepOutcome.Continue;
         var minimum = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Min(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count);
         var markerBranch = _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count == minimum && target.Markers.GetValueOrDefault(marker) == 0;
@@ -44,7 +44,7 @@ internal sealed partial class CoreLeastHandMarkerDrawProgramsRuntime
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { LeastHandMarkerDraw = null });
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), "截辎得牌孩子结清后，来源失效，剩余程序取消。");
             return true;

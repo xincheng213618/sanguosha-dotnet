@@ -62,7 +62,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
     internal bool RoundOnceCardlessProgramTargetLegal(CharacterState actor, int target, CardConversionSource source, bool ignoreDistance = false) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && actor.Seat != target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], new(0, CardKind.Slash, Suit.None, 0), source, CardKind.Slash, ignoreDistance: ignoreDistance, noEffectiveRank: true, physicalCardIds: []);
     internal IReadOnlyList<PromptChoice> RoundOnceCardlessProgramSlashChoices(ProgramSkillFrame frame, int actorSeat, IReadOnlyList<int> targets, string? resultBind = null)
     {
-        if (frame.RoundOnceCardlessProgramRequest is not null || (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(frame)) && !_characterLiYiOlOperations.IsChanshuangSlashRequest(frame) && !_characterSunYuanOlOperations.IsSayingSlashRequest(frame) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat))
+        if (frame.RoundOnceCardlessProgramRequest is not null || (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(frame)) && !_characterLiYiOlOperations.IsChanshuangSlashRequest(frame) && !_characterSunYuanOlOperations.IsSayingSlashRequest(frame) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat))
             return[];
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame);
         if (effect is null)
@@ -220,7 +220,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
             return true;
         if (_characterLiYiOlOperations.ResumeChanshuangSuppliedSlash(parent))
             return true;
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchOutcomeStatusWinnerAccess._status == EngineStatus.Completed || !_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat], parent.SkillId, parent.SkillInstanceId) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(parent))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchOutcomeStatusWinnerAccess._status == EngineStatus.Completed || !_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(parent) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(parent))
             _coreSkillProgramsOperations.FinishProgramSkill(parent, true);
         else if (parent.FixedTargetSlash is { Issued: true })
             _coreFixedSlashAndDeclaredDeckProgramsOperations.TryResumeFixedSlashAndDeclaredDeck(id);

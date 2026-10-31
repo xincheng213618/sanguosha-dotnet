@@ -42,16 +42,18 @@ public sealed record SkillStateOrigin(long FrameId, int EffectIndex, CardUseEffe
     public int IssuedTurn { get; init; }
 }
 
-public sealed class SkillStateLifetime(SkillStateOrigin origin, IReadOnlyList<SkillStateBoundaryEnd> until)
+public sealed class SkillStateLifetime(SkillStateOrigin? origin, IReadOnlyList<SkillStateBoundaryEnd> until)
 {
-    public SkillStateOrigin Origin { get; } = origin;
+    public SkillStateOrigin? Origin { get; } = origin;
     public IReadOnlyList<SkillStateBoundaryEnd> Until { get; } = Array.AsReadOnly(until.ToArray());
 }
 
 public sealed record SkillStateConditionContext(int OwnerSeat, int TargetSeat, ActualDiscardRecoveryPhaseKey? IssuedPhase = null);
+public sealed record SkillStateDeclarationSource(string SkillId, string GrantId, int DeclarationIndex,
+    SkillStateDeclaration Declaration);
 public sealed record SkillStateRestriction(string Id, string SourceId, SkillStateAction Action,
     SkillStateMatch Match, SkillStateConditionContext Context, SkillStateLifetime Lifetime,
-    ProgramExpression? While = null);
+    ProgramExpression? While = null, SkillStateDeclarationSource? DeclarationSource = null);
 
 public sealed partial record SkillGrant
 {

@@ -9,7 +9,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     internal IReadOnlyList<PromptChoice> MouXqProgramSlashChoices(ProgramSkillFrame f, int actorSeat, IReadOnlyList<int> targets, string? resultBind = null)
     {
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f);
-        if (effect is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || f.MouXiaoQiaoJueyanResponseGrant is not null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(f) && !_characterLiYiOlOperations.IsChanshuangSlashRequest(f) && !_characterSunYuanOlOperations.IsSayingSlashRequest(f)) || !_coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, effect.Op, actorSeat) || resultBind is not null && effect.ResultBind != resultBind)
+        if (effect is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || f.MouXiaoQiaoJueyanResponseGrant is not null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(f) && !_characterLiYiOlOperations.IsChanshuangSlashRequest(f) && !_characterSunYuanOlOperations.IsSayingSlashRequest(f)) || !_coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, effect.Op, actorSeat) || resultBind is not null && effect.ResultBind != resultBind)
             return[];
         var allowed = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramTargets(f, actorSeat, effect.Op);
         if (allowed.Length == 0 || targets.Any(t => !allowed.Contains(t)))
@@ -99,7 +99,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXiaoQiaoJueyanResponseGrant = null });
         if (_characterSunYuanOlOperations.ResumeSayingSuppliedSlash(f) || _characterLiYiOlOperations.ResumeChanshuangSuppliedSlash(f))
             return true;
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(f))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(f))
             _coreSkillProgramsOperations.FinishProgramSkill(f, true);
         else if (f.FixedTargetSlash is { Issued: true })
             _coreFixedSlashAndDeclaredDeckProgramsOperations.TryResumeFixedSlashAndDeclaredDeck(id);

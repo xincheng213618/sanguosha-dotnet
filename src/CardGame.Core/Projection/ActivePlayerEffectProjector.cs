@@ -137,6 +137,15 @@ internal sealed class ActivePlayerEffectProjector(IActivePlayerTurnEffectQueries
                 if (item.Effects.HasFlag(DirectedTurnCardPolicyEffect.IgnoreArmor)) details.Add("无视目标防具");
                 Add(item.Source.SkillId, item.Source.OwnerSeat, $"{actor}对{target}的{EffectCardNames(item.CardKinds)}：{string.Join("、", details)}。");
             }
+        var declaredStates = new List<SkillStateDeclaration>();
+        foreach (var restriction in player.SkillGrants.Restrictions)
+            if (restriction.DeclarationSource is { } source &&
+                !declaredStates.Any(state => state.StructurallyEquals(source.Declaration)))
+            {
+                declaredStates.Add(source.Declaration);
+                if (content.FindSkill(source.SkillId) is { } definition)
+                    Add(source.SkillId, restriction.Context.OwnerSeat, definition.Description, ActivePlayerEffectExpiry.RuleCleared);
+            }
         foreach (var restriction in player.SkillGrants.Restrictions)
             if (restriction.Action == SkillStateAction.Suppress && restriction.Match.StructurallyEquals(SkillStateMatch.NonLocked) &&
                 restriction.Lifetime.Origin is { } origin && restriction.Lifetime.Until.Any(end =>

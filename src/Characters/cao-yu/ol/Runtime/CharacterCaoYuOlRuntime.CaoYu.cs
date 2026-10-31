@@ -118,7 +118,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
     internal void PublishCaoYu(ProgramSkillFrame f)
     {
         var r = f.CaoYu!;
-        if (r.Stage == CaoYuStage.GongjieTake && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || r.Index >= r.Targets.Count))
+        if (r.Stage == CaoYuStage.GongjieTake && (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || r.Index >= r.Targets.Count))
         {
             AfterGongjieGifts(f);
             return;

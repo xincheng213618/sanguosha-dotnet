@@ -92,7 +92,7 @@ internal sealed partial class CoreGameEngineActualTurnDamageClaimsRuntime
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (frame.ActualTurnDamageClaim is not null || frame.InstructionIndex != 1 || !MatchesActualTurnDamageEnding(frame))
             throw new InvalidOperationException("A damage-entity claim requires its independent original actual Ending candidate exactly once.");
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return SkillProgramStepOutcome.Continue;
         var facts = EligibleActualTurnDamageEntities(frame.OwnerSeat);
         var ids = facts.Select(e => e.CardId).ToArray();

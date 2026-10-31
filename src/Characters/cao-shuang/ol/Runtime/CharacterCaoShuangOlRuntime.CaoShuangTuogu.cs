@@ -53,7 +53,7 @@ internal sealed partial class CharacterCaoShuangOlRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoShuangTuogu: { Granted: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.VictimSeat || _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoShuangTuoguChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Only the exact deceased chooser can select its frozen printed Tuogu skill.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CaoShuangTuogu = null });
             _coreSkillProgramsOperations.FinishProgramSkill(f, false);

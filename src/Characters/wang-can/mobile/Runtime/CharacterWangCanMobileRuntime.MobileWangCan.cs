@@ -32,7 +32,7 @@ internal sealed partial class CharacterWangCanMobileRuntime
     internal SkillProgramStepOutcome BeginMobileWangCanXi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != MobileWangCanShanxi || f.MobileWangCanXi is not null || f.InstructionIndex != 1 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.SkillId != MobileWangCanShanxi || f.MobileWangCanXi is not null || f.InstructionIndex != 1 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Shanxi lost its exact active issuing source.");
         var marking = op == SkillProgramEffectOp.TransferMobileWangCanXi;
         if (marking ? f.TriggerId != "move-xi" || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting, OwnerSeat: var owner } || owner != f.OwnerSeat || !MobileWangCanXiTargets(owner).Any() : f.WindowContext is not { } w || !ExactMobileWangCanRecovery(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0), w))

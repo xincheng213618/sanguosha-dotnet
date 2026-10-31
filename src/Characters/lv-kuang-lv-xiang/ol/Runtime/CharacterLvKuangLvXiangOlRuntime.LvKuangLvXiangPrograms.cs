@@ -5,7 +5,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
 {
     internal const string LiehouReason = "skill-program.liehou.hand-relay";
     internal static CardConversionSource LvKuangLvXiangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lv_kuang_lv_xiang_ol_LvKuangLvXiangPrograms.LvKuangLvXiangSource(f);
-    internal bool LvKuangLvXiangCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool LvKuangLvXiangCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     internal bool LvKuangLvXiangActivationTargetAllowed(CharacterState target, SkillProgramActivation a, int ownerSeat) => !ProgramInstructionResolver.Default.Features(a).HasOperation(SkillProgramEffectOp.ResolveLiehouRangeHandRelay) || target.IsAlive && target.Seat != ownerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0 && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(ownerSeat, target.Seat);
     internal bool QigongOriginal(ProgramTriggerCandidate c, ProgramSkillWindowContext w, out CardUseFrame original, bool requireLivingTarget = true)
     {

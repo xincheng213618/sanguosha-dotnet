@@ -134,7 +134,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
 
     internal void PublishBoundaryLiuFeng(ProgramSkillFrame f)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             CancelBoundaryLiuFeng(f);
             return;

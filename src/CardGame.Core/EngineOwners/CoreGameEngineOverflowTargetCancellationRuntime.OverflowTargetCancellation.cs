@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count;
         var limit = _coreNativeRuleQueriesOperations.GetHandLimit(owner);
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId) || hand <= limit || !OverflowPrimaryTargets(use.CardKind, use.TargetSeats).Any(s => s != frame.OwnerSeat))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || hand <= limit || !OverflowPrimaryTargets(use.CardKind, use.TargetSeats).Any(s => s != frame.OwnerSeat))
             return SkillProgramStepOutcome.Continue;
         if (!_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, use.Action!))
             throw new InvalidOperationException("Overflow cancellation cannot replace an unproven actual use.");

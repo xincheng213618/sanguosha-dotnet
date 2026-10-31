@@ -18,6 +18,7 @@ internal interface INativeDrawProducerQueries : IProgramSelectionQuery
     bool IsValidSeat(int seat);
     bool IsAlive(int seat);
     bool HasSkillInstance(int seat, string skillId, string skillInstanceId);
+    bool CanInvokeProgramSkill(ProgramSkillFrame frame);
     bool CanApplyPrepDiscardImmediateDraw(ProgramSkillFrame frame);
     Winner Winner { get; }
     long PairBenefitSequence { get; }

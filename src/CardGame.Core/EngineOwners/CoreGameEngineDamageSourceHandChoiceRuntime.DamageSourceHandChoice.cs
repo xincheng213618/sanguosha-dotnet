@@ -87,7 +87,7 @@ internal sealed partial class CoreGameEngineDamageSourceHandChoiceRuntime
             throw new InvalidOperationException("Damage hand choice no longer matches its published branch or hand cost.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
-        if (branch == "decline" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (branch == "decline" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             CompleteDamageSourceHandChoice(f, false);
             return;

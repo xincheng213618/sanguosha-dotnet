@@ -12,7 +12,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         QushiSeal? seal = null;
         if (op == SkillProgramEffectOp.ResolveQushiDrawAndPrivateSeal)
         {
-            if (f.ActivationId != "draw-seal" || f.TriggerId is not null || f.WindowContext is not null || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (f.ActivationId != "draw-seal" || f.TriggerId is not null || f.WindowContext is not null || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
                 throw new InvalidOperationException("Qushi requires the original living actual Play activation.");
         }
         else

@@ -345,7 +345,7 @@ internal sealed partial class CharacterZhouFeiBoundaryMobileRuntime
                 return;
             }
 
-            if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+            if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             {
                 ReturnBoundaryZfDeposit(frame);
                 return;

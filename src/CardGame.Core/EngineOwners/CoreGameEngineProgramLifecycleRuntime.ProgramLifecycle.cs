@@ -5,6 +5,10 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
 {
     internal ProgramInteractionRouter ProgramInteractions => _programInteractionsOperations._programInteractions ??= new(ProgramInteractionCatalog.Default, _kernelCoreProgramRuntimeModulesOperations.BindRuntimeHandler, ResolveProgramActivationChoice, _modeRuntimeOperations._modeRuntime.PromptAnswers);
 
+    internal bool CanInvokeProgramSkill(ProgramSkillFrame frame) =>
+        _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) ||
+        ProgramInvocations.Allows(frame, _resolutionStackOperations._resolutionStack.FirstOrDefault(parent => parent.Id == frame.WindowContext?.ParentFrameId));
+
     [ProgramAnswerBefore(1)]
     internal bool TryResolveRoundOnceProgramAnswer(PromptChoice selected) => _coreRoundOnceCardlessProgramRequestsOperations.TryResolveRoundOnceCardlessProgramSlash(selected, false);
     [ProgramAiChoice(SkillProgramEffectOp.ChooseHpBoundOtherAndDealRandomDamage)]

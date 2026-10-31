@@ -68,7 +68,7 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
         var branch = selected.Parameters["branch"];
         if (r.Stage == MouMengHuoStage.Selecting)
         {
-            if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 FinishMouMh(f);
                 return;

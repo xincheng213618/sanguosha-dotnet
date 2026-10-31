@@ -81,7 +81,6 @@ public sealed record ContentCardDefinition(
 public enum SkillImplementationStatus { Complete, Partial, Planned }
 
 /// <summary>A passive rule that suspends the owner's other skills while its condition holds.</summary>
-public sealed record SkillSuppressionRule(int OwnerHpEquals);
 
 public sealed record ContentSkillDefinition(
     string Id,
@@ -95,7 +94,6 @@ public sealed record ContentSkillDefinition(
     public SkillTag Tags { get; init; }
     public SkillExecutionForm ExecutionForms { get; init; }
     public SkillActionForm ActionForms { get; init; }
-    public SkillSuppressionRule? SuppressionRule { get; init; }
     public IReadOnlyDictionary<Role, double>? SelectionWeights { get; init; }
     public SkillRevealWeights? RevealWeights { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
@@ -702,8 +700,8 @@ public sealed partial class ContentRegistry
                 }
                 foreach (var suitGrant in skill.Program!.EquipmentSuitSkillGrants)
                 {
-                    if (!_skills.TryGetValue(suitGrant.SkillId, out var leaf) || leaf.SuppressionRule is not null ||
-                        leaf.Program is not { } target || target.EquipmentSuitSkillGrants.Count != 0 ||
+                    if (!_skills.TryGetValue(suitGrant.SkillId, out var leaf) ||
+                        leaf.Program is not { } target || target.SkillStates.Count != 0 || target.EquipmentSuitSkillGrants.Count != 0 ||
                         target.HpSkillGrants.Count != 0 || target.LordSkillProjection ||
                         target.CardPolicies.Any(policy => policy.Kind == SkillProgramCardPolicyKind.RewriteSuit) ||
                         target.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.InitializePrivateGeneralLibrary)))
@@ -712,7 +710,7 @@ public sealed partial class ContentRegistry
                 foreach (var hpGrant in skill.Program!.HpSkillGrants)
                 {
                     if (!_skills.TryGetValue(hpGrant.SkillId, out var derived) ||
-                        derived.Program?.HpSkillGrants.Count > 0 || derived.Program?.EquipmentSuitSkillGrants.Count > 0 || derived.SuppressionRule is not null ||
+                        derived.Program?.HpSkillGrants.Count > 0 || derived.Program?.EquipmentSuitSkillGrants.Count > 0 || derived.Program?.SkillStates.Count > 0 ||
                         derived.Program?.LordSkillProjection == true ||
                         derived.Program?.Triggers.Any(trigger => trigger.Effects.Any(effect =>
                             effect.Op == SkillProgramEffectOp.InitializePrivateGeneralLibrary)) == true)
@@ -721,7 +719,7 @@ public sealed partial class ContentRegistry
                 foreach (var phaseGrant in skill.Program!.Triggers.SelectMany(trigger => trigger.Effects)
                              .Where(effect => effect.Op == SkillProgramEffectOp.GrantOtherPlayUseRestriction))
                 {
-                    if (!_skills.TryGetValue(phaseGrant.SkillIds.Single(), out var derived) || derived.SuppressionRule is not null ||
+                    if (!_skills.TryGetValue(phaseGrant.SkillIds.Single(), out var derived) || derived.Program?.SkillStates.Count > 0 ||
                         derived.Program is not { CardPolicies: [{ Kind: SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount }] } leaf ||
                         leaf.Activations.Count != 0 || leaf.Triggers.Count != 0 || leaf.ViewAs.Count != 0 ||
                         leaf.Modifiers.Count != 0 || leaf.Contributions.Count != 0 || leaf.CardIdentities.Count != 0 ||

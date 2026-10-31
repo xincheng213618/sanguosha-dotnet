@@ -64,11 +64,12 @@ internal static class SkillStateMatcher
         "skill.lord" or "skill.printed" or "skill.ordinal" or "skill.character" or "skill.isSource";
 
     internal static bool Matches(SkillStateMatch match, SkillGrant grant, CharacterState owner,
-        ContentSkillDefinition definition, string? sourceSkillId = null, IProgramExpressionWorld? bindings = null) => !grant.IsModeRule &&
+        ContentSkillDefinition definition, string? sourceSkillId = null, IProgramExpressionWorld? bindings = null,
+        IReadOnlySet<string>? sourceSkillIds = null) => !grant.IsModeRule &&
         (match.SkillIds is null || match.SkillIds.Contains(grant.SkillId, StringComparer.Ordinal)) &&
         (match.GrantIds is null || match.GrantIds.Contains(grant.GrantId, StringComparer.Ordinal)) &&
         (match.Filter is null || ProgramExpressions.EvaluateBool(match.Filter,
-            new MetadataWorld(owner, grant, definition, sourceSkillId, bindings)) == true);
+            new MetadataWorld(owner, grant, definition, sourceSkillId, bindings, sourceSkillIds)) == true);
 
     internal static bool IsFilterExpression(ProgramExpression expression) => expression.Type == ProgramExpressionType.Bool &&
         expression.Nodes().All(node => node.Op != "number" || node.Name?.StartsWith("skill.", StringComparison.Ordinal) != true || IsFilterFact(node.Name));
@@ -79,7 +80,7 @@ internal static class SkillStateMatcher
              "+" or "-" or "min" or "max" or "floorDiv" or "when"));
 
     private sealed class MetadataWorld(CharacterState owner, SkillGrant grant, ContentSkillDefinition skill,
-        string? sourceSkillId, IProgramExpressionWorld? bindings) : IProgramExpressionWorld
+        string? sourceSkillId, IProgramExpressionWorld? bindings, IReadOnlySet<string>? sourceSkillIds) : IProgramExpressionWorld
     {
         public int? Participant(string name) => bindings?.Participant(name);
         public IReadOnlyList<int>? ParticipantSet(string name) => bindings?.ParticipantSet(name);
@@ -94,7 +95,8 @@ internal static class SkillStateMatcher
             "skill.lord" => skill.Tags.HasFlag(SkillTag.Lord) ? 1 : 0,
             "skill.printed" => IsPrinted(grant) ? 1 : 0,
             "skill.character" => IsCharacter(grant) ? 1 : 0,
-            "skill.isSource" => sourceSkillId is null ? null : grant.SkillId == sourceSkillId ? 1 : 0,
+            "skill.isSource" => sourceSkillIds is not null ? sourceSkillIds.Contains(grant.SkillId) ? 1 : 0 :
+                sourceSkillId is null ? null : grant.SkillId == sourceSkillId ? 1 : 0,
             "skill.ordinal" => PrintedOrdinal(),
             _ => bindings?.Number(name)
         };

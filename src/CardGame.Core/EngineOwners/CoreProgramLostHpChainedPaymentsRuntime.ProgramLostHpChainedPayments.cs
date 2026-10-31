@@ -15,7 +15,7 @@ internal sealed partial class CoreProgramLostHpChainedPaymentsRuntime
     {
         if (!_coreNamedAcquisitionObserversOperations.Value.HasLostHpTargetSelection(frame))
             return frame;
-        if (!IsLostHpChainedComposition(frame) || frame.InstructionIndex != 2 || frame.LostHpChainedPayment is not null || destination != SkillProgramCardDestination.DiscardPile || exceptBind is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!IsLostHpChainedComposition(frame) || frame.InstructionIndex != 2 || frame.LostHpChainedPayment is not null || destination != SkillProgramCardDestination.DiscardPile || exceptBind is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             throw new InvalidOperationException("A lost-HP chain payment requires its still-qualified original seven-node activation.");
         var binding = frame.CardSetBindings.SingleOrDefault(b => b.Name == sourceBind);
         if (binding is null || binding.CardIds is not [var cardId] || binding.SourceLocations is not [var from] || from.OwnerSeat != frame.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || binding.SelectionActorSeat is { } chooser && chooser != frame.OwnerSeat || _cardZonesOperations._cardZones.GetLocation(cardId) != from)

@@ -104,7 +104,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
         var r = f.DamageZoneAcquisition!;
         if (r.Stage != DamageZoneAcquisitionStage.Selecting || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], r.Choices.Where(c => c.Id == selected.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DamageAcquisitionChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Damage acquisition must retain its exact published opaque/public slot.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "获得前技能来源已失效。");

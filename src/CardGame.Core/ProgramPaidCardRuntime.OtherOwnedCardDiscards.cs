@@ -114,7 +114,7 @@ internal sealed partial class ProgramPaidCardRuntime
             decision.PlayerSeat != chooserSeat)
             throw new InvalidOperationException("The other-player card chooser changed while suspended.");
         if (!_facts.IsAlive(frame.OwnerSeat) || !_facts.IsAlive(chooserSeat) ||
-            !_facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId))
+            !_facts.CanInvokeProgramSkill(frame))
         {
             _prompts.Clear();
             _operations.Cancel(frame, "选牌参与者或技能实例已失效，技能剩余步骤取消。");

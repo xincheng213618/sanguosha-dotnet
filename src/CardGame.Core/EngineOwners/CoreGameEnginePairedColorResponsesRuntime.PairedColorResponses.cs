@@ -138,7 +138,7 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The paired-color chooser lost its owning frame.");
         if (f.PairedColorDisposition is not { Stage: PairedColorDispositionStage.ChoosingCard } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_corePairedColorResponseObserversOperations.Value.IsPairedColorDispositionChoice(f, prompt) || !PairedColorDispositionChoices(f).Any(c => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, selected)) || !Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !int.TryParse(selected.Parameters.GetValueOrDefault("slot-index"), out var slot))
             throw new InvalidOperationException("Paired-color disposition requires its current exact owner-only published card slot.");
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.CounterpartSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.CounterpartSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             CompletePairedColorDisposition(f, false);
@@ -182,7 +182,7 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
                 return true;
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.CounterpartSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || PairedColorDispositionChoices(f).Count == 0)
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.CounterpartSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || PairedColorDispositionChoices(f).Count == 0)
             {
                 CompletePairedColorDisposition(f, false);
                 return true;

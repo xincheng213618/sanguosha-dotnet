@@ -29,7 +29,7 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
     IEnumerable<T> IMouDongZhuoOlFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouDongZhuoOlFacts.ExactStart(ProgramSkillFrame f, SkillProgramEffectOp op)
     {
-        if (f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op || ((IMouDongZhuoOlFacts)this).Program(f.SkillId).GameplayHash != f.GameplayHash || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
+        if (f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op || ((IMouDongZhuoOlFacts)this).Program(f.SkillId).GameplayHash != f.GameplayHash || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
             return false;
         if (f.TriggerId is null)
             return op == SkillProgramEffectOp.ResolveMouDongZhuoFengshang && f.SkillId == MouDongZhuoOlRuntime.Fengshang && f.ActivationId == "distribute-pair" && f.WindowContext is null && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == f.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p) && MouDongZhuoOl.CanFengshang(f.OwnerSeat, false);

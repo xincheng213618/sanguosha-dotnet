@@ -113,7 +113,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.CompletedUndamagedTargetReveal is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || CompletedUndamagedUse(context)is not { Action: { } action } use || use.SourceSeat != f.OwnerSeat || !_coreCompletedUndamagedTargetRevealObserversOperations.Value.ExactCompletedUndamagedParent(f, context, use) || !CompletedUndamagedSourceUseQualifies(f.SkillId, use))
             throw new InvalidOperationException("Completed-target reveal lost its original completed Use and current optional candidate.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var targets = CompletedUndamagedEligibleTargets(use);
         if (targets.Length == 0)
@@ -182,7 +182,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
         if (r.Stage is not (CompletedUndamagedTargetRevealStage.ChoosingTarget or CompletedUndamagedTargetRevealStage.ChoosingCards) || !CompletedUndamagedTargetRevealChoices(f).Any(c => CompletedUndamagedChoiceEquals(c, choice)))
             throw new InvalidOperationException("Completed-target reveal changed its exact frozen target or opaque slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "遗毒在发行展示前失去原技能资格或发动者。");
             return;

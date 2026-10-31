@@ -303,7 +303,7 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
 
         if (r.MovePurpose == "place")
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || r.Deposited >= 3)
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || r.Deposited >= 3)
             {
                 DrawMouGn(f);
                 return;
@@ -331,7 +331,7 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
     internal void NextMouGnWei(ProgramSkillFrame f)
     {
         var r = f.MouGanNing!;
-        if (r.TargetIndex + 1 >= r.Targets.Count || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (r.TargetIndex + 1 >= r.Targets.Count || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishMouGn(f);
             return;

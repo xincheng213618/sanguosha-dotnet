@@ -59,10 +59,20 @@ public sealed partial class CharacterState
             _general = value;
         }
     }
-    public required bool GeneralSelected { get; set; }
+    private bool _generalSelected;
+    public required bool GeneralSelected
+    {
+        get => _generalSelected;
+        set { _generalSelected = value; if (value) SkillGrants.AdmitSkillStates(); }
+    }
     // Owned by this seat's current setup selection; command replay rebuilds it.
     internal IReadOnlyList<GeneralDefinition>? GeneralDraftCandidates { get; set; }
-    public required bool GeneralRevealed { get; set; }
+    private bool _generalRevealed;
+    public required bool GeneralRevealed
+    {
+        get => _generalRevealed;
+        set { _generalRevealed = value; if (value) SkillGrants.AdmitSkillStates(); }
+    }
     public GeneralDefinition? SecondaryGeneral
     {
         get => _secondaryGeneral;
@@ -72,8 +82,18 @@ public sealed partial class CharacterState
             _secondaryGeneral = value;
         }
     }
-    public bool SecondaryGeneralSelected { get; set; }
-    public bool SecondaryGeneralRevealed { get; set; }
+    private bool _secondaryGeneralSelected;
+    public bool SecondaryGeneralSelected
+    {
+        get => _secondaryGeneralSelected;
+        set { _secondaryGeneralSelected = value; if (value) SkillGrants.AdmitSkillStates(); }
+    }
+    private bool _secondaryGeneralRevealed;
+    public bool SecondaryGeneralRevealed
+    {
+        get => _secondaryGeneralRevealed;
+        set { _secondaryGeneralRevealed = value; if (value) SkillGrants.AdmitSkillStates(); }
+    }
     private int _maxHp;
     public required int MaxHp
     {

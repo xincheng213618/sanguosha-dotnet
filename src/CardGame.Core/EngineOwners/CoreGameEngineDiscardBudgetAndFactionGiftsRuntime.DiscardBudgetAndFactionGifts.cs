@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsRuntime
     SkillProgramStepOutcome IDiscardBudgetAndFactionGiftHost.PreventOwnPlayOutsideTargetRangeDamage(ProgramSkillFrame f) => PreventOwnPlayOutsideRange(f);
     SkillProgramStepOutcome IDiscardBudgetAndFactionGiftHost.DiscardOutsideRangeAfterInsufficientUses(ProgramSkillFrame f) => BeginOutsideRangeDiscard(f);
     SkillProgramStepOutcome IDiscardBudgetAndFactionGiftHost.OfferCompletedFactionCostGift(ProgramSkillFrame f, string faction) => BeginCompletedFactionGift(f, faction);
-    internal bool BudgetGiftSourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId);
+    internal bool BudgetGiftSourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId);
     internal Dictionary<string, string> BudgetGiftParameters(ProgramSkillFrame f, string action, string mode) => new()
     {
         ["program-action"] = action,

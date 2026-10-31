@@ -67,7 +67,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
     internal SkillProgramStepOutcome ExecuteFriendTrio(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.InstructionIndex != 1 || f.FriendTrio is not null || f.WindowContext is not { } c || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.InstructionIndex != 1 || f.FriendTrio is not null || f.WindowContext is not { } c || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Friend skill lost its owning instruction and native opportunity.");
         if (op == SkillProgramEffectOp.ExchangeFriendGainForDiscard)
             return _characterPangTongFriendOperations.BeginFriendManjuan(f);

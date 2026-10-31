@@ -76,7 +76,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
     internal SkillProgramStepOutcome InitializeOriginalHandEntities(ProgramSkillFrame supplied, string stateId)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) || f.InstructionIndex != 1 || !IsOriginalHandTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f), SkillProgramEffectOp.InitializeOriginalHandEntities) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) || f.InstructionIndex != 1 || !IsOriginalHandTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f), SkillProgramEffectOp.InitializeOriginalHandEntities) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Original-hand initialization requires its exact native game-start candidate.");
         var key = new GameEngine.OriginalHandStateKey(f.OwnerSeat, f.SkillId, stateId);
         if (_coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.ContainsKey(key))
@@ -196,7 +196,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
         }
 
         var r = f.OriginalHandBenefit!;
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "原始手牌奖励在选定并发行前失去原技能资格。");
             return;

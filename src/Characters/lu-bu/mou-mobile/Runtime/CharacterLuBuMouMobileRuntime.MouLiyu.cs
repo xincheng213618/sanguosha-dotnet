@@ -90,7 +90,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
 
         if (branch == "take")
         {
-            if (!r.Paid && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!r.Paid && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 FinishMouLb(f);
                 return;

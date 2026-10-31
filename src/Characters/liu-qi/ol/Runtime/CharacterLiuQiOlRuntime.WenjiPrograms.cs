@@ -39,7 +39,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LiuQiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Wenji lost its exact independent recipient authority.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive)
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive)
         {
             FinishLiuQi(f);
             return;

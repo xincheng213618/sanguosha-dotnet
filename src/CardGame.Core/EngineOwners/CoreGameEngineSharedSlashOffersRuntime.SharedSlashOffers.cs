@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
         var cards = _coreProgramLifecycleOperations.GetProgramCardSet(f, bind);
         if (f.SharedSlashOffer is not null)
             throw new InvalidOperationException("A shared Slash gift cannot repay its cost.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || actorSeat == f.OwnerSeat || f.SelectedTargetSeats is not [var selected] || selected != actorSeat || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || cards.CardIds.Count != 1 || cards.SourceLocations.Count != 1 || cards.SourceLocations[0].OwnerSeat != f.OwnerSeat || cards.SourceLocations[0].Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _cardZonesOperations._cardZones.GetLocation(cards.CardIds[0]) != cards.SourceLocations[0])
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || actorSeat == f.OwnerSeat || f.SelectedTargetSeats is not [var selected] || selected != actorSeat || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || cards.CardIds.Count != 1 || cards.SourceLocations.Count != 1 || cards.SourceLocations[0].OwnerSeat != f.OwnerSeat || cards.SourceLocations[0].Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _cardZonesOperations._cardZones.GetLocation(cards.CardIds[0]) != cards.SourceLocations[0])
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "赠牌来源、受赠者或技能实例已失效，未支付。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -56,7 +56,7 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal bool SharedSlashUnchosenSourceValid(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.SharedSlashOffer!.ActorSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    internal bool SharedSlashUnchosenSourceValid(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.SharedSlashOffer!.ActorSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     internal int[] SharedSlashLegalTargets(int actorSeat) => _coreProgramVirtualSlashOffersOperations.GetProgramVirtualSlashOfferTargets(actorSeat).Where(seat => !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Slash, Suit.None)).ToArray();
     [ProgramContinuation(ProgramContinuationKind.Resume, 580)]
     internal bool ResumeSharedSlashOffer(long frameId)

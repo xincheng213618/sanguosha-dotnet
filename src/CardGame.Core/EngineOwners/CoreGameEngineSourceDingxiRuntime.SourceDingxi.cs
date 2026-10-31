@@ -138,7 +138,7 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
         if (r.Stage != SourceDingxiStage.Returned)
             return;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SourceDingxi = r with { Stage = SourceDingxiStage.StoreChildren, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        if ((_cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.Processing || _cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.DiscardPile) && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if ((_cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.Processing || _cardZonesOperations._cardZones.GetLocation(r.CardId) == CardLocation.DiscardPile) && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             var pile = _corePublicPileSourcesOperations.EnsurePublicPileSource(f, int.MaxValue);
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([r.CardId], pile.Location, new("skill-program.source-dingxi.store"), (_, moves) =>

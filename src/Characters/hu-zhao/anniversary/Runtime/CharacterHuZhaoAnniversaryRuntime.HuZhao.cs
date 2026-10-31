@@ -67,7 +67,7 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var mode = c.Parameters["mode"];
         var mask = int.Parse(c.Parameters["value"], CultureInfo.InvariantCulture);
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreSkillProgramsOperations.FinishProgramSkill(f, false);
             return;

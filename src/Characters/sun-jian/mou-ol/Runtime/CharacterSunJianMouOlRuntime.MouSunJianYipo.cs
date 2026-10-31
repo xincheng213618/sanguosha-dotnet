@@ -115,7 +115,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
 
         if (r.Stage == MouSunJianOlYipoStage.Option)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat!.Value].IsAlive)
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat!.Value].IsAlive)
             {
                 FinishMouSunJianOl(f);
                 return;

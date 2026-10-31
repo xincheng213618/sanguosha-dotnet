@@ -40,7 +40,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHuangYueyingMobile: { Stage: MouHuangYueyingMobileStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], MouHyQicaiChoices(f).Where(p => p.Id == c.Id).ToArray()))
             throw new InvalidOperationException("Qicai requires its current real Hand/public-discard entity and original recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
+        if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
         {
             FinishMouHy(f);
             return;

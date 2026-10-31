@@ -223,7 +223,7 @@ internal static class DrawDiscardCategoryRefundChecks
             var catalog = SkillProgramCatalog.Load(rules.ToJsonString(), JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = presentations }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, "实际支付与精确返回")
                 { Program = program, ProgramPresentation = catalog.Presentations[id], Tags = id == "fixture:category-refund-protection" ? SkillTag.Locked : SkillTag.None });
-            b.AddSkill(new(Suppressor, "实际HP5资格抑制", "仅抑制取得来源资格，保留实体技能实例") { SuppressionRule = new(5) });
+            b.AddSkill(new(Suppressor, "实际HP5资格抑制", "仅抑制取得来源资格，保留实体技能实例") { Program = CharacterFixtureContent.SuppressionProgram(Suppressor, 5) });
             b.AddSkill(new("fixture:category-refund-pick", "固定原生AI选将", "小四人实际模式") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => 100d) });
             var extras = new[] { Watch, "fixture:category-refund-protection" }
                 .Concat(sourceLoss ? new[] { EquipmentChild } : Array.Empty<string>()).Concat(protection ? new[] { Restrict } : Array.Empty<string>()).ToArray();

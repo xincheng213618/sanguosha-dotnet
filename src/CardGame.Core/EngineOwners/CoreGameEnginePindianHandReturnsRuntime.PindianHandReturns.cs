@@ -21,7 +21,7 @@ internal sealed partial class CoreGameEnginePindianHandReturnsRuntime
             return null;
         var receipt = RequirePindianHandReturn(f);
         var cards = _coreProgramLifecycleOperations.GetProgramCardSet(f, bind);
-        if (receipt.AcquisitionPaid || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !cards.CardIds.Order().SequenceEqual(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat]).Select(c => c.Id).Order()) || cards.SourceLocations.Any(location => location != CardLocation.Hand(receipt.TargetSeat)))
+        if (receipt.AcquisitionPaid || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !cards.CardIds.Order().SequenceEqual(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat]).Select(c => c.Id).Order()) || cards.SourceLocations.Any(location => location != CardLocation.Hand(receipt.TargetSeat)))
             throw new InvalidOperationException("Pindian whole-hand acquisition lost its exact unpaid opponent hand.");
         return _coreOutsidePhaseDrawDiscardOperations.OutsidePhaseMovementSequence;
     }

@@ -71,6 +71,8 @@ internal sealed partial class CoreGameEngineNationalSkillsRuntime
     }
 
     internal SkillBindingShard GetSkillBindingShard(CharacterState player) => _coreGameEngineActionQueriesActionQueryAccess._actionQuery is { } query ? query.Bindings[player.Seat] ??= _skillBindingIndexOperations._skillBindingIndex.GetShard(player) : _skillBindingIndexOperations._skillBindingIndex.GetShard(player);
+    internal bool IsSkillGrantStateEffective(CharacterState player, SkillGrant grant) =>
+        _skillBindingIndexOperations._skillBindingIndex.Availability.IsGrantEffectiveUnderStates(player, grant);
     internal IReadOnlyList<string> EnabledPrintedContentSkillIds(CharacterState player)
     {
         return EnabledRuntimeSkillGrants(player).Where(grant => grant.SourceId is CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource).Select(grant => grant.SkillId).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
@@ -88,11 +90,9 @@ internal sealed partial class CoreGameEngineNationalSkillsRuntime
     internal IReadOnlyList<SkillGrant> GetOwnedSkillGrants(CharacterState player) => GetSkillBindingShard(player).OwnedGrants;
     internal bool HasOwnedRuntimeSkill(CharacterState player, string skillId) => GetSkillBindingShard(player).HasOwnedSkill(skillId);
     internal bool HasOwnedRuntimeSkillInstance(CharacterState player, string skillId, string skillInstanceId) => GetSkillBindingShard(player).HasOwnedInstance(skillId, skillInstanceId);
-    // Existing runtime queries mean effective availability. Keming remains a
-    // window-scoped invocation exception; it does not become general possession.
-    internal bool HasRuntimeSkillInstance(CharacterState player, string skillId, string skillInstanceId) => GetSkillBindingShard(player).HasInstance(skillId, skillInstanceId) || _characterCaoPiAnniversaryGodOperations.HasKemingBorrowedSkillInstance(player, skillId, skillInstanceId);
-    internal string GetRuntimeSkillInstanceId(CharacterState player, string skillId) => _corePrintedLordSkillQualificationsOperations.PreferredQualifiedPrintedLordInstance(player, skillId) ?? EnabledRuntimeSkillGrants(player).Where(grant => grant.SkillId == skillId).OrderBy(grant => grant.SkillInstanceId, StringComparer.Ordinal).Select(grant => grant.SkillInstanceId).FirstOrDefault() ?? _characterCaoPiAnniversaryGodOperations.KemingBorrowedSkillInstance(player, skillId) ?? throw new InvalidOperationException($"Player {(player.Seat)} does not own enabled skill '{(skillId)}'.");
-    internal bool HasRuntimeSkill(CharacterState player, string skillId) => GetSkillBindingShard(player).HasSkill(skillId) || _characterCaoPiAnniversaryGodOperations.HasKemingBorrowedSkill(player, skillId);
+    internal bool HasRuntimeSkillInstance(CharacterState player, string skillId, string skillInstanceId) => GetSkillBindingShard(player).HasInstance(skillId, skillInstanceId);
+    internal string GetRuntimeSkillInstanceId(CharacterState player, string skillId) => _corePrintedLordSkillQualificationsOperations.PreferredQualifiedPrintedLordInstance(player, skillId) ?? EnabledRuntimeSkillGrants(player).Where(grant => grant.SkillId == skillId).OrderBy(grant => grant.SkillInstanceId, StringComparer.Ordinal).Select(grant => grant.SkillInstanceId).FirstOrDefault() ?? throw new InvalidOperationException($"Player {(player.Seat)} does not own enabled skill '{(skillId)}'.");
+    internal bool HasRuntimeSkill(CharacterState player, string skillId) => GetSkillBindingShard(player).HasSkill(skillId);
     internal string EnabledSkillNames(CharacterState player)
     {
         var names = GetSkillBindingShard(player).Definitions.Values.Select(skill => skill.Name).Distinct().ToList();

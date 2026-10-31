@@ -5,7 +5,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
 {
     internal const string ShanjiaDrawReason = "skill-program.shanjia.draw", ShanjiaDiscardReason = "skill-program.shanjia.discard";
     internal static CardConversionSource CaoChunSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_chun_ol_CaoChunPrograms.CaoChunSource(f);
-    internal bool CaoChunSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool CaoChunSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     internal SkillProgramStepOutcome ExecuteCaoChun(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

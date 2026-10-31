@@ -19,7 +19,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
     internal SkillProgramStepOutcome BeginMouXiahouShiQiaoshi(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.MouXiahouShiQiaoshi is not null || !ExactMouXiahouShiDamageContext(f) || CurrentMouXiahouShiTurn()is not { } turn || f.WindowContext!.SourceSeat is not { } source || source == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || MouXiahouShiQiaoshiSpent(f.OwnerSeat, turn) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.MouXiahouShiQiaoshi is not null || !ExactMouXiahouShiDamageContext(f) || CurrentMouXiahouShiTurn()is not { } turn || f.WindowContext!.SourceSeat is not { } source || source == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || MouXiahouShiQiaoshiSpent(f.OwnerSeat, turn) || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Qiaoshi requires its exact native foreign after-damage occurrence and unused actual turn.");
         var w = (DamageTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(i => i.Id == f.WindowContext.ParentFrameId);
         var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(w);

@@ -108,7 +108,7 @@ internal sealed class ForeignTurnContestRuntime(IProgramRuntimeFrames frames, IN
             !MatchesOrigin(current, bind, origin))
             throw new InvalidOperationException("A foreign turn contest cannot replay or replace its original result.");
         if (facts.Winner != Winner.None || !participants.IsAlive(current.OwnerSeat) || !participants.IsAlive(turn.CurrentSeat) ||
-            !facts.HasSkillInstance(current.OwnerSeat, current.SkillId, current.SkillInstanceId))
+            !facts.CanInvokeProgramSkill(current))
             return SkillProgramStepOutcome.Continue;
         if (origin.Result.SourceWon)
         {
@@ -149,7 +149,7 @@ internal sealed class ForeignTurnContestRuntime(IProgramRuntimeFrames frames, IN
             movementWindows.Begin(frame.Id, subjectSeat: frame.OwnerSeat)) return true;
         frames.ReplaceTop(frame = frame with { PendingMovementContinuation = null });
         if (facts.Winner != Winner.None || !participants.IsAlive(frame.OwnerSeat) || !participants.IsAlive(receipt.Origin.Result.OpponentSeat) ||
-            !facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId) ||
+            !facts.CanInvokeProgramSkill(frame) ||
             !slashes.CanIssue(receipt.Origin.Result.OpponentSeat, frame.OwnerSeat))
         {
             frames.ReplaceTop(frame = frame with { ForeignTurnContest = receipt with { Stage = ForeignTurnContestStage.Complete } });

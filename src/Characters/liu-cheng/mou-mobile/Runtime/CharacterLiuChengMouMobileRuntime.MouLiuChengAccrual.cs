@@ -80,7 +80,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         foreach (var target in q.Targets)
         {
             var used = MouLiuChengPhaseUses(f.OwnerSeat, f.SkillId, q.Phase);
-            if (used >= 2 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || f.SkillId == MouLiuChengComposition.Yingwu && !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], MouLiuChengComposition.Lueying))
+            if (used >= 2 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || f.SkillId == MouLiuChengComposition.Yingwu && !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], MouLiuChengComposition.Lueying))
                 break;
             if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengChuiEarnedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId && e.UseId == q.UseId && e.ActionId == q.ActionId && e.TargetSeat == target))
                 continue;

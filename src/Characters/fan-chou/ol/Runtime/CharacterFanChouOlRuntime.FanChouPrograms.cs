@@ -12,7 +12,7 @@ internal sealed partial class CharacterFanChouOlRuntime
     internal bool HasFanChouCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseXingluanRankSixBenefit);
 
     internal static CardConversionSource FanChouSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_fan_chou_ol_FanChouPrograms.FanChouSource(f);
-    internal bool FanChouSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool FanChouSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     internal bool TryFanChouUse(int owner, ProgramSkillWindowContext context, out FanChouUseProof proof)
     {
         proof = null !;

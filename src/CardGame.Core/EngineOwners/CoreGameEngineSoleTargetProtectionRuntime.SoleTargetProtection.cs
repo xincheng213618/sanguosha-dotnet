@@ -130,7 +130,7 @@ internal sealed partial class CoreGameEngineSoleTargetProtectionRuntime
 
         if (r.Stage == SoleTargetProtectionStage.ChoosingCost)
         {
-            if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || f.WindowContext is not { } context || !CanOfferSoleTargetProtection(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+            if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || f.WindowContext is not { } context || !CanOfferSoleTargetProtection(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             {
                 _coreNativePromptBoundaryOperations.ClearPendingDecision();
                 _coreSkillProgramsOperations.FinishProgramSkill(f, false);

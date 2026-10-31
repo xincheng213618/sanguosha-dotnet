@@ -101,7 +101,7 @@ internal sealed partial class CharacterWenYangOlRuntime
     internal IReadOnlyList<PromptChoice> WenYangChoices(ProgramSkillFrame f) => f.WenYang is { Stage: WenYangStage.Choice } ? Array.AsReadOnly(new[] { "draw", "recover" }.Select(branch => new PromptChoice(new($"wen-yang.{(f.Id)}.{(branch)}"), branch == "draw" ? "将手牌摸至当前体力值" : "将体力回复至当前手牌数", [], [], new Dictionary<string, string> { { "program-action", "wen-yang" }, { "branch", branch }, { "frame-id", f.Id.ToString(CultureInfo.InvariantCulture) } })).ToArray()) : [];
     internal void PublishWenYang(ProgramSkillFrame f)
     {
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishWenYang(f);
             return;

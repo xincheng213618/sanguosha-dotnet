@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineGameActivationAwakeningRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(f);
-        if (f.GameActivationAwakening is not null || f.InstructionIndex != 1 || !ExactGameActivationAwakeningParent(f) || trigger.Effects is not [var configured] || configured != effect || !CanOfferGameActivationAwakening(f.OwnerSeat, f.SkillId, trigger) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
+        if (f.GameActivationAwakening is not null || f.InstructionIndex != 1 || !ExactGameActivationAwakeningParent(f) || trigger.Effects is not [var configured] || configured != effect || !CanOfferGameActivationAwakening(f.OwnerSeat, f.SkillId, trigger) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             throw new InvalidOperationException("Game-activation awakening lost its exact preparation candidate or actual activation threshold.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var before = owner.MaxHp;

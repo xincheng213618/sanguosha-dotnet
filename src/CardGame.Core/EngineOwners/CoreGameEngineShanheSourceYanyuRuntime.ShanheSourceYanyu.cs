@@ -50,7 +50,7 @@ internal sealed partial class CoreGameEngineShanheSourceYanyuRuntime
         if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id)))
             return true;
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-        var stop = !receipt.Red || !_coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+        var stop = !receipt.Red || !_coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || _coreMatchOutcomeWinnerAccess._winner != Winner.None;
         var count = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Instructions.Count;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ShanheSourceYanyu = null, PendingMovementContinuation = null, InstructionIndex = stop ? count : frame.InstructionIndex });
         return false;

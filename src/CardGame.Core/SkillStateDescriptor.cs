@@ -55,7 +55,7 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.Effect.SkillState?.Action == SkillStateAction.Lose;
 
-    private static SkillStateMatch ParseMatch(JsonElement node, string path)
+    internal static SkillStateMatch ParseMatch(JsonElement node, string path)
     {
         ObjectShape(node, path, "skillIds", "filter");
         var ids = node.TryGetProperty("skillIds", out var idNode) ? Identifiers(idNode, path + ".skillIds") : null;
@@ -93,9 +93,9 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
         return Array.AsReadOnly(boundaries.ToArray());
     }
 
-    private static bool IsPersistentCondition(ProgramExpression expression) => expression.Nodes().All(node => node.Op is
+    internal static bool IsPersistentCondition(ProgramExpression expression) => expression.Nodes().All(node => node.Op is
         "bool" or "int" or "and" or "or" or "not" or "<" or "<=" or ">" or ">=" or "==" or "!=" or "+" or "-" or
-        "min" or "max" or "floorDiv" or "when" or "same" or "alive" or "hasHp" or "faceDown" or "chained" or "inIssuedPhase" or "hp" or "maxHp" or
+        "min" or "max" or "floorDiv" or "when" or "same" or "alive" or "hasHp" or "faceDown" or "chained" or "inIssuedPhase" or "inUpcomingTurnPrelude" or "hp" or "maxHp" or
         "lostHp" or "handCount" or "equipmentCount" or "all" or "any" or "count" or "owner" or "selectedTarget" or "it" or "living" or "livingOthers");
 
     private static IReadOnlyList<string> Identifiers(JsonElement node, string path)
@@ -111,7 +111,7 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
         return Array.AsReadOnly(ids);
     }
 
-    private static void ObjectShape(JsonElement node, string path, params string[] names)
+    internal static void ObjectShape(JsonElement node, string path, params string[] names)
     {
         if (node.ValueKind != JsonValueKind.Object) Fail(path, "must be an object");
         var seen = new HashSet<string>(StringComparer.Ordinal);

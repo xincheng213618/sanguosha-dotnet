@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
         if (f.PlaySlashRecast is not null || f.TriggerId is not null || f.InstructionIndex != 1 || f.SelectedCardIds is not [var id] || f.SelectedTargetSeats.Count != 0 || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId < 1)
             throw new InvalidOperationException("Slash recast requires its original one-card, zero-target actual Play activation.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(f.OwnerSeat))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(f.OwnerSeat))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "原手牌、来源或参与者已失效，没有支付重铸。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
         if (!r.DrawIssued)
         {
             var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-            if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
+            if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 // The real paid recast survives cancellation; an unattempted
                 // reward must not be recorded as an issued zero-card draw.

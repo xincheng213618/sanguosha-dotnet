@@ -6,7 +6,7 @@ namespace CardGame.Core;
 
 internal readonly record struct SkillBindingIndexStamp(
     long SkillRevision,
-    int CurrentHp,
+    int? CurrentHp,
     bool PrimarySelected,
     bool PrimaryRevealed,
     bool HasSecondary,
@@ -211,7 +211,8 @@ internal sealed class SkillBindingShard
 internal sealed class MatchSkillBindingIndex
 {
     private readonly SkillAvailability _availability;
-    private readonly Func<CharacterState, bool>? _hasHpSensitiveSuppression;
+    private readonly Func<CharacterState, bool>? _hasHpSensitiveSources;
+    private readonly RuntimeEntries.CoreGameEngineHealthQueriesEntries? _health;
     private readonly bool _tracksPrintedLordQualification;
     private readonly Func<long>? _projectionStamp;
     private readonly Func<CharacterState, long>? _derivedProjectionStamp;
@@ -220,23 +221,26 @@ internal sealed class MatchSkillBindingIndex
     internal MatchSkillBindingIndex(
         Func<string, ContentSkillDefinition> resolveDefinition,
         bool isNationalWarMode,
-        Func<CharacterState, bool>? hasHpSensitiveSuppression = null,
-        Func<CharacterState, SkillGrant, bool>? grantQualification = null, Func<long>? projectionStamp = null, Func<CharacterState,IReadOnlySet<string>>? suppressionInputs = null,
+        Func<CharacterState, bool>? hasHpSensitiveSources = null,
+        Func<CharacterState, SkillGrant, bool>? grantQualification = null, Func<long>? projectionStamp = null,
         Func<CharacterState, long>? derivedProjectionStamp = null, bool dualGenerals = false,
         Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification = null,
         EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
-        IActualDiscardRecoveryPhaseQueries? phases = null)
+        IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
+        RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null)
     {
         ArgumentNullException.ThrowIfNull(resolveDefinition);
         _availability = new(resolveDefinition, isNationalWarMode, dualGenerals,
-            grantQualification, suppressionInputs, additionalPrintedLordQualification, participants, cards, phases);
-        _hasHpSensitiveSuppression = hasHpSensitiveSuppression;
+            grantQualification, additionalPrintedLordQualification, participants, cards, phases, frames, health);
+        _hasHpSensitiveSources = hasHpSensitiveSources;
+        _health = health;
         _projectionStamp = projectionStamp;
         _derivedProjectionStamp = derivedProjectionStamp;
         _tracksPrintedLordQualification = additionalPrintedLordQualification is not null;
     }
 
     internal int CachedSeatCount => _shards.Count;
+    internal SkillAvailability Availability => _availability;
     internal int TotalRebuildCount => _shards.Values.Sum(static entry => entry.RebuildCount);
     internal int GetRebuildCount(int seat) => _shards.GetValueOrDefault(seat).RebuildCount;
     internal void Invalidate(int seat) => _shards.Remove(seat);
@@ -246,7 +250,7 @@ internal sealed class MatchSkillBindingIndex
         ArgumentNullException.ThrowIfNull(player);
         var stamp = CaptureStamp(player) with
         {
-            CurrentHp = _hasHpSensitiveSuppression?.Invoke(player) == true ? player.Hp : 0,
+            CurrentHp = _hasHpSensitiveSources?.Invoke(player) == true ? _health?.UnambiguousHp(player) : 0,
             ProjectionRevision = _projectionStamp?.Invoke() ?? 0,
             DerivedProjectionRevision = _derivedProjectionStamp?.Invoke(player) ?? 0,
             OwnerRole = player.Role,

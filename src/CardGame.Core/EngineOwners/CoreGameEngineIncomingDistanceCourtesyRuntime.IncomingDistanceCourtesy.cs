@@ -96,7 +96,7 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Incoming distance lost its owning program.");
         RequireIncomingDistanceCourtesyReceipt(f);
         var r = f.IncomingDistanceCourtesy!;
-        if (r.Stage != IncomingDistanceCourtesyStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], IncomingDistanceCourtesyChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (r.Stage != IncomingDistanceCourtesyStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], IncomingDistanceCourtesyChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Incoming distance selected a stale choice or an already paid instruction.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["selection"] == "decline")

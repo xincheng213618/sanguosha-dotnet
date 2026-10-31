@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXinPiOlRuntime
 {
     internal const string ChijieClaimReason = "skill-program.chijie.claim", YinjuDrawReason = "skill-program.yinju.draw";
-    internal bool XinPiSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+    internal bool XinPiSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     internal SkillProgramStepOutcome BeginXinPi(ProgramSkillFrame supplied, SkillProgramEffect e)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

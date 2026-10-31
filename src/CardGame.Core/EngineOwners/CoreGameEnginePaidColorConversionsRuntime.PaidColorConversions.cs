@@ -18,7 +18,7 @@ internal sealed partial class CoreGameEnginePaidColorConversionsRuntime
             throw new InvalidOperationException("A paid color conversion requires its original completed-draw candidate exactly once.");
         var cards = _coreProgramLifecycleOperations.GetProgramCardSet(frame, bind);
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId) || cards.CardIds is not [var cardId] || cards.SourceLocations is not [var from] || from.OwnerSeat != owner.Seat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _cardZonesOperations._cardZones.GetLocation(cardId) != from)
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || cards.CardIds is not [var cardId] || cards.SourceLocations is not [var from] || from.OwnerSeat != owner.Seat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _cardZonesOperations._cardZones.GetLocation(cardId) != from)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "技能来源或原弃牌付款失效，未支付且不授予转换。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEnginePaidColorConversionsRuntime
         {
             var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
             var p = paid.Origin;
-            if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId) && p.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && p.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && HasActualRedOrBlackSuit(p.EffectiveSuit))
+            if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && owner.IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && p.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && p.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && HasActualRedOrBlackSuit(p.EffectiveSuit))
             {
                 var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantConversion(p.ActualTurnNumber, p.TurnOwnerSeat, f.Id, paid.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), paid.SourceBind, SkillProgramCardColorRelation.OppositeBoundCard, CoreNativeCardClassificationsRuntime.IsRedSuit(p.EffectiveSuit), CardKind.Duel, p);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardConversionGrantedEvent(grant));

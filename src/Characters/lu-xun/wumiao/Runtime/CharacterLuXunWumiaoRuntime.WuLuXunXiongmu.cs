@@ -43,7 +43,7 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (f.SkillId != WuXiongmuSkill || f.TriggerId != "round-start" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { } c || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CanOfferWuXiongmu(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
+        if (f.SkillId != WuXiongmuSkill || f.TriggerId != "round-start" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { } c || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CanOfferWuXiongmu(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
             throw new InvalidOperationException("Xiongmu requires its original optional round-start candidate and no prior invocation this round.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count;

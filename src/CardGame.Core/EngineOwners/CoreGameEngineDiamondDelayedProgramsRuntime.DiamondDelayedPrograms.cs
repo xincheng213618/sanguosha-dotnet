@@ -55,7 +55,7 @@ internal sealed partial class CoreGameEngineDiamondDelayedProgramsRuntime
 
     internal bool IsDiamondDelayedChoiceLegal(PromptChoice choice)
     {
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.DiamondDelayed is not { Stage: ProgramDiamondDelayedStage.Choosing } d || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString() || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || d.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _cardZonesOperations._cardZones.GetLocation(d.CardId) != d.Source || !DiamondPaymentLegal(frame.OwnerSeat, _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(d.CardId), frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.DiamondDelayed is not { Stage: ProgramDiamondDelayedStage.Choosing } d || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString() || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || d.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _cardZonesOperations._cardZones.GetLocation(d.CardId) != d.Source || !DiamondPaymentLegal(frame.OwnerSeat, _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(d.CardId), frame.SkillId, frame.SkillInstanceId))
             return false;
         return DiamondDelayedChoices(frame).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(choice.Parameters.OrderBy(p => p.Key)));
     }
@@ -138,7 +138,7 @@ internal sealed partial class CoreGameEngineDiamondDelayedProgramsRuntime
             return false;
         if (d.Stage == ProgramDiamondDelayedStage.Using || frame.PendingMovementContinuation is not null)
             return true;
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "国色的持有人或来源已失效。");
             return true;

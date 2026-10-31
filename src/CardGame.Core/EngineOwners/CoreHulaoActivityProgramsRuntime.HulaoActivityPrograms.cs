@@ -5,7 +5,7 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
 {
     SkillProgramStepOutcome IHulaoActivityProgramHost.ExecuteHulaoActivity(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteHulaoActivity(f, e);
     internal static CardConversionSource HulaoProgramSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal bool HulaoProgramSourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId && p.GameplayHash == f.GameplayHash);
+    internal bool HulaoProgramSourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId && p.GameplayHash == f.GameplayHash);
     internal SkillProgramStepOutcome ExecuteHulaoActivity(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

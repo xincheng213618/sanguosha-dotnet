@@ -54,7 +54,7 @@ internal sealed partial class CharacterXuRongOlRuntime
 
     internal SkillProgramStepOutcome TransferXuRong(ProgramSkillFrame f)
     {
-        if (f.TriggerId is not null || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || XuRongPool(f.OwnerSeat) < 1 || _coreMatchParticipantsPlayersAccess._players[target].Markers.GetValueOrDefault(PlayerMarkerKind.Baoli) >= 3 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.TriggerId is not null || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || XuRongPool(f.OwnerSeat) < 1 || _coreMatchParticipantsPlayersAccess._players[target].Markers.GetValueOrDefault(PlayerMarkerKind.Baoli) >= 3 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Xionghuo needs one actual owned pool marker and a real other target.");
         var before = XuRongPool(f.OwnerSeat);
         var targetBefore = _coreMatchParticipantsPlayersAccess._players[target].Markers.GetValueOrDefault(PlayerMarkerKind.Baoli);

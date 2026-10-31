@@ -74,7 +74,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
         if (!SlashBenefitProgramParentMatches(f) || f.SlashTargetBenefitDraft is not { Stage: SlashTargetBenefitDraftStage.Complete } d || _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(d.Receipt)is not { } receipt || !_coreSlashTargetBenefitObserversOperations.Value.ValidSlashTargetBenefitReceipt(receipt))
             throw new InvalidOperationException("An issued benefit cannot return before its original receipt and paid children finish.");
         var paid = d.Settlement || receipt.Stage == SlashTargetBenefitStage.Paid;
-        _coreSkillProgramsOperations.FinishProgramSkill(f, _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (paid || _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)));
+        _coreSkillProgramsOperations.FinishProgramSkill(f, _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (paid || _coreProgramLifecycleOperations.CanInvokeProgramSkill(f)));
     }
 
     internal SkillProgramStepOutcome ResolveSlashTargetBenefit(ProgramSkillFrame supplied, bool settlement, string? settlementBinding)
@@ -94,7 +94,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
         }
 
         var receipt = _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(identity) ?? throw new InvalidOperationException("The original use lost its benefit receipt.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[identity.Use.TargetSeat].IsAlive || !settlement && (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreCardUseLifecycleOperations.LifecycleCardUse(identity.Use.CardUseFrameId)!.TargetSeats.Contains(identity.Use.TargetSeat)))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[identity.Use.TargetSeat].IsAlive || !settlement && (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreCardUseLifecycleOperations.LifecycleCardUse(identity.Use.CardUseFrameId)!.TargetSeats.Contains(identity.Use.TargetSeat)))
             return CompleteSlashBenefitOperation(f, false);
         if (settlement && (receipt.Stage != SlashTargetBenefitStage.CancellationQualified || !_coreSlashTargetBenefitObserversOperations.Value.ValidSlashTargetBenefitReceipt(receipt)))
             throw new InvalidOperationException("The settlement requires the original paid and genuinely cancelled target.");
@@ -160,7 +160,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.SlashTargetBenefitDraft is not { } d || !SlashBenefitProgramParentMatches(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } decision || decision.PlayerSeat != (d.Settlement ? d.Receipt.Use.TargetSeat : f.OwnerSeat) || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !SlashBenefitChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets)))
             throw new InvalidOperationException("An unpublished Slash benefit choice cannot pay or advance.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.Receipt.Use.TargetSeat].IsAlive || !d.Settlement && (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreCardUseLifecycleOperations.LifecycleCardUse(d.Receipt.Use.CardUseFrameId)!.TargetSeats.Contains(d.Receipt.Use.TargetSeat)))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.Receipt.Use.TargetSeat].IsAlive || !d.Settlement && (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreCardUseLifecycleOperations.LifecycleCardUse(d.Receipt.Use.CardUseFrameId)!.TargetSeats.Contains(d.Receipt.Use.TargetSeat)))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             CompleteSlashBenefitOperation(f, false);

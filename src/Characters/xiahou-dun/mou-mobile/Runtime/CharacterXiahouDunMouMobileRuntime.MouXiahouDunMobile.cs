@@ -13,7 +13,7 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
     internal SkillProgramStepOutcome StartMouXiahouDunMobile(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.MouXiahouDunMobile is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.MouXiahouDunMobile is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Mou Xiahou Dun requires its live owning entry.");
         ActualDiscardRecoveryPhaseKey? phase = null;
         if (op == SkillProgramEffectOp.ResolveMouXiahouDunGanglie)

@@ -273,7 +273,7 @@ internal sealed partial class CharacterPangJiOlRuntime
     internal void PublishDouyu(ProgramSkillFrame f)
     {
         var choices = DouyuChoices(f);
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || choices.Count == 0)
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || choices.Count == 0)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { Douyu = null });
             _coreSkillProgramsOperations.FinishProgramSkill(f, false);
@@ -296,7 +296,7 @@ internal sealed partial class CharacterPangJiOlRuntime
     [ProgramAnswer("douyu")]
     internal void AnswerDouyu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Douyu: { Stage: DouyuStage.OpponentChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !DouyuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Douyu: { Stage: DouyuStage.OpponentChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !DouyuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Douyu requires its actual owner's private published opponent choice.");
         var parent = DouyuParent(r.ContestId);
         var contest = parent.DouyuContest!;

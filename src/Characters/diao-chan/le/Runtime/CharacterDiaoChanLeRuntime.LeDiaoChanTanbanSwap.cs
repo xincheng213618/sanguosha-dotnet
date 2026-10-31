@@ -30,7 +30,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         if (!ExactTanbanDrawEndFrame(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Any(e => e.FrameId == frame.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanEntityMarkChangedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Tanban inversion requires its once-accepted exact actual draw-end mother.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        if (!owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
+        if (!owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return SkillProgramStepOutcome.Continue;
         var source = TanbanSource(frame);
         // Snapshot the whole actual Hand once, so every entity inverts the same

@@ -21,7 +21,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (f.SkillId != "wumiao:yixian" || f.ActivationId != "all-equipment" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(f.OwnerSeat, f.SkillId, WuYixianUsage, SkillUsageScope.Game) != 0)
+        if (f.SkillId != "wumiao:yixian" || f.ActivationId != "all-equipment" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(f.OwnerSeat, f.SkillId, WuYixianUsage, SkillUsageScope.Game) != 0)
             throw new InvalidOperationException("Yixian requires its owner's current unused limited Play activation.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Yixian = new(WuYixianSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, YixianStage.BranchChoice) });
         PublishWuYixian(f);
@@ -92,7 +92,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal void CommitWuYixianEquipment(ProgramSkillFrame f, YixianBranch branch)
     {
-        if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(f.OwnerSeat, f.SkillId, WuYixianUsage, SkillUsageScope.Game, 1))
+        if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(f.OwnerSeat, f.SkillId, WuYixianUsage, SkillUsageScope.Game, 1))
             throw new InvalidOperationException("Yixian cannot pay an expired or already-consumed limited activation.");
         var ids = branch == YixianBranch.Field ? _coreMatchParticipantsPlayersAccess._players.SelectMany(p => _corePhysicalOwnedCardQueriesOperations.GetEquipment(p)).Select(c => c.Id).ToArray() : _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(c.Kind)).Select(c => c.Id).ToArray();
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;

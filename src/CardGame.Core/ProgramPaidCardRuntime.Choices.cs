@@ -65,7 +65,7 @@ internal sealed partial class ProgramPaidCardRuntime
             throw new InvalidOperationException("The selected option's required cards are no longer available.");
         _prompts.Clear();
         if ((!_facts.IsAlive(chooserSeat) && !(chooserSeat == frame.OwnerSeat && _facts.CanContinueAfterOwnerDeath(frame))) || !stillAvailable ||
-            (!_facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId) && !_facts.CanContinueAfterSkillLoss(frame)))
+            (!_facts.CanInvokeProgramSkill(frame) && !_facts.CanContinueAfterSkillLoss(frame)))
         {
             _operations.Cancel(frame, "效果选项或技能实例已失效，技能剩余步骤取消。");
             return;

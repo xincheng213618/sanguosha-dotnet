@@ -97,7 +97,7 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
             throw new InvalidOperationException("Top ordering choice is not current.");
         if (state.RequiredTopCount is not null)
             _coreExactTopReorderProgramsOperations.Value.ValidateExactTopReorder(frame);
-        if (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op == SkillProgramEffectOp.ReorderTopByCurrentFaluTokens && (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId)))
+        if (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op == SkillProgramEffectOp.ReorderTopByCurrentFaluTokens && (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame)))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "观看技能的来源已失效，未提交的排序结束。");
@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
         if (state.Population is not null)
         {
             _corePopulationTopReorderProgramsOperations.Value.ValidatePopulationTopReorder(frame);
-            if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+            if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             {
                 _coreNativePromptBoundaryOperations.ClearPendingDecision();
                 _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "观看技能的来源已失效，未提交的排序结束。");

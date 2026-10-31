@@ -28,6 +28,8 @@ internal sealed class ProgramBindingRuntime(IProgramRuntimeFrames frames, IProgr
             WindowContext = context,
             DyingAlcoholPermission = native.CaptureDyingAlcoholPermission(candidate, context)
         };
+        if (ProgramInvocations.Find(frames.Find(context.ParentFrameId), candidate, context) is { } authorization)
+            frame = frame with { InvocationAuthorization = authorization with { ProgramFrameId = frame.Id } };
         frame = native.CaptureHpConditionalSource(frame);
         frame = native.CaptureEquipmentSuitSource(frame);
         native.AttachAfterTurnEndedChild(frame, candidate, context);

@@ -51,6 +51,7 @@ internal sealed class ModeEncounterHost(EngineStates.CoreGameLogState gameLogSta
             if (getCoreGameEnginePrivateGeneralLibrariesRuntime().HasPrivateGeneralLibraryCapability)
                 replacement.GeneralLibraryGenderQuery = getCoreGameEnginePrivateGeneralLibrariesRuntime().GetPrivateGeneralLibraryGender;
             matchParticipantsState.ReferenceToPlayers[replacement.Seat] = replacement;
+            replacement.SkillGrants.BindSkillStatesFrom(previous.SkillGrants);
             getSkillRuntimeStateStore().ResetOwner(replacement.Seat);
             foreach (var key in gameEngineSkillProgramsState.ReferenceToProgramUses.Keys.Where(key => key.Seat == replacement.Seat).ToArray())
                 gameEngineSkillProgramsState.ReferenceToProgramUses.Remove(key);

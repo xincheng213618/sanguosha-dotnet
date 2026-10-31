@@ -45,6 +45,22 @@ public static class HappyShenDaXiaoQiaoChecks
             var s = Scene.Start(); s.Play();
             s.Use("damage", [0]); s.PoolBoundary(); s.Pool(HappyQiaoPool.XiaoQiao); s.Play();
             s.Need(s.Health == new HappyQiaoDualHealth(3, 2, 3), "The quantity query really has two different current HP values.");
+            if (pool == HappyQiaoPool.DaQiao)
+            {
+                var player = ((IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(s.G)!)[0];
+                var world = new SkillStateConditionWorld(new(0, 0), player, health: s.G.HealthQueriesEntries);
+                using var condition = JsonDocument.Parse("[\"==\",[\"hp\",\"owner\"],3]");
+                var expression = ProgramExpressions.Parse(condition.RootElement, "fixture.while");
+                var reads = new List<(int? Hp, int? LostHp, bool? Active)>();
+                s.G.HealthQueriesEntries.HappyQiaoActionQueryUnion(() =>
+                {
+                    reads.Add((world.Stat("hp", 0), world.Stat("lostHp", 0), ProgramExpressions.EvaluateBool(expression, world)));
+                    return Array.Empty<LegalAction>();
+                });
+                s.Need(reads.SequenceEqual(new (int?, int?, bool?)[] { (3, 0, true), (2, 1, false) }),
+                    "A continuous condition reuses the current pool selected by the existing health query, including its lost HP value.");
+            }
             var hand = s.V.HandCount; var expected = s.Health.Hp(pool);
             var previousQueries = s.E<HappyQiaoHealthRequestedEvent>().Count(e => e.ReturnKind == HappyQiaoHealthReturnKind.Query);
             s.Use("draw-current-hp", []); s.PoolBoundary();

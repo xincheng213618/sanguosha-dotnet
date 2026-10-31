@@ -57,7 +57,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
         var userSeat = frame.SelectedTargetSeats.Single();
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != userSeat)
             throw new InvalidOperationException("The slash request responder changed while suspended.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[userSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[userSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "挑衅参与者或技能实例已失效，技能剩余步骤取消。");
@@ -166,7 +166,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
         var action = selected.Parameters.GetValueOrDefault("program-action");
         if (action != "request-slash-nearest-decline" && _characterPangJiOlOperations.IsBiguoCategoryForbidden(participantSeat, CardKind.Slash))
             throw new InvalidOperationException("The requested new Slash is forbidden by the active type restriction.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[participantSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[participantSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "乱武参与者或技能实例已失效，技能剩余步骤取消。");

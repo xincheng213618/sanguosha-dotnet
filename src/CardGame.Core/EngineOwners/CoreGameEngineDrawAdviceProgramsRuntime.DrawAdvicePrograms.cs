@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         if (!ExactDrawAdviceParent(frame) || frame.SelectedTargetSeats.Single() != recipient || frame.DrawAdviceReceipt is not null || frame.PendingMovementContinuation is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawAdviceStartedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Draw advice requires its exact unpaid own draw-end program and selected recipient.");
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "弼政来源或受益者失效，未重新支付摸牌。");
             return SkillProgramStepOutcome.AwaitChild;

@@ -137,7 +137,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
 
                 var p = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
                 var marks = p.Markers.GetValueOrDefault(PlayerMarkerKind.Tianren);
-                if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(p, f.SkillId, f.SkillInstanceId) || p.MaxHp <= 0 || marks < p.MaxHp)
+                if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || p.MaxHp <= 0 || marks < p.MaxHp)
                 {
                     FinishShenJw(f);
                     return;

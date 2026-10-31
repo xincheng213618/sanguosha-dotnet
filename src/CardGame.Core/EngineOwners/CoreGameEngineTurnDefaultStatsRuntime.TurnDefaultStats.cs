@@ -80,7 +80,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(f);
-        if (f.InstructionIndex != 1 || f.TurnDefaultStatAllocation is not null || trigger.Effects is not [var configured] || configured != effect || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CanOfferTurnDefaultStatProgram(f.OwnerSeat, f.SkillId, trigger, context))
+        if (f.InstructionIndex != 1 || f.TurnDefaultStatAllocation is not null || trigger.Effects is not [var configured] || configured != effect || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !CanOfferTurnDefaultStatProgram(f.OwnerSeat, f.SkillId, trigger, context))
             throw new InvalidOperationException("The default-stat operation lost its exact mandatory candidate or source.");
         return effect.Op == SkillProgramEffectOp.AllocateCurrentTurnDefaultStats ? BeginTurnDefaultStatAllocation(f, effect.StateId!) : IncreaseNextTurnDefaultStatMinimum(f, effect.StateId!);
     }

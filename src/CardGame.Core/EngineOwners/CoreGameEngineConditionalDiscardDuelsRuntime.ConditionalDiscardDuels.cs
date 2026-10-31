@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
 {
     internal const string ConditionalDuelOwnerReason = "skill-program.conditional-discard-duel.owner-cost";
     internal const string ConditionalDuelTargetReason = "skill-program.conditional-discard-duel.target-cost";
-    internal bool ConditionalDuelSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    internal bool ConditionalDuelSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 60, SkillProgramEffectOp.DiscardSlashThenOtherCardAndUseDuel)]
     internal bool CanStartConditionalDiscardDuel(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Any(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner.Seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
     internal bool ConditionalDuelParentMatches(ProgramSkillFrame f)

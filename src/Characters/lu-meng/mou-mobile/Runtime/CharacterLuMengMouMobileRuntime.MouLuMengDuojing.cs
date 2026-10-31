@@ -66,7 +66,7 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLuMengDuojing = r });
         }
 
-        if (r.TargetIndex >= r.Targets.Count || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Armor <= 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (r.TargetIndex >= r.Targets.Count || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Armor <= 0 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             CompleteMouDuojing(f);
             return;
@@ -114,7 +114,7 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
             throw new InvalidOperationException("Duojing can only pay its canonical current finalized target once.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = r.Targets[r.TargetIndex];
-        if (selected.Parameters.GetValueOrDefault("option-id") == "skip" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Armor < 1)
+        if (selected.Parameters.GetValueOrDefault("option-id") == "skip" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Armor < 1)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuMengDuojingSkippedEvent(f.Id, r.TargetIndex, target));
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouLuMengDuojing = r with { TargetIndex = r.TargetIndex + 1 } });

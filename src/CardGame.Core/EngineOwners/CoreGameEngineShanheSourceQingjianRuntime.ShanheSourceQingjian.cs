@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineShanheSourceQingjianRuntime
 
     internal void PublishSourceQingjian(ProgramSkillFrame frame)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
         {
             FinishSourceQingjian(frame);
             return;

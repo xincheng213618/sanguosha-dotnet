@@ -124,7 +124,7 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     {
         var r = f.HappyZhenJi!;
         var choices = HappyZjChoices(f);
-        if (choices.Count == 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (choices.Count == 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishHappyZj(f);
             return;

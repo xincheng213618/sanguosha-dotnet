@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineCappedConversionBenefitsRuntime
     internal SkillProgramStepOutcome BeginCappedConversionBenefit(ProgramSkillFrame supplied, string state)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.CappedConversionBenefit is not null || f.InstructionIndex != 1 || !ExactCappedConversionParent(f, out var window) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.CappedConversionBenefit is not null || f.InstructionIndex != 1 || !ExactCappedConversionParent(f, out var window) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("A capped conversion benefit lost its exact original damage recipient and current candidate.");
         // Opening effects can deal damage before Round 1. The exact damage
         // parent qualifies this benefit even while the current round is zero.
@@ -56,7 +56,7 @@ internal sealed partial class CoreGameEngineCappedConversionBenefitsRuntime
             r = f.CappedConversionBenefit!;
         }
 
-        var qualified = _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+        var qualified = _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
         var modified = qualified && _coreProgramSkillChangesOperations.TryUpgradeConfiguredConversionTier(f, r.StateId, r.FrozenSuccessfulModifications);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CappedConversionBenefitCompletedEvent(id, r.Source, r.StateId, r.FrozenSuccessfulModifications, r.ActualDrawCount, modified, _coreProgramTieredRoundConversionOperations.TieredRoundTier(f.OwnerSeat, r.StateId)));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id)with { CappedConversionBenefit = null, PendingMovementContinuation = null });

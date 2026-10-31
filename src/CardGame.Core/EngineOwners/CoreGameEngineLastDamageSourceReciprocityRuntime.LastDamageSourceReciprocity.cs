@@ -137,7 +137,7 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
         if (r.Stage != LastDamageSourceReciprocityStage.ChoosingDiscard || r.MovementIssued || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != r.ParticipantSeat || choice.Parameters.GetValueOrDefault("program-action") != "last-damage-source-discard" || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Cards is not [var id] || choice.Targets.Count != 0 || !LastDamageSourceDiscardChoices(f).Any(c => c.Id == choice.Id && c.Cards.SequenceEqual(choice.Cards) && c.Targets.SequenceEqual(choice.Targets) && c.Parameters.OrderBy(x => x.Key).SequenceEqual(choice.Parameters.OrderBy(x => x.Key))))
             throw new InvalidOperationException("Last-source discard changed its private chooser, frozen entity or owning frame.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.ParticipantSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.ParticipantSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "伤害后弃牌在付款前失去原技能资格或实际参与者。");
             return;

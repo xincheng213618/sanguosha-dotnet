@@ -70,7 +70,7 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
         if (!ExactLiejieParent(frame) || frame.InstructionIndex != 4 || effect.Op != SkillProgramEffectOp.LiejieSourceDiscard || frame.LiejieDiscardPending is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramLiejieSelectionStartedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Liejie requires its exact unpaid damage-source selection.");
         var colors = ExactLiejiePaidColors(frame, effect.SourceBind!);
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || colors.RedCount == 0 || frame.WindowContext!.SourceSeat is not { } source || source == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || colors.RedCount == 0 || frame.WindowContext!.SourceSeat is not { } source || source == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive)
             return SkillProgramStepOutcome.Continue;
         var cards = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(frame.Id, frame.OwnerSeat, source, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard).Select(c => ResolveLiejieSlot(source, c)).ToArray();
         if (cards.Length == 0)
@@ -134,7 +134,7 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
         var draft = frame.LiejieDiscardPending!;
         if (draft.Paid || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { PlayerSeat: var chooser, IsPrivate: true } || chooser != frame.OwnerSeat || !LiejieDiscardChoices(frame).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(selected.Parameters.OrderBy(p => p.Key))))
             throw new InvalidOperationException("Liejie requires its exact published private HE choice.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.SourceSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.SourceSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             throw new InvalidOperationException("The unpaid Liejie participants or source skill changed.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters["program-action"] == "liejie-pick")

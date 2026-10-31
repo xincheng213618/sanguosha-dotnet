@@ -5,7 +5,7 @@ internal interface IForeignTurnContestFacts : IProgramSelectionQuery
     Winner Winner { get; }
     bool HasHpValue(int seat);
     bool IsRuleWounded(int seat);
-    bool HasSkillInstance(int seat, string skillId, string instanceId);
+    bool CanInvokeProgramSkill(ProgramSkillFrame frame);
 }
 
 // Existing native windows, shared grant and binding completion remain the

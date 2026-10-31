@@ -42,7 +42,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
                         new(issue.Source.SkillId, issue.Source.BindingId, issue.Source.OwnerSeat, issue.Source.SkillInstanceId)),
                         issue.TargetSeat, new(SkillStateAction.Suppress, SkillStateMatch.NonLocked,
                             [new(SkillStateBoundaryEvent.PhaseEnded, SkillStateSubject.Target, SkillStateBoundaryTiming.After, Phase: phase.Kind)],
-                            new("inIssuedPhase", ProgramExpressionType.Bool, [new("selectedTarget", ProgramExpressionType.Participant, [])])));
+                            new("inIssuedPhase", ProgramExpressionType.Bool, [new("selectedTarget", ProgramExpressionType.Participant, [], name: "selectedTarget")])));
             }
         }
     }

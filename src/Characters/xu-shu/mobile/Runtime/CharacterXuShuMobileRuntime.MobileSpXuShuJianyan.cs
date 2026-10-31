@@ -59,7 +59,7 @@ internal sealed partial class CharacterXuShuMobileRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == "declare")
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 _coreSkillProgramsOperations.FinishProgramSkill(f, false);
                 return;

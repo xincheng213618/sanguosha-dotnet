@@ -29,7 +29,7 @@ internal sealed class SkillProgramDependencies
             .SelectMany(effect => effect.SkillState?.Until ?? []).ToArray();
         UsesSkillStatePhaseEnds = skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseEnded);
         UsesConsumedAlcoholSlash = triggers.Any(trigger => trigger.RequiresConsumedAlcoholSlash);
-        HpSensitiveSkillIds = definitions.Where(skill => skill.SuppressionRule is not null || skill.Program?.HpSkillGrants.Count > 0)
+        HpSensitiveSkillIds = definitions.Where(skill => skill.Program?.HpSkillGrants.Count > 0)
             .Select(skill => skill.Id).ToFrozenSet(StringComparer.Ordinal);
         HpConditionalCapabilitySkillIds = definitions.Where(skill => skill.Program?.HpSkillGrants.Count > 0)
             .Select(skill => skill.Id).ToFrozenSet(StringComparer.Ordinal);

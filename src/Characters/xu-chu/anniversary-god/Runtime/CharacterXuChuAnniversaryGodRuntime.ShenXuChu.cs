@@ -137,7 +137,7 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
 
             if (r.Stage == ShenXuChuStage.MarkChoice)
             {
-                if (!_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.QingBanner) == 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+                if (!_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.QingBanner) == 0 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
                 {
                     NextZhuangpoTarget(f);
                     continue;
@@ -247,7 +247,7 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
                 return;
             }
 
-            if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || count < 1 || count > before)
+            if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || count < 1 || count > before)
                 throw new InvalidOperationException("Zhuangpo's unspent mark cost is no longer available.");
             var required = Math.Min(count, ZhuangpoDiscardOptions(f).Count);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenXuChu = r with { Stage = ShenXuChuStage.DiscardChoice, PaidMarks = count, RequiredDiscards = required } });

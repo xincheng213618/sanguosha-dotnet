@@ -117,7 +117,7 @@ internal sealed partial class CoreGameEngineDeckProgramsRuntime
         return true;
     }
 
-    internal bool DeckProgramSourceValid(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(program => program.Id == frame.SkillId);
+    internal bool DeckProgramSourceValid(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(program => program.Id == frame.SkillId);
     internal void ResumeDeckEndExchange(ProgramSkillFrame frame)
     {
         var d = frame.DeckEndExchange!;

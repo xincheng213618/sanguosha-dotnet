@@ -60,7 +60,7 @@ internal sealed partial class CharacterYanPuOlRuntime
         if (r.Stage == YanPuStage.GiftChoice)
         {
             var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex);
-            if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !IsYanPuDrawContext(c, f.WindowContext))
+            if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !IsYanPuDrawContext(c, f.WindowContext))
                 return[];
             return Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer).Select(c => Choice("gift", $"交给{(_coreMatchParticipantsPlayersAccess._players[r.Target].Name)}【{(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()).DisplayName)}】并跳过此次摸牌阶段", c.Cards)).ToArray());
         }

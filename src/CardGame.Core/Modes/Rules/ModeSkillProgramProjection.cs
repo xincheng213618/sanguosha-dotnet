@@ -63,7 +63,7 @@ internal static class ModeSkillProgramProjection
             original.RuntimeVersion, original.MinimumRulesVersion, original.Modifiers, Array.AsReadOnly(views.ToArray()),
             original.Activations, Array.AsReadOnly(triggers), original.Contributions, original.CardIdentities,
             original.BooleanStates, original.DamageModifiers, original.CardPolicies, original.LordSkillProjection,
-            original.CannotChallengeDeclarations, original.HpSkillGrants, original.EquipmentSuitSkillGrants);
+            original.CannotChallengeDeclarations, original.HpSkillGrants, original.EquipmentSuitSkillGrants, original.SkillStates);
     }
 
     private static string ActivityViewAsFamily(SkillProgramViewAs rule) =>

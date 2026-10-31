@@ -31,8 +31,7 @@ internal sealed partial class CoreGameEngineHpConditionalSkillGrantsRuntime
     {
         if (!_corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, source) || !_coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, source) || !_coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, source) || !_corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, source))
             return false;
-        var suppressors = _corePrivateGeneralLibrariesOperations.HasPrivateGeneralLibraryCapability ? _corePrivateGeneralLibrariesOperations.PrivateGeneralLibrarySuppressionInputs(owner) : owner.SkillGrants.Grants.Where(grant => grant.HpConditionalSource is null && _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).SuppressionRule is { } rule && owner.Hp == rule.OwnerHpEquals && _corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, grant) && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, grant) && _coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, grant)).Select(grant => grant.SkillId).ToHashSet(StringComparer.Ordinal);
-        return suppressors.Count == 0 || suppressors.Contains(source.SkillId) || source.SourceId.StartsWith("equipment:", StringComparison.Ordinal);
+        return true;
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 50)]

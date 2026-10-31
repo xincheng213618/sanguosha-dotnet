@@ -176,7 +176,7 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
     {
         var r = f.BoundaryDanshou!;
         var legal = BoundaryDanshouMaterials(f.OwnerSeat).Select(c => c.Id).ToHashSet();
-        if (r.Selected.Count != r.X || r.Selected.Any(id => !legal.Contains(id)) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.Actor].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (r.Selected.Count != r.X || r.Selected.Any(id => !legal.Contains(id)) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.Actor].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "胆守成本或来源已失效。");
             return;

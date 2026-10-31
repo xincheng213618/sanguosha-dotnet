@@ -17,7 +17,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var store = effect.Op == SkillProgramEffectOp.ResolveMobileYuJinJieyue;
-        if (frame.SkillId != MobileYuJinJieyue.Skill || frame.InstructionIndex != (store ? 3 : 1) || frame.TriggerId != (store ? MobileYuJinJieyue.Ending : MobileYuJinJieyue.Preparation) || frame.WindowContext is not { } context || context.Window != (store ? SkillProgramTriggerWindow.TurnEnding : SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || frame.MobileYuJinTransfer is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (frame.SkillId != MobileYuJinJieyue.Skill || frame.InstructionIndex != (store ? 3 : 1) || frame.TriggerId != (store ? MobileYuJinJieyue.Ending : MobileYuJinJieyue.Preparation) || frame.WindowContext is not { } context || context.Window != (store ? SkillProgramTriggerWindow.TurnEnding : SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || frame.MobileYuJinTransfer is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             throw new InvalidOperationException("Jieyue requires its original own actual ending or preparation instruction.");
         if (store)
             return BeginMobileYuJinChoice(frame);

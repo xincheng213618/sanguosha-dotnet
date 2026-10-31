@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineTriggeredCardConversionsRuntime
         if (binding.CardIds is not [var cardId] || binding.SourceLocations is not [var location])
             throw new InvalidOperationException("A triggered physical Slash requires exactly one owned bound entity.");
         var card = _coreCardAttackStateOperations.GetAttackCard(cardId);
-        if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || !MatchesTriggeredSlashMaterial(frame, effect.SourceBind!, frame.OwnerSeat, card, location))
+        if (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || !MatchesTriggeredSlashMaterial(frame, effect.SourceBind!, frame.OwnerSeat, card, location))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "转化的实体牌、技能或目标已失效，未支付实体牌。");
             return SkillProgramStepOutcome.AwaitChild;

@@ -41,7 +41,7 @@ internal interface IProgramSeatAcquisitionFacts : IProgramSelectionQuery
     bool IsAlive(int seat);
     bool IsFaceDown(int seat);
     bool CannotTurnOver(int seat);
-    bool HasSkillInstance(int seat, string skillId, string instanceId);
+    bool CanInvokeProgramSkill(ProgramSkillFrame frame);
     uint RandomState { get; }
     long MovementSequence { get; }
     ProgramSeatAcquisitionDamagePoint? DamagePoint(ProgramSkillFrame frame);
@@ -136,7 +136,7 @@ internal sealed class ProgramRandomSeatAcquisitionRuntime(IProgramRuntimeFrames 
             complete: static (c, f) => c.Runtime.Finish(f, false, c.Policy));
     }
     private bool ShouldCancel(ProgramSkillFrame f, int paid) => facts.Winner != Winner.None || !facts.IsAlive(f.OwnerSeat) ||
-        paid == 0 && !facts.HasSkillInstance(f.OwnerSeat, f.SkillId, f.SkillInstanceId);
+        paid == 0 && !facts.CanInvokeProgramSkill(f);
     private bool Drain(ProgramSkillFrame f) => operations.DrainChildren(f);
     private bool Stop(ProgramSkillFrame f, ProgramSeatAcquisitionReceipt r, IProgramSeatAcquisitionPolicy policy)
     {

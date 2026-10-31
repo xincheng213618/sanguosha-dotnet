@@ -36,7 +36,7 @@ internal sealed partial class CharacterCaoCaoOlMagicRuntime
     CardLocation IMoCaoCaoFacts.Location(int id) => _cardZonesOperations._cardZones.GetLocation(id);
     CardKind IMoCaoCaoFacts.Kind(int id) => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind;
     IEnumerable<T> IMoCaoCaoFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
-    bool IMoCaoCaoFacts.Held(ProgramSkillFrame f) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    bool IMoCaoCaoFacts.Held(ProgramSkillFrame f) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     bool IMoCaoCaoFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
     long IMoCaoCaoFacts.MovementSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;

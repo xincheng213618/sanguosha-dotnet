@@ -6,7 +6,11 @@ public sealed record BeiMiHuTurnPreludeFrame(
     long Id, BeiMiHuBeforeTurnProof Proof, bool RoundAdvanced, int Stage = 0,
     ResolutionFrameStep Step = ResolutionFrameStep.ResolvingEffect,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? WindowId = null)
-    : ResolutionFrame(Id, ResolutionFrameKind.BeiMiHuTurnPrelude, Step);
+    : ResolutionFrame(Id, ResolutionFrameKind.BeiMiHuTurnPrelude, Step)
+{
+    [JsonIgnore]
+    public override ActualTurnPreludeContext? UpcomingTurnPrelude => new(Proof.UpcomingOwnerSeat, Proof.UpcomingTurnNumber);
+}
 
 public sealed partial record ProgramSkillWindowContext
 {

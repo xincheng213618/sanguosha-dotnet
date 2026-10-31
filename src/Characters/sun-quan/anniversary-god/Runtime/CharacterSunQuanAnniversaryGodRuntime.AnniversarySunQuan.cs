@@ -85,7 +85,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     internal IReadOnlyList<PromptChoice> AnniversarySunQuanChoices(ProgramSkillFrame f)
     {
         var r = f.AnniversarySunQuan!;
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return[];
         PromptChoice Choice(int branch, int? target, string label) => new(new($"anniversary-surge.{(f.Id)}.{(branch)}.{(target ?? -1)}"), label, [], target is { } s ? [s] : [], new Dictionary<string, string> { ["program-action"] = "anniversary-surge", ["branch"] = branch.ToString(CultureInfo.InvariantCulture) });
         if (r.Stage == AnniversarySunQuanStage.ChoosingBranch)

@@ -48,7 +48,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
         PromptChoice Choice(string option, string label, IReadOnlyList<int>? ids = null, int? target = null) => new(new($"du-fu-ren.{(f.Id)}.{(r.Stage)}.{(option)}.{(target)}.{(string.Join('.', ids ?? []))}"), label, ids ?? [], target is { } seat ? [seat] : [], new Dictionary<string, string> { ["program-action"] = "du-fu-ren", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["option"] = option });
         if (r.Stage == DuFuRenStage.RedChoice)
             return _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat!.Value].IsAlive && _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat.Value].Hp < _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat.Value].MaxHp ? [Choice("recover", $"令{(_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat.Value].Name)}回复1点体力"), Choice("decline", "不回复体力")] : [];
-        if (r.Stage != DuFuRenStage.GiftChoice || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (r.Stage != DuFuRenStage.GiftChoice || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return[];
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex);
         if (!IsDuFuRenGiftContext(candidate, f.WindowContext))

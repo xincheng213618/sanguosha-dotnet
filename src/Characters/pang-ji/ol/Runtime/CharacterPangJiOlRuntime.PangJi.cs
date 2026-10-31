@@ -33,7 +33,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return SkillProgramStepOutcome.Continue;
-        if (target ? !IsIssuedBiguoCandidate(candidate, c) : c.Window != SkillProgramTriggerWindow.DrawPhaseEnded || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (target ? !IsIssuedBiguoCandidate(candidate, c) : c.Window != SkillProgramTriggerWindow.DrawPhaseEnded || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Biguo lost his native draw-end or already-paid target entitlement.");
         var r = new PangJiReceipt(source, f.GameplayHash, op, c.ParentFrameId, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, target ? PangJiStage.Pindian : PangJiStage.CostChoice)
         {
@@ -68,7 +68,7 @@ internal sealed partial class CharacterPangJiOlRuntime
 
     internal void PublishPangJi(ProgramSkillFrame f)
     {
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishPangJi(f);
             return;

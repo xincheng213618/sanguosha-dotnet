@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineProgramOrdinaryTrickUsesRuntime
             throw new InvalidOperationException("The ordinary-trick choice does not match its suspended program instruction.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).OrderBy(card => card.Id).ToArray();
-        if (!owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId) || hand.Length == 0 || !frame.SelectedCardIds.Order().SequenceEqual(hand.Select(card => card.Id)) || hand.Any(card => _coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, card)))
+        if (!owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || hand.Length == 0 || !frame.SelectedCardIds.Order().SequenceEqual(hand.Select(card => card.Id)) || hand.Any(card => _coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, card)))
             throw new InvalidOperationException("The ordinary-trick choice lost its owner, skill instance or exact all-hand cost.");
         var option = BuildProgramOrdinaryTrickUseOptions(owner, effect.OutputKind, enforceUsePermission: true, physicalCardIds: frame.SelectedCardIds, includeNextActualUseAdjustment: true).SingleOrDefault(candidate => candidate.Id == selected.Id) ?? throw new InvalidOperationException("The selected ordinary-trick use is no longer legal.");
         if (!selected.Targets.SequenceEqual(option.TargetSeats))

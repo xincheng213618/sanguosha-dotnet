@@ -31,7 +31,7 @@ internal sealed partial class CharacterLiFengOlRuntime
             pile = _corePublicPileSourcesOperations.EnsurePublicPileSource(f, 3);
         if (pile is null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
-        if (op != SkillProgramEffectOp.CollectJiyunCompletedUseEntities && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (op != SkillProgramEffectOp.CollectJiyunCompletedUseEntities && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         if (op == SkillProgramEffectOp.InitializeJiyunCategoryGrain && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiFengStartedEvent>().Any(e => e.Op == op && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId))
             throw new InvalidOperationException("Jiyun cannot initialize one source twice.");
@@ -107,7 +107,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         PromptChoice Choice(string branch, string label, IReadOnlyList<int>? cards = null, IReadOnlyList<int>? targets = null) => new(new($"li-feng.{(f.Id)}.{(branch)}.{(string.Join('-', cards ?? []))}.{(string.Join('-', targets ?? []))}"), label, cards ?? [], targets ?? [], new Dictionary<string, string> { ["program-action"] = "li-feng", ["branch"] = branch });
         if (r.Stage == LiFengStage.PreparationTargets)
         {
-            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             {
                 if (r.Recipients.Count < r.MaximumRecipients)
                     foreach (var p in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !r.Recipients.Contains(p.Seat)))
@@ -120,7 +120,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         }
         else if (r.Stage == LiFengStage.DistributionChoice)
         {
-            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (r.Paid || _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)))
+            if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (r.Paid || _coreProgramLifecycleOperations.CanInvokeProgramSkill(f)))
                 foreach (var entity in r.Entities.Where(e => !r.DistributedIds.Contains(e.CardId) && _cardZonesOperations._cardZones.GetLocation(e.CardId) == e.From))
                     foreach (var p in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
                         choices.Add(Choice("give", $"将粮【{(CardCatalog.Get(entity.Kind).DisplayName)}】交给{(p.Name)}", [entity.CardId], [p.Seat]));
@@ -175,7 +175,7 @@ internal sealed partial class CharacterLiFengOlRuntime
 
         if (branch == "start")
         {
-            if (r.Stage != LiFengStage.PreparationTargets || r.Paid || r.Recipients.Count == 0 || r.Recipients.Count > r.MaximumRecipients || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+            if (r.Stage != LiFengStage.PreparationTargets || r.Paid || r.Recipients.Count == 0 || r.Recipients.Count > r.MaximumRecipients || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
                 throw new InvalidOperationException("Jiyun cannot issue a canceled recipient queue.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LiFeng = r with { Paid = true, Stage = LiFengStage.PreparationDraw } });
             for (var i = 0; i < r.Recipients.Count; i++)
@@ -185,7 +185,7 @@ internal sealed partial class CharacterLiFengOlRuntime
             return;
         }
 
-        if (branch != "give" || r.Stage != LiFengStage.DistributionChoice || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (branch != "give" || r.Stage != LiFengStage.DistributionChoice || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Shuliang cannot issue a new unqualified grain distribution.");
         var card = selected.Cards.Single();
         var target = selected.Targets.Single();
@@ -268,7 +268,7 @@ internal sealed partial class CharacterLiFengOlRuntime
 
             if (r.Stage is LiFengStage.PreparationTargets or LiFengStage.DistributionChoice)
             {
-                if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !r.Paid && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+                if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !r.Paid && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
                 {
                     FinishLiFeng(f);
                     return;

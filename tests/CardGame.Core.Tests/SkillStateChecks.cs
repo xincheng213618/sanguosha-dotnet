@@ -8,6 +8,8 @@ internal static class SkillStateChecks
     private const string Driver = "fixture:skill-state-driver", Counter = "fixture:skill-state-counter";
     private const string Locked = "fixture:skill-state-locked", Owner = "fixture:skill-state-owner";
     private const string Mode = "identity:classic-shared-skill-state";
+    private const string Chanyuan = "classic:chanyuan", MobileChanyuan = "boundary:chanyuan-mobile";
+    private const string EquipmentSkill = "fixture:skill-state-equipment", ModeSkill = "fixture:skill-state-mode";
 
     public static void StateChangesPreserveOwnershipChoicesInstancesAndExpiryCold()
     {
@@ -24,6 +26,8 @@ internal static class SkillStateChecks
             ("filter resources", FiltersShareExpressionResourcesAndReadSkillFacts),
             ("printed source filter", PrintedFilterDoesNotLoseAnAcquiredSourceOfTheSameSkill),
             ("continuous HP condition", WhileTracksHpWithoutRemovingItsRestriction),
+            ("declared profiles", DeclaredProfilesFollowHpAndOutliveTheirOriginalGrants),
+            ("declaration admission", DeclaredProfilesBindOnlyAcceptedSourcesAndTargets),
             ("legacy JSON rejection", LegacySkillStateFieldsAreRejected),
             ("native phase boundaries", PhaseBoundariesUseActualTokensAndSelectedTiming),
             ("boundary OR and atomic cleanup", BoundarySkipAndAlternativesClearBorrowedStateBeforeFacts),
@@ -286,16 +290,122 @@ internal static class SkillStateChecks
         }
     }
 
-    private static void LoadFilter(string filter, bool captureThreshold = false, string? legacyProperty = null)
+    private static void LoadFilter(string filter, bool captureThreshold = false, string? legacyProperty = null, string? declaration = null)
     {
         var capture = captureThreshold ? "{\"op\":\"captureNumber\",\"target\":\"owner\",\"resultBind\":\"threshold\",\"valueExpr\":0}," : "";
         var legacy = legacyProperty is null ? "" : "," + legacyProperty;
+        var declared = declaration is null ? "" : ",\"skillStates\":[" + declaration + "]";
         _ = SkillProgramCatalog.Load($$$"""
-            {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{Driver}}}","revision":1,
+            {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{Driver}}}","revision":1{{{declared}}},
               "activations":[{"id":"filter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
                 "effects":[{{{capture}}}{"op":"skillState","target":"owner","action":"suppress","match":{"filter":{{{filter}}}},"until":[{"event":"turnCleanup","participant":{"kind":"turnOwner"},"timing":"before"}]{{{legacy}}}}]}]}]}
             """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
                 skills = new Dictionary<string, object> { [Driver] = new { name = "Filter", description = "Shared expression resources" } } }));
+    }
+
+    private static void DeclaredProfilesFollowHpAndOutliveTheirOriginalGrants()
+    {
+        var s = Scene.Start(declaredStates: true);
+        var classic = s.Registry.GetSkill(Chanyuan).Program!.SkillStates.Single();
+        var mobile = s.Registry.GetSkill(MobileChanyuan).Program!.SkillStates.Single();
+        Require(classic.StructurallyEquals(mobile), "The two real Chanyuan definitions declare the same state profile.");
+        var ids = s.Player(1).SkillGrants.Restrictions.Select(state => state.Id).ToArray();
+        Require(ids.Length == 2 && s.View(1).Hp == 8 && s.Effective(1, Counter) && s.Effective(1, Locked) &&
+            !s.G.CardDeclarationsEntries.CanChallengeDeclaration(1, 0),
+            "Initial real template grants materialize both inactive profiles and independently prohibit challenges.");
+        s.Use(0, Driver, "injure-seven", 1); s.Play(0);
+        Require(s.View(1).Hp == 1 && s.Effective(1, Chanyuan) && s.Effective(1, MobileChanyuan) &&
+            s.Owns(1, Counter) && !s.Effective(1, Counter) && !s.Effective(1, Locked),
+            "At one HP equivalent profiles exempt both sources while suppressing other character skills, including locked skills.");
+        s.Cold();
+        Require(!s.Effective(1, Counter) && s.Effective(1, Chanyuan) && s.Effective(1, MobileChanyuan) &&
+            s.Player(1).SkillGrants.Restrictions.Select(state => state.Id).SequenceEqual(ids),
+            "Cold replay preserves the same active declarations and their shared source exemption.");
+        s.Use(0, Driver, "heal-one", 1); s.Play(0); s.Cold();
+        Require(s.View(1).Hp == 2 && s.Effective(1, Counter) && s.Effective(1, Locked) &&
+            s.Player(1).SkillGrants.Restrictions.Select(state => state.Id).SequenceEqual(ids),
+            "A native recovery disables the retained profiles without expiring or replacing them.");
+        s.Use(0, Driver, "injure-one", 1); s.Play(0); s.Cold();
+
+        // These direct source mutations exercise synchronous queries only; no command or cold replay follows them.
+        var target = s.Player(1);
+        target.SkillGrants.Grant(new("equipment-profile-probe", EquipmentSkill, "equipment-profile-instance", "equipment:profile-probe"));
+        target.SkillGrants.Grant(new("mode-profile-probe", ModeSkill, "mode-profile-instance", "mode:profile-probe") { IsModeRule = true });
+        Require(s.Effective(1, EquipmentSkill) && s.Effective(1, ModeSkill) && !s.Effective(1, Locked),
+            "The character-only profile protects equipment and mode sources at one HP.");
+        var original = target.SkillGrants.Grants.Single(grant => grant.SkillId == Chanyuan);
+        target.SkillGrants.SetEnabled(original.GrantId, false);
+        target.SkillGrants.RemoveGrant(target.SkillGrants.Grants.Single(grant => grant.SkillId == MobileChanyuan).GrantId);
+        Require(!s.Owns(1, Chanyuan) && !s.Owns(1, MobileChanyuan) && !s.Effective(1, Chanyuan) && !s.Effective(1, MobileChanyuan) &&
+            !s.Effective(1, Counter) && !s.Effective(1, Locked) &&
+            target.SkillGrants.Restrictions.Select(state => state.Id).SequenceEqual(ids) &&
+            target.SkillGrants.Restrictions.All(state => state.DeclarationSource is not null && state.Lifetime.Origin is null) &&
+            !s.G.CardDeclarationsEntries.CanChallengeDeclaration(1, 0),
+            "Applied definitions retain the restrictions and challenge prohibition after their real sources are disabled or removed, without a fake frame.");
+        var allState = new SkillStateDeclaration(SkillStateTarget.All, new(SkillStateAction.Suppress,
+            SkillStateMatch.NonLocked, @while: new ProgramExpression("bool", ProgramExpressionType.Bool, [], 1)));
+        s.Player(0).SkillGrants.BindSkillStates(0, new Dictionary<string, IReadOnlyList<SkillStateDeclaration>> { [Driver] = [allState] },
+            Enumerable.Range(0, s.G.CreateSnapshot(0).Players.Count).Select(s.Player).ToArray());
+        Require(s.View(1).ActiveEffects?.Any(effect => effect.SkillId == Driver && effect.SourceSeat == 0) == true,
+            "An all-target applied declaration projects its actual source seat rather than the recipient seat.");
+    }
+
+    private static void DeclaredProfilesBindOnlyAcceptedSourcesAndTargets()
+    {
+        CharacterState Player(int seat) => new()
+        {
+            Seat = seat, Name = "Binding target", IsHuman = true, Role = Role.Rebel, RoleRevealed = true,
+            General = new GeneralDefinition($"fixture:state-binding-{seat}", "Binding", "", []),
+            GeneralSelected = false, GeneralRevealed = false, Hp = 1, MaxHp = 8
+        };
+        var owner = Player(0); var other = Player(1);
+        var always = new ProgramExpression("bool", ProgramExpressionType.Bool, [], 1);
+        var ownerState = new SkillStateDeclaration(SkillStateTarget.Owner, new(SkillStateAction.Suppress, SkillStateMatch.CharacterSkills, @while: always));
+        var allState = new SkillStateDeclaration(SkillStateTarget.All, new(SkillStateAction.Lose, SkillStateMatch.ForSkills([Locked]), @while: always));
+        owner.SkillGrants.BindSkillStates(0, new Dictionary<string, IReadOnlyList<SkillStateDeclaration>>
+        { [Counter] = [ownerState], [Driver] = [allState] }, [owner, other]);
+        owner.SkillGrants.Grant(new("initial-profile", Counter, "initial-profile-instance", CharacterState.PrimarySkillSource));
+        Require(owner.SkillGrants.Restrictions.Count == 0 && other.SkillGrants.Restrictions.Count == 0,
+            "An unselected initial template source cannot apply declarations.");
+        owner.GeneralSelected = true;
+        Require(owner.SkillGrants.Restrictions.Count == 0, "Selection alone cannot apply an unrevealed source.");
+        owner.GeneralRevealed = true;
+        Require(owner.SkillGrants.Restrictions.Count == 1 && other.SkillGrants.Restrictions.Count == 0,
+            "Actual selection and reveal apply the owner declaration only to its source owner.");
+        owner.SkillGrants.Grant(new("disabled-profile", Driver, "disabled-profile-instance", "acquired:profile", false));
+        Require(owner.SkillGrants.Restrictions.Count == 1 && other.SkillGrants.Restrictions.Count == 0,
+            "Granting a disabled source does not materialize its state.");
+        owner.SkillGrants.SetEnabled("disabled-profile", true);
+        Require(owner.SkillGrants.Restrictions.Count == 2 && other.SkillGrants.Restrictions.Count == 1 &&
+            other.SkillGrants.Restrictions.Single().Context == new SkillStateConditionContext(0, 1) && other.SkillGrants.Grants.Count == 0,
+            "First enablement writes the all-target declaration into each real recipient, without granting fake skills.");
+        owner.SkillGrants.RemoveGrant("initial-profile"); owner.SkillGrants.RemoveGrant("disabled-profile");
+        Require(owner.SkillGrants.Restrictions.Count == 2 && other.SkillGrants.Restrictions.Count == 1 &&
+            owner.SkillGrants.Restrictions.Concat(other.SkillGrants.Restrictions).All(state => state.Lifetime.Origin is null),
+            "Removing source grants leaves accepted declarations and their frame-free provenance intact.");
+
+        foreach (var declaration in new[]
+        {
+            """{"target":"selectedTarget","action":"suppress","match":{},"while":true}""",
+            """{"target":"owner","action":"transfer","match":{},"while":true}""",
+            """{"target":"owner","action":"suppress","match":{},"until":[],"while":true}""",
+            """{"target":"owner","action":"suppress","match":{"filter":["==",["number","threshold"],0]},"while":true}""",
+            """{"target":"owner","action":"suppress","match":{},"while":["==",["boundCount","cards"],0]}""",
+            """{"target":"owner","action":"suppress","match":{}}"""
+        })
+        {
+            var rejected = false;
+            try { LoadFilter("true", declaration: declaration); } catch (InvalidOperationException) { rejected = true; }
+            Require(rejected, "The existing rules loader rejects declarations that require a frame, transient binding, choice or expiry.");
+        }
+        const string legacy = """{"formatVersion":1,"packageId":"fixture:retired-suppression","characterId":null,"skills":[{"registrationOrder":1,"programBundle":null,"includeProgramPresentation":false,"definition":{"id":"fixture:retired-suppression","name":"Old","description":"Old","suppressionRule":{"ownerHpEquals":1}}}],"generals":[]}""";
+        var loader = typeof(StandardContentPackage).Assembly.GetType("CardGame.Content.Standard.CharacterContentCatalog", true)!
+            .GetMethod("Load", BindingFlags.Static | BindingFlags.NonPublic)!;
+        var oldRejected = false;
+        try { loader.Invoke(null, [new[] { (Name: "retired.character.json", Json: legacy) }]); }
+        catch (TargetInvocationException error) when (error.InnerException is InvalidOperationException invalid && invalid.Message.Contains("suppressionRule", StringComparison.Ordinal))
+        { oldRejected = true; }
+        Require(oldRejected, "The original character manifest loader explicitly rejects the retired suppressionRule field.");
     }
 
     private static void PhaseBoundariesUseActualTokensAndSelectedTiming()
@@ -537,12 +647,13 @@ internal static class SkillStateChecks
     private static void Require(bool condition, string message)
     { if (!condition) throw new InvalidOperationException(message); }
 
-    private sealed class Scene(GameEngine game, ContentRegistry registry)
+    private sealed class Scene(GameEngine game, ContentRegistry registry, bool declaredStates = false)
     {
         public GameEngine G { get; private set; } = game;
+        public ContentRegistry Registry => registry;
         public PendingDecision? Pending => Enumerable.Range(0, 4).Select(seat => G.CreateSnapshot(seat).PendingDecision).FirstOrDefault(p => p is not null);
         public PlayerSnapshot View(int seat) => G.CreateSnapshot(seat).Players[seat];
-        private CharacterState Player(int seat) => ((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine
+        public CharacterState Player(int seat) => ((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine
             .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(G)!)[seat];
         public bool Owns(int seat, string skill) => G.NationalSkillsEntries.HasOwnedRuntimeSkill(Player(seat), skill);
         public bool Effective(int seat, string skill) => G.NationalSkillsEntries.HasRuntimeSkill(Player(seat), skill);
@@ -586,7 +697,7 @@ internal static class SkillStateChecks
                 switch (p.Kind)
                 {
                     case DecisionKind.SelectGeneral:
-                        var general = p.PlayerSeat == 0 ? Owner : p.ValidContentIds[0];
+                        var general = p.PlayerSeat == 0 ? Owner : declaredStates ? $"fixture:skill-state-other-{p.PlayerSeat}" : p.ValidContentIds[0];
                         Submit(new SelectGeneralCommand(p.PlayerSeat, general, G.Revision, p.PromptId)); break;
                     case DecisionKind.PlayCard:
                         Submit(new EndPlayPhaseCommand(p.PlayerSeat, G.Revision, p.PromptId)); break;
@@ -614,22 +725,23 @@ internal static class SkillStateChecks
             Require(G.AcceptedCommands.Count == commands && Enumerable.Range(0, 4).All(seat => SnapshotJson.Serialize(G.CreateSnapshot(seat)) == views[seat]),
                 "Cold command replay preserves choices, every viewer's privacy, skill state and accepted command prefix.");
         }
-        public static Scene Start()
+        public static Scene Start(bool declaredStates = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(declaredStates));
             var scene = new Scene(GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4,
                 HumanSeat = 0, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord, ModeId = Mode,
-                UseInteractiveSetup = true, UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 16 }, registry), registry);
+                UseInteractiveSetup = true, UseInteractiveDiscard = true, AdvanceAfterHumanCommands = false, MaxTurns = 16 }, registry), registry, declaredStates);
             scene.Submit(new StartGameCommand()); scene.Play(0);
             return scene;
         }
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool declaredStates = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture:shared-skill-state", "1.0.0", "Shared skill-state command checks");
         public void Register(IContentRegistryBuilder builder)
         {
+            if (declaredStates) CharacterFixtureContent.Register(builder, "classic:yu-ji", "boundary:yu-ji-mobile");
             var rules = SkillProgramCatalog.Load($$$"""
                 {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
                   {"id":"{{{Driver}}}","revision":1,"viewAs":[
@@ -668,6 +780,8 @@ internal static class SkillStateChecks
                       {"op":"skillState","target":"selectedTarget","action":"suppress","match":{"skillIds":["{{{Counter}}}"]},"until":[],"while":["<",["hp","target"],["maxHp","target"]]}]},
                     {"id":"injure-one","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"loseHp","target":"selectedTarget","amount":1}]},
+                    {"id":"injure-seven","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"loseHp","target":"selectedTarget","amount":7}]},
                     {"id":"heal-one","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"recover","target":"selectedTarget","amount":1}]},
                     {"id":"until-target-play-start","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
@@ -697,8 +811,12 @@ internal static class SkillStateChecks
                         [Counter] = new { name = "Counter", description = "Persistent state and quota" }, [Locked] = new { name = "Locked", description = "Locked exemption" } } }));
             foreach (var (id, program) in rules.Programs)
                 builder.AddSkill(new(id, id, id) { Program = program, Tags = id == Locked ? SkillTag.Locked : SkillTag.None });
+            if (declaredStates)
+                foreach (var id in new[] { EquipmentSkill, ModeSkill }) builder.AddSkill(new(id, id, "Protected source"));
             builder.AddGeneral(new(Owner, "State owner", "supporter", Driver, "wei", 8, [Counter, Locked]));
-            for (var i = 1; i < 4; i++) builder.AddGeneral(new($"fixture:skill-state-other-{i}", "Public target", "supporter", Counter, "qun", 8, [Locked]));
+            for (var i = 1; i < 4; i++)
+                builder.AddGeneral(new($"fixture:skill-state-other-{i}", "Public target", "supporter", Counter, "qun", 8,
+                    declaredStates && i == 1 ? [Locked, Chanyuan, MobileChanyuan] : [Locked]));
             builder.AddDeck(new("fixture:skill-state-deck", "Quiet fixed deck", 4, 2, [])
             { PhysicalCards = Enumerable.Range(0, 160).Select(i => new ContentDeckPhysicalCard("standard:dodge", Suit.Heart, i % 13 + 1)).ToArray() });
             builder.AddMode(new(Mode, "Shared skill state", 4, 4,

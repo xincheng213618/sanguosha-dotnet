@@ -79,7 +79,7 @@ internal sealed partial class CharacterHuoJunOlRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuoJunFenrui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HuoJunFenruiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Fenrui lost its exact private payer, restored slot or current equipment-count target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || r.CostCardId is null && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || r.CostCardId is null && !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishHuoJunFenrui(f);
             return;

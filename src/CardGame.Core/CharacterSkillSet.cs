@@ -29,6 +29,9 @@ public sealed class CharacterSkillSet
 {
     private readonly Dictionary<string, SkillGrant> _grants = new(StringComparer.Ordinal);
     private readonly Dictionary<string, SkillStateRestriction> _restrictions = new(StringComparer.Ordinal);
+    private int _skillStateOwnerSeat;
+    private IReadOnlyDictionary<string, IReadOnlyList<SkillStateDeclaration>>? _skillStateTemplates;
+    private IReadOnlyList<CharacterState>? _skillStateRecipients;
     private long _restrictionsSnapshotRevision = -1;
     private long _restrictionRevision;
     private IReadOnlyList<SkillStateRestriction> _restrictionsSnapshot = [];
@@ -78,6 +81,26 @@ public sealed class CharacterSkillSet
         return false;
     }
 
+    internal void BindSkillStates(int ownerSeat,
+        IReadOnlyDictionary<string, IReadOnlyList<SkillStateDeclaration>> templates, IReadOnlyList<CharacterState> recipients)
+    {
+        _skillStateOwnerSeat = ownerSeat; _skillStateTemplates = templates; _skillStateRecipients = recipients;
+        AdmitSkillStates();
+    }
+
+    internal void AdmitSkillStates()
+    {
+        if (_skillStateTemplates is not null)
+            foreach (var grant in Grants)
+                SkillStateApplications.Apply(_skillStateOwnerSeat, grant, _skillStateTemplates, _skillStateRecipients!);
+    }
+
+    internal void BindSkillStatesFrom(CharacterSkillSet previous)
+    {
+        if (previous._skillStateTemplates is not null)
+            BindSkillStates(previous._skillStateOwnerSeat, previous._skillStateTemplates, previous._skillStateRecipients!);
+    }
+
     public bool Grant(SkillGrant grant)
     {
         ArgumentNullException.ThrowIfNull(grant);
@@ -109,6 +132,8 @@ public sealed class CharacterSkillSet
             throw new InvalidOperationException($"Skill grant '{grant.GrantId}' conflicts with an existing grant.");
         }
         _grants.Add(grant.GrantId, grant);
+        if (_skillStateTemplates is not null)
+            SkillStateApplications.Apply(_skillStateOwnerSeat, grant, _skillStateTemplates, _skillStateRecipients!);
         GrantsChanged();
         return true;
     }
@@ -142,7 +167,10 @@ public sealed class CharacterSkillSet
             throw new KeyNotFoundException($"Unknown skill grant '{grantId}'.");
         if (grant.IsModeRule && !enabled) return false;
         if (grant.IsEnabled == enabled) return false;
-        _grants[grantId] = grant with { IsEnabled = enabled };
+        var updated = grant with { IsEnabled = enabled };
+        _grants[grantId] = updated;
+        if (enabled && _skillStateTemplates is not null)
+            SkillStateApplications.Apply(_skillStateOwnerSeat, updated, _skillStateTemplates, _skillStateRecipients!);
         GrantsChanged();
         return true;
     }

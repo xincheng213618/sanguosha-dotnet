@@ -54,7 +54,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.GainGiftReceipt is not null)
             throw new InvalidOperationException("An issued gain/loss receipt cannot be paid twice.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchOutcomeStatusWinnerAccess._status == EngineStatus.Completed || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchOutcomeStatusWinnerAccess._status == EngineStatus.Completed || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         if (effect.Op == SkillProgramEffectOp.DelegateJudgmentReplacement)
             return PayDelegatedJudgment(f, effect);
@@ -136,7 +136,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
         if (r.Operation != SkillProgramEffectOp.GiveAfterBatchGain || r.Stage != GainGiftStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GainGiftChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Gift choice lost its current private owner and exact choices.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (choice.Parameters["branch"] == "finish" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (choice.Parameters["branch"] == "finish" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishGainGift(f);
             return;
@@ -175,7 +175,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
         var r = f.GainGiftReceipt!;
         if (GainGiftHasFinalGameEnd())
             return;
-        if (r.LossIndex >= r.RedLosses.Count || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (r.LossIndex >= r.RedLosses.Count || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
         {
             FinishGainGift(f);
             return;
@@ -233,7 +233,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
             return true;
         }
 
-        if (r.Stage == GainGiftStage.GiftChildren && r.GivenTargets.Count < 2 && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && TransferableGainGiftCards(f.OwnerSeat).Length > 0 && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && !r.GivenTargets.Contains(p.Seat)))
+        if (r.Stage == GainGiftStage.GiftChildren && r.GivenTargets.Count < 2 && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && TransferableGainGiftCards(f.OwnerSeat).Length > 0 && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && !r.GivenTargets.Contains(p.Seat)))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GainGiftReceipt = r with { Stage = GainGiftStage.Choosing } });
             PublishGainGiftChoice(f);

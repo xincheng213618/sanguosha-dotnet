@@ -7,7 +7,7 @@ internal sealed partial class CharacterYangWanOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active))
             return SkillProgramStepOutcome.Continue;
         var candidates = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).Select(player => player.Seat).ToArray();
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
@@ -45,7 +45,7 @@ internal sealed partial class CharacterYangWanOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SourceSeat: { } boundarySeat } || boundarySeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SourceSeat: { } boundarySeat } || boundarySeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
             return SkillProgramStepOutcome.Continue;
         var chosenSeat = _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat;
         var state = frame.ZhuihuanRetaliate;

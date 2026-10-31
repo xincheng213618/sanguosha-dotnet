@@ -32,7 +32,7 @@ internal sealed partial class CharacterZhouYuLeRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (frame.SkillId != "le:pinglu" || frame.ActivationId != "all-in-range-random-hand" || frame.TriggerId is not null || frame.WindowContext is not null || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || PingluPlay(frame.OwnerSeat)is not { } phase || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || HasPingluCustody(frame.OwnerSeat, phase))
+        if (frame.SkillId != "le:pinglu" || frame.ActivationId != "all-in-range-random-hand" || frame.TriggerId is not null || frame.WindowContext is not null || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || PingluPlay(frame.OwnerSeat)is not { } phase || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || HasPingluCustody(frame.OwnerSeat, phase))
             throw new InvalidOperationException("Pinglu requires its real current Play, eligible source and released original Hand cohort.");
         var targets = PingluTargets(frame.OwnerSeat);
         if (!targets.Any(seat => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count > 0))

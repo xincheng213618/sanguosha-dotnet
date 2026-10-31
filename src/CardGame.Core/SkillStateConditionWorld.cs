@@ -4,7 +4,8 @@ namespace CardGame.Core;
 // would recurse back into the restriction being evaluated.
 internal sealed class SkillStateConditionWorld(SkillStateConditionContext context, CharacterState owner,
     EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
-    IActualDiscardRecoveryPhaseQueries? phases = null) : IProgramExpressionWorld
+    IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
+    RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null) : IProgramExpressionWorld
 {
     public int? Participant(string name)
     {
@@ -27,9 +28,9 @@ internal sealed class SkillStateConditionWorld(SkillStateConditionContext contex
         if (Player(seat) is not { } player) return null;
         return stat switch
         {
-            "hp" => Hp(player),
+            "hp" => health?.UnambiguousHp(player),
             "maxHp" => player.MaxHp,
-            "lostHp" => Hp(player) is { } hp ? player.MaxHp - hp : null,
+            "lostHp" => health?.UnambiguousHp(player) is { } hp ? player.MaxHp - hp : null,
             "handCount" => cards?.Count(CardLocation.Hand(seat)),
             "equipmentCount" => cards?.Count(CardLocation.Equipment(seat)),
             _ => null
@@ -46,13 +47,12 @@ internal sealed class SkillStateConditionWorld(SkillStateConditionContext contex
             "faceDown" => player.IsFaceDown,
             "chained" => player.IsChained,
             "inIssuedPhase" => context.IssuedPhase is { } issued && issued.ActorSeat == seat && phases?.Current() == issued,
+            "inUpcomingTurnPrelude" => frames is null ? null :
+                frames.OfType<ResolutionFrame>().FirstOrDefault()?.UpcomingTurnPrelude?.OwnerSeat == seat,
             _ => null
         };
     }
 
     private IEnumerable<CharacterState> Players => participants is null ? [owner] : participants._players;
     private CharacterState? Player(int seat) => Players.FirstOrDefault(player => player.Seat == seat);
-    private static int? Hp(CharacterState player) => !player.HasHpValue ? null : player.HappyQiaoHealth is { } health
-        ? health.DaQiaoHp == health.XiaoQiaoHp ? health.DaQiaoHp : null
-        : player.Hp;
 }

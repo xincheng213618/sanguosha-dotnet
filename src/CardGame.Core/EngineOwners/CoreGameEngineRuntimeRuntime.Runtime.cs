@@ -164,7 +164,7 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
 
     int IProgramCompletionFacts.TriggerPriority(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.GetProgramTrigger(frame).Priority;
     bool IProgramCompletionFacts.Alive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool IProgramCompletionFacts.HasSkillInstance(int seat, string skillId, string instanceId) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skillId, instanceId);
+    bool IProgramCompletionFacts.CanInvokeProgramSkill(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
     bool IProgramCompletionFacts.CanContinueEquipmentSuit(ProgramSkillFrame frame) => _characterHeQiOlOperations.CanContinueEquipmentSuitProgram(frame);
     bool IProgramCompletionFacts.CanContinueHpConditional(ProgramSkillFrame frame) => _coreHpConditionalSkillGrantsOperations.Value.CanContinueHpConditionalProgram(frame);
     bool IProgramCompletionFacts.CanContinuePhaseAlcohol(ProgramSkillFrame frame) => _coreForcedPhaseAlcoholOperations.CanContinuePhaseAlcohol(frame);

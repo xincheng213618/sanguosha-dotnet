@@ -27,7 +27,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
     string IMouHuCheErFacts.SkillName(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Name;
     string IMouHuCheErFacts.SkillDescription(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Description;
     SkillProgram IMouHuCheErFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    bool IMouHuCheErFacts.Owns(ProgramSkillFrame f) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    bool IMouHuCheErFacts.Owns(ProgramSkillFrame f) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
     ActualDiscardRecoveryPhaseKey? IMouHuCheErFacts.Phase() => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
     bool IMouHuCheErFacts.Recorded(ActualDiscardRecoveryPhaseKey p) => _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p);
     IReadOnlyList<int> IMouHuCheErFacts.Targets(int owner) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive && t.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(t).Count > 0).Select(t => t.Seat).ToArray());

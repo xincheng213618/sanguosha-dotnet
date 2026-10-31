@@ -26,7 +26,7 @@ internal sealed partial class CharacterChenDengOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualRoundProgressRoundNumberAccess._roundNumber == 0 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId) || IsXuanhuiDisabledByOwnSwap(active.OwnerSeat))
+        if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualRoundProgressRoundNumberAccess._roundNumber == 0 || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || IsXuanhuiDisabledByOwnSwap(active.OwnerSeat))
             return SkillProgramStepOutcome.Continue;
         var swapped = CurrentRoundFengjiOptions(active.OwnerSeat).Where(option => option.Accepted && option.RecipientSeat != active.OwnerSeat).ToArray();
         if (swapped.Length == 0)

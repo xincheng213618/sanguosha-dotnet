@@ -72,7 +72,7 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
                 throw new InvalidOperationException("A selected-card payment cannot return before its movement children finish.");
             var valid = (payment.Operation != SkillProgramEffectOp.SelectAndMoveOwnedCard || payment.Movement is { Delivered: true }) &&
                 facts.Alive(frame.OwnerSeat) &&
-                (facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId) ||
+                (facts.CanInvokeProgramSkill(frame) ||
                  facts.CanContinueEquipmentSuit(frame) || facts.CanContinueHpConditional(frame) || facts.CanContinuePhaseAlcohol(frame) ||
                  facts.CanContinueSelectedCardPayment(frame));
             frames.ReplaceTop(frame with
@@ -108,7 +108,7 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
             throw new InvalidOperationException("The movement continuation is missing.");
         frames.ReplaceTop(frame with { PendingMovementContinuation = null });
         if (!facts.Alive(frame.OwnerSeat) || !facts.Alive(pending.SubjectSeat) ||
-            !facts.HasSkillInstance(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId) &&
+            !facts.CanInvokeProgramSkill(frame) &&
             !facts.CanContinueEquipmentSuit(frame) && !facts.CanContinueHpConditional(frame) && !facts.CanContinuePhaseAlcohol(frame))
         {
             protocols.CancelBindingAndCleanup(frames.ActiveProgram(frameId),
@@ -130,7 +130,7 @@ internal interface IProgramCompletionFacts : IProgramSelectionQuery
     EngineStatus Status { get; }
     int TriggerPriority(ProgramSkillFrame frame);
     bool Alive(int seat);
-    bool HasSkillInstance(int seat, string skillId, string instanceId);
+    bool CanInvokeProgramSkill(ProgramSkillFrame frame);
     bool CanContinueEquipmentSuit(ProgramSkillFrame frame);
     bool CanContinueHpConditional(ProgramSkillFrame frame);
     bool CanContinuePhaseAlcohol(ProgramSkillFrame frame);
