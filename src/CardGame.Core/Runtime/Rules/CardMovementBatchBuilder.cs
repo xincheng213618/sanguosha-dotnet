@@ -30,6 +30,9 @@ internal sealed class CardMovementBatchBuilder(
     public IReadOnlyDictionary<CardLocation, int> SourceCountsBefore { get; } = sourceCountsBefore;
     public IReadOnlyDictionary<CardLocation, int> DestinationCountsBefore { get; } = destinationCountsBefore;
     public ProgramSkillFrame? OriginProgram { get; } = originProgram;
+    private IReadOnlyList<EquipmentDepartureCandidate>? _equipmentDepartures;
+    public IReadOnlyList<EquipmentDepartureCandidate>? EquipmentDepartures
+    { get => _equipmentDepartures; internal set => SetStartMetadata(ref _equipmentDepartures, value); }
     private CardMovementTiming? _movementTiming;
     public CardMovementTiming? MovementTiming
     { get => _movementTiming; internal set => SetStartMetadata(ref _movementTiming, value); }

@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineCurrentSlashFireOffersEntries
 {
-    internal void AddCurrentNonFireConvertedTargetActions(ICollection<LegalAction> actions, CharacterState actor, int? selectedPhysicalCardId = default) => _resolve().AddCurrentNonFireConvertedTargetActions(actions, actor, selectedPhysicalCardId);
     internal void AssertCurrentSlashFireDraft(ProgramSkillFrame f) => _resolve().AssertCurrentSlashFireDraft(f);
     internal void AssertCurrentSlashFirePolicy(CardUseFrame use) => _resolve().AssertCurrentSlashFirePolicy(use);
     internal SkillProgramStepOutcome BeginCurrentSlashFireOffer(ProgramSkillFrame input) => _resolve().BeginCurrentSlashFireOffer(input);

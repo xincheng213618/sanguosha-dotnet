@@ -73,7 +73,7 @@ internal sealed partial class ProgramPaidCardRuntime
         _frames.ReplaceTop(frame with
         {
             ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(
-                new ProgramChoiceResultBinding(effect.ResultBind!, option.Id, chooserSeat)).ToArray())
+                new ProgramChoiceResultBinding(effect.ResultBind!, option.Id, chooserSeat) { Number = option.Number }).ToArray())
         });
         _events.AdvanceFact(new ProgramOptionChosenEvent(frame.Id, frame.SkillId, RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame),
             frame.OwnerSeat, effect.ResultBind!, option.Id, chooserSeat, option.Label));

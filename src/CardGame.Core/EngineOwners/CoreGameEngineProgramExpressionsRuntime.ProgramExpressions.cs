@@ -24,7 +24,9 @@ internal sealed partial class CoreGameEngineProgramExpressionsRuntime
     }
 
     internal const string ExpressionNumberPrefix = "expression-number-";
-    internal int? ReadProgramExpressionNumber(ProgramSkillFrame frame, string name) => frame.NumberBindings.Where(binding => binding.Name == ExpressionNumberPrefix + name).ToArray()is [var value] ? value.Value : null;
+    internal int? ReadProgramExpressionNumber(ProgramSkillFrame frame, string name) => GeneratedEquipmentRuntime.IsNumberFact(name)
+        ? generatedEquipment.Value.DestroyedBatches(frame)
+        : frame.NumberBindings.Where(binding => binding.Name == ExpressionNumberPrefix + name).ToArray()is [var value] ? value.Value : null;
     internal void CaptureProgramExpressionNumber(long frameId, string name, int value)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);

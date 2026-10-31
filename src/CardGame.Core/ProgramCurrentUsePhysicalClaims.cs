@@ -8,7 +8,7 @@ public sealed record ProgramCurrentUsePhysicalCardsClaimedEvent(ProgramCurrentUs
 
 internal interface ICurrentUsePhysicalClaimProgramHost
 {
-    SkillProgramStepOutcome ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame);
+    SkillProgramStepOutcome ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame, ProgramParticipantReference? recipient);
     void PreventCurrentTargetSlashCancellationByRule(ProgramSkillFrame frame);
 }
 
@@ -29,6 +29,19 @@ internal sealed class ClaimCurrentUsePhysicalCardsDescriptor : CurrentTargetSlas
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ClaimCurrentUsePhysicalCards;
     public override ISkillProgramEffectHandler Handler { get; } = new ClaimCurrentUsePhysicalCardsHandler();
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
+    {
+        r.AllowOnly("op", "target", "targetRef", "condition");
+        var recipient = r.Has("targetRef") ? r.RequiredParticipantReference("targetRef") : null;
+        if (recipient is not null && recipient.Kind is not (ProgramParticipantRef.Owner or ProgramParticipantRef.EventTarget))
+            throw new InvalidOperationException(r.Path + ": a current-use claim requires owner or eventTarget recipient.");
+        return new(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition(), targetReference: recipient);
+    }
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        [new RequireTriggerWindows([SkillProgramTriggerWindow.CardUseTargetsFinalized, SkillProgramTriggerWindow.SlashFullyDodged]),
+         new RequireCardActionActor(), new RequireCardActionRelation(SkillProgramCardActionOwnerRelation.Actor,
+             [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash])];
+
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.Gift,
         static (_, context) => context.CurrentUsePhysicalClaimValue());
 }
@@ -36,7 +49,7 @@ internal sealed class ClaimCurrentUsePhysicalCardsHandler : ISkillProgramEffectH
 {
     public SkillProgramEffectOp Op => SkillProgramEffectOp.ClaimCurrentUsePhysicalCards;
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat,
-        ISkillProgramEffectHost host) => host.GetCapability<ICurrentUsePhysicalClaimProgramHost>().ClaimCurrentUsePhysicalCards(frame);
+        ISkillProgramEffectHost host) => host.GetCapability<ICurrentUsePhysicalClaimProgramHost>().ClaimCurrentUsePhysicalCards(frame, effect.TargetReference);
 }
 
 internal sealed class PreventCurrentTargetSlashCancellationByRuleDescriptor : CurrentTargetSlashOperationDescriptor

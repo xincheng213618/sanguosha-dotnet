@@ -63,7 +63,7 @@ internal sealed partial class CoreNativeLegalActionsRuntime
                     var effectiveName = CardCatalog.Get(effectiveKind).DisplayName;
                     foreach (var target in targets)
                     {
-                        actions.Add(new LegalAction(LegalActionKind.Slash, card.Id, target.Seat, _coreCardConversionsOperations.DescribeConversion(conversionSource, variant.AdditionalConversionSource is { } chained ? $"将【{(physicalName)}】视为【杀】，再发动【{(_coreProgramCardUseRulesOperations.DescribeAdditionalConversion(chained))}】改为【火杀】对 {(target.Name)} 使用" : variant.UsesZhuqueFan ? $"将【{(physicalName)}】视为【杀】，再以【朱雀羽扇】改为【火杀】对 {(target.Name)} 使用" : $"将【{(physicalName)}】视为【{(effectiveName)}】对 {(target.Name)} 使用"), PlayedCardKind: effectiveKind) { ConversionSource = conversionSource, AdditionalConversionSources = additionalConversions });
+                        actions.Add(new LegalAction(LegalActionKind.Slash, card.Id, target.Seat, _coreCardConversionsOperations.DescribeConversion(conversionSource, variant.AdditionalConversionSource is { } chained ? $"将【{(physicalName)}】视为【杀】，再发动【{(_coreProgramCardUseRulesOperations.DescribeAdditionalConversion(chained))}】改为【{(effectiveName)}】对 {(target.Name)} 使用" : variant.UsesZhuqueFan ? $"将【{(physicalName)}】视为【杀】，再以【朱雀羽扇】改为【火杀】对 {(target.Name)} 使用" : $"将【{(physicalName)}】视为【{(effectiveName)}】对 {(target.Name)} 使用"), PlayedCardKind: effectiveKind) { ConversionSource = conversionSource, AdditionalConversionSources = additionalConversions });
                     }
 
                     _coreNativeMultiTargetActionsOperations.AddFangtianHalberdSlashActions(actions, actor, card, targets, effectiveName, effectiveKind, conversionSource, additionalConversions);
@@ -89,74 +89,40 @@ internal sealed partial class CoreNativeLegalActionsRuntime
                 }
             }
 
-            foreach (var slash in playableCards.Where(card => card.Kind == CardKind.Slash))
-                foreach (var conversionSource in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, slash, CardKind.FireSlash, forResponse: false).Where(source => !_characterGuanYuWumiaoOperations.IsJuewuSource(source)))
-                {
-                    var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, slash, conversionSource, effectiveKind: CardKind.FireSlash);
-                    foreach (var target in targets)
-                    {
-                        actions.Add(new LegalAction(LegalActionKind.Slash, slash.Id, target.Seat, _coreCardConversionsOperations.DescribeConversion(conversionSource, $"将【杀】改为【火杀】对 {(target.Name)} 使用"), PlayedCardKind: CardKind.FireSlash) { ConversionSource = conversionSource });
-                    }
-
-                    _coreNativeMultiTargetActionsOperations.AddFangtianHalberdSlashActions(actions, actor, slash, targets, "火杀", CardKind.FireSlash, conversionSource);
-                    _coreProgramCardUseRulesOperations.AddProgramTargetCountSlashActions(actions, actor, slash, targets, "火杀", CardKind.FireSlash, conversionSource);
-                }
-
-            foreach (var converted in _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Where(IncludesPhysicalCard).Where(card => card.Kind != CardKind.Slash))
-                foreach (var conversion in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, converted, CardKind.FireSlash, false).Where(source => !_characterGuanYuWumiaoOperations.IsJuewuSource(source)))
-                    foreach (var target in _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, converted, conversion, effectiveKind: CardKind.FireSlash))
-                        actions.Add(new LegalAction(LegalActionKind.Slash, converted.Id, target.Seat, _coreCardConversionsOperations.DescribeConversion(conversion, $"当作【火杀】对 {(target.Name)} 使用"), PlayedCardKind: CardKind.FireSlash) { ConversionSource = conversion });
-            _coreCurrentSlashFireOffersOperations.AddCurrentNonFireConvertedTargetActions(actions, actor, selectedPhysicalCardId);
-            foreach (var converted in playableCards)
+            // Every physical Slash conversion uses the same variant and target producers,
+            // including a subsequent conversion of its declared elemental identity.
+            var conversionCards = playableCards.Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor))
+                .Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor))
+                .Concat(_coreLastZoneConversionsOperations.GetLastZoneJudgmentConversionCards(actor, forResponse: false))
+                .Where(IncludesPhysicalCard).DistinctBy(card => card.Id)
+                .Where(card => !_coreProgramCardLegalityOperations.IsProgramEntityPhysicalRestricted(actor.Seat, card.Id));
+            foreach (var converted in conversionCards)
             {
-                var programSources = _coreActionQueriesOperations.GetProgramViewAsConversions(actor, converted, CardKind.Slash, forResponse: false);
-                if (programSources.Count == 0)
-                    continue;
-                var physicalName = CardCatalog.Get(converted.Kind).DisplayName;
-                var sources = new List<CardConversionSource?>();
-                sources.AddRange(programSources);
-                foreach (var conversionSource in sources)
-                {
-                    foreach (var variant in _coreProgramCardUseRulesOperations.GetSlashUseVariants(actor, converted, CardKind.Slash, conversionSource))
+                var sources = CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds
+                    .SelectMany(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(actor, converted, kind, forResponse: false)
+                        .Select(source => (Kind: kind, Source: source)))
+                    .DistinctBy(item => item.Source);
+                foreach (var (kind, conversionSource) in sources)
+                    foreach (var variant in _coreProgramCardUseRulesOperations.GetSlashUseVariants(actor, converted, kind, conversionSource))
                     {
                         IReadOnlyList<CardConversionSource>? additionalConversions = variant.AdditionalConversionSource is { } additional ? [additional] : null;
                         var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, converted, conversionSource, effectiveKind: variant.EffectiveKind);
                         var effectiveName = CardCatalog.Get(variant.EffectiveKind).DisplayName;
                         foreach (var target in targets)
                         {
-                            var description = variant.AdditionalConversionSource is { } chained ? $"将【{(physicalName)}】当作【杀】，再发动【{(_coreProgramCardUseRulesOperations.DescribeAdditionalConversion(chained))}】改为【火杀】对 {(target.Name)} 使用" : variant.UsesZhuqueFan ? $"将【{(physicalName)}】当作【杀】，再以【朱雀羽扇】改为【火杀】对 {(target.Name)} 使用" : $"将【{(physicalName)}】当作【杀】对 {(target.Name)} 使用";
-                            actions.Add(new LegalAction(LegalActionKind.Slash, converted.Id, target.Seat, _coreCardConversionsOperations.DescribeConversion(conversionSource, description), PlayedCardKind: variant.EffectiveKind) { ConversionSource = conversionSource, AdditionalConversionSources = additionalConversions });
+                            var description = variant.AdditionalConversionSource is { } chained
+                                ? $"将【{converted.DisplayName}】转换后，再发动【{_coreProgramCardUseRulesOperations.DescribeAdditionalConversion(chained)}】改为【{effectiveName}】对 {target.Name} 使用"
+                                : variant.UsesZhuqueFan
+                                    ? $"将【{converted.DisplayName}】当作【杀】，再以【朱雀羽扇】改为【火杀】对 {target.Name} 使用"
+                                    : $"将【{converted.DisplayName}】当作【{effectiveName}】对 {target.Name} 使用";
+                            actions.Add(new LegalAction(LegalActionKind.Slash, converted.Id, target.Seat,
+                                _coreCardConversionsOperations.DescribeConversion(conversionSource, description), PlayedCardKind: variant.EffectiveKind)
+                                { ConversionSource = conversionSource, AdditionalConversionSources = additionalConversions });
                         }
-
-                        _coreNativeMultiTargetActionsOperations.AddFangtianHalberdSlashActions(actions, actor, converted, targets, effectiveName, variant.EffectiveKind, conversionSource, additionalConversions);
+                        if (_corePhysicalOwnedCardQueriesOperations.GetHand(actor).Any(card => card.Id == converted.Id))
+                            _coreNativeMultiTargetActionsOperations.AddFangtianHalberdSlashActions(actions, actor, converted, targets, effectiveName, variant.EffectiveKind, conversionSource, additionalConversions);
                         _coreProgramCardUseRulesOperations.AddProgramTargetCountSlashActions(actions, actor, converted, targets, effectiveName, variant.EffectiveKind, conversionSource, additionalConversions);
                     }
-                }
-            }
-
-            {
-                foreach (var converted in _corePhysicalOwnedCardQueriesOperations.GetEquipment(actor).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).Concat(_coreLastZoneConversionsOperations.GetLastZoneJudgmentConversionCards(actor, forResponse: false)).Where(IncludesPhysicalCard).Where(card => !_coreProgramCardLegalityOperations.IsProgramEntityPhysicalRestricted(actor.Seat, card.Id)).Where(card => _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, CardKind.Slash, forResponse: false).Count != 0))
-                {
-                    var physicalName = CardCatalog.Get(converted.Kind).DisplayName;
-                    var conversionZoneName = _coreLastZoneConversionsOperations.IsLastZoneJudgmentCard(actor, converted) ? "判定区" : _coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(actor, converted) ? "武将牌堆中" : "装备区";
-                    var sources = _coreActionQueriesOperations.GetProgramViewAsConversions(actor, converted, CardKind.Slash, forResponse: false);
-                    foreach (var conversionSource in sources)
-                    {
-                        foreach (var variant in _coreProgramCardUseRulesOperations.GetSlashUseVariants(actor, converted, CardKind.Slash, conversionSource))
-                        {
-                            IReadOnlyList<CardConversionSource>? additionalConversions = variant.AdditionalConversionSource is { } additional ? [additional] : null;
-                            var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, converted, conversionSource, effectiveKind: variant.EffectiveKind);
-                            var effectiveName = CardCatalog.Get(variant.EffectiveKind).DisplayName;
-                            foreach (var target in targets)
-                            {
-                                var description = variant.AdditionalConversionSource is { } chained ? $"将{(conversionZoneName)}【{(physicalName)}】当作【杀】，再发动【{(_coreProgramCardUseRulesOperations.DescribeAdditionalConversion(chained))}】改为【火杀】对 {(target.Name)} 使用" : variant.UsesZhuqueFan ? $"将{(conversionZoneName)}【{(physicalName)}】当作【杀】，再以【朱雀羽扇】改为【火杀】对 {(target.Name)} 使用" : $"将{(conversionZoneName)}【{(physicalName)}】当作【杀】对 {(target.Name)} 使用";
-                                actions.Add(new LegalAction(LegalActionKind.Slash, converted.Id, target.Seat, _coreCardConversionsOperations.DescribeConversion(conversionSource, description), PlayedCardKind: variant.EffectiveKind) { ConversionSource = conversionSource, AdditionalConversionSources = additionalConversions });
-                            }
-
-                            _coreProgramCardUseRulesOperations.AddProgramTargetCountSlashActions(actions, actor, converted, targets, effectiveName, variant.EffectiveKind, conversionSource, additionalConversions);
-                        }
-                    }
-                }
             }
 
             if (selectedPhysicalCardId is null && _coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(actor))

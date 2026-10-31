@@ -116,7 +116,7 @@ internal static class ProgramExpressions
             Arity(2, 2);
             return new(op, ProgramExpressionType.Int, [Arg(0, ProgramExpressionType.Bool), Arg(1, ProgramExpressionType.Int)]);
         }
-        if (op is "number" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank" or "boundIsEquipment")
+        if (op is "number" or "choiceNumber" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank" or "boundIsEquipment")
         {
             Arity(1, 1);
             if (args[0].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[0].GetString()) || args[0].GetString()!.Length > 128)
@@ -199,7 +199,7 @@ internal static class ProgramExpressions
             case "int": return e.Literal;
             case "when": return EvaluateBool(e.Args[0], world, it) == true ? EvaluateInt(e.Args[1], world, it) : null;
             case "number": return world.Number(e.Name!);
-            case "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank": return world.BindingStat(e.Op, e.Name!);
+            case "choiceNumber" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank": return world.BindingStat(e.Op, e.Name!);
             case "-":
                 return EvaluateInt(e.Args[0], world, it) is { } left && EvaluateInt(e.Args[1], world, it) is { } right ? left - right : null;
             case "floorDiv":

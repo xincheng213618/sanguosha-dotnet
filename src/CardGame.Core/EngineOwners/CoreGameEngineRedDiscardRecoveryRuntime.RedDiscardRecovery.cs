@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineRedDiscardRecoveryRuntime
 
         foreach (var move in movements.Where(m => m.To == CardLocation.DiscardPile && m.From != CardLocation.DiscardPile))
         {
-            var suit = _cardZonesOperations._cardZones.CardsAt(move.To).Single(c => c.Id == move.CardId).Suit;
+            var suit = move.PrintedSuitAtMovement(_cardZonesOperations._cardZones);
             if (suit is Suit.Heart or Suit.Diamond)
                 _coreGameEngineRedDiscardRecoveryTurnRedDiscardCountTurnRedDiscardTurnAccess._turnRedDiscardCount++;
         }

@@ -289,6 +289,13 @@ internal sealed class ProgramOperationNodeReader
     }
     internal IReadOnlyList<T>? OptionalEnumArray<T>(string name) where T : struct, Enum =>
         Has(name) ? RequiredEnumArray<T>(name) : null;
+    internal IReadOnlyList<ProgramOperationNodeReader> RequiredObjects(string name)
+    {
+        var array = Required(name, JsonValueKind.Array);
+        if (array.GetArrayLength() > MaximumItems) Fail(Path + "." + name, $"contains more than {MaximumItems} items");
+        return Array.AsReadOnly(array.EnumerateArray().Select((node, index) =>
+            new ProgramOperationNodeReader(node, $"{Path}.{name}[{index}]", _conditionParser, AllowZeroDraw)).ToArray());
+    }
     internal IReadOnlyList<string> RequiredIdentifierArray(string name)
     {
         var array = Required(name, JsonValueKind.Array);
@@ -343,7 +350,7 @@ internal sealed class ProgramOperationNodeReader
         var options = array.EnumerateArray().Select((node, index) =>
         {
             var reader = new ProgramOperationNodeReader(node, $"{Path}.options[{index}]", _conditionParser);
-            reader.AllowOnly("id", "condition", "requiredTargetKind");
+            reader.AllowOnly("id", "condition", "requiredTargetKind", "number");
             var requiredTargetKind = reader.Has("requiredTargetKind")
                 ? reader.RequiredEnum<SkillProgramTargetKind>("requiredTargetKind") : (SkillProgramTargetKind?)null;
             if (requiredTargetKind is not null and not
@@ -351,6 +358,7 @@ internal sealed class ProgramOperationNodeReader
                 Fail(reader.Path + ".requiredTargetKind", "requires an attack-range, discardable-card, virtual-Duel, original Anxu pair or movable-equipment source target set");
             return new SkillProgramChoiceOption(reader.RequiredIdentifier("id"), reader.Condition())
             {
+                Number = reader.Has("number") ? reader.RequiredInt("number") : null,
                 RequiredTargetKind = requiredTargetKind
             };
         }).ToArray();

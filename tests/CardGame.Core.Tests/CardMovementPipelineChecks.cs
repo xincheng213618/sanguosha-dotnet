@@ -45,7 +45,8 @@ internal static class CardMovementPipelineChecks
                 return completed with { MovementTiming = new(0, TurnPhase.Draw, 1) };
             }
         };
-        var coordinator = new CardMovementBatchCoordinator(frames, zones, facts, store, pipeline);
+        var coordinator = new CardMovementBatchCoordinator(frames, zones, facts, store, pipeline,
+            match.Capabilities.Get<IEquipmentMovementCapture>());
         IEnumerable<CardLocation> Sources()
         {
             Require(frames.NextId() == parent.Id + 1, "Source enumeration must precede batch identity allocation.");

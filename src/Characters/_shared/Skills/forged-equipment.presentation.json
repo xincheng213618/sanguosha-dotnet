@@ -1,0 +1,29 @@
+﻿{
+  "schemaVersion": 3,
+  "skills": {
+    "equipment:bintie-double-halberd": {
+      "name": "镔铁双戟",
+      "description": "你的杀被抵消后，你可以失去1点体力，然后获得此杀、摸一张牌，本回合使用杀的次数+1。"
+    },
+    "equipment:black-iron-chain": {
+      "name": "乌铁锁链",
+      "description": "你使用杀指定目标后，若其未横置，你令其横置。"
+    },
+    "equipment:five-elements-fan": {
+      "name": "五行鹤翎扇",
+      "description": "你可以将属性杀当任意其他属性杀使用。"
+    },
+    "equipment:sanlue": {
+      "name": "三略",
+      "description": "锁定技，你的攻击范围、手牌上限及出牌阶段使用杀的次数各+1。"
+    },
+    "equipment:tianji-diagram": {
+      "name": "天机图",
+      "description": "锁定技，此牌进入你的装备区时，弃置一张其他牌；离开你的装备区时，将手牌摸至五张。"
+    },
+    "equipment:taigong-yinfu": {
+      "name": "太公阴符",
+      "description": "出牌阶段开始时，你可以横置或重置一名角色；出牌阶段结束时，你可以重铸一张手牌。"
+    }
+  }
+}

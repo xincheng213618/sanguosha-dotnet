@@ -5,6 +5,7 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     public int? Number(string name) => getCoreGameEngineProgramExpressionsRuntime().ReadProgramExpressionNumber(frame, name);
     public int? BindingStat(string stat, string name)
     {
+        if (stat == "choiceNumber") return frame.ChoiceBindings.SingleOrDefault(binding => binding.Name == name)?.Number;
         if (frame.CardSetBindings.SingleOrDefault(binding => binding.Name == name)is not { } binding)
             return null;
         if (stat == "boundCount")

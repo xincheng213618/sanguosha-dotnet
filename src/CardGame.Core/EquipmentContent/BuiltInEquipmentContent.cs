@@ -13,7 +13,7 @@ public static partial class BuiltInEquipmentContent
     // Computed after the independent package initializers have completed; no
     // static field depends on declaration order across the partial files.
     public static IReadOnlyList<EquipmentContentPackage> All =>
-        Array.AsReadOnly<EquipmentContentPackage>([Standard, Hulao, Shenwu, Guandu, CharacterGenerated, Shanhe, WushuangPurchases]);
+        Array.AsReadOnly<EquipmentContentPackage>([Standard, Hulao, Shenwu, Guandu, CharacterGenerated, Shanhe, WushuangPurchases, Forged]);
 
     /// <summary>
     /// Builds the equipment catalogue for one match. Registered cards, conversion outputs and

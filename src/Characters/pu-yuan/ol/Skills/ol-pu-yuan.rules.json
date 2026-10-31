@@ -1,0 +1,507 @@
+﻿{
+  "schemaVersion": 62,
+  "skills": [
+    {
+      "id": "ol:shengong",
+      "revision": 1,
+      "activations": [
+        {
+          "id": "weapon",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "cardCategories": [
+            "equipment"
+          ],
+          "equipmentSlots": [
+            "weapon"
+          ],
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "discardSelected",
+              "target": "owner",
+              "amount": 1
+            },
+            {
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "quality",
+              "options": [
+                {
+                  "id": "perfect",
+                  "number": 3
+                },
+                {
+                  "id": "success",
+                  "number": 2
+                },
+                {
+                  "id": "failure",
+                  "number": 1
+                }
+              ]
+            },
+            {
+              "op": "offerGeneratedEquipment",
+              "target": "owner",
+              "amountExpr": [
+                "choiceNumber",
+                "quality"
+              ],
+              "source": "equipment:forged",
+              "resultBind": "forged",
+              "templates": [
+                {
+                  "kind": "wushuangHalberd",
+                  "suit": "diamond",
+                  "rank": 12
+                },
+                {
+                  "kind": "ghostDragonCrescentBlade",
+                  "suit": "spade",
+                  "rank": 5
+                },
+                {
+                  "kind": "scarletBloodSword",
+                  "suit": "spade",
+                  "rank": 6
+                },
+                {
+                  "kind": "bintieDoubleHalberd",
+                  "suit": "diamond",
+                  "rank": 13
+                },
+                {
+                  "kind": "blackIronChain",
+                  "suit": "spade",
+                  "rank": 13
+                },
+                {
+                  "kind": "fiveElementsFan",
+                  "suit": "diamond",
+                  "rank": 1
+                }
+              ]
+            },
+            {
+              "op": "placeBoundEquipment",
+              "target": "owner",
+              "sourceBind": "forged",
+              "chooseRecipient": true
+            }
+          ]
+        },
+        {
+          "id": "armor",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "cardCategories": [
+            "equipment"
+          ],
+          "equipmentSlots": [
+            "armor"
+          ],
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "discardSelected",
+              "target": "owner",
+              "amount": 1
+            },
+            {
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "quality",
+              "options": [
+                {
+                  "id": "perfect",
+                  "number": 3
+                },
+                {
+                  "id": "success",
+                  "number": 2
+                },
+                {
+                  "id": "failure",
+                  "number": 1
+                }
+              ]
+            },
+            {
+              "op": "offerGeneratedEquipment",
+              "target": "owner",
+              "amountExpr": [
+                "choiceNumber",
+                "quality"
+              ],
+              "source": "equipment:forged",
+              "resultBind": "forged",
+              "templates": [
+                {
+                  "kind": "lionBelt",
+                  "suit": "spade",
+                  "rank": 2
+                },
+                {
+                  "kind": "redCottonRobe",
+                  "suit": "club",
+                  "rank": 1
+                },
+                {
+                  "kind": "nationalStyleRobe",
+                  "suit": "spade",
+                  "rank": 9
+                },
+                {
+                  "kind": "qimenEightTrigrams",
+                  "suit": "spade",
+                  "rank": 2
+                },
+                {
+                  "kind": "huxinMirror",
+                  "suit": "club",
+                  "rank": 1
+                },
+                {
+                  "kind": "blackLightArmor",
+                  "suit": "club",
+                  "rank": 2
+                }
+              ]
+            },
+            {
+              "op": "placeBoundEquipment",
+              "target": "owner",
+              "sourceBind": "forged",
+              "chooseRecipient": true
+            }
+          ]
+        },
+        {
+          "id": "treasure",
+          "minCards": 1,
+          "maxCards": 1,
+          "sourceZones": [
+            "hand",
+            "equipment"
+          ],
+          "cardCategories": [
+            "equipment"
+          ],
+          "equipmentSlots": [
+            "offensiveHorse",
+            "defensiveHorse",
+            "treasure"
+          ],
+          "minTargets": 0,
+          "maxTargets": 0,
+          "targetKind": "anyLiving",
+          "usesPerTurn": null,
+          "usesPerPhase": 1,
+          "effects": [
+            {
+              "op": "discardSelected",
+              "target": "owner",
+              "amount": 1
+            },
+            {
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "quality",
+              "options": [
+                {
+                  "id": "perfect",
+                  "number": 3
+                },
+                {
+                  "id": "success",
+                  "number": 2
+                },
+                {
+                  "id": "failure",
+                  "number": 1
+                }
+              ]
+            },
+            {
+              "op": "offerGeneratedEquipment",
+              "target": "owner",
+              "amountExpr": [
+                "choiceNumber",
+                "quality"
+              ],
+              "source": "equipment:forged",
+              "resultBind": "forged",
+              "templates": [
+                {
+                  "kind": "purpleGoldCrown",
+                  "suit": "diamond",
+                  "rank": 1
+                },
+                {
+                  "kind": "delusionCrown",
+                  "suit": "club",
+                  "rank": 4
+                },
+                {
+                  "kind": "sanlue",
+                  "suit": "spade",
+                  "rank": 5
+                },
+                {
+                  "kind": "zhaoguMirror",
+                  "suit": "diamond",
+                  "rank": 1
+                },
+                {
+                  "kind": "tianjiDiagram",
+                  "suit": "club",
+                  "rank": 12
+                },
+                {
+                  "kind": "taigongYinfu",
+                  "suit": "spade",
+                  "rank": 2
+                }
+              ]
+            },
+            {
+              "op": "placeBoundEquipment",
+              "target": "owner",
+              "sourceBind": "forged",
+              "chooseRecipient": true
+            }
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "id": "destroyed-equipment-ending-draw",
+          "window": "turnEnding",
+          "subject": "owner",
+          "turnOwnerScope": "anyLiving",
+          "optional": false,
+          "effects": [
+            {
+              "op": "draw",
+              "target": "owner",
+              "amountExpr": [
+                "number",
+                "equipment.destroyedThisTurn"
+              ],
+              "condition": {
+                "kind": "expression",
+                "expr": [
+                  ">",
+                  [
+                    "number",
+                    "equipment.destroyedThisTurn"
+                  ],
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ol:qisi",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "opening-equipment",
+          "window": "gameStarting",
+          "subject": "owner",
+          "optional": false,
+          "effects": [
+            {
+              "op": "selectRandomPileEquipment",
+              "target": "owner",
+              "amount": 2,
+              "resultBind": "opening",
+              "zones": [
+                "drawPile"
+              ],
+              "distinctEquipmentCategories": true
+            },
+            {
+              "op": "placeBoundEquipment",
+              "target": "owner",
+              "sourceBind": "opening"
+            }
+          ]
+        },
+        {
+          "id": "draw-equipment",
+          "window": "drawPhaseStarting",
+          "subject": "owner",
+          "optional": true,
+          "effects": [
+            {
+              "op": "adjustNormalDraw",
+              "target": "owner",
+              "amount": -1
+            },
+            {
+              "op": "chooseOption",
+              "target": "owner",
+              "resultBind": "category",
+              "options": [
+                {
+                  "id": "weapon"
+                },
+                {
+                  "id": "armor"
+                },
+                {
+                  "id": "horse"
+                },
+                {
+                  "id": "treasure"
+                }
+              ]
+            },
+            {
+              "op": "selectRandomPileEquipment",
+              "target": "owner",
+              "amount": 1,
+              "resultBind": "weapon",
+              "zones": [
+                "drawPile",
+                "discardPile"
+              ],
+              "equipmentSlots": [
+                "weapon"
+              ],
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "category",
+                "optionId": "weapon"
+              }
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "weapon",
+              "destination": "ownerHand",
+              "awaitMovementTriggers": true,
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "category",
+                "optionId": "weapon"
+              }
+            },
+            {
+              "op": "selectRandomPileEquipment",
+              "target": "owner",
+              "amount": 1,
+              "resultBind": "armor",
+              "zones": [
+                "drawPile",
+                "discardPile"
+              ],
+              "equipmentSlots": [
+                "armor"
+              ],
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "category",
+                "optionId": "armor"
+              }
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "armor",
+              "destination": "ownerHand",
+              "awaitMovementTriggers": true,
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "category",
+                "optionId": "armor"
+              }
+            },
+            {
+              "op": "selectRandomPileEquipment",
+              "target": "owner",
+              "amount": 1,
+              "resultBind": "horse",
+              "zones": [
+                "drawPile",
+                "discardPile"
+              ],
+              "equipmentSlots": [
+                "offensiveHorse",
+                "defensiveHorse"
+              ],
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "category",
+                "optionId": "horse"
+              }
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "horse",
+              "destination": "ownerHand",
+              "awaitMovementTriggers": true,
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "category",
+                "optionId": "horse"
+              }
+            },
+            {
+              "op": "selectRandomPileEquipment",
+              "target": "owner",
+              "amount": 1,
+              "resultBind": "treasure",
+              "zones": [
+                "drawPile",
+                "discardPile"
+              ],
+              "equipmentSlots": [
+                "treasure"
+              ],
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "category",
+                "optionId": "treasure"
+              }
+            },
+            {
+              "op": "moveBoundCards",
+              "target": "owner",
+              "sourceBind": "treasure",
+              "destination": "ownerHand",
+              "awaitMovementTriggers": true,
+              "condition": {
+                "kind": "choiceIs",
+                "sourceBind": "category",
+                "optionId": "treasure"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -19,6 +19,12 @@ public static class CardCatalog
     private static readonly IReadOnlyDictionary<CardKind, CardDefinition> Definitions =
         new Dictionary<CardKind, CardDefinition>
         {
+            [CardKind.BintieDoubleHalberd] = new(CardKind.BintieDoubleHalberd, "镔铁双戟", "装备牌", "杀被抵消后，可失去1点体力，获得此杀、摸一张牌，本回合杀次数+1。", 32, 0, 42),
+            [CardKind.BlackIronChain] = new(CardKind.BlackIronChain, "乌铁锁链", "装备牌", "使用杀指定未横置的目标后，横置之。", 32, 0, 42),
+            [CardKind.FiveElementsFan] = new(CardKind.FiveElementsFan, "五行鹤翎扇", "装备牌", "可以将属性杀当其他属性杀使用。", 32, 0, 42),
+            [CardKind.Sanlue] = new(CardKind.Sanlue, "三略", "装备牌", "攻击范围、手牌上限、出牌阶段杀次数各+1。", 32, 0, 42),
+            [CardKind.TianjiDiagram] = new(CardKind.TianjiDiagram, "天机图", "装备牌", "进入装备区时弃置一张其他牌；离开时将手牌摸至五张。", 32, 0, 42),
+            [CardKind.TaigongYinfu] = new(CardKind.TaigongYinfu, "太公阴符", "装备牌", "出牌阶段开始时可横置或重置一名角色；结束时可重铸一张手牌。", 32, 0, 42),
             [CardKind.MantianGuohai] = new(CardKind.MantianGuohai, "瞒天过海", "锦囊牌", "此牌不计入手牌上限。出牌阶段，对至多两名区域内有牌的其他角色使用：依次获得目标角色区域内的一张牌，然后依次交给目标角色一张手牌。", 35, 0, 40),
             [CardKind.DagongChe] = new(CardKind.DagongChe, "大攻车", "装备牌", "出牌阶段开始时，你可视为使用一张杀（不计入次数）；此杀造成伤害后，你弃置目标一张牌。升级选项：无视距离和防具；目标数+1；弃牌数+1，每个大攻车最多升级5次。未升级时不能被弃置，离开装备区时销毁。", 32, 0, 42),
             [CardKind.QizhengXiangsheng] = new(CardKind.QizhengXiangsheng, "奇正相生", "锦囊牌", "出牌阶段，对一名其他角色使用，暗中指定奇兵或正兵。目标可打出一张杀或闪。奇兵未打出杀则受到你造成的1点伤害；正兵未打出闪则你获得其一张牌。", 38, 0, 42),

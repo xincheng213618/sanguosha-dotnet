@@ -275,12 +275,17 @@ public sealed record SkillProgramChoiceOption(string Id, SkillProgramCondition C
 {
     public string Label { get; internal set; } = "";
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? Number { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramTargetKind? RequiredTargetKind { get; init; }
 }
 public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    OfferGeneratedEquipment = 910000,
+    SelectRandomPileEquipment = 910001,
+    PlaceBoundEquipment = 910002,
     DistributeShanheSourceQingjianGains = 24750,
     ResolveShanheSourceTiepaoRetaliation = 24780,
     PlaceRandomMissingArmorDeckEquipment = 24880,
@@ -3276,7 +3281,7 @@ public sealed class SkillProgramOwnerZoneLossQualification
             !(move.To.OwnerSeat == ownerSeat && Zones.Contains(move.To.Zone))) == ExpectedValue;
 }
 
-public sealed class SkillProgramTrigger
+public sealed partial class SkillProgramTrigger
 {
     public bool IsSkillInvocation { get; internal init; } = true;
     internal SkillProgramTrigger(string id, SkillProgramTriggerWindow window, string? sourceSkillId,
@@ -4700,6 +4705,9 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             Fail(path + ".outputKind", "this card kind has no configured viewAs use or response path");
         var forPlay = RequiredBool(node, "forPlay", path);
         var forResponse = RequiredBool(node, "forResponse", path);
+        var physicalSlashConversion = inputCount == 1 && inputs.Count > 0 &&
+            inputs.All(kind => kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) &&
+            output is (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) && forPlay && !forResponse;
         if (tieredRound is null && singleTrick && (inputCount != 1 || !forPlay || forResponse || CardUseCategoryCatalog.Get(output) != CardUseCategories.InstantTrick || output == CardKind.Nullification))
             Fail(path + ".singleCardTrickUse", "requires one physical source and an ordinary trick for play");
         if (!rankTwoDamageUse && !equalNameLengthUse && xieweiBaitBasicUse is null && leiluanBasicUse is null && tieredRound is null && drawFunded is null && roundDistinct is null && !chainedStateCost.HasValue && useOnly && !singleTrick && !((conversionState is not null || unusedName || lastInSourceZone == true) && output == CardKind.Nullification && !forPlay && forResponse && inputCount == 1) && (inputCount != 1 ||
@@ -4765,9 +4773,9 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             Fail(path + ".forPlay", "nullification is only legal in the counterspell response window");
         if (!fuleAlias && output == CardKind.Peach && forPlay && usesPerPhase is null && !extended && !useOnly)
             Fail(path + ".forPlay", "proactive peach has no configured viewAs executor");
-        if (!fuleAlias && output == CardKind.ThunderSlash && usesPerPhase is null && !extended && !useOnly && declaration is null)
+        if (!fuleAlias && output == CardKind.ThunderSlash && usesPerPhase is null && !extended && !useOnly && declaration is null && !physicalSlashConversion)
             Fail(path + ".outputKind", "thunderSlash requires phase-limited play viewAs");
-        if (!fuleAlias && output == CardKind.FireSlash && usesPerPhase is null && !extended && !useOnly)
+        if (!fuleAlias && output == CardKind.FireSlash && usesPerPhase is null && !extended && !useOnly && !physicalSlashConversion)
         {
             if (inputCount == 1 && inputs.Count > 0 && suits.Count == 0)
             {
@@ -4788,8 +4796,8 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             }
         }
         if (allowChainedInput &&
-            (!forPlay || forResponse || inputCount != 1 || output != CardKind.FireSlash))
-            Fail(path + ".allowChainedInput", "chained viewAs currently supports one input for fireSlash play only");
+            (!forPlay || forResponse || inputCount != 1 || output is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash)))
+            Fail(path + ".allowChainedInput", "chained viewAs requires one input and a Slash-family play output");
         if (!allowSameKind && inputs.Count > 0 && inputs.All(kind => kind == output))
             Fail(path + ".inputKinds", "viewAs must change at least one accepted input kind");
         if (declaration is not null && (inputCount != 1 || !sourceZones.SequenceEqual([CardZoneKind.Hand]) ||
@@ -5237,7 +5245,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
     private static SkillProgramTrigger ParseTrigger(JsonElement node, string path, string skillId)
     {
         RequireObject(node, path);
-        CheckProperties(node, path, "id", "window", "sourceSkillId", "sourceViewAsId", "cardKinds", "isSkillInvocation",
+        CheckProperties(node, path, "id", "window", "sourceSkillId", "sourceViewAsId", "cardKinds", "isSkillInvocation", "ownEquipmentOnly",
             "cardCategories", "damageCardKinds", "sourceZones", "movementOccurrence", "damageOccurrence",
             "subject", "suits", "minimumRank", "maximumRank", "excludedReasons", "judgmentReasons",
             "judgmentSource", "optional", "condition", "priority", "usageScope", "usageLimit",
@@ -6427,6 +6435,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             condition, effects, priority, usageScope, usageLimit, choiceGroup, ownerRelation,
             cardCategories: cardCategories, damageCardKinds: damageCardKinds, turnOwnerScope: turnOwnerScope)
         {
+            OwnEquipmentOnly = node.TryGetProperty("ownEquipmentOnly", out _) && RequiredBool(node, "ownEquipmentOnly", path),
             DynamicUsageLimit = dynamicLimit, NamedUsageGroup = namedUsage, GainPhaseQualification = gainPhase, RequireDamageSource = requireDamageSource,
             RequiresConsumedAlcoholSlash = requiresConsumedAlcoholSlash,
             OwnerZoneLoss = ownerZoneLoss,
@@ -6451,6 +6460,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             HpChangeOccurrence = hpChangeOccurrence,
             MarkerCost = ParseMarkerCost(node, path)
         };
+        EquipmentMovementRuntime.ValidateTrigger(path, parsedTrigger);
         if ((contractedCommittedSingleAction || window == SkillProgramTriggerWindow.CardUseCommitted && includeResponseUses && !recordsCommittedSuit &&
             (effects.Count != 1 || effects[0].Op is not (SkillProgramEffectOp.IssueCardNoResponseAndPlayUseBan or SkillProgramEffectOp.RecordOpeningTurnUse or SkillProgramEffectOp.HoldUsedSuitHandAndDraw or SkillProgramEffectOp.NullifyMatchingHandUse or SkillProgramEffectOp.DrawShenwuMingwanUse))) &&
             !ProgramCommittedUseContracts.TryValidate(skillId, parsedTrigger))

@@ -3,15 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCurrentSlashFireOffersRuntime
 {
-    internal void AddCurrentNonFireConvertedTargetActions(ICollection<LegalAction> actions, CharacterState actor, int? selectedPhysicalCardId = null)
-    {
-        if (!HasCommittedSlashFireCapability(actor))
-            return;
-        foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Where(c => (selectedPhysicalCardId is null || c.Id == selectedPhysicalCardId) && c.Kind == CardKind.ThunderSlash))
-            foreach (var source in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, CardKind.FireSlash, false))
-                _coreProgramCardUseRulesOperations.AddProgramTargetCountSlashActions(actions, actor, card, _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, card, source, effectiveKind: CardKind.FireSlash), "火杀", CardKind.FireSlash, source);
-    }
-
     internal bool HasCommittedSlashFireCapability(CharacterState owner) => owner.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCommitted).Any(binding => ProgramInstructionResolver.Default.Features(binding.Trigger).HasOperation(SkillProgramEffectOp.OfferCurrentSlashFireAndExtraTarget));
     internal CardUseFrame CurrentSlashFireUse(ProgramSkillFrame f)
     {

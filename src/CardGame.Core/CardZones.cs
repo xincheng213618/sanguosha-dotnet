@@ -219,7 +219,18 @@ public static class CardMoveReasons
     public static CardMoveReason Reshuffle { get; } = new("deck.reshuffle");
 }
 
-public sealed partial record CardMovementRecord(int Sequence, int TurnNumber, int CardId, CardKind CardKind, CardLocation From, CardLocation To, CardMoveReason Reason);
+public sealed partial record CardMovementRecord(int Sequence, int TurnNumber, int CardId, CardKind CardKind, CardLocation From, CardLocation To, CardMoveReason Reason)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public long BatchId { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public Suit? PrintedSuit { get; init; }
+
+    // The issued face remains readable after destruction, transfer or a later face change.
+    // The fallback accepts older diagnostic records without requiring a stored-format gate.
+    internal Suit PrintedSuitAtMovement(ICardZoneQueries cards) => PrintedSuit ??
+        cards.CardsAt(cards.GetLocation(CardId)).Single(card => card.Id == CardId).Suit;
+}
 internal readonly record struct CardTransfer(int CardId, CardLocation From, CardLocation To);
 // Trusted rule queries read the existing physical zones through this contract.
 // It exposes no movement operations and creates no second card store.

@@ -194,8 +194,10 @@ internal static class ProgramCompositionValidator
                 .SelectMany(expression => expression!.Nodes()).ToArray();
             var expressionReads = expressions.Where(expression => expression.Op.StartsWith("bound", StringComparison.Ordinal))
                 .Select(expression => (ProgramResourceOperation)new ReadCardSet(expression.Name!))
-                .Concat(expressions.Where(expression => expression.Op == "number")
-                    .Select(expression => (ProgramResourceOperation)new ReadNumberBinding(expression.Name!)));
+                .Concat(expressions.Where(expression => expression.Op == "number" && !GeneratedEquipmentRuntime.IsNumberFact(expression.Name))
+                    .Select(expression => (ProgramResourceOperation)new ReadNumberBinding(expression.Name!)))
+                .Concat(expressions.Where(expression => expression.Op == "choiceNumber")
+                    .Select(expression => (ProgramResourceOperation)new ReadNumberBinding("choice-number:" + expression.Name!)));
             foreach (var resource in expressionReads.Concat(descriptor.Resources(effect)))
             {
                 if (judgmentTargetGuard is not null && resource is (ReadSelectedTarget or RequireSelectedTargetKind or ReadVirtualDuelPair or

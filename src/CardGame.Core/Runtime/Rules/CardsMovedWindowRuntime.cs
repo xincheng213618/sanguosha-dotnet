@@ -2,6 +2,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
 {
+    private readonly RuntimeEntries.DeferredRuntime<EquipmentMovementRuntime> _equipment;
     private readonly ICardsMovedWindowNativeProofs _native;
     private readonly ICardsMovedWindowCardUseProofs _cardUse;
     private readonly ICardsMovedWindowNativeReturns _returns;
@@ -17,8 +18,9 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
     private readonly IProgramRuntimeEvents _events;
     private readonly IProgramRuntimePrompts _prompts;
     private readonly IProgramWindowCursors _cursors;
-    internal CardsMovedWindowRuntime(ICardsMovedWindowNativeProofs native,ICardsMovedWindowCardUseProofs cardUse,ICardsMovedWindowNativeReturns returns,ICardsMovedWindowCardUseContinuations cardUseContinuations,ICardsMovedWindowSelections selection,ICardsMovedWindowOperations operations,ICardsMovedWindowFacts facts,ICardsMovedWindowPipeline pipeline,ICardMovementBatchQueue batches,IProgramEventHistoryQueries history,ICardZoneQueries zones,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramWindowCursors cursors)
+    internal CardsMovedWindowRuntime(ICardsMovedWindowNativeProofs native,ICardsMovedWindowCardUseProofs cardUse,ICardsMovedWindowNativeReturns returns,ICardsMovedWindowCardUseContinuations cardUseContinuations,ICardsMovedWindowSelections selection,ICardsMovedWindowOperations operations,ICardsMovedWindowFacts facts,ICardsMovedWindowPipeline pipeline,ICardMovementBatchQueue batches,IProgramEventHistoryQueries history,ICardZoneQueries zones,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramWindowCursors cursors, RuntimeEntries.DeferredRuntime<EquipmentMovementRuntime> equipment)
     {
+        _equipment = equipment;
         _native = native;
         _cardUse = cardUse;
         _returns = returns;
@@ -45,6 +47,8 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         var window = new CardsMovedTriggerWindowFrame(batch.Id, batch, Array.AsReadOnly(candidates), ResumeProgramFrameId: resumeProgramFrameId);
         return window with
         {
+            InvocationAuthorizations = Array.AsReadOnly(candidates.Where(c => _equipment.Value.IsDeparture(batch, c))
+                .Select(c => new ProgramInvocationAuthorization(window.Id, batch.ParentFrameId ?? 0, SkillProgramTriggerWindow.CardsMoved, c)).ToArray()),
             Contexts = Array.AsReadOnly(candidates.Select(c => CreateCardsMovedProgramContext(window, c)).ToArray())
         };
     }
@@ -308,7 +312,9 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
                 var ownerSeat = count.Location.OwnerSeat!.Value;
                 if (!_facts.IsValidPlayerSeat(ownerSeat))
                     continue;
-                foreach (var candidate in _facts.CollectProgramTriggerCandidates(ownerSeat, window))
+                foreach (var candidate in _facts.CollectProgramTriggerCandidates(ownerSeat, window)
+                    .Concat(window == SkillProgramTriggerWindow.CardsMoved ? _equipment.Value.Departures(batch, ownerSeat) : [])
+                    .Distinct())
                 {
                     var trigger = _facts.GetProgramTrigger(candidate);
                     if (_pipeline.ExcludeOrdinaryMovementCandidate(candidate, trigger))
@@ -437,6 +443,10 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
     internal int[] MatchingMovementIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardLocation location)
     {
         var features = ProgramInstructionResolver.Default.Features(trigger);
+        if (trigger.OwnEquipmentOnly)
+            return batch.Movements.Select((m, i) => (m, i)).Where(item =>
+                (trigger.Window == SkillProgramTriggerWindow.CardsGained ? item.m.To : item.m.From) == location &&
+                item.m.From != item.m.To && _equipment.Value.MatchesOwnCard(candidate, item.m)).Select(item => item.i).ToArray();
         if (UsesNativeDrawThreshold(trigger))
             return _selection.MatchingNativeDrawThresholdIndexes(batch, candidate);
         var ordinalIndexes = RuntimeSkills.RuntimeRules_Core_NativeDrawOrdinals.UsesNativeDrawOrdinal(trigger) ? _selection.MatchingNativeDrawOrdinalIndexes(batch, candidate) : null;

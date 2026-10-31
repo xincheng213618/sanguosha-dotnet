@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineFinalTargetSlashRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 920)]
     internal bool CanOfferFinalTargetSlash(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext window)
     {
-        if (!HasFinalTargetSlashEffects(trigger.Effects) || trigger.Window == SkillProgramTriggerWindow.SlashBeforeResponse && trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ProhibitCurrentResponse))
+        if (trigger.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || !HasFinalTargetSlashEffects(trigger.Effects))
             return true;
         return window is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, TargetSeat: { } target, CardUse: { } context, Facts: not null } && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == context.ParentCardUseFrameId)?.Action is { Type: CardActionType.Use } action && action.ActionId == context.CardActionId && action.ActorSeat == candidate.OwnerSeat && context.ActorSeat == candidate.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && action.EffectiveDesignatedTargetSeats.Contains(target) && (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.RevealRecordedSuitSlash) || action.EffectiveDesignatedTargetSeats.Count == 1);
     }

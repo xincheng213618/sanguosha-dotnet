@@ -24461,6 +24461,23 @@
           "pixelHeight": 750
         }
       ]
+    },
+    {
+      "key": "ol-pu-yuan",
+      "characterName": "蒲元",
+      "defaultSkinId": "51000",
+      "skins": [
+        {
+          "id": "51000",
+          "name": "经典形象",
+          "sourcePage": "https://www.sanguosha.com/hero/510",
+          "imageUrl": "https://web.sanguosha.com/220/miniGame/release/laya2/res/runtime/m/general/big/static/51000.png",
+          "localPath": "src/CardGame.Wpf/Assets/official-ol-pu-yuan.png",
+          "sha256": "36b2c8d8707694829a45166bf4da50c2e7a71cc23ce344cede922872c7cf0d05",
+          "pixelWidth": 750,
+          "pixelHeight": 950
+        }
+      ]
     }
   ]
 }

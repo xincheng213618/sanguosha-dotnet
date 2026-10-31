@@ -22,6 +22,11 @@ internal sealed partial class ProgramTargetSelectionRuntime
             frames.ReplaceTop(frame = frame with { SelectedTargetSeats = Array.AsReadOnly(Array.Empty<int>()) });
         }
         var targetSeats = GetProgramTargetSeats(ownerSeat, targetKind, frame.WindowContext);
+        if (paused.AllTargets == true)
+        {
+            frames.ReplaceTop(frame with { SelectedTargetSeats = Array.AsReadOnly(targetSeats.ToArray()) });
+            return SkillProgramStepOutcome.Continue;
+        }
         if ((numberExpression is SkillProgramNumberExpression.CurrentHp or SkillProgramNumberExpression.OwnerLostHpAtLeastOne) && !Player(ownerSeat).HasHpValue)
         { protocols.Cancel(frame, "体力值未定义，无法计算技能目标数量。"); return SkillProgramStepOutcome.Continue; }
         var expressionMaximum = numberExpression switch

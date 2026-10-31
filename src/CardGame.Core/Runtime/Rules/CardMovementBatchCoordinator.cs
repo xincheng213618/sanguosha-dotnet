@@ -20,7 +20,8 @@ internal interface ICardMovementBatchPipeline : IProgramRuntimeOperations
 /// <summary>Owns the ordered start, settlement and publication of atomic movement batches.</summary>
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class CardMovementBatchCoordinator(IProgramRuntimeFrames frames, ICardZoneQueries cards,
-    ICardMovementBatchFacts facts, ICardMovementBatchLifecycle batches, ICardMovementBatchPipeline pipeline)
+    ICardMovementBatchFacts facts, ICardMovementBatchLifecycle batches, ICardMovementBatchPipeline pipeline,
+    IEquipmentMovementCapture equipment)
     : IAtomicCardMovementBatches
 {
     public CardMovementBatchBuilder Begin(IEnumerable<CardLocation> sourceLocations,
@@ -42,6 +43,7 @@ internal sealed class CardMovementBatchCoordinator(IProgramRuntimeFrames frames,
                 location => cards.CardsAt(location).Count),
             frames.Top is SkillInvocationFrame ? null : facts.LastProgram);
         pipeline.Begin(batch);
+        batch.EquipmentDepartures = equipment.Capture(sources.Keys);
         batch.SealStartMetadata();
         batches.PushActiveBatch(batch.Id);
         return batch;
@@ -82,7 +84,8 @@ internal sealed class CardMovementBatchCoordinator(IProgramRuntimeFrames frames,
         {
             MovementTiming = batch.MovementTiming,
             DiscardRecoveryPhase = batch.DiscardRecoveryPhase,
-            MouYishiSources = batch.MouYishiSources
+            MouYishiSources = batch.MouYishiSources,
+            EquipmentDepartures = batch.EquipmentDepartures
         };
         batches.AppendCompletedBatch(pipeline.Complete(batch, completed));
     }

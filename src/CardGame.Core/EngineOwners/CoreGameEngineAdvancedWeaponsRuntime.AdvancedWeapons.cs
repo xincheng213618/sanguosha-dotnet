@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineAdvancedWeaponsRuntime
 {
     internal bool MoveProcessingCardUnlessDestroyed(Card card, CardLocation destination, CardMoveReason reason, Action<CardMovementRecord>? beforeFact = null)
     {
-        if ((card.IsGeneralWeapon || _characterDiaoChanLeOperations.IsDiouCarrier(card.Id) || _coreWushuangShopCardsOperations.IsWushuangShopEquipment(card.Id) || _coreShanheStartingResourcesOperations.IsShanheStartingResource(card.Id) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == card.Id)) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.OutsideGame)
+        if ((card.EquipmentOrigin is not null || card.IsGeneralWeapon || _characterDiaoChanLeOperations.IsDiouCarrier(card.Id) || _coreWushuangShopCardsOperations.IsWushuangShopEquipment(card.Id) || _coreShanheStartingResourcesOperations.IsShanheStartingResource(card.Id) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == card.Id)) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.OutsideGame)
             return false;
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, destination, reason, beforeFact);
         return true;

@@ -10,10 +10,12 @@ internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
         return owner;
     }
 
-    internal SkillProgramStepOutcome ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame)
+    internal SkillProgramStepOutcome ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame, ProgramParticipantReference? recipient = null)
     {
-        var owner = CurrentFinalTargetSlashOwner(frame);
-        var target = frame.WindowContext!.TargetSeat!.Value;
+        var owner = frame.WindowContext is { Window: SkillProgramTriggerWindow.SlashFullyDodged, CardUse: { } use }
+            ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(f => f.Id == use.ParentCardUseFrameId)
+            : CurrentFinalTargetSlashOwner(frame);
+        var target = recipient?.Kind == ProgramParticipantRef.Owner ? frame.OwnerSeat : frame.WindowContext!.TargetSeat!.Value;
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_characterPangDeBoundaryMobileOperations.Value.HasBoundaryPangDePaidDiscard(frame))
             return SkillProgramStepOutcome.Continue;
         var effectIndex = frame.InstructionIndex - 1;
@@ -49,6 +51,6 @@ internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTargetSlashReceiptIssuedEvent(owner.Id, receipt));
     }
 
-    SkillProgramStepOutcome ICurrentUsePhysicalClaimProgramHost.ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame) => ClaimCurrentUsePhysicalCards(frame);
+    SkillProgramStepOutcome ICurrentUsePhysicalClaimProgramHost.ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame, ProgramParticipantReference? recipient) => ClaimCurrentUsePhysicalCards(frame, recipient);
     void ICurrentUsePhysicalClaimProgramHost.PreventCurrentTargetSlashCancellationByRule(ProgramSkillFrame frame) => PreventCurrentTargetSlashCancellationByRule(frame);
 }

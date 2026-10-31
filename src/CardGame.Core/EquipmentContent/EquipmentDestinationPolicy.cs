@@ -1,7 +1,10 @@
 namespace CardGame.Core;
 
 /// <summary>Trusted creation identity reconstructed from the existing creation facts, never from player commands.</summary>
-public sealed record EquipmentCardOrigin(int CardId, string SourceId, int? InitialOwnerSeat = null);
+public sealed record EquipmentCardOrigin(int CardId, string SourceId, int? InitialOwnerSeat = null)
+{
+    public string? IssuingSkillId { get; init; }
+}
 
 /// <summary>Movement facts supplied by the owning card store. This is a read-only query, not additional pending state.</summary>
 public sealed record EquipmentDestinationContext(Card Card, CardLocation From, CardLocation To,
@@ -9,8 +12,11 @@ public sealed record EquipmentDestinationContext(Card Card, CardLocation From, C
 
 /// <summary>A source-specific lifetime. Ordinary and purchased entities of the same card kind may differ.</summary>
 public sealed record EquipmentDestinationPolicy(string SourceId, bool DestroyOnEquipmentExit = false,
-    bool RestrictInitialPlacementToOwnerEquipment = false, CardKind? RequiredEquipmentKind = null)
+    bool RestrictInitialPlacementToOwnerEquipment = false, CardKind? RequiredEquipmentKind = null,
+    bool DestroyOnDiscardPileEntry = false)
 {
+    // Entry-triggered destruction preserves the actual discard fact and its payment.
+    public bool DestroysOnArrival(CardLocation destination) => DestroyOnDiscardPileEntry && destination == CardLocation.DiscardPile;
     public CardLocation Normalize(EquipmentDestinationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

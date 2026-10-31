@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineTurnDiscardSuitHistoryRuntime
         var mask = previousMask;
         foreach (var move in movements.Where(m => m.To == CardLocation.DiscardPile && m.From != CardLocation.DiscardPile))
         {
-            var suit = _cardZonesOperations._cardZones.CardsAt(move.To).Single(c => c.Id == move.CardId).Suit;
+            var suit = move.PrintedSuitAtMovement(_cardZonesOperations._cardZones);
             mask |= suit switch
             {
                 Suit.Spade => 1,

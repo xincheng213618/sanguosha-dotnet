@@ -16,7 +16,7 @@ internal sealed class AtomicCardMovementRuntime(IAtomicCardMovementFacts facts, 
         to = policies.NormalizeEphemeralDestination(card, from, to, reason);
         to = policies.NormalizeCopiedDestination(card, from, to, reason);
         to = policies.NormalizeDiscardDestination(card, from, to, reason);
-        if ((facts.IsCarrier(card.Id) || facts.IsPurchasedEquipment(card.Id) || facts.IsStartingResource(card.Id)) && from == to)
+        if ((card.EquipmentOrigin is not null || facts.IsCarrier(card.Id) || facts.IsPurchasedEquipment(card.Id) || facts.IsStartingResource(card.Id)) && from == to)
             return;
         if (card.IsGeneralWeapon && from.Zone == CardZoneKind.Equipment || policies.IsGeneratedDeparture(card, from, to))
             to = CardLocation.OutsideGame;

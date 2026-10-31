@@ -134,7 +134,13 @@ public enum CardKind
     Duanhun = 20836,
     KunlunMirror = 20841,
     HuxinMirror = 20746,
-    GouXiang = 20883
+    GouXiang = 20883,
+    BintieDoubleHalberd = 910000,
+    BlackIronChain,
+    FiveElementsFan,
+    Sanlue,
+    TianjiDiagram,
+    TaigongYinfu
 }
 
 public enum Suit
@@ -630,6 +636,8 @@ public sealed record GameOptions
 
 public sealed record Card(int Id, CardKind Kind, Suit Suit, int Rank)
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public EquipmentCardOrigin? EquipmentOrigin { get; init; }
     public string? PrintedName { get; init; }
     public int? PrintedAttackRange { get; init; }
     public IReadOnlyList<string> GrantedSkillIds { get; init; } = [];

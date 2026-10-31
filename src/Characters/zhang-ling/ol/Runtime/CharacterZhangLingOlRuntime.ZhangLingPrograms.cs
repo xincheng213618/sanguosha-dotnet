@@ -33,8 +33,7 @@ internal sealed partial class CharacterZhangLingOlRuntime
         var record = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == moved.CardId && m.From == moved.From && m.To == moved.To && m.Reason == moved.Reason);
         if (record is null || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(record)?.OwnerSeat is not { } owner || owner != phase.ActorSeat || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CategoryTalismanDiscardRecordedEvent>().Any(e => e.MovementSequence == record.Sequence))
             return;
-        var card = _cardZonesOperations._cardZones.CardsAt(record.To).Single(c => c.Id == record.CardId);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CategoryTalismanDiscardRecordedEvent(phase, owner, card.Id, record.Sequence, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CategoryTalismanDiscardRecordedEvent(phase, owner, record.CardId, record.Sequence, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(record.CardKind)));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 65)]

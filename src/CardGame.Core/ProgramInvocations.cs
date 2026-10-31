@@ -28,6 +28,16 @@ internal static class ProgramInvocations
     internal static ProgramInvocationAuthorization? Find(ResolutionFrame? parent,
         ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
+        if (parent is CardsMovedTriggerWindowFrame movement)
+        {
+            if (movement.Id != context.ParentFrameId || context.MovementBatch?.Id != movement.Batch.Id ||
+                context.Window != SkillProgramTriggerWindow.CardsMoved || candidate.OwnerSeat != context.OwnerSeat ||
+                movement.CandidateIndex < 0 || movement.CandidateIndex >= movement.Candidates.Count ||
+                movement.Candidates[movement.CandidateIndex] != candidate) return null;
+            return movement.InvocationAuthorizations?.SingleOrDefault(a => a.ProgramFrameId == 0 &&
+                a.WindowId == movement.Id && a.NativeFrameId == (movement.Batch.ParentFrameId ?? 0) &&
+                a.Window == context.Window && a.Candidate == candidate);
+        }
         if (parent is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId ||
             window.ParentFrameId != context.DamageFrameId || window.TriggerWindow != context.Window ||
             candidate.OwnerSeat != context.OwnerSeat || context.OccurrenceIndex != candidate.OccurrenceIndex ||

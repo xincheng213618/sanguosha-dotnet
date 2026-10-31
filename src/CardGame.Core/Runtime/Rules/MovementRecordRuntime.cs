@@ -5,7 +5,8 @@ namespace CardGame.Core;
 internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovementRecordMetadata metadata,
     IMovementRecordJournal journal, IMovementRecordMaterials materials, IMovementRecordObservers observers,
     IMovementRecordOrigins origins, IMovementRecordNotifications notifications, IProgramRuntimeEvents events,
-    ICardMovementEventSuppression suppression)
+    ICardMovementEventSuppression suppression, ICardMovementBatchLifecycle batches,
+    RuntimeEntries.DeferredRuntime<GeneratedEquipmentRuntime> equipmentLifetime)
 {
     internal CardMovementRecord Record(
         Card card,
@@ -23,7 +24,7 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
             card.Kind,
             from,
             to,
-            reason) { Disclosure = facts.PublishesDisclosure ? disclosure : CardMovementDisclosure.Unspecified,
+            reason) { BatchId = batches.ActiveBatchId ?? 0, PrintedSuit = card.Suit, Disclosure = facts.PublishesDisclosure ? disclosure : CardMovementDisclosure.Unspecified,
                 ActualPlaySlashLoss = metadata.CaptureActualPlaySlashLoss(card, from, to),
                 RedOwnedLoss = metadata.CaptureRedOwnedLoss(card, from, to, facts.Sequence),
                 HappyMedicineHandLoss = metadata.CaptureHappyHuaTuoHandLoss(card, from, to, facts.Sequence),
@@ -46,6 +47,7 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
         observers.ObserveSourceCurseMovement(movement);
         origins.RecordLishiDiscardRedirection(movement);
         beforeFact?.Invoke(movement);
+        equipmentLifetime.Value.DestroyOnEntry(movement);
         origins.CaptureRequestedDeckBasicPaid(card, from, to);
         origins.CaptureDiscardedEntityOrigin(card, movement);
         origins.CaptureAdjacentDiscardOrigin(card, movement, adjacentDiscardIdentity);

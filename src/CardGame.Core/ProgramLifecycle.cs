@@ -127,7 +127,11 @@ public sealed partial record ProgramAttackRangeAid(
     IReadOnlyList<int> ResponderSeats,
     int ResponderIndex);
 
-public sealed record ProgramChoiceResultBinding(string Name, string OptionId, int ChooserSeat);
+public sealed record ProgramChoiceResultBinding(string Name, string OptionId, int ChooserSeat)
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public int? Number { get; init; }
+}
 
 public sealed record ProgramOptionChosenEvent(
     long FrameId, string SkillId, string BindingId, int OwnerSeat,

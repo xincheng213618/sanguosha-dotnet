@@ -163,6 +163,12 @@ internal sealed class RecoverToProgramOperationDescriptor : ProgramOperationDesc
         WithSelectedTarget(effect);
 }
 
+public sealed partial class SkillProgramEffect
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public bool? AllTargets { get; internal init; }
+}
+
 internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.SelectTargets;
@@ -172,7 +178,7 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
         static (effect, context) => context.SelectTargets(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "targetKind", "minimumTargets", "maximumTargets", "numberExpression", "sourceBind", "targetAiOrder", "condition", "replaceSelection");
+        r.AllowOnly("op", "target", "targetKind", "minimumTargets", "maximumTargets", "numberExpression", "sourceBind", "targetAiOrder", "condition", "replaceSelection", "allTargets");
         var target = FilterBoundCardsProgramOperationDescriptor.Owner(r);
         var kind = r.RequiredEnum<SkillProgramTargetKind>("targetKind");
         var sourceBind = r.Has("sourceBind") ? r.RequiredIdentifier("sourceBind") : null;
@@ -235,8 +241,12 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
             minimumTargets: minimum, maximumTargets: maximum,
             targetAiOrder: aiOrder, sourceBind: sourceBind)
         {
-            ReplaceSelection = r.Has("replaceSelection") ? r.RequiredBool("replaceSelection") : null
+            ReplaceSelection = r.Has("replaceSelection") ? r.RequiredBool("replaceSelection") : null,
+            AllTargets = r.Has("allTargets") ? r.RequiredBool("allTargets") : null
         };
+        if (effect.AllTargets == true && (kind != SkillProgramTargetKind.CurrentCardUseTargets ||
+            minimum != 1 || maximum != 64 || numberExpression is not null || sourceBind is not null))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: allTargets requires the complete current card-use target set without a count expression.");
         if (effect.ReplaceSelection is not null &&
             (effect.ReplaceSelection != true || kind != SkillProgramTargetKind.AnyLivingChained || minimum != 0 ||
                 numberExpression is not null || sourceBind is not null || aiOrder != SkillProgramTargetAiOrder.SupportDraw ||
@@ -245,6 +255,7 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
         return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        effect.AllTargets == true ? [new RequireContext(ProgramContextCapability.CardAction), new SelectTargetSet(0, 64)] :
         effect.ReplaceSelection == true ? [new ReplaceSingleTargetWithSet()] : effect.SourceBind is not null
             ? [new ReadCardSet(effect.SourceBind), new SelectTargetSet(effect.MinimumTargets, effect.MaximumTargets)]
             : effect.NumberExpression == SkillProgramNumberExpression.EventMovedCardCount
