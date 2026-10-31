@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.EngineOwners;
-[Core.ProgramRuntimeModule, Core.ProgramCapability]
-internal sealed partial class CharacterGuYongMobileRuntime(RuntimeEntries.CoreGameEngineProgramCategoryChallengesEntries _coreProgramCategoryChallengesOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations, RuntimeEntries.CoreGameEngineSkillProgramsEntries _coreSkillProgramsOperations) : IMobileGuYongHost
-{
-}

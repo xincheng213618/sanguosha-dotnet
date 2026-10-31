@@ -81,6 +81,7 @@
         {
           "id": "equipment-entered",
           "window": "cardsGained",
+          "ownerZoneLoss": { "zones": ["equipment"], "expectedValue": false },
           "subject": "owner",
           "destinationZones": [
             "equipment"

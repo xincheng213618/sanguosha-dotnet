@@ -1,11 +1,82 @@
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
 internal static class CardMovementProgramChecks
 {
     private const int HumanSeat = 0;
+
+    public static void OwnerZoneLossQualificationPrecedesPrompts()
+    {
+        var rules = JsonNode.Parse(Rules)!;
+        rules["skills"]![0]!["triggers"] = JsonNode.Parse("""
+            [{"id":"zone-loss","window":"cardsMoved","subject":"owner","sourceZones":["hand"],
+              "movementOccurrence":"perOwnerBatch","optional":true,
+              "ownerZoneLoss":{"zones":["hand","equipment"],"expectedValue":true},
+              "effects":[{"op":"draw","target":"owner","amount":1}]}]
+            """);
+        var node = rules["skills"]![0]!["triggers"]![0]!;
+        SkillProgram Load(bool expected)
+        {
+            node["ownerZoneLoss"]!["expectedValue"] = expected;
+            return SkillProgramCatalog.Load(rules.ToJsonString(), Presentation).Programs[ScenarioPackage.SkillId];
+        }
+        var positive = Load(true);
+        var loss = positive.Triggers.Single().OwnerZoneLoss!;
+        var noLoss = Load(false).Triggers.Single().OwnerZoneLoss!;
+        var equipmentRules = JsonNode.Parse(rules.ToJsonString())!;
+        equipmentRules["skills"]![0]!["triggers"]![0]!["ownerZoneLoss"]!["zones"] = new JsonArray("equipment");
+        var equipmentNoLoss = SkillProgramCatalog.Load(equipmentRules.ToJsonString(), Presentation)
+            .Programs[ScenarioPackage.SkillId].Triggers.Single().OwnerZoneLoss!;
+        CardMovementBatchContext Batch(params (CardLocation From, CardLocation To)[] moves) => new(1, null, null, 1,
+            moves.Select((move, index) => new CardMovementRecord(index + 1, 1, index + 1, CardKind.Crossbow,
+                move.From, move.To, new("fixture.owner-zone-loss"))).ToArray(),
+            [new(CardLocation.Equipment(0), 1, 1)]);
+        var internalMove = Batch((CardLocation.Hand(0), CardLocation.Equipment(0)));
+        var exchange = Batch((CardLocation.Equipment(0), CardLocation.DiscardPile),
+            (CardLocation.Hand(1), CardLocation.Equipment(0)));
+        Require(!loss.Matches(0, internalMove) && noLoss.Matches(0, internalMove) &&
+                loss.Matches(0, Batch((CardLocation.Hand(0), CardLocation.Hand(1)))) &&
+                !loss.Matches(0, Batch((CardLocation.Hand(1), CardLocation.DiscardPile))) &&
+                loss.Matches(0, exchange) && !equipmentNoLoss.Matches(0, exchange) &&
+                equipmentNoLoss.Matches(0, internalMove) && !loss.Matches(0, null) && !noLoss.Matches(0, null),
+            "Zone-set loss must distinguish internal transfers, foreign owners and a simultaneous equipment loss/gain even with unchanged counts; neither expectation accepts a missing batch.");
+        try { ((IList<CardZoneKind>)loss.Zones)[0] = CardZoneKind.Judgment; throw new InvalidOperationException("Mutable loss zones."); }
+        catch (NotSupportedException) { }
+        foreach (var bad in new[] { "{\"zones\":[],\"expectedValue\":true}",
+            "{\"zones\":[\"drawPile\"],\"expectedValue\":true}",
+            "{\"zones\":[\"hand\",\"hand\"],\"expectedValue\":true}",
+            "{\"zones\":[\"hand\"]}", "{\"zones\":[\"hand\"],\"expectedValue\":true,\"unknown\":true}" })
+        {
+            var invalid = JsonNode.Parse(rules.ToJsonString())!;
+            invalid["skills"]![0]!["triggers"]![0]!["ownerZoneLoss"] = JsonNode.Parse(bad);
+            Reject(invalid.ToJsonString(), "ownerZoneLoss");
+        }
+        var invalidWindow = JsonNode.Parse(rules.ToJsonString())!;
+        invalidWindow["skills"]![0]!["triggers"]![0]!["window"] = "turnEnding";
+        Reject(invalidWindow.ToJsonString(), "ownerZoneLoss");
+        var legacy = SkillProgramCatalog.Load(Rules, Presentation).Programs[ScenarioPackage.SkillId];
+        Require(legacy.Triggers.All(trigger => trigger.OwnerZoneLoss is null) &&
+                !JsonSerializer.Serialize(legacy).Contains("OwnerZoneLoss", StringComparison.Ordinal),
+            "Absent qualification metadata stays absent from existing serialized definitions.");
+        foreach (var expected in new[] { true, false })
+        {
+            var program = Load(expected);
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new ScenarioPackage(program));
+            var game = CreateAndSelect(registry, ScenarioPackage.ModeId, ScenarioPackage.OwnerGeneralId);
+            ReachHumanPlay(game);
+            var prompt = RequirePrompt(game, DecisionKind.PlayCard);
+            var hand = game.CreateSnapshot(HumanSeat).Players[HumanSeat].Hand.Select(card => card.Id).ToArray();
+            var result = game.Submit(new UseProgramSkillCommand(HumanSeat, ScenarioPackage.SkillId, "discard-two",
+                hand, [], game.Revision, prompt.PromptId));
+            Require(result.Accepted, result.Error?.Message ?? "The qualified movement fixture failed.");
+            Require((game.PendingDecision is { Kind: DecisionKind.ProgramTrigger, SkillPrompt.SkillId: ScenarioPackage.SkillId }) == expected &&
+                    !game.Events.Any(item => item.Payload is ProgramBindingStartedEvent),
+                "The shared qualification must admit or suppress the optional prompt before any trigger binding starts.");
+        }
+    }
 
     public static void AtomicBatchRunsPerCardAndPerBatchAndReplays()
     {

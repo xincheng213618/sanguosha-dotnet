@@ -387,7 +387,6 @@ public enum SkillProgramEffectOp
     CollectMobileYuJinJieyue = 76301,
     PrepareMobileChenQunDingpin = 77200,
     CompleteMobileChenQunDingpin = 77201,
-    CompleteMobileGuYongOnMixedHand = 77300,
     IssueMobileLiYanNextDrawBonus = 77900,
     PrepareMobileMaZhongFuman = 78800,
     IncreaseMobileShiXieIncomingDistanceByLivingFactions = 78900,
@@ -3265,6 +3264,17 @@ public sealed class SkillProgramContribution
 public enum SkillProgramDynamicUsageLimitKind { AlivePlayersCapped }
 public sealed record SkillProgramDynamicUsageLimit(SkillProgramDynamicUsageLimitKind Kind, int Cap);
 
+public sealed class SkillProgramOwnerZoneLossQualification
+{
+    internal SkillProgramOwnerZoneLossQualification(IReadOnlyList<CardZoneKind> zones, bool expectedValue) =>
+        (Zones, ExpectedValue) = (zones, expectedValue);
+    public IReadOnlyList<CardZoneKind> Zones { get; }
+    public bool ExpectedValue { get; }
+    internal bool Matches(int ownerSeat, CardMovementBatchContext? batch) => batch is not null &&
+        batch.Movements.Any(move => move.From.OwnerSeat == ownerSeat && Zones.Contains(move.From.Zone) &&
+            !(move.To.OwnerSeat == ownerSeat && Zones.Contains(move.To.Zone))) == ExpectedValue;
+}
+
 public sealed class SkillProgramTrigger
 {
     public bool IsSkillInvocation { get; internal init; } = true;
@@ -3333,6 +3343,8 @@ public sealed class SkillProgramTrigger
     public string? NamedUsageGroup { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramGainPhaseQualification? GainPhaseQualification { get; internal init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramOwnerZoneLossQualification? OwnerZoneLoss { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? RequireDamageSource { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -5218,7 +5230,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             "judgmentSource", "optional", "condition", "priority", "usageScope", "usageLimit",
             "drawPhaseMode", "choiceGroup", "orderGroup", "ownerRelation", "turnOwnerScope", "effects",
             "destinationZones", "movementReasons", "excludedMovementReasons", "ignoreOwnSkillMovements",
-            "hpChangeOccurrence", "markerCost", "evaluateConditionAtResolution", "allowNoEventTarget", "allowOwnDiscardPhaseEnded", "movementDiscardOnly", "discardOwnerScope", "includeResponseUses", "singleActionInstance", "onlyDesignatedCardTargets", "noDyingAtActivation", "deferredTurnEndOnly", "dynamicUsageLimit", "namedUsageGroup", "gainPhaseQualification", "requireDamageSource", "requireNoCardConversion", "requiredPolarity");
+            "hpChangeOccurrence", "markerCost", "evaluateConditionAtResolution", "allowNoEventTarget", "allowOwnDiscardPhaseEnded", "movementDiscardOnly", "discardOwnerScope", "includeResponseUses", "singleActionInstance", "onlyDesignatedCardTargets", "noDyingAtActivation", "deferredTurnEndOnly", "dynamicUsageLimit", "namedUsageGroup", "gainPhaseQualification", "ownerZoneLoss", "requireDamageSource", "requireNoCardConversion", "requiredPolarity");
         var id = Identifier(node, "id", path);
         var window = EnumValue<SkillProgramTriggerWindow>(node, "window", path);
         var requiredPolarity = node.TryGetProperty("requiredPolarity", out _)
@@ -5240,6 +5252,18 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             : (SkillProgramGainPhaseQualification?)null;
         if (gainPhase is not null && window != SkillProgramTriggerWindow.CardsGained)
             Fail(path + ".gainPhaseQualification", "requires a cardsGained trigger");
+        SkillProgramOwnerZoneLossQualification? ownerZoneLoss = null;
+        if (node.TryGetProperty("ownerZoneLoss", out var zoneLoss))
+        {
+            var lossPath = path + ".ownerZoneLoss";
+            RequireObject(zoneLoss, lossPath);
+            CheckProperties(zoneLoss, lossPath, "zones", "expectedValue");
+            var zones = EnumArray<CardZoneKind>(zoneLoss, "zones", lossPath);
+            if (window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained) ||
+                zones.Count == 0 || zones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)))
+                Fail(lossPath, "requires a movement trigger and nonempty hand, equipment or judgment zones");
+            ownerZoneLoss = new(zones, RequiredBool(zoneLoss, "expectedValue", lossPath));
+        }
         bool? requireDamageSource = null;
         if (node.TryGetProperty("requireDamageSource", out _))
         {
@@ -6387,6 +6411,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             cardCategories: cardCategories, damageCardKinds: damageCardKinds, turnOwnerScope: turnOwnerScope)
         {
             DynamicUsageLimit = dynamicLimit, NamedUsageGroup = namedUsage, GainPhaseQualification = gainPhase, RequireDamageSource = requireDamageSource,
+            OwnerZoneLoss = ownerZoneLoss,
             IsSkillInvocation = !node.TryGetProperty("isSkillInvocation", out _) || RequiredBool(node, "isSkillInvocation", path),
             RequireNoCardConversion = requireNoCardConversion,
             RequiredPolarity = requiredPolarity,

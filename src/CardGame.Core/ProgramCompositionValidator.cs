@@ -639,7 +639,7 @@ internal static class ProgramCompositionValidator
                         if (read.AllowEmptyChainedDraw && minimum == 0 &&
                             !BoundaryGuYongComposition.AllowsEmptyRecipientDraw(effects, index, window) &&
                             !MobileZhugeJinComposition.AllowsEmptyHongyuanDraw(effects, index, window) &&
-                            (index == 0 || !ReferenceEquals(selection, effects[index - 1]) || !NativeDrawProducerRuntime.IsOptionalRecipientSelection(selection)))
+                            (index == 0 || !ReferenceEquals(selection, effects[index - 1]) || !NativeDrawProducerRuntime.IsOptionalRecipientSelection(selection, effect.Condition)))
                             Fail("an empty selected-target draw requires its immediately preceding committed optional recipient selection");
                         if (!targetSetAvailable || minimum < read.Minimum ||
                             read.Maximum is { } exactMaximum && maximum > exactMaximum)

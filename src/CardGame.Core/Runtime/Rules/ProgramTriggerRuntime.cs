@@ -120,6 +120,7 @@ internal sealed class ProgramTriggerRuntime
         var features = plan.Features;
         var legality = new ProgramTriggerLegalityContext(owner, program, plan, candidate, context);
         if (!query.CanTrigger(ProgramTriggerLegalityPhase.BeforeGainQualification, legality)) return false;
+        if (trigger.OwnerZoneLoss is { } loss && !loss.Matches(candidate.OwnerSeat, context.MovementBatch)) return false;
         if (!query.IsGainPhaseQualified(trigger, candidate.OwnerSeat, context.MovementBatch?.MovementTiming)) return false;
         if (!query.CanTrigger(ProgramTriggerLegalityPhase.BeforeAdvancedPrerequisites, legality)) return false;
         if (!query.AdvancedTriggerPrerequisites(owner, candidate.SkillId, trigger)) return false;

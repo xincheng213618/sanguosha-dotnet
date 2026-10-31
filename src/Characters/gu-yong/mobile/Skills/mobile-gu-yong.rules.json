@@ -40,23 +40,20 @@
               "sourceBind": "shown-hand"
             },
             {
-              "op": "completeMobileGuYongOnMixedHand",
-              "target": "owner",
-              "sourceBind": "shown-hand"
-            },
-            {
               "op": "selectTargets",
               "target": "owner",
               "targetKind": "anyLiving",
               "minimumTargets": 0,
               "maximumTargets": 8,
               "numberExpression": "currentHandCount",
-              "targetAiOrder": "supportDraw"
+              "targetAiOrder": "supportDraw",
+              "condition": { "kind": "boundCardsSameColor", "sourceBind": "shown-hand" }
             },
             {
               "op": "draw",
               "target": "selectedTargets",
-              "amount": 1
+              "amount": 1,
+              "condition": { "kind": "boundCardsSameColor", "sourceBind": "shown-hand" }
             }
           ]
         }

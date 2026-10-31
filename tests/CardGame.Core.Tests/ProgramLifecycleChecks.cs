@@ -73,6 +73,81 @@ internal static class ProgramLifecycleChecks
             "Program disposal must move only its own bound cards, never the parent attack card.");
     }
 
+    public static void ConditionalTargetSetsSkipPromptsAndResume()
+    {
+        foreach (var expression in new[] { "false", """["==",["hp","selectedTarget"],1]""", "true" })
+        {
+            var registry = Registry(Rules($$"""
+                {"op":"selectTargets","target":"owner","targetKind":"anyLiving","minimumTargets":0,"maximumTargets":1,"numberExpression":"currentHandCount","targetAiOrder":"supportDraw","condition":{"kind":"expression","expr":{{expression}} } },
+                {"op":"draw","target":"selectedTargets","amount":1,"condition":{"kind":"expression","expr":{{expression}} } },
+                {"op":"draw","target":"owner","amount":1}
+                """));
+            var game = CreateAndSelect(registry);
+            if (expression == "true")
+            {
+                for (var step = 0; game.PendingDecision?.Choices.Any(choice =>
+                    choice.Parameters.GetValueOrDefault("program-action") == "select-targets") != true; step++)
+                {
+                    Require(step < 80 && game.PendingDecision is null,
+                        "An enabled conditional target set must reach its original selection prompt.");
+                    Require(game.Submit(new AdvanceOneStepCommand(game.Revision)).Accepted,
+                        "The conditional target fixture could not reach selection.");
+                }
+                var frame = game.ResolutionStack.OfType<ProgramSkillFrame>().Single();
+                Require(frame.InstructionIndex == 1,
+                    "The selector commits its cursor before publishing the existing target prompt.");
+                var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(
+                    GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+                foreach (var (branch, targets) in new[] { (game, new[] { 1 }), (restored, Array.Empty<int>()) })
+                {
+                    var prompt = RequirePrompt(branch, DecisionKind.ProgramTrigger);
+                    var choice = prompt.Choices.Single(item => item.Targets.SequenceEqual(targets));
+                    Require(branch.Submit(new AnswerPromptCommand(0, prompt.PromptId, choice.Id, branch.Revision)).Accepted,
+                        "A resumed conditional target set must accept its published recipient.");
+                    ReachHumanPlay(branch);
+                    CheckDraws(branch, 1 + targets.Length, targets.Length);
+                }
+            }
+            else
+            {
+                ReachHumanPlay(game);
+                CheckDraws(game, 1, 0);
+            }
+        }
+
+        const string selector = """{"op":"selectTargets","target":"owner","targetKind":"anyLiving","minimumTargets":0,"maximumTargets":1,"numberExpression":"currentHandCount","targetAiOrder":"supportDraw","condition":CONDITION}""";
+        const string draw = """{"op":"draw","target":"selectedTargets","amount":1,"condition":CONDITION}""";
+        static string Pair(string selected, string drawn) =>
+            selector.Replace("CONDITION", selected) + "," + draw.Replace("CONDITION", drawn);
+        RejectPair(Pair("""{"kind":"expression","expr":false}""", """{"kind":"expression","expr":true}"""),
+            "immediately preceding committed optional recipient selection");
+        RejectPair("""
+            {"op":"selectOwnedCards","target":"owner","numberExpression":"allOwnedZoneCards","zones":["hand"],"resultBind":"first"},
+            {"op":"selectOwnedCards","target":"owner","numberExpression":"allOwnedZoneCards","zones":["hand"],"resultBind":"second"},
+            """ + Pair("""{"kind":"boundCardsSameColor","sourceBind":"first"}""", """{"kind":"boundCardsSameColor","sourceBind":"second"}"""),
+            "immediately preceding committed optional recipient selection");
+        RejectPair(Pair("""{"kind":"boundCardsSameColor","sourceBind":"missing"}""", """{"kind":"boundCardsSameColor","sourceBind":"missing"}"""),
+            "unknown card binding");
+
+        static void RejectPair(string effects, string error)
+        {
+            try { _ = Registry(Rules(effects)); }
+            catch (InvalidOperationException failure) when (failure.Message.Contains(error, StringComparison.Ordinal)) { return; }
+            throw new InvalidOperationException("A conditional recipient draw accepted an unmatched or missing binding.");
+        }
+
+        static void CheckDraws(GameEngine game, int total, int recipient)
+        {
+            var draws = game.CardMovements.Where(move =>
+                move.Reason.Value == "skill-program.fixture:lifecycle.Draw").ToArray();
+            Require(draws.Length == total && draws.Count(move => move.To == CardLocation.Hand(0)) == 1 &&
+                draws.Count(move => move.To == CardLocation.Hand(1)) == recipient &&
+                game.Events.Select(item => item.Payload).OfType<ProgramBindingResolvedEvent>()
+                    .Count(item => item.SkillId == FixturePackage.SkillId && item.Completed) == 1,
+                "False or unknown conditions skip selection; an enabled selection resumes once before the following owner draw.");
+        }
+    }
+
     private static void AdvanceUntilProgramResolved(GameEngine game)
     {
         for (var step = 0; step < 512; step++)

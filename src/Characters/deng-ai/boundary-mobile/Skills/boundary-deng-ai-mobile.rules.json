@@ -5,6 +5,7 @@
       "modifiers": [{ "id": "field-outgoing-distance", "query": "outgoingDistance", "operation": "add", "valueExpression": "negatedOwnedZoneCount", "valueZone": "authority", "priority": 0 }],
       "triggers": [{ "id": "judge-after-off-turn-owned-loss", "window": "cardsMoved", "subject": "owner", "sourceZones": ["hand", "equipment"],
         "movementOccurrence": "perOwnerBatch", "optional": true,
+        "ownerZoneLoss": { "zones": ["hand", "equipment"], "expectedValue": true },
         "condition": { "kind": "not", "children": [{ "kind": "ownerIsTurnPlayer" }] },
         "effects": [
           { "op": "startJudgment", "target": "owner", "judgmentReason": "skill.boundary.tuntian-mobile", "resultBind": "tuntian-card", "outcomeBind": "tuntian-outcome", "visibility": "public" },

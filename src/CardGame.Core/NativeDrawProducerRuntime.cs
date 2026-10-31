@@ -49,13 +49,19 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
             ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;
     }
 
-    internal static bool IsOptionalRecipientSelection(SkillProgramEffect? effect) => effect is
+    internal static bool IsOptionalRecipientSelection(SkillProgramEffect? effect, SkillProgramCondition drawCondition) => effect is
         { Op: SkillProgramEffectOp.SelectTargets, Target: SkillProgramEffectTarget.Owner,
           MinimumTargets: 0, TargetKind: SkillProgramTargetKind.AnyLivingChained, SourceBind: null, ReplaceSelection: true } ||
         effect is { Op: SkillProgramEffectOp.SelectTargets, Target: SkillProgramEffectTarget.Owner,
           MinimumTargets: 0, MaximumTargets: > 0 and <= 8, TargetKind: SkillProgramTargetKind.AnyLiving,
           SourceBind: null, ReplaceSelection: null, NumberExpression: SkillProgramNumberExpression.CurrentHandCount,
-          TargetAiOrder: SkillProgramTargetAiOrder.SupportDraw, Condition.Kind: SkillProgramConditionKind.Always };
+          TargetAiOrder: SkillProgramTargetAiOrder.SupportDraw } &&
+        (effect.Condition.Kind == SkillProgramConditionKind.Always ||
+         effect.Condition.Kind == drawCondition.Kind &&
+         (effect.Condition.Kind == SkillProgramConditionKind.BoundCardsSameColor &&
+            !string.IsNullOrEmpty(effect.Condition.SourceBind) && effect.Condition.SourceBind == drawCondition.SourceBind ||
+          effect.Condition.Kind == SkillProgramConditionKind.Expression && effect.Condition.Expression is { } expression &&
+            drawCondition.Expression is { } paired && expression.StructurallyEquals(paired)));
 
     internal static bool IsCommittedEmptyTargetDraw(ProgramSkillFrame frame, ProgramExecutionPlan plan, int amount) =>
         BoundaryGuYongComposition.IsCommittedEmptyRecipientDraw(frame, plan, amount) ||
@@ -70,7 +76,7 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
         // The preceding selection was validated and committed by the ordinary
         // answer path on this same cursor. An unselected/default empty list is
         // not sufficient to turn an arbitrary multi-recipient draw into a no-op.
-        IsOptionalRecipientSelection(plan.Instructions[frame.InstructionIndex - 2]);
+        IsOptionalRecipientSelection(plan.Instructions[frame.InstructionIndex - 2], draw.Condition);
 
     public SkillProgramStepOutcome BeginOperationProgramDraw(ProgramSkillFrame frame,
         int recipientSeat, int requestedCount, CardMoveReason reason)

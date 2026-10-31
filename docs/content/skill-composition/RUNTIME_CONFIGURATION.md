@@ -37,6 +37,8 @@
 
 `condition` 与触发器 `condition` 的可用种类不同。触发条件可读取冻结的 CardAction、Damage、Death、移动及实际阶段事实；不得把宿主输出事件或相邻移动拼成不存在的原生动作。
 
+移动触发器（`cardsMoved`、`cardsGained`）可加 `ownerZoneLoss` 资格，例如 `{"zones":["hand","equipment"],"expectedValue":true}`。它读取原移动批，判断是否有牌从拥有者指定区域集合移到集合之外；集合内转移不算损失，同批获得新牌也不抵消损失。`expectedValue:false` 要求没有这种损失，缺少移动批时两种期望都拒绝。区域支持手牌、装备和判定区，在可选询问和支付之前检查。
+
 ## 值与对象引用
 
 `amount` 表达固定值；`numberExpression` 表达被该操作明确允许的数量，例如 `ownerLostHp`、`boundCardCount`。动态表达式需要的来源绑定必须已存在且类型正确，不能与互斥的固定数量字段混写。
@@ -48,6 +50,8 @@
 ## 顺序与子流程
 
 `effects` 按数组顺序执行。`draw`、`recover`、`loseHp`、`giveSelected`、`discardSelected`、区域支付、判定及原生用牌均通过对应核心流程执行。可能暂停的步骤把结果和返回点保存在原程序帧；继续时读取原收据，不重新执行整段。
+
+`selectTargets` 可使用效果条件；为假时不发布选择提示。依赖这次选择的后续效果应受同一资格约束，不能把未发生的选择当成已有结果。带 `replaceSelection:true` 的替换选择仍要求无条件执行。
 
 材料移动、装备离场、获牌、回复、伤害、濒死等都可能开启子窗口。需要等待这些后果的操作必须显式使用相应续接能力；不能因为一次 `MoveBatch` 返回就假设全部原生后果已经完成。
 

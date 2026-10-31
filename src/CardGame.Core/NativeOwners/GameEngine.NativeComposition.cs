@@ -469,7 +469,6 @@ public sealed partial class GameEngine
     internal NativeOwners.MobileDianWeiProgramCapability ComposeNativeMobileDianWeiProgramCapability() => new NativeOwners.MobileDianWeiProgramCapability(() => this.DianWeiBoundaryMobileEntries);
     internal NativeOwners.MobileDongBaiHost ComposeNativeMobileDongBaiHost() => new NativeOwners.MobileDongBaiHost(() => this.DongBaiMobileEntries);
     internal NativeOwners.MobileFenxunHost ComposeNativeMobileFenxunHost() => new NativeOwners.MobileFenxunHost(() => this.DingFengMobileEntries);
-    internal NativeOwners.MobileGuYongHost ComposeNativeMobileGuYongHost() => new NativeOwners.MobileGuYongHost(() => this.ProgramLifecycleEntries, () => this.ProgramCategoryChallengesEntries, () => this.SkillProgramsEntries);
     internal NativeOwners.MobileGuixinCapability ComposeNativeMobileGuixinCapability() => new NativeOwners.MobileGuixinCapability(() => this.CaoCaoMobileGodEntries);
     internal NativeOwners.MobileGuoHuaiHost ComposeNativeMobileGuoHuaiHost() => new NativeOwners.MobileGuoHuaiHost(() => this.ProgramLifecycleEntries, () => this.GuoHuaiMobileEntries);
     internal NativeOwners.MobileHeQiHost ComposeNativeMobileHeQiHost() => new NativeOwners.MobileHeQiHost(() => this.HeQiMobileEntries);

@@ -239,9 +239,9 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
         };
         if (effect.ReplaceSelection is not null &&
             (effect.ReplaceSelection != true || kind != SkillProgramTargetKind.AnyLivingChained || minimum != 0 ||
-                numberExpression is not null || sourceBind is not null || aiOrder != SkillProgramTargetAiOrder.SupportDraw))
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}: replacement selection requires an empty-safe chained support target set.");
-        RequireAlways(effect, r.Path);
+                numberExpression is not null || sourceBind is not null || aiOrder != SkillProgramTargetAiOrder.SupportDraw ||
+                effect.Condition.Kind != SkillProgramConditionKind.Always))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: replacement selection requires an unconditional empty-safe chained support target set.");
         return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>

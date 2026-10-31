@@ -14,6 +14,7 @@
           "subject": "owner",
           "sourceZones": ["hand", "equipment"],
           "movementOccurrence": "perOwnerBatch",
+          "ownerZoneLoss": { "zones": ["hand", "equipment"], "expectedValue": true },
           "optional": true,
           "condition": { "kind": "not", "children": [{ "kind": "ownerIsTurnPlayer" }] },
           "effects": [
